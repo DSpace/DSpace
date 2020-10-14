@@ -252,8 +252,11 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
 
             solr.add(doc1);
-            //commits are executed automatically using the solr autocommit
-//            solr.commit(false, false);
+            // commits are executed automatically using the solr autocommit
+            boolean useAutoCommit = configurationService.getBooleanProperty("solr-statistics.autoCommit", true);
+            if (!useAutoCommit) {
+                solr.commit(false, false);
+            }
 
         } catch (RuntimeException re) {
             throw re;
@@ -289,7 +292,10 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
             solr.add(doc1);
             // commits are executed automatically using the solr autocommit
-            // solr.commit(false, false);
+            boolean useAutoCommit = configurationService.getBooleanProperty("solr-statistics.autoCommit", true);
+            if (!useAutoCommit) {
+                solr.commit(false, false);
+            }
 
         } catch (RuntimeException re) {
             throw re;
@@ -842,18 +848,18 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     }
 
     @Override
-    public void query(String query, int max)
+    public void query(String query, int max, int facetMinCount)
             throws SolrServerException, IOException {
-        query(query, null, null, 0, max, null, null, null, null, null, false);
+        query(query, null, null, 0, max, null, null, null, null, null, false, facetMinCount);
     }
 
     @Override
     public ObjectCount[] queryFacetField(String query,
                                          String filterQuery, String facetField, int max, boolean showTotal,
-                                         List<String> facetQueries)
+                                         List<String> facetQueries, int facetMinCount)
             throws SolrServerException, IOException {
         QueryResponse queryResponse = query(query, filterQuery, facetField,
-                                            0, max, null, null, null, facetQueries, null, false);
+                                            0, max, null, null, null, facetQueries, null, false, facetMinCount);
         if (queryResponse == null) {
             return new ObjectCount[0];
         }
@@ -887,50 +893,55 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     @Override
     public ObjectCount[] queryFacetDate(String query,
                                         String filterQuery, int max, String dateType, String dateStart,
-                                        String dateEnd, boolean showTotal, Context context)
+                                        String dateEnd, boolean showTotal, Context context, int facetMinCount)
             throws SolrServerException, IOException {
         QueryResponse queryResponse = query(query, filterQuery, null, 0, max,
-                                            dateType, dateStart, dateEnd, null, null, false);
+                                            dateType, dateStart, dateEnd, null, null, false, facetMinCount);
         if (queryResponse == null) {
             return new ObjectCount[0];
         }
 
-        FacetField dateFacet = queryResponse.getFacetDate("time");
-        // TODO: check if this cannot crash I checked it, it crashed!!!
-        // Create an array for our result
-        ObjectCount[] result = new ObjectCount[dateFacet.getValueCount()
-            + (showTotal ? 1 : 0)];
-        // Run over our datefacet & store all the values
-        for (int i = 0; i < dateFacet.getValues().size(); i++) {
-            FacetField.Count dateCount = dateFacet.getValues().get(i);
-            result[i] = new ObjectCount();
-            result[i].setCount(dateCount.getCount());
-            result[i].setValue(getDateView(dateCount.getName(), dateType, context));
+        List<RangeFacet> rangeFacets = queryResponse.getFacetRanges();
+        for (RangeFacet rangeFacet: rangeFacets) {
+            if (rangeFacet.getName().equalsIgnoreCase("time")) {
+                RangeFacet timeFacet = rangeFacet;
+                // Create an array for our result
+                ObjectCount[] result = new ObjectCount[timeFacet.getCounts().size()
+                                                       + (showTotal ? 1 : 0)];
+                // Run over our datefacet & store all the values
+                for (int i = 0; i < timeFacet.getCounts().size(); i++) {
+                    RangeFacet.Count dateCount = (RangeFacet.Count) timeFacet.getCounts().get(i);
+                    result[i] = new ObjectCount();
+                    result[i].setCount(dateCount.getCount());
+                    result[i].setValue(getDateView(dateCount.getValue(), dateType, context));
+                }
+                if (showTotal) {
+                    result[result.length - 1] = new ObjectCount();
+                    result[result.length - 1].setCount(queryResponse.getResults()
+                                                                    .getNumFound());
+                    // TODO: Make sure that this total is gotten out of the msgs.xml
+                    result[result.length - 1].setValue("total");
+                }
+                return result;
+            }
         }
-        if (showTotal) {
-            result[result.length - 1] = new ObjectCount();
-            result[result.length - 1].setCount(queryResponse.getResults()
-                                                            .getNumFound());
-            // TODO: Make sure that this total is gotten out of the msgs.xml
-            result[result.length - 1].setValue("total");
-        }
-        return result;
+        return new ObjectCount[0];
     }
 
     @Override
-    public Map<String, Integer> queryFacetQuery(String query,
-                                                String filterQuery, List<String> facetQueries)
+    public Map<String, Integer> queryFacetQuery(String query, String filterQuery, List<String> facetQueries,
+                                                int facetMinCount)
         throws SolrServerException, IOException {
         QueryResponse response = query(query, filterQuery, null, 0, 1, null, null,
-                                       null, facetQueries, null, false);
+                                       null, facetQueries, null, false, facetMinCount);
         return response.getFacetQuery();
     }
 
     @Override
-    public ObjectCount queryTotal(String query, String filterQuery)
+    public ObjectCount queryTotal(String query, String filterQuery, int facetMinCount)
         throws SolrServerException, IOException {
         QueryResponse queryResponse = query(query, filterQuery, null, 0, -1, null,
-                                            null, null, null, null, false);
+                                            null, null, null, null, false, facetMinCount);
         ObjectCount objCount = new ObjectCount();
         objCount.setCount(queryResponse.getResults().getNumFound());
 
@@ -985,7 +996,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     @Override
     public QueryResponse query(String query, String filterQuery,
                                String facetField, int rows, int max, String dateType, String dateStart,
-                               String dateEnd, List<String> facetQueries, String sort, boolean ascending)
+                               String dateEnd, List<String> facetQueries, String sort, boolean ascending,
+                               int facetMinCount)
         throws SolrServerException, IOException {
         if (solr == null) {
             return null;
@@ -993,20 +1005,20 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
         // System.out.println("QUERY");
         SolrQuery solrQuery = new SolrQuery().setRows(rows).setQuery(query)
-                                             .setFacetMinCount(1);
+                                             .setFacetMinCount(facetMinCount);
         addAdditionalSolrYearCores(solrQuery);
 
         // Set the date facet if present
         if (dateType != null) {
-            solrQuery.setParam("facet.date", "time")
+            solrQuery.setParam("facet.range", "time")
                 .
                 // EXAMPLE: NOW/MONTH+1MONTH
-                    setParam("facet.date.end",
+                    setParam("f.time.facet.range.end",
                              "NOW/" + dateType + dateEnd + dateType).setParam(
-                "facet.date.gap", "+1" + dateType)
+                "f.time.facet.range.gap", "+1" + dateType)
                 .
                 // EXAMPLE: NOW/MONTH-" + nbMonths + "MONTHS
-                    setParam("facet.date.start",
+                    setParam("f.time.facet.range.start",
                              "NOW/" + dateType + dateStart + dateType + "S")
                 .setFacet(true);
         }
@@ -1555,7 +1567,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
      * initialization at the same time.
      */
     protected synchronized void initSolrYearCores() {
-        if (statisticYearCoresInit || !(solr instanceof HttpSolrClient)) {
+        if (statisticYearCoresInit || !(solr instanceof HttpSolrClient) || !configurationService.getBooleanProperty(
+            "usage-statistics.shardedByYear", false)) {
             return;
         }
 
