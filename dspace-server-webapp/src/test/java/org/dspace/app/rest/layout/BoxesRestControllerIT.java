@@ -150,6 +150,9 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
         MetadataField lastName = mfss.findByElement(context, schema, "familyName", null);
         MetadataField provenance = mfss.findByElement(context, schema, "description", "provenance");
         MetadataField sponsorship = mfss.findByElement(context, schema, "description", "sponsorship");
+
+        MetadataField knowsLanguage = mfss.findByElement(context, schema, "knowsLanguage", null);
+
         // Create box without content
         CrisLayoutBox boxOne = CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, false)
             .withShortname("Shortname 2")
@@ -180,6 +183,28 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
             .withRendering("TEXT")
             .withBox(boxThree)
             .build();
+        CrisLayoutBox administratorBox = CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, false)
+            .withShortname("Shortname 5")
+            .withSecurity(LayoutSecurity.ADMINISTRATOR)
+            .withHeader("Header")
+            .withStyle("Style")
+            .build();
+        CrisLayoutFieldBuilder.createMetadataField(context, firstName, 0, 0)
+              .withLabel("ISSUE NUMBER")
+              .withRendering("TEXT")
+              .withBox(administratorBox)
+              .build();
+        CrisLayoutBox ownerBox = CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, false)
+             .withShortname("Shortname Owner")
+             .withSecurity(LayoutSecurity.OWNER_ONLY)
+             .withHeader("Header")
+             .withStyle("Style")
+             .build();
+        CrisLayoutFieldBuilder.createMetadataField(context, firstName, 0, 0)
+              .withLabel("ISSUE NUMBER")
+              .withRendering("ownerBox")
+              .withBox(ownerBox)
+              .build();
         // Create tab
         CrisLayoutTab tab = CrisLayoutTabBuilder.createTab(context, eTypePer, 0)
             .withShortName("Tab Shortname 1")
@@ -188,6 +213,8 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
             .addBox(boxOne)
             .addBox(boxTwo)
             .addBox(boxThree)
+            .addBox(administratorBox)
+            .addBox(ownerBox)
             .build();
         // Create box and tab for other entity type
         CrisLayoutBox boxFour = CrisLayoutBoxBuilder.createBuilder(context, eType, false, false)
