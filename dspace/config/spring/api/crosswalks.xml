@@ -14,6 +14,15 @@
 		</constructor-arg>
 	</bean>
 	
+	<bean class="org.dspace.content.integration.crosswalks.DocumentCrosswalkMapper">
+		<constructor-arg>
+			<map>
+				<entry key="person-pdf" value-ref="pdfCrosswalkPerson"></entry>
+				<entry key="person-rtf" value-ref="rtfCrosswalkPerson"></entry>
+			</map>
+		</constructor-arg>
+	</bean>
+	
 	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkBibtex">
 		<constructor-arg name="templateFileName" value="crosswalks/template/bibtex.template"/>
 		<constructor-arg name="mimeType" value="application/x-bibtex; charset=UTF-8"/>
@@ -33,6 +42,20 @@
 		<constructor-arg name="fileName" value="person.json"/>
 		<property name="converter" ref="jsonValueConverter" />
 		<property name="linesPostProcessor" ref="jsonPostProcessor" />
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.DocumentCrosswalk" id="pdfCrosswalkPerson">
+		<constructor-arg name="templateFileName" value="crosswalks/template/person.xsl"/>
+		<constructor-arg name="fileName" value="person.pdf"/>
+		<constructor-arg name="mimeType" value="application/pdf"/>
+		<constructor-arg name="referCrosswalk" ref="referCrosswalkPersonXml"/>
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.DocumentCrosswalk" id="rtfCrosswalkPerson">
+		<constructor-arg name="templateFileName" value="crosswalks/template/person.xsl"/>
+		<constructor-arg name="fileName" value="person.rtf"/>
+		<constructor-arg name="mimeType" value="application/rtf"/>
+		<constructor-arg name="referCrosswalk" ref="referCrosswalkPersonXml"/>
 	</bean>
 	
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldMapper">

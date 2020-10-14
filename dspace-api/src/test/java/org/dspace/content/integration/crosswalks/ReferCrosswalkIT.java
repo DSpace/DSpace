@@ -116,6 +116,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withOrcidIdentifier("0000-0002-9079-5932")
             .withPersonAffiliation("Company")
             .withPersonAffiliationStartDate("2018-01-01")
+            .withPersonAffiliationEndDate(PLACEHOLDER_PARENT_METADATA_VALUE)
             .withPersonAffiliationRole("Developer")
             .withDescriptionAbstract("Biography \n\t<This is my biography>")
             .withPersonCountry("England")
@@ -130,6 +131,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withPersonQualificationEndDate("2016-01-01")
             .withPersonQualification("Second Qualification")
             .withPersonQualificationStartDate("2016-01-02")
+            .withPersonQualificationEndDate(PLACEHOLDER_PARENT_METADATA_VALUE)
             .build();
 
         context.restoreAuthSystemState();
@@ -173,6 +175,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withResearcherIdentifier("0002")
             .withPersonAffiliation("Company")
             .withPersonAffiliationStartDate("2018-01-01")
+            .withPersonAffiliationEndDate(PLACEHOLDER_PARENT_METADATA_VALUE)
             .withPersonAffiliationRole("Developer")
             .withPersonCountry("England")
             .withPersonEducation("School")
@@ -225,6 +228,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withPersonAffiliation("Company")
             .withPersonAffiliationStartDate("2018-01-01")
             .withPersonAffiliationRole("Developer")
+            .withPersonAffiliationEndDate(PLACEHOLDER_PARENT_METADATA_VALUE)
             .withDescriptionAbstract("Biography: \n\t\"This is my biography\"")
             .withPersonCountry("England")
             .withPersonKnowsLanguages("English")
@@ -238,6 +242,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withPersonQualificationEndDate("2016-01-01")
             .withPersonQualification("Second Qualification")
             .withPersonQualificationStartDate("2016-01-02")
+            .withPersonQualificationEndDate(PLACEHOLDER_PARENT_METADATA_VALUE)
             .build();
 
         context.restoreAuthSystemState();
