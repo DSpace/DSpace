@@ -14,12 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.util.DCInput;
-import org.dspace.app.util.DCInputSet;
-import org.dspace.app.util.DCInputsReader;
-import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.content.MetadataField;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.MetadataFieldService;
@@ -144,8 +139,6 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
             if (dmc >= Choices.CF_UNSET) {
                 defaultMinConfidence = dmc;
             }
-
-            autoRegisterAuthorityFromInputReader();
         }
     }
 
@@ -205,7 +198,6 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
         }
     }
 
-
     /**
      * Give the minimal level of confidence required to consider valid an authority value
      * for the given metadata.
@@ -228,36 +220,5 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
             copy.add(s.replaceAll("_", "."));
         }
         return copy;
-    }
-
-
-    private void autoRegisterAuthorityFromInputReader() {
-        try {
-            DCInputsReader dcInputsReader = new DCInputsReader();
-            for (DCInputSet dcinputSet : dcInputsReader.getAllInputs(Integer.MAX_VALUE, 0)) {
-                DCInput[][] dcinputs = dcinputSet.getFields();
-                for (DCInput[] dcrows : dcinputs) {
-                    for (DCInput dcinput : dcrows) {
-                        if (StringUtils.isNotBlank(dcinput.getPairsType())
-                            || StringUtils.isNotBlank(dcinput.getVocabulary())) {
-                            String authorityName = dcinput.getPairsType();
-                            if (StringUtils.isBlank(authorityName)) {
-                                authorityName = dcinput.getVocabulary();
-                            }
-                            if (!StringUtils.equals(dcinput.getInputType(), "qualdrop_value")) {
-                                String fieldKey = makeFieldKey(dcinput.getSchema(), dcinput.getElement(),
-                                                               dcinput.getQualifier());
-                                boolean req = ConfigurationManager
-                                    .getBooleanProperty("authority.required." + fieldKey, false);
-                                controlled.put(fieldKey, true);
-                                isAuthorityRequired.put(fieldKey, req);
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (DCInputsReaderException e) {
-            throw new IllegalStateException(e.getMessage(), e);
-        }
     }
 }

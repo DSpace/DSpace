@@ -84,3 +84,28 @@ Download an assetstore from a tar file on the internet.
 ```
 docker-compose -p d7 -f docker-compose-cli.yml -f dspace/src/main/docker-compose/cli.assetstore.yml run dspace-cli
 ```
+
+## Modify DSpace Configuration in Docker
+While your Docker containers are running, you may directly modify the `local.cfg` in this directory which will change the DSpace configuration for the running Docker container. (Keep in mind, this works because our `docker-compose.yml` mounts this `[src]/dspace/src/main/docker-compose/local.cfg` from the host into the running Docker instance.)
+
+Many DSpace configuration settings will reload automatically (after a few seconds).  However, configurations which are cached by DSpace (or by Spring Boot) may require you to quickly reboot the Docker containers by running `docker-compose -p d7 down` followed by `docker-compose -p d7 up -d`.
+
+## Running DSpace CLI scripts in Docker
+While the Docker containers are running, you can use the DSpace CLI image to run any DSpace commandline script (i.e. any command that normally can be run by `[dspace]/bin/dspace`).  The general format is:
+
+```
+docker-compose -p d7 -f docker-compose-cli.yml run --rm dspace-cli [command] [parameters]
+```
+
+So, for example, to reindex all content in Discovery, normally you'd run `./dspace index-discovery -b` from commandline.  Using our DSpace CLI image, that command becomes:
+
+```
+docker-compose -p d7 -f docker-compose-cli.yml run --rm dspace-cli index-discovery -b
+```
+
+Similarly, you can see the value of any DSpace configuration (in local.cfg or dspace.cfg) by running:
+
+```
+# Output the value of `dspace.ui.url` from running Docker instance
+docker-compose -p d7 -f docker-compose-cli.yml run --rm dspace-cli dsprop -p dspace.ui.url
+```

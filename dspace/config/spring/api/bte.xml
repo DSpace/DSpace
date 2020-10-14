@@ -14,9 +14,7 @@
 			    <!-- Specify here any data loaders that you want to have access to in the command line batch import.
 			    	Key is the name that you need to specify in the "-i" option in the command line script when "-b"
 			    	option is used (which means BTE Batch import) -->
-				<entry key="pubmedXML" value-ref="pubmedFileDataLoader" />
 				<entry key="crossrefXML" value-ref="crossRefFileDataLoader" />
-				<entry key="arxivXML" value-ref="arXivFileDataLoader" />
 				<entry key="ciniiXML" value-ref="ciniiFileDataLoader" />
 				<entry key="bibtex" value-ref="bibTeXDataLoader" />
 				<entry key="ris" value-ref="risDataLoader" />
@@ -79,7 +77,6 @@
                 <value>jeissn</value>
                 <value>pisbn</value>
                 <value>eisbn</value>
-                <value>arxivCategory</value>
                 <value>keywords</value>
                 <value>mesh</value>
                 <value>language</value>
@@ -106,13 +103,9 @@
 	            <!-- Specify here any data loaders you want to include in the submission lookup process.
 	            	Dataloaders must either extend the "NetworkSubmissionLookupDataLoader" abstract class
 	            	or conform to "FileDataLoader" interface of BTE -->
-	            <entry key="pubmed" value-ref="pubmedOnlineDataLoader"/>
 	            <entry key="crossref" value-ref="crossRefOnlineDataLoader"/>
-	            <entry key="arxiv" value-ref="arXivOnlineDataLoader"/>
 	            <entry key="cinii" value-ref="ciniiOnlineDataLoader"/>
-	            <entry key="pubmedXML" value-ref="pubmedFileDataLoader"/>
 	            <entry key="crossRefXML" value-ref="crossRefFileDataLoader"/>
-	            <entry key="arXivXML" value-ref="arXivFileDataLoader"/>
 	            <entry key="ciniiXML" value-ref="ciniiFileDataLoader"/>
 	            <entry key="bibtex" value-ref="bibTeXDataLoader"/>
 	            <entry key="ris" value-ref="risDataLoader"/>
@@ -129,38 +122,9 @@
 	<bean name="phase1LinearWorkflow" class="gr.ekt.bte.core.LinearWorkflow">
 	    <property name="process">
 			<list>
-			    <ref bean="mapConverter_arxivSubject"/>
-			    <ref bean="mapConverter_pubstatusPubmed"/>
 			    <ref bean="removeLastDot"/>
 			</list>
 		</property>
-	</bean>
-	
-	<!-- Converts an input value to an output one -->
-	<bean name="mapConverter_arxivSubject" class="org.dspace.submit.lookup.MapConverterModifier" init-method="init">
-	    <constructor-arg value="mapConverter_arxivSubject Modifier"/>
-	    <property name="converterNameFile" value="mapConverter-arxivSubject.properties"/>
-	    <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
-	    <property name="fieldKeys">
-	        <list>
-	            <!-- Specify the internal BTE keys that this modifier needs to be applied for -->
-	        	<value>arxivCategory</value>
-	        </list>
-	    </property>
-	</bean>
-	
-	<!-- Converts an input value to an output one -->
-	<bean name="mapConverter_pubstatusPubmed" class="org.dspace.submit.lookup.MapConverterModifier" init-method="init">
-	    <constructor-arg value="mapConverter_pubstatusPubmed Modifier"/>
-	    <property name="converterNameFile" value="mapConverter-pubstatusPubmed.properties"/>
-	    <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
-	    <property name="defaultValue" value="Subjected to Journal"/>
-	    <property name="fieldKeys">
-	        <list>
-	            <!-- Specify the internal BTE keys that this modifier needs to be applied for -->
-	        	<value>publicationStatus</value>
-	        </list>
-	    </property>
 	</bean>
 	
 	<!-- Remove the last dot in the specified field keys -->
@@ -357,75 +321,6 @@
 			value="http://ebooks.serrelib.gr/serrelib-oai/request" />
 	</bean>
 
-	<!-- PubMed -->
-	<bean id="pubmedOnlineDataLoader" class="org.dspace.submit.lookup.PubmedOnlineDataLoader">
-		<property name="searchProvider" value="false" />
-		<property name="fieldMap" ref="pubmedInputMap" />
-	</bean>
-
-	<bean id="pubmedFileDataLoader" class="org.dspace.submit.lookup.PubmedFileDataLoader">
-		<property name="fieldMap" ref="pubmedInputMap" />
-	</bean>
-
-	<bean name="pubmedInputMap" class="java.util.HashMap" scope="prototype">
-		<constructor-arg>
-			<map key-type="java.lang.String" value-type="java.lang.String">
-				<entry key="pubmedID" value="pubmedID" />
-				<entry key="doi" value="doi" />
-				<entry key="printISSN" value="jissn" />
-				<entry key="electronicISSN" value="jeissn" />
-				<entry key="journalTitle" value="journal" />
-				<entry key="articleTitle" value="title" />
-				<entry key="pubDate" value="issued" />
-				<entry key="journalVolume" value="volume" />
-				<entry key="journalIssue" value="issue" />
-				<entry key="language" value="language" />
-				<entry key="publicationType" value="subtype" />
-				<entry key="primaryKeyword" value="keywords" />
-				<entry key="secondaryKeyword" value="keywords" />
-				<entry key="primaryMeshHeading" value="mesh" />
-				<entry key="secondaryMeshHeading" value="mesh" />
-				<entry key="startPage" value="firstpage" />
-				<entry key="endPage" value="lastpage" />
-				<entry key="abstractText" value="abstract" />
-				<entry key="publicationStatus" value="publicationStatus" />
-				<entry key="author" value="authors" />
-				<!-- Not used -->
-				<!-- 
-					<entry key="pubblicationModel" value="" />
-				 -->
-			</map>
-		</constructor-arg>
-	</bean>
-
-	<!-- Arxiv Data Loaders -->
-	<bean id="arXivOnlineDataLoader" class="org.dspace.submit.lookup.ArXivOnlineDataLoader">
-		<property name="searchProvider" value="false" />
-		<property name="fieldMap" ref="arxivInputMap" />
-	</bean>
-
-	<bean id="arXivFileDataLoader" class="org.dspace.submit.lookup.ArXivFileDataLoader">
-		<property name="fieldMap" ref="arxivInputMap" />
-	</bean>
-
-	<bean name="arxivInputMap" class="java.util.HashMap" scope="prototype">
-		<constructor-arg>
-			<map key-type="java.lang.String" value-type="java.lang.String">
-				<entry key="journalRef" value="journal" />
-				<entry key="doi" value="doi" />
-				<entry key="author" value="authors" />
-				<entry key="authorWithAffiliation" value="authorsWithAffiliation" />
-				<entry key="comment" value="note" />
-				<entry key="published" value="issued" />
-				<entry key="articleTitle" value="title" />
-				<entry key="summary" value="abstract" />
-				<entry key="id" value="url" />
-				<entry key="pdfUrl" value="fulltextUrl" />
-				<entry key="primaryCategory" value="arxivCategory" />
-				<entry key="category" value="arxivCategory" />
-			</map>
-		</constructor-arg>
-	</bean>
 
 	<!-- CrossRef Data Loaders -->
 	<bean id="crossRefOnlineDataLoader" class="org.dspace.submit.lookup.CrossRefOnlineDataLoader">
@@ -544,7 +439,6 @@
 				<entry value="chairs" key="dc.contributor.other" />
 				<entry value="abstract" key="dc.description.abstract" />
 				<entry value="allkeywords" key="dc.subject" />
-				<entry value="arxivCategory" key="dc.subject" />
 				<entry value="doi" key="dc.identifier" />
 				<entry value="publisher" key="dc.publisher" />
 				<!-- Not used - new metadata fields need to be declared for them in DSpace registry -->
@@ -553,7 +447,6 @@
 				<entry value="note" key="" />
 				<entry value="fulltextUrl" key="" />
 				<entry value="authorsWithAffiliation" key="" />
-				<entry value="pubmedID" key="" />
 				<entry value="publicationStatus" key="" />
 				<entry value="jeissn" key="" />
 				<entry value="volume" key="" />
