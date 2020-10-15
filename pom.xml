@@ -202,11 +202,11 @@
                     <version>2.7</version>
                 </plugin>
                 <!-- Used to validate License Headers (see build process) -->
-                <plugin>
-                    <groupId>com.mycila</groupId>
-                    <artifactId>license-maven-plugin</artifactId>
-                    <version>2.11</version>
-                </plugin>
+<!--                <plugin>-->
+<!--                    <groupId>com.mycila</groupId>-->
+<!--                    <artifactId>license-maven-plugin</artifactId>-->
+<!--                    <version>2.11</version>-->
+<!--                </plugin>-->
                 <!-- Used to generate a new release via Sonatype (see release profile). -->
                 <plugin>
                     <groupId>org.sonatype.plugins</groupId>
