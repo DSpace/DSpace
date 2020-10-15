@@ -78,7 +78,7 @@ public class ViewUsageStatisticsFeatureIT extends AbstractControllerIntegrationT
     private BitstreamConverter bitstreamConverter;
 
     @Autowired
-    SiteService siteService;
+    private SiteService siteService;
 
     private Site site;
     private SiteRest siteRest;
