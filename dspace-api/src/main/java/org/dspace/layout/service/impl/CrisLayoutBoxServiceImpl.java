@@ -191,7 +191,8 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
     @Override
     public List<CrisLayoutBox> findByItem(
         Context context, UUID itemUuid, Integer tabId) throws SQLException {
-        Item item = Objects.requireNonNull(itemService.find(context, itemUuid));
+        Item item = Objects.requireNonNull(itemService.find(context, itemUuid),
+                                           "The item uuid entered does not match with any item");
 
         String entityType = itemService.getMetadata(item, "relationship.type");
 
