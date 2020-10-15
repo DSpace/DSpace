@@ -15,14 +15,14 @@ import org.dspace.eperson.EPerson;
 import org.dspace.layout.CrisLayoutBox;
 
 /**
- * Service that contains methods to be called to discipline box access rights
+ * Service to be used to check box access rights
  *
  * @author Corrado Lombardi (corrado.lombardi at 4science.it)
  */
 public interface CrisLayoutBoxAccessService {
 
     /**
-     * Establish wether or not, currentUser is enabled to have access to layout data
+     * Establishes wether or not, currentUser is enabled to have access to layout data
      * contained in a layout box for a given Item.
      *
      * @param context     current Context
