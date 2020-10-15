@@ -40,7 +40,7 @@ pipeline {
                 emailext(
                         subject: "FAILURE: ${currentBuild.fullDisplayName}",
                         body: "${message}\n Open: ${env.BUILD_URL}",
-                        to: 'teamrosa@bibsys.no',
+                        to: 'testmail-utvikling@unit.no',
                         attachlog: true,
                         compresslog: true,
                         recipientProviders: [[$class: 'CulpritsRecipientProvider']]
