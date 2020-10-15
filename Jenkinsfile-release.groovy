@@ -41,19 +41,6 @@ pipeline {
                 stage('Tag, test, deploy to registry') {
                     stages {
 
-                        stage('Checkout') {
-                            steps {
-                                println(" --- Running checkout #${env.BUILD_ID} of job ${env.JOB_NAME}, git branch: ${env.BRANCH_NAME}" as java.lang.Object)
-                                script {
-                                    brageVars = checkout scm
-                                    dir('config') {
-                                        //configVars = checkout scm
-                                        git url: 'git@github.com:BIBSYSDEV/Brage6-environment.git'
-                                    }
-                                }
-                            }
-                        }
-
                         stage('Tag maven version') {
                             steps{
                                 withMaven() {
