@@ -108,6 +108,8 @@ public class DocumentCrosswalk implements StreamDisseminationCrosswalk, FileName
         // Setup XSLT
         TransformerFactory factory = TransformerFactory.newInstance();
         Transformer transformer = factory.newTransformer(getTemplate());
+        transformer.setParameter("imageDir", getImageDir());
+        transformer.setParameter("imageSuffix", ".tmp");
 
         // Resulting SAX events (the generated FO) must be piped through to FOP
         Result res = new SAXResult(fop.getDefaultHandler());
@@ -122,6 +124,11 @@ public class DocumentCrosswalk implements StreamDisseminationCrosswalk, FileName
         String parent = configurationService.getProperty("dspace.dir") + File.separator + "config" + File.separator;
         File templateFile = new File(parent, templateFileName);
         return new StreamSource(templateFile);
+    }
+
+    private String getImageDir() {
+        String tempDir = configurationService.getProperty("crosswalk.virtualfield.bitstream.tempdir", " export");
+        return new File(System.getProperty("java.io.tmpdir"), tempDir).getAbsolutePath();
     }
 
 }

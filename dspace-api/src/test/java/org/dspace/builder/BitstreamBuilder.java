@@ -105,6 +105,13 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
         return this;
     }
 
+    public BitstreamBuilder withType(String type) throws SQLException {
+
+        bitstreamService.addMetadata(context, bitstream, "dc", "type", null, null, type);
+
+        return this;
+    }
+
     private Bundle getOriginalBundle(Item item) throws SQLException, AuthorizeException {
         List<Bundle> bundles = itemService.getBundles(item, ORIGINAL);
         Bundle targetBundle = null;

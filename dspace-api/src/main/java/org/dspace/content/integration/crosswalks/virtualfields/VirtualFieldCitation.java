@@ -12,6 +12,7 @@ import java.io.ByteArrayOutputStream;
 import org.apache.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
+import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
 
 /**
@@ -25,7 +26,7 @@ public class VirtualFieldCitation implements VirtualField {
 
     private static Logger log = Logger.getLogger(VirtualFieldCitation.class);
 
-    public String[] getMetadata(Item item, String fieldName) {
+    public String[] getMetadata(Context context, Item item, String fieldName) {
         StreamDisseminationCrosswalk crosswalk = getStreamDisseminationCrosswalk(fieldName);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         String[] result = null;

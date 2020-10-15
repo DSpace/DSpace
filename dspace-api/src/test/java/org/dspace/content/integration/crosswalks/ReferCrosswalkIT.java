@@ -11,6 +11,7 @@ import static org.dspace.builder.CollectionBuilder.createCollection;
 import static org.dspace.builder.CommunityBuilder.createCommunity;
 import static org.dspace.builder.ItemBuilder.createItem;
 import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -25,9 +26,15 @@ import java.sql.SQLException;
 import org.apache.commons.io.IOUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.builder.BitstreamBuilder;
+import org.dspace.builder.BundleBuilder;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
+import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.utils.DSpace;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +47,7 @@ import org.junit.Test;
  */
 public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
-    private static final String BASE_OUTPUT_DIR_PATH = "./target/testing/dspace/assetstore/refer-crosswalk/";
+    private static final String BASE_OUTPUT_DIR_PATH = "./target/testing/dspace/assetstore/crosswalk/";
 
     private ReferCrosswalkMapper referCrosswalkMapper;
 
@@ -196,6 +203,34 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             String expectedXml = IOUtils.toString(fis, Charset.defaultCharset());
             assertThat(out.toString(), equalTo(expectedXml));
         }
+    }
+
+    @Test
+    public void testPersonXmlDisseminateWithPersonalPicture() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item item = createItem(context, collection)
+            .withTitle("John Smith")
+            .build();
+
+        Bundle bundle = BundleBuilder.createBundle(context, item)
+            .withName("ORIGINAL")
+            .build();
+
+        Bitstream bitstream = BitstreamBuilder.createBitstream(context, bundle, getFileInputStream("picture.jpeg"))
+            .withType("personal picture")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        StreamDisseminationCrosswalk streamCrosswalk = (StreamDisseminationCrosswalk) CoreServiceFactory
+            .getInstance().getPluginService().getNamedPlugin(StreamDisseminationCrosswalk.class, "person-xml");
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        streamCrosswalk.disseminate(context, item, out);
+
+        assertThat(out.toString(), containsString("<personal-picture>" + bitstream.getID() + "</personal-picture>"));
     }
 
     @Test

@@ -71,4 +71,5 @@
 	<knows-languages>
 		<language>@person.knowsLanguage@</language>
 	</knows-languages>
+	<personal-picture>@virtual.bitstream.original.picture@</personal-picture>
 </person>

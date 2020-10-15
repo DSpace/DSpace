@@ -9,6 +9,7 @@ package org.dspace.content.integration.crosswalks.virtualfields;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Item;
+import org.dspace.core.Context;
 
 /**
  * Implements virtual field processing to build custom identifier
@@ -17,7 +18,7 @@ import org.dspace.content.Item;
  */
 public class VirtualFieldHandleLocalNameIdentifier implements VirtualField {
 
-    public String[] getMetadata(Item item, String fieldName) {
+    public String[] getMetadata(Context context, Item item, String fieldName) {
 
         String handle = item.getHandle();
         int position = handle.indexOf("/");

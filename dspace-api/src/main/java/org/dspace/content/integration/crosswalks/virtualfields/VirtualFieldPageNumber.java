@@ -12,6 +12,7 @@ import java.util.List;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -29,7 +30,7 @@ public class VirtualFieldPageNumber implements VirtualField {
         this.itemService = itemService;
     }
 
-    public String[] getMetadata(Item item, String fieldName) {
+    public String[] getMetadata(Context context, Item item, String fieldName) {
         String[] virtualFieldName = fieldName.split("\\.");
         String qualifier = virtualFieldName[2];
         String separator = " - ";

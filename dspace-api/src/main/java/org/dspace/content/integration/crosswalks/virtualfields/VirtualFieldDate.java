@@ -10,6 +10,7 @@ package org.dspace.content.integration.crosswalks.virtualfields;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ public class VirtualFieldDate implements VirtualField {
         this.itemService = itemService;
     }
 
-    public String[] getMetadata(Item item, String fieldName) {
+    public String[] getMetadata(Context context, Item item, String fieldName) {
 
         String dateIssued = itemService.getMetadataFirstValue(item, "dc", "date", "issued", Item.ANY);
         if (StringUtils.isBlank(dateIssued)) {

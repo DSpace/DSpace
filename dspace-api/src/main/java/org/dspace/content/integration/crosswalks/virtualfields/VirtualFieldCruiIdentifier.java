@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -29,7 +30,7 @@ public class VirtualFieldCruiIdentifier implements VirtualField {
         this.itemService = itemService;
     }
 
-    public String[] getMetadata(Item item, String fieldName) {
+    public String[] getMetadata(Context context, Item item, String fieldName) {
         List<MetadataValue> mds = itemService.getMetadataByMetadataString(item, "dc.identifier.issn");
         String element = "";
         if (mds != null && mds.size() > 0) {

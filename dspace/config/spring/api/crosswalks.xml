@@ -45,14 +45,14 @@
 	</bean>
 	
 	<bean class="org.dspace.content.integration.crosswalks.DocumentCrosswalk" id="pdfCrosswalkPerson">
-		<constructor-arg name="templateFileName" value="crosswalks/template/person.xsl"/>
+		<constructor-arg name="templateFileName" value="crosswalks/template/person-template.xsl"/>
 		<constructor-arg name="fileName" value="person.pdf"/>
 		<constructor-arg name="mimeType" value="application/pdf"/>
 		<constructor-arg name="referCrosswalk" ref="referCrosswalkPersonXml"/>
 	</bean>
 	
 	<bean class="org.dspace.content.integration.crosswalks.DocumentCrosswalk" id="rtfCrosswalkPerson">
-		<constructor-arg name="templateFileName" value="crosswalks/template/person.xsl"/>
+		<constructor-arg name="templateFileName" value="crosswalks/template/person-template.xsl"/>
 		<constructor-arg name="fileName" value="person.rtf"/>
 		<constructor-arg name="mimeType" value="application/rtf"/>
 		<constructor-arg name="referCrosswalk" ref="referCrosswalkPersonXml"/>
@@ -71,6 +71,7 @@
 				<entry key="uniqueidentifier" value-ref="virtualFieldUniqueIdentifier" />
 				<entry key="cruiidentifier" value-ref="virtualFieldCruiIdentifier" />
 				<entry key="handlelocalname" value-ref="virtualFieldHandleLocalNameIdentifier" />
+				<entry key="bitstream" value-ref="virtualFieldBitstream" />
 			</map>
 		</constructor-arg>
 	</bean>
@@ -85,6 +86,13 @@
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldUniqueIdentifier" id="virtualFieldUniqueIdentifier"/>
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldCruiIdentifier" id="virtualFieldCruiIdentifier"/>
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldHandleLocalNameIdentifier" id="virtualFieldHandleLocalNameIdentifier"/>
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldBitstream" id="virtualFieldBitstream">
+		<constructor-arg name="bitstreamTypeMap">
+			<map>
+				<entry key="picture" value="personal picture" />
+			</map>
+		</constructor-arg>
+	</bean>
 	
 	<bean class="org.dspace.content.integration.crosswalks.converter.XmlValueConverter" id="xmlValueConverter" />
 	<bean class="org.dspace.content.integration.crosswalks.converter.JsonValueConverter" id="jsonValueConverter" />

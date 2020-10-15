@@ -14,6 +14,7 @@ import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,7 +32,7 @@ public class VirtualFieldRefererType implements VirtualField {
         this.configurationService = configurationService;
     }
 
-    public String[] getMetadata(Item item, String fieldName) {
+    public String[] getMetadata(Context context, Item item, String fieldName) {
         String[] virtualFieldName = fieldName.split("\\.");
         String qualifier = virtualFieldName[2];
         String type = configurationService.getProperty(PROPERTY_PREFIX + qualifier + "." + getAliasForm(item));

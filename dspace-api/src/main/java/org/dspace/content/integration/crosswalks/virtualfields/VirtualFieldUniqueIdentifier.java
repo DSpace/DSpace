@@ -9,6 +9,7 @@ package org.dspace.content.integration.crosswalks.virtualfields;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Item;
+import org.dspace.core.Context;
 
 /**
  * Implements virtual field processing for generate an unique identifier of the
@@ -18,7 +19,7 @@ import org.dspace.content.Item;
  */
 public class VirtualFieldUniqueIdentifier implements VirtualField {
 
-    public String[] getMetadata(Item item, String fieldName) {
+    public String[] getMetadata(Context context, Item item, String fieldName) {
         String handle = item.getHandle();
         if (StringUtils.isNotBlank(handle)) {
             return new String[] { handle.replace("/", "_") };

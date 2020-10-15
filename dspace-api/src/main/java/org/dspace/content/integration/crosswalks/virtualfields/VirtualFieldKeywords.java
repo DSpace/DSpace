@@ -12,6 +12,7 @@ import java.util.List;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -33,7 +34,7 @@ public class VirtualFieldKeywords implements VirtualField {
         this.configurationService = configurationService;
     }
 
-    public String[] getMetadata(Item item, String fieldName) {
+    public String[] getMetadata(Context context, Item item, String fieldName) {
         // Get the citation from the item
         String keywordsDC = configurationService.getProperty("crosswalk.virtualkeywords.value", "dc.subject.keywords");
 

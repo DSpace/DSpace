@@ -14,11 +14,17 @@ import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
-import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.sql.SQLException;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.builder.BitstreamBuilder;
+import org.dspace.builder.BundleBuilder;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -35,6 +41,8 @@ import org.junit.Test;
  *
  */
 public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
+
+    private static final String BASE_OUTPUT_DIR_PATH = "./target/testing/dspace/assetstore/crosswalk/";
 
     private ReferCrosswalkMapper referCrosswalkMapper;
 
@@ -56,7 +64,7 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
-    public void testPdfCrosswalkPersonDisseminate() throws Exception {
+    public void testPdfCrosswalkPersonDisseminateWithoutImage() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -67,14 +75,14 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         StreamDisseminationCrosswalk streamCrosswalkDefault = (StreamDisseminationCrosswalk) CoreServiceFactory
             .getInstance().getPluginService().getNamedPlugin(StreamDisseminationCrosswalk.class, "person-pdf");
 
-        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+        try (FileOutputStream out = new FileOutputStream(new File("/home/luca/Scrivania/test-without-image.pdf"))) {
             streamCrosswalkDefault.disseminate(context, item, out);
         }
 
     }
 
     @Test
-    public void testRtfCrosswalkPersonDisseminate() throws Exception {
+    public void testRtfCrosswalkPersonDisseminateWithoutImage() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -85,7 +93,59 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         StreamDisseminationCrosswalk streamCrosswalkDefault = (StreamDisseminationCrosswalk) CoreServiceFactory
             .getInstance().getPluginService().getNamedPlugin(StreamDisseminationCrosswalk.class, "person-rtf");
 
-        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+        try (FileOutputStream out = new FileOutputStream(new File("/home/luca/Scrivania/test-without-image.rtf"))) {
+            streamCrosswalkDefault.disseminate(context, item, out);
+        }
+
+    }
+
+    @Test
+    public void testPdfCrosswalkPersonDisseminateWithImage() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item item = buildItem();
+
+        Bundle bundle = BundleBuilder.createBundle(context, item)
+            .withName("ORIGINAL")
+            .build();
+
+        BitstreamBuilder.createBitstream(context, bundle, getFileInputStream("picture.jpeg"))
+            .withType("personal picture")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        StreamDisseminationCrosswalk streamCrosswalkDefault = (StreamDisseminationCrosswalk) CoreServiceFactory
+            .getInstance().getPluginService().getNamedPlugin(StreamDisseminationCrosswalk.class, "person-pdf");
+
+        try (FileOutputStream out = new FileOutputStream(new File("/home/luca/Scrivania/test-with-image.pdf"))) {
+            streamCrosswalkDefault.disseminate(context, item, out);
+        }
+
+    }
+
+    @Test
+    public void testRtfCrosswalkPersonDisseminateWithImage() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item item = buildItem();
+
+        Bundle bundle = BundleBuilder.createBundle(context, item)
+            .withName("ORIGINAL")
+            .build();
+
+        BitstreamBuilder.createBitstream(context, bundle, getFileInputStream("picture.jpeg"))
+            .withType("personal picture")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        StreamDisseminationCrosswalk streamCrosswalkDefault = (StreamDisseminationCrosswalk) CoreServiceFactory
+            .getInstance().getPluginService().getNamedPlugin(StreamDisseminationCrosswalk.class, "person-rtf");
+
+        try (FileOutputStream out = new FileOutputStream(new File("/home/luca/Scrivania/test-with-image.rtf"))) {
             streamCrosswalkDefault.disseminate(context, item, out);
         }
 
@@ -153,5 +213,9 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             + "nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit "
             + "esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in "
             + "culpa qui officia deserunt mollit anim id est laborum.";
+    }
+
+    private FileInputStream getFileInputStream(String name) throws FileNotFoundException {
+        return new FileInputStream(new File(BASE_OUTPUT_DIR_PATH, name));
     }
 }

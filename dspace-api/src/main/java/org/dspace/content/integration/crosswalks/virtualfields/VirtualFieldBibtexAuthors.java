@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -31,7 +32,7 @@ public class VirtualFieldBibtexAuthors implements VirtualField {
         this.itemService = itemService;
     }
 
-    public String[] getMetadata(Item item, String fieldName) {
+    public String[] getMetadata(Context context, Item item, String fieldName) {
 
         String metadata = "dc.contributor.author";
 

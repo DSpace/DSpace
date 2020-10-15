@@ -121,7 +121,7 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
         Item item = (Item) dso;
 
         List<String> lines = new ArrayList<String>();
-        appendLines(item, lines);
+        appendLines(context, item, lines);
 
         if (linesPostProcessor != null) {
             linesPostProcessor.accept(lines);
@@ -176,7 +176,7 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
         return templateLineObj;
     }
 
-    private void appendLines(Item item, List<String> lines) throws IOException {
+    private void appendLines(Context context, Item item, List<String> lines) throws IOException {
         TemplateLineGroup currentGroup = null;
 
         for (TemplateLine line : templateLines) {
@@ -188,7 +188,7 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
             }
 
             if (line.isMetadataGroupEndField()) {
-                appendMetadataGroupLines(item, currentGroup, lines);
+                appendMetadataGroupLines(context, item, currentGroup, lines);
                 currentGroup = null;
                 continue;
             }
@@ -203,7 +203,7 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
                 continue;
             }
 
-            List<String> metadataValues = getMetadataValuesForLine(line, item);
+            List<String> metadataValues = getMetadataValuesForLine(context, line, item);
             for (String metadataValue : metadataValues) {
                 appendLine(lines, line, metadataValue);
             }
@@ -214,10 +214,10 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
         return itemService.getMetadataByMetadataString(item, metadataGroupFieldName).size();
     }
 
-    private List<String> getMetadataValuesForLine(TemplateLine line, Item item) {
+    private List<String> getMetadataValuesForLine(Context context, TemplateLine line, Item item) {
         if (line.isVirtualField()) {
             VirtualField virtualField = virtualFieldMapper.getVirtualField(line.getVirtualFieldName());
-            String[] values = virtualField.getMetadata(item, line.getField());
+            String[] values = virtualField.getMetadata(context, item, line.getField());
             return values != null ? Arrays.asList(values) : Collections.emptyList();
         } else {
             return itemService.getMetadataByMetadataString(item, line.getField()).stream()
@@ -226,7 +226,7 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
         }
     }
 
-    private void appendMetadataGroupLines(Item item, TemplateLineGroup lineGroup, List<String> lines)
+    private void appendMetadataGroupLines(Context context, Item item, TemplateLineGroup lineGroup, List<String> lines)
         throws IOException {
 
         List<TemplateLine> groupLines = lineGroup.getTemplateLines();
@@ -249,7 +249,7 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
                 if (metadataValues.containsKey(field)) {
                     metadata = metadataValues.get(field);
                 } else {
-                    metadata = getMetadataValuesForLine(line, item);
+                    metadata = getMetadataValuesForLine(context, line, item);
                     metadataValues.put(field, metadata);
                 }
 
