@@ -326,8 +326,8 @@
                 }
               });
             </script>
-
-            <xsl:choose>
+              <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">&#160;</script>
+            <!--xsl:choose>
 
               <xsl:when test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='scheme']='https'">
                 <script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">&#160;</script>
@@ -335,7 +335,7 @@
               <xsl:otherwise>
                 <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">&#160;</script>
               </xsl:otherwise>
-            </xsl:choose>
+            </xsl:choose-->
           </xsl:if>
 
         </head>
