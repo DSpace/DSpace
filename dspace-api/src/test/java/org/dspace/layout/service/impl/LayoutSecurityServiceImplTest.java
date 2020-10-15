@@ -1,14 +1,14 @@
 package org.dspace.layout.service.impl;
 
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
@@ -32,23 +32,20 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 /**
- * Unit tests for CrisLayoutBoxAccessServiceImpl box grants scenarios
- *
  * @author Corrado Lombardi (corrado.lombardi at 4science.it)
  */
-
 @RunWith(MockitoJUnitRunner.class)
-public class CrisLayoutBoxAccessServiceImplTest {
+public class LayoutSecurityServiceImplTest {
 
     @Mock
     private AuthorizeService authorizeService;
     @Mock
     private ItemService itemService;
-    private CrisLayoutBoxAccessServiceImpl crisLayoutBoxAccessService;
+    private LayoutSecurityServiceImpl securityService;
 
     @Before
     public void setUp() throws Exception {
-        crisLayoutBoxAccessService = new CrisLayoutBoxAccessServiceImpl(authorizeService, itemService);
+        securityService = new LayoutSecurityServiceImpl(authorizeService, itemService);
     }
 
     /**
@@ -60,10 +57,11 @@ public class CrisLayoutBoxAccessServiceImplTest {
     public void publicAccessReturnsTrue() throws SQLException {
 
         boolean granted =
-            crisLayoutBoxAccessService.grantAccess(mock(Context.class),
-                                                   ePerson(UUID.randomUUID()),
-                                                   box(LayoutSecurity.PUBLIC),
-                                                   mock(Item.class));
+            securityService.grantAccess(LayoutSecurity.PUBLIC,
+                                        mock(Context.class),
+                                        ePerson(UUID.randomUUID()),
+                                        emptySet(),
+                                        mock(Item.class));
 
         assertThat(granted, is(true));
     }
@@ -83,8 +81,12 @@ public class CrisLayoutBoxAccessServiceImplTest {
             .thenReturn(userUuid.toString());
 
         boolean granted =
-            crisLayoutBoxAccessService
-                .grantAccess(mock(Context.class), ePerson(userUuid), box(LayoutSecurity.OWNER_ONLY), item);
+            securityService
+                .grantAccess(LayoutSecurity.OWNER_ONLY,
+                             mock(Context.class),
+                             ePerson(userUuid),
+                             emptySet(),
+                             item);
 
         assertThat(granted, is(true));
     }
@@ -106,8 +108,11 @@ public class CrisLayoutBoxAccessServiceImplTest {
             .thenReturn(ownerUuid.toString());
 
         boolean granted =
-            crisLayoutBoxAccessService
-                .grantAccess(mock(Context.class), ePerson(userUuid), box(LayoutSecurity.OWNER_ONLY), item);
+            securityService
+                .grantAccess(LayoutSecurity.OWNER_ONLY,
+                             mock(Context.class), ePerson(userUuid),
+                             emptySet(),
+                             item);
 
         assertThat(granted, is(false));
     }
@@ -126,8 +131,10 @@ public class CrisLayoutBoxAccessServiceImplTest {
         when(authorizeService.isAdmin(context)).thenReturn(true);
 
         boolean granted =
-            crisLayoutBoxAccessService
-                .grantAccess(context, mock(EPerson.class), box(LayoutSecurity.OWNER_AND_ADMINISTRATOR), item);
+            securityService
+                .grantAccess(LayoutSecurity.OWNER_AND_ADMINISTRATOR,
+                             context, mock(EPerson.class), emptySet(),
+                             item);
 
         assertThat(granted, is(true));
     }
@@ -151,8 +158,9 @@ public class CrisLayoutBoxAccessServiceImplTest {
             .thenReturn(userUuid.toString());
 
         boolean granted =
-            crisLayoutBoxAccessService
-                .grantAccess(context, ePerson(userUuid), box(LayoutSecurity.OWNER_AND_ADMINISTRATOR), item);
+            securityService
+                .grantAccess(LayoutSecurity.OWNER_AND_ADMINISTRATOR,
+                             context, ePerson(userUuid), emptySet(), item);
 
         assertThat(granted, is(true));
     }
@@ -177,8 +185,9 @@ public class CrisLayoutBoxAccessServiceImplTest {
             .thenReturn(ownerUuid.toString());
 
         boolean granted =
-            crisLayoutBoxAccessService
-                .grantAccess(context, ePerson(userUuid), box(LayoutSecurity.OWNER_AND_ADMINISTRATOR), item);
+            securityService
+                .grantAccess(LayoutSecurity.OWNER_AND_ADMINISTRATOR,
+                             context, ePerson(userUuid), emptySet(), item);
 
         assertThat(granted, is(false));
     }
@@ -196,8 +205,10 @@ public class CrisLayoutBoxAccessServiceImplTest {
         when(authorizeService.isAdmin(context)).thenReturn(true);
 
         boolean granted =
-            crisLayoutBoxAccessService
-                .grantAccess(context, mock(EPerson.class), box(LayoutSecurity.ADMINISTRATOR), mock(Item.class));
+            securityService
+                .grantAccess(LayoutSecurity.ADMINISTRATOR,
+                             context, mock(EPerson.class), emptySet(),
+                             mock(Item.class));
 
         assertThat(granted, is(true));
     }
@@ -214,9 +225,8 @@ public class CrisLayoutBoxAccessServiceImplTest {
 
         when(authorizeService.isAdmin(context)).thenReturn(false);
 
-        boolean granted =
-            crisLayoutBoxAccessService
-                .grantAccess(context, mock(EPerson.class), box(LayoutSecurity.ADMINISTRATOR), mock(Item.class));
+        boolean granted = securityService.grantAccess(LayoutSecurity.ADMINISTRATOR,
+                                                      context, mock(EPerson.class), emptySet(), mock(Item.class));
 
         assertThat(granted, is(false));
     }
@@ -237,16 +247,16 @@ public class CrisLayoutBoxAccessServiceImplTest {
         List<MetadataValue> metadataValueList = Arrays.asList(metadataValueWithAuthority(userUuid.toString()),
                                                               metadataValueWithAuthority(UUID.randomUUID().toString()));
 
-        MetadataField securityMetadataField = securityMetadataField();
+        HashSet<MetadataField> securityMetadataFieldSet = new HashSet<>(singletonList(
+            securityMetadataField()));
 
-        when(itemService.getMetadata(item, securityMetadataField.getMetadataSchema().getName(),
-                                     securityMetadataField.getElement(), null, Item.ANY, true))
+        when(itemService.getMetadata(item, securityMetadataField().getMetadataSchema().getName(),
+                                     securityMetadataField().getElement(), null, Item.ANY, true))
             .thenReturn(metadataValueList);
 
         boolean granted =
-            crisLayoutBoxAccessService
-                .grantAccess(mock(Context.class), ePerson(userUuid), box(LayoutSecurity.CUSTOM_DATA,
-                                                                         securityMetadataField), item);
+            securityService.grantAccess(LayoutSecurity.CUSTOM_DATA, mock(Context.class), ePerson(userUuid),
+                                        securityMetadataFieldSet, item);
 
         assertThat(granted, is(true));
     }
@@ -272,6 +282,8 @@ public class CrisLayoutBoxAccessServiceImplTest {
 
         MetadataField securityMetadataField = securityMetadataField();
 
+        HashSet<MetadataField> securityMetadataFieldSet = new HashSet<>(singletonList(securityMetadataField));
+
         List<MetadataValue> metadataValueList =
             Arrays.asList(metadataValueWithAuthority(securityAuthorityUuid.toString()),
                           metadataValueWithAuthority(groupUuid.toString()));
@@ -282,10 +294,10 @@ public class CrisLayoutBoxAccessServiceImplTest {
             .thenReturn(metadataValueList);
 
 
-        boolean granted =
-            crisLayoutBoxAccessService
-                .grantAccess(mock(Context.class), currentUser, box(LayoutSecurity.CUSTOM_DATA, securityMetadataField),
-                             item);
+        boolean granted = securityService.grantAccess(LayoutSecurity.CUSTOM_DATA,
+                                                      mock(Context.class), currentUser,
+                                                      securityMetadataFieldSet,
+                                                      item);
 
         assertThat(granted, is(true));
     }
@@ -308,18 +320,21 @@ public class CrisLayoutBoxAccessServiceImplTest {
 
         MetadataField securityMetadataField = securityMetadataField();
 
+        HashSet<MetadataField> securityMetadataFieldSet = new HashSet<>(
+            singletonList(securityMetadataField));
+
         List<MetadataValue> metadataValueList =
-            Collections.singletonList(metadataValueWithAuthority(securityAuthorityUuid.toString()));
+            singletonList(metadataValueWithAuthority(securityAuthorityUuid.toString()));
 
 
         when(itemService.getMetadata(item, securityMetadataField.getMetadataSchema().getName(),
                                      securityMetadataField.getElement(), null, Item.ANY, true))
             .thenReturn(metadataValueList);
 
-        boolean granted =
-            crisLayoutBoxAccessService
-                .grantAccess(mock(Context.class), ePerson(userUuid, groupUuid), box(LayoutSecurity.CUSTOM_DATA,
-                                                                                    securityMetadataField), item);
+        boolean granted = securityService.grantAccess(
+            LayoutSecurity.CUSTOM_DATA,
+            mock(Context.class), ePerson(userUuid, groupUuid),
+            securityMetadataFieldSet, item);
 
         assertThat(granted, is(false));
     }
