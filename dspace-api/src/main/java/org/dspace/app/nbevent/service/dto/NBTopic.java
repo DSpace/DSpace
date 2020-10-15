@@ -7,49 +7,40 @@
  */
 package org.dspace.app.nbevent.service.dto;
 
-import org.springframework.stereotype.Service;
+import java.util.Date;
 
-@Service
+/**
+ * This model class represent the notification broker topic concept
+ * 
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ *
+ */
 public class NBTopic {
-	private String id;
-	private String type = "openaireBrokerTopic";
-	private String name;
-	private String lastEvent;
-	private String totalSuggestion;
+    private String key;
+    private long totalEvents;
+    private Date lastEvent;
 
-	public String getId() {
-		return id;
-	}
+    public String getKey() {
+        return key;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public void setKey(String key) {
+        this.key = key;
+    }
 
-	public String getType() {
-		return type;
-	}
+    public long getTotalEvents() {
+        return totalEvents;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setTotalEvents(long totalEvents) {
+        this.totalEvents = totalEvents;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public Date getLastEvent() {
+        return lastEvent;
+    }
 
-	public String getLastEvent() {
-		return lastEvent;
-	}
-
-	public void setLastEvent(String lastEvent) {
-		this.lastEvent = lastEvent;
-	}
-
-	public String getTotalSuggestion() {
-		return totalSuggestion;
-	}
-
-	public void setTotalSuggestion(String totalSuggestion) {
-		this.totalSuggestion = totalSuggestion;
-	}
+    public void setLastEvent(Date lastEvent) {
+        this.lastEvent = lastEvent;
+    }
 }

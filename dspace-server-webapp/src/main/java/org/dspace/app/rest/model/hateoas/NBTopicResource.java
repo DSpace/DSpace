@@ -14,8 +14,8 @@ import org.dspace.app.rest.utils.Utils;
 @RelNameDSpaceResource(NBTopicRest.NAME)
 public class NBTopicResource extends DSpaceResource<NBTopicRest> {
 
-	public NBTopicResource(NBTopicRest data, Utils utils) {
-		super(data, utils);
-	}
+    public NBTopicResource(NBTopicRest data, Utils utils) {
+        super(data, utils);
+    }
 
 }

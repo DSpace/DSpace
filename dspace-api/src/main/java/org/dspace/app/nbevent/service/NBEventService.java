@@ -7,35 +7,28 @@
  */
 package org.dspace.app.nbevent.service;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.solr.client.solrj.SolrServerException;
-import org.dspace.app.exception.InvalidEnumeratedDataValueException;
-import org.dspace.app.nbevent.service.dto.NBEventImportDto;
-import org.dspace.app.nbevent.service.dto.NBEventQueryDto;
 import org.dspace.app.nbevent.service.dto.NBTopic;
+import org.dspace.content.NBEvent;
 import org.dspace.core.Context;
-import org.dspace.util.SolrImportExportException;
 
 public interface NBEventService {
 
-	NBTopic findTopicByTopicId(String topicId) throws SolrServerException, IOException, InvalidEnumeratedDataValueException;
+    public NBTopic findTopicByTopicId(String topicId);
 
-	List<NBTopic> findAllTopics(Context context, long offset, Integer count) throws SolrServerException, IOException, InvalidEnumeratedDataValueException;
+    public List<NBTopic> findAllTopics(Context context, long offset, long pageSize);
 
-	public int countTopics(Context context) throws SolrServerException, IOException;
-	
-	List<NBEventQueryDto> findEventsByTopicAndPage(Context context, String topic, long offset, int pageSize) throws SolrServerException, IOException, InvalidEnumeratedDataValueException;
+    public long countTopics(Context context);
 
-	Long countEventsByTopic(Context context, String topic) throws InvalidEnumeratedDataValueException, SolrServerException, IOException;
+    public List<NBEvent> findEventsByTopicAndPage(Context context, String topic, long offset, int pageSize);
 
-	NBEventQueryDto findEventByEventId(Context context, String id) throws SolrServerException, IOException, InvalidEnumeratedDataValueException;
+    public long countEventsByTopic(Context context, String topic);
 
-	void store(Context context, List<NBEventImportDto> entries)
-			throws SolrImportExportException, SolrServerException, IOException, SQLException;
+    public NBEvent findEventByEventId(Context context, String id);
 
-	NBEventImportDto deleteEventByResourceUUID(String id) throws SolrServerException, IOException;
-	
+    public void store(Context context, NBEvent event);
+
+    public void deleteEventByEventId(Context context, String id);
+
 }

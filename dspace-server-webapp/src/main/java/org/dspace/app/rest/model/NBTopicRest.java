@@ -7,72 +7,73 @@
  */
 package org.dspace.app.rest.model;
 
+import java.util.Date;
+
 import org.dspace.app.rest.RestResourceController;
 
+/**
+ * REST Representation of a notification broker topic
+ * 
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ *
+ */
 public class NBTopicRest extends BaseObjectRest<String> {
 
-	private static final long serialVersionUID = -7455358581579629244L;
+    private static final long serialVersionUID = -7455358581579629244L;
 
-	public static final String NAME_PLURAL = "nbtopics";
-	public static final String NAME = "nbtopic";
-	public static final String CATEGORY = RestAddressableModel.INTEGRATION;
-		
-	private String id;
-	private String type = "openaireBrokerTopic";
-	private String name;
-	private String lastEvent;
-	private String totalSuggestions;
+    public static final String NAME_PLURAL = "nbtopics";
+    public static final String NAME = "nbtopic";
+    public static final String CATEGORY = RestAddressableModel.INTEGRATION;
 
-	
-	@Override
-	public String getType() {
-		return NAME;
-	}
+    private String id;
+    private String name;
+    private Date lastEvent;
+    private long totalEvents;
 
-	@Override
-	public String getCategory() {
-		return CATEGORY;
-	}
+    @Override
+    public String getType() {
+        return NAME;
+    }
 
-	@Override
-	public Class getController() {
-		return RestResourceController.class;
-	}
+    @Override
+    public String getCategory() {
+        return CATEGORY;
+    }
 
-	public String getId() {
-		return id;
-	}
+    @Override
+    public Class getController() {
+        return RestResourceController.class;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getLastEvent() {
-		return lastEvent;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setLastEvent(String lastEvent) {
-		this.lastEvent = lastEvent;
-	}
+    public Date getLastEvent() {
+        return lastEvent;
+    }
 
-	public String getTotalSuggestions() {
-		return totalSuggestions;
-	}
+    public void setLastEvent(Date lastEvent) {
+        this.lastEvent = lastEvent;
+    }
 
-	public void setTotalSuggestions(String totalSuggestions) {
-		this.totalSuggestions = totalSuggestions;
-	}
+    public long getTotalEvents() {
+        return totalEvents;
+    }
 
-	public void setType(String type) {
-		this.type = type;
-	}
-
+    public void setTotalEvents(long totalEvents) {
+        this.totalEvents = totalEvents;
+    }
 }
