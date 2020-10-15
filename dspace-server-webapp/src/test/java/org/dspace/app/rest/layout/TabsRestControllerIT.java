@@ -527,6 +527,7 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
         // Create tabs for Person Entity
        CrisLayoutBox boxOne = CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, false)
            .withShortname("Box shortname 1")
+           .withSecurity(LayoutSecurity.PUBLIC)
            .build();
        CrisLayoutFieldBuilder.createMetadataField(context, firstName, 0, 1)
            .withLabel("LAST NAME")
@@ -541,6 +542,11 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
             .build();
         CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, false)
             .withShortname("Box shortname 2")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .build();
+        CrisLayoutBox boxThree = CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, false)
+            .withShortname("Box shortname 33")
+            .withSecurity(LayoutSecurity.ADMINISTRATOR)
             .build();
         CrisLayoutFieldBuilder.createMetadataField(context, lastName, 0, 1)
             .withLabel("LAST NAME")
@@ -552,6 +558,7 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
             .withSecurity(LayoutSecurity.PUBLIC)
             .withHeader("New Tab header")
             .addBox(box)
+            .addBox(boxThree)
             .build();
         // tab without data
         CrisLayoutTabBuilder.createTab(context, eTypePer, 2)
@@ -561,6 +568,28 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
             .addMetadatasecurity(provenance)
             .addMetadatasecurity(sponsorship)
             .build();
+        CrisLayoutTab administratorSecuredTab = CrisLayoutTabBuilder.createTab(context, eTypePer, 2)
+              .withShortName("AdministratorTab")
+              .withSecurity(LayoutSecurity.ADMINISTRATOR)
+              .withHeader("Administrator Tab header")
+              .addMetadatasecurity(provenance)
+              .addMetadatasecurity(sponsorship)
+              .build();
+        CrisLayoutBox administratorSecuredBox = CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, false)
+            .withShortname("Box shortname secured")
+            .withSecurity(LayoutSecurity.ADMINISTRATOR)
+            .build();
+        CrisLayoutFieldBuilder.createMetadataField(context, lastName, 0, 1)
+              .withLabel("LAST NAME")
+              .withRendering("TEXT")
+              .withBox(administratorSecuredBox)
+              .build();
+        CrisLayoutTab tabWithOnlySecuredBox = CrisLayoutTabBuilder.createTab(context, eTypePer, 1)
+           .withShortName("secured box holder - priority 1")
+           .withSecurity(LayoutSecurity.PUBLIC)
+           .withHeader("secured box holder")
+           .addBox(administratorSecuredBox)
+           .build();
         context.restoreAuthSystemState();
         // Test
         getClient().perform(get("/api/layout/tabs/search/findByItem").param("uuid", item.getID().toString()))
