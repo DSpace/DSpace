@@ -32,5 +32,11 @@
         <property name="description" value="Perform the bulk import of an excel file with a list of item to add, update or remove"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.BulkImport"/>
     </bean>
+    
+    <bean id="import-nbevents" class="org.dspace.app.nbevent.NBEventsScriptConfiguration" primary="true">
+        <property name="description" value="Import new openAIRE notification broker events"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.nbevent.NBEventsRunnable"/>
+    </bean>
+    
 
 </beans>

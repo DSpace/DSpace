@@ -5,19 +5,38 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.deduplication.service.dto;
+package org.dspace.app.nbevent.service.dto;
 
-public class OpenstarDto {
+import org.apache.solr.client.solrj.beans.Field;
+
+public class NBEventImportDto {
 	
+	/*
+    public static final String ORIGINAL_ID = "original_id";
+    public static final String TITLE = "title";
+    public static final String TOPIC = "topic";
+    public static final String TRUST = "trust";
+    public static final String MESSAGE = "message";
+    public static final String EVENT_ID = "event_id";
+    public static final String RESOURCE_UUID = "resource_uuid";
+    public static final String LAST_UPDATE = "last_update";
+
+	 */
+	
+    @Field("original_id")
 	private String originalId;
 	
+    @Field("title")
 	private String title;
 	
+    @Field("topic")
 	private String topic;
 	
+    @Field("trust")
 	private String trust;
 	
-	private String message;
+    @Field("message")
+	private MessageDto message;
 
 	public String getOriginalId() {
 		return originalId;
@@ -51,11 +70,12 @@ public class OpenstarDto {
 		this.trust = trust;
 	}
 
-	public String getMessage() {
+
+	public MessageDto getMessage() {
 		return message;
 	}
 
-	public void setMessage(String message) {
+	public void setMessage(MessageDto message) {
 		this.message = message;
 	}
 
