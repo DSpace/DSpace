@@ -198,6 +198,43 @@ public class UserAgreementFilterTest extends AbstractControllerIntegrationTest {
         configurationService.setProperty("user-agreement.filter-enabled", "false");
     }
 
+    @Test
+    public void tryToAccessToItemRestEndpointUserThatCanIgnoreTermsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // enabled filter that require to accept terms
+        configurationService.setProperty("user-agreement.filter-enabled", "true");
+
+        EPerson userA = EPersonBuilder.createEPerson(context)
+                                      .withNameInMetadata("Mykhaylo", "Boychuk")
+                                      .withEmail("user.a@example.com")
+                                      .withPassword(password).build();
+
+        // userA can ignore the terms
+        ePersonService.addMetadata(context, userA, "dspace", "agreements", "ignore", "en", "true");
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+
+        Item publicItem = ItemBuilder.createItem(context, col1)
+                                     .withTitle("Public item 1")
+                                     .withIssueDate("2020-10-14")
+                                     .withAuthor("Smith, Donald")
+                                     .build();
+
+        context.restoreAuthSystemState();
+
+        String tokenUserA = getAuthToken(userA.getEmail(), password);
+        getClient(tokenUserA).perform(get("/api/core/items/" + publicItem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$", is(ItemMatcher
+                                .matchItemWithTitleAndDateIssued(publicItem, "Public item 1", "2020-10-14"))));
+
+        configurationService.setProperty("user-agreement.filter-enabled", "false");
+    }
+
     private void resetOpenPathConfigurations() {
         configurationService.addPropertyValue("user-agreement.open-path-patterns", "/api/authn/status");
         configurationService.addPropertyValue("user-agreement.open-path-patterns", "/api/authn/login");
