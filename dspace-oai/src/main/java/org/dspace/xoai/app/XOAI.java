@@ -210,8 +210,6 @@ public class XOAI {
 //            for (int i = 0; i < documents.getNumFound(); i++) { // small change to prevent ArrayIndexOutOfBounds
                 Object fieldValueItemId = document.getFieldValue("item.id");
                 if (fieldValueItemId != null) {
-                    Object fieldValueItemId = documents.get(i).getFieldValue("item.id");
-                if (fieldValueItemId != null) {
                     Item item = itemService.find(context,
                             UUID.fromString((String) fieldValueItemId));
                     if (item.getLastModified().before(last)) {
