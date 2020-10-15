@@ -28,6 +28,7 @@ import org.dspace.layout.CrisLayoutTab;
 import org.dspace.layout.dao.CrisLayoutTabDAO;
 import org.dspace.layout.service.CrisLayoutBoxAccessService;
 import org.dspace.layout.service.CrisLayoutBoxService;
+import org.dspace.layout.service.CrisLayoutTabAccessService;
 import org.dspace.layout.service.CrisLayoutTabService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -53,14 +54,19 @@ public class CrisLayoutTabServiceImpl implements CrisLayoutTabService {
     @Autowired
     private  CrisLayoutBoxAccessService crisLayoutBoxAccessService;
 
+    @Autowired
+    private CrisLayoutTabAccessService crisLayoutTabAccessService;
+
     public CrisLayoutTabServiceImpl(CrisLayoutTabDAO dao, AuthorizeService authorizeService,
                                     ItemService itemService, CrisLayoutBoxService boxService,
-                                    CrisLayoutBoxAccessService crisLayoutBoxAccessService) {
+                                    CrisLayoutBoxAccessService crisLayoutBoxAccessService,
+                                    CrisLayoutTabAccessService crisLayoutTabAccessService) {
         this.dao = dao;
         this.authorizeService = authorizeService;
         this.itemService = itemService;
         this.boxService = boxService;
         this.crisLayoutBoxAccessService = crisLayoutBoxAccessService;
+        this.crisLayoutTabAccessService = crisLayoutTabAccessService;
     }
 
     public CrisLayoutTabServiceImpl() {
@@ -197,29 +203,36 @@ public class CrisLayoutTabServiceImpl implements CrisLayoutTabService {
             return Collections.emptyList();
         }
 
-        //        if (CollectionUtils.isEmpty(itemMetadata)) {
-//            return Collections.emptyList();
-//        }
-
-        return tabs.stream().filter(t -> CollectionUtils.isNotEmpty(t.getTab2Box()))
+        return tabs.stream()
+                   .filter(t -> tabGrantedAccess(context, t, item))
+                   .filter(t -> CollectionUtils.isNotEmpty(t.getTab2Box()))
                    .filter(t -> hasABoxToDisplay(context, t, item))
                    .collect(Collectors.toList());
     }
 
     private boolean hasABoxToDisplay(Context context, CrisLayoutTab tab,
                                      Item item) {
-        Predicate<CrisLayoutBox> isGranted = box -> granted(context, item, box);
+        Predicate<CrisLayoutBox> isGranted = box -> boxGrantedAccess(context, item, box);
         Predicate<CrisLayoutBox> hasContent = box -> boxService.hasContent(context, box, item.getMetadata());
         return tab.getTab2Box().stream()
                   .map(t2b -> t2b.getBox())
                   .anyMatch(isGranted.and(hasContent));
     }
 
-    private boolean granted(Context context, Item item, CrisLayoutBox box) {
+    private boolean boxGrantedAccess(Context context, Item item, CrisLayoutBox box) {
         try {
             return crisLayoutBoxAccessService.grantAccess(context,
                                                           context.getCurrentUser(), box,
                                                           item);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    private boolean tabGrantedAccess(Context context, CrisLayoutTab tab, Item item) {
+        try {
+            return crisLayoutTabAccessService.grantAccess(context, context.getCurrentUser(),
+                                                          tab, item);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
