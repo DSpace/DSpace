@@ -253,4 +253,46 @@ public class ViewWorkflowStatisticsFeatureIT extends AbstractControllerIntegrati
             .andExpect(jsonPath("$.page.totalElements", greaterThan(0)))
             .andExpect(jsonPath("$._embedded").exists());
     }
+
+    @Test
+    public void anonymousCollectionAdminNotRequiredSuccess() throws Exception {
+        configurationService.setProperty("usage-statistics.authorization.admin.workflow", false);
+
+        getClient().perform(
+            get("/api/authz/authorizations/search/object")
+                .param("embed", "feature")
+                .param("feature", feature)
+                .param("uri", utils.linkToSingleResource(collectionARest, "self").getHref()))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$.page.totalElements", greaterThan(0)))
+                               .andExpect(jsonPath("$._embedded").exists());
+    }
+
+    @Test
+    public void anonymousCommunityAdminNotRequiredSuccess() throws Exception {
+        configurationService.setProperty("usage-statistics.authorization.admin.workflow", false);
+
+        getClient().perform(
+            get("/api/authz/authorizations/search/object")
+                .param("embed", "feature")
+                .param("feature", feature)
+                .param("uri", utils.linkToSingleResource(communityARest, "self").getHref()))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$.page.totalElements", greaterThan(0)))
+                               .andExpect(jsonPath("$._embedded").exists());
+    }
+
+    @Test
+    public void anonymousSiteAdminNotRequiredSuccess() throws Exception {
+        configurationService.setProperty("usage-statistics.authorization.admin.workflow", false);
+
+        getClient().perform(
+            get("/api/authz/authorizations/search/object")
+                .param("embed", "feature")
+                .param("feature", feature)
+                .param("uri", utils.linkToSingleResource(siteRest, "self").getHref()))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$.page.totalElements", greaterThan(0)))
+                               .andExpect(jsonPath("$._embedded").exists());
+    }
 }

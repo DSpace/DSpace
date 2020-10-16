@@ -13,11 +13,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.dspace.app.rest.converter.CommunityConverter;
 import org.dspace.app.rest.converter.SiteConverter;
+import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.utils.Utils;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.content.Community;
 import org.dspace.content.Site;
 import org.dspace.content.service.SiteService;
 import org.dspace.services.ConfigurationService;
@@ -42,8 +46,15 @@ public class ViewSearchStatisticsFeatureIT extends AbstractControllerIntegration
     @Autowired
     SiteService siteService;
 
+
+    @Autowired
+    private CommunityConverter communityConverter;
+
     private Site site;
     private SiteRest siteRest;
+    ;
+    private Community communityA;
+    private CommunityRest communityARest;
 
     final String feature = "canViewSearchStatistics";
 
@@ -51,9 +62,30 @@ public class ViewSearchStatisticsFeatureIT extends AbstractControllerIntegration
     @Before
     public void setUp() throws Exception {
         super.setUp();
+        context.turnOffAuthorisationSystem();
+
 
         site = siteService.findSite(context);
         siteRest = siteConverter.convert(site, Projection.DEFAULT);
+        communityA = CommunityBuilder.createCommunity(context)
+                                     .withName("communityA")
+                                     .build();
+        context.restoreAuthSystemState();
+        communityARest = communityConverter.convert(communityA, Projection.DEFAULT);
+
+    }
+
+    @Test
+    public void adminCommunityAdminRequiredNotFound() throws Exception {
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(
+            get("/api/authz/authorizations/search/object")
+                .param("embed", "feature")
+                .param("feature", feature)
+                .param("uri", utils.linkToSingleResource(communityARest, "self").getHref()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.page.totalElements", is(0)))
+                             .andExpect(jsonPath("$._embedded").doesNotExist());
     }
 
     @Test
@@ -95,5 +127,19 @@ public class ViewSearchStatisticsFeatureIT extends AbstractControllerIntegration
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.totalElements", greaterThan(0)))
             .andExpect(jsonPath("$._embedded").exists());
+    }
+
+    @Test
+    public void anonymousSiteAdminNotRequiredSuccess() throws Exception {
+        configurationService.setProperty("usage-statistics.authorization.admin.search", false);
+
+        getClient().perform(
+            get("/api/authz/authorizations/search/object")
+                .param("embed", "feature")
+                .param("feature", feature)
+                .param("uri", utils.linkToSingleResource(siteRest, "self").getHref()))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$.page.totalElements", greaterThan(0)))
+                               .andExpect(jsonPath("$._embedded").exists());
     }
 }
