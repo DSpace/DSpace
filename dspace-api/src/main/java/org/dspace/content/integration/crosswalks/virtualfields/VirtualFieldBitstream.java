@@ -82,11 +82,12 @@ public class VirtualFieldBitstream implements VirtualField {
             }
 
             String tempFileName = bitstream.getID().toString();
-            File tempFile = File.createTempFile(tempFileName, ".tmp", getTempExportDir());
+            File tempFile = new File(getTempExportDir(), tempFileName);
+            tempFile.createNewFile();
             tempFile.deleteOnExit();
             try (FileOutputStream outputStream = new FileOutputStream(tempFile)) {
                 IOUtils.copy(inputStream, outputStream);
-                return new String[] { tempFileName };
+                return new String[] { tempFile.getName() };
             }
 
         } catch (Exception e) {

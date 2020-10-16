@@ -9,6 +9,12 @@ package org.dspace.content.integration.crosswalks.virtualfields;
 
 import org.dspace.content.Item;
 
+/**
+ * Interface for virtual field that allow to get metadata from item and add metadata to an item.
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ */
 public interface VirtualField extends VirtualFieldDisseminator, VirtualFieldIngester {
 
     public default boolean addMetadata(Item item, String fieldName, String value) {

@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 
 /**
  * Consumer implementation to post process all the lines of the generated json.
+ * It is used to remove the commas present before an } or a ] character.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *

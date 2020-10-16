@@ -32,6 +32,13 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 
+/**
+ * Implementation of {@link StreamDisseminationCrosswalk} to produce a document
+ * in a specific format (pdf, rtf etc...) from an item.
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ */
 public class DocumentCrosswalk implements StreamDisseminationCrosswalk, FileNameDisseminator {
 
     private final ConfigurationService configurationService;
@@ -109,14 +116,12 @@ public class DocumentCrosswalk implements StreamDisseminationCrosswalk, FileName
         TransformerFactory factory = TransformerFactory.newInstance();
         Transformer transformer = factory.newTransformer(getTemplate());
         transformer.setParameter("imageDir", getImageDir());
-        transformer.setParameter("imageSuffix", ".tmp");
 
         // Resulting SAX events (the generated FO) must be piped through to FOP
         Result res = new SAXResult(fop.getDefaultHandler());
 
         // Start XSLT transformation and FOP processing
-        // That's where the XML is first transformed to XSL-FO and then
-        // PDF is created
+        // That's where the XML is first transformed to XSL-FO and then PDF is created
         transformer.transform(xmlSource, res);
     }
 

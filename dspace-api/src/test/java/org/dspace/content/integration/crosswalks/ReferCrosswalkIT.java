@@ -218,7 +218,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withName("ORIGINAL")
             .build();
 
-        Bitstream bitstream = BitstreamBuilder.createBitstream(context, bundle, getFileInputStream("picture.jpeg"))
+        Bitstream bitstream = BitstreamBuilder.createBitstream(context, bundle, getFileInputStream("picture.jpg"))
             .withType("personal picture")
             .build();
 

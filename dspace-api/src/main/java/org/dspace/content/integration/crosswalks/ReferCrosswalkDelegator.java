@@ -20,7 +20,8 @@ import org.dspace.core.SelfNamedPlugin;
 import org.dspace.utils.DSpace;
 
 /**
- * Delegator class to call one of the {@link ReferCrosswalk} bean by name.
+ * Delegator class to call one of the {@link ReferCrosswalk} bean
+ * searching it in the {@link ReferCrosswalkMapper}.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
