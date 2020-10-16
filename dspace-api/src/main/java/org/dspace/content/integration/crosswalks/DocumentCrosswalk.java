@@ -73,7 +73,7 @@ public class DocumentCrosswalk implements StreamDisseminationCrosswalk, FileName
         ByteArrayInputStream xmlInputStream = getItemAsXml(context, item);
 
         try {
-            transformToPdf(out, xmlInputStream);
+            transformToDocument(out, xmlInputStream);
         } catch (Exception e) {
             throw new CrosswalkException(e);
         }
@@ -102,7 +102,7 @@ public class DocumentCrosswalk implements StreamDisseminationCrosswalk, FileName
         return new ByteArrayInputStream(baos.toByteArray());
     }
 
-    private void transformToPdf(OutputStream out, ByteArrayInputStream xmlInputStream) throws Exception {
+    private void transformToDocument(OutputStream out, ByteArrayInputStream xmlInputStream) throws Exception {
         // the XML file which provides the input
         StreamSource xmlSource = new StreamSource(xmlInputStream);
         // create an instance of fop factory
