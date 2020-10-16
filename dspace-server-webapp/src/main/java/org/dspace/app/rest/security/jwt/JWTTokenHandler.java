@@ -149,11 +149,9 @@ public abstract class JWTTokenHandler {
             }
 
             return ePerson;
-        } else {
-            log.warn("Origin '" + getRequestOrigin(request) +
-                         "' tried to use a token which is either expired or not valid for this origin");
-            return null;
         }
+        // Token was either invalid or expired (see isValidToken()), so block it from being used
+        return null;
     }
 
     /**
@@ -287,16 +285,28 @@ public abstract class JWTTokenHandler {
     protected boolean isValidToken(HttpServletRequest request, SignedJWT signedJWT, JWTClaimsSet jwtClaimsSet,
                                  EPerson ePerson) throws JOSEException {
         if (ePerson == null || StringUtils.isBlank(ePerson.getSessionSalt())) {
+            // no active session exists for this EPerson, or no EPerson was found
             return false;
         } else {
+            // Check signature on token based on current request & EPerson
             JWSVerifier verifier = new MACVerifier(buildSigningKey(request, ePerson));
+            if (!signedJWT.verify(verifier)) {
+                // This token is not valid for this request or EPerson. Log a warning of possible token reuse attempt
+                log.warn("EPerson '" + ePerson.getEmail() + "' at Origin '" + getRequestOrigin(request) + "' tried " +
+                             "to reuse a token which is not valid for this Origin or EPerson.");
+                return false;
+            }
 
-            //If token is valid and not expired return eperson in token
+            // Check if token is expired
+            // Ensure expiration timestamp is after the current time, with a minute of acceptable clock skew.
             Date expirationTime = jwtClaimsSet.getExpirationTime();
-            return signedJWT.verify(verifier)
-                && expirationTime != null
-                //Ensure expiration timestamp is after the current time, with a minute of acceptable clock skew.
-                && DateUtils.isAfter(expirationTime, new Date(), MAX_CLOCK_SKEW_SECONDS);
+            if (expirationTime != null && DateUtils.isAfter(expirationTime, new Date(), MAX_CLOCK_SKEW_SECONDS)) {
+                // token is both valid & not expired
+                return true;
+            } else {
+                // token is expired
+                return false;
+            }
         }
     }
 
@@ -407,7 +417,7 @@ public abstract class JWTTokenHandler {
 
     /**
      * Retrieve the Origin information from the request. First checks for the "Origin" header,
-     * if not found falls back to the "Referer" header.
+     * if not found falls back to the "Referer" header. If both are empty, looks for our custom X-DSpace-UI header.
      * <P>
      * NOTE: If URL found includes a path, that path is removed. For instance, if the
      * Origin=https://dspace.org/license/ then this method will return https://dspace.org
@@ -417,10 +427,21 @@ public abstract class JWTTokenHandler {
      * @return found origin (or null if not able to determine)
      */
     private String getRequestOrigin(HttpServletRequest request) {
+        // First we check for "Origin" header, as it is the most trustworthy.
+        // It is set automatically by most browsers & modification is usually blocked by browser.
         String source = request.getHeader("Origin");
         if (StringUtils.isBlank(source)) {
-            // If empty fallback to "Referer" header
+            // If empty fallback to "Referer" header.
+            // Again, it is set automatically & modification is usually blocked by browser.
             source = request.getHeader("Referer");
+        }
+
+        // If both of the above headers are empty, then this may be a non-browser access.
+        // This may occur with our Angular UI when Server Side Rendering (SSR) sent the request, as
+        // Angular Universal (SSR) doesn't always provide Origin or Referer headers.
+        if (StringUtils.isBlank(source)) {
+            // Check for our custom X-DSpace-UI header which is passed by our UI in every request
+            source = request.getHeader("X-DSpace-UI");
         }
 
         // Return base URL (this removes any path, etc)

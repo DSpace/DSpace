@@ -154,7 +154,7 @@ public class Application extends SpringBootServletInitializer {
                             // Allow list of request preflight headers allowed to be sent to us from the client
                             .allowedHeaders("Authorization", "Content-Type", "X-Requested-With", "accept", "Origin",
                                             "Access-Control-Request-Method", "Access-Control-Request-Headers",
-                                            "X-On-Behalf-Of")
+                                            "X-On-Behalf-Of", "X-DSpace-UI")
                             // Allow list of response headers allowed to be sent by us (the server)
                             .exposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials",
                                             "Authorization");

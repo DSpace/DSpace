@@ -363,12 +363,45 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
+    public void testReuseTokenFromSameOrigin() throws Exception {
+        // Simulate a login from a specific, trusted origin
+        // NOTE: "https://dspace.org" is added to "rest.cors.allowed-origins" setting for test environment
+        String trustedOrigin = "https://dspace.org";
+        String token = getAuthTokenWithOrigin(eperson.getEmail(), password, trustedOrigin);
+
+        // Test token works when same "Origin" header is passed
+        getClient(token).perform(get("/api/authn/status")
+                                     .header("Origin", trustedOrigin))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
+
+        // Test token works when same origin is passed in "Referer" header
+        getClient(token).perform(get("/api/authn/status")
+                                     .header("Referer", trustedOrigin))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
+
+
+        // Test token works when same origin is passed in "X-DSpace-UI" custom header
+        getClient(token).perform(get("/api/authn/status")
+                                     .header("X-DSpace-UI", trustedOrigin))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
+
+    }
+
+    @Test
     public void testReuseTokenFromUntrustedOrigin() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
 
         // Test token works
         getClient(token).perform(get("/api/authn/status"))
-
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.okay", is(true)))
                         .andExpect(jsonPath("$.authenticated", is(true)))
@@ -384,29 +417,41 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
     @Test
     public void testReuseTokenWithDifferentTrustedOrigin() throws Exception {
-        // NOTE: By default we do NOT allow token reuse from different origins (even if trusted)
-        String token = getAuthToken(eperson.getEmail(), password);
+        // NOTE: By default we do NOT allow token reuse from different origins (even if origin is trusted)
+        // Simulate a login originating from our UI's origin (which is trusted by default)
+        String uiUrl = configurationService.getProperty("dspace.ui.url");
+        String token = getAuthTokenWithOrigin(eperson.getEmail(), password, uiUrl);
+        // NOTE: "https://dspace.org" is added to "rest.cors.allowed-origins" setting for test environment
+        String differentTrustedOrigin = "https://dspace.org";
 
-        // Test token works
-        getClient(token).perform(get("/api/authn/status"))
+        // Test token works when accessed from same Origin
+        getClient(token).perform(get("/api/authn/status")
+                                    .header("Origin", uiUrl))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.okay", is(true)))
                 .andExpect(jsonPath("$.authenticated", is(true)))
                 .andExpect(jsonPath("$.type", is("status")));
 
-        // Test token still doesn't work from a different origin, even though it's trusted
-        // NOTE: "https://dspace.org" is added to "rest.cors.allowed-origins" setting for test environment
+        // Test token does NOT work from a different origin, even though it's trusted
         getClient(token).perform(get("/api/authn/status")
-                                     .header("Origin", "https://dspace.org"))
+                                     .header("Origin", differentTrustedOrigin))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.okay", is(true)))
                         .andExpect(jsonPath("$.authenticated", is(false)))
                         .andExpect(jsonPath("$.type", is("status")));
 
 
-        // Test token also doesn't work from different (but trusted) Referer
+        // Test token does NOT work from different (but trusted) Referer
         getClient(token).perform(get("/api/authn/status")
-                                     .header("Referer", "https://dspace.org"))
+                                     .header("Referer", differentTrustedOrigin))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(false)))
+                        .andExpect(jsonPath("$.type", is("status")));
+
+        // Test token does NOT work from different (but trusted) UI (X-DSpace-UI sent on all requests from UI)
+        getClient(token).perform(get("/api/authn/status")
+                                     .header("X-DSpace-UI", differentTrustedOrigin))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.okay", is(true)))
                         .andExpect(jsonPath("$.authenticated", is(false)))
@@ -419,11 +464,16 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         // Disable signing of token with Origin. This allows token to be used cross-origin
         configurationService.setProperty("jwt.login.token.include.origin", "false");
 
-        String token = getAuthToken(eperson.getEmail(), password);
+        // Simulate a login originating from our UI's origin (which is trusted by default)
+        String uiUrl = configurationService.getProperty("dspace.ui.url");
+        String token = getAuthTokenWithOrigin(eperson.getEmail(), password, uiUrl);
 
-        // Test token works
-        getClient(token).perform(get("/api/authn/status"))
+        // NOTE: "https://dspace.org" is added to "rest.cors.allowed-origins" setting for test environment
+        String differentTrustedOrigin = "https://dspace.org";
 
+        // Test token works from same Origin
+        getClient(token).perform(get("/api/authn/status")
+                                     .header("Origin", uiUrl))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.okay", is(true)))
                         .andExpect(jsonPath("$.authenticated", is(true)))
@@ -431,7 +481,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         // Test token now works from different trusted Origin
         getClient(token).perform(get("/api/authn/status")
-                                     .header("Origin", "https://dspace.org"))
+                                     .header("Origin", differentTrustedOrigin))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.okay", is(true)))
                         .andExpect(jsonPath("$.authenticated", is(true)))
@@ -439,7 +489,15 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         // Test token now works from different trusted Referer
         getClient(token).perform(get("/api/authn/status")
-                                     .header("Referer", "https://dspace.org"))
+                                     .header("Referer", differentTrustedOrigin))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
+
+        // Test token now works from different trusted UI (X-DSpace-UI sent on all requests from UI)
+        getClient(token).perform(get("/api/authn/status")
+                                     .header("X-DSpace-UI", differentTrustedOrigin))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.okay", is(true)))
                         .andExpect(jsonPath("$.authenticated", is(true)))

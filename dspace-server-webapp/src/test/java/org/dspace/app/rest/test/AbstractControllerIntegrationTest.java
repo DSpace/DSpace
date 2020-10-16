@@ -135,6 +135,15 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
                           .andReturn().getResponse();
     }
 
+    public MockHttpServletResponse getAuthResponseWithOrigin(String user, String password,
+                                                             String origin) throws Exception {
+        return getClient().perform(post("/api/authn/login")
+                                       .param("user", user)
+                                       .param("password", password)
+                                       .header("Origin", origin))
+                          .andReturn().getResponse();
+    }
+
     public MockHttpServletResponse getAuthResponseWithXForwardedForHeader(String user, String password,
                                                                           String xForwardedFor) throws Exception {
         return getClient().perform(post("/api/authn/login")
@@ -148,6 +157,12 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     public String getAuthToken(String user, String password) throws Exception {
         return StringUtils.substringAfter(
             getAuthResponse(user, password).getHeader(AUTHORIZATION_HEADER),
+            AUTHORIZATION_TYPE);
+    }
+
+    public String getAuthTokenWithOrigin(String user, String password, String originHeader) throws Exception {
+        return StringUtils.substringAfter(
+            getAuthResponseWithOrigin(user, password, originHeader).getHeader(AUTHORIZATION_HEADER),
             AUTHORIZATION_TYPE);
     }
 
