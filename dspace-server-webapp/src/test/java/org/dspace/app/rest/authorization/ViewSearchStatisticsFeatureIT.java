@@ -52,7 +52,6 @@ public class ViewSearchStatisticsFeatureIT extends AbstractControllerIntegration
 
     private Site site;
     private SiteRest siteRest;
-    ;
     private Community communityA;
     private CommunityRest communityARest;
 
