@@ -25,15 +25,15 @@ public interface LayoutSecurityService {
 
     /**
      * Checks if given a {@link LayoutSecurity} value, a set of {@link MetadataField} metadata security fields,
-     * access to required {@link Item} to {@link EPerson} currentUser has to be granted
+     * access to required {@link Item} to {@link EPerson} user has to be granted
      *
-     * @param layoutSecurity security policy to be checked
-     * @param context current context
-     * @param currentUser current user
+     * @param layoutSecurity         security policy to be checked
+     * @param context                current context
+     * @param user                   user whom access right has to be checked
      * @param metadataSecurityFields set of {@link MetadataField} driving security policy
-     * @param item Item to check whether or not access has to be granted
+     * @param item                   Item to check whether or not access has to be granted
      * @return {@code true} if access has to be granted, {@code false} otherwise.
      */
-    boolean grantAccess(LayoutSecurity layoutSecurity, Context context, EPerson currentUser,
-                        Set<MetadataField> metadataSecurityFields, Item item) throws SQLException;
+    boolean hasAccess(LayoutSecurity layoutSecurity, Context context, EPerson user,
+                      Set<MetadataField> metadataSecurityFields, Item item) throws SQLException;
 }

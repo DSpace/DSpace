@@ -22,16 +22,16 @@ import org.dspace.layout.CrisLayoutTab;
 public interface CrisLayoutTabAccessService {
 
     /**
-     * Establishes wether or not, currentUser is enabled to have access to layout data
+     * Establishes wether or not, a user is enabled to have access to layout data
      * contained in a layout tab for a given Item.
      *
-     * @param context     current Context
-     * @param currentUser user
-     * @param tab         layout tab
-     * @param item        item to whom metadata contained in the box belong to
+     * @param context current Context
+     * @param user    user
+     * @param tab     layout tab
+     * @param item    item to whom metadata contained in the box belong to
      * @return true if access has to be granded, false otherwise
      * @throws SQLException in case of error during database access
      */
-    boolean grantAccess(Context context, EPerson currentUser, CrisLayoutTab tab, Item item)
+    boolean hasAccess(Context context, EPerson user, CrisLayoutTab tab, Item item)
         throws SQLException;
 }

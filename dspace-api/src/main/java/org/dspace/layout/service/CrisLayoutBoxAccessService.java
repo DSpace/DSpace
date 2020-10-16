@@ -22,16 +22,16 @@ import org.dspace.layout.CrisLayoutBox;
 public interface CrisLayoutBoxAccessService {
 
     /**
-     * Establishes wether or not, currentUser is enabled to have access to layout data
+     * Establishes wether or not, user is enabled to have access to layout data
      * contained in a layout box for a given Item.
      *
-     * @param context     current Context
-     * @param currentUser user
-     * @param box         layout box
-     * @param item        item to whom metadata contained in the box belong to
+     * @param context current Context
+     * @param user    user to be checked
+     * @param box     layout box
+     * @param item    item to whom metadata contained in the box belong to
      * @return true if access has to be granded, false otherwise
      * @throws SQLException in case of error during database access
      */
-    boolean grantAccess(Context context, EPerson currentUser, CrisLayoutBox box, Item item)
+    boolean hasAccess(Context context, EPerson user, CrisLayoutBox box, Item item)
         throws SQLException;
 }

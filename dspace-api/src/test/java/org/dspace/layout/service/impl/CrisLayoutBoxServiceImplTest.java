@@ -196,7 +196,7 @@ public class CrisLayoutBoxServiceImplTest {
                 crisLayoutBox("box2", barMetadata),
                 crisLayoutBox("box3", bazMetadata)));
 
-        when(crisLayoutBoxAccessService.grantAccess(any(), any(), any(), any()))
+        when(crisLayoutBoxAccessService.hasAccess(any(), any(), any(), any()))
             .thenReturn(true);
 
         when(item.getMetadata()).thenReturn(itemMetadata);
@@ -238,11 +238,11 @@ public class CrisLayoutBoxServiceImplTest {
         when(dao.findByEntityType(any(Context.class), eq("EntityType"), eq(tabId), any(), any()))
             .thenReturn(Arrays.asList(fooBox, barBox, bazBox));
 
-        when(crisLayoutBoxAccessService.grantAccess(any(), any(), eq(fooBox), any()))
+        when(crisLayoutBoxAccessService.hasAccess(any(), any(), eq(fooBox), any()))
             .thenReturn(true);
-        when(crisLayoutBoxAccessService.grantAccess(any(), any(), eq(barBox), any()))
+        when(crisLayoutBoxAccessService.hasAccess(any(), any(), eq(barBox), any()))
             .thenReturn(true);
-        when(crisLayoutBoxAccessService.grantAccess(any(), any(), eq(bazBox), any()))
+        when(crisLayoutBoxAccessService.hasAccess(any(), any(), eq(bazBox), any()))
             .thenReturn(false);
 
         when(item.getMetadata()).thenReturn(itemMetadata);

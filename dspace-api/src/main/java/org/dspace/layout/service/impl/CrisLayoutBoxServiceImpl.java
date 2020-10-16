@@ -61,6 +61,7 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
     @Autowired
     private CrisLayoutBoxAccessService crisLayoutBoxAccessService;
 
+    //constructor with all fields injected, used for test purposes (mock injection)
     CrisLayoutBoxServiceImpl(CrisLayoutBoxDAO dao, ItemService itemService, AuthorizeService authorizeService,
                              EntityTypeService entityTypeService,
                              CrisLayoutBoxAccessService crisLayoutBoxAccessService) {
@@ -204,8 +205,8 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
                        .filter(im -> !im.isEmpty())
                        .map(itemMetadata -> boxes
                            .stream()
-                           .filter(b -> accessGranted(context, item, b))
                            .filter(b -> hasContent(context, b, itemMetadata))
+                           .filter(b -> accessGranted(context, item, b))
                            .collect(Collectors.toList()))
                        .orElse(new ArrayList<>());
     }
@@ -295,10 +296,11 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
         return crisOwner.getAuthority().equals(context.getCurrentUser().getID().toString());
     }
 
+    // in private method so that exception can be handled and method can be invoked within a lambda
     private boolean accessGranted(final Context context, final Item item, final CrisLayoutBox box) {
 
         try {
-            return crisLayoutBoxAccessService.grantAccess(context, context.getCurrentUser(), box, item);
+            return crisLayoutBoxAccessService.hasAccess(context, context.getCurrentUser(), box, item);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

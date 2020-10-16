@@ -237,7 +237,7 @@ public class CrisLayoutTabServiceImplTest {
         tab.setShortName(shortName);
         tab.setTab2Box(Arrays.stream(boxes).map(this::tabToBox).collect(toList()));
 
-        when(crisLayoutTabAccessService.grantAccess(eq(context), any(), eq(tab), any()))
+        when(crisLayoutTabAccessService.hasAccess(eq(context), any(), eq(tab), any()))
             .thenReturn(grantedAccess);
 
         return tab;
@@ -270,7 +270,7 @@ public class CrisLayoutTabServiceImplTest {
         box.setId(new Random().nextInt(10000));
         when(boxService.hasContent(context, box, itemMetadata))
             .thenReturn(hasContent);
-        when(crisLayoutBoxAccessService.grantAccess(any(), any(), eq(box), any()))
+        when(crisLayoutBoxAccessService.hasAccess(any(), any(), eq(box), any()))
             .thenReturn(grantedAccess);
         return box;
     }

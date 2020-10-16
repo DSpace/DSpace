@@ -4,11 +4,14 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
@@ -23,6 +26,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.LayoutSecurity;
 import org.junit.Before;
@@ -41,15 +45,18 @@ public class LayoutSecurityServiceImplTest {
     private AuthorizeService authorizeService;
     @Mock
     private ItemService itemService;
+    @Mock
+    private GroupService groupService;
+
     private LayoutSecurityServiceImpl securityService;
 
     @Before
     public void setUp() throws Exception {
-        securityService = new LayoutSecurityServiceImpl(authorizeService, itemService);
+        securityService = new LayoutSecurityServiceImpl(authorizeService, itemService, groupService);
     }
 
     /**
-     * box with PUBLIC {@link LayoutSecurity} set, access is granted
+     * PUBLIC {@link LayoutSecurity} set, access is granted
      *
      * @throws SQLException
      */
@@ -57,17 +64,17 @@ public class LayoutSecurityServiceImplTest {
     public void publicAccessReturnsTrue() throws SQLException {
 
         boolean granted =
-            securityService.grantAccess(LayoutSecurity.PUBLIC,
-                                        mock(Context.class),
-                                        ePerson(UUID.randomUUID()),
-                                        emptySet(),
-                                        mock(Item.class));
+            securityService.hasAccess(LayoutSecurity.PUBLIC,
+                                      mock(Context.class),
+                                      ePerson(UUID.randomUUID()),
+                                      emptySet(),
+                                      mock(Item.class));
 
         assertThat(granted, is(true));
     }
 
     /**
-     * box with OWNER_ONLY {@link LayoutSecurity} set, accessed by item's owner, access is granted.
+     * OWNER_ONLY {@link LayoutSecurity} set, accessed by item's owner, access is granted.
      *
      * @throws SQLException
      */
@@ -82,17 +89,17 @@ public class LayoutSecurityServiceImplTest {
 
         boolean granted =
             securityService
-                .grantAccess(LayoutSecurity.OWNER_ONLY,
-                             mock(Context.class),
-                             ePerson(userUuid),
-                             emptySet(),
-                             item);
+                .hasAccess(LayoutSecurity.OWNER_ONLY,
+                           mock(Context.class),
+                           ePerson(userUuid),
+                           emptySet(),
+                           item);
 
         assertThat(granted, is(true));
     }
 
     /**
-     * box with OWNER_ONLY {@link LayoutSecurity} set, accessed different owner, access forbidden.
+     * OWNER_ONLY {@link LayoutSecurity} set, accessed different owner, access forbidden.
      *
      * @throws SQLException
      */
@@ -109,16 +116,16 @@ public class LayoutSecurityServiceImplTest {
 
         boolean granted =
             securityService
-                .grantAccess(LayoutSecurity.OWNER_ONLY,
-                             mock(Context.class), ePerson(userUuid),
-                             emptySet(),
-                             item);
+                .hasAccess(LayoutSecurity.OWNER_ONLY,
+                           mock(Context.class), ePerson(userUuid),
+                           emptySet(),
+                           item);
 
         assertThat(granted, is(false));
     }
 
     /**
-     * box with OWNER_AND_ADMINISTRATOR {@link LayoutSecurity} set, accessed by administrator user, grant given
+     * OWNER_AND_ADMINISTRATOR {@link LayoutSecurity} set, accessed by administrator user, grant given
      *
      * @throws SQLException
      */
@@ -132,15 +139,15 @@ public class LayoutSecurityServiceImplTest {
 
         boolean granted =
             securityService
-                .grantAccess(LayoutSecurity.OWNER_AND_ADMINISTRATOR,
-                             context, mock(EPerson.class), emptySet(),
-                             item);
+                .hasAccess(LayoutSecurity.OWNER_AND_ADMINISTRATOR,
+                           context, mock(EPerson.class), emptySet(),
+                           item);
 
         assertThat(granted, is(true));
     }
 
     /**
-     * box with OWNER_AND_ADMINISTRATOR {@link LayoutSecurity} set, accessed by item's owner user, access is granted
+     * OWNER_AND_ADMINISTRATOR {@link LayoutSecurity} set, accessed by item's owner user, access is granted
      *
      * @throws SQLException
      */
@@ -159,14 +166,14 @@ public class LayoutSecurityServiceImplTest {
 
         boolean granted =
             securityService
-                .grantAccess(LayoutSecurity.OWNER_AND_ADMINISTRATOR,
-                             context, ePerson(userUuid), emptySet(), item);
+                .hasAccess(LayoutSecurity.OWNER_AND_ADMINISTRATOR,
+                           context, ePerson(userUuid), emptySet(), item);
 
         assertThat(granted, is(true));
     }
 
     /**
-     * box with OWNER_AND_ADMINISTRATOR {@link LayoutSecurity} set, accessed by different user, access NOT granted
+     * OWNER_AND_ADMINISTRATOR {@link LayoutSecurity} set, accessed by different user, access NOT granted
      *
      * @throws SQLException
      */
@@ -186,14 +193,14 @@ public class LayoutSecurityServiceImplTest {
 
         boolean granted =
             securityService
-                .grantAccess(LayoutSecurity.OWNER_AND_ADMINISTRATOR,
-                             context, ePerson(userUuid), emptySet(), item);
+                .hasAccess(LayoutSecurity.OWNER_AND_ADMINISTRATOR,
+                           context, ePerson(userUuid), emptySet(), item);
 
         assertThat(granted, is(false));
     }
 
     /**
-     * box with ADMINISTRATOR {@link LayoutSecurity} set, accessed by administrator eperson, access is granted
+     * ADMINISTRATOR {@link LayoutSecurity} set, accessed by administrator eperson, access is granted
      *
      * @throws SQLException
      */
@@ -206,15 +213,15 @@ public class LayoutSecurityServiceImplTest {
 
         boolean granted =
             securityService
-                .grantAccess(LayoutSecurity.ADMINISTRATOR,
-                             context, mock(EPerson.class), emptySet(),
-                             mock(Item.class));
+                .hasAccess(LayoutSecurity.ADMINISTRATOR,
+                           context, mock(EPerson.class), emptySet(),
+                           mock(Item.class));
 
         assertThat(granted, is(true));
     }
 
     /**
-     * box with ADMINISTRATOR {@link LayoutSecurity} set, accessed by not administrator eperson, access is NOT  granted
+     * ADMINISTRATOR {@link LayoutSecurity} set, accessed by not administrator eperson, access is NOT  granted
      *
      * @throws SQLException
      */
@@ -225,14 +232,14 @@ public class LayoutSecurityServiceImplTest {
 
         when(authorizeService.isAdmin(context)).thenReturn(false);
 
-        boolean granted = securityService.grantAccess(LayoutSecurity.ADMINISTRATOR,
-                                                      context, mock(EPerson.class), emptySet(), mock(Item.class));
+        boolean granted = securityService.hasAccess(LayoutSecurity.ADMINISTRATOR,
+                                                    context, mock(EPerson.class), emptySet(), mock(Item.class));
 
         assertThat(granted, is(false));
     }
 
     /**
-     * box with CUSTOM_DATA {@link LayoutSecurity} set, accessed by user with id having authority on metadata
+     * CUSTOM_DATA {@link LayoutSecurity} set, accessed by user with id having authority on metadata
      * contained in the box, access is granted
      *
      * @throws SQLException
@@ -255,15 +262,15 @@ public class LayoutSecurityServiceImplTest {
             .thenReturn(metadataValueList);
 
         boolean granted =
-            securityService.grantAccess(LayoutSecurity.CUSTOM_DATA, mock(Context.class), ePerson(userUuid),
-                                        securityMetadataFieldSet, item);
+            securityService.hasAccess(LayoutSecurity.CUSTOM_DATA, mock(Context.class), ePerson(userUuid),
+                                      securityMetadataFieldSet, item);
 
         assertThat(granted, is(true));
     }
 
 
     /**
-     * box with CUSTOM_DATA {@link LayoutSecurity} set, accessed by user belonging to a group with id having
+     * CUSTOM_DATA {@link LayoutSecurity} set, accessed by user belonging to a group with id having
      * authority on metadata contained in the box, access is granted
      *
      * @throws SQLException
@@ -275,10 +282,14 @@ public class LayoutSecurityServiceImplTest {
         UUID groupUuid = UUID.randomUUID();
         UUID securityAuthorityUuid = UUID.randomUUID();
 
-        EPerson currentUser = ePerson(userUuid, UUID.randomUUID(), groupUuid);
-
         Item item = mock(Item.class);
+        Context context = mock(Context.class);
 
+        EPerson user = ePerson(userUuid, UUID.randomUUID(), groupUuid);
+        Group userGroup = group(groupUuid);
+
+        when(groupService.allMemberGroupsSet(any(Context.class), eq(user)))
+            .thenReturn(new HashSet<>(Collections.singletonList(userGroup)));
 
         MetadataField securityMetadataField = securityMetadataField();
 
@@ -293,17 +304,16 @@ public class LayoutSecurityServiceImplTest {
                                      securityMetadataField.getElement(), null, Item.ANY, true))
             .thenReturn(metadataValueList);
 
-
-        boolean granted = securityService.grantAccess(LayoutSecurity.CUSTOM_DATA,
-                                                      mock(Context.class), currentUser,
-                                                      securityMetadataFieldSet,
-                                                      item);
+        boolean granted = securityService.hasAccess(LayoutSecurity.CUSTOM_DATA,
+                                                    context, user,
+                                                    securityMetadataFieldSet,
+                                                    item);
 
         assertThat(granted, is(true));
     }
 
     /**
-     * box with CUSTOM_DATA {@link LayoutSecurity} set, accessed by user with id that does not have any authority on
+     * CUSTOM_DATA {@link LayoutSecurity} set, accessed by user with id that does not have any authority on
      * metadata contained in the box, access is NOT  granted
      *
      * @throws SQLException
@@ -317,6 +327,12 @@ public class LayoutSecurityServiceImplTest {
 
         Item item = mock(Item.class);
 
+        Context context = mock(Context.class);
+        EPerson user = ePerson(userUuid);
+        Group userGroup = group(groupUuid);
+
+        when(groupService.allMemberGroupsSet(any(Context.class), eq(user)))
+            .thenReturn(new HashSet<>(Collections.singletonList(userGroup)));
 
         MetadataField securityMetadataField = securityMetadataField();
 
@@ -331,22 +347,19 @@ public class LayoutSecurityServiceImplTest {
                                      securityMetadataField.getElement(), null, Item.ANY, true))
             .thenReturn(metadataValueList);
 
-        boolean granted = securityService.grantAccess(
+        boolean granted = securityService.hasAccess(
             LayoutSecurity.CUSTOM_DATA,
-            mock(Context.class), ePerson(userUuid, groupUuid),
+            context, user,
             securityMetadataFieldSet, item);
 
         assertThat(granted, is(false));
     }
 
-    private EPerson ePerson(UUID userUuid, UUID... groupsUuid) {
+    private EPerson ePerson(UUID userUuid, UUID... groupsUuid) throws SQLException {
         EPerson currentUser = mock(EPerson.class);
 
         when(currentUser.getID()).thenReturn(userUuid);
 
-        List<Group> grups = Arrays.stream(groupsUuid).map(this::group).collect(Collectors.toList());
-        when(currentUser.getGroups())
-            .thenReturn(grups);
         return currentUser;
     }
 

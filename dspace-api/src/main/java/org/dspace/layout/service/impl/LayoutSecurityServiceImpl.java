@@ -21,6 +21,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.layout.LayoutSecurity;
 import org.dspace.layout.service.LayoutSecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,39 +33,43 @@ public class LayoutSecurityServiceImpl implements LayoutSecurityService {
 
     private final AuthorizeService authorizeService;
     private final ItemService itemService;
+    private final GroupService groupService;
 
     @Autowired
     public LayoutSecurityServiceImpl(AuthorizeService authorizeService,
-                                     ItemService itemService) {
+                                     ItemService itemService,
+                                     final GroupService groupService) {
         this.authorizeService = authorizeService;
         this.itemService = itemService;
+        this.groupService = groupService;
     }
 
 
     @Override
-    public boolean grantAccess(LayoutSecurity layoutSecurity, Context context, EPerson currentUser,
-                               Set<MetadataField> metadataSecurityFields, Item item) throws SQLException {
+    public boolean hasAccess(LayoutSecurity layoutSecurity, Context context, EPerson user,
+                             Set<MetadataField> metadataSecurityFields, Item item) throws SQLException {
 
         switch (layoutSecurity) {
             case PUBLIC:
                 return true;
             case OWNER_ONLY:
-                return isOwner(currentUser, item);
+                return isOwner(user, item);
             case CUSTOM_DATA:
-                return customDataGrantAccess(currentUser, metadataSecurityFields, item);
+                return customDataGrantAccess(context, user, metadataSecurityFields, item);
             case ADMINISTRATOR:
                 return authorizeService.isAdmin(context);
             case OWNER_AND_ADMINISTRATOR:
-                return authorizeService.isAdmin(context) || isOwner(currentUser, item);
+                return authorizeService.isAdmin(context) || isOwner(user, item);
             default:
                 return false;
         }
     }
 
-    private boolean customDataGrantAccess(EPerson currentUser, Set<MetadataField> metadataSecurityFields, Item item) {
+    private boolean customDataGrantAccess(final Context context, EPerson user,
+                                          Set<MetadataField> metadataSecurityFields, Item item) {
         return metadataSecurityFields.stream()
                                      .map(mf -> getMetadata(item, mf))
-                                     .anyMatch(values -> checkUser(currentUser, values));
+                                     .anyMatch(values -> checkUser(context, user, values));
 
 
     }
@@ -75,17 +80,26 @@ public class LayoutSecurityServiceImpl implements LayoutSecurityService {
                                 true);
     }
 
-    private boolean checkUser(EPerson currentUser, List<MetadataValue> values) {
-        Predicate<MetadataValue> currentUserPredicate = v -> v.getAuthority().equals(currentUser.getID().toString());
-        Predicate<MetadataValue> checkGroupsPredicate = v -> checkGroup(v, currentUser.getGroups());
+    private boolean checkUser(final Context context, EPerson user, List<MetadataValue> values) {
+        Predicate<MetadataValue> currentUserPredicate = v -> v.getAuthority().equals(user.getID().toString());
+        Predicate<MetadataValue> checkGroupsPredicate = v -> checkGroup(v, groups(context, user));
 
         return values.stream()
                      .anyMatch(currentUserPredicate.or(checkGroupsPredicate));
     }
 
-    private boolean checkGroup(MetadataValue value, List<Group> groups) {
+    private boolean checkGroup(MetadataValue value, Set<Group> groups) {
         return groups.stream()
                      .anyMatch(g -> g.getID().toString().equals(value.getAuthority()));
+    }
+
+    // in private method so that checked exception can be handled and metod can be called from a lambda
+    private Set<Group> groups(final Context context, final EPerson user) {
+        try {
+            return groupService.allMemberGroupsSet(context, user);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     private boolean isOwner(EPerson currentUser, Item item) {

@@ -162,7 +162,7 @@ public class ItemConverter
 
     private boolean grantAccess(Context context, EPerson currentUser, CrisLayoutBox box, Item item)
         throws SQLException {
-        return crisLayoutBoxAccessService.grantAccess(context, currentUser, box, item);
+        return crisLayoutBoxAccessService.hasAccess(context, currentUser, box, item);
     }
 
     private List<CrisLayoutBox> getBoxesWithMetadataFieldExcludedPublic(MetadataField metadataField,

@@ -31,13 +31,13 @@ public class CrisLayoutBoxAccessServiceImpl implements CrisLayoutBoxAccessServic
     }
 
     @Override
-    public boolean grantAccess(Context context, EPerson currentUser, CrisLayoutBox box, Item item)
+    public boolean hasAccess(Context context, EPerson user, CrisLayoutBox box, Item item)
         throws SQLException {
 
-        return layoutSecurityService.grantAccess(LayoutSecurity.valueOf(box.getSecurity()),
-                                                 context,
-                                                 currentUser,
-                                                 box.getMetadataSecurityFields(),
-                                                 item);
+        return layoutSecurityService.hasAccess(LayoutSecurity.valueOf(box.getSecurity()),
+                                               context,
+                                               user,
+                                               box.getMetadataSecurityFields(),
+                                               item);
     }
 }

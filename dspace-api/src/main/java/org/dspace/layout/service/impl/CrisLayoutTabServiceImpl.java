@@ -57,6 +57,7 @@ public class CrisLayoutTabServiceImpl implements CrisLayoutTabService {
     @Autowired
     private CrisLayoutTabAccessService crisLayoutTabAccessService;
 
+    //constructor with all fields injected, used for test purposes (mock injection)
     public CrisLayoutTabServiceImpl(CrisLayoutTabDAO dao, AuthorizeService authorizeService,
                                     ItemService itemService, CrisLayoutBoxService boxService,
                                     CrisLayoutBoxAccessService crisLayoutBoxAccessService,
@@ -204,8 +205,8 @@ public class CrisLayoutTabServiceImpl implements CrisLayoutTabService {
         }
 
         return tabs.stream()
-                   .filter(t -> tabGrantedAccess(context, t, item))
                    .filter(t -> CollectionUtils.isNotEmpty(t.getTab2Box()))
+                   .filter(t -> tabGrantedAccess(context, t, item))
                    .filter(t -> hasABoxToDisplay(context, t, item))
                    .collect(Collectors.toList());
     }
@@ -221,9 +222,9 @@ public class CrisLayoutTabServiceImpl implements CrisLayoutTabService {
 
     private boolean boxGrantedAccess(Context context, Item item, CrisLayoutBox box) {
         try {
-            return crisLayoutBoxAccessService.grantAccess(context,
-                                                          context.getCurrentUser(), box,
-                                                          item);
+            return crisLayoutBoxAccessService.hasAccess(context,
+                                                        context.getCurrentUser(), box,
+                                                        item);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -231,8 +232,8 @@ public class CrisLayoutTabServiceImpl implements CrisLayoutTabService {
 
     private boolean tabGrantedAccess(Context context, CrisLayoutTab tab, Item item) {
         try {
-            return crisLayoutTabAccessService.grantAccess(context, context.getCurrentUser(),
-                                                          tab, item);
+            return crisLayoutTabAccessService.hasAccess(context, context.getCurrentUser(),
+                                                        tab, item);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
