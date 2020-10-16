@@ -321,4 +321,60 @@ public class ViewUsageStatisticsFeatureIT extends AbstractControllerIntegrationT
             .andExpect(jsonPath("$.page.totalElements", is(0)))
             .andExpect(jsonPath("$._embedded").doesNotExist());
     }
+
+    @Test
+    public void anonymousItemAdminNotRequiredSuccess() throws Exception {
+        configurationService.setProperty("usage-statistics.authorization.admin.usage", false);
+
+        getClient().perform(
+            get("/api/authz/authorizations/search/object")
+                .param("embed", "feature")
+                .param("feature", feature)
+                .param("uri", utils.linkToSingleResource(itemARest, "self").getHref()))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$.page.totalElements", greaterThan(0)))
+                               .andExpect(jsonPath("$._embedded").exists());
+    }
+
+    @Test
+    public void anonymousCollectionAdminNotRequiredSuccess() throws Exception {
+        configurationService.setProperty("usage-statistics.authorization.admin.usage", false);
+
+        getClient().perform(
+            get("/api/authz/authorizations/search/object")
+                .param("embed", "feature")
+                .param("feature", feature)
+                .param("uri", utils.linkToSingleResource(collectionARest, "self").getHref()))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$.page.totalElements", greaterThan(0)))
+                               .andExpect(jsonPath("$._embedded").exists());
+    }
+
+    @Test
+    public void anonymousCommunityAdminNotRequiredSuccess() throws Exception {
+        configurationService.setProperty("usage-statistics.authorization.admin.usage", false);
+
+        getClient().perform(
+            get("/api/authz/authorizations/search/object")
+                .param("embed", "feature")
+                .param("feature", feature)
+                .param("uri", utils.linkToSingleResource(communityARest, "self").getHref()))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$.page.totalElements", greaterThan(0)))
+                               .andExpect(jsonPath("$._embedded").exists());
+    }
+
+    @Test
+    public void anonymousSiteAdminNotRequiredSuccess() throws Exception {
+        configurationService.setProperty("usage-statistics.authorization.admin.usage", false);
+
+        getClient().perform(
+            get("/api/authz/authorizations/search/object")
+                .param("embed", "feature")
+                .param("feature", feature)
+                .param("uri", utils.linkToSingleResource(siteRest, "self").getHref()))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$.page.totalElements", greaterThan(0)))
+                               .andExpect(jsonPath("$._embedded").exists());
+    }
 }
