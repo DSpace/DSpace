@@ -5,10 +5,10 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.content.integration.crosswalks;
-import java.util.Map;
+package org.dspace.content.integration.crosswalks.virtualfields;
 
 import org.dspace.content.Item;
+import org.dspace.core.Context;
 
 /**
  * This class has been initially developed by Graham Triggs, we have moved to a
@@ -26,5 +26,5 @@ import org.dspace.content.Item;
  */
 public interface VirtualFieldDisseminator {
 
-    public String[] getMetadata(Item item, Map<String, String> fieldCache, String fieldName);
+    public String[] getMetadata(Context context, Item item, String fieldName);
 }

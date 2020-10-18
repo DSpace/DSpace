@@ -5,9 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.content.integration.crosswalks;
-
-import java.util.Map;
+package org.dspace.content.integration.crosswalks.virtualfields;
 
 import org.dspace.content.Item;
 
@@ -33,12 +31,11 @@ public interface VirtualFieldIngester {
      * be able to retrieve these values later on in finalizeItem()
      * 
      * @param item
-     * @param fieldCache
      * @param fieldName
      * @param value
      * @return
      */
-    public boolean addMetadata(Item item, Map<String, String> fieldCache, String fieldName, String value);
+    public boolean addMetadata(Item item, String fieldName, String value);
 
     /**
      * If the processor has been referenced in an ingest, this method will be called
@@ -47,8 +44,7 @@ public interface VirtualFieldIngester {
      * the fieldCache map.
      * 
      * @param item
-     * @param fieldCache
      * @return
      */
-    public boolean finalizeItem(Item item, Map<String, String> fieldCache);
+    public boolean finalizeItem(Item item);
 }

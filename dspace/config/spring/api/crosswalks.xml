@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd" >
+
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalkMapper">
+		<constructor-arg>
+			<map>
+				<entry key="bibtex" value-ref="referCrosswalkBibtex"></entry>
+				<entry key="person-xml" value-ref="referCrosswalkPersonXml"></entry>
+				<entry key="person-json" value-ref="referCrosswalkPersonJson"></entry>
+			</map>
+		</constructor-arg>
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.DocumentCrosswalkMapper">
+		<constructor-arg>
+			<map>
+				<entry key="person-pdf" value-ref="pdfCrosswalkPerson"></entry>
+				<entry key="person-rtf" value-ref="rtfCrosswalkPerson"></entry>
+			</map>
+		</constructor-arg>
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkBibtex">
+		<constructor-arg name="templateFileName" value="crosswalks/template/bibtex.template"/>
+		<constructor-arg name="mimeType" value="application/x-bibtex; charset=UTF-8"/>
+		<constructor-arg name="fileName" value="references.bib"/>
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkPersonXml">
+		<constructor-arg name="templateFileName" value="crosswalks/template/person-xml.template"/>
+		<constructor-arg name="mimeType" value="application/xml; charset=UTF-8"/>
+		<constructor-arg name="fileName" value="person.xml"/>
+		<property name="converter" ref="xmlValueConverter" />
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkPersonJson">
+		<constructor-arg name="templateFileName" value="crosswalks/template/person-json.template"/>
+		<constructor-arg name="mimeType" value="application/json; charset=UTF-8"/>
+		<constructor-arg name="fileName" value="person.json"/>
+		<property name="converter" ref="jsonValueConverter" />
+		<property name="linesPostProcessor" ref="jsonPostProcessor" />
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.DocumentCrosswalk" id="pdfCrosswalkPerson">
+		<constructor-arg name="templateFileName" value="crosswalks/template/person-template.xsl"/>
+		<constructor-arg name="fileName" value="person.pdf"/>
+		<constructor-arg name="mimeType" value="application/pdf"/>
+		<constructor-arg name="referCrosswalk" ref="referCrosswalkPersonXml"/>
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.DocumentCrosswalk" id="rtfCrosswalkPerson">
+		<constructor-arg name="templateFileName" value="crosswalks/template/person-template.xsl"/>
+		<constructor-arg name="fileName" value="person.rtf"/>
+		<constructor-arg name="mimeType" value="application/rtf"/>
+		<constructor-arg name="referCrosswalk" ref="referCrosswalkPersonXml"/>
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldMapper">
+		<constructor-arg>
+			<map>
+				<entry key="reftype" value-ref="virtualFieldRefererType" />
+				<entry key="citation" value-ref="virtualFieldCitation"/>
+				<entry key="authors" value-ref="virtualFieldBibtexContributors"/>
+				<entry key="keywords" value-ref="virtualFieldKeywords" />
+				<entry key="date" value-ref="virtualFieldDate" />
+				<entry key="bibauthors" value-ref="virtualFieldBibtexAuthors" />
+				<entry key="fullpage" value-ref="virtualFieldPageNumber" />
+				<entry key="uniqueidentifier" value-ref="virtualFieldUniqueIdentifier" />
+				<entry key="cruiidentifier" value-ref="virtualFieldCruiIdentifier" />
+				<entry key="handlelocalname" value-ref="virtualFieldHandleLocalNameIdentifier" />
+				<entry key="bitstream" value-ref="virtualFieldBitstream" />
+			</map>
+		</constructor-arg>
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldRefererType" id="virtualFieldRefererType"/>
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldCitation" id="virtualFieldCitation"/>
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldBibtexContributors" id="virtualFieldBibtexContributors"/>
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldKeywords" id="virtualFieldKeywords"/>
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldDate" id="virtualFieldDate"/>
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldBibtexAuthors" id="virtualFieldBibtexAuthors"/>
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldPageNumber" id="virtualFieldPageNumber"/>	
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldUniqueIdentifier" id="virtualFieldUniqueIdentifier"/>
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldCruiIdentifier" id="virtualFieldCruiIdentifier"/>
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldHandleLocalNameIdentifier" id="virtualFieldHandleLocalNameIdentifier"/>
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldBitstream" id="virtualFieldBitstream">
+		<constructor-arg name="bitstreamTypeMap">
+			<map>
+				<entry key="picture" value="personal picture" />
+			</map>
+		</constructor-arg>
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.converter.XmlValueConverter" id="xmlValueConverter" />
+	<bean class="org.dspace.content.integration.crosswalks.converter.JsonValueConverter" id="jsonValueConverter" />
+	
+	<bean class="org.dspace.content.integration.crosswalks.postprocessors.JsonPostProcessor" id="jsonPostProcessor" />
+	
+</beans>
