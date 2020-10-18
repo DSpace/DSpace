@@ -142,7 +142,7 @@ public class ItemConverter
                 List<CrisLayoutBox> boxesWithMetadataFieldExcludedPublic = getBoxesWithMetadataFieldExcludedPublic(
                         metadataField, boxes);
                 for (CrisLayoutBox box : boxesWithMetadataFieldExcludedPublic) {
-                    if (grantAccess(context, currentUser, box, item)) {
+                    if (crisLayoutBoxAccessService.hasAccess(context, currentUser, box, item)) {
                         return true;
                     }
                 }
@@ -158,11 +158,6 @@ public class ItemConverter
             }
         }
         return false;
-    }
-
-    private boolean grantAccess(Context context, EPerson currentUser, CrisLayoutBox box, Item item)
-        throws SQLException {
-        return crisLayoutBoxAccessService.hasAccess(context, currentUser, box, item);
     }
 
     private List<CrisLayoutBox> getBoxesWithMetadataFieldExcludedPublic(MetadataField metadataField,
