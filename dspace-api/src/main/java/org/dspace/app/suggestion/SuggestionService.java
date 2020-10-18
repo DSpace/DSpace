@@ -27,6 +27,15 @@ public interface SuggestionService {
 
     public List<SuggestionTarget> findAllTargets(Context context, String source, int pageSize, long offset);
 
+    public long countAllByTarget(Context context, UUID target);
+
+    public List<SuggestionTarget> findByTarget(Context context, UUID target, int pageSize, long offset);
 
     public void deleteTarget(SuggestionTarget target);
+
+    public SuggestionSource findSource(Context context, String source);
+
+    public long countSources(Context context);
+
+    public List<SuggestionSource> findAllSources(Context context, int pageSize, long offset);
 }

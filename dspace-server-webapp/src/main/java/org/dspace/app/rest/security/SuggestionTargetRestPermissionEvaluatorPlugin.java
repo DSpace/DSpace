@@ -55,7 +55,7 @@ public class SuggestionTargetRestPermissionEvaluatorPlugin extends RestObjectPer
             return false;
         }
 
-        if (!StringUtils.equalsIgnoreCase(targetType, SuggestionTargetRest.NAME)) {
+        if (!StringUtils.startsWithIgnoreCase(targetType, SuggestionTargetRest.NAME)) {
             return false;
         }
 
@@ -69,8 +69,12 @@ public class SuggestionTargetRestPermissionEvaluatorPlugin extends RestObjectPer
 
         try {
             String id = targetId.toString();
-            String source = id.split(":")[0];
-            UUID uuid = UUIDUtils.fromString(id.split(":")[1]);
+            UUID uuid = null;
+            if (id.contains(":")) {
+                uuid = UUIDUtils.fromString(id.split(":")[1]);
+            } else {
+                uuid = UUIDUtils.fromString(id);
+            }
             if (uuid == null) {
                 return false;
             }

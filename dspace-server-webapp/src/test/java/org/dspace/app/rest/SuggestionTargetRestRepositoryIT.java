@@ -6,6 +6,7 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest;
+
 import static org.dspace.app.rest.matcher.SuggestionTargetMatcher.matchSuggestionTarget;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -19,18 +20,22 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.suggestion.SuggestionTarget;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.SuggestionTargetBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
+
 /**
  * Integration Tests against the /api/integration/suggestiontargets endpoint
  */
 public class SuggestionTargetRestRepositoryIT extends AbstractControllerIntegrationTest {
     private Collection colPeople;
+
     @Override
     @Before
     public void setUp() throws Exception {
@@ -74,16 +79,18 @@ public class SuggestionTargetRestRepositoryIT extends AbstractControllerIntegrat
                 .withSuggestionCount("scopus", 3).build();
         context.restoreAuthSystemState();
     }
+
     @Test
     public void findAllTest() throws Exception {
         buildSuggestionTargetsList();
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(get("/api/integration/suggestiontargets"))
                 .andExpect(status().isMethodNotAllowed());
-        String token = getAuthToken(admin.getEmail(), password);
+        String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/integration/suggestiontargets")).andExpect(status().isMethodNotAllowed());
         getClient().perform(get("/api/integration/suggestiontargets")).andExpect(status().isMethodNotAllowed());
     }
+
     @Test
     public void findBySourceTest() throws Exception {
         buildSuggestionTargetsList();
@@ -91,19 +98,13 @@ public class SuggestionTargetRestRepositoryIT extends AbstractControllerIntegrat
         getClient(adminToken)
                 .perform(get("/api/integration/suggestiontargets/search/findBySource").param("source", "reciter"))
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.suggestiontargets",
-                        Matchers.contains(
-                                matchSuggestionTarget("Bollini, Andrea", "reciter", 31),
-                                matchSuggestionTarget("Digilio, Giuseppe", "reciter", 11),
-                                matchSuggestionTarget("Test 0", "reciter", 3),
-                                matchSuggestionTarget("Test 1", "reciter", 4),
-                                matchSuggestionTarget("Test 2", "reciter", 5),
-                                matchSuggestionTarget("Test 3", "reciter", 6),
-                                matchSuggestionTarget("Test 4", "reciter", 7),
-                                matchSuggestionTarget("Test 5", "reciter", 8),
-                                matchSuggestionTarget("Test 6", "reciter", 9),
-                                matchSuggestionTarget("Test 7", "reciter", 10)
-                                )))
+                .andExpect(jsonPath("$._embedded.suggestiontargets", Matchers.contains(
+                        matchSuggestionTarget("Bollini, Andrea", "reciter", 31),
+                        matchSuggestionTarget("Digilio, Giuseppe", "reciter", 11),
+                        matchSuggestionTarget("Test 0", "reciter", 3), matchSuggestionTarget("Test 1", "reciter", 4),
+                        matchSuggestionTarget("Test 2", "reciter", 5), matchSuggestionTarget("Test 3", "reciter", 6),
+                        matchSuggestionTarget("Test 4", "reciter", 7), matchSuggestionTarget("Test 5", "reciter", 8),
+                        matchSuggestionTarget("Test 6", "reciter", 9), matchSuggestionTarget("Test 7", "reciter", 10))))
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.containsString(
                                 "/api/integration/suggestiontargets/search/findBySource?source=reciter")))
@@ -112,18 +113,17 @@ public class SuggestionTargetRestRepositoryIT extends AbstractControllerIntegrat
                 .perform(get("/api/integration/suggestiontargets/search/findBySource").param("source", "scopus"))
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.suggestiontargets",
-                        Matchers.contains(
-                                matchSuggestionTarget("Bollini, Andrea", "scopus", 3),
+                        Matchers.contains(matchSuggestionTarget("Bollini, Andrea", "scopus", 3),
                                 matchSuggestionTarget("Test 0", "scopus", 7),
                                 matchSuggestionTarget("Test 3", "scopus", 10),
                                 matchSuggestionTarget("Test 6", "scopus", 13),
-                                matchSuggestionTarget("Lombardi, Corrado", "scopus", 3)
-                                )))
+                                matchSuggestionTarget("Lombardi, Corrado", "scopus", 3))))
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.containsString(
                                 "/api/integration/suggestiontargets/search/findBySource?source=scopus")))
                 .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(5)));
     }
+
     @Test
     public void findBySourcePaginationTest() throws Exception {
         buildSuggestionTargetsList();
@@ -133,30 +133,25 @@ public class SuggestionTargetRestRepositoryIT extends AbstractControllerIntegrat
                         .param("source", "reciter").param("size", "1"))
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.suggestiontargets",
-                        Matchers.contains(
-                                matchSuggestionTarget("Bollini, Andrea", "reciter", 31))))
+                        Matchers.contains(matchSuggestionTarget("Bollini, Andrea", "reciter", 31))))
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.allOf(
                                 Matchers.containsString("/api/integration/suggestiontargets/search/findBySource?"),
-                                Matchers.containsString("source=reciter"),
-                                Matchers.containsString("size=1"))))
+                                Matchers.containsString("source=reciter"), Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$._links.next.href",
                         Matchers.allOf(
                                 Matchers.containsString("/api/integration/suggestiontargets/search/findBySource?"),
-                                Matchers.containsString("source=reciter"),
-                                Matchers.containsString("page=1"),
+                                Matchers.containsString("source=reciter"), Matchers.containsString("page=1"),
                                 Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$._links.last.href",
                         Matchers.allOf(
                                 Matchers.containsString("/api/integration/suggestiontargets/search/findBySource?"),
-                                Matchers.containsString("source=reciter"),
-                                Matchers.containsString("page=9"),
+                                Matchers.containsString("source=reciter"), Matchers.containsString("page=9"),
                                 Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$._links.first.href",
                         Matchers.allOf(
                                 Matchers.containsString("/api/integration/suggestiontargets/search/findBySource?"),
-                                Matchers.containsString("source=reciter"),
-                                Matchers.containsString("page=0"),
+                                Matchers.containsString("source=reciter"), Matchers.containsString("page=0"),
                                 Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$._links.prev.href").doesNotExist()).andExpect(jsonPath("$.page.size", is(1)))
                 .andExpect(jsonPath("$.page.totalElements", is(10)));
@@ -165,70 +160,59 @@ public class SuggestionTargetRestRepositoryIT extends AbstractControllerIntegrat
                         .param("size", "1").param("page", "1"))
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.suggestiontargets",
-                        Matchers.contains(
-                                matchSuggestionTarget("Digilio, Giuseppe", "reciter", 11))))
+                        Matchers.contains(matchSuggestionTarget("Digilio, Giuseppe", "reciter", 11))))
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.allOf(
                                 Matchers.containsString("/api/integration/suggestiontargets/search/findBySource?"),
-                                Matchers.containsString("source=reciter"),
-                                Matchers.containsString("page=1"),
+                                Matchers.containsString("source=reciter"), Matchers.containsString("page=1"),
                                 Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$._links.next.href",
                         Matchers.allOf(
                                 Matchers.containsString("/api/integration/suggestiontargets/search/findBySource?"),
-                                Matchers.containsString("source=reciter"),
-                                Matchers.containsString("page=2"),
+                                Matchers.containsString("source=reciter"), Matchers.containsString("page=2"),
                                 Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$._links.last.href",
                         Matchers.allOf(
                                 Matchers.containsString("/api/integration/suggestiontargets/search/findBySource?"),
-                                Matchers.containsString("source=reciter"),
-                                Matchers.containsString("page=9"),
+                                Matchers.containsString("source=reciter"), Matchers.containsString("page=9"),
                                 Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$._links.first.href",
                         Matchers.allOf(
                                 Matchers.containsString("/api/integration/suggestiontargets/search/findBySource?"),
-                                Matchers.containsString("source=reciter"),
-                                Matchers.containsString("page=0"),
+                                Matchers.containsString("source=reciter"), Matchers.containsString("page=0"),
                                 Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$._links.prev.href",
                         Matchers.allOf(
                                 Matchers.containsString("/api/integration/suggestiontargets/search/findBySource?"),
-                                Matchers.containsString("source=reciter"),
-                                Matchers.containsString("page=0"),
+                                Matchers.containsString("source=reciter"), Matchers.containsString("page=0"),
                                 Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$.page.size", is(1))).andExpect(jsonPath("$.page.totalElements", is(10)));
         getClient(adminToken)
-                .perform(get("/api/integration/suggestiontargets/search/findBySource")
-                        .param("source", "reciter").param("size", "1").param("page", "9"))
+                .perform(get("/api/integration/suggestiontargets/search/findBySource").param("source", "reciter")
+                        .param("size", "1").param("page", "9"))
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.suggestiontargets",
-                        Matchers.contains(
-                                matchSuggestionTarget("Test 7", "reciter", 10))))
+                        Matchers.contains(matchSuggestionTarget("Test 7", "reciter", 10))))
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.allOf(
                                 Matchers.containsString("/api/integration/suggestiontargets/search/findBySource?"),
-                                Matchers.containsString("source=reciter"),
-                                Matchers.containsString("page=9"),
+                                Matchers.containsString("source=reciter"), Matchers.containsString("page=9"),
                                 Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$._links.next.href").doesNotExist())
                 .andExpect(jsonPath("$._links.last.href",
                         Matchers.allOf(
                                 Matchers.containsString("/api/integration/suggestiontargets/search/findBySource?"),
-                                Matchers.containsString("source=reciter"),
-                                Matchers.containsString("page=9"),
+                                Matchers.containsString("source=reciter"), Matchers.containsString("page=9"),
                                 Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$._links.first.href",
                         Matchers.allOf(
                                 Matchers.containsString("/api/integration/suggestiontargets/search/findBySource?"),
-                                Matchers.containsString("source=reciter"),
-                                Matchers.containsString("page=0"),
+                                Matchers.containsString("source=reciter"), Matchers.containsString("page=0"),
                                 Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$._links.prev.href",
                         Matchers.allOf(
                                 Matchers.containsString("/api/integration/suggestiontargets/search/findBySource?"),
-                                Matchers.containsString("source=reciter"),
-                                Matchers.containsString("page=8"),
+                                Matchers.containsString("source=reciter"), Matchers.containsString("page=8"),
                                 Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$.page.size", is(1))).andExpect(jsonPath("$.page.totalElements", is(10)));
         getClient(adminToken)
@@ -236,36 +220,31 @@ public class SuggestionTargetRestRepositoryIT extends AbstractControllerIntegrat
                         .param("size", "3").param("page", "0"))
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.suggestiontargets",
-                        Matchers.contains(
-                                matchSuggestionTarget("Bollini, Andrea", "scopus", 3),
+                        Matchers.contains(matchSuggestionTarget("Bollini, Andrea", "scopus", 3),
                                 matchSuggestionTarget("Test 0", "scopus", 7),
                                 matchSuggestionTarget("Test 3", "scopus", 10))))
-        .andExpect(jsonPath("$._links.self.href",
-                Matchers.allOf(
-                        Matchers.containsString("/api/integration/suggestiontargets/search/findBySource?"),
-                        Matchers.containsString("source=scopus"),
-                        Matchers.containsString("page=0"),
-                        Matchers.containsString("size=3"))))
-        .andExpect(jsonPath("$._links.next.href",
-                Matchers.allOf(
-                        Matchers.containsString("/api/integration/suggestiontargets/search/findBySource?"),
-                        Matchers.containsString("source=scopus"),
-                        Matchers.containsString("page=1"),
-                        Matchers.containsString("size=3"))))
-        .andExpect(jsonPath("$._links.last.href",
-                Matchers.allOf(
-                        Matchers.containsString("/api/integration/suggestiontargets/search/findBySource?"),
-                        Matchers.containsString("source=scopus"),
-                        Matchers.containsString("page=1"),
-                        Matchers.containsString("size=3"))))
-        .andExpect(jsonPath("$._links.first.href",
-                Matchers.allOf(
-                        Matchers.containsString("/api/integration/suggestiontargets/search/findBySource?"),
-                        Matchers.containsString("source=scopus"),
-                        Matchers.containsString("page=0"),
-                        Matchers.containsString("size=3"))))
-        .andExpect(jsonPath("$._links.prev.href").doesNotExist())
-        .andExpect(jsonPath("$.page.size", is(3))).andExpect(jsonPath("$.page.totalElements", is(5)));
+                .andExpect(jsonPath("$._links.self.href",
+                        Matchers.allOf(
+                                Matchers.containsString("/api/integration/suggestiontargets/search/findBySource?"),
+                                Matchers.containsString("source=scopus"), Matchers.containsString("page=0"),
+                                Matchers.containsString("size=3"))))
+                .andExpect(jsonPath("$._links.next.href",
+                        Matchers.allOf(
+                                Matchers.containsString("/api/integration/suggestiontargets/search/findBySource?"),
+                                Matchers.containsString("source=scopus"), Matchers.containsString("page=1"),
+                                Matchers.containsString("size=3"))))
+                .andExpect(jsonPath("$._links.last.href",
+                        Matchers.allOf(
+                                Matchers.containsString("/api/integration/suggestiontargets/search/findBySource?"),
+                                Matchers.containsString("source=scopus"), Matchers.containsString("page=1"),
+                                Matchers.containsString("size=3"))))
+                .andExpect(jsonPath("$._links.first.href",
+                        Matchers.allOf(
+                                Matchers.containsString("/api/integration/suggestiontargets/search/findBySource?"),
+                                Matchers.containsString("source=scopus"), Matchers.containsString("page=0"),
+                                Matchers.containsString("size=3"))))
+                .andExpect(jsonPath("$._links.prev.href").doesNotExist()).andExpect(jsonPath("$.page.size", is(3)))
+                .andExpect(jsonPath("$.page.totalElements", is(5)));
 
         getClient(adminToken)
                 .perform(get("/api/integration/suggestiontargets/search/findBySource").param("source", "scopus")
@@ -273,8 +252,7 @@ public class SuggestionTargetRestRepositoryIT extends AbstractControllerIntegrat
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.suggestiontargets", Matchers.iterableWithSize(2)))
                 .andExpect(jsonPath("$._embedded.suggestiontargets",
-                        Matchers.contains(
-                                matchSuggestionTarget("Test 6", "scopus", 13),
+                        Matchers.contains(matchSuggestionTarget("Test 6", "scopus", 13),
                                 matchSuggestionTarget("Lombardi, Corrado", "scopus", 3))))
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.allOf(
@@ -304,20 +282,31 @@ public class SuggestionTargetRestRepositoryIT extends AbstractControllerIntegrat
     public void findBySourceUnAuthenticatedTest() throws Exception {
         buildSuggestionTargetsList();
         // anonymous cannot access the suggestions endpoint
-        getClient().perform(get("/api/integration/suggestiontargets/search/findBySource?source=reciter"))
+        getClient().perform(get("/api/integration/suggestiontargets/search/findBySource").param("source", "reciter"))
                 .andExpect(status().isUnauthorized());
-        getClient().perform(get("/api/integration/suggestiontargets/search/findBySource?source=not-exist"))
+        getClient().perform(get("/api/integration/suggestiontargets/search/findBySource").param("source", "not-exist"))
                 .andExpect(status().isUnauthorized());
     }
+
     @Test
     public void findBySourceForbiddenTest() throws Exception {
         buildSuggestionTargetsList();
         String tokenEperson = getAuthToken(eperson.getEmail(), password);
-        getClient(tokenEperson).perform(get("/api/integration/suggestiontargets/search/findBySource?source=reciter"))
+        getClient(tokenEperson)
+                .perform(get("/api/integration/suggestiontargets/search/findBySource").param("source", "reciter"))
                 .andExpect(status().isForbidden());
-        getClient(tokenEperson).perform(get("/api/integration/suggestiontargets/search/findBySource?source=not-exist"))
+        getClient(tokenEperson)
+                .perform(get("/api/integration/suggestiontargets/search/findBySource").param("source", "not-exist"))
                 .andExpect(status().isForbidden());
     }
+
+    @Test
+    public void findBySourceBadRequestTest() throws Exception {
+        String tokenEperson = getAuthToken(admin.getEmail(), password);
+        getClient(tokenEperson).perform(get("/api/integration/suggestiontargets/search/findBySource"))
+                .andExpect(status().isBadRequest());
+    }
+
     @Test
     public void findOneTest() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -342,6 +331,7 @@ public class SuggestionTargetRestRepositoryIT extends AbstractControllerIntegrat
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.endsWith("/api/integration/suggestiontargets/" + uuidStrEpersonProfile)));
     }
+
     @Test
     public void findOneFullProjectionTest() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -382,6 +372,7 @@ public class SuggestionTargetRestRepositoryIT extends AbstractControllerIntegrat
         String uuidStr = target.getID().toString();
         getClient().perform(get("/api/integration/suggestiontargets/" + uuidStr)).andExpect(status().isUnauthorized());
     }
+
     @Test
     public void findOneForbiddenTest() throws Exception {
         // build a generic person profile
@@ -394,6 +385,7 @@ public class SuggestionTargetRestRepositoryIT extends AbstractControllerIntegrat
         getClient(tokenEperson).perform(get("/api/integration/suggestiontargets/" + uuidStr))
                 .andExpect(status().isForbidden());
     }
+
     @Test
     public void findOneTestWrongID() throws Exception {
         String adminToken = getAuthToken(admin.getEmail(), password);
@@ -424,4 +416,179 @@ public class SuggestionTargetRestRepositoryIT extends AbstractControllerIntegrat
         getClient().perform(get("/api/integration/suggestiontargets/invalid:" + UUID.randomUUID()))
                 .andExpect(status().isUnauthorized());
     }
+
+    @Test
+    public void findByTargetTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item itemFirst = ItemBuilder.createItem(context, colPeople).withTitle("Bollini, Andrea").build();
+        SuggestionTarget targetFirstReciter = SuggestionTargetBuilder.createTarget(context, itemFirst)
+                .withSuggestionCount("reciter", 31).build();
+        SuggestionTarget targetFirstScopus = SuggestionTargetBuilder.createTarget(context, itemFirst)
+                .withSuggestionCount("scopus", 3).build();
+        Item itemLast = ItemBuilder.createItem(context, colPeople).withTitle("Lombardi, Corrado")
+                .withCrisOwner(eperson.getFullName(), eperson.getID().toString()).build();
+        SuggestionTarget targetLast = SuggestionTargetBuilder.createTarget(context, itemLast)
+                .withSuggestionCount("scopus", 2).build();
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken)
+                .perform(get("/api/integration/suggestiontargets/search/findByTarget").param("target",
+                        itemFirst.getID().toString()))
+                .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.suggestiontargets",
+                        Matchers.contains(matchSuggestionTarget("Bollini, Andrea", "reciter", 31),
+                                matchSuggestionTarget("Bollini, Andrea", "scopus", 3))))
+                .andExpect(jsonPath("$._links.self.href",
+                        Matchers.containsString("/api/integration/suggestiontargets/search/findByTarget?target="
+                                + itemFirst.getID().toString())))
+                .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(2)));
+        getClient(adminToken)
+                .perform(get("/api/integration/suggestiontargets/search/findByTarget").param("target",
+                        itemLast.getID().toString()))
+                .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.suggestiontargets",
+                        Matchers.contains(matchSuggestionTarget("Lombardi, Corrado", "scopus", 2))))
+                .andExpect(jsonPath("$._links.self.href",
+                        Matchers.containsString("/api/integration/suggestiontargets/search/findByTarget?target="
+                                + itemLast.getID().toString())))
+                .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(1)));
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+        getClient(epersonToken)
+                .perform(get("/api/integration/suggestiontargets/search/findByTarget").param("target",
+                        itemLast.getID().toString()))
+                .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.suggestiontargets",
+                        Matchers.contains(matchSuggestionTarget("Lombardi, Corrado", "scopus", 2))))
+                .andExpect(jsonPath("$._links.self.href",
+                        Matchers.containsString("/api/integration/suggestiontargets/search/findByTarget?target="
+                                + itemLast.getID().toString())))
+                .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void findByTargetPaginationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item itemFirst = ItemBuilder.createItem(context, colPeople).withTitle("Bollini, Andrea").build();
+        SuggestionTarget targetFirstReciter = SuggestionTargetBuilder.createTarget(context, itemFirst)
+                .withSuggestionCount("reciter", 31).build();
+        SuggestionTarget targetFirstScopus = SuggestionTargetBuilder.createTarget(context, itemFirst)
+                .withSuggestionCount("scopus", 3).build();
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken)
+                .perform(get("/api/integration/suggestiontargets/search/findByTarget").param("size", "1")
+                        .param("target", itemFirst.getID().toString()))
+                .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.suggestiontargets",
+                        Matchers.contains(matchSuggestionTarget("Bollini, Andrea", "reciter", 31))))
+                .andExpect(jsonPath("$._links.self.href",
+                        Matchers.allOf(
+                                Matchers.containsString("/api/integration/suggestiontargets/search/findByTarget?"),
+                                Matchers.containsString("target=" + itemFirst.getID().toString()),
+                                Matchers.containsString("size=1"))))
+                .andExpect(jsonPath("$._links.next.href",
+                        Matchers.allOf(
+                                Matchers.containsString("/api/integration/suggestiontargets/search/findByTarget?"),
+                                Matchers.containsString("target=" + itemFirst.getID().toString()),
+                                Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                .andExpect(jsonPath("$._links.last.href",
+                        Matchers.allOf(
+                                Matchers.containsString("/api/integration/suggestiontargets/search/findByTarget?"),
+                                Matchers.containsString("target=" + itemFirst.getID().toString()),
+                                Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                .andExpect(jsonPath("$._links.first.href",
+                        Matchers.allOf(
+                                Matchers.containsString("/api/integration/suggestiontargets/search/findByTarget?"),
+                                Matchers.containsString("target=" + itemFirst.getID().toString()),
+                                Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                .andExpect(jsonPath("$._links.prev.href").doesNotExist()).andExpect(jsonPath("$.page.size", is(1)))
+                .andExpect(jsonPath("$.page.size", is(1))).andExpect(jsonPath("$.page.totalElements", is(2)));
+        getClient(adminToken)
+                .perform(get("/api/integration/suggestiontargets/search/findByTarget").param("size", "1")
+                        .param("page", "1").param("target", itemFirst.getID().toString()))
+                .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.suggestiontargets",
+                        Matchers.contains(matchSuggestionTarget("Bollini, Andrea", "scopus", 3))))
+                .andExpect(jsonPath("$._links.self.href",
+                        Matchers.allOf(
+                                Matchers.containsString("/api/integration/suggestiontargets/search/findByTarget?"),
+                                Matchers.containsString("target=" + itemFirst.getID().toString()),
+                                Matchers.containsString("size=1"), Matchers.containsString("page=1"))))
+                .andExpect(jsonPath("$._links.prev.href",
+                        Matchers.allOf(
+                                Matchers.containsString("/api/integration/suggestiontargets/search/findByTarget?"),
+                                Matchers.containsString("target=" + itemFirst.getID().toString()),
+                                Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                .andExpect(jsonPath("$._links.last.href",
+                        Matchers.allOf(
+                                Matchers.containsString("/api/integration/suggestiontargets/search/findByTarget?"),
+                                Matchers.containsString("target=" + itemFirst.getID().toString()),
+                                Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                .andExpect(jsonPath("$._links.first.href",
+                        Matchers.allOf(
+                                Matchers.containsString("/api/integration/suggestiontargets/search/findByTarget?"),
+                                Matchers.containsString("target=" + itemFirst.getID().toString()),
+                                Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                .andExpect(jsonPath("$._links.next.href").doesNotExist()).andExpect(jsonPath("$.page.size", is(1)))
+                .andExpect(jsonPath("$.page.size", is(1))).andExpect(jsonPath("$.page.totalElements", is(2)));
+    }
+
+    @Test
+    public void findByTargetUnAuthenticatedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item itemFirst = ItemBuilder.createItem(context, colPeople).withTitle("Bollini, Andrea").build();
+        SuggestionTarget targetFirstReciter = SuggestionTargetBuilder.createTarget(context, itemFirst)
+                .withSuggestionCount("reciter", 31).build();
+        SuggestionTarget targetFirstScopus = SuggestionTargetBuilder.createTarget(context, itemFirst)
+                .withSuggestionCount("scopus", 3).build();
+        Item itemLast = ItemBuilder.createItem(context, colPeople).withTitle("Lombardi, Corrado")
+                .withCrisOwner(eperson.getFullName(), eperson.getID().toString()).build();
+        SuggestionTarget targetLast = SuggestionTargetBuilder.createTarget(context, itemLast)
+                .withSuggestionCount("scopus", 2).build();
+        context.restoreAuthSystemState();
+
+        // anonymous cannot access the suggestions endpoint
+        getClient().perform(get("/api/integration/suggestiontargets/search/findByTarget").param("target",
+                itemFirst.getID().toString())).andExpect(status().isUnauthorized());
+        getClient().perform(get("/api/integration/suggestiontargets/search/findByTarget").param("target",
+                itemLast.getID().toString())).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void findByTargetForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item itemFirst = ItemBuilder.createItem(context, colPeople).withTitle("Bollini, Andrea").build();
+        SuggestionTarget targetFirstReciter = SuggestionTargetBuilder.createTarget(context, itemFirst)
+                .withSuggestionCount("reciter", 31).build();
+        SuggestionTarget targetFirstScopus = SuggestionTargetBuilder.createTarget(context, itemFirst)
+                .withSuggestionCount("scopus", 3).build();
+        Item itemLast = ItemBuilder.createItem(context, colPeople).withTitle("Lombardi, Corrado")
+                .withCrisOwner(eperson.getFullName(), eperson.getID().toString()).build();
+        SuggestionTarget targetLast = SuggestionTargetBuilder.createTarget(context, itemLast)
+                .withSuggestionCount("scopus", 2).build();
+        EPerson anotherEPerson = EPersonBuilder.createEPerson(context).withEmail("another@example.com")
+                .withPassword(password).withNameInMetadata("Test", "Test").build();
+        context.restoreAuthSystemState();
+
+        String tokenAnother = getAuthToken(anotherEPerson.getEmail(), password);
+        getClient(tokenAnother).perform(get("/api/integration/suggestiontargets/search/findByTarget").param("target",
+                itemFirst.getID().toString())).andExpect(status().isForbidden());
+        getClient(tokenAnother).perform(get("/api/integration/suggestiontargets/search/findByTarget").param("target",
+                itemLast.getID().toString())).andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void findByTargetBadRequestTest() throws Exception {
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken)
+                .perform(get("/api/integration/suggestiontargets/search/findByTarget").param("target", "not-exist"))
+                .andExpect(status().isBadRequest());
+        getClient(adminToken).perform(get("/api/integration/suggestiontargets/search/findByTarget"))
+                .andExpect(status().isBadRequest());
+        getClient().perform(get("/api/integration/suggestiontargets/search/findByTarget").param("target", "not-exist"))
+                .andExpect(status().isBadRequest());
+    }
+
 }
