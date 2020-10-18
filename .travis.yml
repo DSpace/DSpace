@@ -29,7 +29,10 @@ env:
 
 before_install:
   - ./dspace-api/src/test/data/dspaceFolder/bin/install_grobid.sh
-
+  # Remove outdated settings.xml from Travis builds. Workaround for https://github.com/travis-ci/travis-ci/issues/4629
+  - sed -i 's/^orcid\.clientid.*/orcid.clientid='$ORCID_CLIENTID'/g' dspace-api/src/test/data/dspaceFolder/config/local.cfg
+  - sed -i 's/^orcid\.clientsecret.*/orcid.clientsecret='$ORCID_CLIENTSECRET'/g' dspace-api/src/test/data/dspaceFolder/config/local.cfg
+  - rm ~/.m2/settings.xml
 # Create two jobs to run Unit & Integration tests in parallel.
 # These jobs only differ in the TEST_FLAGS defined below,
 # and otherwise share all the other configs in this file

@@ -31,28 +31,29 @@ import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
 import org.dspace.external.provider.orcid.xml.XMLtoBio;
 import org.json.JSONObject;
-import org.orcid.jaxb.model.common_v2.OrcidId;
-import org.orcid.jaxb.model.record_v2.Person;
-import org.orcid.jaxb.model.search_v2.Result;
+import org.orcid.jaxb.model.common_v3.OrcidId;
+import org.orcid.jaxb.model.record_v3.Person;
+import org.orcid.jaxb.model.search_v3.Result;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
- * This class is the implementation of the ExternalDataProvider interface that will deal with the OrcidV2 External
+ * This class is the implementation of the ExternalDataProvider interface that will deal with the OrcidV3 External
  * Data lookup
  */
-public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
+public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
 
-    private static Logger log = LogManager.getLogger(OrcidV2AuthorDataProvider.class);
+    private static Logger log = LogManager.getLogger(OrcidV3AuthorDataProvider.class);
 
     private OrcidRestConnector orcidRestConnector;
     private String OAUTHUrl;
-    private String clientId;
 
+    private String clientId;
     private String clientSecret;
 
     private String accessToken;
 
     private String sourceIdentifier;
+
     private String orcidUrl;
 
     public static final String ORCID_ID_SYNTAX = "\\d{4}-\\d{4}-\\d{4}-(\\d{3}X|\\d{4})";
@@ -68,7 +69,8 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
      * @throws java.io.IOException passed through from HTTPclient.
      */
     public void init() throws IOException {
-        if (StringUtils.isNotBlank(accessToken) && StringUtils.isNotBlank(clientSecret)) {
+        if (StringUtils.isNotBlank(clientSecret) && StringUtils.isNotBlank(clientId)
+            && StringUtils.isNotBlank(OAUTHUrl)) {
             String authenticationParameters = "?client_id=" + clientId +
                 "&client_secret=" + clientSecret +
                 "&scope=/read-public&grant_type=client_credentials";
@@ -101,10 +103,10 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
     }
 
     /**
-     * Makes an instance of the Orcidv2 class based on the provided parameters.
+     * Makes an instance of the Orcidv3 class based on the provided parameters.
      * This constructor is called through the spring bean initialization
      */
-    private OrcidV2AuthorDataProvider(String url) {
+    private OrcidV3AuthorDataProvider(String url) {
         this.orcidRestConnector = new OrcidRestConnector(url);
     }
 
@@ -230,7 +232,7 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
 
     /**
      * Generic setter for the sourceIdentifier
-     * @param sourceIdentifier   The sourceIdentifier to be set on this OrcidV2AuthorDataProvider
+     * @param sourceIdentifier   The sourceIdentifier to be set on this OrcidV3AuthorDataProvider
      */
     @Required
     public void setSourceIdentifier(String sourceIdentifier) {
@@ -239,7 +241,7 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
 
     /**
      * Generic getter for the orcidUrl
-     * @return the orcidUrl value of this OrcidV2AuthorDataProvider
+     * @return the orcidUrl value of this OrcidV3AuthorDataProvider
      */
     public String getOrcidUrl() {
         return orcidUrl;
@@ -247,7 +249,7 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
 
     /**
      * Generic setter for the orcidUrl
-     * @param orcidUrl   The orcidUrl to be set on this OrcidV2AuthorDataProvider
+     * @param orcidUrl   The orcidUrl to be set on this OrcidV3AuthorDataProvider
      */
     @Required
     public void setOrcidUrl(String orcidUrl) {
@@ -256,7 +258,7 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
 
     /**
      * Generic setter for the OAUTHUrl
-     * @param OAUTHUrl   The OAUTHUrl to be set on this OrcidV2AuthorDataProvider
+     * @param OAUTHUrl   The OAUTHUrl to be set on this OrcidV3AuthorDataProvider
      */
     public void setOAUTHUrl(String OAUTHUrl) {
         this.OAUTHUrl = OAUTHUrl;
@@ -264,7 +266,7 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
 
     /**
      * Generic setter for the clientId
-     * @param clientId   The clientId to be set on this OrcidV2AuthorDataProvider
+     * @param clientId   The clientId to be set on this OrcidV3AuthorDataProvider
      */
     public void setClientId(String clientId) {
         this.clientId = clientId;
@@ -272,7 +274,7 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
 
     /**
      * Generic setter for the clientSecret
-     * @param clientSecret   The clientSecret to be set on this OrcidV2AuthorDataProvider
+     * @param clientSecret   The clientSecret to be set on this OrcidV3AuthorDataProvider
      */
     public void setClientSecret(String clientSecret) {
         this.clientSecret = clientSecret;
