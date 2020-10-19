@@ -11,148 +11,147 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class MessageDto {
 
-	@JsonProperty("pids[0].value")
-	private String value;
-	
-	@JsonProperty("pids[0].type")
-	private String type;
-	
-	@JsonProperty("instances[0].hostedby")
-	private String instanceHostedBy;
-	
-	@JsonProperty("instances[0].instancetype")
-	private String instanceInstanceType;
+    @JsonProperty("pids[0].value")
+    private String value;
 
-	@JsonProperty("instances[0].license")
-	private String instanceLicense;
-	
-	@JsonProperty("instances[0].url")
-	private String instanceUrl;
-	
-	@JsonProperty("abstracts[0]")
-	private String abstracts;
-	
-	@JsonProperty("projects[0].code")
-	private String code;
-	
-	@JsonProperty("projects[0].funder")
-	private String funder;
-	
-	@JsonProperty("projects[0].fundingProgram")
-	private String fundingProgram;
-	
-	@JsonProperty("projects[0].jurisdiction")
-	private String jurisdiction;
-	
-	@JsonProperty("projects[0].openaireId")
-	private String openaireId;
-	
-	@JsonProperty("projects[0].title")
-	private String title;
-	
-	
+    @JsonProperty("pids[0].type")
+    private String type;
 
-	public String getValue() {
-		return value;
-	}
+    @JsonProperty("instances[0].hostedby")
+    private String instanceHostedBy;
 
-	public void setValue(String value) {
-		this.value = value;
-	}
+    @JsonProperty("instances[0].instancetype")
+    private String instanceInstanceType;
 
-	public String getType() {
-		return type;
-	}
+    @JsonProperty("instances[0].license")
+    private String instanceLicense;
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    @JsonProperty("instances[0].url")
+    private String instanceUrl;
 
-	public String getInstanceHostedBy() {
-		return instanceHostedBy;
-	}
+    @JsonProperty("abstracts[0]")
+    private String abstracts;
 
-	public void setInstanceHostedBy(String instanceHostedBy) {
-		this.instanceHostedBy = instanceHostedBy;
-	}
+    @JsonProperty("projects[0].code")
+    private String code;
 
-	public String getInstanceInstanceType() {
-		return instanceInstanceType;
-	}
+    @JsonProperty("projects[0].funder")
+    private String funder;
 
-	public void setInstanceInstanceType(String instanceInstanceType) {
-		this.instanceInstanceType = instanceInstanceType;
-	}
+    @JsonProperty("projects[0].fundingProgram")
+    private String fundingProgram;
 
-	public String getInstanceLicense() {
-		return instanceLicense;
-	}
+    @JsonProperty("projects[0].jurisdiction")
+    private String jurisdiction;
 
-	public void setInstanceLicense(String instanceLicense) {
-		this.instanceLicense = instanceLicense;
-	}
+    @JsonProperty("projects[0].openaireId")
+    private String openaireId;
 
-	public String getInstanceUrl() {
-		return instanceUrl;
-	}
+    @JsonProperty("projects[0].title")
+    private String title;
 
-	public void setInstanceUrl(String instanceUrl) {
-		this.instanceUrl = instanceUrl;
-	}
 
-	public String getAbstracts() {
-		return abstracts;
-	}
+    public String getValue() {
+        return value;
+    }
 
-	public void setAbstracts(String abstracts) {
-		this.abstracts = abstracts;
-	}
+    public void setValue(String value) {
+        this.value = value;
+    }
 
-	public String getCode() {
-		return code;
-	}
+    public String getType() {
+        return type;
+    }
 
-	public void setCode(String code) {
-		this.code = code;
-	}
+    public void setType(String type) {
+        this.type = type;
+    }
 
-	public String getFunder() {
-		return funder;
-	}
+    public String getInstanceHostedBy() {
+        return instanceHostedBy;
+    }
 
-	public void setFunder(String funder) {
-		this.funder = funder;
-	}
+    public void setInstanceHostedBy(String instanceHostedBy) {
+        this.instanceHostedBy = instanceHostedBy;
+    }
 
-	public String getFundingProgram() {
-		return fundingProgram;
-	}
+    public String getInstanceInstanceType() {
+        return instanceInstanceType;
+    }
 
-	public void setFundingProgram(String fundingProgram) {
-		this.fundingProgram = fundingProgram;
-	}
+    public void setInstanceInstanceType(String instanceInstanceType) {
+        this.instanceInstanceType = instanceInstanceType;
+    }
 
-	public String getJurisdiction() {
-		return jurisdiction;
-	}
+    public String getInstanceLicense() {
+        return instanceLicense;
+    }
 
-	public void setJurisdiction(String jurisdiction) {
-		this.jurisdiction = jurisdiction;
-	}
+    public void setInstanceLicense(String instanceLicense) {
+        this.instanceLicense = instanceLicense;
+    }
 
-	public String getOpenaireId() {
-		return openaireId;
-	}
+    public String getInstanceUrl() {
+        return instanceUrl;
+    }
 
-	public void setOpenaireId(String openaireId) {
-		this.openaireId = openaireId;
-	}
+    public void setInstanceUrl(String instanceUrl) {
+        this.instanceUrl = instanceUrl;
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public String getAbstracts() {
+        return abstracts;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public void setAbstracts(String abstracts) {
+        this.abstracts = abstracts;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getFunder() {
+        return funder;
+    }
+
+    public void setFunder(String funder) {
+        this.funder = funder;
+    }
+
+    public String getFundingProgram() {
+        return fundingProgram;
+    }
+
+    public void setFundingProgram(String fundingProgram) {
+        this.fundingProgram = fundingProgram;
+    }
+
+    public String getJurisdiction() {
+        return jurisdiction;
+    }
+
+    public void setJurisdiction(String jurisdiction) {
+        this.jurisdiction = jurisdiction;
+    }
+
+    public String getOpenaireId() {
+        return openaireId;
+    }
+
+    public void setOpenaireId(String openaireId) {
+        this.openaireId = openaireId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 }

@@ -20,8 +20,8 @@ import org.apache.solr.client.solrj.beans.Field;
  *
  */
 public class NBEvent {
-    public static final char[] HEX_DIGITS =
-        { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+    public static final char[] HEX_DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e',
+        'f' };
 
     @Field("event_id")
     private String eventId;
@@ -47,6 +47,9 @@ public class NBEvent {
     @Field("last_update")
     private Date lastUpdate;
 
+    public NBEvent() {
+    }
+
     public NBEvent(String originalId, String target, String title, String topic, double trust, String message,
             Date lastUpdate) {
         super();
@@ -57,21 +60,8 @@ public class NBEvent {
         this.trust = trust;
         this.message = message;
         this.lastUpdate = lastUpdate;
-
         try {
-            MessageDigest digester = MessageDigest.getInstance("MD5");
-            String dataToString = "originalId=" + originalId + ", title=" + title + ", topic=" + topic + ", trust="
-                    + trust + ", message=" + message;
-            digester.update(dataToString.getBytes("UTF-8"));
-            byte[] signature = digester.digest();
-            char[] arr = new char[signature.length << 1];
-            for (int i = 0; i < signature.length; i++) {
-                int b = signature[i];
-                int idx = i << 1;
-                arr[idx] = HEX_DIGITS[(b >> 4) & 0xf];
-                arr[idx + 1] = HEX_DIGITS[b & 0xf];
-            }
-            eventId = new String(arr);
+            computedEventId();
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
             throw new IllegalStateException(e);
         }
@@ -118,4 +108,55 @@ public class NBEvent {
         this.message = message;
     }
 
+    public String getEventId() {
+        if (eventId == null) {
+            try {
+                computedEventId();
+            } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+        return eventId;
+    }
+
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
+    }
+
+    public String getTarget() {
+        return target;
+    }
+
+    public void setTarget(String target) {
+        this.target = target;
+    }
+
+    public Date getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setLastUpdate(Date lastUpdate) {
+        this.lastUpdate = lastUpdate;
+    }
+
+    /*
+     * DTO constructed via Jackson use empty constructor. In this case, the eventId
+     * must be compute on the get method
+     */
+    private void computedEventId() throws NoSuchAlgorithmException, UnsupportedEncodingException {
+        MessageDigest digester = MessageDigest.getInstance("MD5");
+        String dataToString = "originalId=" + originalId + ", title=" + title + ", topic=" + topic + ", trust=" + trust
+                + ", message=" + message;
+        digester.update(dataToString.getBytes("UTF-8"));
+        byte[] signature = digester.digest();
+        char[] arr = new char[signature.length << 1];
+        for (int i = 0; i < signature.length; i++) {
+            int b = signature[i];
+            int idx = i << 1;
+            arr[idx] = HEX_DIGITS[(b >> 4) & 0xf];
+            arr[idx + 1] = HEX_DIGITS[b & 0xf];
+        }
+        eventId = new String(arr);
+
+    }
 }

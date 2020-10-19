@@ -14,8 +14,8 @@ import org.dspace.app.rest.utils.Utils;
 @RelNameDSpaceResource(NBEventRest.NAME)
 public class NBEventsResource extends DSpaceResource<NBEventRest> {
 
-	public NBEventsResource(NBEventRest data, Utils utils) {
-		super(data, utils);
-	}
+    public NBEventsResource(NBEventRest data, Utils utils) {
+        super(data, utils);
+    }
 
 }

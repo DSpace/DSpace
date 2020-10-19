@@ -27,8 +27,8 @@ public interface NBEventService {
 
     public NBEvent findEventByEventId(Context context, String id);
 
-    public void store(Context context, NBEvent event);
+    public void store(Context context, NBEvent event) throws Exception;
 
-    public void deleteEventByEventId(Context context, String id);
+    public NBEvent deleteEventByEventId(Context context, String id);
 
 }

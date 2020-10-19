@@ -8,15 +8,14 @@
 package org.dspace.app.nbevent.service.impl;
 
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
-import javax.xml.bind.DatatypeConverter;
-
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -29,7 +28,6 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
-import org.dspace.app.exception.InvalidEnumeratedDataValueException;
 import org.dspace.app.nbevent.dao.impl.NBEventsDaoImpl;
 import org.dspace.app.nbevent.service.NBEventService;
 import org.dspace.app.nbevent.service.dto.MessageDto;
@@ -43,14 +41,7 @@ import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.util.SolrImportExportException;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 
 public class NBEventServiceImpl implements NBEventService {
 
@@ -92,52 +83,67 @@ public class NBEventServiceImpl implements NBEventService {
     protected SolrClient getSolr() {
         if (solr == null) {
             String solrService = DSpaceServicesFactory.getInstance().getConfigurationService()
-                    .getProperty("openstar.search.server");
+                    .getProperty("openstar.search.server", "http://localhost:8983/solr/nbevent");
             return new HttpSolrClient.Builder(solrService).build();
         }
         return solr;
     }
 
     @Override
-    public int countTopics(Context context) throws SolrServerException, IOException {
+    public long countTopics(Context context) {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
         solrQuery.setQuery(TOPIC + ":*");
         solrQuery.setFacet(true);
         solrQuery.setFacetMinCount(0);
         solrQuery.addFacetField(TOPIC);
-        QueryResponse response = getSolr().query(solrQuery);
-        return response.getResults().size();
+        QueryResponse response;
+        try {
+            response = getSolr().query(solrQuery);
+            return response.getResults().size();
+        } catch (SolrServerException | IOException e) {
+            log.error("Error querying solr", e);
+            return 0L;
+        }
     }
 
     @Override
-    public NBEventImportDto deleteEventByResourceUUID(String id) throws SolrServerException, IOException {
-        NBEventImportDto dto = findEventByResourceUUID(id);
-        getSolr().deleteById(dto.getHashString());
-        getSolr().commit();
+    public NBEvent deleteEventByEventId(Context context, String id) {
+        NBEvent dto = findEventByEventId(context, id);
+        try {
+            getSolr().deleteById(dto.getEventId());
+            getSolr().commit();
+        } catch (SolrServerException | IOException e) {
+            log.error("Error querying solr", e);
+        }
         return dto;
     }
 
     @Override
-    public NBTopic findTopicByTopicId(String topicId)
-            throws SolrServerException, IOException, InvalidEnumeratedDataValueException {
+    public NBTopic findTopicByTopicId(String topicId) {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
-        solrQuery.setQuery(TOPIC + ":" + OpenstarSupportedTopic.restToSolr(topicId));
+        solrQuery.setQuery(TOPIC + ":" + topicId.replaceAll("|", "/"));
         solrQuery.setFacet(true);
         solrQuery.setFacetMinCount(0);
         solrQuery.addFacetField(TOPIC);
-        QueryResponse response = getSolr().query(solrQuery);
-        FacetField facetField = response.getFacetField(TOPIC);
-        for (Count c : facetField.getValues()) {
-            if (c.getName().equals(OpenstarSupportedTopic.restToSolr(topicId))) {
-                NBTopic topic = new NBTopic();
-                topic.setId(c.getName());
-                topic.setName(OpenstarSupportedTopic.sorlToRest(c.getName()));
-                topic.setTotalSuggestion(String.valueOf(c.getCount()));
-                topic.setLastEvent("MISS THIS VALUE");
-                return topic;
+        QueryResponse response;
+        try {
+            response = getSolr().query(solrQuery);
+            FacetField facetField = response.getFacetField(TOPIC);
+            for (Count c : facetField.getValues()) {
+                if (c.getName().equals(topicId.replace("|", "/"))) {
+                    NBTopic topic = new NBTopic();
+                    topic.setKey(c.getName());
+//                    topic.setName(OpenstarSupportedTopic.sorlToRest(c.getName()));
+                    topic.setTotalEvents(c.getCount());
+                    topic.setLastEvent(new Date());
+                    return topic;
+                }
             }
+        } catch (SolrServerException | IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
         return null;
     }
@@ -155,63 +161,59 @@ public class NBEventServiceImpl implements NBEventService {
      * 
      */
     @Override
-    public List<NBTopic> findAllTopics(Context context, long offset, Integer count)
-            throws SolrServerException, IOException, InvalidEnumeratedDataValueException {
-
+    public List<NBTopic> findAllTopics(Context context, long offset, long count) {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
         solrQuery.setQuery(TOPIC + ":*");
         solrQuery.setFacet(true);
         solrQuery.setFacetMinCount(0);
         solrQuery.addFacetField(TOPIC);
-        QueryResponse response = getSolr().query(solrQuery);
-        FacetField facetField = response.getFacetField(TOPIC);
-        List<NBTopic> nbTopics = new ArrayList<>();
-        for (Count c : facetField.getValues()) {
-            NBTopic topic = new NBTopic();
-            topic.setId(c.getName());
-            topic.setName(OpenstarSupportedTopic.sorlToRest(c.getName()));
-            topic.setTotalSuggestion(String.valueOf(c.getCount()));
-            topic.setLastEvent("MISS THIS VALUE");
-            nbTopics.add(topic);
+        QueryResponse response;
+        List<NBTopic> nbTopics = null;
+        try {
+            response = getSolr().query(solrQuery);
+            FacetField facetField = response.getFacetField(TOPIC);
+            nbTopics = new ArrayList<>();
+            for (Count c : facetField.getValues()) {
+                NBTopic topic = new NBTopic();
+                topic.setKey(c.getName());
+                // topic.setName(c.getName().replaceAll("/", "!"));
+                topic.setTotalEvents(c.getCount());
+                topic.setLastEvent(new Date());
+                nbTopics.add(topic);
+            }
+        } catch (SolrServerException | IOException e) {
+            log.error("Solr error", e);
         }
         return nbTopics;
     }
 
     @Override
-    public void store(Context context, List<NBEventImportDto> entries)
-            throws SolrImportExportException, SolrServerException, IOException, SQLException {
+    public void store(Context context, NBEvent dto) throws Exception {
         UpdateRequest updateRequest = new UpdateRequest();
-        for (NBEventImportDto dto : entries) {
-            String topic = null;
+        String topic = dto.getTopic();
+        if (topic != null) {
+            String checksum = dto.getEventId();
             try {
-                topic = OpenstarSupportedTopic.authorizedTopic(dto.getTopic());
-            } catch (Exception e) {
-
-            }
-            if (topic != null) {
-                String checksum = generateChecksumFromToString(dto.getHashString());
-                try {
-                    if (!nbEventsDao.isEventStored(context, checksum)) {
-                        SolrInputDocument doc = new SolrInputDocument();
-                        doc.addField(EVENT_ID, checksum);
-                        doc.addField(ORIGINAL_ID, dto.getOriginalId());
-                        doc.addField(TITLE, dto.getTitle());
-                        doc.addField(TOPIC, topic);
-                        doc.addField(TRUST, dto.getTrust());
-                        doc.addField(MESSAGE, jsonMapper.writeValueAsString(dto.getMessage()));
-                        doc.addField(LAST_UPDATE, System.currentTimeMillis());
-                        doc.addField(RESOURCE_UUID, getResourceUUID(context, dto.getOriginalId()));
-                        updateRequest.add(doc);
-                    }
-                } catch (SQLException e) {
-                    log.error("Unable to query RDB, throw Exception and stop import", e);
-                    throw e;
+                if (!nbEventsDao.isEventStored(context, checksum)) {
+                    SolrInputDocument doc = new SolrInputDocument();
+                    doc.addField(EVENT_ID, checksum);
+                    doc.addField(ORIGINAL_ID, dto.getOriginalId());
+                    doc.addField(TITLE, dto.getTitle());
+                    doc.addField(TOPIC, topic);
+                    doc.addField(TRUST, dto.getTrust());
+                    doc.addField(MESSAGE, dto.getMessage());
+                    doc.addField(LAST_UPDATE, System.currentTimeMillis());
+                    doc.addField(RESOURCE_UUID, getResourceUUID(context, dto.getOriginalId()));
+                    updateRequest.add(doc);
+                    updateRequest.process(getSolr());
+                    getSolr().commit();
                 }
+            } catch (Exception e) {
+                log.error("Unable to query RDB, throw Exception and stop import", e);
+                throw e;
             }
         }
-        updateRequest.process(getSolr());
-        getSolr().commit();
     }
     /*
      * @Override public void delete(String resourceUUID) throws SolrServerException,
@@ -228,10 +230,9 @@ public class NBEventServiceImpl implements NBEventService {
      */
 
     @Override
-    public NBEventQueryDto findEventByEventId(Context context, String eventId)
-            throws SolrServerException, IOException, InvalidEnumeratedDataValueException {
+    public NBEvent findEventByEventId(Context context, String eventId) {
         SolrQuery param = new SolrQuery();
-        param.set(EVENT_ID, OpenstarSupportedTopic.restToSolr(eventId));
+        param.set(EVENT_ID, eventId.replaceAll("|", "/"));
         QueryResponse response;
         try {
             response = getSolr().query(param);
@@ -239,73 +240,81 @@ public class NBEventServiceImpl implements NBEventService {
                 SolrDocumentList list = response.getResults();
                 if (list != null && list.size() == 1) {
                     SolrDocument doc = list.get(0);
-                    NBEventQueryDto item = new NBEventQueryDto();
+                    NBEvent item = new NBEvent();
                     item.setEventId((String) doc.get(EVENT_ID));
-                    item.setLastUpdate((Long) doc.get(LAST_UPDATE));
-                    item.setMessage(jsonMapper.readValue((String) doc.get(MESSAGE), MessageDto.class));
+                    item.setLastUpdate((Date) doc.get(LAST_UPDATE));
+                    item.setMessage((String) doc.get(MESSAGE));
                     item.setOriginalId((String) doc.get(ORIGINAL_ID));
-                    item.setResourceUUID((String) doc.get(RESOURCE_UUID));
+                    item.setTarget((String) doc.get(RESOURCE_UUID));
                     item.setTitle((String) doc.get(TITLE));
                     item.setTopic((String) doc.get(TOPIC));
-                    item.setTrust((String) doc.get(TRUST));
+                    item.setTrust((long) doc.get(TRUST));
                     return item;
                 }
             }
         } catch (SolrServerException | IOException e) {
             log.error("Exception querying Solr", e);
-            throw e;
         }
         return null;
     }
 
     @Override
-    public List<NBEventQueryDto> findEventsByTopicAndPage(Context context, String topic, long offset, int pageSize)
-            throws SolrServerException, IOException, InvalidEnumeratedDataValueException {
+    public List<NBEvent> findEventsByTopicAndPage(Context context, String topic, long offset, int pageSize) {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setStart(((Long) offset).intValue());
         solrQuery.setRows(pageSize);
-        solrQuery.setQuery(TOPIC + ":" + OpenstarSupportedTopic.restToSolr(topic));
-        QueryResponse response = getSolr().query(solrQuery);
-        if (response != null) {
-            SolrDocumentList list = response.getResults();
-            List<NBEventQueryDto> responseItem = new ArrayList<>();
-            for (SolrDocument doc : list) {
-                NBEventQueryDto item = new NBEventQueryDto();
-                item.setEventId((String) doc.get(EVENT_ID));
-                item.setLastUpdate(Long.parseLong((String) doc.get(LAST_UPDATE)));
-                item.setMessage(jsonMapper.readValue((String) doc.get(MESSAGE), MessageDto.class));
-                item.setOriginalId((String) doc.get(ORIGINAL_ID));
-                item.setResourceUUID((String) doc.get(RESOURCE_UUID));
-                item.setTitle((String) doc.get(TITLE));
-                item.setTopic((String) doc.get(TOPIC));
-                item.setTrust((String) doc.get(TRUST));
-                responseItem.add(item);
+        solrQuery.setQuery(TOPIC + ":" + topic.replaceAll("|", "/"));
+        QueryResponse response;
+        try {
+            response = getSolr().query(solrQuery);
+            if (response != null) {
+                SolrDocumentList list = response.getResults();
+                List<NBEvent> responseItem = new ArrayList<>();
+                for (SolrDocument doc : list) {
+                    NBEvent item = new NBEvent();
+                    item.setEventId((String) doc.get(EVENT_ID));
+                    item.setLastUpdate((Date) doc.get(LAST_UPDATE));
+                    item.setMessage((String) doc.get(MESSAGE));
+                    item.setOriginalId((String) doc.get(ORIGINAL_ID));
+                    item.setTarget((String) doc.get(RESOURCE_UUID));
+                    item.setTitle((String) doc.get(TITLE));
+                    item.setTopic((String) doc.get(TOPIC));
+                    item.setTrust((long) doc.get(TRUST));
+                    responseItem.add(item);
+                }
+                return responseItem;
             }
-            return responseItem;
+        } catch (SolrServerException | IOException e) {
+            log.error("Solr error", e);
         }
         return null;
     }
 
     @Override
-    public Long countEventsByTopic(Context context, String topic)
-            throws InvalidEnumeratedDataValueException, SolrServerException, IOException {
+    public long countEventsByTopic(Context context, String topic) {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
-        solrQuery.setQuery(TOPIC + ":" + OpenstarSupportedTopic.restToSolr(topic));
+        solrQuery.setQuery(TOPIC + ":" + topic.replaceAll("|", "/"));
         solrQuery.setFacet(true);
         solrQuery.setFacetMinCount(0);
         solrQuery.addFacetField(TOPIC);
-        QueryResponse response = getSolr().query(solrQuery);
+        QueryResponse response = null;
+        try {
+            response = getSolr().query(solrQuery);
+        } catch (SolrServerException | IOException e) {
+            log.error("Solr exception:", e);
+            return 0L;
+        }
         FacetField facetField = response.getFacetField(TOPIC);
         for (Count c : facetField.getValues()) {
-            if (c.getName().equals(OpenstarSupportedTopic.restToSolr(topic))) {
+            if (c.getName().equals(topic.replaceAll("|", "/"))) {
                 return c.getCount();
             }
         }
         return 0L;
     }
 
-    private String getResourceUUID(Context context, String originalId) throws SolrImportExportException {
+    private String getResourceUUID(Context context, String originalId) throws Exception {
         try {
             String id = getIdFromOriginalId(originalId);
             if (id != null) {
@@ -320,8 +329,7 @@ public class NBEventServiceImpl implements NBEventService {
             }
         } catch (RuntimeException | SQLException e) {
             System.err.println("OriginalID not found");
-            return UUID.randomUUID().toString();
-//			throw new SolrImportExportException("Original ID is not valid: ");
+            throw e;
         }
     }
 
@@ -329,7 +337,7 @@ public class NBEventServiceImpl implements NBEventService {
     private String getIdFromOriginalId(String originalId) {
         Integer startPosition = originalId.lastIndexOf(':');
         if (startPosition != -1) {
-            return originalId.substring(startPosition, originalId.length());
+            return originalId.substring(startPosition + 1, originalId.length());
         } else {
             return null;
         }
@@ -343,7 +351,6 @@ public class NBEventServiceImpl implements NBEventService {
         QueryResponse response = getSolr().query(solrQuery);
         if (response != null) {
             SolrDocumentList list = response.getResults();
-            List<NBEventQueryDto> responseItem = new ArrayList<>();
             if (list.size() == 1) {
                 SolrDocument doc = list.get(0);
                 NBEventQueryDto item = new NBEventQueryDto();
@@ -354,95 +361,23 @@ public class NBEventServiceImpl implements NBEventService {
                 item.setResourceUUID((String) doc.get(RESOURCE_UUID));
                 item.setTitle((String) doc.get(TITLE));
                 item.setTopic((String) doc.get(TOPIC));
-                item.setTrust((String) doc.get(TRUST));
+                item.setTrust((long) doc.get(TRUST));
                 return item;
             }
         }
         return null;
     }
 
-    public enum OpenstarSupportedTopic {
-        ENRICH_MORE_ABSTRACT("ENRICH/MORE/ABSTRACT", "ENRICH!MORE!ABSTRACT"),
-        ENRICH_MISSING_ABSTRACT("ENRICH/MISSING/ABSTRACT", "ENRICH!MISSING!ABSTRACT"),
-        // no entry of this Topic in json
-        // ENRICH_MORE_SUBJECT("ENRICH/MORE/SUBJECT","ENRICH!MORE!SUBJECT"),
-        ENRICH_MISSING_SUBJECT_ACM("ENRICH/MISSING/SUBJECT/ACM", "ENRICH!MISSING!SUBJECT!ACM"),
-        ENRICH_MORE_PID("ENRICH/MORE/PID", "ENRICH!MORE!PID"),
-        ENRICH_MISSING_PROJECT("ENRICH/MISSING/PROJECT", "ENRICH!MISSING!PROJECT"),
-        ENRICH_MISSING_PID("ENRICH/MISSING/PID", "ENRICH!MISSING!PID");
-
-        private String solrTopic;
-
-        private String restTopic;
-
-        private OpenstarSupportedTopic(String solrTopic, String restTopic) {
-            this.solrTopic = solrTopic;
-            this.restTopic = restTopic;
-        }
-
-        public static String authorizedTopic(String topic) throws SolrImportExportException {
-            try {
-                System.out.println("Topic: " + topic);
-                return OpenstarSupportedTopic.solrToEnum(topic).getSolrTopic();
-            } catch (InvalidEnumeratedDataValueException e) {
-                throw new SolrImportExportException(e.getMessage());
-            }
-        }
-
-        public String getSolrTopic() {
-            return solrTopic;
-        }
-
-        public String getRestTopic() {
-            return restTopic;
-        }
-
-        public static String restToSolr(String restTopic) throws InvalidEnumeratedDataValueException {
-            return OpenstarSupportedTopic.restToEnum(restTopic).getSolrTopic();
-        }
-
-        public static String sorlToRest(String solrTopic) throws InvalidEnumeratedDataValueException {
-            return OpenstarSupportedTopic.solrToEnum(solrTopic).getRestTopic();
-        }
-
-        public static OpenstarSupportedTopic restToEnum(String restTopic) throws InvalidEnumeratedDataValueException {
-            switch (restTopic) {
-            case "ENRICH!MORE!ABSTRACT":
-                return OpenstarSupportedTopic.ENRICH_MORE_ABSTRACT;
-            case "ENRICH!MISSING!ABSTRACT":
-                return OpenstarSupportedTopic.ENRICH_MISSING_ABSTRACT;
-            case "ENRICH!MISSING!SUBJECT!ACM":
-                return OpenstarSupportedTopic.ENRICH_MISSING_SUBJECT_ACM;
-            case "ENRICH!MORE!PID":
-                return OpenstarSupportedTopic.ENRICH_MORE_PID;
-            case "ENRICH!MISSING!PROJECT":
-                return OpenstarSupportedTopic.ENRICH_MISSING_PROJECT;
-            case "ENRICH!MISSING!PID":
-                return OpenstarSupportedTopic.ENRICH_MISSING_PID;
-            default:
-                throw new InvalidEnumeratedDataValueException("Cannot map the input to any valid restTopic",
-                        "restTopic", restTopic);
-            }
-        }
-
-        public static OpenstarSupportedTopic solrToEnum(String solrTopic) throws InvalidEnumeratedDataValueException {
-            switch (solrTopic) {
-            case "ENRICH/MORE/ABSTRACT":
-                return OpenstarSupportedTopic.ENRICH_MORE_ABSTRACT;
-            case "ENRICH/MISSING/ABSTRACT":
-                return OpenstarSupportedTopic.ENRICH_MISSING_ABSTRACT;
-            case "ENRICH/MISSING/SUBJECT!ACM":
-                return OpenstarSupportedTopic.ENRICH_MISSING_SUBJECT_ACM;
-            case "ENRICH/MORE/PID":
-                return OpenstarSupportedTopic.ENRICH_MORE_PID;
-            case "ENRICH/MISSING/PROJECT":
-                return OpenstarSupportedTopic.ENRICH_MISSING_PROJECT;
-            case "ENRICH/MISSING/PID":
-                return OpenstarSupportedTopic.ENRICH_MISSING_PID;
-            default:
-                throw new InvalidEnumeratedDataValueException("Cannot map the input to any valid solrTopic",
-                        "solrTopic", solrTopic);
-            }
-        }
-    }
+    /*
+     * ENRICH_MORE_ABSTRACT("ENRICH/MORE/ABSTRACT", "ENRICH!MORE!ABSTRACT"),
+     * ENRICH_MISSING_ABSTRACT("ENRICH/MISSING/ABSTRACT",
+     * "ENRICH!MISSING!ABSTRACT"), // no entry of this Topic in json //
+     * ENRICH_MORE_SUBJECT("ENRICH/MORE/SUBJECT","ENRICH!MORE!SUBJECT"),
+     * ENRICH_MISSING_SUBJECT_ACM("ENRICH/MISSING/SUBJECT/ACM",
+     * "ENRICH!MISSING!SUBJECT!ACM"), ENRICH_MORE_PID("ENRICH/MORE/PID",
+     * "ENRICH!MORE!PID"), ENRICH_MISSING_PROJECT("ENRICH/MISSING/PROJECT",
+     * "ENRICH!MISSING!PROJECT"), ENRICH_MISSING_PID("ENRICH/MISSING/PID",
+     * "ENRICH!MISSING!PID");
+     * 
+     */
 }

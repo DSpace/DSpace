@@ -12,6 +12,8 @@ import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.nbevent.service.NBEventService;
+import org.dspace.app.nbevent.service.impl.NBEventServiceImpl;
 import org.dspace.app.orcid.factory.OrcidHistoryServiceFactory;
 import org.dspace.app.orcid.factory.OrcidQueueServiceFactory;
 import org.dspace.app.orcid.service.OrcidHistoryService;
@@ -50,6 +52,7 @@ import org.dspace.layout.service.CrisLayoutTabService;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.utils.DSpace;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
@@ -102,7 +105,7 @@ public abstract class AbstractBuilder<T, S> {
     static CrisLayoutFieldService crisLayoutFieldService;
     static OrcidQueueService orcidQueueService;
     static OrcidHistoryService orcidHistoryService;
-
+    static NBEventService nbEventService;
     protected Context context;
 
     /**
@@ -161,6 +164,8 @@ public abstract class AbstractBuilder<T, S> {
         crisLayoutFieldService = CrisLayoutServiceFactory.getInstance().getFieldService();
         orcidQueueService = OrcidQueueServiceFactory.getInstance().getOrcidQueueService();
         orcidHistoryService = OrcidHistoryServiceFactory.getInstance().getOrcidHistoryService();
+        nbEventService = new DSpace().getServiceManager().getServiceByName("nbEventService",
+                NBEventServiceImpl.class);
     }
 
 
@@ -196,7 +201,7 @@ public abstract class AbstractBuilder<T, S> {
         crisLayoutFieldService = null;
         orcidQueueService = null;
         orcidHistoryService = null;
-
+        nbEventService = null;
     }
 
     public static void cleanupObjects() throws Exception {

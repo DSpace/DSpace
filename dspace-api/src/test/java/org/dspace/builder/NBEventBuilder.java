@@ -10,15 +10,10 @@ package org.dspace.builder;
 import java.util.Date;
 
 import org.dspace.app.nbevent.service.NBEventService;
-import org.dspace.app.nbevent.service.dto.NBTopic;
-import org.dspace.app.suggestion.SuggestionService;
-import org.dspace.app.suggestion.SuggestionTarget;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.NBEvent;
 import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Builder to construct Notification Broker Event objects
@@ -26,11 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class NBEventBuilder extends AbstractBuilder<NBEvent, NBEventService> {
-    @Autowired
-    private NBEventService nbEventService;
+
     private Item item;
     private NBEvent target;
-    
+
     private String title;
     private String topic;
     private String message;
@@ -76,18 +70,41 @@ public class NBEventBuilder extends AbstractBuilder<NBEvent, NBEventService> {
         this.topic = topic;
         return this;
     }
+    public NBEventBuilder withTitle(final String title) {
+        this.title = title;
+        return this;
+    }
+    public NBEventBuilder withMessage(final String message) {
+        this.message = message;
+        return this;
+    }
+    public NBEventBuilder withTrust(final double trust) {
+        this.trust = trust;
+        return this;
+    }
+    public NBEventBuilder withOriginalId(final String originalId) {
+        this.originalId = originalId;
+        return this;
+    }
+    public NBEventBuilder withLastUpdate(final Date lastUpdate) {
+        this.lastUpdate = lastUpdate;
+        return this;
+    }
 
     @Override
     public NBEvent build() {
-        target = new NBEvent(originalId, item.getID().toString(), title,
-                topic, trust, message, lastUpdate);
-        nbEventService.store(context, target);
+        target = new NBEvent(originalId, item.getID().toString(), title, topic, trust, message, lastUpdate);
+        try {
+            nbEventService.store(context, target);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return target;
     }
 
     @Override
     public void cleanup() throws Exception {
-        nbEventService.deleteTarget(target);
+        nbEventService.deleteEventByEventId(context, target.getEventId());
     }
 
     @Override
@@ -97,6 +114,8 @@ public class NBEventBuilder extends AbstractBuilder<NBEvent, NBEventService> {
 
     @Override
     public void delete(Context c, NBEvent dso) throws Exception {
-        nbEventService.deleteTarget(dso);
+        nbEventService.deleteEventByEventId(context, target.getEventId());
+
+//        nbEventService.deleteTarget(dso);
     }
 }

@@ -9,93 +9,93 @@ package org.dspace.app.rest.model;
 
 import org.dspace.app.rest.RestResourceController;
 
-@LinksRest(links = {
-		@LinkRest(name = "topic", method = "findByTopic")
-})
+@LinksRest(links =
+    {
+        @LinkRest(name = "topic", method = "findByTopic")
+    }
+)
 public class NBEventRest extends BaseObjectRest<String> {
 
-	private static final long serialVersionUID = -5001130073350654793L;
+    private static final long serialVersionUID = -5001130073350654793L;
 
-	private static final String NAME_PLURAL = "nbevents";
-	public static final String NAME = "nbevent";
-	public static final String CATEGORY = RestAddressableModel.INTEGRATION;
+    private static final String NAME_PLURAL = "nbevents";
+    public static final String NAME = "nbevent";
+    public static final String CATEGORY = RestAddressableModel.INTEGRATION;
 
-	private String id;
-	private String originalId;
-	private String title;
-	private String topic;
-	private String trust;
-	private NBEventMessage message;
-	private String type = "openaireBrokerEvent";
+    private String id;
+    private String originalId;
+    private String title;
+    private String topic;
+    private String trust;
+    private NBEventMessage message;
+    private String type = "openaireBrokerEvent";
 
-	//per i progetti, vedere se trovato o meno
-	// e qui mettere l' handle del progetto
-	private String matchFoundHandle;
-	private String matchFoundId;
-	
-	@Override
-	public String getType() {
-		return NAME;
-	}
+    // per i progetti, vedere se trovato o meno
+    // e qui mettere l' handle del progetto
+    private String matchFoundHandle;
+    private String matchFoundId;
 
-	@Override
-	public String getCategory() {
-		return CATEGORY;
-	}
+    @Override
+    public String getType() {
+        return NAME;
+    }
 
-	@Override
-	public Class getController() {
-		return RestResourceController.class;
-	}
-	
-	public String getId() {
-		return id;
-	}
+    @Override
+    public String getCategory() {
+        return CATEGORY;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    @Override
+    public Class getController() {
+        return RestResourceController.class;
+    }
 
-	public String getOriginalId() {
-		return originalId;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public void setOriginalId(String originalId) {
-		this.originalId = originalId;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public String getOriginalId() {
+        return originalId;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public void setOriginalId(String originalId) {
+        this.originalId = originalId;
+    }
 
-	public String getTopic() {
-		return topic;
-	}
+    public String getTitle() {
+        return title;
+    }
 
-	public void setTopic(String topic) {
-		this.topic = topic;
-	}
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-	public String getTrust() {
-		return trust;
-	}
+    public String getTopic() {
+        return topic;
+    }
 
-	public void setTrust(String trust) {
-		this.trust = trust;
-	}
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
 
-	public NBEventMessage getMessage() {
-		return message;
-	}
+    public String getTrust() {
+        return trust;
+    }
 
-	public void setMessage(NBEventMessage message) {
-		this.message = message;
-	}
+    public void setTrust(String trust) {
+        this.trust = trust;
+    }
 
+    public NBEventMessage getMessage() {
+        return message;
+    }
 
+    public void setMessage(NBEventMessage message) {
+        this.message = message;
+    }
 
 }

@@ -8,27 +8,26 @@
 package org.dspace.app.nbevent;
 
 import org.apache.commons.cli.ParseException;
-import org.dspace.app.bulkedit.MetadataExportScriptConfiguration;
 import org.dspace.scripts.DSpaceRunnable;
 
 public class NBEventsRunnable extends DSpaceRunnable<NBEventsScriptConfiguration> {
 
-	@Override
-	public NBEventsScriptConfiguration getScriptConfiguration() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public NBEventsScriptConfiguration getScriptConfiguration() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public void setup() throws ParseException {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void setup() throws ParseException {
+        // TODO Auto-generated method stub
 
-	@Override
-	public void internalRun() throws Exception {
-		// TODO Auto-generated method stub
-		
-	}
+    }
+
+    @Override
+    public void internalRun() throws Exception {
+        // TODO Auto-generated method stub
+
+    }
 
 }

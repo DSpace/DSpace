@@ -7,10 +7,13 @@
  */
 package org.dspace.content;
 
+import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -24,7 +27,9 @@ import org.dspace.eperson.EPerson;
  */
 @Entity
 @Table(name = "nbevent_processed")
-public class NBEventProcessed {
+public class NBEventProcessed implements Serializable {
+
+    private static final long serialVersionUID = 3427340199132007814L;
 
     @Id
     @Column(name = "nbevent_id")
@@ -34,10 +39,12 @@ public class NBEventProcessed {
     @Column(name = "nbevent_timestamp")
     private Date eventTimestamp;
 
-    @Column(name = "eperson_uuid")
+    @JoinColumn(name = "eperson_uuid")
+    @OneToOne
     private EPerson eperson;
 
-    @Column(name = "item_uuid")
+    @JoinColumn(name = "item_uuid")
+    @OneToOne
     private Item item;
 
     public String getEventId() {

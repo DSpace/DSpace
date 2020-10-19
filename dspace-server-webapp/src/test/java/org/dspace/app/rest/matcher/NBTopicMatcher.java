@@ -23,6 +23,16 @@ public class NBTopicMatcher {
             hasJsonPath("$.name", is(key)),
             hasJsonPath("$.id", is(key.replace("!", "/"))),
             hasJsonPath("$.totalEvents", is(totalEvents))
-            );
+        );
     }
+
+
+    public static Matcher<? super Object> matchNBTopicEntry(String key) {
+        return allOf(
+            hasJsonPath("$.type", is("nbtopic")),
+            hasJsonPath("$.name", is(key)),
+            hasJsonPath("$.id", is(key.replace("!", "/")))
+        );
+    }
+
 }
