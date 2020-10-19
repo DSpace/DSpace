@@ -144,4 +144,12 @@
     </bean>
 
 
+    <bean id="openaireImportService"
+          class="org.dspace.importer.external.openaire.service.OpenAireImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="openaireMetadataFieldMapping"/>
+    </bean>
+    <bean id="openaireMetadataFieldMapping"
+          class="org.dspace.importer.external.openaire.service.metadatamapping.OpenAireFieldMapping">
+    </bean>
+
 </beans>
