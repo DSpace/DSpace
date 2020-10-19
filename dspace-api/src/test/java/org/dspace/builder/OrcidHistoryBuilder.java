@@ -85,6 +85,10 @@ public class OrcidHistoryBuilder extends  AbstractBuilder<OrcidHistory, OrcidHis
      * @throws IOException
      */
     public static void deleteOrcidHistory(Integer id) throws SQLException, IOException {
+        if (id == null) {
+            return;
+        }
+
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
             OrcidHistory orcidHistory = orcidHistoryService.find(c, id);

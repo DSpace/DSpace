@@ -30,4 +30,12 @@
         </property>
     </bean>
 
+	<!-- Converts an input value to an output one -->
+	<bean name="mapConverterOrcidWorkType" class="org.dspace.util.SimpleMapConverter"
+		init-method="init">
+		<constructor-arg value="mapConverterOrcidWorkType" />
+		<property name="converterNameFile" value="mapConverter-orcid-worktype.properties" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+		<property name="defaultValue" value="other"/>
+	</bean>
 </beans>

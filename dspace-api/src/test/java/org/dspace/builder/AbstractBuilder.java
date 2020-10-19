@@ -17,6 +17,7 @@ import org.dspace.app.orcid.factory.OrcidHistoryServiceFactory;
 import org.dspace.app.orcid.factory.OrcidQueueServiceFactory;
 import org.dspace.app.orcid.service.OrcidHistoryService;
 import org.dspace.app.orcid.service.OrcidQueueService;
+import org.dspace.app.suggestion.SuggestionService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -105,6 +106,8 @@ public abstract class AbstractBuilder<T, S> {
     static OrcidQueueService orcidQueueService;
     static OrcidHistoryService orcidHistoryService;
     static NBEventService nbEventService;
+    static SuggestionService suggestionService;
+
     protected Context context;
 
     /**
@@ -164,6 +167,7 @@ public abstract class AbstractBuilder<T, S> {
         orcidQueueService = OrcidQueueServiceFactory.getInstance().getOrcidQueueService();
         orcidHistoryService = OrcidHistoryServiceFactory.getInstance().getOrcidHistoryService();
         nbEventService = new DSpace().getSingletonService(NBEventService.class);
+        suggestionService = new DSpace().getSingletonService(SuggestionService.class);
     }
 
 

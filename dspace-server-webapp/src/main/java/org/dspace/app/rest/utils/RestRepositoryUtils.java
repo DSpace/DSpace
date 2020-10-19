@@ -28,7 +28,6 @@ import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.support.QueryMethodParameterConversionException;
-import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.server.core.AnnotationAttribute;
 import org.springframework.hateoas.server.core.MethodParameters;
 import org.springframework.stereotype.Component;
@@ -153,9 +152,7 @@ public class RestRepositoryUtils {
      * executeQueryMethod(RepositoryInvoker, MultiValueMap<String, Object>,
      * Method, DefaultedPageable, Sort, PersistentEntityResourceAssembler)
      */
-    public Object executeQueryMethod(DSpaceRestRepository repository, MultiValueMap<String, Object> parameters,
-                                     Method method, Pageable pageable, Sort sort, PagedResourcesAssembler assembler) {
-
+    public MultiValueMap<String, Object> getSearchParameters(MultiValueMap<String, Object> parameters, Method method) {
         MultiValueMap<String, Object> result = new LinkedMultiValueMap<String, Object>(parameters);
         MethodParameters methodParameters = new MethodParameters(method, PARAM_ANNOTATION);
 
@@ -174,8 +171,7 @@ public class RestRepositoryUtils {
 
             result.put(paramName, value);
         }
-
-        return invokeQueryMethod(repository, method, result, pageable, sort);
+        return result;
     }
 
     /*

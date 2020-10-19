@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -70,6 +71,8 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.TemplateVariable.VariableType;
+import org.springframework.hateoas.UriTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -1030,8 +1033,6 @@ public class RestResourceController implements InitializingBean {
             PagedResourcesAssembler assembler,
             @RequestParam MultiValueMap<String, Object> parameters)
         throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-
-        Link link = linkTo(this.getClass(), apiCategory, model).slash("search").slash(searchMethodName).withSelfRel();
         DSpaceRestRepository repository = utils.getResourceRepository(apiCategory, model);
         boolean returnPage = false;
         Object searchResult = null;
@@ -1045,9 +1046,14 @@ public class RestResourceController implements InitializingBean {
                 throw new RepositorySearchNotFoundException(model);
             }
         }
+        MultiValueMap<String, Object> searchParameters = repositoryUtils.getSearchParameters(parameters, searchMethod);
+
+        Link link = addParameters(
+                linkTo(this.getClass(), apiCategory, model).slash("search").slash(searchMethodName).withSelfRel(),
+                parameters, pageable, sort);
 
         searchResult = repositoryUtils
-            .executeQueryMethod(repository, parameters, searchMethod, pageable, sort, assembler);
+            .invokeQueryMethod(repository, searchMethod, searchParameters, pageable, sort);
 
         returnPage = searchMethod.getReturnType().isAssignableFrom(Page.class);
         RepresentationModel result = null;
@@ -1068,6 +1074,18 @@ public class RestResourceController implements InitializingBean {
         }
         return result;
     }
+
+    private Link addParameters(Link link, MultiValueMap<String, Object> parameters, Pageable pageable, Sort sort) {
+        UriTemplate template = link.getTemplate();
+        if (parameters != null) {
+            for (String param : parameters.keySet().stream().sorted().collect(Collectors.toList())) {
+                template = template.with(param, VariableType.COMPOSITE_PARAM);
+            }
+        }
+        Link result = new Link(template, link.getRel()).expand(parameters);
+        return result;
+    }
+
 
     @RequestMapping(method = RequestMethod.DELETE, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT)
     public ResponseEntity<RepresentationModel<?>> delete(HttpServletRequest request, @PathVariable String apiCategory,
