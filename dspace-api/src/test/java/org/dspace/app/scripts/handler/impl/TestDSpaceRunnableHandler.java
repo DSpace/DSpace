@@ -7,6 +7,10 @@
  */
 package org.dspace.app.scripts.handler.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.dspace.scripts.handler.impl.CommandLineDSpaceRunnableHandler;
 
 /**
@@ -17,6 +21,12 @@ public class TestDSpaceRunnableHandler extends CommandLineDSpaceRunnableHandler 
 
     private Exception exception = null;
 
+    private final List<String> infoMessages = new ArrayList<>();
+
+    private final List<String> errorMessages = new ArrayList<>();
+
+    private final List<String> warningMessages = new ArrayList<>();
+
     /**
      * We're overriding this method so that we can stop the script from doing the System.exit() if
      * an exception within the script is thrown
@@ -24,6 +34,17 @@ public class TestDSpaceRunnableHandler extends CommandLineDSpaceRunnableHandler 
     @Override
     public void handleException(String message, Exception e) {
         exception = e;
+
+        if (message != null) {
+            System.err.println(message);
+            errorMessages.add(message);
+        }
+        if (e != null) {
+            message = ExceptionUtils.getRootCauseMessage(e);
+            System.err.println(message);
+            errorMessages.add(message);
+        }
+
     }
 
     /**
@@ -32,5 +53,35 @@ public class TestDSpaceRunnableHandler extends CommandLineDSpaceRunnableHandler 
      */
     public Exception getException() {
         return exception;
+    }
+
+    @Override
+    public void logInfo(String message) {
+        System.out.println(message);
+        infoMessages.add(message);
+    }
+
+    @Override
+    public void logWarning(String message) {
+        System.out.println(message);
+        warningMessages.add(message);
+    }
+
+    @Override
+    public void logError(String message) {
+        System.err.println(message);
+        errorMessages.add(message);
+    }
+
+    public List<String> getInfoMessages() {
+        return infoMessages;
+    }
+
+    public List<String> getErrorMessages() {
+        return errorMessages;
+    }
+
+    public List<String> getWarningMessages() {
+        return warningMessages;
     }
 }

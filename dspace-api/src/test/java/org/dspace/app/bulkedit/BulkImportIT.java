@@ -26,7 +26,7 @@ import java.util.List;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.launcher.ScriptLauncher;
-import org.dspace.app.scripts.handler.impl.ListDSpaceRunnableHandler;
+import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -38,6 +38,12 @@ import org.dspace.core.CrisConstants;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * Integration tests for {@link BulkImport}.
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ */
 public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
     private static final String BASE_XLS_DIR_PATH = "./target/testing/dspace/assetstore/bulk-import/";
@@ -63,7 +69,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         String fileLocation = getXlsFile("empty.xls").getAbsolutePath();
         String[] args = new String[] { "bulk-import", "-c", collection.getID().toString(), "-f", fileLocation };
-        ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
         assertThat("Expected no infos", handler.getInfoMessages(), emptyCollectionOf(String.class));
@@ -79,7 +85,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         String fileLocation = getXlsFile("empty-headers.xls").getAbsolutePath();
         String[] args = new String[] { "bulk-import", "-c", collection.getID().toString(), "-f", fileLocation };
-        ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
         assertThat("Expected no infos", handler.getInfoMessages(), emptyCollectionOf(String.class));
@@ -95,7 +101,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         String fileLocation = getXlsFile("one-header-empty.xls").getAbsolutePath();
         String[] args = new String[] { "bulk-import", "-c", collection.getID().toString(), "-f", fileLocation };
-        ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
         assertThat("Expected no infos", handler.getInfoMessages(), emptyCollectionOf(String.class));
@@ -112,7 +118,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         String fileLocation = getXlsFile("without-headers.xls").getAbsolutePath();
         String[] args = new String[] { "bulk-import", "-c", collection.getID().toString(), "-f", fileLocation };
-        ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
         assertThat("Expected no infos", handler.getInfoMessages(), emptyCollectionOf(String.class));
@@ -128,7 +134,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         String fileLocation = getXlsFile("invalid-headers.xls").getAbsolutePath();
         String[] args = new String[] { "bulk-import", "-c", collection.getID().toString(), "-f", fileLocation };
-        ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
         assertThat("Expected no infos", handler.getInfoMessages(), emptyCollectionOf(String.class));
@@ -146,7 +152,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         String fileLocation = getXlsFile("invalid-sheet-name.xlsx").getAbsolutePath();
         String[] args = new String[] { "bulk-import", "-c", collection.getID().toString(), "-f", fileLocation };
-        ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
         assertThat("Expected no infos", handler.getInfoMessages(), emptyCollectionOf(String.class));
@@ -171,7 +177,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         String fileLocation = getXlsFile("metadata-group-row-with-many-values.xlsx").getAbsolutePath();
         String[] args = new String[] { "bulk-import", "-c", publications.getID().toString(), "-f", fileLocation };
-        ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
         assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
@@ -203,7 +209,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         String fileLocation = getXlsFile("headers-duplicated.xls").getAbsolutePath();
         String[] args = new String[] { "bulk-import", "-c", patents.getID().toString(), "-f", fileLocation };
-        ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
         assertThat("Expected no infos", handler.getInfoMessages(), emptyCollectionOf(String.class));
@@ -229,7 +235,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         String fileLocation = getXlsFile("create-patent.xls").getAbsolutePath();
         String[] args = new String[] { "bulk-import", "-c", patents.getID().toString(), "-f", fileLocation };
-        ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
         assertThat("Expected no errors", handler.getErrorMessages(), emptyCollectionOf(String.class));
@@ -278,7 +284,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         String fileLocation = getXlsFile("update-patent.xls").getAbsolutePath();
         String[] args = new String[] { "bulk-import", "-c", patents.getID().toString(), "-f", fileLocation };
-        ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
         assertThat("Expected no errors", handler.getErrorMessages(), emptyCollectionOf(String.class));
@@ -316,7 +322,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         String fileLocation = getXlsFile("create-publication-with-authority.xlsx").getAbsolutePath();
         String[] args = new String[] { "bulk-import", "-c", publications.getID().toString(), "-f", fileLocation };
-        ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
         assertThat("Expected no errors", handler.getErrorMessages(), emptyCollectionOf(String.class));
@@ -365,7 +371,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         String fileLocation = getXlsFile("many-publications.xls").getAbsolutePath();
         String[] args = new String[] { "bulk-import", "-c", publications.getID().toString(), "-f", fileLocation };
-        ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
         assertThat("Expected no errors", handler.getErrorMessages(), emptyCollectionOf(String.class));
@@ -431,7 +437,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         String fileLocation = getXlsFile("many-publications.xls").getAbsolutePath();
         String[] args = new String[] { "bulk-import", "-c", publications.getID().toString(), "-f", fileLocation };
-        ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
 
@@ -489,7 +495,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         String fileLocation = getXlsFile("many-publications.xls").getAbsolutePath();
         String[] args = new String[] { "bulk-import", "-c", publications.getID().toString(), "-f", fileLocation, "-e" };
-        ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
 
@@ -542,7 +548,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         String fileLocation = getXlsFile("create-publication-with-one-invalid-authority.xlsx").getAbsolutePath();
         String[] args = new String[] { "bulk-import", "-c", publications.getID().toString(), "-f", fileLocation };
-        ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
 
@@ -585,7 +591,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         String fileLocation = getXlsFile("create-publication-with-one-invalid-authority.xlsx").getAbsolutePath();
         String[] args = new String[] { "bulk-import", "-c", publications.getID().toString(), "-f", fileLocation, "-e" };
-        ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
 

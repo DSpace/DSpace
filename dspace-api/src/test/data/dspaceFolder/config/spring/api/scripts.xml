@@ -47,4 +47,9 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.BulkImportCli"/>
     </bean>
     
+    <bean id="item-export" class="org.dspace.content.integration.crosswalks.script.ItemExportCliScriptConfiguration">
+        <property name="description" value="Perform the item export in the given format"/>
+        <property name="dspaceRunnableClass" value="org.dspace.content.integration.crosswalks.script.ItemExportCli"/>
+    </bean>
+    
 </beans>
