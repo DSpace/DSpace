@@ -509,14 +509,14 @@
        when adding a document.
    -->
 	
-    <!-- Internal DSpaceObject Type ID -->
+    <field name="event_id" type="string" indexed="true" stored="true" omitNorms="true" />
     <field name="original_id" type="string" indexed="true" stored="true" omitNorms="true" />
     <field name="title" type="string" indexed="true" stored="true" omitNorms="true" />
 	<field name="topic" type="string" indexed="true" stored="true" omitNorms="true" />
 	<field name="trust" type="double" indexed="true" stored="true" omitNorms="true" />
 	<field name="message" type="string" indexed="true" stored="true" omitNorms="true" />
-	<field name="event_id" type="string" indexed="true" stored="true" omitNorms="true" />
 	<field name="resource_uuid" type="string" indexed="true" stored="true" omitNorms="true" />
+	<field name="related_uuid" type="string" indexed="true" stored="true" omitNorms="true" />
 	<field name="last_update" type="date" indexed="true" stored="true" omitNorms="true" />
    	    
    	<dynamicField name="*_i"  type="int"    indexed="true"  stored="true" multiValued="true" docValues="true"/>

@@ -108,9 +108,6 @@ public class NBTopicRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         //test result
         context.restoreAuthSystemState();
-
-        //test result
-        context.restoreAuthSystemState();
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/integration/nbtopics")).andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
@@ -304,12 +301,12 @@ public class NBTopicRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         try {
             String authToken = getAuthToken(admin.getEmail(), password);
-            getClient(authToken).perform(get("/api/integration/nbtopics/ENRICH|MISSING|DOI"))
+            getClient(authToken).perform(get("/api/integration/nbtopics/ENRICH!MISSING!DOI"))
                 .andExpect(jsonPath("$._embedded.nbtopics",
                     Matchers.containsInAnyOrder(NBTopicMatcher.matchNBTopicEntry("ENRICH/MISSING/PID", 1))));
-            getClient(authToken).perform(get("/api/integration/nbtopics/ENRICH|MISSING|ABSTRACT"))
+            getClient(authToken).perform(get("/api/integration/nbtopics/ENRICH!MISSING!ABSTRACT"))
             .andExpect(jsonPath("$._embedded.nbtopics",
-                Matchers.containsInAnyOrder(NBTopicMatcher.matchNBTopicEntry("ENRICH/MISSING/ABSTRACT", 3))));
+                Matchers.containsInAnyOrder(NBTopicMatcher.matchNBTopicEntry("ENRICH!MISSING!ABSTRACT", 3))));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -318,14 +315,14 @@ public class NBTopicRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     @Ignore
     public void findOneUnauthorizedTest() throws Exception {
-        getClient().perform(get("/api/integration/nbtopics/ENRICH|MISSING|DOI")).andExpect(status().isUnauthorized());
+        getClient().perform(get("/api/integration/nbtopics/ENRICH!MISSING!DOI")).andExpect(status().isUnauthorized());
     }
 
     @Test
     @Ignore
     public void findOneForbiddenTest() throws Exception {
         String authToken = getAuthToken(eperson.getEmail(), password);
-        getClient(authToken).perform(get("/api/integration/nbtopics/ENRICH|MISSING|DOI"))
+        getClient(authToken).perform(get("/api/integration/nbtopics/ENRICH!MISSING!DOI"))
             .andExpect(status().isForbidden());
     }
 

@@ -22,6 +22,9 @@ public class NBEventMessage {
     private String fundingProgram;
     private String jurisdiction;
     private String title;
+    //FIXME use a link
+    private String matchFoundHandle;
+    private String matchFoundId;
 
     public String getType() {
         return type;
@@ -93,6 +96,22 @@ public class NBEventMessage {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getMatchFoundHandle() {
+        return matchFoundHandle;
+    }
+
+    public void setMatchFoundHandle(String matchFoundHandle) {
+        this.matchFoundHandle = matchFoundHandle;
+    }
+
+    public void setMatchFoundId(String matchFoundId) {
+        this.matchFoundId = matchFoundId;
+    }
+
+    public String getMatchFoundId() {
+        return matchFoundId;
     }
 
     public NBEventMessage() {

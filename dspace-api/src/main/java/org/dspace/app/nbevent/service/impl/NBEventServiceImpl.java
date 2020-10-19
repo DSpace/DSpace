@@ -123,7 +123,7 @@ public class NBEventServiceImpl implements NBEventService {
     public NBTopic findTopicByTopicId(String topicId) {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
-        solrQuery.setQuery(TOPIC + ":" + topicId.replaceAll("|", "/"));
+        solrQuery.setQuery(TOPIC + ":" + topicId.replaceAll("!", "/"));
         solrQuery.setFacet(true);
         solrQuery.setFacetMinCount(0);
         solrQuery.addFacetField(TOPIC);
@@ -132,7 +132,7 @@ public class NBEventServiceImpl implements NBEventService {
             response = getSolr().query(solrQuery);
             FacetField facetField = response.getFacetField(TOPIC);
             for (Count c : facetField.getValues()) {
-                if (c.getName().equals(topicId.replace("|", "/"))) {
+                if (c.getName().equals(topicId.replace("!", "/"))) {
                     NBTopic topic = new NBTopic();
                     topic.setKey(c.getName());
 //                    topic.setName(OpenstarSupportedTopic.sorlToRest(c.getName()));
@@ -232,7 +232,7 @@ public class NBEventServiceImpl implements NBEventService {
     @Override
     public NBEvent findEventByEventId(Context context, String eventId) {
         SolrQuery param = new SolrQuery();
-        param.set(EVENT_ID, eventId.replaceAll("|", "/"));
+        param.set(EVENT_ID, eventId.replaceAll("!", "/"));
         QueryResponse response;
         try {
             response = getSolr().query(param);
@@ -263,7 +263,7 @@ public class NBEventServiceImpl implements NBEventService {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setStart(((Long) offset).intValue());
         solrQuery.setRows(pageSize);
-        solrQuery.setQuery(TOPIC + ":" + topic.replaceAll("|", "/"));
+        solrQuery.setQuery(TOPIC + ":" + topic.replaceAll("!", "/"));
         QueryResponse response;
         try {
             response = getSolr().query(solrQuery);
@@ -294,7 +294,7 @@ public class NBEventServiceImpl implements NBEventService {
     public long countEventsByTopic(Context context, String topic) {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
-        solrQuery.setQuery(TOPIC + ":" + topic.replaceAll("|", "/"));
+        solrQuery.setQuery(TOPIC + ":" + topic.replaceAll("!", "/"));
         solrQuery.setFacet(true);
         solrQuery.setFacetMinCount(0);
         solrQuery.addFacetField(TOPIC);
@@ -307,7 +307,7 @@ public class NBEventServiceImpl implements NBEventService {
         }
         FacetField facetField = response.getFacetField(TOPIC);
         for (Count c : facetField.getValues()) {
-            if (c.getName().equals(topic.replaceAll("|", "/"))) {
+            if (c.getName().equals(topic.replaceAll("!", "/"))) {
                 return c.getCount();
             }
         }

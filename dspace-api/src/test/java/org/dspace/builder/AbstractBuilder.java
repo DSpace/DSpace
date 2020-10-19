@@ -13,7 +13,6 @@ import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.nbevent.service.NBEventService;
-import org.dspace.app.nbevent.service.impl.NBEventServiceImpl;
 import org.dspace.app.orcid.factory.OrcidHistoryServiceFactory;
 import org.dspace.app.orcid.factory.OrcidQueueServiceFactory;
 import org.dspace.app.orcid.service.OrcidHistoryService;
@@ -164,8 +163,7 @@ public abstract class AbstractBuilder<T, S> {
         crisLayoutFieldService = CrisLayoutServiceFactory.getInstance().getFieldService();
         orcidQueueService = OrcidQueueServiceFactory.getInstance().getOrcidQueueService();
         orcidHistoryService = OrcidHistoryServiceFactory.getInstance().getOrcidHistoryService();
-        nbEventService = new DSpace().getServiceManager().getServiceByName("nbEventService",
-                NBEventServiceImpl.class);
+        nbEventService = new DSpace().getSingletonService(NBEventService.class);
     }
 
 

@@ -17,8 +17,6 @@ import org.dspace.app.rest.RestResourceController;
 public class NBEventRest extends BaseObjectRest<String> {
 
     private static final long serialVersionUID = -5001130073350654793L;
-
-    private static final String NAME_PLURAL = "nbevents";
     public static final String NAME = "nbevent";
     public static final String CATEGORY = RestAddressableModel.INTEGRATION;
 
@@ -28,12 +26,6 @@ public class NBEventRest extends BaseObjectRest<String> {
     private String topic;
     private String trust;
     private NBEventMessage message;
-    private String type = "openaireBrokerEvent";
-
-    // per i progetti, vedere se trovato o meno
-    // e qui mettere l' handle del progetto
-    private String matchFoundHandle;
-    private String matchFoundId;
 
     @Override
     public String getType() {

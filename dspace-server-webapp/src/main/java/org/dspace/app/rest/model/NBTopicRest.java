@@ -21,7 +21,6 @@ public class NBTopicRest extends BaseObjectRest<String> {
 
     private static final long serialVersionUID = -7455358581579629244L;
 
-    public static final String NAME_PLURAL = "nbtopics";
     public static final String NAME = "nbtopic";
     public static final String CATEGORY = RestAddressableModel.INTEGRATION;
 

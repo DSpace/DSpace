@@ -32,6 +32,9 @@ public class NBEvent {
     @Field("resource_uuid")
     private String target;
 
+    @Field("related_uuid")
+    private String related;
+
     @Field("title")
     private String title;
 
@@ -137,6 +140,14 @@ public class NBEvent {
 
     public void setLastUpdate(Date lastUpdate) {
         this.lastUpdate = lastUpdate;
+    }
+
+    public void setRelated(String related) {
+        this.related = related;
+    }
+
+    public String getRelated() {
+        return related;
     }
 
     /*

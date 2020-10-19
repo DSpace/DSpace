@@ -29,7 +29,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.common.SolrInputDocument;
-import org.dspace.app.nbevent.service.impl.NBEventServiceImpl;
+import org.dspace.app.nbevent.service.NBEventService;
 import org.dspace.content.Item;
 import org.dspace.content.NBEvent;
 import org.dspace.core.Context;
@@ -37,8 +37,6 @@ import org.dspace.handle.factory.HandleServiceFactoryImpl;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.SolrImportExportException;
 import org.dspace.utils.DSpace;
-
-
 
 public class NBEventsCli {
 
@@ -53,8 +51,7 @@ public class NBEventsCli {
 
     public static void main(String[] args) throws Exception {
         DSpace dspace = new DSpace();
-        NBEventServiceImpl nbEventService = dspace.getServiceManager().getServiceByName("nbEventService",
-                NBEventServiceImpl.class);
+        NBEventService nbEventService = dspace.getSingletonService(NBEventService.class);
         if (nbEventService == null) {
             System.err.println("nbEventService is NULL. Error in spring configuration");
         } else {

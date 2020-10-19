@@ -15,11 +15,10 @@ import javax.servlet.http.HttpServletRequest;
 import org.dspace.app.nbevent.dao.NBEventsDao;
 import org.dspace.app.nbevent.service.NBEventService;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
-import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.NBEventRest;
 import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.repository.patch.ResourcePatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.NBEvent;
@@ -49,6 +48,9 @@ public class NBEventsRestRepository extends DSpaceRestRepository<NBEventRest, St
 
     @Autowired
     private EPersonService ePersonService;
+
+    @Autowired
+    private ResourcePatch<NBEvent> resourcePatch;
 
     private Logger log = org.slf4j.LoggerFactory.getLogger(NBEventsRestRepository.class);
 
@@ -97,10 +99,11 @@ public class NBEventsRestRepository extends DSpaceRestRepository<NBEventRest, St
     }
 
     @Override
-    public NBEventRest patch(HttpServletRequest request, String apiCategory, String model, String id, Patch patch)
-            throws UnprocessableEntityException, DSpaceBadRequestException {
-        // TODO Auto-generated method stub
-        return super.patch(request, apiCategory, model, id, patch);
+    @PreAuthorize("permitAll()")
+    protected void patch(Context context, HttpServletRequest request, String apiCategory, String model,
+            String id, Patch patch) throws SQLException, AuthorizeException {
+        NBEvent nbEvent = nbEventService.findEventByEventId(context, id);
+        resourcePatch.patch(context, nbEvent, patch.getOperations());
     }
 
     @Override
