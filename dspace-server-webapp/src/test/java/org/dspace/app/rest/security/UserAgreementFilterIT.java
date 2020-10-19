@@ -27,11 +27,11 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Integration test class that functionality of @UserAgreementFilter
+ * Integration test class that functionality of {@link UserAgreementFilter}
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
-public class UserAgreementFilterTest extends AbstractControllerIntegrationTest {
+public class UserAgreementFilterIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private ConfigurationService configurationService;
@@ -172,6 +172,7 @@ public class UserAgreementFilterTest extends AbstractControllerIntegrationTest {
         getClient(tokenEperson).perform(get("/api/core/items/" + privateItem.getID()))
                                .andExpect(status().isForbidden());
 
+        String[] oldOpenPathPatterns = configurationService.getArrayProperty("user-agreement.open-path-patterns");
         // add /api/core/items/ to the open-path
         configurationService.setProperty("user-agreement.open-path-patterns", "/api/core/items/**");
 
@@ -181,7 +182,7 @@ public class UserAgreementFilterTest extends AbstractControllerIntegrationTest {
                                   .matchItemWithTitleAndDateIssued(privateItem, "Public item 1", "2020-10-14"))));
 
         configurationService.setProperty("user-agreement.filter-enabled", "false");
-        resetOpenPathConfigurations();
+        resetOpenPathConfigurations(oldOpenPathPatterns);
     }
 
     @Test
@@ -235,17 +236,12 @@ public class UserAgreementFilterTest extends AbstractControllerIntegrationTest {
         configurationService.setProperty("user-agreement.filter-enabled", "false");
     }
 
-    private void resetOpenPathConfigurations() {
-        configurationService.addPropertyValue("user-agreement.open-path-patterns", "/api/authn/status");
-        configurationService.addPropertyValue("user-agreement.open-path-patterns", "/api/authn/login");
-        configurationService.addPropertyValue("user-agreement.open-path-patterns", "/api/authn/logout");
-        configurationService.addPropertyValue("user-agreement.open-path-patterns", "/api/authn/oidc");
-        configurationService.addPropertyValue("user-agreement.open-path-patterns", "/api/authn/shibboleth");
-        configurationService.addPropertyValue("user-agreement.open-path-patterns", "/api/layout/sections");
-        configurationService.addPropertyValue("user-agreement.open-path-patterns", "/api/statistics/viewevents");
-        configurationService.addPropertyValue("user-agreement.open-path-patterns", "/api/authz/authorizations/**");
-        configurationService.addPropertyValue("user-agreement.open-path-patterns", "/api/core/sites/**");
-        configurationService.addPropertyValue("user-agreement.open-path-patterns", "/api/eperson/epersons/**");
-        configurationService.addPropertyValue("user-agreement.open-path-patterns", "/api/eperson/groups/**");
+    private void resetOpenPathConfigurations(String[] values) {
+        configurationService.getConfiguration().clearProperty("user-agreement.open-path-patterns");
+        if (values != null) {
+            for (String value : values) {
+                configurationService.addPropertyValue("user-agreement.open-path-patterns", value);
+            }
+        }
     }
 }
