@@ -17,6 +17,8 @@ import static org.apache.commons.lang3.ArrayUtils.isNotEmpty;
  */
 public final class TemplateLine {
 
+    private static final String ITEM_TEMPLATE_FIELD = "item.template";
+
     private static final String VIRTUAL_FIELD = "virtual";
 
     private static final String GROUP_FIELD = "group";
@@ -75,6 +77,10 @@ public final class TemplateLine {
 
     public boolean isVirtualField() {
         return isNotEmpty(fieldBits) && fieldBits.length > 1 && VIRTUAL_FIELD.equals(fieldBits[0]);
+    }
+
+    public boolean isTemplateField() {
+        return ITEM_TEMPLATE_FIELD.equals(field);
     }
 
     public boolean isMetadataGroupStartField() {

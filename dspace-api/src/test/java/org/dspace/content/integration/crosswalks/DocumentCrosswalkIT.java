@@ -55,7 +55,7 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
     private static final String BASE_OUTPUT_DIR_PATH = "./target/testing/dspace/assetstore/crosswalk/";
 
-    private ReferCrosswalkMapper referCrosswalkMapper;
+    private StreamDisseminationCrosswalkMapper referCrosswalkMapper;
 
     private Community community;
 
@@ -64,7 +64,7 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
     @Before
     public void setup() throws SQLException, AuthorizeException {
 
-        this.referCrosswalkMapper = new DSpace().getSingletonService(ReferCrosswalkMapper.class);
+        this.referCrosswalkMapper = new DSpace().getSingletonService(StreamDisseminationCrosswalkMapper.class);
         assertThat(referCrosswalkMapper, notNullValue());
 
         context.turnOffAuthorisationSystem();

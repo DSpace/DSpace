@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.nio.charset.Charset;
 import java.sql.SQLException;
+import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
@@ -49,7 +50,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
     private static final String BASE_OUTPUT_DIR_PATH = "./target/testing/dspace/assetstore/crosswalk/";
 
-    private ReferCrosswalkMapper referCrosswalkMapper;
+    private StreamDisseminationCrosswalkMapper crosswalkMapper;
 
     private Community community;
 
@@ -58,8 +59,8 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
     @Before
     public void setup() throws SQLException, AuthorizeException {
 
-        this.referCrosswalkMapper = new DSpace().getSingletonService(ReferCrosswalkMapper.class);
-        assertThat(referCrosswalkMapper, notNullValue());
+        this.crosswalkMapper = new DSpace().getSingletonService(StreamDisseminationCrosswalkMapper.class);
+        assertThat(crosswalkMapper, notNullValue());
 
         context.turnOffAuthorisationSystem();
         community = createCommunity(context).build();
@@ -83,7 +84,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        ReferCrosswalk referCrossWalk = referCrosswalkMapper.getReferCrosswalk("bibtex");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("bibtex");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -143,7 +144,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        ReferCrosswalk referCrossWalk = referCrosswalkMapper.getReferCrosswalk("person-xml");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("person-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -193,7 +194,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        ReferCrosswalk referCrossWalk = referCrosswalkMapper.getReferCrosswalk("person-xml");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("person-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -282,7 +283,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        ReferCrosswalk referCrossWalk = referCrosswalkMapper.getReferCrosswalk("person-json");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("person-json");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -293,6 +294,94 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             String exportedJson = out.toString();
             System.out.println(exportedJson);
             assertThat(exportedJson, equalTo(expectedJson));
+        }
+    }
+
+    @Test
+    public void testManyPersonsXmlDisseminate() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        Item firstItem = createItem(context, collection)
+            .withTitle("John Smith")
+            .withGivenName("John")
+            .withFamilyName("Smith")
+            .withBirthDate("1992-06-26")
+            .withGender("M")
+            .withPersonAffiliation("Company")
+            .withPersonAffiliationStartDate("2018-01-01")
+            .withPersonAffiliationRole("Developer")
+            .withPersonAffiliationEndDate(PLACEHOLDER_PARENT_METADATA_VALUE)
+            .build();
+        Item secondItem = createItem(context, collection)
+            .withTitle("Adam White")
+            .withGivenName("Adam")
+            .withFamilyName("White")
+            .withBirthDate("1962-03-23")
+            .withGender("M")
+            .withJobTitle("Researcher")
+            .withPersonMainAffiliation("University")
+            .withPersonKnowsLanguages("English")
+            .withPersonKnowsLanguages("Italian")
+            .withPersonEducation("School")
+            .withPersonEducationStartDate("2000-01-01")
+            .withPersonEducationEndDate("2005-01-01")
+            .withPersonEducationRole("Student")
+            .build();
+        context.restoreAuthSystemState();
+
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("person-xml");
+        assertThat(referCrossWalk, notNullValue());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        referCrossWalk.disseminate(context, Arrays.asList(firstItem, secondItem), out);
+
+        try (FileInputStream fis = getFileInputStream("persons.xml")) {
+            String expectedXml = IOUtils.toString(fis, Charset.defaultCharset());
+            assertThat(out.toString(), equalTo(expectedXml));
+        }
+    }
+
+    @Test
+    public void testManyPersonsJsonDisseminate() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        Item firstItem = createItem(context, collection)
+            .withTitle("John Smith")
+            .withGivenName("John")
+            .withFamilyName("Smith")
+            .withBirthDate("1992-06-26")
+            .withGender("M")
+            .withPersonAffiliation("Company")
+            .withPersonAffiliationStartDate("2018-01-01")
+            .withPersonAffiliationRole("Developer")
+            .withPersonAffiliationEndDate(PLACEHOLDER_PARENT_METADATA_VALUE)
+            .build();
+        Item secondItem = createItem(context, collection)
+            .withTitle("Adam White")
+            .withGivenName("Adam")
+            .withFamilyName("White")
+            .withBirthDate("1962-03-23")
+            .withGender("M")
+            .withJobTitle("Researcher")
+            .withPersonMainAffiliation("University")
+            .withPersonKnowsLanguages("English")
+            .withPersonKnowsLanguages("Italian")
+            .withPersonEducation("School")
+            .withPersonEducationStartDate("2000-01-01")
+            .withPersonEducationEndDate("2005-01-01")
+            .withPersonEducationRole("Student")
+            .build();
+        context.restoreAuthSystemState();
+
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("person-json");
+        assertThat(referCrossWalk, notNullValue());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        referCrossWalk.disseminate(context, Arrays.asList(firstItem, secondItem), out);
+
+        try (FileInputStream fis = getFileInputStream("persons.json")) {
+            String expectedJson = IOUtils.toString(fis, Charset.defaultCharset());
+            assertThat(out.toString(), equalTo(expectedJson));
         }
     }
 

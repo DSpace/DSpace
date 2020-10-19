@@ -4,19 +4,12 @@
 	xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd" >
 
-	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalkMapper">
+	<bean class="org.dspace.content.integration.crosswalks.StreamDisseminationCrosswalkMapper">
 		<constructor-arg>
 			<map>
 				<entry key="bibtex" value-ref="referCrosswalkBibtex"></entry>
 				<entry key="person-xml" value-ref="referCrosswalkPersonXml"></entry>
 				<entry key="person-json" value-ref="referCrosswalkPersonJson"></entry>
-			</map>
-		</constructor-arg>
-	</bean>
-	
-	<bean class="org.dspace.content.integration.crosswalks.DocumentCrosswalkMapper">
-		<constructor-arg>
-			<map>
 				<entry key="person-pdf" value-ref="pdfCrosswalkPerson"></entry>
 				<entry key="person-rtf" value-ref="rtfCrosswalkPerson"></entry>
 			</map>
@@ -27,12 +20,14 @@
 		<constructor-arg name="templateFileName" value="crosswalks/template/bibtex.template"/>
 		<constructor-arg name="mimeType" value="application/x-bibtex; charset=UTF-8"/>
 		<constructor-arg name="fileName" value="references.bib"/>
+		<constructor-arg name="multipleItemsTemplateFileName" value=""/>
 	</bean>
 	
 	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkPersonXml">
 		<constructor-arg name="templateFileName" value="crosswalks/template/person-xml.template"/>
 		<constructor-arg name="mimeType" value="application/xml; charset=UTF-8"/>
 		<constructor-arg name="fileName" value="person.xml"/>
+		<constructor-arg name="multipleItemsTemplateFileName" value="crosswalks/template/persons-xml.template"/>
 		<property name="converter" ref="xmlValueConverter" />
 	</bean>
 	
@@ -40,6 +35,7 @@
 		<constructor-arg name="templateFileName" value="crosswalks/template/person-json.template"/>
 		<constructor-arg name="mimeType" value="application/json; charset=UTF-8"/>
 		<constructor-arg name="fileName" value="person.json"/>
+		<constructor-arg name="multipleItemsTemplateFileName" value="crosswalks/template/persons-json.template"/>
 		<property name="converter" ref="jsonValueConverter" />
 		<property name="linesPostProcessor" ref="jsonPostProcessor" />
 	</bean>
