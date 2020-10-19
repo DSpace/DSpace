@@ -88,7 +88,7 @@ public class SuggestionSourceRestRepositoryIT extends AbstractControllerIntegrat
     }
 
     @Test
-    public void findBySourcePaginationTest() throws Exception {
+    public void findAllPaginationTest() throws Exception {
         buildSuggestionTargetsList();
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(get("/api/integration/suggestionsources").param("size", "1"))

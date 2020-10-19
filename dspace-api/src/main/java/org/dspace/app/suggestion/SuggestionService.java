@@ -38,4 +38,11 @@ public interface SuggestionService {
     public long countSources(Context context);
 
     public List<SuggestionSource> findAllSources(Context context, int pageSize, long offset);
+
+    public Suggestion findSuggestion(Context context, String id);
+
+    public List<Suggestion> findByTargetAndSource(Context context, UUID target, String source, int pageSize,
+            long offset);
+
+    public long countAllByTargetAndSource(Context context, String source, UUID target);
 }

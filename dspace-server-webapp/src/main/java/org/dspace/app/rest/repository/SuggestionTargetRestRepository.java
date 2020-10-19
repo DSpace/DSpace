@@ -65,8 +65,9 @@ public class SuggestionTargetRestRepository extends DSpaceRestRepository<Suggest
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @SearchRestMethod(name = "findBySource")
-    public Page<SuggestionTargetRest> findBySource(Context context,
-            @Parameter(required = true, value = "source") String source, Pageable pageable) {
+    public Page<SuggestionTargetRest> findBySource(@Parameter(required = true, value = "source") String source,
+            Pageable pageable) {
+        Context context = obtainContext();
         List<SuggestionTarget> suggestionTargets = suggestionService.findAllTargets(context, source,
                 pageable.getPageSize(), pageable.getOffset());
         long tot = suggestionService.countAll(context, source);
@@ -75,8 +76,9 @@ public class SuggestionTargetRestRepository extends DSpaceRestRepository<Suggest
 
     @PreAuthorize("hasPermission(#target, 'SUGGESTIONTARGET.TARGET', 'READ')")
     @SearchRestMethod(name = "findByTarget")
-    public Page<SuggestionTargetRest> findByTarget(Context context,
-            @Parameter(required = true, value = "target") UUID target, Pageable pageable) {
+    public Page<SuggestionTargetRest> findByTarget(@Parameter(required = true, value = "target") UUID target,
+            Pageable pageable) {
+        Context context = obtainContext();
         List<SuggestionTarget> suggestionTargets = suggestionService.findByTarget(context, target,
                 pageable.getPageSize(), pageable.getOffset());
         long tot = suggestionService.countAllByTarget(context, target);

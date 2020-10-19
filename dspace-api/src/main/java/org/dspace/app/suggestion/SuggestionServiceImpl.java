@@ -7,19 +7,27 @@
  */
 package org.dspace.app.suggestion;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.content.Item;
+import org.dspace.content.dto.MetadataValueDTO;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class SuggestionServiceImpl implements SuggestionService {
 
     List<SuggestionTarget> storage = new ArrayList<>();
+
+    @Autowired
+    private ItemService itemService;
 
     @Override
     public void addSuggestionTarget(SuggestionTarget target) {
@@ -74,8 +82,7 @@ public class SuggestionServiceImpl implements SuggestionService {
 
     @Override
     public List<SuggestionSource> findAllSources(Context context, int pageSize, long offset) {
-        List<SuggestionSource> fullSources = getSources().stream()
-                .skip(offset).limit(pageSize)
+        List<SuggestionSource> fullSources = getSources().stream().skip(offset).limit(pageSize)
                 .collect(Collectors.toList());
         return fullSources;
     }
@@ -100,4 +107,74 @@ public class SuggestionServiceImpl implements SuggestionService {
         return results;
     }
 
+    @Override
+    public long countAllByTargetAndSource(Context context, String source, UUID target) {
+        SuggestionTarget targetSuggestion = find(context, source, target);
+        if (targetSuggestion != null) {
+            return targetSuggestion.getTotal();
+        }
+        return 0;
+    }
+
+    @Override
+    public List<Suggestion> findByTargetAndSource(Context context, UUID target, String source, int pageSize,
+            long offset) {
+        SuggestionTarget targetSuggestion = find(context, source, target);
+        if (targetSuggestion != null) {
+            List<Suggestion> allSuggestions = generateAllSuggestion(context, target, source, targetSuggestion);
+            List<Suggestion> pageSuggestion = allSuggestions.stream().skip(offset).limit(pageSize)
+                    .collect(Collectors.toList());
+            return pageSuggestion;
+        }
+        return null;
+    }
+
+    @Override
+    public Suggestion findSuggestion(Context context, String id) {
+        String source = id.split(":", 3)[0];
+        UUID target = UUID.fromString(id.split(":", 3)[1]);
+        SuggestionTarget targetSuggestion = find(context, source, target);
+        if (targetSuggestion != null) {
+            List<Suggestion> allSuggestions = generateAllSuggestion(context, target, source, targetSuggestion);
+            return allSuggestions.stream().filter(st -> StringUtils.equals(id, st.getID())).findFirst().orElse(null);
+        }
+        return null;
+    }
+
+    private List<Suggestion> generateAllSuggestion(Context context, UUID target, String source,
+            SuggestionTarget targetSuggestion) {
+        List<Suggestion> allSuggestions = new ArrayList<Suggestion>();
+        Item itemTarget;
+        try {
+            itemTarget = itemService.find(context, target);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        for (int idx = 0; idx < targetSuggestion.getTotal(); idx++) {
+            String idPartStr = String.valueOf(idx + 1);
+            Suggestion sug = new Suggestion(source, itemTarget, idPartStr);
+            sug.setDisplay("Suggestion " + source + " " + idPartStr);
+            MetadataValueDTO mTitle = new MetadataValueDTO();
+            mTitle.setSchema("dc");
+            mTitle.setElement("title");
+            mTitle.setValue("Title Suggestion " + idPartStr);
+
+            MetadataValueDTO mSource1 = new MetadataValueDTO();
+            mSource1.setSchema("dc");
+            mSource1.setElement("source");
+            mSource1.setValue("Source 1");
+
+            MetadataValueDTO mSource2 = new MetadataValueDTO();
+            mSource2.setSchema("dc");
+            mSource2.setElement("source");
+            mSource2.setValue("Source 2");
+
+            sug.getMetadata().add(mTitle);
+            sug.getMetadata().add(mSource1);
+            sug.getMetadata().add(mSource2);
+
+            allSuggestions.add(sug);
+        }
+        return allSuggestions;
+    }
 }

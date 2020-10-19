@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.rest.model.SuggestionTargetRest;
+import org.dspace.app.rest.model.SuggestionRest;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
@@ -32,15 +32,14 @@ import org.springframework.stereotype.Component;
 
 /**
  *
- * An authenticated user is allowed to view the suggestions summary
- * (SuggestionTarget) for the data that his own. This
- * {@link RestPermissionEvaluatorPlugin} implements that requirement.
+ * An authenticated user is allowed to view a suggestion for the data that his
+ * own. This {@link RestPermissionEvaluatorPlugin} implements that requirement.
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
 @Component
-public class SuggestionTargetRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
+public class SuggestionRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
 
     @Autowired
     private RequestService requestService;
@@ -56,8 +55,8 @@ public class SuggestionTargetRestPermissionEvaluatorPlugin extends RestObjectPer
             return false;
         }
 
-        if (!StringUtils.equalsIgnoreCase(targetType, SuggestionTargetRest.NAME)
-                && !StringUtils.startsWithIgnoreCase(targetType, SuggestionTargetRest.NAME)) {
+        if (!StringUtils.equalsIgnoreCase(targetType, SuggestionRest.NAME)
+                && !StringUtils.startsWithIgnoreCase(targetType, SuggestionRest.NAME)) {
             return false;
         }
 
@@ -73,7 +72,7 @@ public class SuggestionTargetRestPermissionEvaluatorPlugin extends RestObjectPer
             String id = targetId.toString();
             UUID uuid = null;
             if (id.contains(":")) {
-                uuid = UUIDUtils.fromString(id.split(":", 2)[1]);
+                uuid = UUIDUtils.fromString(id.split(":", 3)[1]);
             } else {
                 uuid = UUIDUtils.fromString(id);
             }
