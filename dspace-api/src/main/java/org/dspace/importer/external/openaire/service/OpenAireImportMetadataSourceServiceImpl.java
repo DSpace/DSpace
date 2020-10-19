@@ -27,6 +27,7 @@ import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.exception.MetadataSourceException;
+import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.components.QuerySource;
 import org.jaxen.JaxenException;
@@ -185,7 +186,7 @@ public class OpenAireImportMetadataSourceServiceImpl extends AbstractImportMetad
                 List<OMElement> omElements = splitToRecords(responseString);
                 if (omElements != null) {
                     for (OMElement record : omElements) {
-                        results.add(transformSourceRecords(record));
+                        results.add(filterMultipleTitles(transformSourceRecords(record)));
                     }
                 }
                 return results != null ? results.get(0) : null;
@@ -219,7 +220,6 @@ public class OpenAireImportMetadataSourceServiceImpl extends AbstractImportMetad
                 AXIOMXPath xpath = null;
                 try {
                     xpath = new AXIOMXPath("/response/header/total");
-//                    xpath.addNamespace("ns", "http://www.w3.org/2005/Atom");
                     OMElement totalItem = (OMElement) xpath.selectSingleNode(element);
                     return totalItem != null ? Integer.parseInt(totalItem.getText()) : null;
                 } catch (JaxenException e) {
@@ -263,13 +263,35 @@ public class OpenAireImportMetadataSourceServiceImpl extends AbstractImportMetad
                 List<OMElement> omElements = splitToRecords(responseString);
                 if (omElements != null) {
                     for (OMElement record : omElements) {
-                        System.out.println("\n\n---SEPARATOR --- \n" + record.toString());
-                        results.add(transformSourceRecords(record));
+                        results.add(filterMultipleTitles(transformSourceRecords(record)));
                     }
                 }
             }
             return results;
         }
+    }
+
+    /**
+     * This method remove multiple titles occurrences
+     * 
+     * @param transformSourceRecords
+     * @return ImportRecord with one or zero title
+     */
+    private ImportRecord filterMultipleTitles(ImportRecord transformSourceRecords) {
+        List<MetadatumDTO> metadata = (List<MetadatumDTO>)transformSourceRecords.getValueList();
+        ArrayList<MetadatumDTO> nextSourceRecord = new ArrayList<>();
+        boolean found = false;
+        for (MetadatumDTO dto : metadata) {
+            if ("dc".equals(dto.getSchema()) && "title".equals(dto.getElement()) && dto.getQualifier() == null) {
+                if (!found) {
+                    nextSourceRecord.add(dto);
+                    found = true;
+                }
+            } else {
+                nextSourceRecord.add(dto);
+            }
+        }
+        return new ImportRecord(nextSourceRecord);
     }
 
     private List<OMElement> splitToRecords(String recordsSrc) {
@@ -278,7 +300,9 @@ public class OpenAireImportMetadataSourceServiceImpl extends AbstractImportMetad
         AXIOMXPath xpath = null;
         try {
             xpath = new AXIOMXPath("/response/results/result");
-//            xpath.addNamespace("ns", "http://www.w3.org/2005/Atom");
+            xpath.addNamespace("dri", "http://www.driver-repository.eu/namespace/dri");
+            xpath.addNamespace("oaf", "http://namespace.openaire.eu/oaf");
+            xpath.addNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
             List<OMElement> recordsList = xpath.selectNodes(element);
             return recordsList;
         } catch (JaxenException e) {
