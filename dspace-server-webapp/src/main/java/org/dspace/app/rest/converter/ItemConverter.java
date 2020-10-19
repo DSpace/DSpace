@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ItemRest;
@@ -27,11 +26,11 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.CrisLayoutField;
 import org.dspace.layout.LayoutSecurity;
+import org.dspace.layout.service.CrisLayoutBoxAccessService;
 import org.dspace.layout.service.CrisLayoutBoxService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -61,6 +60,9 @@ public class ItemConverter
 
     @Autowired
     GroupService groupService;
+
+    @Autowired
+    private CrisLayoutBoxAccessService crisLayoutBoxAccessService;
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemConverter.class);
 
@@ -140,7 +142,7 @@ public class ItemConverter
                 List<CrisLayoutBox> boxesWithMetadataFieldExcludedPublic = getBoxesWithMetadataFieldExcludedPublic(
                         metadataField, boxes);
                 for (CrisLayoutBox box : boxesWithMetadataFieldExcludedPublic) {
-                    if (grantAccess(context, currentUser, box, item)) {
+                    if (crisLayoutBoxAccessService.hasAccess(context, currentUser, box, item)) {
                         return true;
                     }
                 }
@@ -156,60 +158,6 @@ public class ItemConverter
             }
         }
         return false;
-    }
-
-    private boolean grantAccess(Context context, EPerson currentUser, CrisLayoutBox box, Item item)
-            throws SQLException {
-        boolean grantAcces;
-        int layoutSecurity = box.getSecurity();
-        switch (layoutSecurity) {
-            case 1 : grantAcces = authorizeService.isAdmin(context);
-            break;
-            case 2 : grantAcces = isOwner(currentUser, item);
-            break;
-            case 3 : grantAcces = (isOwner(currentUser, item) || authorizeService.isAdmin(context));
-            break;
-            case 4 : grantAcces = customDataGrantAccess(context, currentUser, box, item);
-            break;
-            default: grantAcces = false;
-        }
-        return grantAcces;
-    }
-
-    private boolean customDataGrantAccess(Context context, EPerson currentUser, CrisLayoutBox box, Item item) {
-        Set<MetadataField> metadataSecurityFields = box.getMetadataSecurityFields();
-        for (MetadataField field : metadataSecurityFields) {
-            List<MetadataValue> values = itemService.getMetadata(item, field.getMetadataSchema().getName(),
-                                                     field.getElement(), field.getQualifier(), Item.ANY, true);
-            if (checkUser(currentUser, values)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean checkUser(EPerson currentUser, List<MetadataValue> values) {
-        List<Group> groups = currentUser.getGroups();
-        for (MetadataValue value : values) {
-            if (value.getAuthority().equals(currentUser.getID().toString()) || checkGroup(value, groups)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean checkGroup(MetadataValue value, List<Group> groups) {
-        for (Group group : groups) {
-            if (group.getID().toString().equals(value.getAuthority())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean isOwner(EPerson currentUser, Item item) {
-        String uuidOwner = itemService.getMetadataFirstValue(item, "cris", "owner", null, Item.ANY);
-        return (uuidOwner != null && uuidOwner.equals(currentUser.getID().toString()));
     }
 
     private List<CrisLayoutBox> getBoxesWithMetadataFieldExcludedPublic(MetadataField metadataField,

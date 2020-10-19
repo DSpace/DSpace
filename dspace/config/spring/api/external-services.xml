@@ -58,5 +58,11 @@
         <property name="recordIdMetadata" value="dc.identifier.other"/>
     </bean>
 
+    <bean id="openaireLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="openaireImportService"/>
+        <property name="sourceIdentifier" value="openaire"/>
+        <property name="recordIdMetadata" value="dc.identifier.other"/>
+    </bean>
+
 </beans>
 
