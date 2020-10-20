@@ -9,8 +9,10 @@ package org.dspace.content.integration.crosswalks.model;
 
 import static org.apache.commons.lang3.ArrayUtils.isNotEmpty;
 
+import org.dspace.content.integration.crosswalks.ReferCrosswalk;
+
 /**
- * Models a template line.
+ * Models a template line used in the {@link ReferCrosswalk}.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *

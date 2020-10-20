@@ -75,6 +75,8 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
 
     private Consumer<List<String>> linesPostProcessor;
 
+    private String multipleItemsTemplateFileName;
+
 
     private final String templateFileName;
 
@@ -82,23 +84,19 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
 
     private final String fileName;
 
-    private final String multipleItemsTemplateFileName;
-
     private List<TemplateLine> templateLines;
 
     private List<TemplateLine> multipleItemsTemplateLines;
 
     public ReferCrosswalk(ConfigurationService configurationService, ItemService itemService,
         VirtualFieldMapper virtualFieldMapper, String templateFileName, String mimeType, String fileName,
-        String valueDelimiter, String multipleItemsTemplateFileName) {
-        super();
+        String valueDelimiter) {
         this.configurationService = configurationService;
         this.itemService = itemService;
         this.virtualFieldMapper = virtualFieldMapper;
         this.templateFileName = templateFileName;
         this.mimeType = mimeType;
         this.fileName = fileName;
-        this.multipleItemsTemplateFileName = multipleItemsTemplateFileName;
     }
 
     @PostConstruct
@@ -349,6 +347,10 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
 
     public void setLinesPostProcessor(Consumer<List<String>> linesPostProcessor) {
         this.linesPostProcessor = linesPostProcessor;
+    }
+
+    public void setMultipleItemsTemplateFileName(String multipleItemsTemplateFileName) {
+        this.multipleItemsTemplateFileName = multipleItemsTemplateFileName;
     }
 
 }
