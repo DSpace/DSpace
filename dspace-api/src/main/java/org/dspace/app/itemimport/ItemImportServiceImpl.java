@@ -1506,23 +1506,24 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     log.error("Unable to create contents directory: " + zipDir + entry.getName());
                 }
             } else {
-                File outFile = new File(zipDir + entry.getName());
+                String entryName = entry.getName();
+                File outFile = new File(zipDir + entryName);
                 // Verify that this file will be extracted into our zipDir (and not somewhere else!)
                 if (!outFile.toPath().normalize().startsWith(zipDir)) {
-                    throw new IOException("Bad zip entry: '" + entry.getName()
+                    throw new IOException("Bad zip entry: '" + entryName
                                               + "' in file '" + zipfile.getAbsolutePath() + "'!"
                                               + " Cannot process this file.");
                 } else {
-                    System.out.println("Extracting file: " + entry.getName());
-                    log.info("Extracting file: " + entry.getName());
+                    System.out.println("Extracting file: " + entryName);
+                    log.info("Extracting file: " + entryName);
 
-                    int index = entry.getName().lastIndexOf('/');
+                    int index = entryName.lastIndexOf('/');
                     if (index == -1) {
                         // Was it created on Windows instead?
-                        index = entry.getName().lastIndexOf('\\');
+                        index = entryName.lastIndexOf('\\');
                     }
                     if (index > 0) {
-                        File dir = new File(zipDir + entry.getName().substring(0, index));
+                        File dir = new File(zipDir + entryName.substring(0, index));
                         if (!dir.exists() && !dir.mkdirs()) {
                             log.error("Unable to create directory: " + dir.getAbsolutePath());
                         }
@@ -1535,7 +1536,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                         //            item2 / contents|dublin_core|...
 
                         //regex supports either windows or *nix file paths
-                        String[] entryChunks = entry.getName().split("/|\\\\");
+                        String[] entryChunks = entryName.split("/|\\\\");
                         if (entryChunks.length > 2) {
                             if (StringUtils.equals(sourceDirForZip, sourcedir)) {
                                 sourceDirForZip = sourcedir + "/" + entryChunks[0];
