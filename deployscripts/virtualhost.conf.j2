@@ -9,4 +9,9 @@ RedirectMatch ^/{{ kunde }}-xmlui$ https://{{ kundedata[kunde]["virtualhost"] | 
 ProxyPass /{{ kunde }}-oai ajp://{{ appserver }}:8009/{{ kunde }}-oai secret={{ ajpsecret }}
 ProxyPass /{{ kunde }}-rest ajp://{{ appserver }}:8009/{{ kunde }}-rest secret={{ ajpsecret }}
 ProxyPass /{{ kunde }}-xmlui ajp://{{ appserver }}:8009/{{ kunde }}-xmlui secret={{ ajpsecret }}
+{% if kundedata[kunde]["customvhostconfigs"] is defined %}
+{% for customcfg in kundedata[kunde]["customvhostconfigs"] %}
+Include conf/vhosts/active/brage/{{ customcfg }}
+{% endfor %}
+{% endif %}
 </VirtualHost>
