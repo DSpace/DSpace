@@ -102,6 +102,11 @@ public class AuthenticationServiceImpl implements AuthenticationService
     {
         // better is lowest, so start with the highest.
         int bestRet = AuthenticationMethod.BAD_ARGS;
+        
+        // trim username otherwise a login with a legit value containing leading or trailing spaces will fail
+        if (null != username) {
+            username = username.trim();
+        }
 
         // return on first success, otherwise "best" outcome.
         for (AuthenticationMethod aMethodStack : getAuthenticationMethodStack()) {
