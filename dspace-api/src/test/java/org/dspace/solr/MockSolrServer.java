@@ -63,9 +63,8 @@ public class MockSolrServer {
      * Wrap an instance of embedded Solr.
      *
      * @param coreName name of the core to serve.
-     * @throws Exception passed through.
      */
-    public MockSolrServer(final String coreName) throws Exception {
+    public MockSolrServer(final String coreName) {
         this.coreName = coreName;
         initSolrServer();
     }
@@ -79,9 +78,8 @@ public class MockSolrServer {
 
     /**
      * Ensure that this instance's core is loaded.  Create it if necessary.
-     * @throws Exception passed through.
      */
-    protected void initSolrServer() throws Exception {
+    protected void initSolrServer() {
         solrServer = loadedCores.get(coreName);
         if (solrServer == null) {
             solrServer = initSolrServerForCore(coreName);
