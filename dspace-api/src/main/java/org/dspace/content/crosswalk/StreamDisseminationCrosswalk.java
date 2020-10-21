@@ -10,6 +10,7 @@ package org.dspace.content.crosswalk;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
@@ -55,6 +56,24 @@ public interface StreamDisseminationCrosswalk {
      */
     public void disseminate(Context context, DSpaceObject dso, OutputStream out)
         throws CrosswalkException, IOException, SQLException, AuthorizeException;
+
+    /**
+     * Execute crosswalk on the given objects, sending output to the stream.
+     *
+     * @param context the DSpace context
+     * @param dsos     the  DSpace Objects whose metadata to export.
+     * @param out     output stream to write to
+     * @throws CrosswalkInternalException  (<code>CrosswalkException</code>) failure of the crosswalk itself.
+     * @throws CrosswalkObjectNotSupported (<code>CrosswalkException</code>) Cannot crosswalk this kind of DSpace
+     *                                     object.
+     * @throws IOException                 I/O failure in services this calls
+     * @throws SQLException                Database failure in services this calls
+     * @throws AuthorizeException          current user not authorized for this operation.
+     */
+    public default void disseminate(Context context, List<DSpaceObject> dsos, OutputStream out)
+        throws CrosswalkException, IOException, SQLException, AuthorizeException {
+        throw new UnsupportedOperationException("Crosswalk on multiple DSpace object not supported");
+    }
 
     public String getMIMEType();
 }

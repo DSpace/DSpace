@@ -12,6 +12,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,6 +30,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -73,6 +75,8 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
 
     private Consumer<List<String>> linesPostProcessor;
 
+    private String multipleItemsTemplateFileName;
+
 
     private final String templateFileName;
 
@@ -82,10 +86,11 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
 
     private List<TemplateLine> templateLines;
 
+    private List<TemplateLine> multipleItemsTemplateLines;
+
     public ReferCrosswalk(ConfigurationService configurationService, ItemService itemService,
         VirtualFieldMapper virtualFieldMapper, String templateFileName, String mimeType, String fileName,
         String valueDelimiter) {
-        super();
         this.configurationService = configurationService;
         this.itemService = itemService;
         this.virtualFieldMapper = virtualFieldMapper;
@@ -96,17 +101,13 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
 
     @PostConstruct
     private void postConstruct() throws IOException {
-
         String parent = configurationService.getProperty("dspace.dir") + File.separator + "config" + File.separator;
         File templateFile = new File(parent, templateFileName);
+        this.templateLines = readTemplateLines(templateFile);
 
-        try (FileReader fileReader = new FileReader(templateFile);
-            BufferedReader templateReader = new BufferedReader(fileReader)) {
-
-            templateLines = templateReader.lines()
-                .map(this::buildTemplateLine)
-                .collect(Collectors.toList());
-
+        if (StringUtils.isNotBlank(multipleItemsTemplateFileName)) {
+            File multipleItemsTemplateFile = new File(parent, multipleItemsTemplateFileName);
+            this.multipleItemsTemplateLines = readTemplateLines(multipleItemsTemplateFile);
         }
     }
 
@@ -114,27 +115,47 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
     public void disseminate(Context context, DSpaceObject dso, OutputStream out)
         throws CrosswalkException, IOException, SQLException, AuthorizeException {
 
-        if (dso.getType() != Constants.ITEM) {
-            throw new CrosswalkObjectNotSupported("ReferCrosswalk can only crosswalk an Item.");
-        }
-
-        Item item = (Item) dso;
-
-        List<String> lines = new ArrayList<String>();
-        appendLines(context, item, lines);
+        List<String> lines = getItemLines(context, dso);
 
         if (linesPostProcessor != null) {
             linesPostProcessor.accept(lines);
         }
 
-        try (OutputStreamWriter osw = new OutputStreamWriter(out, UTF_8);
-            BufferedWriter writer = new BufferedWriter(osw)) {
-            for (String line : lines) {
-                writer.write(line);
-                writer.newLine();
-            }
-            writer.flush();
+        writeLines(out, lines);
+
+    }
+
+    @Override
+    public void disseminate(Context context, List<DSpaceObject> dsos, OutputStream out)
+        throws CrosswalkException, IOException, SQLException, AuthorizeException {
+
+        if (CollectionUtils.isEmpty(multipleItemsTemplateLines)) {
+            throw new UnsupportedOperationException("No template defined for multiple items");
         }
+
+        List<String> lines = new ArrayList<String>();
+
+        for (TemplateLine line : multipleItemsTemplateLines) {
+
+            if (line.isTemplateField()) {
+
+                for (DSpaceObject dso : dsos) {
+                    List<String> singleTemplateLines = getSingleItemLines(context, dso, line);
+                    for (String singleTemplateLine : singleTemplateLines) {
+                        lines.add(line.getBeforeField() + singleTemplateLine);
+                    }
+                }
+
+            } else {
+                lines.add(line.getBeforeField());
+            }
+        }
+
+        if (linesPostProcessor != null) {
+            linesPostProcessor.accept(lines);
+        }
+
+        writeLines(out, lines);
 
     }
 
@@ -151,6 +172,14 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
     @Override
     public String getMIMEType() {
         return mimeType;
+    }
+
+    private List<TemplateLine> readTemplateLines(File templateFile) throws IOException, FileNotFoundException {
+        try (BufferedReader templateReader = new BufferedReader(new FileReader(templateFile))) {
+            return templateReader.lines()
+                .map(this::buildTemplateLine)
+                .collect(Collectors.toList());
+        }
     }
 
     private TemplateLine buildTemplateLine(String templateLine) {
@@ -174,6 +203,33 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
         }
 
         return templateLineObj;
+    }
+
+    private List<String> getItemLines(Context context, DSpaceObject dso)
+        throws CrosswalkObjectNotSupported, IOException {
+
+        if (dso.getType() != Constants.ITEM) {
+            throw new CrosswalkObjectNotSupported("ReferCrosswalk can only crosswalk an Item.");
+        }
+
+        Item item = (Item) dso;
+
+        List<String> lines = new ArrayList<String>();
+        appendLines(context, item, lines);
+
+        return lines;
+    }
+
+    private List<String> getSingleItemLines(Context context, DSpaceObject dso, TemplateLine line)
+        throws CrosswalkObjectNotSupported, IOException {
+
+        List<String> singleItemLines = getItemLines(context, dso);
+        if (singleItemLines.size() > 0) {
+            String lastLine = singleItemLines.get(singleItemLines.size() - 1);
+            singleItemLines.set(singleItemLines.size() - 1, lastLine + line.getAfterField());
+        }
+
+        return singleItemLines;
     }
 
     private void appendLines(Context context, Item item, List<String> lines) throws IOException {
@@ -274,12 +330,27 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
         lines.add(line.getBeforeField() + valueToAdd + line.getAfterField());
     }
 
+    private void writeLines(OutputStream out, List<String> lines) throws IOException {
+        try (OutputStreamWriter osw = new OutputStreamWriter(out, UTF_8);
+            BufferedWriter writer = new BufferedWriter(osw)) {
+            for (String line : lines) {
+                writer.write(line);
+                writer.newLine();
+            }
+            writer.flush();
+        }
+    }
+
     public void setConverter(Converter<String, String> converter) {
         this.converter = converter;
     }
 
     public void setLinesPostProcessor(Consumer<List<String>> linesPostProcessor) {
         this.linesPostProcessor = linesPostProcessor;
+    }
+
+    public void setMultipleItemsTemplateFileName(String multipleItemsTemplateFileName) {
+        this.multipleItemsTemplateFileName = multipleItemsTemplateFileName;
     }
 
 }

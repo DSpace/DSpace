@@ -10,22 +10,23 @@ package org.dspace.content.integration.crosswalks;
 import java.util.Map;
 import java.util.Set;
 
+import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
+
 /**
- * Class to map each {@link DocumentCrosswalk} with its name.
+ * Class to map each {@link StreamDisseminationCrosswalk} with its type.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public class DocumentCrosswalkMapper {
+public class StreamDisseminationCrosswalkMapper {
 
-    private final Map<String, DocumentCrosswalk> map;
+    private final Map<String, StreamDisseminationCrosswalk> map;
 
-    public DocumentCrosswalkMapper(Map<String, DocumentCrosswalk> map) {
-        super();
+    public StreamDisseminationCrosswalkMapper(Map<String, StreamDisseminationCrosswalk> map) {
         this.map = map;
     }
 
-    public DocumentCrosswalk getDisseminationCrosswalk(String type) {
+    public StreamDisseminationCrosswalk getByType(String type) {
         return map.get(type);
     }
 

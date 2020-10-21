@@ -9,13 +9,17 @@ package org.dspace.content.integration.crosswalks.model;
 
 import static org.apache.commons.lang3.ArrayUtils.isNotEmpty;
 
+import org.dspace.content.integration.crosswalks.ReferCrosswalk;
+
 /**
- * Models a template line.
+ * Models a template line used in the {@link ReferCrosswalk}.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
 public final class TemplateLine {
+
+    private static final String ITEM_TEMPLATE_FIELD = "item.template";
 
     private static final String VIRTUAL_FIELD = "virtual";
 
@@ -75,6 +79,10 @@ public final class TemplateLine {
 
     public boolean isVirtualField() {
         return isNotEmpty(fieldBits) && fieldBits.length > 1 && VIRTUAL_FIELD.equals(fieldBits[0]);
+    }
+
+    public boolean isTemplateField() {
+        return ITEM_TEMPLATE_FIELD.equals(field);
     }
 
     public boolean isMetadataGroupStartField() {

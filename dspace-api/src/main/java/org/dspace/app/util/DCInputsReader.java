@@ -9,6 +9,7 @@ package org.dspace.app.util;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.servlet.ServletException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -272,6 +274,30 @@ public class DCInputsReader {
         lastInputSet = new DCInputSet(formName,
                                       pages, valuePairs);
         return lastInputSet;
+    }
+
+    /**
+     * Returns true if an input form with the given name exists.
+     *
+     * @param formName the form name to check
+     * @return true if the input form exists, false otherwise
+     */
+    public boolean hasFormWithName(String formName) {
+        return formDefns.get(formName) != null;
+    }
+
+    /**
+     * Returns all the field names in the given form.
+     *
+     * @param formName the form name
+     * @return the field names
+     * @throws DCInputsReaderException if not found
+     */
+    public List<String> getAllFieldNamesByFormName(String formName) throws DCInputsReaderException {
+        return Arrays.stream(getInputsByFormName(formName).getFields())
+            .flatMap(dcInputs -> Arrays.stream(dcInputs))
+            .map(dcInput -> dcInput.getFieldName())
+            .collect(Collectors.toList());
     }
 
     /**

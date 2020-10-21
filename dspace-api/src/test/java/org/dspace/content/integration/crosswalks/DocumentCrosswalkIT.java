@@ -14,7 +14,6 @@ import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.isEmptyString;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 import java.io.ByteArrayInputStream;
@@ -41,7 +40,6 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
 import org.dspace.core.factory.CoreServiceFactory;
-import org.dspace.utils.DSpace;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -55,17 +53,12 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
     private static final String BASE_OUTPUT_DIR_PATH = "./target/testing/dspace/assetstore/crosswalk/";
 
-    private ReferCrosswalkMapper referCrosswalkMapper;
-
     private Community community;
 
     private Collection collection;
 
     @Before
     public void setup() throws SQLException, AuthorizeException {
-
-        this.referCrosswalkMapper = new DSpace().getSingletonService(ReferCrosswalkMapper.class);
-        assertThat(referCrosswalkMapper, notNullValue());
 
         context.turnOffAuthorisationSystem();
         community = createCommunity(context).build();
