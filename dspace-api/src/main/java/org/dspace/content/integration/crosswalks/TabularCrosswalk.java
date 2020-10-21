@@ -198,17 +198,21 @@ public abstract class TabularCrosswalk implements StreamDisseminationCrosswalk, 
 
     private List<String> getMetadataValuesForLine(Context context, TabularTemplateLine line, Item item) {
         if (line.isVirtualField()) {
-            VirtualField virtualField = virtualFieldMapper.getVirtualField(line.getVirtualFieldName());
-            String[] values = virtualField.getMetadata(context, item, line.getField());
-            return values != null ? Arrays.asList(values) : Collections.emptyList();
+            return getVirtualFieldValues(context, line, item);
         } else if (line.isMetadataGroupField()) {
-            return getMetadataGroupValues(context, item, line);
+            return getMetadataGroupValues(context, line, item);
         } else {
             return getMetadataValues(item, line.getField());
         }
     }
 
-    private List<String> getMetadataGroupValues(Context context, Item item, TabularTemplateLine line) {
+    private List<String> getVirtualFieldValues(Context context, TabularTemplateLine line, Item item) {
+        VirtualField virtualField = virtualFieldMapper.getVirtualField(line.getVirtualFieldName());
+        String[] values = virtualField.getMetadata(context, item, line.getField());
+        return values != null ? Arrays.asList(values) : Collections.emptyList();
+    }
+
+    private List<String> getMetadataGroupValues(Context context, TabularTemplateLine line, Item item) {
         String metadataGroupFieldName = line.getMetadataGroupFieldName();
 
         List<String> metadataGroup = getMetadataGroup(item, metadataGroupFieldName);

@@ -143,7 +143,7 @@ public class XlsCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         assertThat(getRowValues(sheet.getRow(0)), contains("Preferred name", "Full name", "Vernacular name", "Variants",
             "Given name", "Family name", "Birth-date", "Gender", "Job title", "Main affiliation", "Working groups",
-            "Personal sites", "Email", "Interests", "Orcid", "Scopus author ids", "Researcher ids", "Affiliations",
+            "Personal sites", "Email", "Interests", "ORCID", "Scopus author ids", "Researcher ids", "Affiliations",
             "Biography", "Educations", "Country", "Qualifications", "Knows languages"));
 
         assertThat(getRowValues(sheet.getRow(1)), contains("John Smith", "John Smith", "JOHN SMITH", "J.S.||Smith John",
@@ -210,7 +210,7 @@ public class XlsCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         assertThat(getRowValues(sheet.getRow(0)), contains("Preferred name", "Full name", "Vernacular name", "Variants",
             "Given name", "Family name", "Birth-date", "Gender", "Job title", "Main affiliation", "Working groups",
-            "Personal sites", "Email", "Interests", "Orcid", "Scopus author ids", "Researcher ids", "Affiliations",
+            "Personal sites", "Email", "Interests", "ORCID", "Scopus author ids", "Researcher ids", "Affiliations",
             "Biography", "Educations", "Country", "Qualifications", "Knows languages"));
 
         assertThat(getRowValues(sheet.getRow(1)), contains("Walter White", "", "", "Heisenberg||W.W.",

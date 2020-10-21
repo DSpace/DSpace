@@ -64,7 +64,7 @@ public class CsvCrosswalk extends TabularCrosswalk {
     }
 
     private String getFieldsSeparator() {
-        return configurationService.getProperty("crosswalk.csv.separator.fields", ";");
+        return configurationService.getProperty("crosswalk.csv.separator.fields", ",");
     }
 
 }
