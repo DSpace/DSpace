@@ -55,11 +55,8 @@ public class XlsCrosswalk extends TabularCrosswalk {
                 for (String field : row) {
                     Cell cell = sheetRow.createCell(cellCount++);
                     cell.setCellValue(field);
-                    sheet.autoSizeColumn(cellCount);
                 }
             }
-
-            autoSizeColumns(sheet);
 
             workbook.write(out);
 
@@ -67,16 +64,6 @@ public class XlsCrosswalk extends TabularCrosswalk {
             throw new RuntimeException(e);
         }
 
-    }
-
-    private void autoSizeColumns(Sheet sheet) {
-        if (sheet.getPhysicalNumberOfRows() > 0) {
-            Row row = sheet.getRow(sheet.getFirstRowNum());
-            for (Cell cell : row) {
-                int columnIndex = cell.getColumnIndex();
-                sheet.autoSizeColumn(columnIndex);
-            }
-        }
     }
 
     protected String getValuesSeparator() {

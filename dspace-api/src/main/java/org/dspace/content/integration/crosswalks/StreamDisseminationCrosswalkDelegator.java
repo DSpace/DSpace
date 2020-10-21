@@ -10,7 +10,7 @@ package org.dspace.content.integration.crosswalks;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.Iterator;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
@@ -41,9 +41,9 @@ public class StreamDisseminationCrosswalkDelegator extends SelfNamedPlugin
     }
 
     @Override
-    public void disseminate(Context context, List<DSpaceObject> dsos, OutputStream out)
+    public void disseminate(Context context, Iterator<? extends DSpaceObject> dsoIterator, OutputStream out)
         throws CrosswalkException, IOException, SQLException, AuthorizeException {
-        getStreamDisseminationCrosswalk().disseminate(context, dsos, out);
+        getStreamDisseminationCrosswalk().disseminate(context, dsoIterator, out);
     }
 
     @Override

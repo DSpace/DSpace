@@ -133,7 +133,7 @@ public class XlsCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         xlsCrosswalk.setDCInputsReader(dcInputsReader);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        xlsCrosswalk.disseminate(context, Arrays.asList(firstItem, secondItem, thirdItem), baos);
+        xlsCrosswalk.disseminate(context, Arrays.asList(firstItem, secondItem, thirdItem).iterator(), baos);
 
         Workbook workbook = WorkbookFactory.create(new ByteArrayInputStream(baos.toByteArray()));
         assertThat(workbook.getNumberOfSheets(), equalTo(1));

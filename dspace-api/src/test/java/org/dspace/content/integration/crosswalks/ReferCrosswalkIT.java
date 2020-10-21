@@ -333,7 +333,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        referCrossWalk.disseminate(context, Arrays.asList(firstItem, secondItem), out);
+        referCrossWalk.disseminate(context, Arrays.asList(firstItem, secondItem).iterator(), out);
 
         try (FileInputStream fis = getFileInputStream("persons.xml")) {
             String expectedXml = IOUtils.toString(fis, Charset.defaultCharset());
@@ -377,7 +377,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        referCrossWalk.disseminate(context, Arrays.asList(firstItem, secondItem), out);
+        referCrossWalk.disseminate(context, Arrays.asList(firstItem, secondItem).iterator(), out);
 
         try (FileInputStream fis = getFileInputStream("persons.json")) {
             String expectedJson = IOUtils.toString(fis, Charset.defaultCharset());

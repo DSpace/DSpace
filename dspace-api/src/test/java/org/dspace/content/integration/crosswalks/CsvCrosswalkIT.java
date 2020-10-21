@@ -131,7 +131,7 @@ public class CsvCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         csvCrosswalk.setDCInputsReader(dcInputsReader);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        csvCrosswalk.disseminate(context, Arrays.asList(firstItem, secondItem, thirdItem), out);
+        csvCrosswalk.disseminate(context, Arrays.asList(firstItem, secondItem, thirdItem).iterator(), out);
 
         try (FileInputStream fis = getFileInputStream("persons.csv")) {
             String expectedCsv = IOUtils.toString(fis, Charset.defaultCharset());

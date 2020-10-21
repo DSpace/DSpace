@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -140,17 +141,18 @@ public abstract class TabularCrosswalk implements StreamDisseminationCrosswalk, 
     @Override
     public void disseminate(Context context, DSpaceObject dso, OutputStream out)
         throws CrosswalkException, IOException, SQLException, AuthorizeException {
-        this.disseminate(context, Arrays.asList(dso), out);
+        this.disseminate(context, Arrays.asList(dso).iterator(), out);
     }
 
     @Override
-    public void disseminate(Context context, List<DSpaceObject> dsos, OutputStream out)
+    public void disseminate(Context context, Iterator<? extends DSpaceObject> dsoIterator, OutputStream out)
         throws CrosswalkException, IOException, SQLException, AuthorizeException {
 
         List<List<String>> rows = new ArrayList<>();
         rows.add(getHeader());
 
-        for (DSpaceObject dso : dsos) {
+        while (dsoIterator.hasNext()) {
+            DSpaceObject dso = dsoIterator.next();
             rows.add(getRow(context, dso));
         }
 

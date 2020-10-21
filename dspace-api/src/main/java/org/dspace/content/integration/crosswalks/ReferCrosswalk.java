@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -126,7 +127,7 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
     }
 
     @Override
-    public void disseminate(Context context, List<DSpaceObject> dsos, OutputStream out)
+    public void disseminate(Context context, Iterator<? extends DSpaceObject> dsoIterator, OutputStream out)
         throws CrosswalkException, IOException, SQLException, AuthorizeException {
 
         if (CollectionUtils.isEmpty(multipleItemsTemplateLines)) {
@@ -139,7 +140,8 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
 
             if (line.isTemplateField()) {
 
-                for (DSpaceObject dso : dsos) {
+                while (dsoIterator.hasNext()) {
+                    DSpaceObject dso = dsoIterator.next();
                     List<String> singleTemplateLines = getSingleItemLines(context, dso, line);
                     for (String singleTemplateLine : singleTemplateLines) {
                         lines.add(line.getBeforeField() + singleTemplateLine);
