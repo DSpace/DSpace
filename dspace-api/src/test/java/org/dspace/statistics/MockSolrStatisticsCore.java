@@ -5,10 +5,9 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.statistics.solr;
+package org.dspace.statistics;
 
 import org.dspace.solr.MockSolrServer;
-import org.dspace.statistics.SolrStatisticsCore;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +21,13 @@ public class MockSolrStatisticsCore extends SolrStatisticsCore implements Dispos
         if (solr == null) {
             solr = mockSolrServer.getSolrServer();
         }
+    }
+
+    /**
+     * Reset the core for the next test.  See {@link MockSolrServer#reset()}.
+     */
+    public void reset() {
+        mockSolrServer.reset();
     }
 
     @Override
