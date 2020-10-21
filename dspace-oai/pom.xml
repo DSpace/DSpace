@@ -108,6 +108,11 @@
                     <groupId>org.dom4j</groupId>
                     <artifactId>dom4j</artifactId>
                 </exclusion>
+                <!-- We don't use this test framework & it causes dependency convergence issues -->
+                <exclusion>
+                    <groupId>com.lyncode</groupId>
+                    <artifactId>test-support</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -197,24 +202,6 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Utilities -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>19.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.lyncode</groupId>
-            <artifactId>builder-commons</artifactId>
-            <version>1.0.2</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
         <!-- Testing -->
         <dependency>
             <groupId>junit</groupId>
@@ -232,22 +219,6 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.lyncode</groupId>
-            <artifactId>test-support</artifactId>
-            <version>1.0.3</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.lyncode</groupId>
-                    <artifactId>builder-commons</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>

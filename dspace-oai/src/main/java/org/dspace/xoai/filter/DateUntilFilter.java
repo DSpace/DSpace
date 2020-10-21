@@ -7,9 +7,9 @@
  */
 package org.dspace.xoai.filter;
 
+import java.util.Calendar;
 import java.util.Date;
 
-import com.lyncode.builder.DateBuilder;
 import com.lyncode.xoai.dataprovider.services.api.DateProvider;
 import com.lyncode.xoai.dataprovider.services.impl.BaseDateProvider;
 import org.apache.solr.client.solrj.util.ClientUtils;
@@ -24,7 +24,11 @@ public class DateUntilFilter extends DSpaceFilter {
     private final Date date;
 
     public DateUntilFilter(Date date) {
-        this.date = new DateBuilder(date).setMaxMilliseconds().build();
+        Calendar calendar =  Calendar.getInstance();
+        calendar.setTime(date);
+        // As this is a 'from' filter, ensure milliseconds are set to 999 (maximum value)
+        calendar.set(Calendar.MILLISECOND, 999);
+        this.date = calendar.getTime();
     }
 
     @Override

@@ -9,9 +9,10 @@ package org.dspace.xoai.tests.unit.services.impl;
 
 import static org.mockito.Mockito.mock;
 
+import java.util.Calendar;
 import java.util.Date;
 
-import com.lyncode.builder.DateBuilder;
+//import com.lyncode.builder.DateBuilder;
 import com.lyncode.xoai.dataprovider.services.impl.BaseDateProvider;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.xoai.services.api.CollectionsService;
@@ -59,11 +60,19 @@ public abstract class AbstractQueryResolverTest {
 
     protected String escapedFromDate(Date date) {
         return ClientUtils.escapeQueryChars(
-            baseDateProvider.format(new DateBuilder(date).setMinMilliseconds().build()).replace("Z", ".000Z"));
+            baseDateProvider.format(dateWithMilliseconds(date, 0)).replace("Z", ".000Z"));
     }
 
     protected String escapedUntilDate(Date date) {
         return ClientUtils.escapeQueryChars(
-            baseDateProvider.format(new DateBuilder(date).setMaxMilliseconds().build()).replace("Z", ".999Z"));
+            baseDateProvider.format(dateWithMilliseconds(date, 999)).replace("Z", ".999Z"));
+    }
+
+    // Return date with specified milliseconds value
+    private Date dateWithMilliseconds(Date date, int milliseconds) {
+        Calendar calendar =  Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.MILLISECOND, milliseconds);
+        return calendar.getTime();
     }
 }

@@ -1651,12 +1651,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>19.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.lyncode</groupId>
-                <artifactId>builder-commons</artifactId>
-                <version>1.0.2</version>
+                <version>30.0-jre</version>
             </dependency>
             <dependency>
                 <groupId>xom</groupId>

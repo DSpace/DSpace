@@ -8,7 +8,8 @@
 
 package org.dspace.xoai.tests.integration.xoai;
 
-import static com.lyncode.test.matchers.xml.XPathMatchers.xPath;
+import static org.dspace.xoai.tests.support.XmlMatcherBuilder.xml;
+//import static com.lyncode.test.matchers.xml.XPathMatchers.xPath;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -17,6 +18,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 
 import com.lyncode.xoai.util.XSLPipeline;
+import org.dspace.xoai.tests.support.XmlMatcherBuilder;
 import org.junit.Test;
 import org.parboiled.common.FileUtils;
 
@@ -31,7 +33,8 @@ public class PipelineTest {
                                                   .apply(factory.newTransformer(new StreamSource(xslt)))
                                                   .getTransformed());
 
-        assertThat(output, xPath("/oai_dc:dc/dc:title", equalTo("Teste")));
+        assertThat(output, oai_dc().withXPath("/oai_dc:dc/dc:title", equalTo("Teste")));
+        //assertThat(output, xPath("/oai_dc:dc/dc:title", equalTo("Teste")));
 
         input.close();
         input = null;
@@ -39,4 +42,11 @@ public class PipelineTest {
         xslt = null;
         output = null;
     }
+
+    private XmlMatcherBuilder oai_dc() {
+        return xml()
+            .withNamespace("oai_dc", "http://www.openarchives.org/OAI/2.0/oai_dc/")
+            .withNamespace("dc", "http://purl.org/dc/elements/1.1/");
+    }
+
 }
