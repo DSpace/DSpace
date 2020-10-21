@@ -7,20 +7,30 @@
  */
 package org.dspace.app.rest;
 
+import static java.util.Arrays.asList;
+import static java.util.Calendar.DAY_OF_YEAR;
 import static org.apache.commons.codec.CharEncoding.UTF_8;
 import static org.apache.commons.io.IOUtils.toInputStream;
+import static org.apache.commons.lang.time.DateFormatUtils.format;
 import static org.dspace.app.rest.utils.UsageReportUtils.TOP_CITIES_REPORT_ID;
 import static org.dspace.app.rest.utils.UsageReportUtils.TOP_COUNTRIES_REPORT_ID;
 import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_DOWNLOADS_REPORT_ID;
 import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_VISITS_PER_MONTH_REPORT_ID;
 import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_VISITS_REPORT_ID;
+import static org.dspace.core.Constants.BITSTREAM;
+import static org.dspace.core.Constants.COLLECTION;
+import static org.dspace.core.Constants.COMMUNITY;
+import static org.dspace.core.Constants.ITEM;
+import static org.dspace.statistics.SolrLoggerServiceImpl.DATE_FORMAT_8601;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -29,6 +39,12 @@ import java.util.Locale;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.SolrInputDocument;
 import org.dspace.app.rest.matcher.UsageReportMatcher;
 import org.dspace.app.rest.model.UsageReportPointCityRest;
 import org.dspace.app.rest.model.UsageReportPointCountryRest;
@@ -55,6 +71,7 @@ import org.dspace.content.Site;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
+import org.dspace.statistics.SolrStatisticsCore;
 import org.dspace.statistics.factory.StatisticsServiceFactory;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -75,6 +92,8 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
     ConfigurationService configurationService;
     @Autowired
     protected AuthorizeService authorizeService;
+    @Autowired
+    SolrStatisticsCore solrStatisticsCore;
 
     private Community communityNotVisited;
     private Community communityVisited;
@@ -1204,6 +1223,181 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                     TOP_COUNTRIES_REPORT_ID, Arrays.asList(expectedPointCountry)),
                 UsageReportMatcher.matchUsageReport(bitstreamVisited.getID() + "_" + TOTAL_DOWNLOADS_REPORT_ID,
                     TOTAL_DOWNLOADS_REPORT_ID, Arrays.asList(expectedPointTotalVisits)))));
+    }
+
+    @Test
+    public void testAnonymizeStatistics() throws Exception {
+
+        // bitstream document which should not be anonymized
+        addSolrDocument(asList(
+            Pair.of("id", "bitstream_view_recent"),
+            Pair.of("type", BITSTREAM),
+            Pair.of("ip", "75.133.248.54"),
+            Pair.of("dns", "dns_1"),
+            Pair.of("time", getTimeNDaysAgo(5))
+        ));
+
+        // item document which should not be anonymized
+        addSolrDocument(asList(
+            Pair.of("id", "item_view_recent"),
+            Pair.of("type", ITEM),
+            Pair.of("ip", "195.11.13.244"),
+            Pair.of("dns", "dns_2"),
+            Pair.of("time", getTimeNDaysAgo(20))
+        ));
+
+        // collection document which should not be anonymized
+        addSolrDocument(asList(
+            Pair.of("id", "collection_view_recent"),
+            Pair.of("type", COLLECTION),
+            Pair.of("ip", "16f4:0586:3148:3a8a:f307:e13e:2614:21a2"),
+            Pair.of("dns", "dns_3"),
+            Pair.of("time", getTimeNDaysAgo(50))
+        ));
+
+        // community document which should not be anonymized
+        addSolrDocument(asList(
+            Pair.of("id", "community_view_recent"),
+            Pair.of("type", COMMUNITY),
+            Pair.of("ip", "5b02:f3ed:635f:98b1:d2c5:f292:90d9:3982"),
+            Pair.of("dns", "dns_4"),
+            Pair.of("time", getTimeNDaysAgo(89))
+        ));
+
+        // bitstream document which should be anonymized
+        addSolrDocument(asList(
+            Pair.of("id", "bitstream_view_old"),
+            Pair.of("type", BITSTREAM),
+            Pair.of("ip", "75.133.248.54"),
+            Pair.of("dns", "dns_1"),
+            Pair.of("time", getTimeNDaysAgo(90))
+        ));
+
+        // item document which should be anonymized
+        addSolrDocument(asList(
+            Pair.of("id", "item_view_old"),
+            Pair.of("type", ITEM),
+            Pair.of("ip", "195.11.13.244"),
+            Pair.of("dns", "dns_2"),
+            Pair.of("time", getTimeNDaysAgo(130))
+        ));
+
+        // collection document which should be anonymized
+        addSolrDocument(asList(
+            Pair.of("id", "community_view_old"),
+            Pair.of("type", COLLECTION),
+            Pair.of("ip", "16f4:0586:3148:3a8a:f307:e13e:2614:21a2"),
+            Pair.of("dns", "dns_3"),
+            Pair.of("time", getTimeNDaysAgo(200))
+        ));
+
+        // community document which should be anonymized
+        addSolrDocument(asList(
+            Pair.of("id", "collection_view_old"),
+            Pair.of("type", COMMUNITY),
+            Pair.of("ip", "5b02:f3ed:635f:98b1:d2c5:f292:90d9:3982"),
+            Pair.of("dns", "dns_4"),
+            Pair.of("time", getTimeNDaysAgo(500))
+        ));
+
+        solrStatisticsCore.getSolr().commit();
+
+        runDSpaceScript("anonymize-statistics");
+
+        assertEquals(
+            getSolrDocumentById("bitstream_view_recent").getFieldValue("ip"),
+            "75.133.248.54"
+        );
+        assertEquals(
+            getSolrDocumentById("bitstream_view_recent").getFieldValue("dns"),
+            "dns_1"
+        );
+
+        assertEquals(
+            getSolrDocumentById("item_view_recent").getFieldValue("ip"),
+            "195.11.13.244"
+        );
+        assertEquals(
+            getSolrDocumentById("item_view_recent").getFieldValue("dns"),
+            "dns_2"
+        );
+
+        assertEquals(
+            getSolrDocumentById("collection_view_recent").getFieldValue("ip"),
+            "16f4:0586:3148:3a8a:f307:e13e:2614:21a2"
+        );
+        assertEquals(
+            getSolrDocumentById("collection_view_recent").getFieldValue("dns"),
+            "dns_3"
+        );
+
+        assertEquals(
+            getSolrDocumentById("community_view_recent").getFieldValue("ip"),
+            "5b02:f3ed:635f:98b1:d2c5:f292:90d9:3982"
+        );
+        assertEquals(
+            getSolrDocumentById("community_view_recent").getFieldValue("dns"),
+            "dns_4"
+        );
+
+        assertEquals(
+            getSolrDocumentById("bitstream_view_old").getFieldValue("ip"),
+            "75.133.248.255"
+        );
+        assertEquals(
+            getSolrDocumentById("bitstream_view_old").getFieldValue("dns"),
+            "anonymized"
+        );
+
+        assertEquals(
+            getSolrDocumentById("item_view_old").getFieldValue("ip"),
+            "195.11.13.255"
+        );
+        assertEquals(
+            getSolrDocumentById("item_view_old").getFieldValue("dns"),
+            "anonymized"
+        );
+
+        assertEquals(
+            getSolrDocumentById("collection_view_old").getFieldValue("ip"),
+            "16f4:0586:3148:3a8a:f307:e13e:ffff:ffff"
+        );
+        assertEquals(
+            getSolrDocumentById("collection_view_old").getFieldValue("dns"),
+            "anonymized"
+        );
+
+        assertEquals(
+            getSolrDocumentById("community_view_old").getFieldValue("ip"),
+            "5b02:f3ed:635f:98b1:d2c5:f292:ffff:ffff"
+        );
+        assertEquals(
+            getSolrDocumentById("community_view_old").getFieldValue("dns"),
+            "anonymized"
+        );
+    }
+
+    private void addSolrDocument(List<Pair<String, Object>> fields) throws IOException, SolrServerException {
+
+        SolrInputDocument document = new SolrInputDocument();
+        for (Pair<String, Object> field : fields) {
+            document.addField(field.getKey(), field.getValue());
+        }
+        solrStatisticsCore.getSolr().add(document);
+    }
+    
+    private SolrDocument getSolrDocumentById(String id) throws IOException, SolrServerException {
+        SolrDocumentList results = solrStatisticsCore.getSolr().query(new SolrQuery("id:" + id)).getResults();
+        if (results.isEmpty()) {
+            return null;
+        }
+        return results.get(0);
+    }
+
+    private String getTimeNDaysAgo(int daysAgo) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(DAY_OF_YEAR, daysAgo);
+        return format(calendar, DATE_FORMAT_8601);
     }
 
     // Create expected points from -6 months to now, with given number of views in current month
