@@ -32,6 +32,9 @@ public class MessageDto {
     @JsonProperty("abstracts[0]")
     private String abstracts;
 
+    @JsonProperty("projects.acronym")
+    private String acronym;
+
     @JsonProperty("projects[0].code")
     private String code;
 
@@ -105,6 +108,14 @@ public class MessageDto {
 
     public void setAbstracts(String abstracts) {
         this.abstracts = abstracts;
+    }
+
+    public String getAcronym() {
+        return acronym;
+    }
+
+    public void setAcronym(String acronym) {
+        this.acronym = acronym;
     }
 
     public String getCode() {

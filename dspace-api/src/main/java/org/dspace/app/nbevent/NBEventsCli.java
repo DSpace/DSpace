@@ -66,14 +66,8 @@ public class NBEventsCli {
         List<NBEvent> entries;
         try {
             entries = getEntriesFromFile(fileLocation);
-            try {
-                for (NBEvent entry : entries) {
-                    nbEventService.store(context, entry);
-                }
-                System.exit(0);
-            } catch (SolrImportExportException | SolrServerException e) {
-                e.printStackTrace();
-                System.exit(1);
+            for (NBEvent entry : entries) {
+                nbEventService.store(context, entry);
             }
         } catch (JsonParseException | JsonMappingException e) {
             System.err.println("Unable to parse the file content.");

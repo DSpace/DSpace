@@ -17,11 +17,11 @@ public class NBTopicMatcher {
 
     private NBTopicMatcher() { }
 
-    public static Matcher<? super Object> matchNBTopicEntry(String key, long totalEvents) {
+    public static Matcher<? super Object> matchNBTopicEntry(String key, int totalEvents) {
         return allOf(
             hasJsonPath("$.type", is("nbtopic")),
             hasJsonPath("$.name", is(key)),
-            hasJsonPath("$.id", is(key.replace("!", "/"))),
+            hasJsonPath("$.id", is(key.replace("/", "!"))),
             hasJsonPath("$.totalEvents", is(totalEvents))
         );
     }
@@ -31,7 +31,7 @@ public class NBTopicMatcher {
         return allOf(
             hasJsonPath("$.type", is("nbtopic")),
             hasJsonPath("$.name", is(key)),
-            hasJsonPath("$.id", is(key.replace("!", "/")))
+            hasJsonPath("$.id", is(key.replace("/", "/")))
         );
     }
 
