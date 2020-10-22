@@ -40,7 +40,7 @@
 
     <bean id="openaireTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="openaire.title"/>
-        <property name="query" value="descendant::title"/>
+        <property name="query" value="descendant::oaf:result/title"/>
         <property name="prefixToNamespaceMapping" ref="openairePrefixToNamespaceMapping"/>
     </bean>
     <bean id="openaire.title" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
@@ -49,7 +49,7 @@
 
     <bean id="openaireSummaryContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="openaire.summary"/>
-        <property name="query" value="descendant::description"/>
+        <property name="query" value="descendant::oaf:result/description"/>
         <property name="prefixToNamespaceMapping" ref="openairePrefixToNamespaceMapping"/>
     </bean>
     <bean id="openaire.summary" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
@@ -60,7 +60,7 @@
         <property name="dateFormatFrom" value="yyyy-MM-dd'T'HH:mm:ss'Z'"/>
         <property name="dateFormatTo" value="yyyy-MM-dd"></property>
         <property name="field" ref="openaire.published"/>
-        <property name="query" value="descendant::dri:dateOfCollection"/>
+        <property name="query" value="descendant::oaf:result/relevantdate"/>
         <property name="prefixToNamespaceMapping" ref="openairePrefixToNamespaceMapping"/>
     </bean>
     <bean id="openaire.published" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
@@ -69,7 +69,7 @@
 
     <bean id="openaireDoiContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="openaire.doi"/>
-        <property name="query" value="descendant::pid"/>
+        <property name="query" value="descendant::oaf:result/pid"/>
         <property name="prefixToNamespaceMapping" ref="openairePrefixToNamespaceMapping"/>
     </bean>
     <bean id="openaire.doi" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
@@ -78,7 +78,7 @@
 
     <bean id="openaireJournalContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="openaire.journal_ref"/>
-        <property name="query" value="descendant::journal"/>
+        <property name="query" value="descendant::oaf:result/collectedfrom/@name"/>
         <property name="prefixToNamespaceMapping" ref="openairePrefixToNamespaceMapping"/>
     </bean>
     <bean id="openaire.journal_ref" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
@@ -88,7 +88,7 @@
 
     <bean id="openaireCategoryTermContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="openaire.category.term"/>
-        <property name="query" value="descendant::subject"/>
+        <property name="query" value="descendant::oaf:result/subject"/>
         <property name="prefixToNamespaceMapping" ref="openairePrefixToNamespaceMapping"/>
     </bean>
     <bean id="openaire.category.term" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
@@ -97,7 +97,7 @@
 
     <bean id="openaireAuthorContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="openaire.author.name"/>
-        <property name="query" value="descendant::creator"/>
+        <property name="query" value="descendant::oaf:result/creator"/>
         <property name="prefixToNamespaceMapping" ref="openairePrefixToNamespaceMapping"/>
     </bean>
     <bean id="openaire.author.name" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">

@@ -47,13 +47,21 @@ public class AuthorNamesApprover {
         List<String> authors = searchMetadataValues(researcher);
         for (ImportRecord importRecord : importRecords) {
             List<String> metadataAuthors = new ArrayList<>();
-            Collection<MetadatumDTO> metadata = importRecord.getValue("dc", "contributor", "author");
+            Collection<MetadatumDTO> metadata = new ArrayList<>();
+            for (String contributorMetadatum : contributorMetadata) {
+                String[] fields = contributorMetadatum.split("\\.");
+                if (fields.length == 2) {
+                    metadata.addAll(importRecord.getValue(fields[0], fields[1], null));
+                } else {
+                    metadata.addAll(importRecord.getValue(fields[0], fields[1], fields[2]));
+                }
+            }
             if (metadata != null) {
                 for (MetadatumDTO metadatum : metadata) {
                     metadataAuthors.add(metadatum.getValue());
                 }
             }
-            for (String metadataAuthor: metadataAuthors) {
+            for (String metadataAuthor : metadataAuthors) {
                 if (authors.contains(metadataAuthor)) {
                     filteredRecords.add(importRecord);
                     break;

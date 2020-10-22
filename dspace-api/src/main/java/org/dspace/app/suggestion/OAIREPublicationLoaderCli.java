@@ -47,6 +47,8 @@ public class OAIREPublicationLoaderCli {
     private static final String CATEGORY = "category";
     private static final String EXTERNAL_URI = "external-uri";
     private static final String REJECTED = "rejected";
+
+
     private static final String SOURCE_NAME = "oaire";
 
 
@@ -63,6 +65,7 @@ public class OAIREPublicationLoaderCli {
             CommandLineParser parser = new PosixParser();
             Options options = createCommandLineOptions();
             CommandLine line = parser.parse(options, args);
+            checkHelpEntered(options, line);
             String profile = getProfileFromCommandLine(line);
             List<Item> researchers = null;
             if (profile == null) {
@@ -117,23 +120,21 @@ public class OAIREPublicationLoaderCli {
         getSuggestionSolr().commit();
     }
 
+    //FIXME: move this method in spring bean to inject metadata schema?
     private static SolrInputDocument translateImportRecordToSolrDocument(Item item, ImportRecord record) {
-
+        String openAireId = getFirstEntryByMetadatum(record, "dc", "identifier", "other");
         System.out.println("Processing Metadata:\n" + record.toString());
-
-        // FIXME: externalize metadata configuration?
         SolrInputDocument document = new SolrInputDocument();
         document.addField(SOURCE, SOURCE_NAME);
-        document.addField(SUGGESTION_ID, getFirstEntryByMetadatum(record, "dc", "identifier", "other"));
+        document.addField(SUGGESTION_ID, openAireId);
         document.addField(TARGET_ID, item.getID().toString());
         document.addField(TITLE, getFirstEntryByMetadatum(record, "dc", "title", null));
         document.addField(DATE, getFirstEntryByMetadatum(record, "dc", "date", "issued"));
         document.addField(CONTRIBUTORS, getAllEntriesByMetadatum(record, "dc", "contributor", "author"));
         document.addField(ABSTRACT, getFirstEntryByMetadatum(record, "dc", "description", "abstract"));
-        // TODO: which metadatum here?
-        document.addField(CATEGORY, "");
-        // FIXME: api call are correct?
-        document.addField(EXTERNAL_URI, "");
+        document.addField(CATEGORY, getAllEntriesByMetadatum(record, "dc", "source", null));
+        document.addField(EXTERNAL_URI, getDSpaceUri() + "/api/integration/externalsources/openaire/entryValues/"
+                + openAireId);
         document.addField(REJECTED, "false");
         return document;
     }
@@ -219,6 +220,12 @@ public class OAIREPublicationLoaderCli {
         }
         System.out.println("Found " + items.size() + " researcher(s)");
         return items;
+    }
+
+
+    private static String getDSpaceUri() {
+        return DSpaceServicesFactory.getInstance().getConfigurationService()
+                    .getProperty("dspace.server.url");
     }
 
     /**
