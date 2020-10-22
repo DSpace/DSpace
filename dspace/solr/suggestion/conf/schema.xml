@@ -512,9 +512,9 @@
     <field name="target_id" type="string" indexed="true" stored="true" omitNorms="true" />
     <field name="title" type="string" indexed="true" stored="true" omitNorms="true" />
     <field name="date" type="string" indexed="true" stored="true" omitNorms="true" />
-    <field name="contributors" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
+    <field name="contributors" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" />
     <field name="abstract" type="string" indexed="true" stored="true" omitNorms="true" />
-    <field name="category" type="string" indexed="true" stored="true" omitNorms="true" />
+    <field name="category" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
     <field name="external-uri" type="string" indexed="true" stored="true" omitNorms="true" />
     <field name="rejected" type="boolean" indexed="true" stored="true" omitNorms="true" />
     

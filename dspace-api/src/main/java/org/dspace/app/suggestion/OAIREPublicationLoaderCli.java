@@ -47,6 +47,8 @@ public class OAIREPublicationLoaderCli {
     private static final String CATEGORY = "category";
     private static final String EXTERNAL_URI = "external-uri";
     private static final String REJECTED = "rejected";
+    private static final String SOURCE_NAME = "oaire";
+
 
     private static DSpace dspace = null;
     private static SolrClient solrSuggestionClient = null;
@@ -79,7 +81,7 @@ public class OAIREPublicationLoaderCli {
             }
             System.exit(0);
         } catch (Exception e) {
-            System.err.println(e);
+            e.printStackTrace();
         }
     }
 
@@ -116,9 +118,12 @@ public class OAIREPublicationLoaderCli {
     }
 
     private static SolrInputDocument translateImportRecordToSolrDocument(Item item, ImportRecord record) {
-        // FIXME: externalize this configuration
+
+        System.out.println("Processing Metadata:\n" + record.toString());
+
+        // FIXME: externalize metadata configuration?
         SolrInputDocument document = new SolrInputDocument();
-        document.addField(SOURCE, getFirstEntryByMetadatum(record, "dc", "source", null));
+        document.addField(SOURCE, SOURCE_NAME);
         document.addField(SUGGESTION_ID, getFirstEntryByMetadatum(record, "dc", "identifier", "other"));
         document.addField(TARGET_ID, item.getID().toString());
         document.addField(TITLE, getFirstEntryByMetadatum(record, "dc", "title", null));
@@ -150,7 +155,10 @@ public class OAIREPublicationLoaderCli {
             String qualifier) {
         Collection<MetadatumDTO> metadata = record.getValue(schema, element, qualifier);
         Iterator<MetadatumDTO> iterator = metadata.iterator();
-        return iterator.next().getValue();
+        if (iterator.hasNext()) {
+            return iterator.next().getValue();
+        }
+        return null;
     }
 
     /**
