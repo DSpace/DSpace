@@ -3830,6 +3830,55 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
+    public void createWorkspaceItemFromExternalSourcesNonAdminWithPermission() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                .withSubmitterGroup(eperson).build();
+
+        context.restoreAuthSystemState();
+
+        Integer workspaceItemId = null;
+
+        ObjectMapper mapper = new ObjectMapper();
+        String token = getAuthToken(eperson.getEmail(), password);
+        MvcResult mvcResult = getClient(token).perform(post("/api/submission/workspaceitems?owningCollection="
+                                          + col1.getID().toString())
+                                     .contentType(parseMediaType(
+                                         TEXT_URI_LIST_VALUE))
+                                     .content("https://localhost:8080/server/api/integration/externalsources/" +
+                                                  "mock/entryValues/one"))
+                                    .andExpect(status().isCreated()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String,Object> map = mapper.readValue(content, Map.class);
+        workspaceItemId = (Integer) map.get("id");
+        String itemUuidString = String.valueOf(((Map) ((Map) map.get("_embedded")).get("item")).get("uuid"));
+
+        getClient(token).perform(get("/api/submission/workspaceitems/" + workspaceItemId))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", Matchers.allOf(
+            hasJsonPath("$.id", is(workspaceItemId)),
+            hasJsonPath("$.type", is("workspaceitem")),
+            hasJsonPath("$._embedded.item", Matchers.allOf(
+                hasJsonPath("$.id", is(itemUuidString)),
+                hasJsonPath("$.uuid", is(itemUuidString)),
+                hasJsonPath("$.type", is("item")),
+                hasJsonPath("$.metadata", Matchers.allOf(
+                    MetadataMatcher.matchMetadata("dc.contributor.author", "Donald, Smith")
+                )))))
+        ));
+    }
+
+    @Test
     public void findByItemUuidTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
