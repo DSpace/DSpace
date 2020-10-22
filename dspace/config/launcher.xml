@@ -373,5 +373,12 @@
             <class>org.dspace.app.nbevent.NBEventsCli</class>
         </step>
     </command>
+    <command>
+        <name>import-oaire-suggestions</name>
+        <description>Import and store locally metadata from OpenAIRE</description>
+        <step>
+            <class>org.dspace.app.suggestion.OAIREPublicationLoaderCli</class>
+        </step>
+    </command>
     
 </commands>
