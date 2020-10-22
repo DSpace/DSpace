@@ -17,7 +17,7 @@ import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class AuthorNameApprover {
+public class AuthorNamesApprover {
 
     private List<String> contributorMetadata;
 

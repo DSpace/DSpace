@@ -14,11 +14,15 @@ import org.dspace.importer.external.datamodel.ImportRecord;
 
 public class OAIREPublicationApproverServiceImpl {
 
-    private List<AuthorNameApprover> pipeline;
+    private List<AuthorNamesApprover> pipeline;
+
+    public void setPipeline(List<AuthorNamesApprover> pipeline) {
+        this.pipeline = pipeline;
+    }
 
     public List<ImportRecord> approve(Item researcher, List<ImportRecord> importRecord) {
         List<ImportRecord> filtered = importRecord;
-        for (AuthorNameApprover authorNameApprover : pipeline) {
+        for (AuthorNamesApprover authorNameApprover : pipeline) {
             filtered = authorNameApprover.filter(researcher, importRecord);
         }
         return filtered;

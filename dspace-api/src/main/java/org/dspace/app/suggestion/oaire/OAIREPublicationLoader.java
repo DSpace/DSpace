@@ -44,7 +44,11 @@ public class OAIREPublicationLoader {
             for (String searchValue : searchValues) {
                 matchingRecords.addAll(openaireImportService.getRecords(searchValue, 0, 9999));
             }
-            return removeDuplicates(matchingRecords);
+            System.out.println("Found " + matchingRecords.size() + " records to process for researcher "
+                    + researcher.getID().toString());
+            List<ImportRecord> toReturn = removeDuplicates(matchingRecords);
+            System.out.println("Filter " + (matchingRecords.size() - toReturn.size()) + " records");
+            return toReturn;
         } catch (MetadataSourceException e) {
             throw new RuntimeException("Fail to import metadata from OpenAIRE");
         }

@@ -65,7 +65,7 @@ public class OAIREPublicationLoaderCli {
             List<Item> researchers = null;
             if (profile == null) {
                 System.out.println("No argument for -s, process all profile");
-                researchers = getResearchers(context, UUID.fromString(profile));
+                researchers = getResearchers(context, null);
             } else {
                 System.out.println("Process eperson item with UUID " + profile);
                 researchers = getResearchers(context, UUID.fromString(profile));
@@ -79,7 +79,7 @@ public class OAIREPublicationLoaderCli {
             }
             System.exit(0);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println(e);
         }
     }
 
@@ -209,6 +209,7 @@ public class OAIREPublicationLoaderCli {
                 items.add((Item) o.getIndexedObject());
             }
         }
+        System.out.println("Found " + items.size() + " researcher(s)");
         return items;
     }
 
