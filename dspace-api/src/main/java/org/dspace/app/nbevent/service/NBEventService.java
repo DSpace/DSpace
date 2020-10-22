@@ -9,7 +9,7 @@ package org.dspace.app.nbevent.service;
 
 import java.util.List;
 
-import org.dspace.app.nbevent.service.dto.NBTopic;
+import org.dspace.app.nbevent.NBTopic;
 import org.dspace.content.NBEvent;
 import org.dspace.core.Context;
 
@@ -27,8 +27,8 @@ public interface NBEventService {
 
     public NBEvent findEventByEventId(Context context, String id);
 
-    public void store(Context context, NBEvent event) throws Exception;
+    public void store(Context context, NBEvent event);
 
-    public NBEvent deleteEventByEventId(Context context, String id);
+    public void deleteEventByEventId(Context context, String id);
 
 }

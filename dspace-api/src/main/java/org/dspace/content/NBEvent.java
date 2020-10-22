@@ -170,4 +170,5 @@ public class NBEvent {
         eventId = new String(arr);
 
     }
+
 }

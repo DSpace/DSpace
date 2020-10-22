@@ -29,7 +29,6 @@ public class NBEventBuilder extends AbstractBuilder<NBEvent, NBEventService> {
     private String topic;
     private String message;
     private double trust = 0.5;
-    private String originalId;
     private Date lastUpdate = new Date();
 
     protected NBEventBuilder(Context context) {
@@ -52,6 +51,7 @@ public class NBEventBuilder extends AbstractBuilder<NBEvent, NBEventService> {
         try {
             ItemBuilder itemBuilder = ItemBuilder.createItem(context, col).withTitle(name);
             item = itemBuilder.build();
+            this.title = name;
             context.dispatchEvents();
             indexingService.commit();
         } catch (Exception e) {
@@ -82,10 +82,6 @@ public class NBEventBuilder extends AbstractBuilder<NBEvent, NBEventService> {
         this.trust = trust;
         return this;
     }
-    public NBEventBuilder withOriginalId(final String originalId) {
-        this.originalId = originalId;
-        return this;
-    }
     public NBEventBuilder withLastUpdate(final Date lastUpdate) {
         this.lastUpdate = lastUpdate;
         return this;
@@ -93,7 +89,8 @@ public class NBEventBuilder extends AbstractBuilder<NBEvent, NBEventService> {
 
     @Override
     public NBEvent build() {
-        target = new NBEvent(originalId, item.getID().toString(), title, topic, trust, message, lastUpdate);
+        target = new NBEvent("oai:www.dspace.org:" + item.getHandle(), item.getID().toString(), title, topic, trust,
+                message, lastUpdate);
         try {
             nbEventService.store(context, target);
         } catch (Exception e) {

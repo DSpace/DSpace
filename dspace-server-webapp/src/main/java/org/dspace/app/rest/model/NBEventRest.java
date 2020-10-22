@@ -7,25 +7,32 @@
  */
 package org.dspace.app.rest.model;
 
+import java.util.Date;
+
 import org.dspace.app.rest.RestResourceController;
 
-@LinksRest(links =
-    {
-        @LinkRest(name = "topic", method = "findByTopic")
-    }
-)
+@LinksRest(
+        links = {
+                @LinkRest(name = "topic", method = "getTopic"),
+                @LinkRest(name = "target", method = "getTarget"),
+                @LinkRest(name = "related", method = "getRelated")
+        })
 public class NBEventRest extends BaseObjectRest<String> {
 
     private static final long serialVersionUID = -5001130073350654793L;
     public static final String NAME = "nbevent";
     public static final String CATEGORY = RestAddressableModel.INTEGRATION;
 
-    private String id;
+    public static final String TOPIC = "TOPIC";
+    public static final String TARGET = "TARGET";
+    public static final String RELATED = "RELATED";
     private String originalId;
     private String title;
     private String topic;
     private String trust;
-    private NBEventMessage message;
+    private Date eventDate;
+    private NBEventMessageRest message;
+    private String status;
 
     @Override
     public String getType() {
@@ -82,12 +89,27 @@ public class NBEventRest extends BaseObjectRest<String> {
         this.trust = trust;
     }
 
-    public NBEventMessage getMessage() {
+    public Date getEventDate() {
+        return eventDate;
+    }
+
+    public void setEventDate(Date eventDate) {
+        this.eventDate = eventDate;
+    }
+
+    public NBEventMessageRest getMessage() {
         return message;
     }
 
-    public void setMessage(NBEventMessage message) {
+    public void setMessage(NBEventMessageRest message) {
         this.message = message;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

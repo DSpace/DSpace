@@ -9,8 +9,8 @@ package org.dspace.app.rest.repository;
 
 import java.util.List;
 
+import org.dspace.app.nbevent.NBTopic;
 import org.dspace.app.nbevent.service.NBEventService;
-import org.dspace.app.nbevent.service.dto.NBTopic;
 import org.dspace.app.rest.model.NBTopicRest;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +36,7 @@ public class NBTopicRestRepository extends DSpaceRestRepository<NBTopicRest, Str
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
     public Page<NBTopicRest> findAll(Context context, Pageable pageable) {
         List<NBTopic> nbTopics = nbEventService.findAllTopics(context, pageable.getOffset(), pageable.getPageSize());
         long count = nbEventService.countTopics(context);

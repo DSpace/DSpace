@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.nbevent.service.dto;
+package org.dspace.app.nbevent;
 
 import java.util.Date;
 

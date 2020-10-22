@@ -28,12 +28,9 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.dspace.app.nbevent.NBTopic;
 import org.dspace.app.nbevent.dao.impl.NBEventsDaoImpl;
 import org.dspace.app.nbevent.service.NBEventService;
-import org.dspace.app.nbevent.service.dto.MessageDto;
-import org.dspace.app.nbevent.service.dto.NBEventImportDto;
-import org.dspace.app.nbevent.service.dto.NBEventQueryDto;
-import org.dspace.app.nbevent.service.dto.NBTopic;
 import org.dspace.content.Item;
 import org.dspace.content.NBEvent;
 import org.dspace.content.service.ItemService;
@@ -93,30 +90,27 @@ public class NBEventServiceImpl implements NBEventService {
     public long countTopics(Context context) {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
-        solrQuery.setQuery(TOPIC + ":*");
+        solrQuery.setQuery("*:*");
         solrQuery.setFacet(true);
         solrQuery.setFacetMinCount(0);
         solrQuery.addFacetField(TOPIC);
         QueryResponse response;
         try {
             response = getSolr().query(solrQuery);
-            return response.getResults().size();
         } catch (SolrServerException | IOException e) {
-            log.error("Error querying solr", e);
-            return 0L;
+            throw new RuntimeException(e);
         }
+        return response.getFacetField(TOPIC).getValueCount();
     }
 
     @Override
-    public NBEvent deleteEventByEventId(Context context, String id) {
-        NBEvent dto = findEventByEventId(context, id);
+    public void deleteEventByEventId(Context context, String id) {
         try {
-            getSolr().deleteById(dto.getEventId());
+            getSolr().deleteById(id);
             getSolr().commit();
         } catch (SolrServerException | IOException e) {
-            log.error("Error querying solr", e);
+            throw new RuntimeException(e);
         }
-        return dto;
     }
 
     @Override
@@ -164,9 +158,10 @@ public class NBEventServiceImpl implements NBEventService {
     public List<NBTopic> findAllTopics(Context context, long offset, long count) {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
-        solrQuery.setQuery(TOPIC + ":*");
+        solrQuery.setQuery("*:*");
         solrQuery.setFacet(true);
         solrQuery.setFacetMinCount(0);
+        solrQuery.setFacetLimit((int) (offset + count));
         solrQuery.addFacetField(TOPIC);
         QueryResponse response;
         List<NBTopic> nbTopics = null;
@@ -174,13 +169,19 @@ public class NBEventServiceImpl implements NBEventService {
             response = getSolr().query(solrQuery);
             FacetField facetField = response.getFacetField(TOPIC);
             nbTopics = new ArrayList<>();
+            int idx = 0;
             for (Count c : facetField.getValues()) {
+                if (idx < offset) {
+                    idx++;
+                    continue;
+                }
                 NBTopic topic = new NBTopic();
                 topic.setKey(c.getName());
                 // topic.setName(c.getName().replaceAll("/", "!"));
                 topic.setTotalEvents(c.getCount());
                 topic.setLastEvent(new Date());
                 nbTopics.add(topic);
+                idx++;
             }
         } catch (SolrServerException | IOException e) {
             log.error("Solr error", e);
@@ -189,7 +190,7 @@ public class NBEventServiceImpl implements NBEventService {
     }
 
     @Override
-    public void store(Context context, NBEvent dto) throws Exception {
+    public void store(Context context, NBEvent dto) {
         UpdateRequest updateRequest = new UpdateRequest();
         String topic = dto.getTopic();
         if (topic != null) {
@@ -203,36 +204,21 @@ public class NBEventServiceImpl implements NBEventService {
                     doc.addField(TOPIC, topic);
                     doc.addField(TRUST, dto.getTrust());
                     doc.addField(MESSAGE, dto.getMessage());
-                    doc.addField(LAST_UPDATE, System.currentTimeMillis());
+                    doc.addField(LAST_UPDATE, new Date());
                     doc.addField(RESOURCE_UUID, getResourceUUID(context, dto.getOriginalId()));
                     updateRequest.add(doc);
                     updateRequest.process(getSolr());
                     getSolr().commit();
                 }
             } catch (Exception e) {
-                log.error("Unable to query RDB, throw Exception and stop import", e);
-                throw e;
+                throw new RuntimeException(e);
             }
         }
     }
-    /*
-     * @Override public void delete(String resourceUUID) throws SolrServerException,
-     * IOException { UpdateResponse response =
-     * getSolr().deleteByQuery(RESOURCE_UUID+":"+resourceUUID); getSolr().commit();
-     * }
-     * 
-     * @Override public void query(String resourceUUID) throws SolrServerException,
-     * IOException { SolrQuery param = new SolrQuery(); param.set(RESOURCE_UUID,
-     * resourceUUID); QueryResponse response = getSolr().query(param); if(response
-     * == null) { return; } else { NamedList<Object> oItems =
-     * response.getResponse(); for(Object o : oItems) { NBEventQueryDto item =
-     * (NBEventQueryDto)o; } } return; }
-     */
 
     @Override
     public NBEvent findEventByEventId(Context context, String eventId) {
-        SolrQuery param = new SolrQuery();
-        param.set(EVENT_ID, eventId.replaceAll("!", "/"));
+        SolrQuery param = new SolrQuery(EVENT_ID + ":" + eventId);
         QueryResponse response;
         try {
             response = getSolr().query(param);
@@ -240,22 +226,26 @@ public class NBEventServiceImpl implements NBEventService {
                 SolrDocumentList list = response.getResults();
                 if (list != null && list.size() == 1) {
                     SolrDocument doc = list.get(0);
-                    NBEvent item = new NBEvent();
-                    item.setEventId((String) doc.get(EVENT_ID));
-                    item.setLastUpdate((Date) doc.get(LAST_UPDATE));
-                    item.setMessage((String) doc.get(MESSAGE));
-                    item.setOriginalId((String) doc.get(ORIGINAL_ID));
-                    item.setTarget((String) doc.get(RESOURCE_UUID));
-                    item.setTitle((String) doc.get(TITLE));
-                    item.setTopic((String) doc.get(TOPIC));
-                    item.setTrust((long) doc.get(TRUST));
-                    return item;
+                    return getNBEventFromSOLR(doc);
                 }
             }
         } catch (SolrServerException | IOException e) {
-            log.error("Exception querying Solr", e);
+            throw new RuntimeException("Exception querying Solr", e);
         }
         return null;
+    }
+
+    private NBEvent getNBEventFromSOLR(SolrDocument doc) {
+        NBEvent item = new NBEvent();
+        item.setEventId((String) doc.get(EVENT_ID));
+        item.setLastUpdate((Date) doc.get(LAST_UPDATE));
+        item.setMessage((String) doc.get(MESSAGE));
+        item.setOriginalId((String) doc.get(ORIGINAL_ID));
+        item.setTarget((String) doc.get(RESOURCE_UUID));
+        item.setTitle((String) doc.get(TITLE));
+        item.setTopic((String) doc.get(TOPIC));
+        item.setTrust((double) doc.get(TRUST));
+        return item;
     }
 
     @Override
@@ -271,21 +261,13 @@ public class NBEventServiceImpl implements NBEventService {
                 SolrDocumentList list = response.getResults();
                 List<NBEvent> responseItem = new ArrayList<>();
                 for (SolrDocument doc : list) {
-                    NBEvent item = new NBEvent();
-                    item.setEventId((String) doc.get(EVENT_ID));
-                    item.setLastUpdate((Date) doc.get(LAST_UPDATE));
-                    item.setMessage((String) doc.get(MESSAGE));
-                    item.setOriginalId((String) doc.get(ORIGINAL_ID));
-                    item.setTarget((String) doc.get(RESOURCE_UUID));
-                    item.setTitle((String) doc.get(TITLE));
-                    item.setTopic((String) doc.get(TOPIC));
-                    item.setTrust((long) doc.get(TRUST));
+                    NBEvent item = getNBEventFromSOLR(doc);
                     responseItem.add(item);
                 }
                 return responseItem;
             }
         } catch (SolrServerException | IOException e) {
-            log.error("Solr error", e);
+            throw new RuntimeException(e);
         }
         return null;
     }
@@ -294,29 +276,19 @@ public class NBEventServiceImpl implements NBEventService {
     public long countEventsByTopic(Context context, String topic) {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
-        solrQuery.setQuery(TOPIC + ":" + topic.replaceAll("!", "/"));
-        solrQuery.setFacet(true);
-        solrQuery.setFacetMinCount(0);
-        solrQuery.addFacetField(TOPIC);
+        solrQuery.setQuery(TOPIC + ":" + topic.replace("!", "/"));
         QueryResponse response = null;
         try {
             response = getSolr().query(solrQuery);
+            return response.getResults().getNumFound();
         } catch (SolrServerException | IOException e) {
-            log.error("Solr exception:", e);
-            return 0L;
+            throw new RuntimeException(e);
         }
-        FacetField facetField = response.getFacetField(TOPIC);
-        for (Count c : facetField.getValues()) {
-            if (c.getName().equals(topic.replaceAll("!", "/"))) {
-                return c.getCount();
-            }
-        }
-        return 0L;
     }
 
     private String getResourceUUID(Context context, String originalId) throws Exception {
         try {
-            String id = getIdFromOriginalId(originalId);
+            String id = getHandleFromOriginalId(originalId);
             if (id != null) {
                 Item item = (Item) handleService.resolveToObject(context, id);
                 if (item != null) {
@@ -334,7 +306,7 @@ public class NBEventServiceImpl implements NBEventService {
     }
 
     // oai:www.openstarts.units.it:10077/21486
-    private String getIdFromOriginalId(String originalId) {
+    private String getHandleFromOriginalId(String originalId) {
         Integer startPosition = originalId.lastIndexOf(':');
         if (startPosition != -1) {
             return originalId.substring(startPosition + 1, originalId.length());
@@ -343,41 +315,4 @@ public class NBEventServiceImpl implements NBEventService {
         }
     }
 
-    private NBEventImportDto findEventByResourceUUID(String uuid) throws SolrServerException, IOException {
-        SolrQuery solrQuery = new SolrQuery();
-        solrQuery.setStart(0);
-        solrQuery.setRows(1);
-        solrQuery.setQuery(RESOURCE_UUID + ":" + uuid);
-        QueryResponse response = getSolr().query(solrQuery);
-        if (response != null) {
-            SolrDocumentList list = response.getResults();
-            if (list.size() == 1) {
-                SolrDocument doc = list.get(0);
-                NBEventQueryDto item = new NBEventQueryDto();
-                item.setEventId((String) doc.get(EVENT_ID));
-                item.setLastUpdate(Long.parseLong((String) doc.get(LAST_UPDATE)));
-                item.setMessage(jsonMapper.readValue((String) doc.get(MESSAGE), MessageDto.class));
-                item.setOriginalId((String) doc.get(ORIGINAL_ID));
-                item.setResourceUUID((String) doc.get(RESOURCE_UUID));
-                item.setTitle((String) doc.get(TITLE));
-                item.setTopic((String) doc.get(TOPIC));
-                item.setTrust((long) doc.get(TRUST));
-                return item;
-            }
-        }
-        return null;
-    }
-
-    /*
-     * ENRICH_MORE_ABSTRACT("ENRICH/MORE/ABSTRACT", "ENRICH!MORE!ABSTRACT"),
-     * ENRICH_MISSING_ABSTRACT("ENRICH/MISSING/ABSTRACT",
-     * "ENRICH!MISSING!ABSTRACT"), // no entry of this Topic in json //
-     * ENRICH_MORE_SUBJECT("ENRICH/MORE/SUBJECT","ENRICH!MORE!SUBJECT"),
-     * ENRICH_MISSING_SUBJECT_ACM("ENRICH/MISSING/SUBJECT/ACM",
-     * "ENRICH!MISSING!SUBJECT!ACM"), ENRICH_MORE_PID("ENRICH/MORE/PID",
-     * "ENRICH!MORE!PID"), ENRICH_MISSING_PROJECT("ENRICH/MISSING/PROJECT",
-     * "ENRICH!MISSING!PROJECT"), ENRICH_MISSING_PID("ENRICH/MISSING/PID",
-     * "ENRICH!MISSING!PID");
-     * 
-     */
 }

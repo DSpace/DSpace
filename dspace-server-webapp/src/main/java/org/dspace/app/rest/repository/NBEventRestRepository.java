@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.nbevent.dao.NBEventsDao;
 import org.dspace.app.nbevent.service.NBEventService;
+import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.NBEventRest;
@@ -32,10 +33,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Component(NBEventRest.CATEGORY + "." + NBEventRest.NAME)
-public class NBEventsRestRepository extends DSpaceRestRepository<NBEventRest, String> {
+public class NBEventRestRepository extends DSpaceRestRepository<NBEventRest, String> {
 
     @Autowired
     private NBEventService nbEventService;
@@ -52,10 +52,10 @@ public class NBEventsRestRepository extends DSpaceRestRepository<NBEventRest, St
     @Autowired
     private ResourcePatch<NBEvent> resourcePatch;
 
-    private Logger log = org.slf4j.LoggerFactory.getLogger(NBEventsRestRepository.class);
+    private Logger log = org.slf4j.LoggerFactory.getLogger(NBEventRestRepository.class);
 
     @Override
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public NBEventRest findOne(Context context, String id) {
         NBEvent nbEvent = nbEventService.findEventByEventId(context, id);
         if (nbEvent == null) {
@@ -65,8 +65,9 @@ public class NBEventsRestRepository extends DSpaceRestRepository<NBEventRest, St
     }
 
     @SearchRestMethod(name = "findByTopic")
-    @PreAuthorize("permitAll()")
-    public Page<NBEventRest> findByTopic(Context context, @RequestParam String topic, Pageable pageable) {
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Page<NBEventRest> findByTopic(Context context, @Parameter(value = "topic", required = true) String topic,
+            Pageable pageable) {
         List<NBEvent> nbEvents = null;
         Long count = 0L;
         nbEvents = nbEventService.findEventsByTopicAndPage(context, topic, pageable.getOffset(),
@@ -84,12 +85,10 @@ public class NBEventsRestRepository extends DSpaceRestRepository<NBEventRest, St
         try {
             item = itemService.find(context, UUID.fromString(id));
             EPerson eperson = context.getCurrentUser();
-            NBEvent nbEvent = nbEventService.deleteEventByEventId(context, id);
-            if (nbEvent != null) {
-                nbEventDao.storeEvent(context, nbEvent.getEventId(), eperson, item);
-            }
+            nbEventService.deleteEventByEventId(context, id);
+            nbEventDao.storeEvent(context, id, eperson, item);
         } catch (SQLException e) {
-            log.error("SQL Exception error", e);
+            throw new RuntimeException("Unable to delete NBEvent " + id, e);
         }
     }
 
@@ -99,7 +98,7 @@ public class NBEventsRestRepository extends DSpaceRestRepository<NBEventRest, St
     }
 
     @Override
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAuthority('ADMIN')")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model,
             String id, Patch patch) throws SQLException, AuthorizeException {
         NBEvent nbEvent = nbEventService.findEventByEventId(context, id);
