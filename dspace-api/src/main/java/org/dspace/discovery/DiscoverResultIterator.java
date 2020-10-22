@@ -36,9 +36,9 @@ public class DiscoverResultIterator<T extends ReloadableEntity, PK extends Seria
 
     private int iteratorCounter;
 
-    private Iterator<IndexableObject> currentSlotIterator;
+    private DiscoverResult currentDiscoverResult;
 
-    private List<IndexableObject> indexableObjects;
+    private Iterator<IndexableObject> currentSlotIterator;
 
     public DiscoverResultIterator(Context context, DiscoverQuery discoverQuery) {
         this(context, null, discoverQuery);
@@ -49,6 +49,7 @@ public class DiscoverResultIterator<T extends ReloadableEntity, PK extends Seria
         this.context = context;
         this.scopeObject = scopeObject;
         this.discoverQuery = discoverQuery;
+        this.iteratorCounter = discoverQuery.getStart();
         this.searchService = SearchUtils.getSearchService();
 
         updateCurrentSlotIterator();
@@ -74,8 +75,13 @@ public class DiscoverResultIterator<T extends ReloadableEntity, PK extends Seria
         return nextElement;
     }
 
+    public long getTotalSearchResults() {
+        return this.currentDiscoverResult.getTotalSearchResults();
+    }
+
     private void uncacheEntitites() {
-        for (IndexableObject indexableObj : this.indexableObjects) {
+        List<IndexableObject> indexableObjects = currentDiscoverResult.getIndexableObjects();
+        for (IndexableObject indexableObj : indexableObjects) {
             try {
                 context.uncacheEntity(indexableObj.getIndexedObject());
             } catch (SQLException e) {
@@ -85,9 +91,8 @@ public class DiscoverResultIterator<T extends ReloadableEntity, PK extends Seria
     }
 
     private void updateCurrentSlotIterator() {
-        DiscoverResult searchResult = search();
-        this.indexableObjects = searchResult.getIndexableObjects();
-        this.currentSlotIterator = indexableObjects.iterator();
+        this.currentDiscoverResult = search();
+        this.currentSlotIterator = currentDiscoverResult.getIndexableObjects().iterator();
     }
 
     private DiscoverResult search() {

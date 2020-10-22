@@ -58,12 +58,24 @@ public class XlsCrosswalk extends TabularCrosswalk {
                 }
             }
 
+            autoSizeColumns(sheet);
+
             workbook.write(out);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
+    }
+
+    private void autoSizeColumns(Sheet sheet) {
+        if (sheet.getPhysicalNumberOfRows() > 0) {
+            Row row = sheet.getRow(sheet.getFirstRowNum());
+            for (Cell cell : row) {
+                int columnIndex = cell.getColumnIndex();
+                sheet.autoSizeColumn(columnIndex);
+            }
+        }
     }
 
     protected String getValuesSeparator() {
