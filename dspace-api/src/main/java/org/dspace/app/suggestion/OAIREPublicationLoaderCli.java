@@ -35,6 +35,15 @@ import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 
+/**
+ * Runner responsible to import metadata about authors from OpenAIRE to Solr.
+ * This runner works in two ways:
+ * If -s parameter with a valid UUID is received, then the specific researcher
+ * with this UUID will be used.
+ * Invocation without any parameter results in massive import, processing all
+ * authors registered in DSpace.
+ */
+
 public class OAIREPublicationLoaderCli {
 
     private static final String SOURCE = "source";
@@ -60,6 +69,15 @@ public class OAIREPublicationLoaderCli {
     private OAIREPublicationLoaderCli() {
     }
 
+    /**
+     * Import record from OpenAIRE to Solr.
+     * This method works in two ways. If -s parameter with a valid UUID is received,
+     * then the specific researcher with this UUID will be used. Otherwise, information
+     * about all researcher will be loaded.
+     * 
+     * @param args
+     * @throws Exception
+     */
     public static void main(String[] args) throws Exception {
         try (Context context = new Context()) {
             CommandLineParser parser = new PosixParser();
@@ -82,6 +100,7 @@ public class OAIREPublicationLoaderCli {
                 List<ImportRecord> records = getOAireApprover().approve(researcher, metadata);
                 saveAuthorRecords(researcher, records);
             }
+            System.out.println("Process complete");
             System.exit(0);
         } catch (Exception e) {
             e.printStackTrace();
@@ -110,6 +129,15 @@ public class OAIREPublicationLoaderCli {
         }
     }
 
+    /**
+     * Save a List of ImportRecord into Solr.
+     * ImportRecord will be translate into a SolrDocument by the method translateImportRecordToSolrDocument.
+     * 
+     * @param researcher a DSpace Item
+     * @param records List of importRecord
+     * @throws SolrServerException
+     * @throws IOException
+     */
     private static void saveAuthorRecords(Item researcher, List<ImportRecord> records)
             throws SolrServerException, IOException {
         Collection<SolrInputDocument> docs = new ArrayList<>();
@@ -120,10 +148,15 @@ public class OAIREPublicationLoaderCli {
         getSuggestionSolr().commit();
     }
 
+    /**
+     * Translate and ImportRecord into SolrDocument
+     * @param item DSpace item
+     * @param record ImportRecord
+     * @return SolrDocument
+     */
     //FIXME: move this method in spring bean to inject metadata schema?
     private static SolrInputDocument translateImportRecordToSolrDocument(Item item, ImportRecord record) {
         String openAireId = getFirstEntryByMetadatum(record, "dc", "identifier", "other");
-        System.out.println("Processing Metadata:\n" + record.toString());
         SolrInputDocument document = new SolrInputDocument();
         document.addField(SOURCE, SOURCE_NAME);
         document.addField(SUGGESTION_ID, openAireId);
@@ -139,6 +172,16 @@ public class OAIREPublicationLoaderCli {
         return document;
     }
 
+    /**
+     * This method receive and ImportRecord and a metadatum key.
+     * It return only the values of the Metadata associated with the key.
+     * 
+     * @param record the ImportRecord to extract metadata from
+     * @param schema schema of the searching record
+     * @param element element of the searching record
+     * @param qualifier qualifier of the searching record
+     * @return value of the first matching record
+     */
     private static String[] getAllEntriesByMetadatum(ImportRecord record, String schema, String element,
             String qualifier) {
         Collection<MetadatumDTO> metadata = record.getValue(schema, element, qualifier);
@@ -152,6 +195,16 @@ public class OAIREPublicationLoaderCli {
         return values;
     }
 
+    /**
+     * This method receive and ImportRecord and a metadatum key.
+     * It return only the value of the first Metadatum from the list associated with the key.
+     * 
+     * @param record the ImportRecord to extract metadata from
+     * @param schema schema of the searching record
+     * @param element element of the searching record
+     * @param qualifier qualifier of the searching record
+     * @return value of the first matching record
+     */
     private static String getFirstEntryByMetadatum(ImportRecord record, String schema, String element,
             String qualifier) {
         Collection<MetadatumDTO> metadata = record.getValue(schema, element, qualifier);
@@ -205,11 +258,10 @@ public class OAIREPublicationLoaderCli {
         SearchService searchService = getDSpace().getSingletonService(SearchService.class);
         List<IndexableObject> objects = null;
         if (uuid != null) {
-            // TODO: fix query here
-            objects = searchService.search(context, "*:*", "lastModified", false, 0, 100, "search.resourcetype:Item",
-                    "relationship.type:Person");
+            objects = searchService.search(context, "search.resourceid:" + uuid.toString(),
+                "lastModified", false, 0, 1000, "search.resourcetype:Item", "relationship.type:Person");
         } else {
-            objects = searchService.search(context, "*:*", "lastModified", false, 0, 100, "search.resourcetype:Item",
+            objects = searchService.search(context, "*:*", "lastModified", false, 0, 1000, "search.resourcetype:Item",
                     "relationship.type:Person");
         }
         List<Item> items = new ArrayList<Item>();
