@@ -12,7 +12,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.apache.solr.client.solrj.beans.Field;
+import org.dspace.app.nbevent.RawJsonDeserializer;
 
 /**
  * This class represent the notification broker data as loaded in our solr
@@ -47,6 +49,7 @@ public class NBEvent {
     private double trust;
 
     @Field("message")
+    @JsonDeserialize(using = RawJsonDeserializer.class)
     private String message;
 
     @Field("last_update")
