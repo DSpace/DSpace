@@ -59,7 +59,13 @@ public class NBEventRestRepository extends DSpaceRestRepository<NBEventRest, Str
     public NBEventRest findOne(Context context, String id) {
         NBEvent nbEvent = nbEventService.findEventByEventId(context, id);
         if (nbEvent == null) {
-            return null;
+            // HACK check if this request is part of a patch flow
+            nbEvent = (NBEvent) requestService.getCurrentRequest().getAttribute("patchedNotificationEvent");
+            if (nbEvent != null && nbEvent.getEventId().contentEquals(id)) {
+                return converter.toRest(nbEvent, utils.obtainProjection());
+            } else {
+                return null;
+            }
         }
         return converter.toRest(nbEvent, utils.obtainProjection());
     }

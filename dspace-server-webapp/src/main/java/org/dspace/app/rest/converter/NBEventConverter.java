@@ -10,6 +10,7 @@ package org.dspace.app.rest.converter;
 import java.text.DecimalFormat;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.dspace.app.nbevent.service.dto.MessageDto;
@@ -22,7 +23,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class NBEventConverter implements DSpaceConverter<NBEvent, NBEventRest> {
 
-    private ObjectMapper jsonMapper = new JsonMapper();
+    private ObjectMapper jsonMapper;
+
+    public NBEventConverter() {
+        super();
+        jsonMapper = new JsonMapper();
+        jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
 
     @Override
     public NBEventRest convert(NBEvent modelObject, Projection projection) {

@@ -35,6 +35,7 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
@@ -110,6 +111,9 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Autowired(required = true)
     protected SearchService searchService;
+
+    @Autowired(required = true)
+    protected RelationshipService relationshipService;
 
     protected CollectionServiceImpl() {
         super();
@@ -1011,4 +1015,50 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         DiscoverResult resp = searchService.search(context, discoverQuery);
         return resp;
     }
+
+    @Override
+    public Collection retrieveCollectionByRelationshipType(Item item, String relationshipType) throws SQLException {
+        Collection ownCollection = item.getOwningCollection();
+        return retrieveCollectionByRelationshipType(ownCollection.getCommunities(), relationshipType);
+    }
+
+    private Collection retrieveCollectionByRelationshipType(List<Community> communities, String relationshipType) {
+
+        for (Community community : communities) {
+            Collection collection = retriveCollectionByRelationshipType(community, relationshipType);
+            if (collection != null) {
+                return collection;
+            }
+        }
+
+        for (Community community : communities) {
+            List<Community> parentCommunities = community.getParentCommunities();
+            Collection collection = retrieveCollectionByRelationshipType(parentCommunities, relationshipType);
+            if (collection != null) {
+                return collection;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public Collection retriveCollectionByRelationshipType(Community community, String relationshipType) {
+
+        for (Collection collection : community.getCollections()) {
+            if (relationshipService.hasRelationshipType(collection, relationshipType)) {
+                return collection;
+            }
+        }
+
+        for (Community subCommunity : community.getSubcommunities()) {
+            Collection collection = retriveCollectionByRelationshipType(subCommunity, relationshipType);
+            if (collection != null) {
+                return collection;
+            }
+        }
+
+        return null;
+    }
+
 }

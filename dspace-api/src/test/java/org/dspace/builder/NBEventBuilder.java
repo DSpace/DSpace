@@ -28,6 +28,7 @@ public class NBEventBuilder extends AbstractBuilder<NBEvent, NBEventService> {
     private String title;
     private String topic;
     private String message;
+    private String relatedItem;
     private double trust = 0.5;
     private Date lastUpdate = new Date();
 
@@ -87,10 +88,16 @@ public class NBEventBuilder extends AbstractBuilder<NBEvent, NBEventService> {
         return this;
     }
 
+    public NBEventBuilder withRelatedItem(String relatedItem) {
+        this.relatedItem = relatedItem;
+        return this;
+    }
+
     @Override
     public NBEvent build() {
         target = new NBEvent("oai:www.dspace.org:" + item.getHandle(), item.getID().toString(), title, topic, trust,
                 message, lastUpdate);
+        target.setRelated(relatedItem);
         try {
             nbEventService.store(context, target);
         } catch (Exception e) {

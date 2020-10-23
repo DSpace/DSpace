@@ -23,9 +23,9 @@ public class NBEventRest extends BaseObjectRest<String> {
     public static final String NAME = "nbevent";
     public static final String CATEGORY = RestAddressableModel.INTEGRATION;
 
-    public static final String TOPIC = "TOPIC";
-    public static final String TARGET = "TARGET";
-    public static final String RELATED = "RELATED";
+    public static final String TOPIC = "topic";
+    public static final String TARGET = "target";
+    public static final String RELATED = "related";
     private String originalId;
     private String title;
     private String topic;

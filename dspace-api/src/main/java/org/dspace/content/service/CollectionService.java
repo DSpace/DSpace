@@ -399,4 +399,28 @@ public interface CollectionService
     public int countCollectionsWithSubmit(String q, Context context, Community community, String metadata,
             String metadataValue)
         throws SQLException, SearchServiceException;
+
+    /**
+     * Retrieve the first collection in the community or its descending that support
+     * the provided relationshipType
+     * 
+     * @param community        the root from where the search start
+     * @param relationshipType the requested entity type
+     * @return the first collection in the community or its descending that support
+     *         the provided relationshipType
+     */
+    public Collection retriveCollectionByRelationshipType(Community community, String relationshipType);
+
+    /**
+     * Retrieve the close collection to the item that support the provided
+     * relationshipType. Close mean the collection that can be reach with the
+     * minimum steps starting from the item (owningCollection, brothers collections,
+     * etc)
+     * 
+     * @param item        the item from where the search start
+     * @param relationshipType the requested entity type
+     * @return the first collection in the community or its descending that support
+     *         the provided relationshipType
+     */
+    public Collection retrieveCollectionByRelationshipType(Item item, String relationshipType) throws SQLException;
 }

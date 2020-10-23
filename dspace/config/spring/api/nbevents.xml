@@ -21,8 +21,10 @@
 	<!--The key are the TOPIC, the value must be a valid implementation of the 
 		org.dspace.app.nbevent.NBEventAction interface -->
                <entry key="ENRICH/MORE/PROJECT" value-ref="ProjectLinkedEntityAction" />
+               <entry key="ENRICH/MISSING/PROJECT" value-ref="ProjectLinkedEntityAction" />
                <entry key="ENRICH/MISSING/ABSTRACT" value-ref="AbstractMetadataAction" />
                <entry key="ENRICH/MORE/PID" value-ref="PIDMetadataAction" />
+               <entry key="ENRICH/MISSING/PID" value-ref="PIDMetadataAction" />
             </map>   
         </property>
      </bean>
@@ -31,7 +33,7 @@
         <!-- which metadata will hold the relation between the publication and the project -->
         <property name="metadata" value="dc.relation.funding" />
         <!-- the type of local entity used to store the project details -->
-        <property name="entityType" value="funding" />
+        <property name="entityType" value="Funding" />
         <property name="entityMetadata">
             <map>
 	<!--The key are the json path of nb message, the value is the metadata in 
@@ -54,7 +56,8 @@
 	<!--The key are the type of identifier (or subject) reported in the message, the value is the metadata in 
         the linked entity where the information should be stored -->
                <entry key="default" value="dc.identifier" />
-               <entry key="doi" value="dc.identifier.doi" />          
+               <entry key="doi" value="dc.identifier.doi" />
+               <entry key="pmid" value="dc.identifier.pmid" />
 	         </map>
 	     </property>    
      </bean>

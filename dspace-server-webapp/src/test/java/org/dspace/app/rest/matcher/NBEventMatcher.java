@@ -9,6 +9,7 @@ package org.dspace.app.rest.matcher;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.is;
 
 import java.text.DecimalFormat;
@@ -20,11 +21,23 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.nbevent.service.dto.MessageDto;
 import org.dspace.content.NBEvent;
 import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 import org.hamcrest.core.IsAnything;
 
 public class NBEventMatcher {
 
     private NBEventMatcher() {
+    }
+
+    public static Matcher<? super Object> matchNBEventFullEntry(NBEvent event) {
+        return allOf(
+                matchNBEventEntry(event),
+                hasJsonPath("$._embedded.topic.name", is(event.getTopic())),
+                hasJsonPath("$._embedded.target.id", is(event.getTarget())),
+                event.getRelated() != null ?
+                        hasJsonPath("$._embedded.related.id", is(event.getRelated())) :
+                        hasJsonPath("$._embedded.related", is(emptyOrNullString()))
+                );
     }
 
     public static Matcher<? super Object> matchNBEventEntry(NBEvent event) {
@@ -37,6 +50,9 @@ public class NBEventMatcher {
                     hasJsonPath("$.status", is("PENDING")),
                     hasJsonPath("$.message",
                             matchMessage(event.getTopic(), jsonMapper.readValue(event.getMessage(), MessageDto.class))),
+                    hasJsonPath("$._links.target.href", Matchers.endsWith(event.getEventId() + "/target")),
+                    hasJsonPath("$._links.related.href", Matchers.endsWith(event.getEventId() + "/related")),
+                    hasJsonPath("$._links.topic.href", Matchers.endsWith(event.getEventId() + "/topic")),
                     hasJsonPath("$.type", is("nbevent")));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

@@ -22,7 +22,9 @@ import org.apache.solr.client.solrj.beans.Field;
 public class NBEvent {
     public static final char[] HEX_DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e',
         'f' };
-
+    public static final String ACCEPTED = "accepted";
+    public static final String REJECTED = "rejected";
+    public static final String DISCARDED = "discarded";
     @Field("event_id")
     private String eventId;
 
@@ -49,6 +51,8 @@ public class NBEvent {
 
     @Field("last_update")
     private Date lastUpdate;
+
+    private String status = "PENDING";
 
     public NBEvent() {
     }
@@ -148,6 +152,14 @@ public class NBEvent {
 
     public String getRelated() {
         return related;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getStatus() {
+        return status;
     }
 
     /*

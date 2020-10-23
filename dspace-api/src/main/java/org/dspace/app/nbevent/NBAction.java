@@ -7,10 +7,10 @@
  */
 package org.dspace.app.nbevent;
 
+import org.dspace.app.nbevent.service.dto.MessageDto;
 import org.dspace.content.Item;
-import org.dspace.content.NBEvent;
 import org.dspace.core.Context;
 
 public interface NBAction {
-    public void applyCorrection(Context context, Item item, NBEvent event);
+    public void applyCorrection(Context context, Item item, Item relatedItem, MessageDto message);
 }

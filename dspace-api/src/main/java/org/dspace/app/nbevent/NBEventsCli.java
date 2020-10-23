@@ -9,7 +9,6 @@ package org.dspace.app.nbevent;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -24,18 +23,9 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.request.UpdateRequest;
-import org.apache.solr.common.SolrInputDocument;
 import org.dspace.app.nbevent.service.NBEventService;
-import org.dspace.content.Item;
 import org.dspace.content.NBEvent;
 import org.dspace.core.Context;
-import org.dspace.handle.factory.HandleServiceFactoryImpl;
-import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.util.SolrImportExportException;
 import org.dspace.utils.DSpace;
 
 public class NBEventsCli {
@@ -48,6 +38,8 @@ public class NBEventsCli {
     public static final String EVENT_ID = "event_id";
     public static final String RESOURCE_UUID = "resource_uuid";
     public static final String LAST_UPDATE = "last_update";
+
+    private NBEventsCli() { }
 
     public static void main(String[] args) throws Exception {
         DSpace dspace = new DSpace();
@@ -111,61 +103,4 @@ public class NBEventsCli {
         return query;
     }
 
-    private SolrClient getSolr() {
-
-        String solrService = DSpaceServicesFactory.getInstance().getConfigurationService()
-                .getProperty("openstar.search.server");
-        return new HttpSolrClient.Builder(solrService).build();
-    }
-
-    public void store(Context context, List<NBEvent> entries)
-            throws SolrImportExportException, SolrServerException, IOException {
-        UpdateRequest updateRequest = new UpdateRequest();
-        for (NBEvent dto : entries) {
-            SolrInputDocument doc = new SolrInputDocument();
-            doc.addField(EVENT_ID, dto.getEventId());
-            doc.addField(ORIGINAL_ID, dto.getOriginalId());
-            doc.addField(TITLE, dto.getTitle());
-            doc.addField(TOPIC, dto.getTopic());
-            doc.addField(TRUST, dto.getTrust());
-            doc.addField(MESSAGE, dto.getMessage());
-            doc.addField(LAST_UPDATE, System.currentTimeMillis());
-            doc.addField(RESOURCE_UUID, getResourceUUID(context, dto.getOriginalId()));
-            updateRequest.add(doc);
-        }
-        updateRequest.process(getSolr());
-        getSolr().commit();
-    }
-
-    private String getResourceUUID(Context context, String originalId) throws SolrImportExportException {
-        try {
-            String id = getIdFromOriginalId(originalId);
-            if (id != null) {
-                Item item = (Item) HandleServiceFactoryImpl.getInstance().getHandleService().resolveToObject(context,
-                        id);
-                if (item != null) {
-                    return item.getID().toString();
-                } else {
-                    System.err.println("OriginalID not found");
-                    throw new RuntimeException();
-                }
-            } else {
-                System.err.println("OriginalID not found");
-                throw new RuntimeException();
-            }
-        } catch (RuntimeException | SQLException e) {
-            System.err.println("OriginalID not found");
-            throw new SolrImportExportException("Original ID is not valid: ");
-        }
-    }
-
-    // oai:www.openstarts.units.it:10077/21486
-    private String getIdFromOriginalId(String originalId) {
-        Integer startPosition = originalId.lastIndexOf(':');
-        if (startPosition != -1) {
-            return originalId.substring(startPosition, originalId.length());
-        } else {
-            return null;
-        }
-    }
 }

@@ -76,6 +76,7 @@ public class NBEventServiceImpl implements NBEventService {
     public static final String EVENT_ID = "event_id";
     public static final String RESOURCE_UUID = "resource_uuid";
     public static final String LAST_UPDATE = "last_update";
+    public static final String RELATED_UUID = "related_uuid";
 
     protected SolrClient getSolr() {
         if (solr == null) {
@@ -206,6 +207,7 @@ public class NBEventServiceImpl implements NBEventService {
                     doc.addField(MESSAGE, dto.getMessage());
                     doc.addField(LAST_UPDATE, new Date());
                     doc.addField(RESOURCE_UUID, getResourceUUID(context, dto.getOriginalId()));
+                    doc.addField(RELATED_UUID, dto.getRelated());
                     updateRequest.add(doc);
                     updateRequest.process(getSolr());
                     getSolr().commit();
@@ -245,6 +247,7 @@ public class NBEventServiceImpl implements NBEventService {
         item.setTitle((String) doc.get(TITLE));
         item.setTopic((String) doc.get(TOPIC));
         item.setTrust((double) doc.get(TRUST));
+        item.setRelated((String) doc.get(RELATED_UUID));
         return item;
     }
 

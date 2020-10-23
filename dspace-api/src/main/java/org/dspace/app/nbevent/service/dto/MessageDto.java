@@ -32,7 +32,7 @@ public class MessageDto {
     @JsonProperty("abstracts[0]")
     private String abstracts;
 
-    @JsonProperty("projects.acronym")
+    @JsonProperty("projects[0].acronym")
     private String acronym;
 
     @JsonProperty("projects[0].code")
