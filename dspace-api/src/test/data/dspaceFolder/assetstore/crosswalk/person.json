@@ -73,5 +73,22 @@
 	"knows-languages": [
 		"English",
 		"Italian"
+	],
+	"publications": [
+		{
+			"title": "First Publication",
+			"date-issued": "2020-01-01",
+			"authors": [
+				"John Smith",
+				"Walter White"
+			]
+		},
+		{
+			"title": "Second Publication",
+			"date-issued": "2020-04-01",
+			"authors": [
+				"John Smith"
+			]
+		}
 	]
 }

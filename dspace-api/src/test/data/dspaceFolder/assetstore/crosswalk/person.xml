@@ -74,4 +74,21 @@
 		<language>English</language>
 		<language>Italian</language>
 	</knows-languages>
+	<publications>
+		<publication>
+			<title>First Publication</title>
+			<date-issued>2020-01-01</date-issued>
+			<authors>
+				<author>John Smith</author>
+				<author>Walter White</author>
+			</authors>
+		</publication>
+		<publication>
+			<title>Second Publication</title>
+			<date-issued>2020-04-01</date-issued>
+			<authors>
+				<author>John Smith</author>
+			</authors>
+		</publication>
+	</publications>
 </person>

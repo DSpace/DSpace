@@ -70,5 +70,16 @@
 	],
 	"knows-languages": [
 		"@person.knowsLanguage@",
+	],
+	"publications": [
+		@relation.researchoutputs.start@
+		{
+			"title": "@dc.title@",
+			"date-issued": "@dc.date.issued@",
+			"authors": [
+				"@dc.contributor.author@",
+			]
+		},
+		@relation.researchoutputs.end@
 	]
 }
