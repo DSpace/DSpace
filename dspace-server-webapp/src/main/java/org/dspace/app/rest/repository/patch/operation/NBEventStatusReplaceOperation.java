@@ -48,6 +48,7 @@ public class NBEventStatusReplaceOperation extends PatchOperation<NBEvent> {
     @Override
     public boolean supports(Object objectToMatch, Operation operation) {
         return StringUtils.equals(operation.getOp(), "replace") && objectToMatch instanceof NBEvent && StringUtils
-                .containsAny(operation.getValue().toString(), NBEvent.ACCEPTED, NBEvent.DISCARDED, NBEvent.REJECTED);
+                .containsAny(operation.getValue().toString().toLowerCase(), NBEvent.ACCEPTED, NBEvent.DISCARDED,
+                        NBEvent.REJECTED);
     }
 }

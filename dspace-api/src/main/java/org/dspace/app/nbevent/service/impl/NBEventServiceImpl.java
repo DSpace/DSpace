@@ -81,7 +81,7 @@ public class NBEventServiceImpl implements NBEventService {
     protected SolrClient getSolr() {
         if (solr == null) {
             String solrService = DSpaceServicesFactory.getInstance().getConfigurationService()
-                    .getProperty("openstar.search.server", "http://localhost:8983/solr/nbevent");
+                    .getProperty("oaire-nbevents.solr.server", "http://localhost:8983/solr/nbevent");
             return new HttpSolrClient.Builder(solrService).build();
         }
         return solr;
@@ -137,8 +137,7 @@ public class NBEventServiceImpl implements NBEventService {
                 }
             }
         } catch (SolrServerException | IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return null;
     }
@@ -185,7 +184,7 @@ public class NBEventServiceImpl implements NBEventService {
                 idx++;
             }
         } catch (SolrServerException | IOException e) {
-            log.error("Solr error", e);
+            throw new RuntimeException(e);
         }
         return nbTopics;
     }

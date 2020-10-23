@@ -422,40 +422,57 @@ public class NBEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         // prepare the different patches for our decisions
         List<Operation> acceptOp = new ArrayList<Operation>();
         acceptOp.add(new ReplaceOperation("/status", NBEvent.ACCEPTED));
+        List<Operation> acceptOpUppercase = new ArrayList<Operation>();
+        acceptOpUppercase.add(new ReplaceOperation("/status", NBEvent.ACCEPTED));
         List<Operation> discardOp = new ArrayList<Operation>();
         discardOp.add(new ReplaceOperation("/status", NBEvent.DISCARDED));
         List<Operation> rejectOp = new ArrayList<Operation>();
         rejectOp.add(new ReplaceOperation("/status", NBEvent.REJECTED));
         String patchAccept = getPatchContent(acceptOp);
+        String patchAcceptUppercase = getPatchContent(acceptOpUppercase);
         String patchDiscard = getPatchContent(discardOp);
         String patchReject = getPatchContent(rejectOp);
 
         String authToken = getAuthToken(admin.getEmail(), password);
         // accept pid1, unknownPID, morePID, the two projects and abstract
+        eventMissingPID1.setStatus(NBEvent.ACCEPTED);
+        eventMorePID.setStatus(NBEvent.ACCEPTED);
+        eventMissingUnknownPID.setStatus(NBEvent.ACCEPTED);
+        eventMissingUnknownPID.setStatus(NBEvent.ACCEPTED);
+        eventProjectBound.setStatus(NBEvent.ACCEPTED);
+        eventProjectNoBound.setStatus(NBEvent.ACCEPTED);
+        eventAbstract.setStatus(NBEvent.ACCEPTED);
+
         getClient(authToken).perform(patch("/api/integration/nbevents/" + eventMissingPID1.getEventId())
                 .content(patchAccept)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", NBEventMatcher.matchNBEventEntry(eventMissingPID1)));
         getClient(authToken).perform(patch("/api/integration/nbevents/" + eventMorePID.getEventId())
-                .content(patchAccept)
+                .content(patchAcceptUppercase)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", NBEventMatcher.matchNBEventEntry(eventMorePID)));
         getClient(authToken).perform(patch("/api/integration/nbevents/" + eventMissingUnknownPID.getEventId())
                 .content(patchAccept)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", NBEventMatcher.matchNBEventEntry(eventMissingUnknownPID)));
         getClient(authToken).perform(patch("/api/integration/nbevents/" + eventProjectBound.getEventId())
                 .content(patchAccept)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", NBEventMatcher.matchNBEventEntry(eventProjectBound)));
         getClient(authToken).perform(patch("/api/integration/nbevents/" + eventProjectNoBound.getEventId())
                 .content(patchAccept)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", NBEventMatcher.matchNBEventEntry(eventProjectNoBound)));
         getClient(authToken).perform(patch("/api/integration/nbevents/" + eventAbstract.getEventId())
                 .content(patchAccept)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", NBEventMatcher.matchNBEventEntry(eventAbstract)));
         // check if the item has been updated
         getClient(authToken).perform(get("/api/core/items/" + eventMissingPID1.getTarget())
                     .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
@@ -493,20 +510,24 @@ public class NBEventRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$",
                         hasJsonPath("$.metadata['dc.description.abstract'][0].value", is("An abstract to add..."))));
         // reject pid2
+        eventMissingPID2.setStatus(NBEvent.REJECTED);
         getClient(authToken).perform(patch("/api/integration/nbevents/" + eventMissingPID2.getEventId())
                 .content(patchReject)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", NBEventMatcher.matchNBEventEntry(eventMissingPID2)));
         getClient(authToken).perform(get("/api/core/items/" + eventMissingPID2.getTarget())
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$",
                     hasNoJsonPath("$.metadata['dc.identifier.doi']")));
         // discard abstractToDiscard
+        eventAbstractToDiscard.setStatus(NBEvent.DISCARDED);
         getClient(authToken).perform(patch("/api/integration/nbevents/" + eventAbstractToDiscard.getEventId())
                 .content(patchDiscard)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", NBEventMatcher.matchNBEventEntry(eventAbstractToDiscard)));
         getClient(authToken).perform(get("/api/core/items/" + eventMissingPID2.getTarget())
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())

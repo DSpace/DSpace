@@ -47,7 +47,7 @@ public class NBEventMatcher {
                     hasJsonPath("$.originalId", is(event.getOriginalId())),
                     hasJsonPath("$.title", is(event.getTitle())),
                     hasJsonPath("$.trust", is(new DecimalFormat("0.000").format(event.getTrust()))),
-                    hasJsonPath("$.status", is("PENDING")),
+                    hasJsonPath("$.status", Matchers.equalToIgnoringCase(event.getStatus())),
                     hasJsonPath("$.message",
                             matchMessage(event.getTopic(), jsonMapper.readValue(event.getMessage(), MessageDto.class))),
                     hasJsonPath("$._links.target.href", Matchers.endsWith(event.getEventId() + "/target")),

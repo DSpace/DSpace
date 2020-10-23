@@ -47,7 +47,7 @@ public class NBEventConverter implements DSpaceConverter<NBEvent, NBEventRest> {
         rest.setEventDate(modelObject.getLastUpdate());
         rest.setTrust(new DecimalFormat("0.000").format(modelObject.getTrust()));
         // right now only the pending status can be found in persisted nb events
-        rest.setStatus("PENDING");
+        rest.setStatus(modelObject.getStatus());
         return rest;
     }
 
