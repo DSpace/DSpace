@@ -29,6 +29,7 @@ import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.BundleBuilder;
+import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -100,7 +101,8 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
     public void testPersonXmlDisseminate() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        Item item = createItem(context, collection)
+        Item personItem = createItem(context, collection)
+            .withRelationshipType("Person")
             .withTitle("John Smith")
             .withFullName("John Smith")
             .withVariantName("J.S.")
@@ -142,18 +144,30 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withPersonQualificationEndDate(PLACEHOLDER_PARENT_METADATA_VALUE)
             .build();
 
+        ItemBuilder.createItem(context, collection)
+            .withTitle("First Publication")
+            .withIssueDate("2020-01-01")
+            .withAuthor("John Smith", personItem.getID().toString())
+            .withAuthor("Walter White")
+            .build();
+
+        ItemBuilder.createItem(context, collection)
+            .withTitle("Second Publication")
+            .withIssueDate("2020-04-01")
+            .withAuthor("John Smith", personItem.getID().toString())
+            .build();
+
         context.restoreAuthSystemState();
 
         ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("person-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        referCrossWalk.disseminate(context, item, out);
+        referCrossWalk.disseminate(context, personItem, out);
 
         try (FileInputStream fis = getFileInputStream("person.xml")) {
             String expectedXml = IOUtils.toString(fis, Charset.defaultCharset());
             String exportedXml = out.toString();
-            System.out.println(exportedXml);
             assertThat(exportedXml, equalTo(expectedXml));
         }
     }
@@ -163,6 +177,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         Item item = createItem(context, collection)
+            .withRelationshipType("Person")
             .withTitle("John Smith")
             .withFullName("John Smith")
             .withVariantName("J.S.")
@@ -238,7 +253,8 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
     public void testPersonJsonDisseminate() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        Item item = createItem(context, collection)
+        Item personItem = createItem(context, collection)
+            .withRelationshipType("Person")
             .withTitle("John Smith")
             .withFullName("John Smith")
             .withVernacularName("JOHN SMITH")
@@ -281,13 +297,26 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withPersonQualificationEndDate(PLACEHOLDER_PARENT_METADATA_VALUE)
             .build();
 
+        ItemBuilder.createItem(context, collection)
+            .withTitle("First Publication")
+            .withIssueDate("2020-01-01")
+            .withAuthor("John Smith", personItem.getID().toString())
+            .withAuthor("Walter White")
+            .build();
+
+        ItemBuilder.createItem(context, collection)
+            .withTitle("Second Publication")
+            .withIssueDate("2020-04-01")
+            .withAuthor("John Smith", personItem.getID().toString())
+            .build();
+
         context.restoreAuthSystemState();
 
         ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("person-json");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        referCrossWalk.disseminate(context, item, out);
+        referCrossWalk.disseminate(context, personItem, out);
 
         try (FileInputStream fis = getFileInputStream("person.json")) {
             String expectedJson = IOUtils.toString(fis, Charset.defaultCharset());
@@ -302,6 +331,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         context.turnOffAuthorisationSystem();
         Item firstItem = createItem(context, collection)
+            .withRelationshipType("Person")
             .withTitle("John Smith")
             .withGivenName("John")
             .withFamilyName("Smith")
@@ -313,6 +343,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withPersonAffiliationEndDate(PLACEHOLDER_PARENT_METADATA_VALUE)
             .build();
         Item secondItem = createItem(context, collection)
+            .withRelationshipType("Person")
             .withTitle("Adam White")
             .withGivenName("Adam")
             .withFamilyName("White")
@@ -327,6 +358,15 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withPersonEducationEndDate("2005-01-01")
             .withPersonEducationRole("Student")
             .build();
+
+        // with multiple persons export the publications should not be exported
+        ItemBuilder.createItem(context, collection)
+            .withTitle("First Publication")
+            .withIssueDate("2020-01-01")
+            .withAuthor("John Smith", firstItem.getID().toString())
+            .withAuthor("Walter White")
+            .build();
+
         context.restoreAuthSystemState();
 
         ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("person-xml");
@@ -346,6 +386,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         context.turnOffAuthorisationSystem();
         Item firstItem = createItem(context, collection)
+            .withRelationshipType("Person")
             .withTitle("John Smith")
             .withGivenName("John")
             .withFamilyName("Smith")
@@ -357,6 +398,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withPersonAffiliationEndDate(PLACEHOLDER_PARENT_METADATA_VALUE)
             .build();
         Item secondItem = createItem(context, collection)
+            .withRelationshipType("Person")
             .withTitle("Adam White")
             .withGivenName("Adam")
             .withFamilyName("White")
@@ -371,6 +413,15 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withPersonEducationEndDate("2005-01-01")
             .withPersonEducationRole("Student")
             .build();
+
+        // with multiple persons export the publications should not be exported
+        ItemBuilder.createItem(context, collection)
+            .withTitle("First Publication")
+            .withIssueDate("2020-01-01")
+            .withAuthor("John Smith", firstItem.getID().toString())
+            .withAuthor("Walter White")
+            .build();
+
         context.restoreAuthSystemState();
 
         ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("person-json");

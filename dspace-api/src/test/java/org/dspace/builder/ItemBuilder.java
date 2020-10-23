@@ -8,6 +8,7 @@
 package org.dspace.builder;
 
 import static org.dspace.content.MetadataSchemaEnum.CRIS;
+import static org.dspace.content.MetadataSchemaEnum.DC;
 import static org.dspace.content.authority.Choices.CF_ACCEPTED;
 
 import java.io.IOException;
@@ -80,6 +81,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withAuthor(final String authorName) {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "contributor", "author", authorName);
+    }
+
+    public ItemBuilder withAuthor(final String authorName, final String authority) {
+        return addMetadataValue(item, DC.getName(), "contributor", "author", null, authorName, authority, 600);
     }
 
     public ItemBuilder withPersonIdentifierFirstName(final String personIdentifierFirstName) {
@@ -172,6 +177,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withPersonMainAffiliation(String affiliation) {
         return setMetadataSingleValue(item, "person", "affiliation", "name", affiliation);
+    }
+
+    public ItemBuilder withPersonMainAffiliation(final String affiliation, final String authority) {
+        return addMetadataValue(item, "person", "affiliation", "name", null, affiliation, authority, 600);
     }
 
     public ItemBuilder withWorkingGroup(String workingGroup) {

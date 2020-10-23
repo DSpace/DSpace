@@ -117,7 +117,7 @@ public class BulkItemExportIT extends AbstractIntegrationTestWithDatabase {
             assertThat(content, containsString("<preferred-name>Edward Red</preferred-name>"));
             assertThat(content, containsString("<preferred-name>Edward Smith</preferred-name>"));
             assertThat(content, not(containsString("<preferred-name>John Smith</preferred-name>")));
-            assertThat(content, not(containsString("<preferred-name>My publication</preferred-name>")));
+            assertThat(content, not(containsString("<preferred-name>Company</preferred-name>")));
         }
     }
 
@@ -216,8 +216,65 @@ public class BulkItemExportIT extends AbstractIntegrationTestWithDatabase {
             assertThat(content, containsString("<preferred-name>John Smith</preferred-name>"));
             assertThat(content, containsString("<preferred-name>Edward Red</preferred-name>"));
             assertThat(content, not(containsString("<preferred-name>Walter White</preferred-name>")));
-            assertThat(content, not(containsString("<preferred-name>My publication</preferred-name>")));
+            assertThat(content, not(containsString("<preferred-name>My project</preferred-name>")));
         }
+    }
+
+    @Test
+    public void testBulkItemExportWithConfiguration() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item orgUnit = ItemBuilder.createItem(context, collection)
+            .withTitle("4Science")
+            .build();
+
+        String orgUnitId = orgUnit.getID().toString();
+
+        ItemBuilder.createItem(context, collection)
+            .withTitle("Edward Red")
+            .withRelationshipType("Person")
+            .withPersonMainAffiliation("4Science", orgUnitId)
+            .build();
+
+        ItemBuilder.createItem(context, collection)
+            .withTitle("John Smith")
+            .withRelationshipType("Person")
+            .withPersonMainAffiliation("4Science", orgUnitId)
+            .build();
+
+        ItemBuilder.createItem(context, collection)
+            .withTitle("Walter White")
+            .withRelationshipType("Person")
+            .withPersonMainAffiliation("Company")
+            .build();
+
+        createItem(collection, "My project", "", "Project");
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        File xml = new File("person.xml");
+        xml.deleteOnExit();
+
+        String[] args = new String[] { "bulk-item-export", "-t", "Person", "-f", "person-xml",
+            "-s", orgUnitId, "-c", "RELATION.OrgUnit.people" };
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+
+        handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
+
+        assertThat(handler.getErrorMessages(), empty());
+        assertThat(handler.getInfoMessages(), hasItem("Found 2 items to export"));
+        assertThat("The xml file should be created", xml.exists(), is(true));
+
+        try (FileInputStream fis = new FileInputStream(xml)) {
+            String content = IOUtils.toString(fis, Charset.defaultCharset());
+            assertThat(content, containsString("<preferred-name>John Smith</preferred-name>"));
+            assertThat(content, containsString("<preferred-name>Edward Red</preferred-name>"));
+            assertThat(content, not(containsString("<preferred-name>Walter White</preferred-name>")));
+            assertThat(content, not(containsString("<preferred-name>My project</preferred-name>")));
+        }
+
     }
 
     @Test

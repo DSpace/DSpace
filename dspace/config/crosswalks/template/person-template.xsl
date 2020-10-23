@@ -48,7 +48,11 @@
 										<xsl:value-of select="names/preferred-name"  />
 									</fo:block>
 									<fo:block font-size="12pt" text-align="center">
-										<xsl:value-of select="job-title"  /> at <xsl:value-of select="main-affiliation"  />
+										<xsl:value-of select="job-title"  />
+										<xsl:if test="job-title and main-affiliation">
+											<xsl:text> at </xsl:text>
+										</xsl:if>
+										<xsl:value-of select="main-affiliation"  />
 									</fo:block>
 								</fo:block>
 								
@@ -113,7 +117,7 @@
 					</xsl:for-each>
 					
 					<xsl:call-template name="section-title">
-				    	<xsl:with-param name="label" select="'Qualification'" />
+				    	<xsl:with-param name="label" select="'Qualifications'" />
 			    	</xsl:call-template>
 					<xsl:for-each select="qualifications/qualification">
 						<fo:block font-size="10pt">
@@ -121,6 +125,28 @@
 							<xsl:if test="end-date/text()">
 							 to <xsl:value-of select="end-date" />
 							</xsl:if>
+						</fo:block>
+					</xsl:for-each>
+
+					<xsl:call-template name="section-title">
+				    	<xsl:with-param name="label" select="'Publications'" />
+			    	</xsl:call-template>
+			    	<xsl:for-each select="publications/publication">
+						<fo:block font-size="10pt">
+							<xsl:for-each select="authors/author">
+								<xsl:value-of select="current()" />
+							    <xsl:if test="position() != last()"> and </xsl:if>
+							</xsl:for-each>
+							<xsl:text> </xsl:text>
+							<xsl:if test="date-issued">
+								<xsl:text>(</xsl:text>
+								<xsl:value-of select="date-issued" />
+								<xsl:text>)</xsl:text>
+							</xsl:if>
+							<xsl:text>. </xsl:text>
+							<fo:inline font-style="italic" >
+								<xsl:value-of select="title" /> 
+							</fo:inline >
 						</fo:block>
 					</xsl:for-each>
 					
@@ -139,21 +165,24 @@
 				    	<xsl:with-param name="label" select="'Knows languages'" />
 				    	<xsl:with-param name="values" select="knows-languages/language" />
 			    	</xsl:call-template>
-			    	<fo:block font-size="10pt" margin-top="2mm">
-			    		<fo:inline font-weight="bold" text-align="right" >
-							Personal sites:
-						</fo:inline>
-						<fo:inline>
-							<xsl:for-each select="personal-sites/personal-site">
-								<xsl:value-of select="site-url" />
-								<xsl:text> </xsl:text>
-								<xsl:if test="site-title">
-									( <xsl:value-of select="site-title" /> )
-								</xsl:if>
-							    <xsl:if test="position() != last()">, </xsl:if>
-							</xsl:for-each>
-						</fo:inline >
-					</fo:block>
+			    	
+	  				<xsl:if test="personal-sites/personal-site">
+				    	<fo:block font-size="10pt" margin-top="2mm">
+				    		<fo:inline font-weight="bold" text-align="right" >
+								Personal sites:
+							</fo:inline>
+							<fo:inline>
+								<xsl:for-each select="personal-sites/personal-site">
+									<xsl:value-of select="site-url" />
+									<xsl:text> </xsl:text>
+									<xsl:if test="site-title">
+										( <xsl:value-of select="site-title" /> )
+									</xsl:if>
+								    <xsl:if test="position() != last()">, </xsl:if>
+								</xsl:for-each>
+							</fo:inline >
+						</fo:block>
+					</xsl:if>
 
 				</fo:flow>
 			</fo:page-sequence>

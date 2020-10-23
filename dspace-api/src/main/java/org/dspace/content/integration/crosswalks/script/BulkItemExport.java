@@ -230,26 +230,23 @@ public class BulkItemExport extends DSpaceRunnable<BulkItemExportScriptConfigura
     }
 
     private DiscoverQuery buildBaseQuery(DiscoveryConfiguration discoveryConfiguration, IndexableObject<?, ?> scope) {
-        DiscoverQuery queryArgs = new DiscoverQuery();
-        queryArgs.setDiscoveryConfigurationName(discoveryConfiguration.getId());
+        DiscoverQuery discoverQuery = new DiscoverQuery();
 
-        String[] queryArray = discoveryConfiguration.getDefaultFilterQueries()
-            .toArray(new String[discoveryConfiguration.getDefaultFilterQueries().size()]);
+        if (discoveryConfiguration == null) {
+            return discoverQuery;
+        }
 
-        if (discoveryConfiguration != null && discoveryConfiguration instanceof DiscoveryRelatedItemConfiguration) {
-            if (queryArray != null) {
-                for (int i = 0; i < queryArray.length; i++) {
-                    queryArray[i] = MessageFormat.format(queryArray[i], scope.getID());
-                }
-            } else {
-                String message = "you are trying to set queries parameters on an empty queries list";
-                handler.logWarning(message);
-                LOGGER.warn(message);
+        discoverQuery.setDiscoveryConfigurationName(discoveryConfiguration.getId());
+
+        List<String> filterQueries = discoveryConfiguration.getDefaultFilterQueries();
+
+        if (scope != null && discoveryConfiguration instanceof DiscoveryRelatedItemConfiguration) {
+            for (String filterQuery : filterQueries) {
+                discoverQuery.addFilterQueries(MessageFormat.format(filterQuery, scope.getID()));
             }
         }
 
-        queryArgs.addFilterQueries(queryArray);
-        return queryArgs;
+        return discoverQuery;
     }
 
     private String[] getFilterQueries(DiscoveryConfiguration discoveryConfiguration) throws SQLException {

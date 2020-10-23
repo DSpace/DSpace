@@ -23,7 +23,9 @@ public final class TemplateLine {
 
     private static final String VIRTUAL_FIELD = "virtual";
 
-    private static final String GROUP_FIELD = "group";
+    private static final String METADATA_GROUP_FIELD = "group";
+
+    private static final String RELATION_GROUP_FIELD = "relation";
 
     private static final String GROUP_START_FIELD = "start";
 
@@ -94,7 +96,19 @@ public final class TemplateLine {
     }
 
     public boolean isMetadataGroupField() {
-        return isNotEmpty(fieldBits) && fieldBits.length == 3 && GROUP_FIELD.equals(fieldBits[0]);
+        return isNotEmpty(fieldBits) && fieldBits.length == 3 && METADATA_GROUP_FIELD.equals(fieldBits[0]);
+    }
+
+    public boolean isRelationGroupStartField() {
+        return isRelationGroupField() && GROUP_START_FIELD.equals(fieldBits[2]);
+    }
+
+    public boolean isRelationGroupEndField() {
+        return isRelationGroupField() && GROUP_END_FIELD.equals(fieldBits[2]);
+    }
+
+    public boolean isRelationGroupField() {
+        return isNotEmpty(fieldBits) && fieldBits.length == 3 && RELATION_GROUP_FIELD.equals(fieldBits[0]);
     }
 
     public String getVirtualFieldName() {
@@ -103,6 +117,10 @@ public final class TemplateLine {
 
     public String getMetadataGroupFieldName() {
         return isMetadataGroupField() ? fieldBits[1].replaceAll("-", ".") : null;
+    }
+
+    public String getRelationName() {
+        return isRelationGroupField() ? fieldBits[1] : null;
     }
 
 }

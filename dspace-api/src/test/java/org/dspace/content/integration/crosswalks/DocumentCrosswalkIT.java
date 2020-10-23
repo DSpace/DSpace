@@ -34,6 +34,7 @@ import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.BundleBuilder;
+import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -72,7 +73,20 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         context.turnOffAuthorisationSystem();
 
-        Item item = buildItem();
+        Item personItem = buildPersonItem();
+
+        ItemBuilder.createItem(context, collection)
+            .withTitle("First Publication")
+            .withIssueDate("2020-01-01")
+            .withAuthor("John Smith", personItem.getID().toString())
+            .withAuthor("Walter White")
+            .build();
+
+        ItemBuilder.createItem(context, collection)
+            .withTitle("Second Publication")
+            .withIssueDate("2020-04-01")
+            .withAuthor("John Smith", personItem.getID().toString())
+            .build();
 
         context.restoreAuthSystemState();
 
@@ -80,7 +94,7 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .getInstance().getPluginService().getNamedPlugin(StreamDisseminationCrosswalk.class, "person-pdf");
 
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            streamCrosswalkDefault.disseminate(context, item, out);
+            streamCrosswalkDefault.disseminate(context, personItem, out);
             assertThat(out.toString(), not(isEmptyString()));
             assertThatPdfHasTheExpectedContent(out);
         }
@@ -92,7 +106,20 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         context.turnOffAuthorisationSystem();
 
-        Item item = buildItem();
+        Item personItem = buildPersonItem();
+
+        ItemBuilder.createItem(context, collection)
+            .withTitle("First Publication")
+            .withIssueDate("2020-01-01")
+            .withAuthor("John Smith", personItem.getID().toString())
+            .withAuthor("Walter White")
+            .build();
+
+        ItemBuilder.createItem(context, collection)
+            .withTitle("Second Publication")
+            .withIssueDate("2020-04-01")
+            .withAuthor("John Smith", personItem.getID().toString())
+            .build();
 
         context.restoreAuthSystemState();
 
@@ -100,7 +127,7 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .getInstance().getPluginService().getNamedPlugin(StreamDisseminationCrosswalk.class, "person-rtf");
 
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            streamCrosswalkDefault.disseminate(context, item, out);
+            streamCrosswalkDefault.disseminate(context, personItem, out);
             assertThat(out.toString(), not(isEmptyString()));
             assertThatRtfHasExpectedContent(out);
         }
@@ -112,9 +139,22 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         context.turnOffAuthorisationSystem();
 
-        Item item = buildItem();
+        Item personItem = buildPersonItem();
 
-        Bundle bundle = BundleBuilder.createBundle(context, item)
+        ItemBuilder.createItem(context, collection)
+            .withTitle("First Publication")
+            .withIssueDate("2020-01-01")
+            .withAuthor("John Smith", personItem.getID().toString())
+            .withAuthor("Walter White")
+            .build();
+
+        ItemBuilder.createItem(context, collection)
+            .withTitle("Second Publication")
+            .withIssueDate("2020-04-01")
+            .withAuthor("John Smith", personItem.getID().toString())
+            .build();
+
+        Bundle bundle = BundleBuilder.createBundle(context, personItem)
             .withName("ORIGINAL")
             .build();
 
@@ -128,7 +168,7 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .getInstance().getPluginService().getNamedPlugin(StreamDisseminationCrosswalk.class, "person-pdf");
 
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            streamCrosswalkDefault.disseminate(context, item, out);
+            streamCrosswalkDefault.disseminate(context, personItem, out);
             assertThat(out.toString(), not(isEmptyString()));
             assertThatPdfHasTheExpectedContent(out);
         }
@@ -140,9 +180,22 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         context.turnOffAuthorisationSystem();
 
-        Item item = buildItem();
+        Item personItem = buildPersonItem();
 
-        Bundle bundle = BundleBuilder.createBundle(context, item)
+        ItemBuilder.createItem(context, collection)
+            .withTitle("First Publication")
+            .withIssueDate("2020-01-01")
+            .withAuthor("John Smith", personItem.getID().toString())
+            .withAuthor("Walter White")
+            .build();
+
+        ItemBuilder.createItem(context, collection)
+            .withTitle("Second Publication")
+            .withIssueDate("2020-04-01")
+            .withAuthor("John Smith", personItem.getID().toString())
+            .build();
+
+        Bundle bundle = BundleBuilder.createBundle(context, personItem)
             .withName("ORIGINAL")
             .build();
 
@@ -156,15 +209,16 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .getInstance().getPluginService().getNamedPlugin(StreamDisseminationCrosswalk.class, "person-rtf");
 
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            streamCrosswalkDefault.disseminate(context, item, out);
+            streamCrosswalkDefault.disseminate(context, personItem, out);
             assertThat(out.toString(), not(isEmptyString()));
             assertThatRtfHasExpectedContent(out);
         }
 
     }
 
-    private Item buildItem() {
+    private Item buildPersonItem() {
         Item item = createItem(context, collection)
+            .withRelationshipType("Person")
             .withTitle("John Smith")
             .withFullName("John Smith")
             .withVariantName("J.S.")
@@ -245,6 +299,7 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
     private void assertThatHasExpectedContent(String content) {
         assertThat(content, containsString("John Smith"));
         assertThat(content, containsString("Researcher at University"));
+
         assertThat(content, containsString("Birth Date: 1992-06-26"));
         assertThat(content, containsString("Gender: M"));
         assertThat(content, containsString("Country: England"));
@@ -252,13 +307,22 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         assertThat(content, containsString("ORCID: 0000-0002-9079-5932"));
         assertThat(content, containsString("Scopus Author IDs: 111-222-333, 444-555-666"));
         assertThat(content, containsString("Lorem ipsum dolor sit amet"));
+
         assertThat(content, containsString("Affiliations"));
         assertThat(content, containsString("Researcher at University from 2020-01-02"));
         assertThat(content, containsString("Developer at Company from 2015-01-01 to 2020-01-01"));
+
         assertThat(content, containsString("Education"));
         assertThat(content, containsString("Student at School from 2000-01-01 to 2005-01-01"));
+
+        assertThat(content, containsString("Qualifications"));
         assertThat(content, containsString("First Qualification from 2015-01-01 to 2016-01-01"));
         assertThat(content, containsString("Second Qualification from 2016-01-02"));
+
+        assertThat(content, containsString("Publications"));
+        assertThat(content, containsString("John Smith and Walter White (2020-01-01). First Publication"));
+        assertThat(content, containsString("John Smith (2020-04-01). Second Publication"));
+
         assertThat(content, containsString("Other informations"));
         assertThat(content, containsString("Working groups: First work group, Second work group"));
         assertThat(content, containsString("Interests: Science"));
