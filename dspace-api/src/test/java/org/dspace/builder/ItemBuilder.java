@@ -179,6 +179,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return setMetadataSingleValue(item, "person", "affiliation", "name", affiliation);
     }
 
+    public ItemBuilder withPersonMainAffiliation(final String affiliation, final String authority) {
+        return addMetadataValue(item, "person", "affiliation", "name", null, affiliation, authority, 600);
+    }
+
     public ItemBuilder withWorkingGroup(String workingGroup) {
         return addMetadataValue(item, "crisrp", "workgroup", null, workingGroup);
     }
