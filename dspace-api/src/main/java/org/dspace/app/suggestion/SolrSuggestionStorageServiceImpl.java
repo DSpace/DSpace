@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.commons.codec.binary.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -78,14 +78,16 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
 
     private List<String> getAllValues(Suggestion suggestion, String schema, String element, String qualifier) {
         return suggestion.getMetadata().stream()
-                .filter(st -> StringUtils.equals(st.getSchema(), schema) && StringUtils.equals(st.getElement(), element)
+                .filter(st -> StringUtils.isNotBlank(st.getValue()) && StringUtils.equals(st.getSchema(), schema)
+                        && StringUtils.equals(st.getElement(), element)
                         && StringUtils.equals(st.getQualifier(), qualifier))
                 .map(st -> st.getValue()).collect(Collectors.toList());
     }
 
     private String getFirstValue(Suggestion suggestion, String schema, String element, String qualifier) {
         return suggestion.getMetadata().stream()
-                .filter(st -> StringUtils.equals(st.getSchema(), schema) && StringUtils.equals(st.getElement(), element)
+                .filter(st -> StringUtils.isNotBlank(st.getValue()) && StringUtils.equals(st.getSchema(), schema)
+                        && StringUtils.equals(st.getElement(), element)
                         && StringUtils.equals(st.getQualifier(), qualifier))
                 .map(st -> st.getValue()).findFirst().orElse(null);
     }
