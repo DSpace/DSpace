@@ -107,7 +107,7 @@ public class OAIREPublicationLoaderCli {
     public static OAIREPublicationLoader getOAIREPublicationLoader() {
         if (oairePublicationLoader == null) {
             oairePublicationLoader = getDSpace().getServiceManager().getServiceByName(
-                    "org.dspace.app.suggestion.oaire.OAIREPublicationLoader", OAIREPublicationLoader.class);
+                    "OAIREPublicationLoader", OAIREPublicationLoader.class);
         }
         return oairePublicationLoader;
     }
