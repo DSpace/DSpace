@@ -1499,8 +1499,10 @@
         <property name="spellCheckEnabled" value="true"/>
     </bean>
 
-    <!-- fundings related to a project -->
-    <bean id="funding" class="org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration">
+    <bean id="funding" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
+          scope="prototype">
+        <property name="id" value="orgUnit"/>
+        <property name="indexAlways" value="true"/>
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
