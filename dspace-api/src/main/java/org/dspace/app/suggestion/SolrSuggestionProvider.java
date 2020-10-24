@@ -32,6 +32,7 @@ import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
+import org.dspace.content.Item;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
@@ -86,7 +87,7 @@ public class SolrSuggestionProvider implements SuggestionProvider {
         solrQuery.setQuery(SOURCE + ":" + sourceName);
         solrQuery.addFilterQuery(PROCESSED + ":false");
         solrQuery.setFacet(true);
-        solrQuery.setFacetMinCount(0);
+        solrQuery.setFacetMinCount(1);
         solrQuery.addFacetField(TARGET_ID);
         solrQuery.setFacetLimit(Integer.MAX_VALUE);
         QueryResponse response;
@@ -146,7 +147,7 @@ public class SolrSuggestionProvider implements SuggestionProvider {
         solrQuery.setQuery(SOURCE + ":" + sourceName);
         solrQuery.addFilterQuery(PROCESSED + ":false");
         solrQuery.setFacet(true);
-        solrQuery.setFacetMinCount(0);
+        solrQuery.setFacetMinCount(1);
         solrQuery.addFacetField(TARGET_ID);
         solrQuery.setFacetLimit((int) (pageSize + offset));
         QueryResponse response = null;
@@ -207,7 +208,12 @@ public class SolrSuggestionProvider implements SuggestionProvider {
             SuggestionTarget sTarget = new SuggestionTarget();
             sTarget.setSource(sourceName);
             sTarget.setTotal((int) response.getResults().getNumFound());
-            sTarget.setTarget(itemService.find(context, target));
+            Item itemTarget = itemService.find(context, target);
+            if (itemTarget != null) {
+                sTarget.setTarget(itemTarget);
+            } else {
+                return null;
+            }
             return sTarget;
         } catch (SolrServerException | IOException | SQLException e) {
             throw new RuntimeException(e);

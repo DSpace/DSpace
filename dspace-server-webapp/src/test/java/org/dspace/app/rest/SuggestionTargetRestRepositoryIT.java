@@ -101,10 +101,11 @@ public class SuggestionTargetRestRepositoryIT extends AbstractControllerIntegrat
                 .andExpect(jsonPath("$._embedded.suggestiontargets", Matchers.contains(
                         matchSuggestionTarget("Bollini, Andrea", "reciter", 31),
                         matchSuggestionTarget("Digilio, Giuseppe", "reciter", 11),
-                        matchSuggestionTarget("Test 0", "reciter", 3), matchSuggestionTarget("Test 1", "reciter", 4),
-                        matchSuggestionTarget("Test 2", "reciter", 5), matchSuggestionTarget("Test 3", "reciter", 6),
-                        matchSuggestionTarget("Test 4", "reciter", 7), matchSuggestionTarget("Test 5", "reciter", 8),
-                        matchSuggestionTarget("Test 6", "reciter", 9), matchSuggestionTarget("Test 7", "reciter", 10))))
+                        matchSuggestionTarget("Test 7", "reciter", 10), matchSuggestionTarget("Test 6", "reciter", 9),
+                        matchSuggestionTarget("Test 5", "reciter", 8), matchSuggestionTarget("Test 4", "reciter", 7),
+                        matchSuggestionTarget("Test 3", "reciter", 6), matchSuggestionTarget("Test 2", "reciter", 5),
+                        matchSuggestionTarget("Test 1", "reciter", 4), matchSuggestionTarget("Test 0", "reciter", 3)
+                        )))
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.containsString(
                                 "/api/integration/suggestiontargets/search/findBySource?source=reciter")))
@@ -113,10 +114,11 @@ public class SuggestionTargetRestRepositoryIT extends AbstractControllerIntegrat
                 .perform(get("/api/integration/suggestiontargets/search/findBySource").param("source", "scopus"))
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.suggestiontargets",
-                        Matchers.contains(matchSuggestionTarget("Bollini, Andrea", "scopus", 3),
-                                matchSuggestionTarget("Test 0", "scopus", 7),
-                                matchSuggestionTarget("Test 3", "scopus", 10),
+                        Matchers.containsInAnyOrder(
                                 matchSuggestionTarget("Test 6", "scopus", 13),
+                                matchSuggestionTarget("Test 3", "scopus", 10),
+                                matchSuggestionTarget("Test 0", "scopus", 7),
+                                matchSuggestionTarget("Bollini, Andrea", "scopus", 3),
                                 matchSuggestionTarget("Lombardi, Corrado", "scopus", 3))))
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.containsString(
@@ -192,7 +194,7 @@ public class SuggestionTargetRestRepositoryIT extends AbstractControllerIntegrat
                         .param("size", "1").param("page", "9"))
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.suggestiontargets",
-                        Matchers.contains(matchSuggestionTarget("Test 7", "reciter", 10))))
+                        Matchers.contains(matchSuggestionTarget("Test 0", "reciter", 3))))
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.allOf(
                                 Matchers.containsString("/api/integration/suggestiontargets/search/findBySource?"),
@@ -220,9 +222,10 @@ public class SuggestionTargetRestRepositoryIT extends AbstractControllerIntegrat
                         .param("size", "3").param("page", "0"))
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.suggestiontargets",
-                        Matchers.contains(matchSuggestionTarget("Bollini, Andrea", "scopus", 3),
-                                matchSuggestionTarget("Test 0", "scopus", 7),
-                                matchSuggestionTarget("Test 3", "scopus", 10))))
+                        Matchers.contains(
+                                matchSuggestionTarget("Test 6", "scopus", 13),
+                                matchSuggestionTarget("Test 3", "scopus", 10),
+                                matchSuggestionTarget("Test 0", "scopus", 7))))
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.allOf(
                                 Matchers.containsString("/api/integration/suggestiontargets/search/findBySource?"),
@@ -252,7 +255,7 @@ public class SuggestionTargetRestRepositoryIT extends AbstractControllerIntegrat
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.suggestiontargets", Matchers.iterableWithSize(2)))
                 .andExpect(jsonPath("$._embedded.suggestiontargets",
-                        Matchers.contains(matchSuggestionTarget("Test 6", "scopus", 13),
+                        Matchers.containsInAnyOrder(matchSuggestionTarget("Bollini, Andrea", "scopus", 3),
                                 matchSuggestionTarget("Lombardi, Corrado", "scopus", 3))))
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.allOf(

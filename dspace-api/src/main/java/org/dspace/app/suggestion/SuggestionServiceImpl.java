@@ -8,6 +8,7 @@
 package org.dspace.app.suggestion;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -29,8 +30,6 @@ public class SuggestionServiceImpl implements SuggestionService {
         } else {
             return null;
         }
-        // return storage.stream().filter(st -> st.getID().toString().equals(source +
-        // ":" + id)).findFirst().orElse(null);
     }
 
     @Override
@@ -40,7 +39,6 @@ public class SuggestionServiceImpl implements SuggestionService {
         } else {
             return 0;
         }
-        //return storage.stream().filter(st -> StringUtils.equals(st.getSource(), source)).count();
     }
 
     @Override
@@ -50,10 +48,6 @@ public class SuggestionServiceImpl implements SuggestionService {
         } else {
             return null;
         }
-//        List<SuggestionTarget> fullSourceTargets = storage.stream()
-//                .filter(st -> StringUtils.equals(st.getSource(), source)).skip(offset).limit(pageSize)
-//                .collect(Collectors.toList());
-//        return fullSourceTargets;
     }
 
     @Override
@@ -65,7 +59,6 @@ public class SuggestionServiceImpl implements SuggestionService {
             }
         }
         return count;
-        //return storage.stream().filter(st -> target.equals(st.getTarget().getID())).count();
     }
 
     @Override
@@ -77,17 +70,19 @@ public class SuggestionServiceImpl implements SuggestionService {
                 fullSourceTargets.add(sTarget);
             }
         }
-//        List<SuggestionTarget> fullSourceTargets = storage.stream()
-//        .filter(st -> target.equals(st.getTarget().getID()))
-//                .skip(offset).limit(pageSize).collect(Collectors.toList());
-        return fullSourceTargets;
+        fullSourceTargets.sort(new Comparator<SuggestionTarget>() {
+            @Override
+            public int compare(SuggestionTarget arg0, SuggestionTarget arg1) {
+                return -(arg0.getTotal() - arg1.getTotal());
+            }
+        }
+        );
+        return fullSourceTargets.stream().skip(offset).limit(pageSize).collect(Collectors.toList());
     }
 
     @Override
     public long countSources(Context context) {
         return providersMap.size();
-//        List<SuggestionSource> results = getSources();
-//        return results.size();
     }
 
     @Override
@@ -99,7 +94,6 @@ public class SuggestionServiceImpl implements SuggestionService {
         } else {
             return null;
         }
-//        return getSources().stream().filter(st -> StringUtils.equals(source, st.getID())).findFirst().orElse(null);
     }
 
     @Override
@@ -116,21 +110,6 @@ public class SuggestionServiceImpl implements SuggestionService {
             ssource.setTotal((int) providersMap.get(source).countAllTargets(context));
             results.add(ssource);
         }
-//        for (SuggestionTarget t : storage) {
-//            SuggestionSource s = null;
-//            for (SuggestionSource ss : results) {
-//                if (StringUtils.equals(ss.getID(), t.getSource())) {
-//                    s = ss;
-//                    s.setTotal(s.getTotal() + 1);
-//                }
-//            }
-//            if (s == null) {
-//                s = new SuggestionSource(t.getSource());
-//                s.setTotal(1);
-//                results.add(s);
-//            }
-//
-//        }
         return results;
     }
 
@@ -139,10 +118,6 @@ public class SuggestionServiceImpl implements SuggestionService {
         if (providersMap.containsKey(source)) {
             return providersMap.get(source).countSuggestionByTarget(context, target);
         }
-//        SuggestionTarget targetSuggestion = find(context, source, target);
-//        if (targetSuggestion != null) {
-//            return targetSuggestion.getTotal();
-//        }
         return 0;
     }
 
@@ -152,13 +127,6 @@ public class SuggestionServiceImpl implements SuggestionService {
         if (providersMap.containsKey(source)) {
             return providersMap.get(source).findAllSuggestions(context, target, pageSize, offset);
         }
-//        SuggestionTarget targetSuggestion = find(context, source, target);
-//        if (targetSuggestion != null) {
-//            List<Suggestion> allSuggestions = generateAllSuggestion(context, target, source, targetSuggestion);
-//            List<Suggestion> pageSuggestion = allSuggestions.stream().skip(offset).limit(pageSize)
-//                    .collect(Collectors.toList());
-//            return pageSuggestion;
-//        }
         return null;
     }
 
@@ -169,48 +137,7 @@ public class SuggestionServiceImpl implements SuggestionService {
         if (providersMap.containsKey(source)) {
             return providersMap.get(source).findSuggestion(context, id.split(":", 3)[2]);
         }
-//        SuggestionTarget targetSuggestion = find(context, source, target);
-//        if (targetSuggestion != null) {
-//            List<Suggestion> allSuggestions = generateAllSuggestion(context, target, source, targetSuggestion);
-//            return allSuggestions.stream().filter(st -> StringUtils.equals(id, st.getID())).findFirst().orElse(null);
-//        }
         return null;
     }
 
-//    private List<Suggestion> generateAllSuggestion(Context context, UUID target, String source,
-//            SuggestionTarget targetSuggestion) {
-//        List<Suggestion> allSuggestions = new ArrayList<Suggestion>();
-//        Item itemTarget;
-//        try {
-//            itemTarget = itemService.find(context, target);
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
-//        for (int idx = 0; idx < targetSuggestion.getTotal(); idx++) {
-//            String idPartStr = String.valueOf(idx + 1);
-//            Suggestion sug = new Suggestion(source, itemTarget, idPartStr);
-//            sug.setDisplay("Suggestion " + source + " " + idPartStr);
-//            MetadataValueDTO mTitle = new MetadataValueDTO();
-//            mTitle.setSchema("dc");
-//            mTitle.setElement("title");
-//            mTitle.setValue("Title Suggestion " + idPartStr);
-//
-//            MetadataValueDTO mSource1 = new MetadataValueDTO();
-//            mSource1.setSchema("dc");
-//            mSource1.setElement("source");
-//            mSource1.setValue("Source 1");
-//
-//            MetadataValueDTO mSource2 = new MetadataValueDTO();
-//            mSource2.setSchema("dc");
-//            mSource2.setElement("source");
-//            mSource2.setValue("Source 2");
-//
-//            sug.getMetadata().add(mTitle);
-//            sug.getMetadata().add(mSource1);
-//            sug.getMetadata().add(mSource2);
-//
-//            allSuggestions.add(sug);
-//        }
-//        return allSuggestions;
-//    }
 }
