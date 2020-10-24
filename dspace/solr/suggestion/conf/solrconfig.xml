@@ -809,7 +809,7 @@
      <lst name="defaults">
        <str name="echoParams">explicit</str>
        <int name="rows">10</int>
-       <str name="df">event_id</str>
+       <str name="df">suggestion_id</str>
      </lst>
     <!-- In addition to defaults, "appends" params can be specified
          to identify values which should be appended to the list of
@@ -871,7 +871,7 @@
        <str name="echoParams">explicit</str>
        <str name="wt">json</str>
        <str name="indent">true</str>
-       <str name="df">event_id</str>
+       <str name="df">suggestion_id</str>
      </lst>
   </requestHandler>
 
@@ -910,20 +910,20 @@
        <!-- Query settings -->
        <str name="defType">edismax</str>
        <str name="qf">
-          text^0.5 features^1.0 name^1.2 sku^1.5 event_id^10.0 manu^1.1 cat^1.4
+          text^0.5 features^1.0 name^1.2 sku^1.5 suggestion_id^10.0 manu^1.1 cat^1.4
           title^10.0 description^5.0 keywords^5.0 author^2.0 resourcename^1.0
        </str>
-       <str name="df">event_id</str>
+       <str name="df">suggestion_id</str>
        <str name="mm">100%</str>
        <str name="q.alt">*:*</str>
        <str name="rows">10</str>
        <str name="fl">*,score</str>
 
        <str name="mlt.qf">
-         text^0.5 features^1.0 name^1.2 sku^1.5 event_id^10.0 manu^1.1 cat^1.4
+         text^0.5 features^1.0 name^1.2 sku^1.5 suggestion_id^10.0 manu^1.1 cat^1.4
          title^10.0 description^5.0 keywords^5.0 author^2.0 resourcename^1.0
        </str>
-       <str name="mlt.fl">text,features,name,sku,event_id,manu,cat,title,description,keywords,author,resourcename</str>
+       <str name="mlt.fl">text,features,name,sku,suggestion_id,manu,cat,title,description,keywords,author,resourcename</str>
        <int name="mlt.count">3</int>
 
        <!-- Faceting defaults -->
@@ -1366,7 +1366,7 @@
     <!-- a spellchecker built from a field of the main index -->
     <lst name="spellchecker">
       <str name="name">default</str>
-      <str name="field">event_id</str>
+      <str name="field">suggestion_id</str>
       <str name="classname">solr.DirectSolrSpellChecker</str>
       <!-- the spellcheck distance measure used, the default is the internal levenshtein -->
       <str name="distanceMeasure">internal</str>
@@ -1451,7 +1451,7 @@
     -->
   <requestHandler name="/spell" class="solr.SearchHandler" startup="lazy">
     <lst name="defaults">
-      <str name="df">event_id</str>
+      <str name="df">suggestion_id</str>
       <!-- Solr will use suggestions from both the 'default' spellchecker
            and from the 'wordbreak' spellchecker and combine them.
            collations (re-written queries) can include a combination of
@@ -1488,7 +1488,7 @@
     -->
   <requestHandler name="/tvrh" class="solr.SearchHandler" startup="lazy">
     <lst name="defaults">
-      <str name="df">event_id</str>
+      <str name="df">suggestion_id</str>
       <bool name="tv">true</bool>
     </lst>
     <arr name="last-components">
@@ -1581,7 +1581,7 @@
       <bool name="clustering.results">true</bool>
       <!-- The title field -->
       <str name="carrot.title">name</str>
-      <str name="carrot.url">event_id</str>
+      <str name="carrot.url">suggestion_id</str>
       <!-- The field to cluster on -->
        <str name="carrot.snippet">features</str>
        <!-- produce summaries -->
@@ -1593,7 +1593,7 @@
        
        <str name="defType">edismax</str>
        <str name="qf">
-         text^0.5 features^1.0 name^1.2 sku^1.5 event_id^10.0 manu^1.1 cat^1.4
+         text^0.5 features^1.0 name^1.2 sku^1.5 suggestion_id^10.0 manu^1.1 cat^1.4
        </str>
        <str name="q.alt">*:*</str>
        <str name="rows">10</str>
@@ -1643,7 +1643,7 @@
   <requestHandler name="/elevate" class="solr.SearchHandler" startup="lazy">
     <lst name="defaults">
       <str name="echoParams">explicit</str>
-      <str name="df">event_id</str>
+      <str name="df">suggestion_id</str>
     </lst>
     <arr name="last-components">
       <str>elevator</str>
