@@ -26,6 +26,7 @@ public interface SolrSuggestionStorageService {
     public static final String TARGET_ID = "target_id";
     public static final String TITLE = "title";
     public static final String DATE = "date";
+    public static final String DISPLAY = "display";
     public static final String CONTRIBUTORS = "contributors";
     public static final String ABSTRACT = "abstract";
     public static final String CATEGORY = "category";
@@ -80,4 +81,6 @@ public interface SolrSuggestionStorageService {
     public void deleteTarget(SuggestionTarget target) throws SolrServerException, IOException;
 
     void commit() throws SolrServerException, IOException;
+
+    void flagAllSuggestionAsProcessed(String externalUri) throws SolrServerException, IOException;
 }

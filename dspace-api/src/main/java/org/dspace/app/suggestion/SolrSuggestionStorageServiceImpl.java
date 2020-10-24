@@ -18,6 +18,9 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -54,6 +57,7 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
             document.addField(SUGGESTION_FULLID, suggestionFullID);
             document.addField(SUGGESTION_ID, suggestionFullID.substring(suggestionFullID.lastIndexOf(":") + 1));
             document.addField(TARGET_ID, suggestion.getTarget().getID().toString());
+            document.addField(DISPLAY, suggestion.getDisplay());
             document.addField(TITLE, getFirstValue(suggestion, "dc", "title", null));
             document.addField(DATE, getFirstValue(suggestion, "dc", "date", "issued"));
             document.addField(CONTRIBUTORS, getAllValues(suggestion, "dc", "contributor", "author"));
@@ -74,12 +78,16 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
     }
 
     private List<String> getAllValues(Suggestion suggestion, String schema, String element, String qualifier) {
-        return suggestion.getMetadata().stream().filter(st -> StringUtils.equals(st.getSchema(), schema))
+        return suggestion.getMetadata().stream()
+                .filter(st -> StringUtils.equals(st.getSchema(), schema) && StringUtils.equals(st.getElement(), element)
+                        && StringUtils.equals(st.getQualifier(), qualifier))
                 .map(st -> st.getValue()).collect(Collectors.toList());
     }
 
     private String getFirstValue(Suggestion suggestion, String schema, String element, String qualifier) {
-        return suggestion.getMetadata().stream().filter(st -> StringUtils.equals(st.getSchema(), schema))
+        return suggestion.getMetadata().stream()
+                .filter(st -> StringUtils.equals(st.getSchema(), schema) && StringUtils.equals(st.getElement(), element)
+                        && StringUtils.equals(st.getQualifier(), qualifier))
                 .map(st -> st.getValue()).findFirst().orElse(null);
     }
 
@@ -103,6 +111,25 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
         fieldModifier.put("set", true);
         sdoc.addField(PROCESSED, fieldModifier); // add the map as the field value
         getSolr().add(sdoc);
+        getSolr().commit();
+    }
+
+    @Override
+    public void flagAllSuggestionAsProcessed(String externalUri) throws SolrServerException, IOException {
+        SolrQuery query = new SolrQuery(EXTERNAL_URI + ":\"" + externalUri + "\"");
+        query.setRows(Integer.MAX_VALUE);
+        query.setFields(SUGGESTION_FULLID);
+        SolrDocumentList results = getSolr().query(query).getResults();
+        if (results.getNumFound() > 0) {
+            for (SolrDocument rDoc : results) {
+                SolrInputDocument sdoc = new SolrInputDocument();
+                sdoc.addField(SUGGESTION_FULLID, rDoc.getFieldValue(SUGGESTION_FULLID));
+                Map<String, Object> fieldModifier = new HashMap<>(1);
+                fieldModifier.put("set", true);
+                sdoc.addField(PROCESSED, fieldModifier); // add the map as the field value
+                getSolr().add(sdoc);
+            }
+        }
         getSolr().commit();
     }
 

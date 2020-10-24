@@ -15,11 +15,14 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.springframework.stereotype.Service;
 
 @Service
 public class SuggestionServiceImpl implements SuggestionService {
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SuggestionServiceImpl.class);
+
     @Resource(name = "suggestionProviders")
     private Map<String, SuggestionProvider> providersMap;
 
@@ -132,10 +135,24 @@ public class SuggestionServiceImpl implements SuggestionService {
 
     @Override
     public Suggestion findSuggestion(Context context, String id) {
-        String source = id.split(":", 3)[0];
-        UUID target = UUID.fromString(id.split(":", 3)[1]);
+        String source = null;
+        UUID target = null;
+        String idPart = null;
+        String[] split;
+        try {
+            split = id.split(":", 3);
+            source = split[0];
+            target = UUID.fromString(split[1]);
+            idPart = split[2];
+        } catch (Exception e) {
+            log.warn("findSuggestion got an invalid id " + id + ", return null");
+            return null;
+        }
+        if (split.length != 3) {
+            return null;
+        }
         if (providersMap.containsKey(source)) {
-            return providersMap.get(source).findSuggestion(context, id.split(":", 3)[2]);
+            return providersMap.get(source).findSuggestion(context, target, idPart);
         }
         return null;
     }

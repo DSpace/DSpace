@@ -11,6 +11,7 @@ import static org.dspace.app.suggestion.SolrSuggestionStorageService.ABSTRACT;
 import static org.dspace.app.suggestion.SolrSuggestionStorageService.CATEGORY;
 import static org.dspace.app.suggestion.SolrSuggestionStorageService.CONTRIBUTORS;
 import static org.dspace.app.suggestion.SolrSuggestionStorageService.DATE;
+import static org.dspace.app.suggestion.SolrSuggestionStorageService.DISPLAY;
 import static org.dspace.app.suggestion.SolrSuggestionStorageService.EXTERNAL_URI;
 import static org.dspace.app.suggestion.SolrSuggestionStorageService.PROCESSED;
 import static org.dspace.app.suggestion.SolrSuggestionStorageService.SOURCE;
@@ -175,12 +176,13 @@ public class SolrSuggestionProvider implements SuggestionProvider {
     }
 
     @Override
-    public Suggestion findSuggestion(Context context, String id) {
+    public Suggestion findSuggestion(Context context, UUID target, String id) {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(1);
         solrQuery.setQuery("*:*");
         solrQuery.addFilterQuery(
                 SOURCE + ":" + sourceName,
+                TARGET_ID + ":" + target.toString(),
                 SUGGESTION_ID + ":" + id,
                 PROCESSED + ":false");
         QueryResponse response = null;
@@ -224,7 +226,7 @@ public class SolrSuggestionProvider implements SuggestionProvider {
         Suggestion suggestion = new Suggestion(sourceName,
                 itemService.find(context, UUID.fromString((String) solrDoc.getFieldValue(TARGET_ID))),
                 (String) solrDoc.getFieldValue(SUGGESTION_ID));
-        suggestion.setDisplay((String) solrDoc.getFieldValue(TITLE));
+        suggestion.setDisplay((String) solrDoc.getFieldValue(DISPLAY));
         suggestion.getMetadata()
                 .add(new MetadataValueDTO("dc", "title", null, null, (String) solrDoc.getFieldValue(TITLE)));
         suggestion.getMetadata()
@@ -233,13 +235,17 @@ public class SolrSuggestionProvider implements SuggestionProvider {
                 new MetadataValueDTO("dc", "description", "abstract", null, (String) solrDoc.getFieldValue(ABSTRACT)));
 
         suggestion.setExternalSourceUri((String) solrDoc.getFieldValue(EXTERNAL_URI));
-        for (Object o : solrDoc.getFieldValues(CATEGORY)) {
-            suggestion.getMetadata().add(
-                    new MetadataValueDTO("dc", "source", null, null, (String) o));
+        if (solrDoc.containsKey(CATEGORY)) {
+            for (Object o : solrDoc.getFieldValues(CATEGORY)) {
+                suggestion.getMetadata().add(
+                        new MetadataValueDTO("dc", "source", null, null, (String) o));
+            }
         }
-        for (Object o : solrDoc.getFieldValues(CONTRIBUTORS)) {
-            suggestion.getMetadata().add(
-                    new MetadataValueDTO("dc", "contributor", "author", null, (String) o));
+        if (solrDoc.containsKey(CONTRIBUTORS)) {
+            for (Object o : solrDoc.getFieldValues(CONTRIBUTORS)) {
+                suggestion.getMetadata().add(
+                        new MetadataValueDTO("dc", "contributor", "author", null, (String) o));
+            }
         }
         return suggestion;
     }

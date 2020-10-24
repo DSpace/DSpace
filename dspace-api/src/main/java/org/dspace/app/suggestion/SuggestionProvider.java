@@ -23,6 +23,6 @@ public interface SuggestionProvider {
 
     public long countSuggestionByTarget(Context context, UUID target);
 
-    public Suggestion findSuggestion(Context context, String id);
+    public Suggestion findSuggestion(Context context, UUID target, String id);
 
 }
