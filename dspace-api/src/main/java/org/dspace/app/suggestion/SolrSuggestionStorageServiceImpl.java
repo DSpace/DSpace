@@ -109,7 +109,7 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
     @Override
     public void deleteTarget(SuggestionTarget target) throws SolrServerException, IOException {
         getSolr().deleteByQuery(
-                SOURCE + ":" + target.getSource() + " AND " + TARGET_ID + ":" + target.getTarget().toString());
+                SOURCE + ":" + target.getSource() + " AND " + TARGET_ID + ":" + target.getTarget().getID().toString());
         getSolr().commit();
     }
 }
