@@ -1105,6 +1105,13 @@ public class RestResourceController implements InitializingBean {
         return deleteInternal(apiCategory, model, uuid);
     }
 
+    @RequestMapping(method = RequestMethod.DELETE, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG)
+    public ResponseEntity<RepresentationModel<?>> delete(HttpServletRequest request, @PathVariable String apiCategory,
+                                                         @PathVariable String model, @PathVariable String id)
+        throws HttpRequestMethodNotSupportedException {
+        return deleteInternal(apiCategory, model, id);
+    }
+
     /**
      * Internal method to delete resource.
      *

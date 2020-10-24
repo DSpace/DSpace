@@ -82,5 +82,5 @@ public interface SolrSuggestionStorageService {
 
     void commit() throws SolrServerException, IOException;
 
-    void flagAllSuggestionAsProcessed(String externalUri) throws SolrServerException, IOException;
+    void flagAllSuggestionAsProcessed(String source, String idPart) throws SolrServerException, IOException;
 }

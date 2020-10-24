@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrServerException;
+import org.dspace.app.suggestion.MockSuggestionExternalDataSource;
 import org.dspace.app.suggestion.SolrSuggestionStorageService;
 import org.dspace.app.suggestion.Suggestion;
 import org.dspace.app.suggestion.SuggestionTarget;
@@ -145,6 +146,9 @@ public class SuggestionTargetBuilder extends AbstractBuilder<SuggestionTarget, S
             sug.getMetadata().add(mSource1);
             sug.getMetadata().add(mSource2);
 
+            sug.setExternalSourceUri(
+                    "http://localhost/api/integration/externalsources/" + MockSuggestionExternalDataSource.NAME
+                            + "/entryValues/" + idPartStr);
             allSuggestions.add(sug);
         }
         return allSuggestions;

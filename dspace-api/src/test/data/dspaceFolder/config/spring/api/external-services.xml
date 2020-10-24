@@ -18,5 +18,7 @@
         <property name="clientSecret" value="${orcid.clientsecret}" />
         <property name="OAUTHUrl" value="${orcid.oauth.url}" />
     </bean>
+
+    <bean class="org.dspace.app.suggestion.MockSuggestionExternalDataSource" />
 </beans>
 

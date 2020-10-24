@@ -7,26 +7,37 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.SuggestionMatcher.matchSuggestion;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
+import static org.springframework.http.MediaType.parseMediaType;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Map;
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.app.suggestion.MockSuggestionExternalDataSource;
 import org.dspace.app.suggestion.SuggestionTarget;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.SuggestionTargetBuilder;
+import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.web.servlet.MvcResult;
 
 /**
  * Integration Tests against the /api/integration/suggestions endpoint
@@ -365,4 +376,93 @@ public class SuggestionRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient().perform(get("/api/integration/suggestions/not-exist")).andExpect(status().isUnauthorized());
     }
 
+    @Test
+    public void acceptSuggestionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Collection colPublications = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Publications").build();
+        Item itemFirst = ItemBuilder.createItem(context, colPeople).withTitle("Bollini, Andrea").build();
+        SuggestionTarget targetFirstReciter = SuggestionTargetBuilder.createTarget(context, itemFirst)
+                .withSuggestionCount("reciter", 2).build();
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String suggestionId = "reciter:" + itemFirst.getID().toString() + ":1";
+        // the suggestion is here
+        getClient(adminToken).perform(get("/api/integration/suggestions/" + suggestionId)).andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$", matchSuggestion("reciter", itemFirst, "Suggestion reciter 1", "1")))
+                .andExpect(jsonPath("$._links.self.href",
+                        Matchers.endsWith("/api/integration/suggestions/" + suggestionId)));
+        Integer workspaceItemId = null;
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            MvcResult mvcResult = getClient(adminToken).perform(
+                    post("/api/submission/workspaceitems?owningCollection=" + colPublications.getID().toString())
+                            .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                            .content("http://localhost/api/integration/externalsources/"
+                                    + MockSuggestionExternalDataSource.NAME + "/entryValues/" + suggestionId))
+                    .andExpect(status().isCreated()).andReturn();
+            String content = mvcResult.getResponse().getContentAsString();
+            Map<String,Object> map = mapper.readValue(content, Map.class);
+            workspaceItemId = (Integer) map.get("id");
+            String itemUuidString = String.valueOf(((Map) ((Map) map.get("_embedded")).get("item")).get("uuid"));
+
+            getClient(adminToken).perform(get("/api/submission/workspaceitems/" + workspaceItemId))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$", Matchers.allOf(
+                                hasJsonPath("$.id", is(workspaceItemId)),
+                                hasJsonPath("$.type", is("workspaceitem")),
+                                hasJsonPath("$._embedded.item", Matchers.allOf(
+                                    hasJsonPath("$.id", is(itemUuidString)),
+                                    hasJsonPath("$.uuid", is(itemUuidString)),
+                                    hasJsonPath("$.type", is("item")),
+                                    hasJsonPath("$.metadata", Matchers.allOf(
+                                        MetadataMatcher.matchMetadata("dc.title", "Title Suggestion 1")
+                                    )))))
+                            ));
+
+            getClient(adminToken).perform(get("/api/integration/suggestions/" + suggestionId))
+                    .andExpect(status().isNotFound());
+            // 1 suggestion is still pending
+            getClient(adminToken)
+                .perform(get("/api/integration/suggestions/search/findByTargetAndSource").param("source", "reciter")
+                        .param("target", itemFirst.getID().toString()))
+                .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.suggestions", Matchers.contains(
+                        matchSuggestion("reciter", itemFirst, "Suggestion reciter 2", "2"))))
+                .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(1)));
+        } finally {
+            if (workspaceItemId != null) {
+                WorkspaceItemBuilder.deleteWorkspaceItem(workspaceItemId);
+            }
+        }
+    }
+
+    @Test
+    public void rejectSuggestionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Collection colPublications = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Publications").build();
+        Item itemFirst = ItemBuilder.createItem(context, colPeople).withTitle("Bollini, Andrea").build();
+        SuggestionTarget targetFirstReciter = SuggestionTargetBuilder.createTarget(context, itemFirst)
+                .withSuggestionCount("reciter", 2).build();
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String suggestionId = "reciter:" + itemFirst.getID().toString() + ":1";
+        // reject the suggestion
+        getClient(adminToken).perform(delete("/api/integration/suggestions/" + suggestionId))
+                .andExpect(status().isNoContent());
+        getClient(adminToken).perform(get("/api/integration/suggestions/" + suggestionId))
+                .andExpect(status().isNotFound());
+        // 1 suggestion is still pending
+        getClient(adminToken)
+            .perform(get("/api/integration/suggestions/search/findByTargetAndSource").param("source", "reciter")
+                    .param("target", itemFirst.getID().toString()))
+            .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.suggestions", Matchers.contains(
+                    matchSuggestion("reciter", itemFirst, "Suggestion reciter 2", "2"))))
+            .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
 }

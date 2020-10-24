@@ -10,5 +10,7 @@
         <property name="sourceIdentifier" value="mock"/>
 
     </bean>
+    
+    <bean class="org.dspace.app.suggestion.MockSuggestionExternalDataSource" />
 </beans>
 

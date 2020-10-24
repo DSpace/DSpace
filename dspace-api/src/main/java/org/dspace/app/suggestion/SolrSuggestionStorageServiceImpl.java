@@ -18,7 +18,6 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
@@ -115,8 +114,8 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
     }
 
     @Override
-    public void flagAllSuggestionAsProcessed(String externalUri) throws SolrServerException, IOException {
-        SolrQuery query = new SolrQuery(EXTERNAL_URI + ":\"" + externalUri + "\"");
+    public void flagAllSuggestionAsProcessed(String source, String idPart) throws SolrServerException, IOException {
+        SolrQuery query = new SolrQuery(SOURCE + ":" + source + " AND " + SUGGESTION_ID + ":\"" + idPart + "\"");
         query.setRows(Integer.MAX_VALUE);
         query.setFields(SUGGESTION_FULLID);
         SolrDocumentList results = getSolr().query(query).getResults();

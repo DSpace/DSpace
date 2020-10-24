@@ -37,6 +37,8 @@ public interface SuggestionService {
 
     public Suggestion findSuggestion(Context context, String id);
 
+    public void rejectSuggestion(Context context, String id);
+
     public List<Suggestion> findByTargetAndSource(Context context, UUID target, String source, int pageSize,
             long offset);
 

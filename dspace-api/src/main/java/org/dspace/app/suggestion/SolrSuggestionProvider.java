@@ -53,6 +53,9 @@ public class SolrSuggestionProvider implements SuggestionProvider {
     @Autowired
     private ItemService itemService;
 
+    @Autowired
+    private SolrSuggestionStorageService solrSuggestionStorageService;
+
     private String sourceName;
 
     public String getSourceName() {
@@ -218,6 +221,16 @@ public class SolrSuggestionProvider implements SuggestionProvider {
             }
             return sTarget;
         } catch (SolrServerException | IOException | SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void rejectSuggestion(Context context, UUID target, String idPart) {
+        Suggestion suggestion = findSuggestion(context, target, idPart);
+        try {
+            solrSuggestionStorageService.flagSuggestionAsProcessed(suggestion);
+        } catch (SolrServerException | IOException e) {
             throw new RuntimeException(e);
         }
     }

@@ -18,6 +18,7 @@ import org.dspace.app.rest.model.SuggestionRest;
 import org.dspace.app.rest.model.SuggestionTargetRest;
 import org.dspace.app.suggestion.Suggestion;
 import org.dspace.app.suggestion.SuggestionService;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -40,7 +41,7 @@ public class SuggestionRestRepository extends DSpaceRestRepository<SuggestionRes
     private SuggestionService suggestionService;
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'SUGGESTIONTARGET', 'READ')")
+    @PreAuthorize("hasPermission(#id, 'SUGGESTION', 'READ')")
     public SuggestionRest findOne(Context context, String id) {
         Suggestion suggestion = suggestionService.findSuggestion(context, id);
         if (suggestion == null) {
@@ -65,6 +66,13 @@ public class SuggestionRestRepository extends DSpaceRestRepository<SuggestionRes
                 pageable.getPageSize(), pageable.getOffset());
         long tot = suggestionService.countAllByTargetAndSource(context, source, target);
         return converter.toRestPage(suggestions, pageable, tot, utils.obtainProjection());
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#id, 'SUGGESTION', 'DELETE')")
+    protected void delete(Context context, String id)
+            throws AuthorizeException, RepositoryMethodNotImplementedException {
+        suggestionService.rejectSuggestion(context, id);
     }
 
     @Override

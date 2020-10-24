@@ -25,4 +25,6 @@ public interface SuggestionProvider {
 
     public Suggestion findSuggestion(Context context, UUID target, String id);
 
+    public void rejectSuggestion(Context context, UUID target, String idPart);
+
 }

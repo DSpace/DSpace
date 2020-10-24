@@ -157,4 +157,27 @@ public class SuggestionServiceImpl implements SuggestionService {
         return null;
     }
 
+    @Override
+    public void rejectSuggestion(Context context, String id) {
+        String source = null;
+        UUID target = null;
+        String idPart = null;
+        String[] split;
+        try {
+            split = id.split(":", 3);
+            source = split[0];
+            target = UUID.fromString(split[1]);
+            idPart = split[2];
+        } catch (Exception e) {
+            log.warn("rejectSuggestion got an invalid id " + id + ", doing nothing");
+            return;
+        }
+        if (split.length != 3) {
+            return;
+        }
+        if (providersMap.containsKey(source)) {
+            providersMap.get(source).rejectSuggestion(context, target, idPart);
+        }
+
+    }
 }
