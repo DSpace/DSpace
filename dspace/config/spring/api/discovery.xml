@@ -1517,7 +1517,7 @@
                 <property name="sidebarFacets">
             <list>
                 <ref bean="searchFilterFunderName"/>
-                <ref bean="searchFilterFundingProgramm"/>
+                <ref bean="searchFilterFundingProgram"/>
             </list>
         </property>
         <!--The search filters which can be used on the discovery search page-->
@@ -1525,7 +1525,7 @@
             <list>
                 <ref bean="searchFilterTitle"/>
                 <ref bean="searchFilterFunderName"/>
-                <ref bean="searchFilterFundingProgramm"/>
+                <ref bean="searchFilterFundingProgram"/>
             </list>
         </property>
         <!--Any default filter queries, these filter queries will be used for all
