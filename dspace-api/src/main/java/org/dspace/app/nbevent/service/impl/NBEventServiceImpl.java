@@ -93,6 +93,7 @@ public class NBEventServiceImpl implements NBEventService {
         solrQuery.setRows(0);
         solrQuery.setQuery("*:*");
         solrQuery.setFacet(true);
+        // we would like to get eventually topic that has no longer active nb events
         solrQuery.setFacetMinCount(0);
         solrQuery.addFacetField(TOPIC);
         QueryResponse response;
@@ -120,6 +121,7 @@ public class NBEventServiceImpl implements NBEventService {
         solrQuery.setRows(0);
         solrQuery.setQuery(TOPIC + ":" + topicId.replaceAll("!", "/"));
         solrQuery.setFacet(true);
+        // we would like to get eventually topic that has no longer active nb events
         solrQuery.setFacetMinCount(0);
         solrQuery.addFacetField(TOPIC);
         QueryResponse response;
@@ -160,6 +162,7 @@ public class NBEventServiceImpl implements NBEventService {
         solrQuery.setRows(0);
         solrQuery.setQuery("*:*");
         solrQuery.setFacet(true);
+        // we would like to get eventually topic that has no longer active nb events
         solrQuery.setFacetMinCount(0);
         solrQuery.setFacetLimit((int) (offset + count));
         solrQuery.addFacetField(TOPIC);
