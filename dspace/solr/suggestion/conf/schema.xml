@@ -508,6 +508,7 @@
        when adding a document.
    -->
     <field name="source" type="string" indexed="true" stored="true" omitNorms="true" />
+    <field name="suggestion_fullid" type="string" indexed="true" stored="true" omitNorms="true" />
     <field name="suggestion_id" type="string" indexed="true" stored="true" omitNorms="true" />
     <field name="target_id" type="string" indexed="true" stored="true" omitNorms="true" />
     <field name="title" type="string" indexed="true" stored="true" omitNorms="true" />
@@ -516,7 +517,7 @@
     <field name="abstract" type="string" indexed="true" stored="true" omitNorms="true" />
     <field name="category" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
     <field name="external-uri" type="string" indexed="true" stored="true" omitNorms="true" />
-    <field name="rejected" type="boolean" indexed="true" stored="true" omitNorms="true" />
+    <field name="processed" type="boolean" indexed="true" stored="true" omitNorms="true" />
     
     <dynamicField name="*_i"  type="int"    indexed="true"  stored="true" multiValued="true" docValues="true"/>
    	<dynamicField name="*_s"  type="string"  indexed="true"  stored="true" multiValued="true" docValues="true"/>
@@ -533,7 +534,7 @@
  <!-- Field to use to determine and enforce document uniqueness.
       Unless this field is marked with required="false", it will be a required field
    -->
-<uniqueKey>suggestion_id</uniqueKey>   	    
+<uniqueKey>suggestion_fullid</uniqueKey>   	    
 
  <!-- SolrQueryParser configuration: defaultOperator="AND|OR" -->
  <!-- [deprecated?]

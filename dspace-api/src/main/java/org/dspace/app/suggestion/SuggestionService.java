@@ -19,8 +19,6 @@ import org.dspace.core.Context;
  */
 public interface SuggestionService {
 
-    public void addSuggestionTarget(SuggestionTarget target);
-
     public SuggestionTarget find(Context context, String source, UUID id);
 
     public long countAll(Context context, String source);
@@ -30,8 +28,6 @@ public interface SuggestionService {
     public long countAllByTarget(Context context, UUID target);
 
     public List<SuggestionTarget> findByTarget(Context context, UUID target, int pageSize, long offset);
-
-    public void deleteTarget(SuggestionTarget target);
 
     public SuggestionSource findSource(Context context, String source);
 

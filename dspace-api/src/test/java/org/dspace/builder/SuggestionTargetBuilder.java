@@ -7,10 +7,17 @@
  */
 package org.dspace.builder;
 
-import org.dspace.app.suggestion.SuggestionService;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.solr.client.solrj.SolrServerException;
+import org.dspace.app.suggestion.SolrSuggestionStorageService;
+import org.dspace.app.suggestion.Suggestion;
 import org.dspace.app.suggestion.SuggestionTarget;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
@@ -19,10 +26,11 @@ import org.dspace.eperson.EPerson;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public class SuggestionTargetBuilder extends AbstractBuilder<SuggestionTarget, SuggestionService> {
+public class SuggestionTargetBuilder extends AbstractBuilder<SuggestionTarget, SolrSuggestionStorageService> {
 
     private Item item;
     private SuggestionTarget target;
+    private List<Suggestion> suggestions;
     private String source;
     private int total;
 
@@ -84,22 +92,62 @@ public class SuggestionTargetBuilder extends AbstractBuilder<SuggestionTarget, S
         target = new SuggestionTarget(item);
         target.setTotal(total);
         target.setSource(source);
-        suggestionService.addSuggestionTarget(target);
+        suggestions = generateAllSuggestion();
+        try {
+            for (Suggestion s : suggestions) {
+                solrSuggestionService.addSuggestion(s, false);
+            }
+            solrSuggestionService.commit();
+        } catch (SolrServerException | IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
         return target;
     }
 
     @Override
     public void cleanup() throws Exception {
-        suggestionService.deleteTarget(target);
+        solrSuggestionService.deleteTarget(target);
     }
 
     @Override
-    protected SuggestionService getService() {
-        return suggestionService;
+    protected SolrSuggestionStorageService getService() {
+        return solrSuggestionService;
     }
 
     @Override
     public void delete(Context c, SuggestionTarget dso) throws Exception {
-        suggestionService.deleteTarget(dso);
+        solrSuggestionService.deleteTarget(dso);
     }
+
+    private List<Suggestion> generateAllSuggestion() {
+        List<Suggestion> allSuggestions = new ArrayList<Suggestion>();
+        for (int idx = 0; idx < target.getTotal(); idx++) {
+            String idPartStr = String.valueOf(idx + 1);
+            Suggestion sug = new Suggestion(source, item, idPartStr);
+            sug.setDisplay("Suggestion " + source + " " + idPartStr);
+            MetadataValueDTO mTitle = new MetadataValueDTO();
+            mTitle.setSchema("dc");
+            mTitle.setElement("title");
+            mTitle.setValue("Title Suggestion " + idPartStr);
+
+            MetadataValueDTO mSource1 = new MetadataValueDTO();
+            mSource1.setSchema("dc");
+            mSource1.setElement("source");
+            mSource1.setValue("Source 1");
+
+            MetadataValueDTO mSource2 = new MetadataValueDTO();
+            mSource2.setSchema("dc");
+            mSource2.setElement("source");
+            mSource2.setValue("Source 2");
+
+            sug.getMetadata().add(mTitle);
+            sug.getMetadata().add(mSource1);
+            sug.getMetadata().add(mSource2);
+
+            allSuggestions.add(sug);
+        }
+        return allSuggestions;
+    }
+
 }
