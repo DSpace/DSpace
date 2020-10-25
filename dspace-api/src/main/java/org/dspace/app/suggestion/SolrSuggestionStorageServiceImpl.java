@@ -54,7 +54,7 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
             document.addField(SOURCE, suggestion.getSource());
             String suggestionFullID = suggestion.getID();
             document.addField(SUGGESTION_FULLID, suggestionFullID);
-            document.addField(SUGGESTION_ID, suggestionFullID.substring(suggestionFullID.lastIndexOf(":") + 1));
+            document.addField(SUGGESTION_ID, suggestionFullID.split(":", 3)[2]);
             document.addField(TARGET_ID, suggestion.getTarget().getID().toString());
             document.addField(DISPLAY, suggestion.getDisplay());
             document.addField(TITLE, getFirstValue(suggestion, "dc", "title", null));
