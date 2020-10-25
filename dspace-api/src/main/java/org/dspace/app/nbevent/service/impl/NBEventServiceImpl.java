@@ -305,7 +305,7 @@ public class NBEventServiceImpl implements NBEventService {
                 throw new RuntimeException();
             }
         } catch (RuntimeException | SQLException e) {
-            System.err.println("OriginalID not found");
+            log.warn("OriginalID " + originalId + " not found");
             throw e;
         }
     }

@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.nbevent.service.NBEventService;
 import org.dspace.content.NBEvent;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 
 public class NBEventsCli {
@@ -44,6 +45,8 @@ public class NBEventsCli {
     public static void main(String[] args) throws Exception {
         DSpace dspace = new DSpace();
         NBEventService nbEventService = dspace.getSingletonService(NBEventService.class);
+        ConfigurationService configurationService = dspace.getConfigurationService();
+        String[] topicsToImport = configurationService.getArrayProperty("oaire-nbevents.import.topic");
         if (nbEventService == null) {
             System.err.println("nbEventService is NULL. Error in spring configuration");
         } else {
@@ -59,7 +62,16 @@ public class NBEventsCli {
         try {
             entries = getEntriesFromFile(fileLocation);
             for (NBEvent entry : entries) {
-                nbEventService.store(context, entry);
+                if (StringUtils.equalsAny(entry.getTopic(), topicsToImport)) {
+                    try {
+                        nbEventService.store(context, entry);
+                    } catch (RuntimeException e) {
+                        System.out.println("Skip event for originalId " + entry.getOriginalId() + " item not found");
+                    }
+                } else {
+                    System.out.println(
+                            "Skip event for topic " + entry.getTopic() + " has not allowed in the oaire-nbevents.cfg");
+                }
             }
         } catch (JsonParseException | JsonMappingException e) {
             System.err.println("Unable to parse the file content.");
