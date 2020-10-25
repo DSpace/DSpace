@@ -186,7 +186,7 @@ public class SolrSuggestionProvider implements SuggestionProvider {
         solrQuery.addFilterQuery(
                 SOURCE + ":" + sourceName,
                 TARGET_ID + ":" + target.toString(),
-                SUGGESTION_ID + ":" + id,
+                SUGGESTION_ID + ":\"" + id + "\"",
                 PROCESSED + ":false");
         QueryResponse response = null;
         try {
