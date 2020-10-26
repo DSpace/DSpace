@@ -43,9 +43,12 @@ import org.junit.Rule;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
+import org.dspace.scripts.factory.ScriptServiceFactory;
+import org.dspace.scripts.service.ScriptService;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class MetadataImportTest extends AbstractIntegrationTest {
 
