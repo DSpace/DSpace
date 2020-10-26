@@ -152,8 +152,6 @@
     <bean class="org.dspace.app.orcid.service.impl.OrcidQueueServiceImpl" />
     <bean class="org.dspace.app.orcid.service.impl.OrcidHistoryServiceImpl" />
 
-    <bean class="org.dspace.layout.service.impl.InProgressSubmissionServiceImpl"/>
-
 
 </beans>
 
