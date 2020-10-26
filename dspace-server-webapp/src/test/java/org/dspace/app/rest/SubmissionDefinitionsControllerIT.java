@@ -18,10 +18,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.matcher.SubmissionDefinitionsMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
 import org.dspace.content.Collection;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -125,6 +125,7 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
 
+        context.restoreAuthSystemState();
         getClient().perform(get("/api/config/submissiondefinitions/search/findByCollection")
                                     .param("uuid", col1.getID().toString()))
                    //** THEN **
@@ -160,6 +161,7 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
                 .withName("Collection 1")
                 .build();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/config/submissiondefinitions/search/findByCollection")
                 .param("uuid", col1.getID().toString()))
@@ -204,7 +206,7 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
                    // We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
                    // Match only that a section exists with a submission configuration behind
-                   .andExpect(jsonPath("$._embedded.submissionsections", hasSize(5)))
+                   .andExpect(jsonPath("$._embedded.submissionsections", hasSize(6)))
                    .andExpect(jsonPath("$._embedded.submissionsections",
                                        Matchers.hasItem(
                                            allOf(

@@ -38,7 +38,6 @@ public class EmptyRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         //Test retrieval of all bitstreams while none exist
         getClient(token).perform(get("/api/core/bitstreams"))
-        .   andExpect(status().isOk())
-            .andExpect(jsonPath("$.page.totalElements", is(0)));
+        .   andExpect(status().isMethodNotAllowed());
     }
 }

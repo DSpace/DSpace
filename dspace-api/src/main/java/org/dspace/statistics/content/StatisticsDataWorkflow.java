@@ -65,7 +65,7 @@ public class StatisticsDataWorkflow extends StatisticsData {
 
 
     @Override
-    public Dataset createDataset(Context context)
+    public Dataset createDataset(Context context, int facetMinCount)
         throws SQLException, SolrServerException, IOException, ParseException {
         // Check if we already have one.
         // If we do then give it back.
@@ -92,16 +92,16 @@ public class StatisticsDataWorkflow extends StatisticsData {
                 DatasetTypeGenerator typeGenerator = (DatasetTypeGenerator) datasetGenerator;
                 ObjectCount[] topCounts = solrLoggerService
                     .queryFacetField(query, defaultFilterQuery, typeGenerator.getType(), typeGenerator.getMax(),
-                                     typeGenerator.isIncludeTotal(), null);
+                                     typeGenerator.isIncludeTotal(), null, facetMinCount);
 
                 //Retrieve our total field counts
                 Map<String, Long> totalFieldCounts = new HashMap<String, Long>();
                 if (averageMonths != -1) {
-                    totalFieldCounts = getTotalFacetCounts(typeGenerator);
+                    totalFieldCounts = getTotalFacetCounts(typeGenerator, facetMinCount);
                 }
                 long monthDifference = 1;
-                if (getOldestWorkflowItemDate() != null) {
-                    monthDifference = getMonthsDifference(new Date(), getOldestWorkflowItemDate());
+                if (getOldestWorkflowItemDate(facetMinCount) != null) {
+                    monthDifference = getMonthsDifference(new Date(), getOldestWorkflowItemDate(facetMinCount));
                 }
 
                 dataset = new Dataset(topCounts.length, (averageMonths != -1 ? 3 : 2));
@@ -168,10 +168,10 @@ public class StatisticsDataWorkflow extends StatisticsData {
      * @throws org.apache.solr.client.solrj.SolrServerException passed through.
      * @throws java.io.IOException passed through.
      */
-    protected Map<String, Long> getTotalFacetCounts(DatasetTypeGenerator typeGenerator)
+    protected Map<String, Long> getTotalFacetCounts(DatasetTypeGenerator typeGenerator, int facetMinCount)
             throws SolrServerException, IOException {
         ObjectCount[] objectCounts = solrLoggerService
-            .queryFacetField(getQuery(), null, typeGenerator.getType(), -1, false, null);
+            .queryFacetField(getQuery(), null, typeGenerator.getType(), -1, false, null, facetMinCount);
         Map<String, Long> result = new HashMap<>();
         for (ObjectCount objectCount : objectCounts) {
             result.put(objectCount.getValue(), objectCount.getCount());
@@ -179,14 +179,14 @@ public class StatisticsDataWorkflow extends StatisticsData {
         return result;
     }
 
-    protected Date getOldestWorkflowItemDate()
+    protected Date getOldestWorkflowItemDate(int facetMinCount)
             throws SolrServerException, IOException {
         ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         String workflowStartDate = configurationService.getProperty("usage-statistics.workflow-start-date");
         if (workflowStartDate == null) {
             //Query our solr for it !
             QueryResponse oldestRecord = solrLoggerService
-                .query(getQuery(), null, null, 1, 0, null, null, null, null, "time", true);
+                .query(getQuery(), null, null, 1, 0, null, null, null, null, "time", true, facetMinCount);
             if (0 < oldestRecord.getResults().getNumFound()) {
                 SolrDocument solrDocument = oldestRecord.getResults().get(0);
                 Date oldestDate = (Date) solrDocument.getFieldValue("time");

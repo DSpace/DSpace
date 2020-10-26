@@ -10,6 +10,7 @@ package org.dspace.app.rest;
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -28,14 +29,6 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
-import org.dspace.app.rest.builder.BitstreamBuilder;
-import org.dspace.app.rest.builder.ClaimedTaskBuilder;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.EPersonBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
-import org.dspace.app.rest.builder.WorkflowItemBuilder;
-import org.dspace.app.rest.builder.WorkspaceItemBuilder;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.matcher.WorkflowItemMatcher;
@@ -46,6 +39,14 @@ import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.RemoveOperation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.BitstreamBuilder;
+import org.dspace.builder.ClaimedTaskBuilder;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.WorkflowItemBuilder;
+import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -93,6 +94,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
      * @throws Exception
      */
     public void findAllTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         context.setCurrentUser(admin);
 
         //** GIVEN **
@@ -125,6 +127,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                       .withIssueDate("2016-02-13")
                                       .build();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
         getClient(token).perform(get("/api/workflow/workflowitems"))
@@ -216,6 +219,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
      * @throws Exception
      */
     public void findAllForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         context.setCurrentUser(admin);
 
         //** GIVEN **
@@ -249,6 +253,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                       .withIssueDate("2016-02-13")
                                       .build();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(eperson.getEmail(), password);
 
         // a normal user cannot access the workflowitems collection endpoint
@@ -815,6 +820,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
         context.setCurrentUser(submitter);
 
+        context.restoreAuthSystemState();
         // get the submitter auth token
         String authToken = getAuthToken(submitter.getEmail(), "dspace");
 
@@ -1587,6 +1593,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                                    .withSubject("ExtraEntry")
                                                    .build();
 
+        context.restoreAuthSystemState();
         String authToken = getAuthToken(admin.getEmail(), password);
 
         getClient(authToken).perform(get("/api/workflow/workflowitems/search/item")
@@ -1615,6 +1622,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                            .withWorkflowGroup(1, admin).build();
 
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/workflow/workflowitems/search/item"))
                         .andExpect(status().isBadRequest());
@@ -1645,6 +1653,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                                    .withSubject("ExtraEntry")
                                                    .build();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/workflow/workflowitems/search/item")
                                      .param("uuid", String.valueOf(item.getID())))
@@ -1705,6 +1714,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                                    .withSubject("ExtraEntry")
                                                    .build();
 
+        context.restoreAuthSystemState();
         getClient().perform(get("/api/workflow/workflowitems/search/item")
                                 .param("uuid", String.valueOf(witem.getItem().getID())))
                    .andExpect(status().isUnauthorized());
@@ -1759,6 +1769,8 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                                     .build();
 
         Step step = xmlWorkflowFactory.getStepByName("reviewstep");
+
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
         getClient(token).perform(get("/api/workflow/workflowitems/" + witem1.getID())
@@ -1788,5 +1800,62 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                             WorkflowItemMatcher.matchItemWithTitleAndDateIssued(witem3,
                                                                  "Workflow Item 3", "2016-02-13")))
                         .andExpect(jsonPath("$._embedded.step", WorkflowStepMatcher.matchWorkflowStepEntry(step)));
+    }
+
+    @Test
+    public void discoverableNestedLinkTest() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._links",Matchers.allOf(
+                                hasJsonPath("$.claimedtasks.href",
+                                         is("http://localhost/api/workflow/claimedtasks")),
+                                hasJsonPath("$.claimedtask-search.href",
+                                         is("http://localhost/api/workflow/claimedtask/search")),
+                                hasJsonPath("$.pooltasks.href",
+                                         is("http://localhost/api/workflow/pooltasks")),
+                                hasJsonPath("$.pooltask-search.href",
+                                         is("http://localhost/api/workflow/pooltask/search"))
+                        )));
+    }
+
+    @Test
+    public void findOneFullProjectionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                                           .withWorkflowGroup(1, admin).build();
+
+        //2. a workflow item
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                                                   .withTitle("Workflow Item 1")
+                                                   .withIssueDate("2017-10-17")
+                                                   .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                                   .withSubject("ExtraEntry")
+                                                   .build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(epersonToken).perform(get("/api/workflow/workflowitems/" + witem.getID())
+                                    .param("projection", "full"))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$._embedded.collection._embedded.adminGroup").doesNotExist());
+
+        getClient(adminToken).perform(get("/api/workflow/workflowitems/" + witem.getID())
+                                         .param("projection", "full"))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$._embedded.collection._embedded.adminGroup", nullValue()));
+
     }
 }

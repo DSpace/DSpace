@@ -153,7 +153,7 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
         // If the exception was thrown, unknown will == null so goahead and
         // load s. If not, check that the unknown's registry's name is not
         // being reset.
-        if (unknown == null || unknown.getID() != bitstreamFormat.getID()) {
+        if (unknown == null || !unknown.getID().equals(bitstreamFormat.getID())) {
             bitstreamFormat.setShortDescriptionInternal(shortDescription);
         }
     }
@@ -208,7 +208,7 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
         // Find "unknown" type
         BitstreamFormat unknown = findUnknown(context);
 
-        if (unknown.getID() == bitstreamFormat.getID()) {
+        if (unknown.getID().equals(bitstreamFormat.getID())) {
             throw new IllegalArgumentException("The Unknown bitstream format may not be deleted.");
         }
 

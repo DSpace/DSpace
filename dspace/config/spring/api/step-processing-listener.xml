@@ -13,9 +13,7 @@
         </property>
         <property name="dataloadersMap">
 	        <map>
-                <entry key="pubmed" value-ref="pubmedOnlineDataLoader"/>
 	            <entry key="crossref" value-ref="crossRefOnlineDataLoader"/>
-	            <entry key="arxiv" value-ref="arXivOnlineDataLoader"/>
 	            <entry key="cinii" value-ref="ciniiOnlineDataLoader"/>
 	        </map>
 	    </property>

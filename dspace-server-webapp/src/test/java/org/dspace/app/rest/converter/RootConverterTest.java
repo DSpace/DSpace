@@ -12,6 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
 import org.dspace.app.rest.model.RootRest;
+import org.dspace.app.util.Util;
 import org.dspace.services.ConfigurationService;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,9 +49,10 @@ public class RootConverterTest {
     public void testCorrectPropertiesSetFromConfigurationService() throws Exception {
         String restUrl = "rest";
         RootRest rootRest = rootConverter.convert();
-        assertEquals("dspaceurl", rootRest.getDspaceURL());
+        assertEquals("dspaceurl", rootRest.getDspaceUI());
         assertEquals("dspacename", rootRest.getDspaceName());
-        assertEquals(restUrl, rootRest.getDspaceRest());
+        assertEquals(restUrl, rootRest.getDspaceServer());
+        assertEquals(Util.getSourceVersion(), rootRest.getDspaceVersion());
     }
 
     @Test

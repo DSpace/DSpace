@@ -490,8 +490,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         // Set the item to have two pieces of metadata for dc.type and dc2.type
         String dcType = "DC-TYPE";
         String testType = "TEST-TYPE";
-        itemService.addMetadata(context, it, "dc", "type", null, null, dcType, "accepted", 0);
-        itemService.addMetadata(context, it, "test", "type", null, null, testType, "accepted", 0);
+        itemService.addMetadata(context, it, "dc", "type", null, null, dcType);
+        itemService.addMetadata(context, it, "test", "type", null, null, testType);
 
         // Check that only one is returned when we ask for all dc.type values
         List<MetadataValue> values = itemService.getMetadata(it, "dc", "type", null, null);
@@ -1598,8 +1598,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         assertThat("testGetAdminObject 0", (Item) itemService.getAdminObject(context, it, Constants.REMOVE),
                    equalTo(it));
         assertThat("testGetAdminObject 1", (Item) itemService.getAdminObject(context, it, Constants.ADD), equalTo(it));
-        assertThat("testGetAdminObject 2", (Collection) itemService.getAdminObject(context, it, Constants.DELETE),
-                   equalTo(collection));
+        assertThat("testGetAdminObject 2", (Item) itemService.getAdminObject(context, it, Constants.DELETE),
+                   equalTo(it));
         assertThat("testGetAdminObject 3", (Item) itemService.getAdminObject(context, it, Constants.ADMIN),
                    equalTo(it));
     }
