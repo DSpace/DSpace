@@ -102,7 +102,7 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
 
     public ReferCrosswalk(ConfigurationService configurationService, ItemService itemService,
         DiscoveryConfigurationService searchConfigurationService, VirtualFieldMapper virtualFieldMapper,
-        String templateFileName, String mimeType, String fileName, String valueDelimiter) {
+        String templateFileName, String mimeType, String fileName) {
         this.configurationService = configurationService;
         this.itemService = itemService;
         this.searchConfigurationService = searchConfigurationService;

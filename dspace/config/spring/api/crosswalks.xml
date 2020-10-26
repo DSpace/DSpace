@@ -8,6 +8,8 @@
 		<constructor-arg>
 			<map>
 				<entry key="bibtex" value-ref="referCrosswalkBibtex"></entry>
+				<entry key="publication-ieee-html" value-ref="referCrosswalkPublicationIeeeHtml"></entry>
+				
 				<entry key="person-xml" value-ref="referCrosswalkPersonXml"></entry>
 				<entry key="person-json" value-ref="referCrosswalkPersonJson"></entry>
 				<entry key="person-pdf" value-ref="pdfCrosswalkPerson"></entry>
@@ -64,6 +66,13 @@
 		<constructor-arg name="templateFileName" value="crosswalks/template/person-table.template"/>
 		<constructor-arg name="fileName" value="persons.xls"/>
 		<constructor-arg name="sheetName" value="Persons"/>
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.CSLItemDataCrosswalk" id="referCrosswalkPublicationIeeeHtml">
+		<constructor-arg name="style" value="ieee.csl"/>
+		<constructor-arg name="mimeType" value="text/html; charset=UTF-8"/>
+		<constructor-arg name="format" value="html"/>
+		<constructor-arg name="fileName" value="publications-ieee.html"/>
 	</bean>
 	
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldMapper">
