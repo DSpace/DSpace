@@ -22,6 +22,7 @@ import org.dspace.content.edit.EditItem;
 import org.dspace.content.edit.EditItemMode;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.EPerson;
+import org.dspace.layout.service.InProgressSubmissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -41,6 +42,8 @@ public class EditItemConverter
     private SubmissionSectionConverter submissionSectionConverter;
     @Autowired
     private EditItemModeConverter modeConverter;
+    @Autowired
+    private InProgressSubmissionService inProgressSubmissionService;
 
     public EditItemConverter() throws SubmissionConfigReaderException {
         super();
@@ -73,6 +76,7 @@ public class EditItemConverter
         submitter = obj.getSubmitter();
         EditItemMode mode = obj.getMode();
 
+        inProgressSubmissionService.add(obj);
         rest.setId(obj.getID() + ":none");
         rest.setCollection(collection != null ? converter.toRest(collection, projection) : null);
         rest.setItem(converter.toRest(item, projection));

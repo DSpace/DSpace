@@ -32,6 +32,7 @@ import org.dspace.layout.CrisLayoutField;
 import org.dspace.layout.LayoutSecurity;
 import org.dspace.layout.service.CrisLayoutBoxAccessService;
 import org.dspace.layout.service.CrisLayoutBoxService;
+import org.dspace.layout.service.InProgressSubmissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -63,6 +64,9 @@ public class ItemConverter
 
     @Autowired
     private CrisLayoutBoxAccessService crisLayoutBoxAccessService;
+
+    @Autowired
+    private InProgressSubmissionService inProgressSubmissionService;
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemConverter.class);
 
@@ -104,9 +108,12 @@ public class ItemConverter
                 MetadataField metadataField = metadataValue.getMetadataField();
                 if (checkMetadataFieldVisibility(context, boxes, obj, metadataField)) {
                     returnList.add(metadataValue);
+                } else if (inProgressSubmissionService.hasSubmissionRights(obj.getID(), metadataValue)) {
+                    returnList.add(metadataValue);
                 }
             }
-        } catch (SQLException e) {
+            inProgressSubmissionService.remove(obj.getID());
+        } catch (SQLException e ) {
             log.error("Error filtering item metadata based on permissions", e);
         }
         return new MetadataValueList(returnList);

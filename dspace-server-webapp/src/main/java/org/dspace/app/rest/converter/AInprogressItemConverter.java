@@ -25,6 +25,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
+import org.dspace.layout.service.InProgressSubmissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -54,6 +55,9 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
     @Autowired
     SubmissionService submissionService;
 
+    @Autowired
+    private InProgressSubmissionService inProgressSubmissionService;
+
     public AInprogressItemConverter() throws SubmissionConfigReaderException {
         submissionConfigReader = new SubmissionConfigReader();
     }
@@ -64,6 +68,7 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
         EPerson submitter = null;
         submitter = obj.getSubmitter();
 
+        inProgressSubmissionService.add(obj);
         witem.setId(obj.getID());
         witem.setCollection(collection != null ? converter.toRest(collection, projection) : null);
         witem.setItem(converter.toRest(item, projection));
