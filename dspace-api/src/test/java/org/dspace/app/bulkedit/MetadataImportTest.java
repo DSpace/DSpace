@@ -10,64 +10,96 @@ package org.dspace.app.bulkedit;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.sql.SQLException;
+import java.util.List;
 
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.AbstractIntegrationTest;
+import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.CollectionService;
-import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ScriptService;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class MetadataImportTest extends AbstractIntegrationTest {
+public class MetadataImportTest extends AbstractIntegrationTestWithDatabase {
 
     private final ItemService itemService
         = ContentServiceFactory.getInstance().getItemService();
-    private final CollectionService collectionService
-        = ContentServiceFactory.getInstance().getCollectionService();
-    private final CommunityService communityService
-        = ContentServiceFactory.getInstance().getCommunityService();
+    private final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    private Collection collection;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
+    @Before
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        this.collection = CollectionBuilder.createCollection(context, community).build();
+        context.restoreAuthSystemState();
+    }
+
     @Test
     public void metadataImportTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-        Community community = communityService.create(null, context);
-        Collection collection = collectionService.create(context, community);
-        context.restoreAuthSystemState();
+        String[] csv = {"id,collection,dc.title,dc.contributor.author",
+            "+," + collection.getHandle() + ",\"Test Import 1\"," + "\"Donald, SmithImported\""};
+        performImportScript(csv);
+        Item importedItem = findItemByName("Test Import 1");
 
-        String fileLocation = new File(testProps.get("test.importcsv").toString()).getAbsolutePath();
-        String[] args = new String[] {"metadata-import", "-f", fileLocation, "-e", eperson.getEmail(), "-s"};
-        TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
-
-        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
-        Item importedItem = itemService.findAll(context).next();
         assertTrue(
             StringUtils.equals(
                 itemService.getMetadata(importedItem, "dc", "contributor", "author", Item.ANY).get(0).getValue(),
                 "Donald, SmithImported"));
+
+        eperson = ePersonService.findByEmail(context, eperson.getEmail());
         assertEquals(importedItem.getSubmitter(), eperson);
 
         context.turnOffAuthorisationSystem();
         itemService.delete(context, itemService.find(context, importedItem.getID()));
-        collectionService.delete(context, collectionService.find(context, collection.getID()));
-        communityService.delete(context, communityService.find(context, community.getID()));
         context.restoreAuthSystemState();
+    }
+
+    @Test
+    public void metadataImportRemovingValueTestTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, collection).withAuthor("TestAuthorToRemove").withTitle("title")
+                               .build();
+        context.restoreAuthSystemState();
+
+        assertTrue(
+            StringUtils.equals(
+                itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).get(0).getValue(),
+                "TestAuthorToRemove"));
+
+        String[] csv = {"id,collection,dc.title,dc.contributor.author[*]",
+            item.getID().toString() + "," + collection.getHandle() + "," + item.getName() + ","};
+        performImportScript(csv);
+        item = findItemByName("title");
+        assertEquals(itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).size(), 0);
     }
 
     @Test(expected = ParseException.class)
@@ -87,6 +119,39 @@ public class MetadataImportTest extends AbstractIntegrationTest {
         if (script != null) {
             script.initialize(args, testDSpaceRunnableHandler, null);
             script.run();
+        }
+    }
+
+    private Item findItemByName(String name) throws SQLException {
+        Item importedItem = null;
+        List<Item> allItems = IteratorUtils.toList(itemService.findAll(context));
+        for (Item item : allItems) {
+            if (item.getName().equals(name)) {
+                importedItem = item;
+            }
+        }
+        return importedItem;
+    }
+
+    /**
+     * Import mocked CSVs to test item creation behavior, deleting temporary file afterward.
+     */
+    public void performImportScript(String[] csv) throws Exception {
+        File csvFile = File.createTempFile("dspace-test-import", "csv");
+        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(csvFile), "UTF-8"));
+        for (String csvLine : csv) {
+            out.write(csvLine + "\n");
+        }
+        out.flush();
+        out.close();
+        String fileLocation = csvFile.getAbsolutePath();
+        try {
+            String[] args = new String[] {"metadata-import", "-f", fileLocation, "-e", eperson.getEmail(), "-s"};
+            TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
+            ScriptLauncher
+                .handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
+        } finally {
+            csvFile.delete();
         }
     }
 }
