@@ -8,8 +8,10 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
@@ -72,7 +74,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
 
     @Test
-    public void findAllScriptsTest() throws Exception {
+    public void findAllScriptsWithAdminTest() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
 
         getClient(token).perform(get("/api/system/scripts"))
@@ -93,20 +95,23 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 ScriptMatcher.matchScript(scriptConfigurations.get(6).getName(),
                                                           scriptConfigurations.get(6).getDescription()),
                                 ScriptMatcher.matchScript(scriptConfigurations.get(7).getName(),
-                                                          scriptConfigurations.get(7).getDescription())
+                                                          scriptConfigurations.get(7).getDescription()),
+                                ScriptMatcher.matchScript(scriptConfigurations.get(8).getName(),
+                                                          scriptConfigurations.get(8).getDescription())
                         )));
 
     }
 
 
     @Test
-    public void findAllScriptsUnauthorizedTest() throws Exception {
+    public void findAllScriptsWithNoAdminTest() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
 
         getClient(token).perform(get("/api/system/scripts"))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.page",
-                                            is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 0, 0))));
+                        .andExpect(jsonPath("$._embedded.scripts", hasSize(1)))
+                        .andExpect(jsonPath("$._embedded.scripts", contains(
+                            ScriptMatcher.matchScript("item-export", "Perform the item export in the given format"))));
 
     }
 
@@ -149,7 +154,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", ScriptMatcher
                                 .matchMockScript(
-                                        scriptConfigurations.get(scriptConfigurations.size() - 3).getOptions())));
+                                        scriptConfigurations.get(scriptConfigurations.size() - 4).getOptions())));
     }
 
     @Test

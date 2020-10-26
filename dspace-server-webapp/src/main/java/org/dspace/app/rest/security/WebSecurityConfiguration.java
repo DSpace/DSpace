@@ -8,6 +8,7 @@
 package org.dspace.app.rest.security;
 
 import org.dspace.authenticate.service.AuthenticationService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
@@ -58,7 +59,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     private AuthenticationService authenticationService;
 
     @Autowired
-    private UserAgreementFilter userAgreementFilter;
+    private ConfigurationService configurationService;
 
     @Override
     public void configure(WebSecurity webSecurity) throws Exception {
@@ -129,7 +130,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                                                                ePersonRestAuthenticationProvider, requestService),
                              StatelessLoginFilter.class)
             // Add a filter to verify that the user accepted terms and conditions
-            .addFilterBefore(userAgreementFilter, LogoutFilter.class);
+            .addFilterBefore(new UserAgreementFilter(configurationService), LogoutFilter.class);
     }
 
     @Override

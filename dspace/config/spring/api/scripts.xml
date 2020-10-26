@@ -32,4 +32,15 @@
         <property name="description" value="Perform the bulk import of an excel file with a list of item to add, update or remove"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.BulkImportCli"/>
     </bean>
+
+    <bean id="item-export" class="org.dspace.content.integration.crosswalks.script.ItemExportCliScriptConfiguration">
+        <property name="description" value="Perform the item export in the given format"/>
+        <property name="dspaceRunnableClass" value="org.dspace.content.integration.crosswalks.script.ItemExportCli"/>
+    </bean>
+
+    <bean id="bulk-item-export" class="org.dspace.content.integration.crosswalks.script.BulkItemExportCliScriptConfiguration">
+        <property name="description" value="Perform the multiple items export in the given format"/>
+        <property name="dspaceRunnableClass" value="org.dspace.content.integration.crosswalks.script.BulkItemExportCli"/>
+    </bean>
+    
 </beans>

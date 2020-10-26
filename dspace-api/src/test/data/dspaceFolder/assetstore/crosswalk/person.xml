@@ -1,0 +1,94 @@
+<person>
+	<names>
+		<preferred-name>John Smith</preferred-name>
+		<full-name>John Smith</full-name>
+		<variants>
+			<variant>J.S.</variant>
+			<variant>Smith John</variant>
+		</variants>
+		<given-name>John</given-name>
+		<family-name>Smith</family-name>
+	</names>
+	<birth-date>1992-06-26</birth-date>
+	<gender>M</gender>
+	<job-title>Researcher</job-title>
+	<main-affiliation>University</main-affiliation>
+	<working-groups>
+		<working-group>First work group</working-group>
+		<working-group>Second work group</working-group>
+	</working-groups>
+	<personal-sites>
+		<personal-site>
+			<site-url>www.test.com</site-url>
+			<site-title>Test</site-title>
+		</personal-site>
+		<personal-site>
+			<site-url>www.john-smith.com</site-url>
+		</personal-site>
+		<personal-site>
+			<site-url>www.site.com</site-url>
+			<site-title>Site</site-title>
+		</personal-site>
+	</personal-sites>
+	<email>test@test.com</email>
+	<interests>
+		<interest>Science</interest>
+	</interests>
+	<identifiers>
+		<orcid>0000-0002-9079-5932</orcid>
+		<scopus-author-ids>
+		</scopus-author-ids>
+		<researcher-ids>
+		</researcher-ids>
+	</identifiers>
+	<affiliations>
+		<affiliation>
+			<name>Company</name>
+			<start-date>2018-01-01</start-date>
+			<role>Developer</role>
+		</affiliation>
+	</affiliations>
+	<biography>Biography 
+	&lt;This is my biography&gt;</biography>
+	<educations>
+		<education>
+			<name>School</name>
+			<start-date>2000-01-01</start-date>
+			<end-date>2005-01-01</end-date>
+			<role>Student</role>
+		</education>
+	</educations>
+	<country>England</country>
+	<qualifications>
+		<qualification>
+			<name>First Qualification</name>
+			<start-date>2015-01-01</start-date>
+			<end-date>2016-01-01</end-date>
+		</qualification>
+		<qualification>
+			<name>Second Qualification</name>
+			<start-date>2016-01-02</start-date>
+		</qualification>
+	</qualifications>
+	<knows-languages>
+		<language>English</language>
+		<language>Italian</language>
+	</knows-languages>
+	<publications>
+		<publication>
+			<title>First Publication</title>
+			<date-issued>2020-01-01</date-issued>
+			<authors>
+				<author>John Smith</author>
+				<author>Walter White</author>
+			</authors>
+		</publication>
+		<publication>
+			<title>Second Publication</title>
+			<date-issued>2020-04-01</date-issued>
+			<authors>
+				<author>John Smith</author>
+			</authors>
+		</publication>
+	</publications>
+</person>

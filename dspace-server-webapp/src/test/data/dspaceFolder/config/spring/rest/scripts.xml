@@ -28,9 +28,19 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataDeletion"/>
     </bean>
     
-    <bean id="bulk-import" class="org.dspace.app.bulkedit.BulkImportScriptConfiguration">
+    <bean id="bulk-import" class="org.dspace.app.bulkedit.BulkImportScriptConfiguration" primary="true">
         <property name="description" value="Perform the bulk import of an excel file with a list of item to add, update or remove"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.BulkImport"/>
+    </bean>
+    
+    <bean id="item-export" class="org.dspace.content.integration.crosswalks.script.ItemExportScriptConfiguration" primary="true">
+        <property name="description" value="Perform the item export in the given format"/>
+        <property name="dspaceRunnableClass" value="org.dspace.content.integration.crosswalks.script.ItemExport"/>
+    </bean>
+    
+    <bean id="bulk-item-export" class="org.dspace.content.integration.crosswalks.script.BulkItemExportScriptConfiguration" primary="true">
+        <property name="description" value="Perform the multiple items export in the given format"/>
+        <property name="dspaceRunnableClass" value="org.dspace.content.integration.crosswalks.script.BulkItemExport"/>
     </bean>
 
 </beans>

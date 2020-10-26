@@ -8,9 +8,12 @@
 package org.dspace.layout.service.impl;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.dspace.authorize.AuthorizeException;
@@ -18,13 +21,14 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.CrisLayoutTab;
-import org.dspace.layout.CrisLayoutTab2Box;
 import org.dspace.layout.dao.CrisLayoutTabDAO;
+import org.dspace.layout.service.CrisLayoutBoxAccessService;
 import org.dspace.layout.service.CrisLayoutBoxService;
+import org.dspace.layout.service.CrisLayoutTabAccessService;
 import org.dspace.layout.service.CrisLayoutTabService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -32,7 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Implementation of service to manage Tabs component of layout
  *
  * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
- *
  */
 public class CrisLayoutTabServiceImpl implements CrisLayoutTabService {
 
@@ -47,6 +50,28 @@ public class CrisLayoutTabServiceImpl implements CrisLayoutTabService {
 
     @Autowired
     private CrisLayoutBoxService boxService;
+
+    @Autowired
+    private  CrisLayoutBoxAccessService crisLayoutBoxAccessService;
+
+    @Autowired
+    private CrisLayoutTabAccessService crisLayoutTabAccessService;
+
+    //constructor with all fields injected, used for test purposes (mock injection)
+    public CrisLayoutTabServiceImpl(CrisLayoutTabDAO dao, AuthorizeService authorizeService,
+                                    ItemService itemService, CrisLayoutBoxService boxService,
+                                    CrisLayoutBoxAccessService crisLayoutBoxAccessService,
+                                    CrisLayoutTabAccessService crisLayoutTabAccessService) {
+        this.dao = dao;
+        this.authorizeService = authorizeService;
+        this.itemService = itemService;
+        this.boxService = boxService;
+        this.crisLayoutBoxAccessService = crisLayoutBoxAccessService;
+        this.crisLayoutTabAccessService = crisLayoutTabAccessService;
+    }
+
+    public CrisLayoutTabServiceImpl() {
+    }
 
     @Override
     public CrisLayoutTab create(Context c, CrisLayoutTab tab) throws SQLException, AuthorizeException {
@@ -169,30 +194,49 @@ public class CrisLayoutTabServiceImpl implements CrisLayoutTabService {
      */
     @Override
     public List<CrisLayoutTab> findByItem(Context context, String itemUuid) throws SQLException {
-        Item item = itemService.find(context, UUID.fromString(itemUuid));
-        String entityType = "";
-        if (item != null) {
-            entityType = itemService.getMetadata(item, "relationship.type");
-        }
+        Item item = Objects.requireNonNull(itemService.find(context, UUID.fromString(itemUuid)),
+                                           "The itemUuid entered does not match with any item");
+
+        String entityType  = itemService.getMetadata(item, "relationship.type");
+
         List<CrisLayoutTab> tabs = dao.findByEntityType(context, entityType);
-        List<CrisLayoutTab> resTabs = new ArrayList<>();
-        if (tabs != null && !tabs.isEmpty()) {
-            List<MetadataValue> itemMetadata = item.getMetadata();
-            if (itemMetadata != null && !itemMetadata.isEmpty() ) {
-                for (CrisLayoutTab tab: tabs) {
-                    List<CrisLayoutTab2Box> tab2box = tab.getTab2Box();
-                    if (tab2box != null && !tab2box.isEmpty()) {
-                        for (CrisLayoutTab2Box t2b: tab2box) {
-                            if (boxService.hasContent(context, t2b.getBox(), itemMetadata)) {
-                                resTabs.add(tab);
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
+        if (CollectionUtils.isEmpty(tabs) || CollectionUtils.isEmpty(item.getMetadata())) {
+            return Collections.emptyList();
         }
-        return resTabs;
+
+        return tabs.stream()
+                   .filter(t -> CollectionUtils.isNotEmpty(t.getTab2Box()))
+                   .filter(t -> tabGrantedAccess(context, t, item))
+                   .filter(t -> hasABoxToDisplay(context, t, item))
+                   .collect(Collectors.toList());
+    }
+
+    private boolean hasABoxToDisplay(Context context, CrisLayoutTab tab,
+                                     Item item) {
+        Predicate<CrisLayoutBox> isGranted = box -> boxGrantedAccess(context, item, box);
+        Predicate<CrisLayoutBox> hasContent = box -> boxService.hasContent(context, box, item.getMetadata());
+        return tab.getTab2Box().stream()
+                  .map(t2b -> t2b.getBox())
+                  .anyMatch(isGranted.and(hasContent));
+    }
+
+    private boolean boxGrantedAccess(Context context, Item item, CrisLayoutBox box) {
+        try {
+            return crisLayoutBoxAccessService.hasAccess(context,
+                                                        context.getCurrentUser(), box,
+                                                        item);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    private boolean tabGrantedAccess(Context context, CrisLayoutTab tab, Item item) {
+        try {
+            return crisLayoutTabAccessService.hasAccess(context, context.getCurrentUser(),
+                                                        tab, item);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
 }
