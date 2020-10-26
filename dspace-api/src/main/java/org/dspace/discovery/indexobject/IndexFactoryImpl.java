@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -56,7 +57,7 @@ public abstract class IndexFactoryImpl<T extends IndexableObject, S> implements 
         doc.addField(SearchUtils.RESOURCE_ID_FIELD, indexableObject.getID().toString());
 
         //Do any additional indexing, depends on the plugins
-        for (SolrServiceIndexPlugin solrServiceIndexPlugin : solrServiceIndexPlugins) {
+        for (SolrServiceIndexPlugin solrServiceIndexPlugin : ListUtils.emptyIfNull(solrServiceIndexPlugins)) {
             solrServiceIndexPlugin.additionalIndex(context, indexableObject, doc);
         }
 

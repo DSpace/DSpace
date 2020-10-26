@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.MetadataSchemaEnum;
@@ -291,7 +292,7 @@ public class DCInput {
      *
      * @return the input type
      */
-    public String getInputType() {
+    public @Nullable String getInputType() {
         return inputType;
     }
 

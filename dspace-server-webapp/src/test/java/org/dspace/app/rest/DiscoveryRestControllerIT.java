@@ -25,15 +25,6 @@ import java.util.UUID;
 import com.jayway.jsonpath.matchers.JsonPathMatchers;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
-import org.dspace.app.rest.builder.BitstreamBuilder;
-import org.dspace.app.rest.builder.ClaimedTaskBuilder;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.EPersonBuilder;
-import org.dspace.app.rest.builder.GroupBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
-import org.dspace.app.rest.builder.WorkflowItemBuilder;
-import org.dspace.app.rest.builder.WorkspaceItemBuilder;
 import org.dspace.app.rest.matcher.AppliedFilterMatcher;
 import org.dspace.app.rest.matcher.FacetEntryMatcher;
 import org.dspace.app.rest.matcher.FacetValueMatcher;
@@ -45,6 +36,15 @@ import org.dspace.app.rest.matcher.SortOptionMatcher;
 import org.dspace.app.rest.matcher.WorkflowItemMatcher;
 import org.dspace.app.rest.matcher.WorkspaceItemMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.BitstreamBuilder;
+import org.dspace.builder.ClaimedTaskBuilder;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.GroupBuilder;
+import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.WorkflowItemBuilder;
+import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -95,11 +95,11 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //We have 4 facets in the default configuration, they need to all be present in the embedded section
                 .andExpect(jsonPath("$._embedded.facets", containsInAnyOrder(
                         FacetEntryMatcher.authorFacet(false),
-                       FacetEntryMatcher.entityTypeFacet(false),
+                        FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.dateIssuedFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false)))
-                );
+        );
     }
 
     @Test
@@ -141,6 +141,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("AnotherTest").withSubject("TestingForMore")
                 .withSubject("ExtraEntry")
                 .build();
+
+        context.restoreAuthSystemState();
 
         //** WHEN **
         //An anonymous user browses this endpoint to find the objects in the system and enters a size of 2
@@ -211,6 +213,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test")
                 .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
                 .build();
+
+        context.restoreAuthSystemState();
 
         //** WHEN **
         //An anonymous user browses this endpoint to find the objects in the system and enters a size of 2
@@ -283,6 +287,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("AnotherTest").withSubject("TestingForMore")
                 .withSubject("ExtraEntry")
                 .build();
+
+        context.restoreAuthSystemState();
 
         //** WHEN **
         //An anonymous user browses this endpoint to find the authors by the facets and doesn't enter a size
@@ -357,6 +363,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("ExtraEntry")
                 .build();
 
+        context.restoreAuthSystemState();
+
         //** WHEN **
         //An anonymous user browses this endpoint to find the authors by the facet
         //The user enters a size of two and wants to see page 1, this is the second page.
@@ -429,6 +437,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("AnotherTest").withSubject("TestingForMore")
                 .withSubject("ExtraEntry")
                 .build();
+
+        context.restoreAuthSystemState();
+
         //** WHEN **
         //An anonymous user browses this endpoint to find the authors by the facet
         //The user enters a small query, namely the title has to contain 'test'
@@ -510,6 +521,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("AnotherTest").withSubject("TestingForMore")
                 .withSubject("ExtraEntry")
                 .build();
+
+        context.restoreAuthSystemState();
+
         //** WHEN **
         //An anonymous user browses this endpoint to find the dateIssued results by the facet
         getClient().perform(get("/api/discover/facets/dateIssued"))
@@ -577,6 +591,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("AnotherTest").withSubject("TestingForMore")
                 .withSubject("ExtraEntry")
                 .build();
+
+        context.restoreAuthSystemState();
 
         //** WHEN **
         //An anonymous user browses this endpoint to find the author results by the facet
@@ -710,6 +726,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("ExtraEntry")
                 .build();
 
+        context.restoreAuthSystemState();
+
         //** WHEN **
         //An anonymous user browses this endpoint to find the dateIssued results by the facet
         //And a size of 2
@@ -785,6 +803,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("AnotherTest").withSubject("TestingForMore")
                 .withSubject("ExtraEntry")
                 .build();
+
+        context.restoreAuthSystemState();
+
         //** WHEN **
         //An anonymous user browses this endpoint to find the dateIssued results by the facet
         //With a query stating that the title needs to contain 'test'
@@ -904,6 +925,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("ExtraEntry")
                 .build();
 
+        context.restoreAuthSystemState();
+
         //** WHEN **
         //An anonymous user browses this endpoint to find the objects in the system
         getClient().perform(get("/api/discover/search/objects"))
@@ -985,6 +1008,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("AnotherTest").withSubject("TestingForMore")
                 .withSubject("ExtraEntry")
                 .build();
+
+        context.restoreAuthSystemState();
 
         //** WHEN **
         //An anonymous user browses this endpoint to find the objects in the system
@@ -1076,6 +1101,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("ExtraEntry")
                 .build();
 
+        context.restoreAuthSystemState();
+
         //** WHEN **
         //An anonymous user browses this endpoint to find the the objects in the system
         getClient().perform(get("/api/discover/search/objects"))
@@ -1154,6 +1181,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test")
                 .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
                 .build();
+
+        context.restoreAuthSystemState();
 
         //** WHEN **
         //An anonymous user browses this endpoint to find the the objects in the system
@@ -1235,6 +1264,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("AnotherTest").withSubject("TestingForMore")
                 .withSubject("ExtraEntry")
                 .build();
+
+        context.restoreAuthSystemState();
+
         //** WHEN **
         //An anonymous user browses this endpoint to find the the objects in the system
         //With a scope 'test'
@@ -1317,9 +1349,12 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("ExtraEntry")
                 .build();
 
-        //** WHEN **
-        //An anonymous user browses this endpoint to find the the objects in the system
-        //With a dsoType 'item'
+        context.restoreAuthSystemState();
+
+        // ** WHEN **
+        // An anonymous user browses this endpoint to find the the objects in the system
+
+        // With dsoType 'item'
         getClient().perform(get("/api/discover/search/objects")
                 .param("dsoType", "Item"))
 
@@ -1350,8 +1385,118 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
                 )))
                 //There always needs to be a self link available
-                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
-        ;
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
+
+        // With dsoTypes 'community' and 'collection'
+        getClient().perform(get("/api/discover/search/objects")
+                .param("dsoType", "Community")
+                .param("dsoType", "Collection"))
+
+                //** THEN **
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //The type has to be 'discover'
+                .andExpect(jsonPath("$.type", is("discover")))
+                // The page element needs to look like this and only have four totalElements because we only want
+                // the communities and the collections (dsoType) and we only created two of both types
+                .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 4)
+                )))
+                // Only the two communities and the two collections can be present in the embedded.objects section
+                // as that's what we specified in the dsoType parameter
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                        SearchResultMatcher.match("core", "community", "communities"),
+                        SearchResultMatcher.match("core", "community", "communities"),
+                        SearchResultMatcher.match("core", "collection", "collections"),
+                        SearchResultMatcher.match("core", "collection", "collections")
+                )))
+                //These facets have to show up in the embedded.facets section as well with the given hasMore
+                // property because we don't exceed their default limit for a hasMore true (the default is 10)
+                .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.authorFacet(false),
+                        FacetEntryMatcher.entityTypeFacet(false),
+                        FacetEntryMatcher.subjectFacet(false),
+                        FacetEntryMatcher.dateIssuedFacet(false),
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                )))
+                //There always needs to be a self link available
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
+
+        // With dsoTypes 'collection' and 'item'
+        getClient().perform(get("/api/discover/search/objects")
+                .param("dsoType", "Collection")
+                .param("dsoType", "Item"))
+
+                //** THEN **
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //The type has to be 'discover'
+                .andExpect(jsonPath("$.type", is("discover")))
+                // The page element needs to look like this and only have five totalElements because we only want
+                // the collections and the items (dsoType) and we only created two collections and three items
+                .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 5)
+                )))
+                // Only the two collections and the three items can be present in the embedded.objects section
+                // as that's what we specified in the dsoType parameter
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                        SearchResultMatcher.match("core", "collection", "collections"),
+                        SearchResultMatcher.match("core", "collection", "collections"),
+                        SearchResultMatcher.match("core", "item", "items"),
+                        SearchResultMatcher.match("core", "item", "items"),
+                        SearchResultMatcher.match("core", "item", "items")
+                )))
+                //These facets have to show up in the embedded.facets section as well with the given hasMore
+                // property because we don't exceed their default limit for a hasMore true (the default is 10)
+                .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.authorFacet(false),
+                        FacetEntryMatcher.entityTypeFacet(false),
+                        FacetEntryMatcher.subjectFacet(false),
+                        FacetEntryMatcher.dateIssuedFacet(false),
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                )))
+                //There always needs to be a self link available
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
+
+        // With dsoTypes 'community', 'collection' and 'item'
+        getClient().perform(get("/api/discover/search/objects")
+                .param("dsoType", "Community")
+                .param("dsoType", "Collection")
+                .param("dsoType", "Item"))
+
+                //** THEN **
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //The type has to be 'discover'
+                .andExpect(jsonPath("$.type", is("discover")))
+                // The page element needs to look like this and have seven totalElements because we want
+                // the communities, the collections and the items (dsoType) and we created two communities,
+                // two collections and three items
+                .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 7)
+                )))
+                // The two communities, the two collections and the three items can be present in the embedded.objects
+                // section as that's what we specified in the dsoType parameter
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                        SearchResultMatcher.match("core", "community", "communities"),
+                        SearchResultMatcher.match("core", "community", "communities"),
+                        SearchResultMatcher.match("core", "collection", "collections"),
+                        SearchResultMatcher.match("core", "collection", "collections"),
+                        SearchResultMatcher.match("core", "item", "items"),
+                        SearchResultMatcher.match("core", "item", "items"),
+                        SearchResultMatcher.match("core", "item", "items")
+                )))
+                //These facets have to show up in the embedded.facets section as well with the given hasMore
+                // property because we don't exceed their default limit for a hasMore true (the default is 10)
+                .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.authorFacet(false),
+                        FacetEntryMatcher.entityTypeFacet(false),
+                        FacetEntryMatcher.subjectFacet(false),
+                        FacetEntryMatcher.dateIssuedFacet(false),
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                )))
+                //There always needs to be a self link available
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
     }
 
     @Test
@@ -1392,6 +1537,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("AnotherTest").withSubject("TestingForMore")
                 .withSubject("ExtraEntry")
                 .build();
+
+        context.restoreAuthSystemState();
 
         //** WHEN **
         //An anonymous user browses this endpoint to find the the objects in the system
@@ -1537,6 +1684,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("ExtraEntry")
                 .build();
 
+        context.restoreAuthSystemState();
+
         //** WHEN **
         //An anonymous user browses this endpoint to find dateIssued facet values
         getClient().perform(get("/api/discover/facets/dateIssued"))
@@ -1610,6 +1759,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("d").withSubject("e").withSubject("f").withSubject("g")
                 .withSubject("h").withSubject("i").withSubject("j")
                 .build();
+
+        context.restoreAuthSystemState();
 
         //** WHEN **
         //An anonymous user browses this endpoint to find the the objects in the system
@@ -1701,6 +1852,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         //Run the filter media to make the text in the bitstream searchable through the query
         runDSpaceScript("filter-media", "-f", "-i", publicItem1.getHandle());
+
+        context.restoreAuthSystemState();
 
         //** WHEN **
         //An anonymous user browses this endpoint to find the the objects in the system
@@ -1947,6 +2100,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("ExtraEntry")
                 .build();
 
+        context.restoreAuthSystemState();
+
         UUID scope = col2.getID();
         //** WHEN **
         //An anonymous user browses this endpoint to find the the objects in the system
@@ -2023,6 +2178,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("ExtraEntry")
                 .makeUnDiscoverable()
                 .build();
+
+        context.restoreAuthSystemState();
 
         UUID scope = col2.getID();
         //** WHEN **
@@ -2104,6 +2261,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("AnotherTest").withSubject("ExtraEntry")
                 .build();
 
+        context.restoreAuthSystemState();
 
         String query = "Public";
         //** WHEN **
@@ -2181,6 +2339,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .makeUnDiscoverable()
                 .build();
 
+        context.restoreAuthSystemState();
 
         String query = "Public";
         //** WHEN **
@@ -2247,6 +2406,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
                 .withSubject("AnotherTest").withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
+
+        context.restoreAuthSystemState();
 
         UUID scope = col2.getID();
         //** WHEN **
@@ -2320,6 +2481,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
                 .withSubject("AnotherTest").withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
+
+        context.restoreAuthSystemState();
 
         UUID scope = col2.getID();
         //** WHEN **
@@ -2399,6 +2562,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("d").withSubject("e").withSubject("f").withSubject("g")
                 .withSubject("h").withSubject("i").withSubject("j")
                 .build();
+
+        context.restoreAuthSystemState();
 
         //** WHEN **
         //An anonymous user browses this endpoint to find the the objects in the system
@@ -2483,6 +2648,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("h").withSubject("i").withSubject("j")
                 .build();
 
+        context.restoreAuthSystemState();
+
         //** WHEN **
         //An anonymous user browses this endpoint to find the the objects in the system
         //With a size 2
@@ -2542,6 +2709,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
                 .withSubject("AnotherTest").withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
+
+        context.restoreAuthSystemState();
 
         UUID scope = col2.getID();
         //** WHEN **
@@ -2615,6 +2784,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("AnotherTest").withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
+        context.restoreAuthSystemState();
+
         UUID scope = col2.getID();
         //** WHEN **
         //An anonymous user browses this endpoint to find the the objects in the system
@@ -2687,6 +2858,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
                 .withSubject("AnotherTest").withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
+
+        context.restoreAuthSystemState();
 
         UUID scope = col2.getID();
         //** WHEN **
@@ -2773,6 +2946,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         //Run the filter media to make the text in the bitstream searchable through the query
         runDSpaceScript("filter-media", "-f", "-i", publicItem1.getHandle());
 
+        context.restoreAuthSystemState();
+
         //** WHEN **
         getClient().perform(get("/api/discover/search/objects")
                                 .param("query", "dc.date.issued:\"2010-02-13\""))
@@ -2855,6 +3030,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                                       .withSubject("AnotherTest").withSubject("TestingForMore")
                                       .withSubject("ExtraEntry")
                                       .build();
+
+        context.restoreAuthSystemState();
+
         //** WHEN **
         getClient().perform(get("/api/discover/search/objects")
                                 .param("query", "((dc.date.issued:2010 OR dc.date.issued:1990-02-13)" +
@@ -2923,6 +3101,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                                       .withSubject("AnotherTest").withSubject("TestingForMore")
                                       .withSubject("ExtraEntry")
                                       .build();
+
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/discover/search/objects")
                                 .param("query", "\"Faithful Infidel: Exploring Conformity (2nd edition)\""))
 
@@ -2990,6 +3171,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                                       .withSubject("AnotherTest").withSubject("TestingForMore")
                                       .withSubject("ExtraEntry")
                                       .build();
+
+        context.restoreAuthSystemState();
+
         //** WHEN **
         getClient().perform(get("/api/discover/search/objects")
                                 .param("query", "OR"))
@@ -3077,6 +3261,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         XmlWorkflowItem wfItem1Admin = WorkflowItemBuilder.createWorkflowItem(context, col2)
                 .withTitle("Admin Workflow Item 1").build();
+
+        context.restoreAuthSystemState();
 
         //** WHEN **
         // An anonymous user, the submitter and the admin that browse this endpoint to find the public objects in the
@@ -3866,6 +4052,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                                       .makeUnDiscoverable()
                                       .build();
 
+        context.restoreAuthSystemState();
 
         String query = "Test";
         //** WHEN **

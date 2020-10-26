@@ -47,16 +47,17 @@ import org.apache.log4j.Logger;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
-import org.dspace.app.rest.model.AuthorityRest;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.LinksRest;
 import org.dspace.app.rest.model.ProcessRest;
+import org.dspace.app.rest.model.PropertyRest;
 import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.VersionHistoryRest;
+import org.dspace.app.rest.model.VocabularyRest;
 import org.dspace.app.rest.model.hateoas.EmbeddedPage;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.projection.CompositeProjection;
@@ -86,6 +87,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -252,7 +254,7 @@ public class Utils {
             return CommunityRest.NAME;
         }
         if (modelPlural.equals("authorities")) {
-            return AuthorityRest.NAME;
+            return VocabularyRest.NAME;
         }
         if (modelPlural.equals("resourcepolicies")) {
             return ResourcePolicyRest.NAME;
@@ -262,6 +264,12 @@ public class Utils {
         }
         if (StringUtils.equals(modelPlural, "versionhistories")) {
             return VersionHistoryRest.NAME;
+        }
+        if (StringUtils.equals(modelPlural, "properties")) {
+            return PropertyRest.NAME;
+        }
+        if (StringUtils.equals(modelPlural, "vocabularies")) {
+            return VocabularyRest.NAME;
         }
         return modelPlural.replaceAll("s$", "");
     }
@@ -518,7 +526,7 @@ public class Utils {
      * {@link CompositeProjection} and applied in order as described there.
      * </p><p>
      * In addition, any number of embeds may be specified by rel name via the {@code embed} parameter.
-     * When provided, these act as a whitelist of embeds that may be included in the response, as described
+     * When provided, these act as an "allow list" of embeds that may be included in the response, as described
      * and implemented by {@link EmbedRelsProjection}.
      * </p>
      *
@@ -668,7 +676,13 @@ public class Utils {
                 Object linkedObject = method.invoke(linkRepository, null, contentId, null, projection);
                 resource.embedResource(rel, wrapForEmbedding(resource, linkedObject, link, oldLinks));
             } catch (InvocationTargetException e) {
-                if (e.getTargetException() instanceof RuntimeException) {
+                // This will be thrown from the LinkRepository if a Resource has been requested that'll try to embed
+                // something that we don't have READ rights to. It'll then throw an AccessDeniedException from that
+                // linkRepository and we want to catch it here since we don't want our entire request to fail if a
+                // subresource of the requested resource is not available to be embedded. Instead we'll log it here
+                if (e.getTargetException() instanceof AccessDeniedException) {
+                    log.warn("Tried fetching resource: " + linkRest.name() + " for DSpaceObject with ID: " + contentId);
+                } else if (e.getTargetException() instanceof RuntimeException) {
                     throw (RuntimeException) e.getTargetException();
                 } else {
                     throw new RuntimeException(e);
