@@ -46,6 +46,11 @@ public class AbstractBuilderCleanupUtil {
      * Constructor that will initialize the Map with a predefined order for deletion
      */
     public AbstractBuilderCleanupUtil() {
+        initMap();
+
+    }
+
+    private void initMap() {
         map.put(RelationshipBuilder.class.getName(), new LinkedList<>());
         map.put(RelationshipTypeBuilder.class.getName(), new LinkedList<>());
         map.put(EntityTypeBuilder.class.getName(), new LinkedList<>());
@@ -64,7 +69,6 @@ public class AbstractBuilderCleanupUtil {
         map.put(MetadataSchemaBuilder.class.getName(), new LinkedList<>());
         map.put(SiteBuilder.class.getName(), new LinkedList<>());
         map.put(ProcessBuilder.class.getName(), new LinkedList<>());
-
     }
 
     /**
@@ -89,5 +93,13 @@ public class AbstractBuilderCleanupUtil {
                 abstractBuilder.cleanup();
             }
         }
+    }
+
+    /**
+     * Clears and re-initialises the map of builders
+     */
+    public void cleanupMap() {
+        this.map.clear();
+        initMap();
     }
 }
