@@ -10,6 +10,7 @@ package org.dspace.app.rest;
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
@@ -132,7 +133,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                hasJsonPath("$._links.self.href", not(empty())),
                                hasJsonPath("$.metadata", Matchers.allOf(
                                        matchMetadata("eperson.firstname", "John"),
-                                       matchMetadata("eperson.lastname", "Doe")
+                                       matchMetadata("eperson.lastname", "Doe"),
+                                       matchMetadataDoesNotExist("dc.identifier.uri")
                                )))))
                             .andDo(result -> idRef
                                     .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
