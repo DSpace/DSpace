@@ -55,6 +55,8 @@ import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.Event;
 import org.dspace.harvest.HarvestedCollection;
 import org.dspace.harvest.service.HarvestedCollectionService;
+import org.dspace.identifier.IdentifierException;
+import org.dspace.identifier.service.IdentifierService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
@@ -92,6 +94,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     protected CommunityService communityService;
     @Autowired(required = true)
     protected GroupService groupService;
+    @Autowired(required = true)
+    protected IdentifierService identifierService;
 
     @Autowired(required = true)
     protected LicenseService licenseService;
@@ -131,11 +135,15 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         //Add our newly created collection to our community, authorization checks occur in THIS method
         communityService.addCollection(context, community, newCollection);
 
-        //Update our community so we have a collection identifier
-        if (handle == null) {
-            handleService.createHandle(context, newCollection);
-        } else {
-            handleService.createHandle(context, newCollection, handle);
+        //Update our collection so we have a collection identifier
+        try {
+            if (handle == null) {
+                identifierService.register(context, newCollection);
+            } else {
+                identifierService.register(context, newCollection, handle);
+            }
+        } catch (IdentifierException e) {
+            throw new RuntimeException("Can't create an Identifier!");
         }
 
         // create the default authorization policy for collections

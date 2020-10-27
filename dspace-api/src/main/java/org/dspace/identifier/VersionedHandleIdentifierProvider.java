@@ -17,10 +17,14 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
@@ -67,6 +71,9 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
     @Autowired(required = true)
     private ItemService itemService;
 
+    @Autowired(required = true)
+    protected ContentServiceFactory contentServiceFactory;
+
     @Override
     public boolean supports(Class<? extends Identifier> identifier) {
         return Handle.class.isAssignableFrom(identifier);
@@ -110,6 +117,9 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
             if (dso instanceof Item) {
                 populateHandleMetadata(context, (Item) dso, id);
             }
+            if (dso instanceof Collection || dso instanceof Community) {
+                populateNotVersionedHandleMetadata(context, dso, id);
+            }
         } catch (Exception e) {
             log.error(LogManager.getHeader(context, "Error while attempting to create handle",
                                            "Item id: " + (dso != null ? dso.getID() : "")), e);
@@ -122,6 +132,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
     @Override
     public void register(Context context, DSpaceObject dso, String identifier)
         throws IdentifierException {
+        // FIXME are Collections and Communities to be handled here?
         if (dso instanceof Item && identifier != null) {
             Item item = (Item) dso;
 
@@ -443,5 +454,28 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
                                     "identifier", "uri", null, handleref);
         }
         itemService.update(context, item);
+    }
+
+    protected void populateNotVersionedHandleMetadata(Context context, DSpaceObject dso, String handle)
+            throws SQLException, IOException, AuthorizeException {
+        String handleref = handleService.getCanonicalForm(handle);
+
+        DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
+
+        // Add handle as identifier.uri DC value.
+        // First check that identifier doesn't already exist.
+        boolean identifierExists = false;
+        // List<MetadataValue> identifiers = dsoObjectService
+        List<MetadataValue> identifiers = dsoService
+                .getMetadata(dso, MetadataSchemaEnum.DC.getName(), "identifier", "uri", Item.ANY);
+        for (MetadataValue identifier : identifiers) {
+            if (handleref.equals(identifier.getValue())) {
+                identifierExists = true;
+            }
+        }
+        if (!identifierExists) {
+            dsoService.addMetadata(context, dso, MetadataSchemaEnum.DC.getName(),
+                    "identifier", "uri", null, handleref);
+        }
     }
 }

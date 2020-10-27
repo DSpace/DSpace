@@ -37,6 +37,8 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.event.Event;
+import org.dspace.identifier.IdentifierException;
+import org.dspace.identifier.service.IdentifierService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -69,6 +71,8 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     protected BitstreamService bitstreamService;
     @Autowired(required = true)
     protected SiteService siteService;
+    @Autowired(required = true)
+    protected IdentifierService identifierService;
 
     protected CommunityServiceImpl() {
         super();
@@ -92,13 +96,12 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
         try {
             if (handle == null) {
-                handleService.createHandle(context, newCommunity);
+                identifierService.register(context, newCommunity);
             } else {
-                handleService.createHandle(context, newCommunity, handle);
+                identifierService.register(context, newCommunity, handle);
             }
-        } catch (IllegalStateException ie) {
-            //If an IllegalStateException is thrown, then an existing object is already using this handle
-            throw ie;
+        } catch (IdentifierException e) {
+            throw new RuntimeException("Can't create an Identifier!");
         }
 
         if (parent != null) {
