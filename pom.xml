@@ -36,8 +36,8 @@
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <jaxb-runtime.version>2.3.1</jaxb-runtime.version>
         <!-- NOTE: Jetty needed for Handle Server & tests -->
-        <jetty.version>9.4.15.v20190215</jetty.version>
-        <log4j.version>2.11.2</log4j.version>
+        <jetty.version>9.4.17.v20190418</jetty.version>
+        <log4j.version>2.13.3</log4j.version>
         <pdfbox-version>2.0.15</pdfbox-version>
         <poi-version>3.17</poi-version>
         <slf4j.version>1.7.25</slf4j.version>
@@ -1269,6 +1269,21 @@
                 <groupId>net.cnri</groupId>
                 <artifactId>cnri-servlet-container</artifactId>
                 <version>3.0.0</version>
+                <exclusions>
+                    <!-- A later version of Jetty is pulled in below -->
+                    <exclusion>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-http</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-io</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-util</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <!-- Jetty is needed to run Handle Server (and tests in some modules) -->
             <dependency>
