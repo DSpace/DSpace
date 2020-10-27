@@ -75,6 +75,7 @@ public class MetadataConverter implements DSpaceConverter<MetadataValueList, Met
 
     /**
      * Sets a DSpace object's domain metadata values from a rest representation.
+     * Any existing metadata values are deleted or overwritten.
      *
      * @param context the context to use.
      * @param dso the DSpace object.
@@ -84,8 +85,31 @@ public class MetadataConverter implements DSpaceConverter<MetadataValueList, Met
      */
     public void setMetadata(Context context, DSpaceObject dso, MetadataRest metadataRest)
             throws SQLException, AuthorizeException {
-        DSpaceObjectService dsoService = contentServiceFactory.getDSpaceObjectService(dso);
-        dsoService.clearMetadata(context, dso, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        addMetadataImpl(context, dso, metadataRest, true);
+    }
+
+    /**
+     * Sets a DSpace object's domain metadata values from a rest representation.
+     * Any existing metadata values are preserved.
+     *
+     * @param context the context to use.
+     * @param dso the DSpace object.
+     * @param metadataRest the rest representation of the new metadata.
+     * @throws SQLException if a database error occurs.
+     * @throws AuthorizeException if an authorization error occurs.
+     */
+    public <T extends DSpaceObject> void addMetadata(Context context, T dso, MetadataRest metadataRest)
+            throws SQLException, AuthorizeException {
+        addMetadataImpl(context, dso, metadataRest, false);
+    }
+
+    public <T extends DSpaceObject> void addMetadataImpl(Context context, T dso, MetadataRest metadataRest,
+            boolean clearMetadata)
+            throws SQLException, AuthorizeException {
+        DSpaceObjectService<T> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
+        if (clearMetadata) {
+            dsoService.clearMetadata(context, dso, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        }
         for (Map.Entry<String, List<MetadataValueRest>> entry: metadataRest.getMap().entrySet()) {
             String[] seq = entry.getKey().split("\\.");
             String schema = seq[0];
@@ -98,4 +122,5 @@ public class MetadataConverter implements DSpaceConverter<MetadataValueList, Met
         }
         dsoService.update(context, dso);
     }
+
 }
