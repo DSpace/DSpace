@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import de.undercouch.citeproc.ListItemDataProvider;
 import de.undercouch.citeproc.csl.CSLItemData;
@@ -130,13 +131,9 @@ public class DSpaceListItemDataProvider extends ListItemDataProvider {
     public void processItem(Item item) {
         itemBuilder.id(String.valueOf(item.getID()));
 
-        try {
-            handleStringFields(item);
-            handleCslNameFields(item);
-            handleCslDateFields(item);
-        } catch (ParseException e) {
-            throw new RuntimeException("An error occurs parsing the configured metadata", e);
-        }
+        handleStringFields(item);
+        handleCslNameFields(item);
+        handleCslDateFields(item);
 
         CSLItemData cslItemData = itemBuilder.build();
         this.items.put(cslItemData.getId(), cslItemData);
@@ -148,345 +145,125 @@ public class DSpaceListItemDataProvider extends ListItemDataProvider {
         }
     }
 
-    protected CSLItemDataBuilder handleStringFields(Item item)
-        throws ParseException {
-        if (StringUtils.isNotBlank(type)) {
-            CSLType cslType = CSLTypeMap.get(getMetadataFirstValueFromItem(item, type));
-            itemBuilder.type(cslType);
-        }
+    protected CSLItemDataBuilder handleStringFields(Item item) {
 
-        if (StringUtils.isNotBlank(categories)) {
-            itemBuilder.categories(getMetadataValuesFromItem(item, categories));
-        }
+        consumeMetadataIfNotBlank(type, item, value -> itemBuilder.type(CSLTypeMap.get(value)));
+        consumeIfNotBlank(categories, value -> itemBuilder.categories(getMetadataValues(item, value)));
+        consumeMetadataIfNotBlank(language, item, value -> itemBuilder.language(value));
+        consumeMetadataIfNotBlank(journalAbbreviation, item, value -> itemBuilder.journalAbbreviation(value));
+        consumeMetadataIfNotBlank(shortTitle, item, value -> itemBuilder.shortTitle(value));
+        consumeMetadataIfNotBlank(abstrct, item, value -> itemBuilder.abstrct(value));
+        consumeMetadataIfNotBlank(annote, item, value -> itemBuilder.annote(value));
+        consumeMetadataIfNotBlank(archive, item, value -> itemBuilder.archive(value));
+        consumeMetadataIfNotBlank(archiveLocation, item, value -> itemBuilder.archiveLocation(value));
+        consumeMetadataIfNotBlank(archivePlace, item, value -> itemBuilder.archivePlace(value));
+        consumeMetadataIfNotBlank(authority, item, value -> itemBuilder.authority(value));
+        consumeMetadataIfNotBlank(callNumber, item, value -> itemBuilder.callNumber(value));
+        consumeMetadataIfNotBlank(chapterNumber, item, value -> itemBuilder.chapterNumber(value));
+        consumeMetadataIfNotBlank(citationNumber, item, value -> itemBuilder.citationNumber(value));
+        consumeMetadataIfNotBlank(citationLabel, item, value -> itemBuilder.citationLabel(value));
+        consumeMetadataIfNotBlank(collectionNumber, item, value -> itemBuilder.collectionNumber(value));
+        consumeMetadataIfNotBlank(collectionTitle, item, value -> itemBuilder.collectionTitle(value));
+        consumeMetadataIfNotBlank(containerTitle, item, value -> itemBuilder.containerTitle(value));
+        consumeMetadataIfNotBlank(containerTitleShort, item, value -> itemBuilder.containerTitleShort(value));
+        consumeMetadataIfNotBlank(dimensions, item, value -> itemBuilder.dimensions(value));
+        consumeMetadataIfNotBlank(DOI, item, value -> itemBuilder.DOI(value));
+        consumeMetadataIfNotBlank(edition, item, value -> itemBuilder.edition(value));
+        consumeMetadataIfNotBlank(event, item, value -> itemBuilder.event(value));
+        consumeMetadataIfNotBlank(eventPlace, item, value -> itemBuilder.eventPlace(value));
+        consumeMetadataIfNotBlank(firstReferenceNoteNumber, item, value -> itemBuilder.firstReferenceNoteNumber(value));
+        consumeMetadataIfNotBlank(genre, item, value -> itemBuilder.genre(value));
+        consumeMetadataIfNotBlank(ISBN, item, value -> itemBuilder.ISBN(value));
+        consumeMetadataIfNotBlank(ISSN, item, value -> itemBuilder.ISSN(value));
+        consumeMetadataIfNotBlank(issue, item, value -> itemBuilder.issue(value));
+        consumeMetadataIfNotBlank(jurisdiction, item, value -> itemBuilder.jurisdiction(value));
+        consumeMetadataIfNotBlank(keyword, item, value -> itemBuilder.keyword(value));
+        consumeMetadataIfNotBlank(locator, item, value -> itemBuilder.locator(value));
+        consumeMetadataIfNotBlank(medium, item, value -> itemBuilder.medium(value));
+        consumeMetadataIfNotBlank(note, item, value -> itemBuilder.note(value));
+        consumeMetadataIfNotBlank(number, item, value -> itemBuilder.number(value));
+        consumeMetadataIfNotBlank(numberOfPages, item, value -> itemBuilder.numberOfPages(value));
+        consumeMetadataIfNotBlank(numberOfVolumes, item, value -> itemBuilder.numberOfVolumes(value));
+        consumeMetadataIfNotBlank(originalPublisher, item, value -> itemBuilder.originalPublisher(value));
+        consumeMetadataIfNotBlank(originalPublisherPlace, item, value -> itemBuilder.originalPublisherPlace(value));
+        consumeMetadataIfNotBlank(originalTitle, item, value -> itemBuilder.originalTitle(value));
+        consumeMetadataIfNotBlank(page, item, value -> itemBuilder.page(value));
+        consumeMetadataIfNotBlank(pageFirst, item, value -> itemBuilder.pageFirst(value));
+        consumeMetadataIfNotBlank(PMCID, item, value -> itemBuilder.PMCID(value));
+        consumeMetadataIfNotBlank(PMID, item, value -> itemBuilder.PMID(value));
+        consumeMetadataIfNotBlank(publisher, item, value -> itemBuilder.publisher(value));
+        consumeMetadataIfNotBlank(publisherPlace, item, value -> itemBuilder.publisherPlace(value));
+        consumeMetadataIfNotBlank(references, item, value -> itemBuilder.references(value));
+        consumeMetadataIfNotBlank(reviewedTitle, item, value -> itemBuilder.reviewedTitle(value));
+        consumeMetadataIfNotBlank(scale, item, value -> itemBuilder.scale(value));
+        consumeMetadataIfNotBlank(section, item, value -> itemBuilder.section(value));
+        consumeMetadataIfNotBlank(source, item, value -> itemBuilder.source(value));
+        consumeMetadataIfNotBlank(status, item, value -> itemBuilder.status(value));
+        consumeMetadataIfNotBlank(title, item, value -> itemBuilder.title(value));
+        consumeMetadataIfNotBlank(titleShort, item, value -> itemBuilder.titleShort(value));
+        consumeMetadataIfNotBlank(URL, item, value -> itemBuilder.URL(value));
+        consumeMetadataIfNotBlank(version, item, value -> itemBuilder.version(value));
+        consumeMetadataIfNotBlank(volume, item, value -> itemBuilder.volume(value));
+        consumeMetadataIfNotBlank(yearSuffix, item, value -> itemBuilder.yearSuffix(value));
 
-        if (StringUtils.isNotBlank(language)) {
-            String metadataFirstValueFromItem = getMetadataFirstValueFromItem(item, language);
-            itemBuilder.language(metadataFirstValueFromItem);
-        }
-
-        if (StringUtils.isNotBlank(journalAbbreviation)) {
-            itemBuilder.journalAbbreviation(getMetadataFirstValueFromItem(item, journalAbbreviation));
-        }
-
-        if (StringUtils.isNotBlank(shortTitle)) {
-            itemBuilder.shortTitle(getMetadataFirstValueFromItem(item, shortTitle));
-        }
-
-        if (StringUtils.isNotBlank(abstrct)) {
-            itemBuilder.abstrct(getMetadataFirstValueFromItem(item, abstrct));
-        }
-
-        if (StringUtils.isNotBlank(annote)) {
-            itemBuilder.annote(getMetadataFirstValueFromItem(item, annote));
-        }
-
-        if (StringUtils.isNotBlank(archive)) {
-            itemBuilder.archive(getMetadataFirstValueFromItem(item, archive));
-        }
-
-        if (StringUtils.isNotBlank(archiveLocation)) {
-            itemBuilder.archiveLocation(getMetadataFirstValueFromItem(item, archiveLocation));
-        }
-
-        if (StringUtils.isNotBlank(archivePlace)) {
-            itemBuilder.archivePlace(getMetadataFirstValueFromItem(item, archivePlace));
-        }
-
-        if (StringUtils.isNotBlank(authority)) {
-            itemBuilder.authority(getMetadataFirstValueFromItem(item, authority));
-        }
-
-        if (StringUtils.isNotBlank(callNumber)) {
-            itemBuilder.callNumber(getMetadataFirstValueFromItem(item, callNumber));
-        }
-
-        if (StringUtils.isNotBlank(chapterNumber)) {
-            itemBuilder.chapterNumber(getMetadataFirstValueFromItem(item, chapterNumber));
-        }
-
-        if (StringUtils.isNotBlank(citationNumber)) {
-            itemBuilder.citationNumber(getMetadataFirstValueFromItem(item, citationNumber));
-        }
-
-        if (StringUtils.isNotBlank(citationLabel)) {
-            itemBuilder.citationLabel(getMetadataFirstValueFromItem(item, citationLabel));
-        }
-
-        if (StringUtils.isNotBlank(collectionNumber)) {
-            itemBuilder.collectionNumber(getMetadataFirstValueFromItem(item, collectionNumber));
-        }
-
-        if (StringUtils.isNotBlank(collectionTitle)) {
-            itemBuilder.collectionTitle(getMetadataFirstValueFromItem(item, collectionTitle));
-        }
-
-        if (StringUtils.isNotBlank(containerTitle)) {
-            itemBuilder.containerTitle(getMetadataFirstValueFromItem(item, containerTitle));
-        }
-
-        if (StringUtils.isNotBlank(containerTitleShort)) {
-            itemBuilder.containerTitleShort(getMetadataFirstValueFromItem(item, containerTitleShort));
-        }
-
-        if (StringUtils.isNotBlank(dimensions)) {
-            itemBuilder.dimensions(getMetadataFirstValueFromItem(item, dimensions));
-        }
-
-        if (StringUtils.isNotBlank(DOI)) {
-            itemBuilder.DOI(getMetadataFirstValueFromItem(item, DOI));
-        }
-
-        if (StringUtils.isNotBlank(edition)) {
-            itemBuilder.edition(getMetadataFirstValueFromItem(item, edition));
-        }
-
-        if (StringUtils.isNotBlank(event)) {
-            itemBuilder.event(getMetadataFirstValueFromItem(item, event));
-        }
-
-        if (StringUtils.isNotBlank(eventPlace)) {
-            itemBuilder.eventPlace(getMetadataFirstValueFromItem(item, eventPlace));
-        }
-
-        if (StringUtils.isNotBlank(firstReferenceNoteNumber)) {
-            itemBuilder.firstReferenceNoteNumber(getMetadataFirstValueFromItem(item, firstReferenceNoteNumber));
-        }
-
-        if (StringUtils.isNotBlank(genre)) {
-            itemBuilder.genre(getMetadataFirstValueFromItem(item, genre));
-        }
-
-        if (StringUtils.isNotBlank(ISBN)) {
-            itemBuilder.ISBN(getMetadataFirstValueFromItem(item, ISBN));
-        }
-
-        if (StringUtils.isNotBlank(ISSN)) {
-            itemBuilder.ISSN(getMetadataFirstValueFromItem(item, ISSN));
-        }
-
-        if (StringUtils.isNotBlank(issue)) {
-            itemBuilder.issue(getMetadataFirstValueFromItem(item, issue));
-        }
-
-        if (StringUtils.isNotBlank(jurisdiction)) {
-            itemBuilder.jurisdiction(getMetadataFirstValueFromItem(item, jurisdiction));
-        }
-
-        if (StringUtils.isNotBlank(keyword)) {
-            itemBuilder.keyword(getMetadataFirstValueFromItem(item, keyword));
-        }
-
-        if (StringUtils.isNotBlank(locator)) {
-            itemBuilder.locator(getMetadataFirstValueFromItem(item, locator));
-        }
-
-        if (StringUtils.isNotBlank(medium)) {
-            itemBuilder.medium(getMetadataFirstValueFromItem(item, medium));
-        }
-
-        if (StringUtils.isNotBlank(note)) {
-            itemBuilder.note(getMetadataFirstValueFromItem(item, note));
-        }
-
-        if (StringUtils.isNotBlank(number)) {
-            itemBuilder.number(getMetadataFirstValueFromItem(item, number));
-        }
-
-        if (StringUtils.isNotBlank(numberOfPages)) {
-            itemBuilder.numberOfPages(getMetadataFirstValueFromItem(item, numberOfPages));
-        }
-
-        if (StringUtils.isNotBlank(numberOfVolumes)) {
-            itemBuilder.numberOfVolumes(getMetadataFirstValueFromItem(item, numberOfVolumes));
-        }
-
-        if (StringUtils.isNotBlank(originalPublisher)) {
-            itemBuilder.originalPublisher(getMetadataFirstValueFromItem(item, originalPublisher));
-        }
-
-        if (StringUtils.isNotBlank(originalPublisherPlace)) {
-            itemBuilder.originalPublisherPlace(getMetadataFirstValueFromItem(item, originalPublisherPlace));
-        }
-
-        if (StringUtils.isNotBlank(originalTitle)) {
-            itemBuilder.originalTitle(getMetadataFirstValueFromItem(item, originalTitle));
-        }
-
-        if (StringUtils.isNotBlank(page)) {
-            itemBuilder.page(getMetadataFirstValueFromItem(item, page));
-        }
-
-        if (StringUtils.isNotBlank(pageFirst)) {
-            itemBuilder.pageFirst(getMetadataFirstValueFromItem(item, pageFirst));
-        }
-
-        if (StringUtils.isNotBlank(PMCID)) {
-            itemBuilder.PMCID(getMetadataFirstValueFromItem(item, PMCID));
-        }
-
-        if (StringUtils.isNotBlank(PMID)) {
-            itemBuilder.PMID(getMetadataFirstValueFromItem(item, PMID));
-        }
-
-        if (StringUtils.isNotBlank(publisher)) {
-            itemBuilder.publisher(getMetadataFirstValueFromItem(item, publisher));
-        }
-
-        if (StringUtils.isNotBlank(publisherPlace)) {
-            itemBuilder.publisherPlace(getMetadataFirstValueFromItem(item, publisherPlace));
-        }
-
-        if (StringUtils.isNotBlank(references)) {
-            itemBuilder.references(getMetadataFirstValueFromItem(item, references));
-        }
-
-        if (StringUtils.isNotBlank(reviewedTitle)) {
-            itemBuilder.reviewedTitle(getMetadataFirstValueFromItem(item, reviewedTitle));
-        }
-
-        if (StringUtils.isNotBlank(scale)) {
-            itemBuilder.scale(getMetadataFirstValueFromItem(item, scale));
-        }
-
-        if (StringUtils.isNotBlank(section)) {
-            itemBuilder.section(getMetadataFirstValueFromItem(item, section));
-        }
-
-        if (StringUtils.isNotBlank(source)) {
-            itemBuilder.source(getMetadataFirstValueFromItem(item, source));
-        }
-
-        if (StringUtils.isNotBlank(status)) {
-            itemBuilder.status(getMetadataFirstValueFromItem(item, status));
-        }
-
-        if (StringUtils.isNotBlank(title)) {
-            itemBuilder.title(getMetadataFirstValueFromItem(item, title));
-        }
-
-        if (StringUtils.isNotBlank(titleShort)) {
-            itemBuilder.titleShort(getMetadataFirstValueFromItem(item, titleShort));
-        }
-
-        if (StringUtils.isNotBlank(URL)) {
-            itemBuilder.URL(getMetadataFirstValueFromItem(item, URL));
-        }
-
-        if (StringUtils.isNotBlank(version)) {
-            itemBuilder.version(getMetadataFirstValueFromItem(item, version));
-        }
-
-        if (StringUtils.isNotBlank(volume)) {
-            itemBuilder.volume(getMetadataFirstValueFromItem(item, volume));
-        }
-
-        if (StringUtils.isNotBlank(yearSuffix)) {
-            itemBuilder.yearSuffix(getMetadataFirstValueFromItem(item, yearSuffix));
-        }
         return itemBuilder;
     }
 
-    protected CSLItemDataBuilder handleCslNameFields(Item item) throws ParseException {
-        if (StringUtils.isNotBlank(author)) {
-            itemBuilder.author(getCslNameFromMetadataValueFromItem(item, author));
-        }
-        if (StringUtils.isNotBlank(collectionEditor)) {
-            itemBuilder.collectionEditor(getCslNameFromMetadataValueFromItem(item, collectionEditor));
-        }
-        if (StringUtils.isNotBlank(composer)) {
-            itemBuilder.composer(getCslNameFromMetadataValueFromItem(item, composer));
-        }
-        if (StringUtils.isNotBlank(containerAuthor)) {
-            itemBuilder.containerAuthor(getCslNameFromMetadataValueFromItem(item, containerAuthor));
-        }
-        if (StringUtils.isNotBlank(director)) {
-            itemBuilder.director(getCslNameFromMetadataValueFromItem(item, director));
-        }
-        if (StringUtils.isNotBlank(editor)) {
-            itemBuilder.editor(getCslNameFromMetadataValueFromItem(item, editor));
-        }
-        if (StringUtils.isNotBlank(editorialDirector)) {
-            itemBuilder.editorialDirector(getCslNameFromMetadataValueFromItem(item, editorialDirector));
-        }
-        if (StringUtils.isNotBlank(interviewer)) {
-            itemBuilder.interviewer(getCslNameFromMetadataValueFromItem(item, interviewer));
-        }
-        if (StringUtils.isNotBlank(illustrator)) {
-            itemBuilder.illustrator(getCslNameFromMetadataValueFromItem(item, illustrator));
-        }
-        if (StringUtils.isNotBlank(originalAuthor)) {
-            itemBuilder.originalAuthor(getCslNameFromMetadataValueFromItem(item, originalAuthor));
-        }
-        if (StringUtils.isNotBlank(recipient)) {
-            itemBuilder.recipient(getCslNameFromMetadataValueFromItem(item, recipient));
-        }
-        if (StringUtils.isNotBlank(reviewedAuthor)) {
-            itemBuilder.reviewedAuthor(getCslNameFromMetadataValueFromItem(item, reviewedAuthor));
-        }
-        if (StringUtils.isNotBlank(translator)) {
-            itemBuilder.translator(getCslNameFromMetadataValueFromItem(item, translator));
-        }
+    protected CSLItemDataBuilder handleCslNameFields(Item item) {
+
+        consumeCSLNamesIfNotBlank(author, item, names -> itemBuilder.author(names));
+        consumeCSLNamesIfNotBlank(collectionEditor, item, names -> itemBuilder.collectionEditor(names));
+        consumeCSLNamesIfNotBlank(composer, item, names -> itemBuilder.composer(names));
+        consumeCSLNamesIfNotBlank(containerAuthor, item, names -> itemBuilder.containerAuthor(names));
+        consumeCSLNamesIfNotBlank(director, item, names -> itemBuilder.director(names));
+        consumeCSLNamesIfNotBlank(editor, item, names -> itemBuilder.editor(names));
+        consumeCSLNamesIfNotBlank(editorialDirector, item, names -> itemBuilder.editorialDirector(names));
+        consumeCSLNamesIfNotBlank(interviewer, item, names -> itemBuilder.interviewer(names));
+        consumeCSLNamesIfNotBlank(illustrator, item, names -> itemBuilder.illustrator(names));
+        consumeCSLNamesIfNotBlank(originalAuthor, item, names -> itemBuilder.originalAuthor(names));
+        consumeCSLNamesIfNotBlank(recipient, item, names -> itemBuilder.recipient(names));
+        consumeCSLNamesIfNotBlank(reviewedAuthor, item, names -> itemBuilder.reviewedAuthor(names));
+        consumeCSLNamesIfNotBlank(translator, item, names -> itemBuilder.translator(names));
+
         return itemBuilder;
     }
 
-    protected CSLItemDataBuilder handleCslDateFields(Item item) throws ParseException {
-        if (StringUtils.isNotBlank(accessed)) {
-            DCDate dcDate = getDCDateFromMetadataValueFromItem(item, accessed);
-            if (dcDate.toDate() != null) {
-                itemBuilder.accessed(dcDate.getYear(), dcDate.getMonth(), dcDate.getDay());
-            }
-        }
+    protected CSLItemDataBuilder handleCslDateFields(Item item) {
 
-        if (StringUtils.isNotBlank(container)) {
-            DCDate dcDate = getDCDateFromMetadataValueFromItem(item, container);
-            if (dcDate.toDate() != null) {
-                itemBuilder.container(dcDate.getYear(), dcDate.getMonth(), dcDate.getDay());
-            }
-        }
+        consumeDateIfNotBlank(accessed, item,
+            dcDate -> itemBuilder.accessed(dcDate.getYear(), dcDate.getMonth(), dcDate.getDay()));
 
-        if (StringUtils.isNotBlank(eventDate)) {
-            DCDate dcDate = getDCDateFromMetadataValueFromItem(item, eventDate);
-            if (dcDate.toDate() != null) {
-                itemBuilder.eventDate(dcDate.getYear(), dcDate.getMonth(), dcDate.getDay());
-            }
-        }
+        consumeDateIfNotBlank(container, item,
+            dcDate -> itemBuilder.container(dcDate.getYear(), dcDate.getMonth(), dcDate.getDay()));
 
-        if (StringUtils.isNotBlank(issued)) {
-            DCDate dcDate = getDCDateFromMetadataValueFromItem(item, issued);
-            if (dcDate.toDate() != null) {
-                itemBuilder.issued(dcDate.getYear(), dcDate.getMonth(), dcDate.getDay());
-            }
-        }
+        consumeDateIfNotBlank(eventDate, item,
+            dcDate -> itemBuilder.eventDate(dcDate.getYear(), dcDate.getMonth(), dcDate.getDay()));
 
-        if (StringUtils.isNotBlank(originalDate)) {
-            DCDate dcDate = getDCDateFromMetadataValueFromItem(item, originalDate);
-            if (dcDate.toDate() != null) {
-                itemBuilder.originalDate(dcDate.getYear(), dcDate.getMonth(), dcDate.getDay());
-            }
-        }
+        consumeDateIfNotBlank(issued, item,
+            dcDate -> itemBuilder.issued(dcDate.getYear(), dcDate.getMonth(), dcDate.getDay()));
 
-        if (StringUtils.isNotBlank(submitted)) {
-            DCDate dcDate = getDCDateFromMetadataValueFromItem(item, submitted);
-            if (dcDate.toDate() != null) {
-                itemBuilder.submitted(dcDate.getYear(), dcDate.getMonth(), dcDate.getDay());
-            }
-        }
+        consumeDateIfNotBlank(originalDate, item,
+            dcDate -> itemBuilder.originalDate(dcDate.getYear(), dcDate.getMonth(), dcDate.getDay()));
+
+        consumeDateIfNotBlank(submitted, item,
+            dcDate -> itemBuilder.submitted(dcDate.getYear(), dcDate.getMonth(), dcDate.getDay()));
+
         return itemBuilder;
     }
 
-    protected DCDate getDCDateFromMetadataValueFromItem(Item item, String metadataField) throws ParseException {
-        String[] mdf = parseCompoundForm(metadataField);
+    protected DCDate getDCDateFromMetadataValue(Item item, String metadataField) {
+        String[] mdf = parseMetadataField(metadataField);
         return new DCDate(itemService.getMetadataFirstValue(item, mdf[0], mdf[1], mdf.length > 2 ? mdf[2] : null, ANY));
     }
 
-    protected String getMetadataFirstValueFromItem(Item item, String metadataField) throws ParseException {
-        String[] mdf = parseCompoundForm(metadataField);
+    protected String getMetadataFirstValue(Item item, String metadataField) {
+        String[] mdf = parseMetadataField(metadataField);
         return itemService.getMetadataFirstValue(item, mdf[0], mdf[1], mdf.length > 2 ? mdf[2] : null, Item.ANY);
     }
 
-    protected CSLName[] getCslNameFromMetadataValueFromItem(Item item, String metadataField) throws ParseException {
+    protected CSLName[] getCslNameFromMetadataValue(Item item, String metadataField) {
 
-        String[] mdf = parseCompoundForm(metadataField);
+        String[] mdf = parseMetadataField(metadataField);
         List<MetadataValue> list = itemService.getMetadata(item, mdf[0], mdf[1], mdf.length > 2 ? mdf[2] : null, ANY);
         List<CSLName> cslNames = new LinkedList<>();
         for (MetadataValue mdv : list) {
@@ -500,9 +277,9 @@ public class DSpaceListItemDataProvider extends ListItemDataProvider {
         return cslNames.toArray(new CSLName[0]);
     }
 
-    protected String[] getMetadataValuesFromItem(Item item, String metadataField) throws ParseException {
+    protected String[] getMetadataValues(Item item, String metadataField) {
 
-        String[] mdf = parseCompoundForm(metadataField);
+        String[] mdf = parseMetadataField(metadataField);
 
         List<MetadataValue> list = itemService.getMetadata(item, mdf[0], mdf[1], mdf.length > 2 ? mdf[2] : null, ANY);
         List<String> metadataValueList = new LinkedList<>();
@@ -510,6 +287,41 @@ public class DSpaceListItemDataProvider extends ListItemDataProvider {
             metadataValueList.add(metadataValue.getValue());
         }
         return metadataValueList.toArray(new String[metadataValueList.size()]);
+    }
+
+    private String[] parseMetadataField(String metadataField) {
+        try {
+            return parseCompoundForm(metadataField);
+        } catch (ParseException e) {
+            throw new RuntimeException("An error occurs parsing the metadata '" + metadataField + "'", e);
+        }
+    }
+
+    private void consumeIfNotBlank(String value, Consumer<String> consumer) {
+        if (StringUtils.isNotBlank(value)) {
+            consumer.accept(value);
+        }
+    }
+
+    private void consumeMetadataIfNotBlank(String value, Item item, Consumer<String> consumer) {
+        if (StringUtils.isNotBlank(value)) {
+            consumer.accept(getMetadataFirstValue(item, value));
+        }
+    }
+
+    private void consumeCSLNamesIfNotBlank(String value, Item item, Consumer<CSLName[]> consumer) {
+        if (StringUtils.isNotBlank(value)) {
+            consumer.accept(getCslNameFromMetadataValue(item, value));
+        }
+    }
+
+    private void consumeDateIfNotBlank(String value, Item item, Consumer<DCDate> consumer) {
+        if (StringUtils.isNotBlank(value)) {
+            DCDate dcDate = getDCDateFromMetadataValue(item, value);
+            if (dcDate.toDate() != null) {
+                consumer.accept(dcDate);
+            }
+        }
     }
 
     public String getId() {
