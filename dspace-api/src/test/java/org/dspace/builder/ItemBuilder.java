@@ -251,8 +251,32 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "crisrp", "qualification", "end", endDate);
     }
 
-    public ItemBuilder withPersonKnowsLanguages(String lanugage) {
-        return addMetadataValue(item, "person", "knowsLanguage", null, lanugage);
+    public ItemBuilder withPersonKnowsLanguages(String languages) {
+        return addMetadataValue(item, "person", "knowsLanguage", null, languages);
+    }
+
+    public ItemBuilder withRelationProject(String project, String authority) {
+        return addMetadataValue(item, DC.getName(), "relation", "project", null, project, authority, 600);
+    }
+
+    public ItemBuilder withInternalId(String internalId) {
+        return addMetadataValue(item, "oairecerif", "internalid", null, internalId);
+    }
+
+    public ItemBuilder withAcronym(String acronym) {
+        return addMetadataValue(item, "oairecerif", "acronym", null, acronym);
+    }
+
+    public ItemBuilder withProjectStartDate(String startDate) {
+        return addMetadataValue(item, "oairecerif", "project", "startDate", startDate);
+    }
+
+    public ItemBuilder withProjectEndDate(String endDate) {
+        return addMetadataValue(item, "oairecerif", "project", "endDate", endDate);
+    }
+
+    public ItemBuilder withType(String type) {
+        return addMetadataValue(item, "dc", "type", null, type);
     }
 
     public ItemBuilder makeUnDiscoverable() {

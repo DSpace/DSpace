@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
@@ -46,6 +48,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.CrisConstants;
 import org.dspace.services.ConfigurationService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Abstract class that implements {@StreamDisseminationCrosswalk} that provided common logic to
@@ -58,29 +61,32 @@ public abstract class TabularCrosswalk implements StreamDisseminationCrosswalk, 
 
     private static Logger log = Logger.getLogger(TabularCrosswalk.class);
 
-    protected final ConfigurationService configurationService;
+    @Autowired
+    protected ConfigurationService configurationService;
 
-    protected final ItemService itemService;
+    @Autowired
+    protected ItemService itemService;
 
-    protected final String templateFileName;
+    @Autowired
+    protected VirtualFieldMapper virtualFieldMapper;
 
-    protected final VirtualFieldMapper virtualFieldMapper;
 
     protected DCInputsReader dcInputsReader;
 
     protected SubmissionConfigReader submissionConfigReader;
 
-    protected final String fileName;
+
+    protected String fileName;
+
+    protected String templateFileName;
+
+    private String entityType;
+
 
     protected List<TabularTemplateLine> templateLines;
 
-    public TabularCrosswalk(ItemService itemService, ConfigurationService configurationService, String templateFileName,
-        VirtualFieldMapper virtualFieldMapper, String fileName) {
-        this.itemService = itemService;
-        this.configurationService = configurationService;
-        this.templateFileName = templateFileName;
-        this.virtualFieldMapper = virtualFieldMapper;
-        this.fileName = fileName;
+
+    public TabularCrosswalk() {
 
         try {
             this.dcInputsReader = new DCInputsReader();
@@ -153,6 +159,10 @@ public abstract class TabularCrosswalk implements StreamDisseminationCrosswalk, 
 
         while (dsoIterator.hasNext()) {
             DSpaceObject dso = dsoIterator.next();
+            if (!canDisseminate(context, dso)) {
+                throw new CrosswalkObjectNotSupported(
+                    "Can only crosswalk an Item with the configured type: " + entityType);
+            }
             rows.add(getRow(context, dso));
         }
 
@@ -161,7 +171,7 @@ public abstract class TabularCrosswalk implements StreamDisseminationCrosswalk, 
 
     @Override
     public boolean canDisseminate(Context context, DSpaceObject dso) {
-        return dso.getType() == Constants.ITEM;
+        return dso.getType() == Constants.ITEM && hasExpectedEntityType((Item) dso);
     }
 
     @Override
@@ -291,5 +301,26 @@ public abstract class TabularCrosswalk implements StreamDisseminationCrosswalk, 
 
     private int getMetadataGroupSize(Item item, String metadataGroupFieldName) {
         return itemService.getMetadataByMetadataString(item, metadataGroupFieldName).size();
+    }
+
+    private boolean hasExpectedEntityType(Item item) {
+        String relationshipType = itemService.getMetadataFirstValue(item, "relationship", "type", null, Item.ANY);
+        return Objects.equals(relationshipType, entityType);
+    }
+
+    public void setTemplateFileName(String templateFileName) {
+        this.templateFileName = templateFileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public void setEntityType(String entityType) {
+        this.entityType = entityType;
+    }
+
+    public Optional<String> getEntityType() {
+        return Optional.ofNullable(entityType);
     }
 }

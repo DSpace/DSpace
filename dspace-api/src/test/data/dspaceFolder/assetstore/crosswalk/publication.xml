@@ -1,0 +1,63 @@
+<Publication id="mock-id">
+   	<Title>Test Publication</Title>
+   	<PublishedIn>
+    	<Publication>
+      	</Publication>
+   	</PublishedIn>
+   	<Publishers>
+   		<Publisher>
+   			<OrgUnit>
+     		</OrgUnit>
+   		</Publisher>
+   	</Publishers>
+   	<PublicationDate>2020-01-01</PublicationDate>
+   	<Authors>
+      	<Author>
+        	<DisplayName>John Smith</DisplayName>
+         	<Affiliation>
+         		<OrgUnit>
+         		</OrgUnit>
+         	</Affiliation>
+      	</Author>
+      	<Author>
+        	<DisplayName>Walter White</DisplayName>
+         	<Affiliation>
+         		<OrgUnit>
+         		</OrgUnit>
+         	</Affiliation>
+      	</Author>
+	</Authors>
+   	<Editors>
+	</Editors>
+   	<OriginatesFrom>
+      	<Project>
+			<Acronym>TP</Acronym>
+         	<Title>Test Project</Title>
+         	<StartDate>2020-01-01</StartDate>
+         	<EndDate>2020-04-01</EndDate>
+         	<Funded>
+				<By>
+					<OrgUnit>
+					</OrgUnit>
+				</By>
+				<As>
+					<Funding id="mock-id">
+						<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">
+							https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#InternalFunding
+						</Type>
+						<Name>Test Funding</Name>
+					</Funding>
+				</As>
+			</Funded>
+      	</Project>
+	</OriginatesFrom>
+	<OutputFrom>
+		<Event>
+		</Event>
+	</OutputFrom>
+	<References>
+		<Product>
+		</Product>
+	</References>
+</Publication>
+

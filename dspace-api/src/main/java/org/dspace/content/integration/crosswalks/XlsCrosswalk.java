@@ -16,9 +16,6 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldMapper;
-import org.dspace.content.service.ItemService;
-import org.dspace.services.ConfigurationService;
 
 /**
  * Implementation of {@StreamDisseminationCrosswalk} to produce a xls file starting from a template.
@@ -28,13 +25,7 @@ import org.dspace.services.ConfigurationService;
  */
 public class XlsCrosswalk extends TabularCrosswalk {
 
-    private final String sheetName;
-
-    public XlsCrosswalk(ItemService itemService, ConfigurationService configurationService, String templateFileName,
-        VirtualFieldMapper virtualFieldMapper, String fileName, String sheetName) {
-        super(itemService, configurationService, templateFileName, virtualFieldMapper, fileName);
-        this.sheetName = sheetName;
-    }
+    private String sheetName;
 
     @Override
     public String getMIMEType() {
@@ -92,6 +83,10 @@ public class XlsCrosswalk extends TabularCrosswalk {
 
     protected String escapeValue(String value) {
         return value;
+    }
+
+    public void setSheetName(String sheetName) {
+        this.sheetName = sheetName;
     }
 
 }

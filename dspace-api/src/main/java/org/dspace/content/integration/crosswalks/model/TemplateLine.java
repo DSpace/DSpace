@@ -7,7 +7,10 @@
  */
 package org.dspace.content.integration.crosswalks.model;
 
+import static java.lang.String.join;
 import static org.apache.commons.lang3.ArrayUtils.isNotEmpty;
+
+import java.util.Arrays;
 
 import org.dspace.content.integration.crosswalks.ReferCrosswalk;
 
@@ -23,6 +26,8 @@ public final class TemplateLine {
 
     private static final String VIRTUAL_FIELD = "virtual";
 
+    private static final String IF_GROUP_FIELD = "if";
+
     private static final String METADATA_GROUP_FIELD = "group";
 
     private static final String RELATION_GROUP_FIELD = "relation";
@@ -30,6 +35,7 @@ public final class TemplateLine {
     private static final String GROUP_START_FIELD = "start";
 
     private static final String GROUP_END_FIELD = "end";
+
 
     private final String beforeField;
 
@@ -87,6 +93,7 @@ public final class TemplateLine {
         return ITEM_TEMPLATE_FIELD.equals(field);
     }
 
+
     public boolean isMetadataGroupStartField() {
         return isMetadataGroupField() && GROUP_START_FIELD.equals(fieldBits[2]);
     }
@@ -99,17 +106,33 @@ public final class TemplateLine {
         return isNotEmpty(fieldBits) && fieldBits.length == 3 && METADATA_GROUP_FIELD.equals(fieldBits[0]);
     }
 
+
     public boolean isRelationGroupStartField() {
         return isRelationGroupField() && GROUP_START_FIELD.equals(fieldBits[2]);
     }
 
-    public boolean isRelationGroupEndField() {
-        return isRelationGroupField() && GROUP_END_FIELD.equals(fieldBits[2]);
+    public boolean isRelationGroupEndField(String relationName) {
+        return isRelationGroupField() && GROUP_END_FIELD.equals(fieldBits[2]) && getRelationName().equals(relationName);
     }
 
     public boolean isRelationGroupField() {
         return isNotEmpty(fieldBits) && fieldBits.length == 3 && RELATION_GROUP_FIELD.equals(fieldBits[0]);
     }
+
+
+    public boolean isIfGroupStartField() {
+        return isIfGroupField() && GROUP_START_FIELD.equals(fieldBits[fieldBits.length - 1]);
+    }
+
+    public boolean isIfGroupEndField(String ifCondition) {
+        return isIfGroupField() && GROUP_END_FIELD.equals(fieldBits[fieldBits.length - 1])
+            && getIfCondition().equals(ifCondition);
+    }
+
+    public boolean isIfGroupField() {
+        return isNotEmpty(fieldBits) && IF_GROUP_FIELD.equals(fieldBits[0]);
+    }
+
 
     public String getVirtualFieldName() {
         return isVirtualField() ? fieldBits[1] : null;
@@ -121,6 +144,19 @@ public final class TemplateLine {
 
     public String getRelationName() {
         return isRelationGroupField() ? fieldBits[1] : null;
+    }
+
+    public String getIfCondition() {
+        return isIfGroupField() ? join(".", Arrays.copyOfRange(fieldBits, 1, fieldBits.length - 1)) : null;
+
+    }
+
+    public String getIfConditionName() {
+        if (!isIfGroupField()) {
+            return null;
+        }
+
+        return fieldBits[1].equals("not") ? fieldBits[2] : fieldBits[1];
     }
 
 }
