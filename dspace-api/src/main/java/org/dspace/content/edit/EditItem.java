@@ -38,6 +38,10 @@ public class EditItem implements InProgressSubmission<String> {
         this.mode = mode;
     }
 
+    public static EditItem none(final Context context, final Item item) {
+        return new EditItem(context, item);
+    }
+
     /* (non-Javadoc)
      * @see org.dspace.content.InProgressSubmission#getID()
      */

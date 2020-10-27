@@ -92,6 +92,16 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                          )))
                  .andExpect(jsonPath("$.sections.onlyTitle['dc.date.issued']").doesNotExist())
                  .andExpect(jsonPath("$.sections.onlyTitle['dc.contributor.author']").doesNotExist());
+
+        // using special case "NONE" (not reported in edititem-service.xml configuration) mode for same item
+        getClient(tokenAdmin).perform(get("/api/core/edititems/" + editItem.getID() + ":none"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._links.modes.href",
+                                     is(REST_SERVER_URL +
+                                             "core/edititems/" + editItem.getID() + ":none/modes")))
+                             .andExpect(jsonPath("$.sections.onlyTitle['dc.title']").doesNotExist())
+                             .andExpect(jsonPath("$.sections.onlyTitle['dc.date.issued']").doesNotExist())
+                             .andExpect(jsonPath("$.sections.onlyTitle['dc.contributor.author']").doesNotExist());
     }
 
     @Test

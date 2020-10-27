@@ -151,6 +151,9 @@ public class EditItemServiceImpl implements EditItemService {
         if (currentUser == null) {
             throw new AuthorizeException();
         } else {
+            if (EditItemMode.NONE.equals(mode)) {
+                return EditItem.none(context, item);
+            }
             editMode = modeService.findMode(context, item, mode);
             if (editMode == null) {
                 throw new NotFoundException();
