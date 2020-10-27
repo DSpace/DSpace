@@ -169,6 +169,9 @@ public class DOIIdentifierProvider
     @Override
     public String register(Context context, DSpaceObject dso)
         throws IdentifierException {
+        if (!(dso instanceof Item)) {
+            return null;
+        }
         String doi = mint(context, dso);
         // register tries to reserve doi if it's not already.
         // So we don't have to reserve it here.
@@ -179,6 +182,9 @@ public class DOIIdentifierProvider
     @Override
     public void register(Context context, DSpaceObject dso, String identifier)
         throws IdentifierException {
+        if (!(dso instanceof Item)) {
+            return;
+        }
         String doi = doiService.formatIdentifier(identifier);
         DOI doiRow = null;
 

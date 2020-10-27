@@ -94,10 +94,18 @@ public class IdentifierServiceImpl implements IdentifierService {
         throws AuthorizeException, SQLException, IdentifierException {
         //We need to commit our context because one of the providers might require the handle created above
         // Next resolve all other services
+        boolean registered = false;
         for (IdentifierProvider service : providers) {
-            service.register(context, dso);
+            String identifier = service.register(context, dso);
+            if (identifier != null) {
+                registered = true;
+            }
         }
-        //Update our item
+        if (!registered) {
+            throw new IdentifierException("Cannot register identifier: Didn't "
+                                              + "find a provider that supports this identifier.");
+        }
+        //Update our item / collection / community
         contentServiceFactory.getDSpaceObjectService(dso).update(context, dso);
     }
 
@@ -117,7 +125,7 @@ public class IdentifierServiceImpl implements IdentifierService {
             throw new IdentifierException("Cannot register identifier: Didn't "
                                               + "find a provider that supports this identifier.");
         }
-        //Update our item
+        //Update our item / collection / community
         contentServiceFactory.getDSpaceObjectService(object).update(context, object);
     }
 
