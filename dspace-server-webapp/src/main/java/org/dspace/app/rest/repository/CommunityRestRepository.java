@@ -91,25 +91,9 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     protected CommunityRest createAndReturn(Context context) throws AuthorizeException {
-        HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
-        ObjectMapper mapper = new ObjectMapper();
-        CommunityRest communityRest;
-        try {
-            ServletInputStream input = req.getInputStream();
-            communityRest = mapper.readValue(input, CommunityRest.class);
-        } catch (IOException e1) {
-            throw new UnprocessableEntityException("Error parsing request body: " + e1.toString());
-        }
 
-        Community community;
-        try {
-            // top-level community
-            community = cs.create(null, context);
-            cs.update(context, community);
-            metadataConverter.setMetadata(context, community, communityRest.getMetadata());
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+        // top-level community
+        Community community = createCommunity(context, null);
 
         return converter.toRest(community, utils.obtainProjection());
     }
@@ -123,6 +107,24 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
                 "Cannot create a SubCommunity without providing a parent Community.");
         }
 
+        Community parent;
+        try {
+            parent = cs.find(context, id);
+            if (parent == null) {
+                throw new UnprocessableEntityException("Parent community for id: "
+                        + id + " not found");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+
+        // sub-community
+        Community community = createCommunity(context, parent);
+
+        return converter.toRest(community, utils.obtainProjection());
+    }
+
+    private Community createCommunity(Context context, Community parent) throws AuthorizeException {
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         ObjectMapper mapper = new ObjectMapper();
         CommunityRest communityRest;
@@ -134,21 +136,15 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         }
 
         Community community;
+
         try {
-            Community parent = cs.find(context, id);
-            if (parent == null) {
-                throw new UnprocessableEntityException("Parent community for id: "
-                    + id + " not found");
-            }
-            // sub-community
             community = cs.create(parent, context);
             cs.update(context, community);
             metadataConverter.setMetadata(context, community, communityRest.getMetadata());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-
-        return converter.toRest(community, utils.obtainProjection());
+        return community;
     }
 
     @Override
