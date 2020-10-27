@@ -307,6 +307,11 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                     nextStep = currentStep;
                     nextActionConfig.getProcessingAction().activate(c, wfi);
                     if (nextActionConfig.requiresUI() && !enteredNewStep) {
+                        //Delete existing task if one with the same c, wfi and user settings is present but has a different actionID
+                        ClaimedTask task = claimedTaskService.findByWorkflowIdAndEPerson(c, wfi, user);
+                        if (!task.getActionID().equals(nextActionConfig.getId())) {
+                            deleteClaimedTask(c, wfi, task);
+                        }
                         createOwnedTask(c, wfi, currentStep, nextActionConfig, user);
                         return nextActionConfig;
                     } else if( nextActionConfig.requiresUI() && enteredNewStep){
