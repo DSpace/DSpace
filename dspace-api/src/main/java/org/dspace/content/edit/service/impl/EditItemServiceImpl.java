@@ -15,6 +15,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import javax.ws.rs.NotFoundException;
 
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.authorize.AuthorizeException;
@@ -143,11 +144,26 @@ public class EditItemServiceImpl implements EditItemService {
      * find(org.dspace.core.Context, java.util.UUID, java.lang.String)
      */
     @Override
-    public EditItem find(Context context, UUID id, String mode) throws SQLException {
-        EditItemMode editMode = modeService.findMode(context, id, mode);
-        return new EditItem(context,
-                getItemService().find(context, id),
-                editMode);
+    public EditItem find(Context context, Item item, String mode) throws SQLException, AuthorizeException {
+        boolean hasAccess = false;
+        EditItemMode editMode = null;
+        EPerson currentUser = context.getCurrentUser();
+        if (currentUser == null) {
+            throw new AuthorizeException();
+        } else {
+            if (EditItemMode.NONE.equals(mode)) {
+                return EditItem.none(context, item);
+            }
+            editMode = modeService.findMode(context, item, mode);
+            if (editMode == null) {
+                throw new NotFoundException();
+            }
+            hasAccess = modeService.hasAccess(context, item, currentUser, editMode);
+            if (!hasAccess) {
+                throw new AuthorizeException();
+            }
+        }
+        return new EditItem(context, item, editMode);
     }
 
 }

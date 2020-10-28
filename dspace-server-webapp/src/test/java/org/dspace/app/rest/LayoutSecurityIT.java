@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -32,10 +33,15 @@ import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.ResourcePolicyBuilder;
+import org.dspace.builder.WorkflowItemBuilder;
+import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
+import org.dspace.content.WorkspaceItem;
+import org.dspace.content.edit.EditItem;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Constants;
@@ -43,6 +49,8 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.LayoutSecurity;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -1863,6 +1871,188 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                                               is("Second Abstract description")))
                              .andExpect(jsonPath("$.metadata['dc.description.abstract'].[1].value",
                                               is("First Abstract description")));
+    }
+
+    @Test
+    public void findOneWorkspaceItemUsingLayoutSecurityCustomDataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withRelationshipType("Publication")
+                                           .withName("Collection 1").build();
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("Title Workspace 1")
+                                                  .withIssueDate("2017-10-17")
+                                                  .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                                  .withSubject("ExtraEntry").build();
+
+        MetadataField policyEperson = mfss.findByElement(context, "cris", "policy", "eperson");
+        MetadataField policyGroup = mfss.findByElement(context, "cris", "policy", "group");
+
+        MetadataField dateIssued = mfss.findByElement(context, "dc", "date", "issued");
+
+        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+                                                 .withShortname("box-shortname-one")
+                                                 .withSecurity(LayoutSecurity.CUSTOM_DATA)
+                                                 .addMetadataSecurityField(policyEperson)
+                                                 .addMetadataSecurityField(policyGroup)
+                                                 .build();
+
+        CrisLayoutFieldBuilder.createMetadataField(context, dateIssued, 0, 0)
+                              .withLabel("LABEL DATE")
+                              .withRendering("RENDERIGN DATE")
+                              .withStyle("STYLE")
+                              .withBox(box1)
+                              .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.sections.publication", Matchers.allOf(
+                                hasJsonPath("$['dc.contributor.author'][0].value", is("Smith, Donald")),
+                                hasJsonPath("$['dc.contributor.author'][1].value", is("Doe, John")),
+                                hasJsonPath("$['dc.date.issued'][0].value", is("2017-10-17")),
+                                hasJsonPath("$['dc.title'][0].value", is("Title Workspace 1"))
+                                )))
+                        .andExpect(jsonPath("$._embedded.item.metadata", Matchers.allOf(
+                                hasJsonPath("$['dc.contributor.author'][0].value", is("Smith, Donald")),
+                                hasJsonPath("$['dc.contributor.author'][1].value", is("Doe, John")),
+                                hasJsonPath("$['dc.date.issued'][0].value", is("2017-10-17")),
+                                hasJsonPath("$['dc.title'][0].value", is("Title Workspace 1"))
+                                )));
+    }
+
+    @Test
+    public void findOneWorkflowItemUsingLayoutSecurityCustomDataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withRelationshipType("Publication")
+                                           .withName("Collection 1")
+                                           .withWorkflowGroup(1, admin).build();
+
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                                                   .withTitle("Workflow Item 1")
+                                                   .withIssueDate("2017-10-17")
+                                                   .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                                   .withSubject("ExtraEntry").build();
+
+        MetadataField policyEperson = mfss.findByElement(context, "cris", "policy", "eperson");
+        MetadataField policyGroup = mfss.findByElement(context, "cris", "policy", "group");
+
+        MetadataField dateIssued = mfss.findByElement(context, "dc", "date", "issued");
+
+        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+                                                 .withShortname("box-shortname-one")
+                                                 .withSecurity(LayoutSecurity.CUSTOM_DATA)
+                                                 .addMetadataSecurityField(policyEperson)
+                                                 .addMetadataSecurityField(policyGroup)
+                                                 .build();
+
+        CrisLayoutFieldBuilder.createMetadataField(context, dateIssued, 0, 0)
+                              .withLabel("LABEL DATE")
+                              .withRendering("RENDERIGN DATE")
+                              .withStyle("STYLE")
+                              .withBox(box1).build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.sections.publication", Matchers.allOf(
+                                    hasJsonPath("$['dc.contributor.author'][0].value", is("Smith, Donald")),
+                                    hasJsonPath("$['dc.contributor.author'][1].value", is("Doe, John")),
+                                    hasJsonPath("$['dc.date.issued'][0].value", is("2017-10-17")),
+                                    hasJsonPath("$['dc.title'][0].value", is("Workflow Item 1"))
+                                    )))
+                            .andExpect(jsonPath("$._embedded.item.metadata", Matchers.allOf(
+                                    hasJsonPath("$['dc.contributor.author'][0].value", is("Smith, Donald")),
+                                    hasJsonPath("$['dc.contributor.author'][1].value", is("Doe, John")),
+                                    hasJsonPath("$['dc.date.issued'][0].value", is("2017-10-17")),
+                                    hasJsonPath("$['dc.title'][0].value", is("Workflow Item 1"))
+                                    )));
+    }
+
+    @Test
+    public void findOneEditItemUsingLayoutSecurityCustomDataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withRelationshipType("Publication")
+                                           .withName("Collection 1")
+                                           .build();
+
+        Item itemA = ItemBuilder.createItem(context, col1)
+                                .withTitle("Title item A")
+                                .withIssueDate("2015-06-25")
+                                .withAuthor("Smith, Maria")
+                                .build();
+
+        EditItem editItem = new EditItem(context, itemA);
+
+        itemService.addMetadata(context, itemA, "dc", "description", "abstract", null, "A secured abstract");
+
+        MetadataField policyEperson = mfss.findByElement(context, "cris", "policy", "eperson");
+        MetadataField policyGroup = mfss.findByElement(context, "cris", "policy", "group");
+
+        MetadataField dateIssued = mfss.findByElement(context, "dc", "date", "issued");
+
+        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+                                                 .withShortname("box-shortname-one")
+                                                 .withSecurity(LayoutSecurity.CUSTOM_DATA)
+                                                 .addMetadataSecurityField(policyEperson)
+                                                 .addMetadataSecurityField(policyGroup)
+                                                 .build();
+
+        CrisLayoutFieldBuilder.createMetadataField(context, dateIssued, 0, 0)
+                              .withLabel("LABEL DATE")
+                              .withRendering("RENDERIGN DATE")
+                              .withStyle("STYLE")
+                              .withBox(box1).build();
+
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+        getClient(tokenAdmin).perform(get("/api/core/edititem/" + itemA.getID() + ":MODE1"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.traditionalpageone-cris", Matchers.allOf(
+                                     hasJsonPath("$['dc.contributor.author'][0].value", is("Smith, Maria")),
+                                     hasJsonPath("$['dc.date.issued'][0].value", is("2015-06-25")),
+                                     hasJsonPath("$['dc.title'][0].value", is("Title item A"))
+                                     )))
+                             .andExpect(jsonPath("$._embedded.item.metadata", Matchers.allOf(
+                                     hasJsonPath("$['dc.contributor.author'][0].value", is("Smith, Maria")),
+                                     hasJsonPath("$['dc.date.issued'][0].value", is("2015-06-25")),
+                                     hasJsonPath("$['dc.title'][0].value", is("Title item A"))
+                                     )));
+
     }
 
 }

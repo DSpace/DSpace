@@ -169,6 +169,17 @@
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
         </step>
+
+        <step id="titleAndIssuedDate" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step>
+        <step id="onlyTitle" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step>
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -259,6 +270,13 @@
         <submission-process name="languagetestprocess">
             <step id="collection"/>
             <step id="languagetest"/>
+        </submission-process>
+        
+        <submission-process name="modeA">
+           <step id="titleAndIssuedDate"/>
+        </submission-process>
+        <submission-process name="modeB">
+           <step id="onlyTitle"/>
         </submission-process>
     </submission-definitions>
 

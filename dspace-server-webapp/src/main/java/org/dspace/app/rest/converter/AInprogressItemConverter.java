@@ -25,6 +25,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
+import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -54,6 +55,9 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
     @Autowired
     SubmissionService submissionService;
 
+    @Autowired
+    RequestService requestService;
+
     public AInprogressItemConverter() throws SubmissionConfigReaderException {
         submissionConfigReader = new SubmissionConfigReader();
     }
@@ -65,9 +69,6 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
         submitter = obj.getSubmitter();
 
         witem.setId(obj.getID());
-        witem.setCollection(collection != null ? converter.toRest(collection, projection) : null);
-        witem.setItem(converter.toRest(item, projection));
-        witem.setSubmitter(converter.toRest(submitter, projection));
 
         // 1. retrieve the submission definition
         // 2. iterate over the submission section to allow to plugin additional
@@ -77,6 +78,7 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
             SubmissionDefinitionRest def = converter.toRest(
                     submissionConfigReader.getSubmissionConfigByCollection(collection), projection);
             witem.setSubmissionDefinition(def);
+            storeSubmissionName(def.getName());
             for (SubmissionSectionRest sections : def.getPanels()) {
                 SubmissionStepConfig stepConfig = submissionSectionConverter.toModel(sections);
 
@@ -114,6 +116,14 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
 
             }
         }
+
+        witem.setCollection(collection != null ? converter.toRest(collection, projection) : null);
+        witem.setItem(converter.toRest(item, projection));
+        witem.setSubmitter(converter.toRest(submitter, projection));
+    }
+
+    void storeSubmissionName(final String name) {
+        requestService.getCurrentRequest().setAttribute("submission-name", name);
     }
 
     protected void addError(List<ErrorRest> errors, ErrorRest toAdd) {

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+
+    <bean class="org.dspace.content.edit.service.impl.EditItemServiceImpl"/>
+
+    <bean class="org.dspace.content.edit.service.impl.EditItemModeServiceImpl">
+         <property name="editModesMap">
+            <map>
+                <entry key="publication">
+                    <list>
+                        <bean class="org.dspace.content.edit.EditItemMode">
+                            <property name="name" value="MODE1" />
+                            <property name="security">
+                              <value type="org.dspace.content.edit.EditItemModeSecurity">
+                                ADMIN
+                              </value>
+                            </property>
+                            <property name="submissionDefinition" value="traditional-cris" />
+                        </bean>
+                        <bean class="org.dspace.content.edit.EditItemMode">
+                            <property name="name" value="FIRST" />
+                            <property name="security">
+                              <value type="org.dspace.content.edit.EditItemModeSecurity">
+                                ADMIN
+                              </value>
+                            </property>
+                            <property name="submissionDefinition" value="modeA" />
+                        </bean>
+                        <bean class="org.dspace.content.edit.EditItemMode">
+                            <property name="name" value="SECOND" />
+                            <property name="security">
+                              <value type="org.dspace.content.edit.EditItemModeSecurity">
+                                ADMIN
+                              </value>
+                            </property>
+                            <property name="submissionDefinition" value="modeB" />
+                        </bean>
+                        <bean class="org.dspace.content.edit.EditItemMode">
+                            <property name="name" value="FIRST-OWNER" />
+                            <property name="security">
+                              <value type="org.dspace.content.edit.EditItemModeSecurity">
+                                OWNER
+                              </value>
+                            </property>
+                            <property name="submissionDefinition" value="modeA" />
+                        </bean>
+                        <bean class="org.dspace.content.edit.EditItemMode">
+                            <property name="name" value="FIRST-CUSTOM" />
+                            <property name="security">
+                              <value type="org.dspace.content.edit.EditItemModeSecurity">
+                                CUSTOM
+                              </value>
+                            </property>
+                            <property name="submissionDefinition" value="modeA" />
+                            <property name="users" ref="usersMetadata" />
+                            <property name="groups" ref="groupsMetadata" />
+                        </bean>
+                    </list>
+                </entry>
+            </map>
+        </property> 
+    </bean>
+
+	<util:list id="usersMetadata" value-type="java.lang.String">
+       <value>cris.policy.eperson</value>
+    </util:list>
+
+	<util:list id="groupsMetadata" value-type="java.lang.String">
+       <value>cris.policy.group</value>
+    </util:list>
+
+</beans>

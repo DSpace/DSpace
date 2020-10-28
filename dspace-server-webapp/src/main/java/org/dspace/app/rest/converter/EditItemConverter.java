@@ -74,9 +74,6 @@ public class EditItemConverter
         EditItemMode mode = obj.getMode();
 
         rest.setId(obj.getID() + ":none");
-        rest.setCollection(collection != null ? converter.toRest(collection, projection) : null);
-        rest.setItem(converter.toRest(item, projection));
-        rest.setSubmitter(converter.toRest(submitter, projection));
 
         // 1. retrieve the submission definition
         // 2. iterate over the submission section to allow to plugin additional
@@ -87,6 +84,7 @@ public class EditItemConverter
             SubmissionDefinitionRest def = converter.toRest(
                     submissionConfigReader.getSubmissionConfigByName(mode.getSubmissionDefinition()), projection);
             rest.setSubmissionDefinition(def);
+            storeSubmissionName(def.getName());
             for (SubmissionSectionRest sections : def.getPanels()) {
                 SubmissionStepConfig stepConfig = submissionSectionConverter.toModel(sections);
 
@@ -124,6 +122,9 @@ public class EditItemConverter
 
             }
         }
+        rest.setCollection(collection != null ? converter.toRest(collection, projection) : null);
+        rest.setItem(converter.toRest(item, projection));
+        rest.setSubmitter(converter.toRest(submitter, projection));
     }
 
     /* (non-Javadoc)
