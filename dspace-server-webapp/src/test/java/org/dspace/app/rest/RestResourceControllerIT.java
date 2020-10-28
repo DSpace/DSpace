@@ -7,7 +7,9 @@
  */
 package org.dspace.app.rest;
 
+import static org.hamcrest.Matchers.endsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.UUID;
@@ -70,5 +72,25 @@ public class RestResourceControllerIT extends AbstractControllerIntegrationTest 
                 // The status has to be 404 Not Found
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    public void selfLinkContainsRequestParametersWhenProvided() throws Exception {
+        // When we call the root endpoint
+        getClient().perform(get("/api/core/metadatafields/search/byFieldName?schema=dc&offset=0"))
+                   // The status has to be 404 Not Found
+                   .andExpect(jsonPath("$._links.self.href", endsWith(
+                           "/api/core/metadatafields/search/byFieldName?schema=dc&offset=0")));
+    }
+
+    @Test
+    public void selfLinkDevoidOfRequestParametersWhenNoneProvided() throws Exception {
+        // When we call the root endpoint
+        getClient().perform(get("/api/core/metadatafields/search/byFieldName"))
+                   // The status has to be 404 Not Found
+                   .andExpect(jsonPath("$._links.self.href",
+                                       endsWith("/api/core/metadatafields/search/byFieldName")));
+    }
+
+
 
 }
