@@ -51,6 +51,22 @@ public class CollectionMatcher {
         );
     }
 
+    public static Matcher<? super Object> matchCollectionEntrySpecificEmbedProjection(String name, UUID uuid,
+                                                                                      String handle) {
+        return matchCollectionEntrySpecificEmbedProjection(name, uuid, handle, null);
+
+    }
+
+    public static Matcher<? super Object> matchCollectionEntrySpecificEmbedProjection(String name, UUID uuid,
+                                                                                      String handle, Bitstream logo) {
+        return allOf(
+            matchProperties(name, uuid, handle),
+            matchLinks(uuid),
+            matchLogo(logo),
+            matchSpecificEmbeds()
+        );
+    }
+
     public static Matcher<? super Object> matchProperties(String name, UUID uuid, String handle) {
         return allOf(
                 hasJsonPath("$.uuid", is(uuid.toString())),
@@ -70,7 +86,11 @@ public class CollectionMatcher {
                 "license",
                 "logo",
                 "parentCommunity",
-                "mappedItems[]"
+                "mappedItems[]",
+                "adminGroup",
+                "submittersGroup",
+                "itemReadGroup",
+                "bitstreamReadGroup"
         );
     }
 
@@ -85,7 +105,12 @@ public class CollectionMatcher {
                 "logo",
                 "mappedItems",
                 "parentCommunity",
-                "self"
+                "self",
+                "adminGroup",
+                "submittersGroup",
+                "itemReadGroup",
+                "bitstreamReadGroup"
+
         );
     }
 
@@ -100,10 +125,26 @@ public class CollectionMatcher {
             );
     }
 
+    /**
+     * Returns a String of embeds that can be used to specify what we to be returned as embeds in the REST call
+     * @return A String containing all different parts we want to have embedded
+     */
+    public static String getEmbedsParameter() {
+        return "license,logo,parentCommunity,mappedItems";
+    }
+
     public static Matcher<? super Object> matchCollection(Collection collection) {
         return allOf(hasJsonPath("$.uuid", is(collection.getID().toString())),
                 hasJsonPath("$.name", is(collection.getName())),
                 hasJsonPath("$.type", is("collection")),
                 hasJsonPath("$.handle", is(collection.getHandle())));
+    }
+
+    /**
+     * Gets a matcher for all expected embeds when the embeds parameter is requested.
+     */
+    public static Matcher<? super Object> matchSpecificEmbeds() {
+        return matchEmbeds(getEmbedsParameter().split(",")
+        );
     }
 }

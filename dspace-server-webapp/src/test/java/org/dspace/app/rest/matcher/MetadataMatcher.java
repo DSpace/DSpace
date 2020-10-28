@@ -8,6 +8,7 @@
 package org.dspace.app.rest.matcher;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 
@@ -42,5 +43,15 @@ public class MetadataMatcher {
      */
     public static Matcher<? super Object> matchMetadata(String key, String value, int position) {
         return hasJsonPath("$.['" + key + "'][" + position + "].value", is(value));
+    }
+
+    /**
+     * Gets a matcher to ensure a given key is not present.
+     *
+     * @param key the metadata key.
+     * @return the matcher.
+     */
+    public static Matcher<? super Object> matchMetadataDoesNotExist(String key) {
+        return hasNoJsonPath("$.['" + key + "']");
     }
 }

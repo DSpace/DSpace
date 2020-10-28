@@ -7,44 +7,45 @@
  */
 package org.dspace.servicemanager;
 
-import org.dspace.kernel.mixins.InitializedService;
-import org.dspace.kernel.mixins.ShutdownService;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 import org.dspace.servicemanager.example.ConcreteExample;
 import org.dspace.servicemanager.example.ServiceExample;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Service;
 
 /**
- * This bean is a simple example of a bean which is annotated as a spring bean and should be found when the AC starts up
+ * This bean is a simple example of a bean which is annotated as a Spring Bean
+ * and should be found when the AC starts up.
  *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 @Service
-public class SampleAnnotationBean implements InitializedService, ShutdownService {
+public class SampleAnnotationBean {
 
     public int initCounter = 0;
 
+    @PostConstruct
     public void init() {
         initCounter++;
     }
 
+    @PreDestroy
     public void shutdown() {
         initCounter++;
     }
 
     private ServiceExample serviceExample;
 
-    @Autowired
-    @Required
+    @Autowired(required = true)
     public void setServiceExample(ServiceExample serviceExample) {
         this.serviceExample = serviceExample;
     }
 
     private ConcreteExample concreteExample;
 
-    @Autowired
-    @Required
+    @Autowired(required = true)
     public void setConcreteExample(ConcreteExample concreteExample) {
         this.concreteExample = concreteExample;
     }

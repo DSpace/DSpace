@@ -17,7 +17,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * This class constructs the page element in the HalResource on the endpoints.
+ * This class inserts pagination information into the endpoints.
+ * It constructs the "page" element (number, size, totalPages, totalElements) in the HalResource for the endpoints.
+ * It also constructs the "_links" element (next, last, prev, self, first) in the HalResource for the endpoints.
  */
 public class EmbeddedPageHeader {
 
@@ -39,6 +41,10 @@ public class EmbeddedPageHeader {
         this(self, page, true);
     }
 
+    /**
+     * Build the "page" element with all valid pagination information (number, size, totalPages, totalElements)
+     * @return Map that will be used to build the JSON of the "page" element
+     */
     @JsonProperty(value = "page")
     public Map<String, Long> getPageInfo() {
         Map<String, Long> pageInfo = new HashMap<String, Long>();
@@ -51,6 +57,10 @@ public class EmbeddedPageHeader {
         return pageInfo;
     }
 
+    /**
+     * Build the "_links" element with all valid pagination links (first, next, prev, last)
+     * @return Map that will be used to build the JSON of the "_links" element
+     */
     @JsonProperty(value = "_links")
     public Map<String, Object> getLinks() {
         Map<String, Object> links = new HashMap<>();
@@ -72,21 +82,38 @@ public class EmbeddedPageHeader {
         return links;
     }
 
-    private Href _link(final Sort sort, Integer i, int size) {
+    /**
+     * Builds a single HREF link element within the "_links" section
+     * <P>
+     * (e.g. "next" : { "href": "[next-link]" } )
+     * @param sort current sort
+     * @param page page param for this link
+     * @param size size param for this link
+     * @return Href representing the link
+     */
+    private Href _link(final Sort sort, Integer page, int size) {
         UriComponentsBuilder uriComp = self.cloneBuilder();
         if (sort != null) {
             for (Sort.Order order : sort) {
-                uriComp = uriComp.queryParam("sort", order.getProperty() + "," + order.getDirection());
+                // replace existing sort param (if exists), otherwise append it
+                uriComp = uriComp.replaceQueryParam("sort", order.getProperty() + "," + order.getDirection());
             }
         }
-        if (i != null) {
-            uriComp = uriComp.queryParam("page", i);
-            uriComp = uriComp.queryParam("size", size);
+        if (page != null) {
+            // replace existing page & size params (if exist), otherwise append them
+            uriComp = uriComp.replaceQueryParam("page", page);
+            uriComp = uriComp.replaceQueryParam("size", size);
         }
         return new Href(uriComp.build().toUriString());
     }
 
-    private class Href {
+    /**
+     * Represents a single HREF property for an single link
+     * (e.g. { "href": "[full-link-url]" } )
+     * <P>
+     * NOTE: This inner class is protected to allow for easier unit testing
+     */
+    protected class Href {
         private String href;
 
         public Href(String href) {

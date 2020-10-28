@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -71,7 +71,7 @@ public class RelationshipTypeRestController {
      * @throws SQLException If something goes wrong
      */
     @RequestMapping(method = RequestMethod.GET)
-    public PagedResources<RelationshipTypeResource> retrieve(@PathVariable Integer id,
+    public PagedModel<RelationshipTypeResource> retrieve(@PathVariable Integer id,
                                                              HttpServletResponse response,
                                                              HttpServletRequest request,
                                                              Pageable pageable,
@@ -81,12 +81,12 @@ public class RelationshipTypeRestController {
         List<RelationshipType> list = relationshipTypeService.findByEntityType(context, entityType, -1, -1);
 
         Page<RelationshipTypeRest> relationshipTypeRestPage = converter
-            .toRestPage(list, pageable, list.size(), utils.obtainProjection());
+            .toRestPage(list, pageable, utils.obtainProjection());
 
         Page<RelationshipTypeResource> relationshipTypeResources = relationshipTypeRestPage
             .map(relationshipTypeRest -> new RelationshipTypeResource(relationshipTypeRest, utils));
         relationshipTypeResources.forEach(halLinkService::addLinks);
-        PagedResources<RelationshipTypeResource> result = assembler.toResource(relationshipTypeResources);
+        PagedModel<RelationshipTypeResource> result = assembler.toModel(relationshipTypeResources);
         return result;
 
 

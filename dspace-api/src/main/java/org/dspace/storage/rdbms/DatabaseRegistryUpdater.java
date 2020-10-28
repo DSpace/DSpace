@@ -9,7 +9,6 @@ package org.dspace.storage.rdbms;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.SQLException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -24,8 +23,8 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
-import org.flywaydb.core.api.MigrationInfo;
-import org.flywaydb.core.api.callback.FlywayCallback;
+import org.flywaydb.core.api.callback.Callback;
+import org.flywaydb.core.api.callback.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -50,7 +49,7 @@ import org.xml.sax.SAXException;
  *
  * @author Tim Donohue
  */
-public class DatabaseRegistryUpdater implements FlywayCallback {
+public class DatabaseRegistryUpdater implements Callback {
     /**
      * logging category
      */
@@ -107,73 +106,38 @@ public class DatabaseRegistryUpdater implements FlywayCallback {
         }
     }
 
+
+    /**
+     * Events supported by this callback.
+     * @param event Flyway event
+     * @param context Flyway context
+     * @return true if AFTER_MIGRATE event
+     */
     @Override
-    public void beforeClean(Connection connection) {
-
-    }
-
-    @Override
-    public void afterClean(Connection connection) {
-
-    }
-
-    @Override
-    public void beforeMigrate(Connection connection) {
-
-    }
-
-    @Override
-    public void afterMigrate(Connection connection) {
+    public boolean supports(Event event, org.flywaydb.core.api.callback.Context context) {
         // Must run AFTER all migrations complete, since it is dependent on Hibernate
+        return event.equals(Event.AFTER_MIGRATE);
+    }
+
+    /**
+     * Whether event can be handled in a transaction or whether it must be handle outside of transaction.
+     * @param event Flyway event
+     * @param context Flyway context
+     * @return true
+     */
+    @Override
+    public boolean canHandleInTransaction(Event event, org.flywaydb.core.api.callback.Context context) {
+        // Always return true, as our handle() method is updating the database.
+        return true;
+    }
+
+    /**
+     * What to run when the callback is triggered.
+     * @param event Flyway event
+     * @param context Flyway context
+     */
+    @Override
+    public void handle(Event event, org.flywaydb.core.api.callback.Context context) {
         updateRegistries();
-    }
-
-    @Override
-    public void beforeEachMigrate(Connection connection, MigrationInfo migrationInfo) {
-
-    }
-
-    @Override
-    public void afterEachMigrate(Connection connection, MigrationInfo migrationInfo) {
-
-    }
-
-    @Override
-    public void beforeValidate(Connection connection) {
-
-    }
-
-    @Override
-    public void afterValidate(Connection connection) {
-
-    }
-
-    @Override
-    public void beforeBaseline(Connection connection) {
-
-    }
-
-    @Override
-    public void afterBaseline(Connection connection) {
-
-    }
-
-    @Override
-    public void beforeRepair(Connection connection) {
-
-    }
-
-    @Override
-    public void afterRepair(Connection connection) {
-
-    }
-
-    @Override
-    public void beforeInfo(Connection connection) {
-
-    }
-
-    @Override
-    public void afterInfo(Connection connection) {
     }
 }
