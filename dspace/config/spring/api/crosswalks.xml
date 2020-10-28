@@ -73,6 +73,7 @@
 		<property name="templateFileName" value="crosswalks/template/person-template.xsl"/>
 		<property name="fileName" value="person.rtf"/>
 		<property name="mimeType" value="application/rtf"/>
+		<property name="entityType" value="Person"/>
 		<property name="referCrosswalk" ref="referCrosswalkPersonXml"/>
 	</bean>
 	

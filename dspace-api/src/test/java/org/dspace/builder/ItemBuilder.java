@@ -66,6 +66,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return setMetadataSingleValue(item, MetadataSchemaEnum.DC.getName(), "title", null, title);
     }
 
+    public ItemBuilder withAlternativeTitle(final String title) {
+        return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "title", "alternative", title);
+    }
+
     public ItemBuilder withTitleForLanguage(final String title, final String language) {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "title", null, language, title);
     }
@@ -85,6 +89,18 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withAuthor(final String authorName, final String authority) {
         return addMetadataValue(item, DC.getName(), "contributor", "author", null, authorName, authority, 600);
+    }
+
+    public ItemBuilder withAuthorAffiliation(String affiliation) {
+        return addMetadataValue(item, "oairecerif", "author", "affiliation", affiliation);
+    }
+
+    public ItemBuilder withEditor(final String editorName) {
+        return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "contributor", "editor", editorName);
+    }
+
+    public ItemBuilder withEditorAffiliation(String affiliation) {
+        return addMetadataValue(item, "oairecerif", "editor", "affiliation", affiliation);
     }
 
     public ItemBuilder withPersonIdentifierFirstName(final String personIdentifierFirstName) {
@@ -121,6 +137,22 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withDoiIdentifier(String doi) {
         return addMetadataValue(item, "dc", "identifier", "doi", doi);
+    }
+
+    public ItemBuilder withIsbnIdentifier(String isbn) {
+        return addMetadataValue(item, "dc", "identifier", "isbn", isbn);
+    }
+
+    public ItemBuilder withIssnIdentifier(String issn) {
+        return addMetadataValue(item, "dc", "identifier", "issn", issn);
+    }
+
+    public ItemBuilder withIsiIdentifier(String issn) {
+        return addMetadataValue(item, "dc", "identifier", "isi", issn);
+    }
+
+    public ItemBuilder withScopusIdentifier(String issn) {
+        return addMetadataValue(item, "dc", "identifier", "scopus", issn);
     }
 
     public ItemBuilder withOrcidIdentifier(String orcid) {
@@ -259,6 +291,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, DC.getName(), "relation", "project", null, project, authority, 600);
     }
 
+    public ItemBuilder withRelationFunding(String funding, String authority) {
+        return addMetadataValue(item, DC.getName(), "relation", "funding", null, funding, authority, 600);
+    }
+
     public ItemBuilder withInternalId(String internalId) {
         return addMetadataValue(item, "oairecerif", "internalid", null, internalId);
     }
@@ -277,6 +313,46 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withType(String type) {
         return addMetadataValue(item, "dc", "type", null, type);
+    }
+
+    public ItemBuilder withLanguage(String language) {
+        return addMetadataValue(item, "dc", "language", "iso", language);
+    }
+
+    public ItemBuilder withFunder(String funder) {
+        return addMetadataValue(item, "oairecerif", "funder", null, funder);
+    }
+
+    public ItemBuilder withFunder(String funder, String authority) {
+        return addMetadataValue(item, "oairecerif", "funder", null, null, funder, authority, 600);
+    }
+
+    public ItemBuilder withPublisher(String publisher) {
+        return addMetadataValue(item, "dc", "publisher", null, publisher);
+    }
+
+    public ItemBuilder withRelationPublication(String publication) {
+        return addMetadataValue(item, "dc", "relation", "publication", publication);
+    }
+
+    public ItemBuilder withRelationDoi(String doi) {
+        return addMetadataValue(item, "dc", "relation", "doi", doi);
+    }
+
+    public ItemBuilder withRelationConference(String conference) {
+        return addMetadataValue(item, "dc", "relation", "conference", conference);
+    }
+
+    public ItemBuilder withRelationDataset(String dataset) {
+        return addMetadataValue(item, "dc", "relation", "dataset", dataset);
+    }
+
+    public ItemBuilder withVolume(String volume) {
+        return addMetadataValue(item, "oaire", "citation", "volume", volume);
+    }
+
+    public ItemBuilder withIssue(String issue) {
+        return addMetadataValue(item, "oaire", "citation", "issue", issue);
     }
 
     public ItemBuilder makeUnDiscoverable() {

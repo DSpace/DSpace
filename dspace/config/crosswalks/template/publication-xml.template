@@ -15,13 +15,13 @@
    	<Publishers>
    		<Publisher>
    			<OrgUnit>
-     			<Name>@dc.publisher@</Name>
+				<Name>@dc.publisher@</Name>
      		</OrgUnit>
    		</Publisher>
    	</Publishers>
    	<PublicationDate>@dc.date.issued@</PublicationDate>
-   	<Volume>@oaire.citation.volume@</Volume>
-   	<Issue>@oaire.citation.issue@<</Issue>
+	<Volume>@oaire.citation.volume@</Volume>
+	<Issue>@oaire.citation.issue@</Issue>
    	<StartPage>@oaire.citation.startPage@</StartPage>
    	<EndPage>@oaire.citation.endPage@</EndPage>
    	<DOI>@dc.identifier.doi@</DOI>
@@ -29,7 +29,6 @@
    	<ISSN>@dc.identifier.issn@</ISSN>
    	<ISI-Number>@dc.identifier.isi@</ISI-Number>
    	<SCP-Number>@dc.identifier.scopus@</SCP-Number>
-   	<URL>@dc.identifier.url@</URL>
    	<Keyword>@dc.subject@</Keyword>
    	<Authors>
    		@group.dc-contributor-author.start@
@@ -37,7 +36,7 @@
         	<DisplayName>@dc.contributor.author@</DisplayName>
          	<Affiliation>
          		<OrgUnit>
-         			<Acronym>@oairecerif.author.affiliation@</Acronym>
+         			<Name>@oairecerif.author.affiliation@</Name>
          		</OrgUnit>
          	</Affiliation>
       	</Author>
@@ -49,7 +48,7 @@
         	<DisplayName>@dc.contributor.editor@</DisplayName>
 	   	  	<Affiliation>
 	      		<OrgUnit>
-	     			<Acronym>@oairecerif.editor.affiliation@</Acronym>
+	     			<Name>@oairecerif.editor.affiliation@</Name>
 	     		</OrgUnit>
 	      	</Affiliation>
    	  	</Editor>
@@ -80,9 +79,7 @@
 				</By>
 				<As>
 					<Funding id="@virtual.id@">
-						<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">
-							@virtual.mapConverter.fundingTypes.dc-type@
-						</Type>
+						<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">@virtual.mapConverter.fundingTypes.dc-type@</Type>
 						<Name>@dc.title@</Name>
 					</Funding>
 				</As>
@@ -94,9 +91,7 @@
    	@relation.dc-relation-funding.start@
    	<OriginatesFrom>
    		<Funding id="@virtual.id@">
-			<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">
-				@virtual.mapConverter.fundingTypes.dc-type@
-			</Type>
+			<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">@virtual.mapConverter.fundingTypes.dc-type@</Type>
 			<Acronym>@oairecerif.acronym@</Acronym>
 			<Name>@dc.title@</Name>
 			<Funder>

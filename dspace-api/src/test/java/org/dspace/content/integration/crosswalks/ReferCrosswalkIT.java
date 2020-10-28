@@ -41,6 +41,7 @@ import org.dspace.content.Item;
 import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
 import org.dspace.content.integration.crosswalks.virtualfields.VirtualField;
 import org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldMapper;
+import org.dspace.core.CrisConstants;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.utils.DSpace;
 import org.junit.After;
@@ -118,7 +119,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         try (FileInputStream fis = getFileInputStream("publication.bib")) {
             String expectedBibtex = IOUtils.toString(fis, Charset.defaultCharset());
-            assertThat(out.toString(), equalTo(expectedBibtex));
+            compareEachLine(out.toString(), expectedBibtex);
         }
     }
 
@@ -192,8 +193,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         try (FileInputStream fis = getFileInputStream("person.xml")) {
             String expectedXml = IOUtils.toString(fis, Charset.defaultCharset());
-            String exportedXml = out.toString();
-            assertThat(exportedXml, equalTo(expectedXml));
+            compareEachLine(out.toString(), expectedXml);
         }
     }
 
@@ -242,7 +242,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         try (FileInputStream fis = getFileInputStream("person-with-empty-groups.xml")) {
             String expectedXml = IOUtils.toString(fis, Charset.defaultCharset());
-            assertThat(out.toString(), equalTo(expectedXml));
+            compareEachLine(out.toString(), expectedXml);
         }
     }
 
@@ -346,9 +346,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         try (FileInputStream fis = getFileInputStream("person.json")) {
             String expectedJson = IOUtils.toString(fis, Charset.defaultCharset());
-            String exportedJson = out.toString();
-            System.out.println(exportedJson);
-            assertThat(exportedJson, equalTo(expectedJson));
+            compareEachLine(out.toString(), expectedJson);
         }
     }
 
@@ -403,7 +401,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         try (FileInputStream fis = getFileInputStream("persons.xml")) {
             String expectedXml = IOUtils.toString(fis, Charset.defaultCharset());
-            assertThat(out.toString(), equalTo(expectedXml));
+            compareEachLine(out.toString(), expectedXml);
         }
     }
 
@@ -458,7 +456,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         try (FileInputStream fis = getFileInputStream("persons.json")) {
             String expectedJson = IOUtils.toString(fis, Charset.defaultCharset());
-            assertThat(out.toString(), equalTo(expectedJson));
+            compareEachLine(out.toString(), expectedJson);
         }
     }
 
@@ -466,6 +464,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
     public void testPublicationXmlDisseminate() throws Exception {
 
         context.turnOffAuthorisationSystem();
+
         Item project = ItemBuilder.createItem(context, collection)
             .withRelationshipType("Project")
             .withTitle("Test Project")
@@ -479,18 +478,49 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withRelationshipType("Funding")
             .withTitle("Test Funding")
             .withType("Internal Funding")
+            .withFunder("Test Funder")
             .withRelationProject("Test Project", project.getID().toString())
+            .build();
+
+        Item funding = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Funding")
+            .withTitle("Another Test Funding")
+            .withType("Contract")
+            .withFunder("Another Test Funder")
+            .withAcronym("ATF-01")
             .build();
 
         Item publication = ItemBuilder.createItem(context, collection)
             .withRelationshipType("Publication")
             .withTitle("Test Publication")
+            .withAlternativeTitle("Alternative publication title")
+            .withRelationPublication("Published in publication")
+            .withRelationDoi("doi:10.3972/test")
+            .withDoiIdentifier("doi:111.111/publication")
+            .withIsbnIdentifier("978-3-16-148410-0")
+            .withIssnIdentifier("2049-3630")
+            .withIsiIdentifier("111-222-333")
+            .withScopusIdentifier("99999999")
+            .withLanguage("en")
+            .withPublisher("Publication publisher")
+            .withVolume("V.01")
+            .withIssue("Issue")
+            .withSubject("test")
+            .withSubject("export")
             .withType("Controlled Vocabulary for Resource Type Genres::text::review")
             .withIssueDate("2020-01-01")
             .withAuthor("John Smith")
+            .withAuthorAffiliation(CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE)
             .withAuthor("Walter White")
+            .withAuthorAffiliation("Company")
+            .withEditor("Editor")
+            .withEditorAffiliation("Editor Affiliation")
             .withRelationProject("Test Project", project.getID().toString())
+            .withRelationFunding("Another Test Funding", funding.getID().toString())
+            .withRelationConference("The best Conference")
+            .withRelationDataset("DataSet")
             .build();
+
         context.restoreAuthSystemState();
         context.commit();
 
@@ -502,7 +532,94 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         try (FileInputStream fis = getFileInputStream("publication.xml")) {
             String expectedXml = IOUtils.toString(fis, Charset.defaultCharset());
-            assertThat(out.toString(), equalTo(expectedXml));
+            compareEachLine(out.toString(), expectedXml);
+        }
+    }
+
+    @Test
+    public void testPublicationXmlDisseminateWithAuthorityOnFunder() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item project = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Project")
+            .withTitle("Test Project")
+            .withInternalId("111-222-333")
+            .withAcronym("TP")
+            .withProjectStartDate("2020-01-01")
+            .withProjectEndDate("2020-04-01")
+            .build();
+
+        Item orgUnit = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("OrgUnit")
+            .withTitle("Test Funder")
+            .withAcronym("TFO")
+            .build();
+
+        ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Funding")
+            .withTitle("Test Funding")
+            .withType("Internal Funding")
+            .withFunder("Test Funder", orgUnit.getID().toString())
+            .withRelationProject("Test Project", project.getID().toString())
+            .build();
+
+        Item funding = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Funding")
+            .withTitle("Another Test Funding")
+            .withType("Contract")
+            .withFunder("Another Test Funder")
+            .withAcronym("ATF-01")
+            .build();
+
+        Item publication = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Publication")
+            .withTitle("Test Publication")
+            .withRelationDoi("doi:10.3972/test")
+            .withDoiIdentifier("doi:111.111/publication")
+            .withIsbnIdentifier("978-3-16-148410-0")
+            .withIssnIdentifier("2049-3630")
+            .withIsiIdentifier("111-222-333")
+            .withScopusIdentifier("99999999")
+            .withType("Controlled Vocabulary for Resource Type Genres::text::book::book part")
+            .withIssueDate("2020-01-01")
+            .withAuthor("John Smith")
+            .withAuthorAffiliation(CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE)
+            .withAuthor("Walter White")
+            .withAuthorAffiliation("Company")
+            .withEditor("Editor")
+            .withEditorAffiliation("Editor Affiliation")
+            .withRelationProject("Test Project", project.getID().toString())
+            .withRelationFunding("Another Test Funding", funding.getID().toString())
+            .withRelationConference("The best Conference")
+            .withRelationDataset("DataSet")
+            .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("publication-xml");
+        assertThat(referCrossWalk, notNullValue());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        referCrossWalk.disseminate(context, publication, out);
+
+        try (FileInputStream fis = getFileInputStream("publication-with-authority-on-funder.xml")) {
+            String expectedXml = IOUtils.toString(fis, Charset.defaultCharset());
+            compareEachLine(out.toString(), expectedXml);
+        }
+    }
+
+    private void compareEachLine(String result, String expectedResult) {
+
+        String[] resultLines = result.split("\n");
+        String[] expectedResultLines = expectedResult.split("\n");
+
+        assertThat("The result should have the same lines number of the expected result",
+            resultLines.length, equalTo(expectedResultLines.length));
+
+        for (int i = 0; i < resultLines.length; i++) {
+            assertThat(resultLines[i], equalTo(expectedResultLines[i]));
         }
     }
 
