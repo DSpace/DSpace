@@ -23,21 +23,18 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author bollini
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  */
-public class VirtualFieldBibtexAuthors implements VirtualField {
+public class VirtualFieldAuthors implements VirtualField {
 
     private final ItemService itemService;
 
     @Autowired
-    public VirtualFieldBibtexAuthors(ItemService itemService) {
+    public VirtualFieldAuthors(ItemService itemService) {
         this.itemService = itemService;
     }
 
     public String[] getMetadata(Context context, Item item, String fieldName) {
 
-        String metadata = "dc.contributor.author";
-
-        // Get the citation from the item
-        List<MetadataValue> authors = itemService.getMetadataByMetadataString(item, metadata);
+        List<MetadataValue> authors = itemService.getMetadataByMetadataString(item, "dc.contributor.author");
         if (CollectionUtils.isEmpty(authors)) {
             return null;
         }
@@ -48,7 +45,7 @@ public class VirtualFieldBibtexAuthors implements VirtualField {
             int splitLength = split.length;
             String str = (splitLength > 1) ? split[1] : "";
             String str2 = split[0];
-            if (StringUtils.isNotBlank(str2)) {
+            if (StringUtils.isNotBlank(str)) {
                 sb.append(str).append(" ");
             }
             sb.append(str2).append(" and ");

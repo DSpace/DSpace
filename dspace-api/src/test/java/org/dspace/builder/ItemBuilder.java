@@ -355,6 +355,18 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "oaire", "citation", "issue", issue);
     }
 
+    public ItemBuilder withIsPartOf(String isPartOf) {
+        return addMetadataValue(item, "dc", "relation", "ispartof", isPartOf);
+    }
+
+    public ItemBuilder withCitationStartPage(String startPage) {
+        return addMetadataValue(item, "oaire", "citation", "startPage", startPage);
+    }
+
+    public ItemBuilder withCitationEndPage(String endPage) {
+        return addMetadataValue(item, "oaire", "citation", "endPage", endPage);
+    }
+
     public ItemBuilder makeUnDiscoverable() {
         item.setDiscoverable(false);
         return this;

@@ -10,6 +10,7 @@
 		<constructor-arg>
 			<map>
 				<entry key="bibtex" value-ref="referCrosswalkBibtex"></entry>
+				<entry key="endnote" value-ref="referCrosswalkEndnote"></entry>
 				<entry key="publication-xml" value-ref="referCrosswalkPublicationXml"></entry>
 				<entry key="publication-ieee-html" value-ref="referCrosswalkPublicationIeeeHtml"></entry>
 				
@@ -62,6 +63,16 @@
 		<property name="converter" ref="xmlValueConverter" />
 	</bean>
 	
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkEndnote">
+		<property name="templateFileName" value="crosswalks/template/endnote.template"/>
+		<property name="mimeType" value="application/x-endnote-refer; charset=UTF-8"/>
+		<property name="fileName" value="publication"/>
+		<property name="entityType" value="Publication"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE}"/>
+	</bean>
+	
+	
+	
 	<bean class="org.dspace.content.integration.crosswalks.DocumentCrosswalk" id="pdfCrosswalkPerson">
 		<property name="templateFileName" value="crosswalks/template/person-template.xsl"/>
 		<property name="fileName" value="person.pdf"/>
@@ -110,34 +121,20 @@
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldMapper">
 		<constructor-arg>
 			<map>
-				<entry key="reftype" value-ref="virtualFieldRefererType" />
-				<entry key="citation" value-ref="virtualFieldCitation"/>
-				<entry key="authors" value-ref="virtualFieldBibtexContributors"/>
-				<entry key="keywords" value-ref="virtualFieldKeywords" />
-				<entry key="date" value-ref="virtualFieldDate" />
-				<entry key="bibauthors" value-ref="virtualFieldBibtexAuthors" />
-				<entry key="fullpage" value-ref="virtualFieldPageNumber" />
-				<entry key="uniqueidentifier" value-ref="virtualFieldUniqueIdentifier" />
-				<entry key="cruiidentifier" value-ref="virtualFieldCruiIdentifier" />
-				<entry key="handlelocalname" value-ref="virtualFieldHandleLocalNameIdentifier" />
-				<entry key="bitstream" value-ref="virtualFieldBitstream" />
 				<entry key="id" value-ref="virtualFieldId" />
+				<entry key="reftype" value-ref="virtualFieldRefererType" />
+				<entry key="authors" value-ref="virtualFieldAuthors" />
+				<entry key="fullpage" value-ref="virtualFieldPageNumber" />
+				<entry key="bitstream" value-ref="virtualFieldBitstream" />
 				<entry key="mapConverter" value-ref="virtualFieldMapConverter" />
 			</map>
 		</constructor-arg>
 	</bean>
 	
-	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldRefererType" id="virtualFieldRefererType"/>
-	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldCitation" id="virtualFieldCitation"/>
-	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldBibtexContributors" id="virtualFieldBibtexContributors"/>
-	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldKeywords" id="virtualFieldKeywords"/>
-	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldDate" id="virtualFieldDate"/>
-	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldBibtexAuthors" id="virtualFieldBibtexAuthors"/>
-	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldPageNumber" id="virtualFieldPageNumber"/>	
-	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldUniqueIdentifier" id="virtualFieldUniqueIdentifier"/>
-	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldCruiIdentifier" id="virtualFieldCruiIdentifier"/>
-	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldHandleLocalNameIdentifier" id="virtualFieldHandleLocalNameIdentifier"/>
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldId" id="virtualFieldId"/>
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldRefererType" id="virtualFieldRefererType"/>
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldAuthors" id="virtualFieldAuthors"/>
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldPageNumber" id="virtualFieldPageNumber"/>	
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldBitstream" id="virtualFieldBitstream">
 		<constructor-arg name="bitstreamTypeMap">
 			<map>

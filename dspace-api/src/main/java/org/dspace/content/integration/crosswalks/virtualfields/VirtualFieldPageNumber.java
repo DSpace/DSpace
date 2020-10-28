@@ -9,6 +9,7 @@ package org.dspace.content.integration.crosswalks.virtualfields;
 
 import java.util.List;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
@@ -31,25 +32,13 @@ public class VirtualFieldPageNumber implements VirtualField {
     }
 
     public String[] getMetadata(Context context, Item item, String fieldName) {
-        String[] virtualFieldName = fieldName.split("\\.");
-        String qualifier = virtualFieldName[2];
-        String separator = " - ";
+        List<MetadataValue> dcvs = itemService.getMetadataByMetadataString(item, "oaire.citation.startPage");
+        List<MetadataValue> dcvs2 = itemService.getMetadataByMetadataString(item, "oaire.citation.endPage");
 
-        if (qualifier.equals("bibtex")) {
-            separator = "--";
+        if (CollectionUtils.isEmpty(dcvs) || CollectionUtils.isEmpty(dcvs2)) {
+            return new String[] {};
         }
 
-        String metadataFirstPage = "dc.relation.firstpage";
-        String metadataLastPage = "dc.relation.lastpage";
-        // Get the citation from the item
-        List<MetadataValue> dcvs = itemService.getMetadataByMetadataString(item, metadataFirstPage);
-        List<MetadataValue> dcvs2 = itemService.getMetadataByMetadataString(item, metadataLastPage);
-
-        if ((dcvs != null && dcvs.size() > 0) && (dcvs2 != null && dcvs2.size() > 0)) {
-            String value = dcvs.get(0).getValue() + separator + dcvs2.get(0).getValue();
-            return new String[] { value };
-        }
-
-        return null;
+        return new String[] { dcvs.get(0).getValue() + " - " + dcvs2.get(0).getValue() };
     }
 }
