@@ -9,7 +9,10 @@ package org.dspace.app.util;
 
 import java.sql.SQLException;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
+import org.apache.logging.log4j.Logger;
+import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
@@ -19,12 +22,22 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.GroupService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.utils.DSpace;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
+import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
 
 /**
  * This class is an addition to the AuthorizeManager that perform authorization
@@ -34,6 +47,7 @@ import org.dspace.core.Context;
  */
 public class AuthorizeUtil {
 
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(AuthorizeUtil.class);
     /**
      * Default constructor
      */
@@ -524,5 +538,155 @@ public class AuthorizeUtil {
                                                  Constants.ADD);
             }
         }
+    }
+
+    /**
+     * This method will check whether the current user is authorized to manage the default read group
+     * @param context       The relevant DSpace context
+     * @param collection    The collection for which this will be checked
+     * @throws AuthorizeException   If something goes wrong
+     * @throws SQLException If something goes wrong
+     */
+    public static void authorizeManageDefaultReadGroup(Context context,
+                                                      Collection collection) throws AuthorizeException, SQLException {
+        AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+        authorizeService.authorizeAction(context, collection, Constants.ADMIN);
+    }
+
+    /**
+     * This method checks whether the current user has sufficient rights to modify the group.
+     * Depending on the kind of group and due to delegated administration, separate checks need to be done to verify
+     * whether the user is allowed to modify the group.
+     *
+     * @param context the context of which the user will be checked
+     * @param group   the group to be checked
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    public static void authorizeManageGroup(Context context, Group group) throws SQLException, AuthorizeException {
+        AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+        CollectionRoleService collectionRoleService = XmlWorkflowServiceFactory.getInstance()
+                                                                               .getCollectionRoleService();
+        if (authorizeService.isAdmin(context)) {
+            return;
+        }
+
+        DSpaceObject parentObject = groupService.getParentObject(context, group);
+        if (parentObject == null) {
+            throw new AuthorizeException("not authorized to manage this group");
+        }
+        if (parentObject.getType() == Constants.COLLECTION) {
+            Collection collection = (Collection) parentObject;
+
+            if (group.equals(collection.getSubmitters())) {
+                authorizeManageSubmittersGroup(context, collection);
+                return;
+            }
+
+
+            List<CollectionRole> collectionRoles = collectionRoleService.findByCollection(context, collection);
+            for (CollectionRole role : collectionRoles) {
+                if (group.equals(role.getGroup())) {
+                    authorizeManageWorkflowsGroup(context, collection);
+                    return;
+                }
+            }
+
+            if (group.equals(collection.getAdministrators())) {
+                authorizeManageAdminGroup(context, collection);
+                return;
+            }
+            // if we reach this point, it means that the group is related
+            // to a collection but as it is not the submitters, nor the administrators,
+            // nor a workflow groups it must be a default item/bitstream groups
+            authorizeManageDefaultReadGroup(context, collection);
+            return;
+        }
+        if (parentObject.getType() == Constants.COMMUNITY) {
+            Community community = (Community) parentObject;
+            authorizeManageAdminGroup(context, community);
+            return;
+        }
+
+        throw new AuthorizeException("not authorized to manage this group");
+    }
+
+    /**
+     * This method will return a boolean indicating whether the current user is allowed to register a new
+     * account or not
+     * @param context   The relevant DSpace context
+     * @param request   The current request
+     * @return          A boolean indicating whether the current user can register a new account or not
+     * @throws SQLException If something goes wrong
+     */
+    public static boolean authorizeNewAccountRegistration(Context context, HttpServletRequest request)
+        throws SQLException {
+        if (DSpaceServicesFactory.getInstance().getConfigurationService()
+                                 .getBooleanProperty("user.registration", true)) {
+            // This allowSetPassword is currently the only mthod that would return true only when it's
+            // actually expected to be returning true.
+            // For example the LDAP canSelfRegister will return true due to auto-register, while that
+            // does not imply a new user can register explicitly
+            return AuthenticateServiceFactory.getInstance().getAuthenticationService()
+                                             .allowSetPassword(context, request, null);
+        }
+        return false;
+    }
+
+    /**
+     * This method will return a boolean indicating whether it's allowed to update the password for the EPerson
+     * with the given email and canLogin property
+     * @param context   The relevant DSpace context
+     * @param email     The email to be checked
+     * @return          A boolean indicating if the password can be updated or not
+     */
+    public static boolean authorizeUpdatePassword(Context context, String email) {
+        try {
+            EPerson eperson = EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context, email);
+            if (eperson != null && eperson.canLogIn()) {
+                HttpServletRequest request = new DSpace().getRequestService().getCurrentRequest()
+                                                         .getHttpServletRequest();
+                return AuthenticateServiceFactory.getInstance().getAuthenticationService()
+                                                 .allowSetPassword(context, request, null);
+            }
+        } catch (SQLException e) {
+            log.error("Something went wrong trying to retrieve EPerson for email: " + email, e);
+        }
+        return false;
+    }
+
+    /**
+     * This method checks if the community Admin can manage accounts
+     *
+     * @return true if is able
+     */
+    public static boolean canCommunityAdminManageAccounts() {
+        boolean isAble = false;
+        if (AuthorizeConfiguration.canCommunityAdminManagePolicies()
+            || AuthorizeConfiguration.canCommunityAdminManageAdminGroup()
+            || AuthorizeConfiguration.canCommunityAdminManageCollectionPolicies()
+            || AuthorizeConfiguration.canCommunityAdminManageCollectionSubmitters()
+            || AuthorizeConfiguration.canCommunityAdminManageCollectionWorkflows()
+            || AuthorizeConfiguration.canCommunityAdminManageCollectionAdminGroup()) {
+            isAble = true;
+        }
+        return isAble;
+    }
+
+    /**
+     * This method checks if the Collection Admin can manage accounts
+     *
+     * @return true if is able
+     */
+    public static boolean canCollectionAdminManageAccounts() {
+        boolean isAble = false;
+        if (AuthorizeConfiguration.canCollectionAdminManagePolicies()
+            || AuthorizeConfiguration.canCollectionAdminManageSubmitters()
+            || AuthorizeConfiguration.canCollectionAdminManageWorkflows()
+            || AuthorizeConfiguration.canCollectionAdminManageAdminGroup()) {
+            isAble = true;
+        }
+        return isAble;
     }
 }

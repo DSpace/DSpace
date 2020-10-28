@@ -76,7 +76,7 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
      * @param group   DSpace group
      * @param ePerson eperson
      */
-    public void removeMember(Context context, Group group, EPerson ePerson);
+    public void removeMember(Context context, Group group, EPerson ePerson) throws SQLException;
 
 
     /**
