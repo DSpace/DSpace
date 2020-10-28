@@ -45,6 +45,8 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
 
     private StreamDisseminationCrosswalkMapper crosswalkMapper;
 
+    private CSLItemDataCrosswalk publicationHtmlCrosswalk;
+
     private Community community;
 
     private Collection collection;
@@ -54,6 +56,9 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
 
         this.crosswalkMapper = new DSpace().getSingletonService(StreamDisseminationCrosswalkMapper.class);
         assertThat(crosswalkMapper, notNullValue());
+
+        this.publicationHtmlCrosswalk = new DSpace().getServiceManager()
+            .getServiceByName("referCrosswalkPublicationIeeeHtml", CSLItemDataCrosswalk.class);
 
         context.turnOffAuthorisationSystem();
         community = createCommunity(context).build();
@@ -75,11 +80,8 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
             .build();
         context.restoreAuthSystemState();
 
-        StreamDisseminationCrosswalk crosswalk = crosswalkMapper.getByType("publication-ieee-html");
-        assertThat(crosswalk, notNullValue());
-
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        crosswalk.disseminate(context, item, out);
+        publicationHtmlCrosswalk.disseminate(context, item, out);
 
         try (FileInputStream fis = getFileInputStream("publication-ieee.html")) {
             String expectedHtml = IOUtils.toString(fis, Charset.defaultCharset());
@@ -110,11 +112,8 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
 
         context.restoreAuthSystemState();
 
-        StreamDisseminationCrosswalk crosswalk = crosswalkMapper.getByType("publication-ieee-html");
-        assertThat(crosswalk, notNullValue());
-
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        crosswalk.disseminate(context, Arrays.asList(firstItem, secondItem).iterator(), out);
+        publicationHtmlCrosswalk.disseminate(context, Arrays.asList(firstItem, secondItem).iterator(), out);
 
         try (FileInputStream fis = getFileInputStream("publications-ieee.html")) {
             String expectedHtml = IOUtils.toString(fis, Charset.defaultCharset());

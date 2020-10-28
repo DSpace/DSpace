@@ -12,7 +12,7 @@
 				<entry key="bibtex" value-ref="referCrosswalkBibtex"></entry>
 				<entry key="endnote" value-ref="referCrosswalkEndnote"></entry>
 				<entry key="publication-xml" value-ref="referCrosswalkPublicationXml"></entry>
-				<entry key="publication-ieee-html" value-ref="referCrosswalkPublicationIeeeHtml"></entry>
+				<entry key="publication-pdf" value-ref="pdfCrosswalkPublication"></entry>
 				
 				<entry key="person-xml" value-ref="referCrosswalkPersonXml"></entry>
 				<entry key="person-json" value-ref="referCrosswalkPersonJson"></entry>
@@ -71,8 +71,6 @@
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE}"/>
 	</bean>
 	
-	
-	
 	<bean class="org.dspace.content.integration.crosswalks.DocumentCrosswalk" id="pdfCrosswalkPerson">
 		<property name="templateFileName" value="crosswalks/template/person-template.xsl"/>
 		<property name="fileName" value="person.pdf"/>
@@ -87,6 +85,14 @@
 		<property name="mimeType" value="application/rtf"/>
 		<property name="entityType" value="Person"/>
 		<property name="referCrosswalk" ref="referCrosswalkPersonXml"/>
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.DocumentCrosswalk" id="pdfCrosswalkPublication">
+		<property name="templateFileName" value="crosswalks/template/publication-template.xsl"/>
+		<property name="fileName" value="publication.pdf"/>
+		<property name="mimeType" value="application/pdf"/>
+		<property name="entityType" value="Publication"/>
+		<property name="referCrosswalk" ref="referCrosswalkPublicationXml"/>
 	</bean>
 	
 	<bean class="org.dspace.content.integration.crosswalks.CsvCrosswalk" id="csvCrosswalkPerson">
@@ -109,6 +115,7 @@
 		<property name="mimeType" value="text/html; charset=UTF-8"/>
 		<property name="format" value="html"/>
 		<property name="fileName" value="publications-ieee.html"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
 	</bean>
 	
 	<bean class="org.dspace.content.integration.crosswalks.converter.XmlValueConverter" id="xmlValueConverter" />

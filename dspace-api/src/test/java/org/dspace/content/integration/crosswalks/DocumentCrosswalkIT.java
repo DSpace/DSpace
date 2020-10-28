@@ -23,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.function.Consumer;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.rtf.RTFEditorKit;
@@ -40,6 +41,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
+import org.dspace.core.CrisConstants;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.junit.Before;
 import org.junit.Test;
@@ -96,7 +98,7 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             streamCrosswalkDefault.disseminate(context, personItem, out);
             assertThat(out.toString(), not(isEmptyString()));
-            assertThatPdfHasTheExpectedContent(out);
+            assertThatPdfHasTheExpectedContent(out, content -> assertThatPersonDocumentHasExpectedContent(content));
         }
 
     }
@@ -129,7 +131,7 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             streamCrosswalkDefault.disseminate(context, personItem, out);
             assertThat(out.toString(), not(isEmptyString()));
-            assertThatRtfHasExpectedContent(out);
+            assertThatRtfHasExpectedContent(out, content -> assertThatPersonDocumentHasExpectedContent(content));
         }
 
     }
@@ -170,7 +172,7 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             streamCrosswalkDefault.disseminate(context, personItem, out);
             assertThat(out.toString(), not(isEmptyString()));
-            assertThatPdfHasTheExpectedContent(out);
+            assertThatPdfHasTheExpectedContent(out, content -> assertThatPersonDocumentHasExpectedContent(content));
         }
 
     }
@@ -211,7 +213,53 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             streamCrosswalkDefault.disseminate(context, personItem, out);
             assertThat(out.toString(), not(isEmptyString()));
-            assertThatRtfHasExpectedContent(out);
+            assertThatRtfHasExpectedContent(out, content -> assertThatPersonDocumentHasExpectedContent(content));
+        }
+
+    }
+
+    @Test
+    public void testPdfCrosswalkPublication() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item publication = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Publication")
+            .withTitle("Test Publication")
+            .withAlternativeTitle("Alternative publication title")
+            .withRelationPublication("Published in publication")
+            .withRelationDoi("doi:10.3972/test")
+            .withDoiIdentifier("doi:111.111/publication")
+            .withIsbnIdentifier("978-3-16-148410-0")
+            .withIssnIdentifier("2049-3630")
+            .withIsiIdentifier("111-222-333")
+            .withScopusIdentifier("99999999")
+            .withLanguage("en")
+            .withPublisher("Publication publisher")
+            .withVolume("V.01")
+            .withIssue("Issue")
+            .withSubject("test")
+            .withSubject("export")
+            .withType("Controlled Vocabulary for Resource Type Genres::text::review")
+            .withIssueDate("2020-01-01")
+            .withAuthor("John Smith")
+            .withAuthorAffiliation(CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE)
+            .withAuthor("Walter White")
+            .withAuthorAffiliation("Company")
+            .withEditor("Editor")
+            .withEditorAffiliation("Editor Affiliation")
+            .withRelationConference("The best Conference")
+            .withRelationDataset("DataSet")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        StreamDisseminationCrosswalk streamCrosswalkDefault = (StreamDisseminationCrosswalk) CoreServiceFactory
+            .getInstance().getPluginService().getNamedPlugin(StreamDisseminationCrosswalk.class, "publication-pdf");
+
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            streamCrosswalkDefault.disseminate(context, publication, out);
+            assertThat(out.toString(), not(isEmptyString()));
         }
 
     }
@@ -281,22 +329,23 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             + "culpa qui officia deserunt mollit anim id est laborum.";
     }
 
-    private void assertThatRtfHasExpectedContent(ByteArrayOutputStream out) throws IOException, BadLocationException {
+    private void assertThatRtfHasExpectedContent(ByteArrayOutputStream out, Consumer<String> assertConsumer)
+        throws IOException, BadLocationException {
         RTFEditorKit rtfParser = new RTFEditorKit();
         Document document = rtfParser.createDefaultDocument();
         rtfParser.read(new ByteArrayInputStream(out.toByteArray()), document, 0);
         String content = document.getText(0, document.getLength());
-        assertThatHasExpectedContent(content);
+        assertConsumer.accept(content);
     }
 
-    private void assertThatPdfHasTheExpectedContent(ByteArrayOutputStream out)
+    private void assertThatPdfHasTheExpectedContent(ByteArrayOutputStream out, Consumer<String> assertConsumer)
         throws InvalidPasswordException, IOException {
         PDDocument document = PDDocument.load(out.toByteArray());
         String content = new PDFTextStripper().getText(document);
-        assertThatHasExpectedContent(content);
+        assertConsumer.accept(content);
     }
 
-    private void assertThatHasExpectedContent(String content) {
+    private void assertThatPersonDocumentHasExpectedContent(String content) {
         assertThat(content, containsString("John Smith"));
         assertThat(content, containsString("Researcher at University"));
 
