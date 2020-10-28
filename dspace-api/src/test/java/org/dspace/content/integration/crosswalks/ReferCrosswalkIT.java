@@ -96,34 +96,6 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
-    public void testBibtextDisseminate() throws Exception {
-
-        context.turnOffAuthorisationSystem();
-
-        Item item = createItem(context, collection)
-            .withRelationshipType("Publication")
-            .withTitle("Publication title")
-            .withIssueDate("2018-05-17")
-            .withAuthor("John Smith")
-            .withAuthor("Edward Red")
-            .withHandle("123456789/0001")
-            .build();
-
-        context.restoreAuthSystemState();
-
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("bibtex");
-        assertThat(referCrossWalk, notNullValue());
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        referCrossWalk.disseminate(context, item, out);
-
-        try (FileInputStream fis = getFileInputStream("publication.bib")) {
-            String expectedBibtex = IOUtils.toString(fis, Charset.defaultCharset());
-            compareEachLine(out.toString(), expectedBibtex);
-        }
-    }
-
-    @Test
     public void testPersonXmlDisseminate() throws Exception {
         context.turnOffAuthorisationSystem();
 

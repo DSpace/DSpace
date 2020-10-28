@@ -23,11 +23,11 @@
 		</constructor-arg>
 	</bean>
 	
-	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkBibtex">
-		<property name="templateFileName" value="crosswalks/template/bibtex.template"/>
+	<bean class="org.dspace.content.integration.crosswalks.CSLItemDataCrosswalk" id="referCrosswalkBibtex">
+		<property name="style" value="bibtex.csl"/>
 		<property name="mimeType" value="application/x-bibtex; charset=UTF-8"/>
+		<property name="format" value="text"/>
 		<property name="fileName" value="references.bib"/>
-		<property name="entityType" value="Publication"/>
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE}"/>
 	</bean>
 	
@@ -94,10 +94,10 @@
 	</bean>
 	
 	<bean class="org.dspace.content.integration.crosswalks.CSLItemDataCrosswalk" id="referCrosswalkPublicationIeeeHtml">
-		<constructor-arg name="style" value="ieee.csl"/>
-		<constructor-arg name="mimeType" value="text/html; charset=UTF-8"/>
-		<constructor-arg name="format" value="html"/>
-		<constructor-arg name="fileName" value="publications-ieee.html"/>
+		<property name="style" value="ieee.csl"/>
+		<property name="mimeType" value="text/html; charset=UTF-8"/>
+		<property name="format" value="html"/>
+		<property name="fileName" value="publications-ieee.html"/>
 	</bean>
 	
 	<bean class="org.dspace.content.integration.crosswalks.converter.XmlValueConverter" id="xmlValueConverter" />
@@ -158,14 +158,14 @@
 		<constructor-arg value="mapConverterCoarTypes" />
 		<property name="converterNameFile" value="mapConverter-coarTypes.properties" />
 		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
-		<property name="defaultValue" value=""/>
+		<property name="defaultValue" value="http://purl.org/coar/resource_type/c_1843"/>
 	</bean>
 	
 	<bean name="mapConverterFundingTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
-		<constructor-arg value="mapConverterCoarTypes" />
+		<constructor-arg value="mapConverterFundingTypes" />
 		<property name="converterNameFile" value="mapConverter-fundingTypes.properties" />
 		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
-		<property name="defaultValue" value=""/>
+		<property name="defaultValue" value="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types"/>
 	</bean>
 	
 	<!-- CONDITION EVALUATORS CONFIGURATION -->
