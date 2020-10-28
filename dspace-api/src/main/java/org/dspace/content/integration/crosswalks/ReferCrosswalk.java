@@ -45,6 +45,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.crosswalk.CrosswalkException;
+import org.dspace.content.crosswalk.CrosswalkMode;
 import org.dspace.content.crosswalk.CrosswalkObjectNotSupported;
 import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
 import org.dspace.content.integration.crosswalks.evaluators.ConditionEvaluator;
@@ -112,6 +113,8 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
     private List<TemplateLine> templateLines;
 
     private List<TemplateLine> multipleItemsTemplateLines;
+
+    private CrosswalkMode crosswalkMode;
 
     @PostConstruct
     private void postConstruct() throws IOException {
@@ -525,6 +528,14 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
 
     public Optional<String> getEntityType() {
         return Optional.ofNullable(entityType);
+    }
+
+    public void setCrosswalkMode(CrosswalkMode crosswalkMode) {
+        this.crosswalkMode = crosswalkMode;
+    }
+
+    public CrosswalkMode getCrosswalkMode() {
+        return this.crosswalkMode != null ? this.crosswalkMode : StreamDisseminationCrosswalk.super.getCrosswalkMode();
     }
 
 }

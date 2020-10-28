@@ -1,4 +1,5 @@
 <Publication id="mock-id">
+	<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/COAR_Publication_Types">http://purl.org/coar/resource_type/c_efa0</Type>
    	<Title>Test Publication</Title>
    	<PublishedIn>
     	<Publication>
@@ -60,4 +61,3 @@
 		</Product>
 	</References>
 </Publication>
-

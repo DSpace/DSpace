@@ -93,4 +93,13 @@ public interface StreamDisseminationCrosswalk {
     public default Optional<String> getEntityType() {
         return Optional.empty();
     }
+
+    /**
+     * Returns the supported crosswalk mode.
+     *
+     * @return the crosswalk mode
+     */
+    public default CrosswalkMode getCrosswalkMode() {
+        return CrosswalkMode.SINGLE;
+    }
 }

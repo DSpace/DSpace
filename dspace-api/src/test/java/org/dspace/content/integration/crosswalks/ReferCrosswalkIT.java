@@ -100,6 +100,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         Item item = createItem(context, collection)
+            .withRelationshipType("Publication")
             .withTitle("Publication title")
             .withIssueDate("2018-05-17")
             .withAuthor("John Smith")
@@ -251,6 +252,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         Item item = createItem(context, collection)
+            .withRelationshipType("Person")
             .withTitle("John Smith")
             .build();
 
@@ -483,6 +485,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         Item publication = ItemBuilder.createItem(context, collection)
             .withRelationshipType("Publication")
             .withTitle("Test Publication")
+            .withType("Controlled Vocabulary for Resource Type Genres::text::review")
             .withIssueDate("2020-01-01")
             .withAuthor("John Smith")
             .withAuthor("Walter White")
