@@ -236,6 +236,11 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             throw new UnprocessableEntityException("Error parsing request body.", e1);
         }
 
+        if (collectionRest.getMetadata().getMap().containsKey("dc.identifier.uri")) {
+            throw new UnprocessableEntityException("Handle identifier cannot be passed "
+                    + "as metadata during collection creation.");
+        }
+
         Collection collection;
         try {
             Community parent = communityService.find(context, id);
@@ -245,7 +250,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             }
             collection = cs.create(context, parent);
             cs.update(context, collection);
-            metadataConverter.addMetadata(context, collection, collectionRest.getMetadata());
+            metadataConverter.mergeMetadata(context, collection, collectionRest.getMetadata());
         } catch (SQLException e) {
             throw new RuntimeException("Unable to create new Collection under parent Community " + id, e);
         }
