@@ -59,6 +59,7 @@ public class ItemExportIT extends AbstractIntegrationTestWithDatabase {
 
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Person")
             .withTitle("Edward White")
             .withJobTitle("Researcher")
             .withOrcidIdentifier("0000-0002-9077-5939")
@@ -91,6 +92,7 @@ public class ItemExportIT extends AbstractIntegrationTestWithDatabase {
 
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Person")
             .withTitle("Edward White")
             .withJobTitle("Researcher")
             .withOrcidIdentifier("0000-0002-9077-5939")

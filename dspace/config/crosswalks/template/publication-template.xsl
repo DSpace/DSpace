@@ -2,6 +2,7 @@
 <xsl:stylesheet version="1.1"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	xmlns:fo="http://www.w3.org/1999/XSL/Format"
+	xmlns:pt="https://www.openaire.eu/cerif-profile/vocab/COAR_Publication_Types"
 	exclude-result-prefixes="fo">
 	
 	<xsl:param name="imageDir" />
@@ -87,6 +88,10 @@
 				    	<xsl:with-param name="label" select="'Keywords'" />
 				    	<xsl:with-param name="values" select="Keyword" />
 			    	</xsl:call-template>
+					<xsl:call-template name="print-value">
+				    	<xsl:with-param name="label" select="'Type'" />
+				    	<xsl:with-param name="value" select="pt:Type" />
+				    </xsl:call-template>
 			    	
 			    	
 					<xsl:call-template name="section-title">
@@ -118,6 +123,47 @@
 				    	<xsl:with-param name="label" select="'End page'" />
 				    	<xsl:with-param name="value" select="EndPage" />
 				    </xsl:call-template>
+			    	
+			    	
+					<xsl:call-template name="section-title">
+				    	<xsl:with-param name="label" select="'Projects'" />
+			    	</xsl:call-template>
+					<xsl:for-each select="OriginatesFrom/Project">
+			    		<fo:block font-size="10pt" margin-top="2mm">
+							<xsl:value-of select="Title" />
+							<xsl:if test="Acronym">
+								( <xsl:value-of select="Acronym"/> )
+							</xsl:if>
+						    <xsl:text> - </xsl:text>
+						    <xsl:if test="StartDate">
+						    	from <xsl:value-of select="StartDate"/>
+						    </xsl:if>
+						    <xsl:if test="EndDate">
+						    	to <xsl:value-of select="EndDate"/>
+						    </xsl:if>
+						</fo:block>
+					</xsl:for-each>
+					
+					<xsl:call-template name="section-title">
+				    	<xsl:with-param name="label" select="'Fundings'" />
+			    	</xsl:call-template>
+			    	<xsl:for-each select="OriginatesFrom/Funding">
+			    		<fo:block font-size="10pt" margin-top="2mm">
+							<xsl:value-of select="Name" />
+							<xsl:if test="Acronym">
+								( <xsl:value-of select="Acronym"/> )
+							</xsl:if>
+							<xsl:if test="Type">
+						    	<xsl:text> - Type: </xsl:text>
+						    	<xsl:value-of select="Type"/>
+					    	</xsl:if>
+						    <xsl:if test="Funder/OrgUnit/Name">
+						    	<xsl:text> - Funder: </xsl:text>
+						    	<xsl:value-of select="Funder/OrgUnit/Name"/>
+						    </xsl:if>
+						</fo:block>
+					</xsl:for-each>
+
 				</fo:flow>
 			</fo:page-sequence>
 		</fo:root>

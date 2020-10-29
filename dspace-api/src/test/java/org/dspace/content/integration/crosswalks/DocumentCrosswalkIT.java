@@ -98,7 +98,7 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             streamCrosswalkDefault.disseminate(context, personItem, out);
             assertThat(out.toString(), not(isEmptyString()));
-            assertThatPdfHasTheExpectedContent(out, content -> assertThatPersonDocumentHasExpectedContent(content));
+            assertThatPdfHasContent(out, content -> assertThatPersonDocumentHasContent(content));
         }
 
     }
@@ -131,7 +131,7 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             streamCrosswalkDefault.disseminate(context, personItem, out);
             assertThat(out.toString(), not(isEmptyString()));
-            assertThatRtfHasExpectedContent(out, content -> assertThatPersonDocumentHasExpectedContent(content));
+            assertThatRtfHasContent(out, content -> assertThatPersonDocumentHasContent(content));
         }
 
     }
@@ -172,7 +172,7 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             streamCrosswalkDefault.disseminate(context, personItem, out);
             assertThat(out.toString(), not(isEmptyString()));
-            assertThatPdfHasTheExpectedContent(out, content -> assertThatPersonDocumentHasExpectedContent(content));
+            assertThatPdfHasContent(out, content -> assertThatPersonDocumentHasContent(content));
         }
 
     }
@@ -213,15 +213,40 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             streamCrosswalkDefault.disseminate(context, personItem, out);
             assertThat(out.toString(), not(isEmptyString()));
-            assertThatRtfHasExpectedContent(out, content -> assertThatPersonDocumentHasExpectedContent(content));
+            assertThatRtfHasContent(out, content -> assertThatPersonDocumentHasContent(content));
         }
 
     }
 
     @Test
-    public void testPdfCrosswalkPublication() throws Exception {
+    public void testPdfCrosswalkPublicationDisseminate() throws Exception {
 
         context.turnOffAuthorisationSystem();
+
+        Item project = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Project")
+            .withTitle("Test Project")
+            .withInternalId("111-222-333")
+            .withAcronym("TP")
+            .withProjectStartDate("2020-01-01")
+            .withProjectEndDate("2020-04-01")
+            .build();
+
+        ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Funding")
+            .withTitle("Test Funding")
+            .withType("Internal Funding")
+            .withFunder("Test Funder")
+            .withRelationProject("Test Project", project.getID().toString())
+            .build();
+
+        Item funding = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Funding")
+            .withTitle("Another Test Funding")
+            .withType("Contract")
+            .withFunder("Another Test Funder")
+            .withAcronym("ATF-01")
+            .build();
 
         Item publication = ItemBuilder.createItem(context, collection)
             .withRelationshipType("Publication")
@@ -248,8 +273,8 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withAuthorAffiliation("Company")
             .withEditor("Editor")
             .withEditorAffiliation("Editor Affiliation")
-            .withRelationConference("The best Conference")
-            .withRelationDataset("DataSet")
+            .withRelationProject("Test Project", project.getID().toString())
+            .withRelationFunding("Another Test Funding", funding.getID().toString())
             .build();
 
         context.restoreAuthSystemState();
@@ -260,6 +285,7 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             streamCrosswalkDefault.disseminate(context, publication, out);
             assertThat(out.toString(), not(isEmptyString()));
+            assertThatPdfHasContent(out, content -> assertThatPublicationDocumentHasContent(content));
         }
 
     }
@@ -329,7 +355,7 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             + "culpa qui officia deserunt mollit anim id est laborum.";
     }
 
-    private void assertThatRtfHasExpectedContent(ByteArrayOutputStream out, Consumer<String> assertConsumer)
+    private void assertThatRtfHasContent(ByteArrayOutputStream out, Consumer<String> assertConsumer)
         throws IOException, BadLocationException {
         RTFEditorKit rtfParser = new RTFEditorKit();
         Document document = rtfParser.createDefaultDocument();
@@ -338,14 +364,14 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         assertConsumer.accept(content);
     }
 
-    private void assertThatPdfHasTheExpectedContent(ByteArrayOutputStream out, Consumer<String> assertConsumer)
+    private void assertThatPdfHasContent(ByteArrayOutputStream out, Consumer<String> assertConsumer)
         throws InvalidPasswordException, IOException {
         PDDocument document = PDDocument.load(out.toByteArray());
         String content = new PDFTextStripper().getText(document);
         assertConsumer.accept(content);
     }
 
-    private void assertThatPersonDocumentHasExpectedContent(String content) {
+    private void assertThatPersonDocumentHasContent(String content) {
         assertThat(content, containsString("John Smith"));
         assertThat(content, containsString("Researcher at University"));
 
@@ -378,6 +404,34 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         assertThat(content, containsString("Knows languages: English, Italian"));
         assertThat(content, containsString("Personal sites: www.test.com ( Test ) , www.john-smith.com , "
             + "www.site.com ( Site )"));
+    }
+
+    private void assertThatPublicationDocumentHasContent(String content) {
+        assertThat(content, containsString("Test Publication"));
+
+        assertThat(content, containsString("Publication basic information"));
+        assertThat(content, containsString("Other titles: Alternative publication title"));
+        assertThat(content, containsString("Publication date: 2020-01-01"));
+        assertThat(content, containsString("DOI: doi:111.111/publication"));
+        assertThat(content, containsString("ISBN: 978-3-16-148410-0"));
+        assertThat(content, containsString("ISI number: 111-222-333"));
+        assertThat(content, containsString("SCP number: 99999999"));
+        assertThat(content, containsString("Authors: John Smith and Walter White ( Company )"));
+        assertThat(content, containsString("Editors: Editor ( Editor Affiliation )"));
+        assertThat(content, containsString("Keywords: test, export"));
+        assertThat(content, containsString("Type: http://purl.org/coar/resource_type/c_efa0"));
+
+        assertThat(content, containsString("Publication bibliographic details"));
+        assertThat(content, containsString("Published in: Published in publication"));
+        assertThat(content, containsString("ISSN: 2049-3630"));
+        assertThat(content, containsString("Volume: V.01"));
+        assertThat(content, containsString("Issue: Issue"));
+
+        assertThat(content, containsString("Projects"));
+        assertThat(content, containsString("Test Project ( TP ) - from 2020-01-01 to 2020-04-01"));
+
+        assertThat(content, containsString("Fundings"));
+        assertThat(content, containsString("Another Test Funding ( ATF-01 ) - Funder: Another Test Funder"));
     }
 
     private FileInputStream getFileInputStream(String name) throws FileNotFoundException {
