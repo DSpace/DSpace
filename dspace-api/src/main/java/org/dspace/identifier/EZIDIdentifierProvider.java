@@ -147,7 +147,9 @@ public class EZIDIdentifierProvider
     public String register(Context context, DSpaceObject dso)
         throws IdentifierException {
         log.debug("register {}", dso);
-
+        if (!(dso instanceof Item)) {
+            return null;
+        }
         DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
         List<MetadataValue> identifiers = dsoService.getMetadata(dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
         for (MetadataValue identifier : identifiers) {
