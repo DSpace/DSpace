@@ -150,6 +150,7 @@
 		</constructor-arg>
 	</bean>
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldMapConverter" id="virtualFieldMapConverter">
+		<constructor-arg name="itemService" ref="org.dspace.content.ItemServiceImpl"/>
 		<constructor-arg name="mapConverters">
 			<map>
 				<entry key="coarTypes" value-ref="mapConverterCoarTypes" />

@@ -24,20 +24,14 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public class AuthorityNotBlankCondition implements ConditionEvaluator {
+public class AuthorityNotBlankCondition extends ConditionEvaluator {
 
     @Autowired
     private ItemService itemService;
 
     @Override
-    public boolean test(Context context, Item item, String condition) {
-        if (StringUtils.isBlank(condition)) {
-            return false;
-        }
+    public boolean doTest(Context context, Item item, String condition) {
 
-        if (condition.startsWith("not.")) {
-            return !test(context, item, condition.substring("not.".length()));
-        }
 
         String[] conditionSections = condition.split("\\.");
         if (conditionSections.length != 2) {

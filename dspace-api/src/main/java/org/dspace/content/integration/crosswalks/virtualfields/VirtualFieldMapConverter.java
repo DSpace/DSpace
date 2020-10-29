@@ -14,7 +14,6 @@ import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.util.SimpleMapConverter;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implementation of {@link VirtualField} that maps the key present in the field name
@@ -25,12 +24,12 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class VirtualFieldMapConverter implements VirtualField {
 
-    @Autowired
     private ItemService itemService;
 
     private final Map<String, SimpleMapConverter> mapConverters;
 
-    public VirtualFieldMapConverter(Map<String, SimpleMapConverter> mapConverters) {
+    public VirtualFieldMapConverter(ItemService itemService, Map<String, SimpleMapConverter> mapConverters) {
+        this.itemService = itemService;
         this.mapConverters = mapConverters;
     }
 

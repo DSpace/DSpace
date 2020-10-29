@@ -7,16 +7,17 @@
  */
 package org.dspace.content.integration.crosswalks.evaluators;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
 /**
- * Interface for classes that can evaluate a given condition on items.
+ * Class that can be extended to evaluate a given condition on items.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public interface ConditionEvaluator {
+public abstract class ConditionEvaluator {
 
     /**
      * Test the given condition on the given item.
@@ -33,6 +34,32 @@ public interface ConditionEvaluator {
      * @param condition the condition to evaluate
      * @return the evaluation result
      */
-    public boolean test(Context context, Item item, String condition);
+    public final boolean test(Context context, Item item, String condition) {
+        if (StringUtils.isBlank(condition)) {
+            return false;
+        }
+
+        if (condition.startsWith("not.")) {
+            return !doTest(context, item, condition.substring("not.".length()));
+        }
+
+        return doTest(context, item, condition);
+
+    }
+
+    /**
+     * Test the given condition on the given item.
+     * The condition should have the format evaluatorIdentifier.value, where:
+     * <ul>
+     * <li> evaluatorIdentifier is the unique identifier of the evaluator
+     * <li> value can be any string useful to the evaluator
+     * </ul>
+     *
+     * @param context the DSpace Context
+     * @param item the item to evaluate
+     * @param condition the condition to evaluate
+     * @return the evaluation result
+     */
+    protected abstract boolean doTest(Context context, Item item, String condition);
 
 }
