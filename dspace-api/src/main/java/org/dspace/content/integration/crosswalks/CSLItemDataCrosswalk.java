@@ -14,18 +14,23 @@ import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Objects;
+import java.util.Optional;
 
 import de.undercouch.citeproc.CSL;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
+import org.dspace.content.crosswalk.CrosswalkMode;
 import org.dspace.content.crosswalk.CrosswalkObjectNotSupported;
 import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
 import org.dspace.content.integration.crosswalks.csl.DSpaceListItemDataProvider;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implementation of {@link StreamDisseminationCrosswalk} to serialize the given
@@ -37,28 +42,25 @@ import org.springframework.beans.factory.ObjectFactory;
  */
 public class CSLItemDataCrosswalk implements StreamDisseminationCrosswalk, FileNameDisseminator {
 
+    @Autowired
     private ObjectFactory<DSpaceListItemDataProvider> dSpaceListItemDataProviderObjectFactory;
 
-    private final String mimeType;
+    @Autowired
+    private ItemService itemService;
 
-    private final String style;
+    private String mimeType;
 
-    private final String format;
+    private String style;
 
-    private final String fileName;
+    private String format;
 
-    public CSLItemDataCrosswalk(ObjectFactory<DSpaceListItemDataProvider> dSpaceListItemDataProviderObjectFactory,
-        String mimeType, String style, String format, String fileName) {
-        this.dSpaceListItemDataProviderObjectFactory = dSpaceListItemDataProviderObjectFactory;
-        this.mimeType = mimeType;
-        this.style = style;
-        this.format = format;
-        this.fileName = fileName;
-    }
+    private String fileName;
+
+    private CrosswalkMode crosswalkMode;
 
     @Override
     public boolean canDisseminate(Context context, DSpaceObject dso) {
-        return dso.getType() == Constants.ITEM;
+        return dso.getType() == Constants.ITEM && isPublication((Item) dso);
     }
 
     @Override
@@ -77,11 +79,10 @@ public class CSLItemDataCrosswalk implements StreamDisseminationCrosswalk, FileN
             DSpaceObject dso = dsoIterator.next();
 
             if (!canDisseminate(context, dso)) {
-                throw new CrosswalkObjectNotSupported("CSLItemDataCrosswalk can only crosswalk an Item.");
+                throw new CrosswalkObjectNotSupported("CSLItemDataCrosswalk can only crosswalk a Publication item.");
             }
 
             dSpaceListItemDataProvider.processItem((Item) dso);
-
         }
 
         CSL citeproc = new CSL(dSpaceListItemDataProvider, style);
@@ -106,6 +107,40 @@ public class CSLItemDataCrosswalk implements StreamDisseminationCrosswalk, FileN
 
     private DSpaceListItemDataProvider getDSpaceListItemDataProviderInstance() {
         return dSpaceListItemDataProviderObjectFactory.getObject();
+    }
+
+    private boolean isPublication(Item item) {
+        String relationshipType = itemService.getMetadataFirstValue(item, "relationship", "type", null, Item.ANY);
+        return Objects.equals(relationshipType, "Publication");
+    }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
+    }
+
+    public void setStyle(String style) {
+        this.style = style;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public void setCrosswalkMode(CrosswalkMode crosswalkMode) {
+        this.crosswalkMode = crosswalkMode;
+    }
+
+    public CrosswalkMode getCrosswalkMode() {
+        return this.crosswalkMode != null ? this.crosswalkMode : StreamDisseminationCrosswalk.super.getCrosswalkMode();
+    }
+
+    @Override
+    public Optional<String> getEntityType() {
+        return Optional.of("Publication");
     }
 
 }

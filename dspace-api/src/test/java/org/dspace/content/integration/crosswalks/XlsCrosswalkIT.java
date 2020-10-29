@@ -99,6 +99,7 @@ public class XlsCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         Item firstItem = createFullPersonItem();
 
         Item secondItem = createItem(context, collection)
+            .withRelationshipType("Person")
             .withTitle("Edward Red")
             .withGivenName("Edward")
             .withFamilyName("Red")
@@ -111,6 +112,7 @@ public class XlsCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .build();
 
         Item thirdItem = createItem(context, collection)
+            .withRelationshipType("Person")
             .withTitle("Adam White")
             .withGivenName("Adam")
             .withFamilyName("White")
@@ -169,6 +171,7 @@ public class XlsCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         Item item = createItem(context, collection)
+            .withRelationshipType("Person")
             .withTitle("Walter White")
             .withVariantName("Heisenberg")
             .withVariantName("W.W.")
@@ -223,6 +226,7 @@ public class XlsCrosswalkIT extends AbstractIntegrationTestWithDatabase {
     private Item createFullPersonItem() {
         Item item = createItem(context, collection)
             .withTitle("John Smith")
+            .withRelationshipType("Person")
             .withFullName("John Smith")
             .withVernacularName("JOHN SMITH")
             .withVariantName("J.S.")

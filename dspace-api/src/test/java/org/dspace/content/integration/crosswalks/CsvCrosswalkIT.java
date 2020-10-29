@@ -97,6 +97,7 @@ public class CsvCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         Item firstItem = createFullPersonItem();
 
         Item secondItem = createItem(context, collection)
+            .withRelationshipType("Person")
             .withTitle("Edward Red")
             .withGivenName("Edward")
             .withFamilyName("Red")
@@ -110,6 +111,7 @@ public class CsvCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         Item thirdItem = createItem(context, collection)
             .withTitle("Adam White")
+            .withRelationshipType("Person")
             .withGivenName("Adam")
             .withFamilyName("White")
             .withBirthDate("1962-03-23")
@@ -145,6 +147,7 @@ public class CsvCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         Item item = createItem(context, collection)
+            .withRelationshipType("Person")
             .withTitle("Walter White")
             .withVariantName("Heisenberg")
             .withVariantName("W.W.")
@@ -187,6 +190,7 @@ public class CsvCrosswalkIT extends AbstractIntegrationTestWithDatabase {
     private Item createFullPersonItem() {
         Item item = createItem(context, collection)
             .withTitle("John Smith")
+            .withRelationshipType("Person")
             .withFullName("John Smith")
             .withVernacularName("JOHN SMITH")
             .withVariantName("J.S.")

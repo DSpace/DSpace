@@ -1,0 +1,99 @@
+<Publication id="mock-id">
+	<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/COAR_Publication_Types">http://purl.org/coar/resource_type/c_efa0</Type>
+	<Language>en</Language>
+   	<Title>Test Publication</Title>
+   	<Subtitle>Alternative publication title</Subtitle>
+   	<PublishedIn>
+    	<Publication>
+        	<Title>Published in publication</Title>
+         	<DOI>doi:10.3972/test</DOI>
+      	</Publication>
+   	</PublishedIn>
+   	<Publishers>
+   		<Publisher>
+   			<OrgUnit>
+				<Name>Publication publisher</Name>
+     		</OrgUnit>
+   		</Publisher>
+   	</Publishers>
+   	<PublicationDate>2020-01-01</PublicationDate>
+	<Volume>V.01</Volume>
+	<Issue>Issue</Issue>
+   	<DOI>doi:111.111/publication</DOI>
+   	<ISBN>978-3-16-148410-0</ISBN>
+   	<ISSN>2049-3630</ISSN>
+   	<ISI-Number>111-222-333</ISI-Number>
+   	<SCP-Number>99999999</SCP-Number>
+   	<Keyword>test</Keyword>
+   	<Keyword>export</Keyword>
+   	<Authors>
+      	<Author>
+        	<DisplayName>John Smith</DisplayName>
+         	<Affiliation>
+         		<OrgUnit>
+         		</OrgUnit>
+         	</Affiliation>
+      	</Author>
+      	<Author>
+        	<DisplayName>Walter White</DisplayName>
+         	<Affiliation>
+         		<OrgUnit>
+         			<Name>Company</Name>
+         		</OrgUnit>
+         	</Affiliation>
+      	</Author>
+	</Authors>
+   	<Editors>
+   	  	<Editor>
+        	<DisplayName>Editor</DisplayName>
+	   	  	<Affiliation>
+	      		<OrgUnit>
+	     			<Name>Editor Affiliation</Name>
+	     		</OrgUnit>
+	      	</Affiliation>
+   	  	</Editor>
+	</Editors>
+   	<OriginatesFrom>
+      	<Project>
+			<Acronym>TP</Acronym>
+         	<Title>Test Project</Title>
+         	<StartDate>2020-01-01</StartDate>
+         	<EndDate>2020-04-01</EndDate>
+         	<Funded>
+				<By>
+					<OrgUnit>
+						<Name>Test Funder</Name>
+					</OrgUnit>
+				</By>
+				<As>
+					<Funding id="mock-id">
+						<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#InternalFunding</Type>
+						<Name>Test Funding</Name>
+					</Funding>
+				</As>
+			</Funded>
+      	</Project>
+	</OriginatesFrom>
+   	<OriginatesFrom>
+   		<Funding id="mock-id">
+			<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#Contract</Type>
+			<Acronym>ATF-01</Acronym>
+			<Name>Another Test Funding</Name>
+			<Funder>
+				<OrgUnit>
+					<Name>Another Test Funder</Name>
+				</OrgUnit>
+			</Funder>
+		</Funding>
+   	</OriginatesFrom>
+	<OutputFrom>
+		<Event>
+			<Name>The best Conference</Name>
+		</Event>
+	</OutputFrom>
+	<References>
+		<Product>
+			<Name>DataSet</Name>
+		</Product>
+	</References>
+</Publication>

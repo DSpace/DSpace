@@ -45,6 +45,8 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
 
     private StreamDisseminationCrosswalkMapper crosswalkMapper;
 
+    private CSLItemDataCrosswalk publicationHtmlCrosswalk;
+
     private Community community;
 
     private Collection collection;
@@ -54,6 +56,9 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
 
         this.crosswalkMapper = new DSpace().getSingletonService(StreamDisseminationCrosswalkMapper.class);
         assertThat(crosswalkMapper, notNullValue());
+
+        this.publicationHtmlCrosswalk = new DSpace().getServiceManager()
+            .getServiceByName("referCrosswalkPublicationIeeeHtml", CSLItemDataCrosswalk.class);
 
         context.turnOffAuthorisationSystem();
         community = createCommunity(context).build();
@@ -68,21 +73,19 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
         context.turnOffAuthorisationSystem();
         Item item = createItem(context, collection)
             .withTitle("Publication title")
+            .withRelationshipType("Publication")
             .withIssueDate("2018-05-17")
             .withAuthor("John Smith")
             .withAuthor("Edward Red")
             .build();
         context.restoreAuthSystemState();
 
-        StreamDisseminationCrosswalk crosswalk = crosswalkMapper.getByType("publication-ieee-html");
-        assertThat(crosswalk, notNullValue());
-
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        crosswalk.disseminate(context, item, out);
+        publicationHtmlCrosswalk.disseminate(context, item, out);
 
         try (FileInputStream fis = getFileInputStream("publication-ieee.html")) {
             String expectedHtml = IOUtils.toString(fis, Charset.defaultCharset());
-            assertThat(out.toString(), equalTo(expectedHtml));
+            compareEachLine(out.toString(), expectedHtml);
         }
     }
 
@@ -93,6 +96,7 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
 
         Item firstItem = createItem(context, collection)
             .withTitle("Publication title")
+            .withRelationshipType("Publication")
             .withIssueDate("2018-05-17")
             .withAuthor("John Smith")
             .withAuthor("Edward Red")
@@ -101,21 +105,60 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
 
         Item secondItem = createItem(context, collection)
             .withTitle("Test publication")
+            .withRelationshipType("Publication")
             .withIssueDate("2020-01-31")
             .withAuthor("Walter White")
             .build();
 
         context.restoreAuthSystemState();
 
-        StreamDisseminationCrosswalk crosswalk = crosswalkMapper.getByType("publication-ieee-html");
-        assertThat(crosswalk, notNullValue());
-
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        crosswalk.disseminate(context, Arrays.asList(firstItem, secondItem).iterator(), out);
+        publicationHtmlCrosswalk.disseminate(context, Arrays.asList(firstItem, secondItem).iterator(), out);
 
         try (FileInputStream fis = getFileInputStream("publications-ieee.html")) {
             String expectedHtml = IOUtils.toString(fis, Charset.defaultCharset());
-            assertThat(out.toString(), equalTo(expectedHtml));
+            compareEachLine(out.toString(), expectedHtml);
+        }
+    }
+
+    @Test
+    public void testBibtextDisseminate() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item item = createItem(context, collection)
+            .withRelationshipType("Publication")
+            .withTitle("Publication title")
+            .withIssueDate("2018-05-17")
+            .withAuthor("John Smith")
+            .withAuthor("Edward Red")
+            .withHandle("123456789/0001")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        StreamDisseminationCrosswalk crosswalk = crosswalkMapper.getByType("bibtex");
+        assertThat(crosswalk, notNullValue());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        crosswalk.disseminate(context, item, out);
+
+        try (FileInputStream fis = getFileInputStream("publication.bib")) {
+            String expectedBibtex = IOUtils.toString(fis, Charset.defaultCharset());
+            compareEachLine(out.toString(), expectedBibtex);
+        }
+    }
+
+    private void compareEachLine(String result, String expectedResult) {
+
+        String[] resultLines = result.split("\n");
+        String[] expectedResultLines = expectedResult.split("\n");
+
+        assertThat("The result should have the same lines number of the expected result",
+            resultLines.length, equalTo(expectedResultLines.length));
+
+        for (int i = 0; i < resultLines.length; i++) {
+            assertThat(resultLines[i], equalTo(expectedResultLines[i]));
         }
     }
 

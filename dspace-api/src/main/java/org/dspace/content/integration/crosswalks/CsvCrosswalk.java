@@ -11,10 +11,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.List;
 
-import org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldMapper;
-import org.dspace.content.service.ItemService;
-import org.dspace.services.ConfigurationService;
-
 /**
  * Implementation of {@StreamDisseminationCrosswalk} to produce a csv file starting from a template.
  *
@@ -26,12 +22,6 @@ public class CsvCrosswalk extends TabularCrosswalk {
     private static final String CSV_QUOTE = String.valueOf('"');
 
     private static final String CSV_ESCAPED_QUOTE_STR = CSV_QUOTE + CSV_QUOTE;
-
-
-    public CsvCrosswalk(ItemService itemService, ConfigurationService configurationService, String templateFileName,
-        VirtualFieldMapper virtualFieldMapper, String fileName) {
-        super(itemService, configurationService, templateFileName, virtualFieldMapper, fileName);
-    }
 
     @Override
     public String getMIMEType() {

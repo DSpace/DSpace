@@ -18,9 +18,9 @@ import org.dspace.content.Item;
 import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.integration.crosswalks.FileNameDisseminator;
+import org.dspace.content.integration.crosswalks.StreamDisseminationCrosswalkMapper;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.scripts.DSpaceRunnable;
@@ -72,7 +72,7 @@ public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration<Ite
             throw new IllegalArgumentException("The export format must be provided");
         }
 
-        StreamDisseminationCrosswalk streamDisseminationCrosswalk = getCrosswalkByName(exportFormat);
+        StreamDisseminationCrosswalk streamDisseminationCrosswalk = getCrosswalkByType(exportFormat);
         if (streamDisseminationCrosswalk == null) {
             throw new IllegalArgumentException("No dissemination configured for format " + exportFormat);
         }
@@ -131,9 +131,8 @@ public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration<Ite
         }
     }
 
-    private StreamDisseminationCrosswalk getCrosswalkByName(String name) {
-        return (StreamDisseminationCrosswalk) CoreServiceFactory.getInstance().getPluginService()
-            .getNamedPlugin(StreamDisseminationCrosswalk.class, name);
+    private StreamDisseminationCrosswalk getCrosswalkByType(String type) {
+        return new DSpace().getSingletonService(StreamDisseminationCrosswalkMapper.class).getByType(type);
     }
 
 }

@@ -13,6 +13,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
+import java.util.Objects;
+import java.util.Optional;
 import javax.xml.transform.Result;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -28,9 +30,11 @@ import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.CrosswalkObjectNotSupported;
 import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implementation of {@link StreamDisseminationCrosswalk} to produce a document
@@ -41,31 +45,28 @@ import org.dspace.services.ConfigurationService;
  */
 public class DocumentCrosswalk implements StreamDisseminationCrosswalk, FileNameDisseminator {
 
-    private final ConfigurationService configurationService;
+    @Autowired
+    private ConfigurationService configurationService;
 
-    private final String fileName;
+    @Autowired
+    private ItemService itemService;
 
-    private final String mimeType;
+    private String fileName;
 
-    private final String templateFileName;
+    private String mimeType;
 
-    private final ReferCrosswalk referCrosswalk;
+    private String templateFileName;
 
-    public DocumentCrosswalk(ConfigurationService configurationService, ReferCrosswalk referCrosswalk, String fileName,
-        String templateFileName, String mimeType) {
-        this.configurationService = configurationService;
-        this.fileName = fileName;
-        this.referCrosswalk = referCrosswalk;
-        this.templateFileName = templateFileName;
-        this.mimeType = mimeType;
-    }
+    private String entityType;
+
+    private ReferCrosswalk referCrosswalk;
 
     @Override
     public void disseminate(Context context, DSpaceObject dso, OutputStream out)
         throws CrosswalkException, IOException, SQLException, AuthorizeException {
 
-        if (dso.getType() != Constants.ITEM) {
-            throw new CrosswalkObjectNotSupported("ReferCrosswalk can only crosswalk an Item.");
+        if (!canDisseminate(context, dso)) {
+            throw new CrosswalkObjectNotSupported("Can only crosswalk an Item with the configured type: " + entityType);
         }
 
         Item item = (Item) dso;
@@ -82,7 +83,7 @@ public class DocumentCrosswalk implements StreamDisseminationCrosswalk, FileName
 
     @Override
     public boolean canDisseminate(Context context, DSpaceObject dso) {
-        return (dso.getType() == Constants.ITEM);
+        return (dso.getType() == Constants.ITEM) && hasExpectedEntityType((Item) dso);
     }
 
     @Override
@@ -135,5 +136,35 @@ public class DocumentCrosswalk implements StreamDisseminationCrosswalk, FileName
         String tempDir = configurationService.getProperty("crosswalk.virtualfield.bitstream.tempdir", " export");
         return new File(System.getProperty("java.io.tmpdir"), tempDir).getAbsolutePath();
     }
+
+    private boolean hasExpectedEntityType(Item item) {
+        String relationshipType = itemService.getMetadataFirstValue(item, "relationship", "type", null, Item.ANY);
+        return Objects.equals(relationshipType, entityType);
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public void setTemplateFileName(String templateFileName) {
+        this.templateFileName = templateFileName;
+    }
+
+    public void setReferCrosswalk(ReferCrosswalk referCrosswalk) {
+        this.referCrosswalk = referCrosswalk;
+    }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
+    }
+
+    public void setEntityType(String entityType) {
+        this.entityType = entityType;
+    }
+
+    public Optional<String> getEntityType() {
+        return Optional.ofNullable(entityType);
+    }
+
 
 }
