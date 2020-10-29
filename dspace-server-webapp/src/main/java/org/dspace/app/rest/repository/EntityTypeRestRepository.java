@@ -20,6 +20,7 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.external.service.ExternalDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +38,8 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
     private EntityTypeService entityTypeService;
     @Autowired
     private CollectionService collectionService;
+    @Autowired
+    private ExternalDataService externalDataService;
 
     @Override
     @PreAuthorize("permitAll()")
@@ -85,6 +88,30 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
                             throw new RuntimeException(e.getMessage(), e);
                         }
                     }).filter(x -> x != null).collect(Collectors.toList());
+            return converter.toRestPage(entityTypes, pageable, utils.obtainProjection());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @SearchRestMethod(name = "findAllByAuthorizedExternalSource")
+    public Page<EntityTypeRest> findAllByAuthorizedExternalSource(Pageable pageable) {
+        try {
+            Context context = obtainContext();
+            List<Collection> collections = collectionService.findAuthorized(context, null, Constants.ADD);
+            List<EntityType> entityTypes = collections.stream().map(type -> type.getRelationshipType()).distinct()
+                    .map(type -> {
+                        if (StringUtils.isBlank(type)) {
+                            return null;
+                        }
+                        try {
+                            return entityTypeService.findByEntityType(context, type);
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e.getMessage(), e);
+                        }
+                    }).filter(x -> x != null)
+                    .filter(x -> externalDataService.getExternalDataProvidersForEntityType(x.getLabel()).size() > 0)
+                    .collect(Collectors.toList());
             return converter.toRestPage(entityTypes, pageable, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);

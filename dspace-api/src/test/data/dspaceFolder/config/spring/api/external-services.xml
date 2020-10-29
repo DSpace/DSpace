@@ -10,6 +10,34 @@
         <property name="sourceIdentifier" value="mock"/>
 
     </bean>
+
+    <bean class="org.dspace.external.provider.impl.MockDataProvider" init-method="init">
+        <property name="sourceIdentifier" value="mock2"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean class="org.dspace.external.provider.impl.MockDataProvider" init-method="init">
+        <property name="sourceIdentifier" value="mock3"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+            </list>
+        </property>
+    </bean>
+    
+    <bean class="org.dspace.external.provider.impl.MockDataProvider" init-method="init">
+        <property name="sourceIdentifier" value="mock4"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>OrgUnit</value>
+            </list>
+        </property>
+    </bean>
+
     <bean class="org.dspace.external.provider.impl.OrcidV3AuthorDataProvider" init-method="init">
         <constructor-arg value="${orcid.api.url}"/>
         <property name="sourceIdentifier" value="orcid"/>

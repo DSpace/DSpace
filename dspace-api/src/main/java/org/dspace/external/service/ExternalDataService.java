@@ -77,4 +77,12 @@ public interface ExternalDataService {
     WorkspaceItem createWorkspaceItemFromExternalDataObject(Context context, ExternalDataObject externalDataObject,
                                                             Collection collection)
         throws AuthorizeException, SQLException;
+
+    /**
+     * Return the ExternalDataProvider that supports a specific entity type
+     * 
+     * @param entityType
+     * @return
+     */
+    public List<ExternalDataProvider> getExternalDataProvidersForEntityType(String entityType);
 }

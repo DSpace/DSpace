@@ -30,7 +30,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.content.DCPersonName;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.model.ExternalDataObject;
-import org.dspace.external.provider.ExternalDataProvider;
+import org.dspace.external.provider.AbstractExternalDataProvider;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -59,7 +59,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Larry Stone
  * @version $Revision $
  */
-public class LCNameDataProvider implements ExternalDataProvider {
+public class LCNameDataProvider extends AbstractExternalDataProvider {
     private static final Logger log = LogManager.getLogger(LCNameDataProvider.class);
 
     private String url;

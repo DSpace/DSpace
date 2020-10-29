@@ -10,6 +10,7 @@ package org.dspace.external.service.impl;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -68,6 +69,12 @@ public class ExternalDataServiceImpl implements ExternalDataService {
     @Override
     public List<ExternalDataProvider> getExternalDataProviders() {
         return externalDataProviders;
+    }
+
+    @Override
+    public List<ExternalDataProvider> getExternalDataProvidersForEntityType(String entityType) {
+        return externalDataProviders.stream().filter(edp -> edp.supportsEntityType(entityType))
+                .collect(Collectors.toList());
     }
 
     @Override

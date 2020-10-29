@@ -28,7 +28,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.OrcidRestConnector;
 import org.dspace.external.model.ExternalDataObject;
-import org.dspace.external.provider.ExternalDataProvider;
+import org.dspace.external.provider.AbstractExternalDataProvider;
 import org.dspace.external.provider.orcid.xml.XMLtoBio;
 import org.json.JSONObject;
 import org.orcid.jaxb.model.common_v3.OrcidId;
@@ -40,7 +40,7 @@ import org.springframework.beans.factory.annotation.Required;
  * This class is the implementation of the ExternalDataProvider interface that will deal with the OrcidV3 External
  * Data lookup
  */
-public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
+public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
 
     private static Logger log = LogManager.getLogger(OrcidV3AuthorDataProvider.class);
 
