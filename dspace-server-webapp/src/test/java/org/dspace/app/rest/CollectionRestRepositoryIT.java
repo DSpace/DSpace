@@ -12,7 +12,7 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataNotEmpty;
-import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataStringContains;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataStringEndsWith;
 import static org.dspace.core.Constants.WRITE;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
@@ -1130,7 +1130,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                             .andExpect(jsonPath("$",
                                 hasJsonPath("$.metadata", Matchers.allOf(
                                     matchMetadataNotEmpty("dc.identifier.uri"),
-                                    matchMetadataStringContains("dc.identifier.uri", handle.get())
+                                    matchMetadataStringEndsWith("dc.identifier.uri", handle.get())
                                 )
                             )))
                             .andDo(result -> idRef

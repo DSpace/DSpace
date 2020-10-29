@@ -12,7 +12,7 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static junit.framework.TestCase.assertEquals;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataNotEmpty;
-import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataStringContains;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataStringEndsWith;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -156,7 +156,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                 .andExpect(jsonPath("$",
                                     hasJsonPath("$.metadata", Matchers.allOf(
                                         matchMetadataNotEmpty("dc.identifier.uri"),
-                                        matchMetadataStringContains("dc.identifier.uri", handle.get())
+                                        matchMetadataStringEndsWith("dc.identifier.uri", handle.get())
                                         )
                                     )))
 
@@ -288,7 +288,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                 .andExpect(jsonPath("$",
                                     hasJsonPath("$.metadata", Matchers.allOf(
                                         matchMetadataNotEmpty("dc.identifier.uri"),
-                                        matchMetadataStringContains("dc.identifier.uri", handle.get())
+                                        matchMetadataStringEndsWith("dc.identifier.uri", handle.get())
                                     )
                                 )))
                                 // capture "id" returned in JSON response
