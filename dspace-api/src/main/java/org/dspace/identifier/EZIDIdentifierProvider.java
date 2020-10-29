@@ -147,6 +147,7 @@ public class EZIDIdentifierProvider
     public String register(Context context, DSpaceObject dso)
         throws IdentifierException {
         log.debug("register {}", dso);
+
         if (!(dso instanceof Item)) {
             return null;
         }
@@ -173,6 +174,9 @@ public class EZIDIdentifierProvider
     public void register(Context context, DSpaceObject object, String identifier) {
         log.debug("register {} as {}", object, identifier);
 
+        if (!(object instanceof Item)) {
+            return;
+        }
         EZIDResponse response;
         try {
             EZIDRequest request = requestFactory.getInstance(loadAuthority(),
