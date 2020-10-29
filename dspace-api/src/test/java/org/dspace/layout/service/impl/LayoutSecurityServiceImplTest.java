@@ -361,6 +361,48 @@ public class LayoutSecurityServiceImplTest {
         assertThat(granted, is(false));
     }
 
+    /**
+     * Tests layout security layers with null user object
+     *
+     * @throws SQLException
+     */
+    @Test
+    public void nullUserHasOnlyPublicAccess() throws SQLException {
+
+        final Context context = mock(Context.class);
+        final Item item = mock(Item.class);
+        final EPerson user = null;
+
+        final MetadataField metadataField = securityMetadataField();
+
+        final HashSet<MetadataField> securityMetadataFieldSet = new HashSet<>(singletonList(metadataField));
+
+        List<MetadataValue> metadataValueList =
+            singletonList(metadataValueWithAuthority(UUID.randomUUID().toString()));
+
+
+        when(itemService.getMetadata(item, metadataField.getMetadataSchema().getName(),
+                                     metadataField.getElement(), null, Item.ANY, true))
+            .thenReturn(metadataValueList);
+
+        final boolean publicAccess = securityService.hasAccess(LayoutSecurity.PUBLIC,
+                                                                   context, user, securityMetadataFieldSet, item);
+
+        final boolean customDataAccess = securityService.hasAccess(LayoutSecurity.CUSTOM_DATA,
+                                                    context, user, securityMetadataFieldSet, item);
+
+        final boolean adminAccess = securityService.hasAccess(LayoutSecurity.ADMINISTRATOR,
+                                                              context, user, securityMetadataFieldSet, item);
+
+        final boolean adminOwnerAccess = securityService.hasAccess(LayoutSecurity.OWNER_AND_ADMINISTRATOR,
+                                                                   context, user, securityMetadataFieldSet, item);
+
+        assertThat(publicAccess, is(true));
+        assertThat(customDataAccess, is(false));
+        assertThat(adminAccess, is(false));
+        assertThat(adminOwnerAccess, is(false));
+    }
+
     private EPerson ePerson(UUID userUuid, UUID... groupsUuid) throws SQLException {
         EPerson currentUser = mock(EPerson.class);
 

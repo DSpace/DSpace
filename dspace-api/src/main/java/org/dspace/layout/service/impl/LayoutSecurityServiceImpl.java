@@ -9,6 +9,7 @@ package org.dspace.layout.service.impl;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -81,7 +82,8 @@ public class LayoutSecurityServiceImpl implements LayoutSecurityService {
     }
 
     private boolean checkUser(final Context context, EPerson user, List<MetadataValue> values) {
-        Predicate<MetadataValue> currentUserPredicate = v -> v.getAuthority().equals(user.getID().toString());
+        Predicate<MetadataValue> currentUserPredicate = v -> Objects.nonNull(user) && v.getAuthority()
+                                                                                       .equals(user.getID().toString());
         Predicate<MetadataValue> checkGroupsPredicate = v -> checkGroup(v, groups(context, user));
 
         return values.stream()
