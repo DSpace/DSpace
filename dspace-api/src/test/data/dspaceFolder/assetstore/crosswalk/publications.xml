@@ -1,0 +1,80 @@
+<Publications>
+	<Publication id="mock-id">
+		<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/COAR_Publication_Types">http://purl.org/coar/resource_type/c_e059</Type>
+	   	<Title>First Publication</Title>
+	   	<PublishedIn>
+	    	<Publication>
+	      	</Publication>
+	   	</PublishedIn>
+	   	<Publishers>
+	   		<Publisher>
+	   			<OrgUnit>
+	     		</OrgUnit>
+	   		</Publisher>
+	   	</Publishers>
+	   	<PublicationDate>2019-12-31</PublicationDate>
+	   	<DOI>doi:111.111/publication</DOI>
+	   	<Authors>
+	      	<Author>
+	        	<DisplayName>Edward Smith</DisplayName>
+	         	<Affiliation>
+	         		<OrgUnit>
+	         			<Name>Company</Name>
+	         		</OrgUnit>
+	         	</Affiliation>
+	      	</Author>
+	      	<Author>
+	        	<DisplayName>Walter White</DisplayName>
+	         	<Affiliation>
+	         		<OrgUnit>
+	         		</OrgUnit>
+	         	</Affiliation>
+	      	</Author>
+		</Authors>
+	   	<Editors>
+		</Editors>
+		<OutputFrom>
+			<Event>
+			</Event>
+		</OutputFrom>
+		<References>
+			<Product>
+			</Product>
+		</References>
+	</Publication>
+	<Publication id="mock-id">
+		<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/COAR_Publication_Types">http://purl.org/coar/resource_type/c_cb28</Type>
+	   	<Title>Second Publication</Title>
+	   	<PublishedIn>
+	    	<Publication>
+	      	</Publication>
+	   	</PublishedIn>
+	   	<Publishers>
+	   		<Publisher>
+	   			<OrgUnit>
+	     		</OrgUnit>
+	   		</Publisher>
+	   	</Publishers>
+	   	<PublicationDate>2010-02-01</PublicationDate>
+	   	<DOI>doi:222.222/publication</DOI>
+	   	<Authors>
+	      	<Author>
+	        	<DisplayName>Jessie Pinkman</DisplayName>
+	         	<Affiliation>
+	         		<OrgUnit>
+	         		</OrgUnit>
+	         	</Affiliation>
+	      	</Author>
+		</Authors>
+	   	<Editors>
+		</Editors>
+		<OutputFrom>
+			<Event>
+			</Event>
+		</OutputFrom>
+		<References>
+			<Product>
+			</Product>
+		</References>
+	</Publication>
+</Publications>

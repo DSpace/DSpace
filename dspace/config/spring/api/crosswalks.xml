@@ -59,7 +59,7 @@
 		<property name="fileName" value="publication.xml"/>
 		<property name="entityType" value="Publication"/>
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
-		<property name="multipleItemsTemplateFileName" value="crosswalks/template/persons-xml.template"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/publications-xml.template"/>
 		<property name="converter" ref="xmlValueConverter" />
 	</bean>
 	

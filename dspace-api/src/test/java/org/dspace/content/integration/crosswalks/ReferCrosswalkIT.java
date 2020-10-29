@@ -583,6 +583,56 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    public void testManyPublicationXmlDisseminate() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item firstPublication = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Publication")
+            .withTitle("First Publication")
+            .withDoiIdentifier("doi:111.111/publication")
+            .withType("Controlled Vocabulary for Resource Type Genres::learning object")
+            .withIssueDate("2019-12-31")
+            .withAuthor("Edward Smith")
+            .withAuthorAffiliation("Company")
+            .withAuthor("Walter White")
+            .withAuthorAffiliation(CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE)
+            .build();
+
+        Item funding = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Funding")
+            .withTitle("Test Funding")
+            .withType("Contract")
+            .withFunder("Test Funder")
+            .withAcronym("TF-01")
+            .build();
+
+        Item secondPublication = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Publication")
+            .withTitle("Second Publication")
+            .withDoiIdentifier("doi:222.222/publication")
+            .withType("Controlled Vocabulary for Resource Type Genres::clinical trial")
+            .withIssueDate("2010-02-01")
+            .withAuthor("Jessie Pinkman")
+            .withRelationFunding("Test Funding", funding.getID().toString())
+            .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("publication-xml");
+        assertThat(referCrossWalk, notNullValue());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        referCrossWalk.disseminate(context, Arrays.asList(firstPublication, secondPublication).iterator(), out);
+
+        try (FileInputStream fis = getFileInputStream("publications.xml")) {
+            String expectedXml = IOUtils.toString(fis, Charset.defaultCharset());
+            compareEachLine(out.toString(), expectedXml);
+        }
+    }
+
+    @Test
     public void testPublicationEndnoteDisseminate() throws Exception {
 
         context.turnOffAuthorisationSystem();
