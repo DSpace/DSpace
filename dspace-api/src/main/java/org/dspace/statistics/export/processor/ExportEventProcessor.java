@@ -208,7 +208,7 @@ public abstract class ExportEventProcessor {
             entityTypes.add(ENTITY_TYPE_DEFAULT);
         }
 
-        if (type != null && entityTypes.contains(type.getLabel())) {
+        if (entityTypes.contains(type.getLabel())) {
             return true;
         }
         return false;
