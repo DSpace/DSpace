@@ -34,10 +34,13 @@ import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.core.CrisConstants;
 import org.dspace.utils.DSpace;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -54,6 +57,8 @@ public class XlsCrosswalkIT extends AbstractIntegrationTestWithDatabase {
     private Collection collection;
 
     private StreamDisseminationCrosswalkMapper crosswalkMapper;
+
+    private XlsCrosswalk xlsCrosswalk;
 
     private DCInputsReader dcInputsReader;
 
@@ -89,6 +94,21 @@ public class XlsCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .thenReturn(Arrays.asList("crisrp.qualification", "crisrp.qualification.start",
                 "crisrp.qualification.end"));
 
+        when(dcInputsReader.hasFormWithName("traditional-dc-contributor-author")).thenReturn(true);
+        when(dcInputsReader.getAllFieldNamesByFormName("traditional-dc-contributor-author"))
+            .thenReturn(Arrays.asList("dc.contributor.author", "oairecerif.author.affiliation"));
+
+        when(dcInputsReader.hasFormWithName("traditional-dc-contributor-editor")).thenReturn(true);
+        when(dcInputsReader.getAllFieldNamesByFormName("traditional-dc-contributor-editor"))
+            .thenReturn(Arrays.asList("dc.contributor.editor", "oairecerif.editor.affiliation"));
+
+    }
+
+    @After
+    public void after() throws DCInputsReaderException {
+        if (this.xlsCrosswalk != null) {
+            this.xlsCrosswalk.setDCInputsReader(new DCInputsReader());
+        }
     }
 
     @Test
@@ -130,7 +150,7 @@ public class XlsCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        XlsCrosswalk xlsCrosswalk = (XlsCrosswalk) crosswalkMapper.getByType("person-xls");
+        xlsCrosswalk = (XlsCrosswalk) crosswalkMapper.getByType("person-xls");
         assertThat(xlsCrosswalk, notNullValue());
         xlsCrosswalk.setDCInputsReader(dcInputsReader);
 
@@ -198,7 +218,7 @@ public class XlsCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        XlsCrosswalk xlsCrosswalk = (XlsCrosswalk) crosswalkMapper.getByType("person-xls");
+        xlsCrosswalk = (XlsCrosswalk) crosswalkMapper.getByType("person-xls");
         assertThat(xlsCrosswalk, notNullValue());
         xlsCrosswalk.setDCInputsReader(dcInputsReader);
 
@@ -220,6 +240,77 @@ public class XlsCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             "Walter", "White", "1962-03-23", "M", "Professor", "High School", "", "", "", "", "0000-0002-9079-5932",
             "", "", "", "", "School/1968-09-01/1973-06-10/Student||University/1980-09-01/1985-06-10/Student", "",
             "Qualification", "English"));
+
+    }
+
+    @Test
+    public void testDisseminatePublications() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item firstItem = createFullPublicationItem();
+
+        Item secondItem = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Publication")
+            .withTitle("Second Publication")
+            .withDoiIdentifier("doi:222.222/publication")
+            .withType("Controlled Vocabulary for Resource Type Genres::learning object")
+            .withIssueDate("2019-12-31")
+            .withAuthor("Edward Smith")
+            .withAuthorAffiliation("Company")
+            .withAuthor("Walter White")
+            .withVolume("V-02")
+            .withCitationStartPage("1")
+            .withCitationEndPage("20")
+            .withAuthorAffiliation(CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE)
+            .build();
+
+        Item thirdItem = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Publication")
+            .withTitle("Another Publication")
+            .withDoiIdentifier("doi:333.333/publication")
+            .withType("Controlled Vocabulary for Resource Type Genres::clinical trial")
+            .withIssueDate("2010-02-01")
+            .withAuthor("Jessie Pinkman")
+            .withDescriptionAbstract("Description of publication")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        xlsCrosswalk = (XlsCrosswalk) crosswalkMapper.getByType("publication-xls");
+        assertThat(xlsCrosswalk, notNullValue());
+        xlsCrosswalk.setDCInputsReader(dcInputsReader);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        xlsCrosswalk.disseminate(context, Arrays.asList(firstItem, secondItem, thirdItem).iterator(), baos);
+
+        Workbook workbook = WorkbookFactory.create(new ByteArrayInputStream(baos.toByteArray()));
+        assertThat(workbook.getNumberOfSheets(), equalTo(1));
+
+        Sheet sheet = workbook.getSheetAt(0);
+        assertThat(sheet.getPhysicalNumberOfRows(), equalTo(4));
+
+        assertThat(getRowValues(sheet.getRow(0)), contains("Title", "Subtitle", "Type", "Language", "Publication date",
+            "Part of", "Journal or Serie", "ISBN (of the container)", "ISSN (of the container)",
+            "DOI (of the container)", "Publisher", "DOI", "ISBN", "ISSN", "ISI-Number", "SCP-Number", "Volume", "Issue",
+            "Start page", "End page", "Authors", "Editors", "Abstract", "Event", "Product"));
+
+        assertThat(getRowValues(sheet.getRow(1)), contains("Test Publication", "Alternative publication title",
+            "http://purl.org/coar/resource_type/c_efa0", "en", "2020-01-01", "Published in publication", "", "", "",
+            "doi:10.3972/test", "Publication publisher", "doi:111.111/publication", "978-3-16-148410-0", "2049-3630",
+            "111-222-333", "99999999", "V.01", "Issue", "", "", "John Smith||Walter White/Company",
+            "Editor/Editor Affiliation", "", "The best Conference", "DataSet"));
+
+        assertThat(getRowValues(sheet.getRow(2)), contains("Second Publication", "",
+            "http://purl.org/coar/resource_type/c_e059", "", "2019-12-31", "", "", "", "", "", "",
+            "doi:222.222/publication", "", "", "", "", "V-02", "", "1", "20", "Edward Smith/Company||Walter White", "",
+            "", "", ""));
+
+        assertThat(getRowValues(sheet.getRow(3)), contains("Another Publication", "",
+            "http://purl.org/coar/resource_type/c_cb28", "", "2010-02-01", "", "", "", "", "", "",
+            "doi:333.333/publication", "", "", "", "", "", "", "", "", "Jessie Pinkman", "",
+            "Description of publication", "", ""));
+
 
     }
 
@@ -271,6 +362,37 @@ public class XlsCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withPersonQualificationEndDate(PLACEHOLDER_PARENT_METADATA_VALUE)
             .build();
         return item;
+    }
+
+    private Item createFullPublicationItem() {
+        return ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Publication")
+            .withTitle("Test Publication")
+            .withAlternativeTitle("Alternative publication title")
+            .withRelationPublication("Published in publication")
+            .withRelationDoi("doi:10.3972/test")
+            .withDoiIdentifier("doi:111.111/publication")
+            .withIsbnIdentifier("978-3-16-148410-0")
+            .withIssnIdentifier("2049-3630")
+            .withIsiIdentifier("111-222-333")
+            .withScopusIdentifier("99999999")
+            .withLanguage("en")
+            .withPublisher("Publication publisher")
+            .withVolume("V.01")
+            .withIssue("Issue")
+            .withSubject("test")
+            .withSubject("export")
+            .withType("Controlled Vocabulary for Resource Type Genres::text::review")
+            .withIssueDate("2020-01-01")
+            .withAuthor("John Smith")
+            .withAuthorAffiliation(CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE)
+            .withAuthor("Walter White")
+            .withAuthorAffiliation("Company")
+            .withEditor("Editor")
+            .withEditorAffiliation("Editor Affiliation")
+            .withRelationConference("The best Conference")
+            .withRelationDataset("DataSet")
+            .build();
     }
 
     private List<String> getRowValues(Row row) {
