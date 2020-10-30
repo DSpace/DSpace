@@ -135,11 +135,6 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
             throw new UnprocessableEntityException("Error parsing request body.", e1);
         }
 
-        if (communityRest.getMetadata().getMap().containsKey("dc.identifier.uri")) {
-            throw new UnprocessableEntityException("Handle identifier cannot be passed "
-                    + "as metadata during community creation.");
-        }
-
         Community community;
 
         try {

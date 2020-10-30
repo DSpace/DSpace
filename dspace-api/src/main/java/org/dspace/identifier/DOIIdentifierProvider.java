@@ -170,6 +170,7 @@ public class DOIIdentifierProvider
     public String register(Context context, DSpaceObject dso)
         throws IdentifierException {
         if (!(dso instanceof Item)) {
+            // DOI are currently assigned only to Item
             return null;
         }
         String doi = mint(context, dso);
@@ -183,6 +184,7 @@ public class DOIIdentifierProvider
     public void register(Context context, DSpaceObject dso, String identifier)
         throws IdentifierException {
         if (!(dso instanceof Item)) {
+            // DOI are currently assigned only to Item
             return;
         }
         String doi = doiService.formatIdentifier(identifier);
