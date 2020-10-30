@@ -184,4 +184,7 @@
 	
 	<bean class="org.dspace.content.integration.crosswalks.evaluators.AuthorityNotBlankCondition" id="authorityConditionEvaluator"/>
 	
+	<!-- Item export format SERVICE -->
+	<bean class="org.dspace.content.integration.crosswalks.service.ItemExportFormatServiceImpl"/>
+	
 </beans>
