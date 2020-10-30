@@ -51,13 +51,12 @@ public class DiscoveryConfigurationService {
             name = dso.getUniqueIndexID();
         }
 
-        return getDiscoveryConfiguration(name);
+        return getDiscoveryConfigurationByNameOrDefault(name);
     }
 
-    public DiscoveryConfiguration getDiscoveryConfiguration(final String name) {
-        DiscoveryConfiguration result;
+    public DiscoveryConfiguration getDiscoveryConfigurationByNameOrDefault(final String name) {
 
-        result = StringUtils.isBlank(name) ? null : getMap().get(name);
+        DiscoveryConfiguration result = getDiscoveryConfigurationByName(name);
 
         if (result == null) {
             //No specific configuration, get the default one
@@ -65,6 +64,10 @@ public class DiscoveryConfigurationService {
         }
 
         return result;
+    }
+
+    public DiscoveryConfiguration getDiscoveryConfigurationByName(String name) {
+        return StringUtils.isBlank(name) ? null : getMap().get(name);
     }
 
     public DiscoveryConfiguration getDiscoveryConfigurationByNameOrDso(final String configurationName,

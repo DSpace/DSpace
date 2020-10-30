@@ -59,7 +59,6 @@ import org.dspace.core.Context;
 import org.dspace.core.CrisConstants;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResultIterator;
-import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationService;
 import org.dspace.discovery.indexobject.IndexableItem;
@@ -437,7 +436,7 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
             return emptyIterator();
         }
 
-        DiscoveryConfiguration discoveryConfiguration = findDiscoveryConfiguration(item, entityType, relationName);
+        DiscoveryConfiguration discoveryConfiguration = findDiscoveryConfiguration(entityType, relationName);
         if (discoveryConfiguration == null) {
             log.warn("No discovery configuration found for relation " + relationName + " for item with id "
                 + item.getID() + " and type " + entityType + ". No related items is found.");
@@ -455,10 +454,9 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
         return new DiscoverResultIterator<Item, UUID>(context, discoverQuery);
     }
 
-    private DiscoveryConfiguration findDiscoveryConfiguration(Item item, String entityType, String relationName) {
-        IndexableObject<?, ?> scopeObject = new IndexableItem(item);
+    private DiscoveryConfiguration findDiscoveryConfiguration(String entityType, String relationName) {
         String configurationName = "RELATION." + entityType + "." + relationName;
-        return searchConfigurationService.getDiscoveryConfigurationByNameOrDso(configurationName, scopeObject);
+        return searchConfigurationService.getDiscoveryConfigurationByName(configurationName);
     }
 
     private void appendLine(List<String> lines, TemplateLine line, String value) {

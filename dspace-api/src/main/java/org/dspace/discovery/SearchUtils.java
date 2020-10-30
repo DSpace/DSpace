@@ -96,7 +96,7 @@ public class SearchUtils {
         String configurationName) {
         DiscoveryConfigurationService configurationService = getConfigurationService();
 
-        return configurationService.getDiscoveryConfiguration(configurationName);
+        return configurationService.getDiscoveryConfigurationByNameOrDefault(configurationName);
     }
 
     public static DiscoveryConfigurationService getConfigurationService() {
