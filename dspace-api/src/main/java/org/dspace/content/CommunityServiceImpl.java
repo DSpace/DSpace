@@ -100,9 +100,10 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
             } else {
                 identifierService.register(context, newCommunity, handle);
             }
-        } catch (IdentifierException e) {
-            throw new RuntimeException("Can't create an Identifier!");
+        }  catch (IllegalStateException | IdentifierException ex) {
+            throw new IllegalStateException(ex);
         }
+
 
         if (parent != null) {
             parent.addSubCommunity(newCommunity);

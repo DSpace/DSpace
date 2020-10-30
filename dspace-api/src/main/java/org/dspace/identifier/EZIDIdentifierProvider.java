@@ -149,6 +149,7 @@ public class EZIDIdentifierProvider
         log.debug("register {}", dso);
 
         if (!(dso instanceof Item)) {
+            // DOI are currently assigned only to Item
             return null;
         }
         DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
@@ -175,6 +176,7 @@ public class EZIDIdentifierProvider
         log.debug("register {} as {}", object, identifier);
 
         if (!(object instanceof Item)) {
+            // DOI are currently assigned only to Item
             return;
         }
         EZIDResponse response;

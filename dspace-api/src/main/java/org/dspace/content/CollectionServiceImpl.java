@@ -142,8 +142,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             } else {
                 identifierService.register(context, newCollection, handle);
             }
-        } catch (IdentifierException e) {
-            throw new RuntimeException("Can't create an Identifier!");
+        } catch (IllegalStateException | IdentifierException ex) {
+            throw new IllegalStateException(ex);
         }
 
         // create the default authorization policy for collections

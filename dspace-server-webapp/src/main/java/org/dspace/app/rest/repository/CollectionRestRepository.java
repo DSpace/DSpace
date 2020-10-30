@@ -236,11 +236,6 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             throw new UnprocessableEntityException("Error parsing request body.", e1);
         }
 
-        if (collectionRest.getMetadata().getMap().containsKey("dc.identifier.uri")) {
-            throw new UnprocessableEntityException("Handle identifier cannot be passed "
-                    + "as metadata during collection creation.");
-        }
-
         Collection collection;
         try {
             Community parent = communityService.find(context, id);
