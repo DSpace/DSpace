@@ -13,6 +13,8 @@
 				<entry key="endnote" value-ref="referCrosswalkEndnote"></entry>
 				<entry key="publication-xml" value-ref="referCrosswalkPublicationXml"></entry>
 				<entry key="publication-pdf" value-ref="pdfCrosswalkPublication"></entry>
+				<entry key="publication-csv" value-ref="csvCrosswalkPublication"></entry>
+				<entry key="publication-xls" value-ref="xlsCrosswalkPublication"></entry>
 				
 				<entry key="person-xml" value-ref="referCrosswalkPersonXml"></entry>
 				<entry key="person-json" value-ref="referCrosswalkPersonJson"></entry>
@@ -59,7 +61,7 @@
 		<property name="fileName" value="publication.xml"/>
 		<property name="entityType" value="Publication"/>
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
-		<property name="multipleItemsTemplateFileName" value="crosswalks/template/persons-xml.template"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/publications-xml.template"/>
 		<property name="converter" ref="xmlValueConverter" />
 	</bean>
 	
@@ -107,6 +109,21 @@
 		<property name="fileName" value="persons.xls"/>
 		<property name="sheetName" value="Persons"/>
 		<property name="entityType" value="Person"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.CsvCrosswalk" id="csvCrosswalkPublication">
+		<property name="templateFileName" value="crosswalks/template/publication-table.template"/>
+		<property name="fileName" value="publications.csv"/>
+		<property name="entityType" value="Publication"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.XlsCrosswalk" id="xlsCrosswalkPublication">
+		<property name="templateFileName" value="crosswalks/template/publication-table.template"/>
+		<property name="fileName" value="publications.xls"/>
+		<property name="sheetName" value="Publications"/>
+		<property name="entityType" value="Publication"/>
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
 	</bean>
 	

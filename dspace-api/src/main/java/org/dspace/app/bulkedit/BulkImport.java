@@ -185,6 +185,10 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         context.setMode(Context.Mode.BATCH_EDIT);
         assignCurrentUserInContext();
 
+        //FIXME: see https://4science.atlassian.net/browse/CSTPER-236 for final solution
+
+        context.turnOffAuthorisationSystem();
+
         InputStream inputStream = handler.getFileStream(context, filename)
             .orElseThrow(() -> new IllegalArgumentException("Error reading file, the file couldn't be "
                 + "found for filename: " + filename));
@@ -201,6 +205,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         try {
             performImport(inputStream);
             context.complete();
+            context.restoreAuthSystemState();
         } catch (Exception e) {
             handler.handleException(e);
             context.abort();

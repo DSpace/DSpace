@@ -30,10 +30,13 @@ import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.core.CrisConstants;
 import org.dspace.utils.DSpace;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -52,6 +55,8 @@ public class CsvCrosswalkIT extends AbstractIntegrationTestWithDatabase {
     private Collection collection;
 
     private StreamDisseminationCrosswalkMapper crosswalkMapper;
+
+    private CsvCrosswalk csvCrosswalk;
 
     private DCInputsReader dcInputsReader;
 
@@ -87,6 +92,21 @@ public class CsvCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .thenReturn(Arrays.asList("crisrp.qualification", "crisrp.qualification.start",
                 "crisrp.qualification.end"));
 
+        when(dcInputsReader.hasFormWithName("traditional-dc-contributor-author")).thenReturn(true);
+        when(dcInputsReader.getAllFieldNamesByFormName("traditional-dc-contributor-author"))
+            .thenReturn(Arrays.asList("dc.contributor.author", "oairecerif.author.affiliation"));
+
+        when(dcInputsReader.hasFormWithName("traditional-dc-contributor-editor")).thenReturn(true);
+        when(dcInputsReader.getAllFieldNamesByFormName("traditional-dc-contributor-editor"))
+            .thenReturn(Arrays.asList("dc.contributor.editor", "oairecerif.editor.affiliation"));
+
+    }
+
+    @After
+    public void after() throws DCInputsReaderException {
+        if (this.csvCrosswalk != null) {
+            this.csvCrosswalk.setDCInputsReader(new DCInputsReader());
+        }
     }
 
     @Test
@@ -128,7 +148,7 @@ public class CsvCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        CsvCrosswalk csvCrosswalk = (CsvCrosswalk) crosswalkMapper.getByType("person-csv");
+        csvCrosswalk = (CsvCrosswalk) crosswalkMapper.getByType("person-csv");
         assertThat(csvCrosswalk, notNullValue());
         csvCrosswalk.setDCInputsReader(dcInputsReader);
 
@@ -174,7 +194,7 @@ public class CsvCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        CsvCrosswalk csvCrosswalk = (CsvCrosswalk) crosswalkMapper.getByType("person-csv");
+        csvCrosswalk = (CsvCrosswalk) crosswalkMapper.getByType("person-csv");
         assertThat(csvCrosswalk, notNullValue());
         csvCrosswalk.setDCInputsReader(dcInputsReader);
 
@@ -182,6 +202,54 @@ public class CsvCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         csvCrosswalk.disseminate(context, item, out);
 
         try (FileInputStream fis = getFileInputStream("person.csv")) {
+            String expectedCsv = IOUtils.toString(fis, Charset.defaultCharset());
+            assertThat(out.toString(), equalTo(expectedCsv));
+        }
+
+    }
+
+    @Test
+    public void testDisseminatePublications() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item firstItem = createFullPublicationItem();
+
+        Item secondItem = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Publication")
+            .withTitle("Second Publication")
+            .withDoiIdentifier("doi:222.222/publication")
+            .withType("Controlled Vocabulary for Resource Type Genres::learning object")
+            .withIssueDate("2019-12-31")
+            .withAuthor("Edward Smith")
+            .withAuthorAffiliation("Company")
+            .withAuthor("Walter White")
+            .withVolume("V-02")
+            .withCitationStartPage("1")
+            .withCitationEndPage("20")
+            .withAuthorAffiliation(CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE)
+            .build();
+
+        Item thirdItem = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Publication")
+            .withTitle("Another Publication")
+            .withDoiIdentifier("doi:333.333/publication")
+            .withType("Controlled Vocabulary for Resource Type Genres::clinical trial")
+            .withIssueDate("2010-02-01")
+            .withAuthor("Jessie Pinkman")
+            .withDescriptionAbstract("Description of publication")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        csvCrosswalk = (CsvCrosswalk) crosswalkMapper.getByType("publication-csv");
+        assertThat(csvCrosswalk, notNullValue());
+        csvCrosswalk.setDCInputsReader(dcInputsReader);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        csvCrosswalk.disseminate(context, Arrays.asList(firstItem, secondItem, thirdItem).iterator(), out);
+
+        try (FileInputStream fis = getFileInputStream("publications.csv")) {
             String expectedCsv = IOUtils.toString(fis, Charset.defaultCharset());
             assertThat(out.toString(), equalTo(expectedCsv));
         }
@@ -235,6 +303,37 @@ public class CsvCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withPersonQualificationEndDate(PLACEHOLDER_PARENT_METADATA_VALUE)
             .build();
         return item;
+    }
+
+    private Item createFullPublicationItem() {
+        return ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Publication")
+            .withTitle("Test Publication")
+            .withAlternativeTitle("Alternative publication title")
+            .withRelationPublication("Published in publication")
+            .withRelationDoi("doi:10.3972/test")
+            .withDoiIdentifier("doi:111.111/publication")
+            .withIsbnIdentifier("978-3-16-148410-0")
+            .withIssnIdentifier("2049-3630")
+            .withIsiIdentifier("111-222-333")
+            .withScopusIdentifier("99999999")
+            .withLanguage("en")
+            .withPublisher("Publication publisher")
+            .withVolume("V.01")
+            .withIssue("Issue")
+            .withSubject("test")
+            .withSubject("export")
+            .withType("Controlled Vocabulary for Resource Type Genres::text::review")
+            .withIssueDate("2020-01-01")
+            .withAuthor("John Smith")
+            .withAuthorAffiliation(CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE)
+            .withAuthor("Walter White")
+            .withAuthorAffiliation("Company")
+            .withEditor("Editor")
+            .withEditorAffiliation("Editor Affiliation")
+            .withRelationConference("The best Conference")
+            .withRelationDataset("DataSet")
+            .build();
     }
 
     private FileInputStream getFileInputStream(String name) throws FileNotFoundException {
