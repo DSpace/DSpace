@@ -46,4 +46,7 @@
 
     <!-- deduplication -->
     <bean class="org.dspace.deduplication.MockSolrDedupCore" id="org.dspace.app.deduplication.service.DedupService"/>
+    
+    <!-- audit -->
+    <bean id="org.dspace.app.audit.AuditService" class="org.dspace.app.audit.MockAuditService"/>
 </beans>
