@@ -42,7 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author David Vivarelli
  */
-public class ADSOnlineDataLoaderTest extends AbstractControllerIntegrationTest {
+public class ADSOnlineDataLoaderIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     MetadataListener metadataListener;
