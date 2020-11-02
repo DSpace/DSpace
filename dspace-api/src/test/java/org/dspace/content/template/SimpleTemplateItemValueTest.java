@@ -34,7 +34,7 @@ public class SimpleTemplateItemValueTest {
         final SimpleTemplateItemValue simpleTemplateItemValue = new SimpleTemplateItemValue();
 
         final boolean applies = simpleTemplateItemValue.appliesTo(metadataValue.getValue());
-        final String actualValue = simpleTemplateItemValue.value(context, item, templateItem, metadataValue).getValue();
+        final String actualValue = simpleTemplateItemValue.value(context, item, templateItem, metadataValue);
 
         assertThat(applies, is(true));
         assertThat(actualValue, is("Simple value"));

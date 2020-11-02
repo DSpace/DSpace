@@ -30,7 +30,7 @@ public class TemplateItemValueService {
         this.templateItemValues = templateItemValues;
     }
 
-    public MetadataValue value(final Context context, final Item targetItem,
+    public String value(final Context context, final Item targetItem,
                                final Item templateItem,
                                final MetadataValue metadataValue) {
         if (CollectionUtils.isEmpty(templateItemValues)) {

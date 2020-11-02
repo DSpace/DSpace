@@ -9,7 +9,6 @@ package org.dspace.content.template.generator;
 
 import org.apache.commons.lang.StringUtils;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
@@ -27,22 +26,21 @@ public class SubmitterValueGenerator implements TemplateValueGenerator {
     private EPersonService ePersonService;
 
     @Override
-    public MetadataValue generator(final Context context, final Item targetItem, final Item templateItem,
-                                   final MetadataValue metadataValue,
-                                   final String extraParams) {
+    public String generator(final Context context, final Item targetItem, final Item templateItem,
+                            final String extraParams) {
 
         EPerson eperson = targetItem.getSubmitter();
         if (StringUtils.equalsIgnoreCase(extraParams, "email")) {
-            metadataValue.setValue(eperson.getEmail());
-        } else if (StringUtils.equalsIgnoreCase(extraParams, "phone")) {
-            metadataValue.setValue(ePersonService.getMetadata(eperson, "phone"));
-        } else if (StringUtils.equalsIgnoreCase(extraParams, "fullname")) {
-            metadataValue.setValue(eperson.getFullName());
-        } else {
-            metadataValue.setValue(ePersonService.getMetadata(eperson, extraParams));
+            return eperson.getEmail();
         }
+        if (StringUtils.equalsIgnoreCase(extraParams, "phone")) {
+            return ePersonService.getMetadata(eperson, "phone");
+        }
+        if (StringUtils.equalsIgnoreCase(extraParams, "fullname")) {
+            return eperson.getFullName();
+        }
+        return ePersonService.getMetadata(eperson, extraParams);
 
-        return metadataValue;
 //        if (StringUtils.isNotBlank(m[0].value)){
 //            return m;
 //        }

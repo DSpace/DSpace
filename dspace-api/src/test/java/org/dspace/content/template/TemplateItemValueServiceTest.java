@@ -64,10 +64,10 @@ public class TemplateItemValueServiceTest {
                 fakeTemplateItemValue(false, "NOTReturnedValue"),
                 fakeTemplateItemValue(true, "RETURNED Value")));
 
-        final MetadataValue valueFromService = templateItemValueService.value(context, item, templateItem,
+        final String valueFromService = templateItemValueService.value(context, item, templateItem,
                                                                               metadataValue("aValue"));
 
-        assertThat(valueFromService.getValue(), Is.is("RETURNED Value"));
+        assertThat(valueFromService, Is.is("RETURNED Value"));
 
     }
 
@@ -76,11 +76,9 @@ public class TemplateItemValueServiceTest {
         return new TemplateItemValue() {
 
             @Override
-            public MetadataValue value(final Context context, final Item targetItem,
+            public String value(final Context context, final Item targetItem,
                                        final Item templateItem, final MetadataValue metadataValue) {
-                MetadataValue result = mock(MetadataValue.class);
-                when(result.getValue()).thenReturn(returnedValue);
-                return result;
+                return returnedValue;
             }
 
             @Override

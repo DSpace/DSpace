@@ -35,10 +35,10 @@ public class DateValueGeneratorTest {
         final MetadataValue metadataValue = metadataValue("original value");
         final String extraParams = "";
 
-        final MetadataValue generatedValue =
-            new DateValueGenerator().generator(context, item, templateItem, metadataValue, extraParams);
+        final String generatedValue =
+            new DateValueGenerator().generator(context, item, templateItem, extraParams);
 
-        assertThat(generatedValue.getValue(), is(new Date().toString()));
+        assertThat(generatedValue, is(new Date().toString()));
     }
 
     @Test
@@ -49,10 +49,10 @@ public class DateValueGeneratorTest {
         final MetadataValue metadataValue = metadataValue("original value");
         final String extraParams = "yyyy-MM-dd";
 
-        final MetadataValue generatedValue =
-            new DateValueGenerator().generator(context, item, templateItem, metadataValue, extraParams);
+        final String generatedValue =
+            new DateValueGenerator().generator(context, item, templateItem, extraParams);
 
-        assertThat(generatedValue.getValue(), is(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(LocalDate.now())));
+        assertThat(generatedValue, is(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(LocalDate.now())));
     }
 
     private MetadataValue metadataValue(final String originalValue) {

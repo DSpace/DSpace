@@ -8,7 +8,6 @@
 package org.dspace.content.template.generator;
 
 import org.dspace.content.Item;
-import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
 
 /**
@@ -17,6 +16,6 @@ import org.dspace.core.Context;
  * @author Corrado Lombardi (corrado.lombardi at 4science.it)
  */
 public interface TemplateValueGenerator {
-    MetadataValue generator(Context context, Item targetItem, Item templateItem, MetadataValue metadataValue,
-                            String extraParams);
+    String generator(Context context, Item targetItem, Item templateItem,
+                     String extraParams);
 }

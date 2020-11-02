@@ -7,7 +7,7 @@
  */
 package org.dspace.content.template;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
@@ -20,13 +20,13 @@ import org.dspace.core.Context;
  */
 public class SimpleTemplateItemValue implements TemplateItemValue {
     @Override
-    public MetadataValue value(final Context context, final Item targetItem,
+    public String value(final Context context, final Item targetItem,
                                final Item templateItem, final MetadataValue metadataValue) {
         if (!appliesTo(metadataValue.getValue())) {
             throw new IllegalArgumentException(
                 "SimpleTemplateItemValue cannot find a value for " + metadataValue.getValue());
         }
-        return metadataValue;
+        return metadataValue.getValue();
     }
 
     @Override

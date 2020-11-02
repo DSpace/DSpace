@@ -33,7 +33,7 @@ public interface TemplateItemValue {
      * @param metadataValue
      * @return
      */
-    MetadataValue value(final Context context, final Item targetItem,
+    String value(final Context context, final Item targetItem,
                         final Item templateItem, final MetadataValue metadataValue);
 
     /**

@@ -13,7 +13,6 @@ import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
 
 /**
@@ -29,19 +28,15 @@ public class DateValueGenerator implements TemplateValueGenerator {
      * @param context       application Context
      * @param targetItem          target item
      * @param templateItem  template item
-     * @param metadataValue template metadata value
      * @param extraParams   pattern (i.e. yyyy-MM-dd) to be used to represent generated date
      * @return
      */
     @Override
-    public MetadataValue generator(final Context context, final Item targetItem, final Item templateItem,
-                                   final MetadataValue metadataValue,
-                                   final String extraParams) {
+    public String generator(final Context context, final Item targetItem, final Item templateItem,
+                            final String extraParams) {
 
         String value = buildValue(extraParams);
-
-        metadataValue.setValue(value);
-        return metadataValue;
+        return value;
     }
 
     private String buildValue(String extraParams) {

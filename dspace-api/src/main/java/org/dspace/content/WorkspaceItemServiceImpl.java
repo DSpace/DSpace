@@ -138,12 +138,12 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
                 MetadataField metadataField = aMd.getMetadataField();
                 MetadataSchema metadataSchema = metadataField.getMetadataSchema();
 
-                final MetadataValue valueFromTemplate = templateItemValueService.value(context, item,
+                final String valueFromTemplate = templateItemValueService.value(context, item,
                                                                                        templateItem, aMd);
 
                 itemService.addMetadata(context, item, metadataSchema.getName(), metadataField.getElement(),
                                         metadataField.getQualifier(), aMd.getLanguage(),
-                                        valueFromTemplate.getValue());
+                                        valueFromTemplate);
 //                itemService.addMetadata(context, item, metadataSchema.getName(), metadataField.getElement(),
 //                                        metadataField.getQualifier(), aMd.getLanguage(),
 //                                        aMd.getValue());

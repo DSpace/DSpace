@@ -53,7 +53,7 @@ public class PlaceholderTemplateItemValueTest {
         final MetadataValue metadataValue = metadataValue("###PLACEHOLDER###");
 
         final PlaceholderTemplateItemValue templateItemValue = new PlaceholderTemplateItemValue(
-            Collections.singletonMap("dummy", generator(metadataValue("returned value")))
+            Collections.singletonMap("dummy", generator("returned value"))
         );
 
         templateItemValue.value(context, item, templateItem, metadataValue);
@@ -67,17 +67,17 @@ public class PlaceholderTemplateItemValueTest {
         final MetadataValue metadataValue = metadataValue("###PLACEHOLDER.doSomething###");
 
         final Map<String, TemplateValueGenerator> generatorMap = new HashMap<>();
-        generatorMap.put("dummy", generator(metadataValue("from dummy")));
-        generatorMap.put("placeholder", generator(metadataValue("something done")));
+        generatorMap.put("dummy", generator("from dummy"));
+        generatorMap.put("placeholder", generator("something done"));
 
 
         final PlaceholderTemplateItemValue templateItemValue = new PlaceholderTemplateItemValue(generatorMap);
 
         final boolean appliesTo = templateItemValue.appliesTo(metadataValue.getValue());
-        final MetadataValue actualValue = templateItemValue.value(context, item, templateItem, metadataValue);
+        final String actualValue = templateItemValue.value(context, item, templateItem, metadataValue);
 
         assertThat(appliesTo, is(true));
-        assertThat(actualValue.getValue(), is("something done"));
+        assertThat(actualValue, is("something done"));
     }
 
     private MetadataValue metadataValue(final String value) {
@@ -86,8 +86,8 @@ public class PlaceholderTemplateItemValueTest {
         return metadataValue;
     }
 
-    private TemplateValueGenerator generator(final MetadataValue expectedMetadataValue) {
+    private TemplateValueGenerator generator(final String expectedMetadataValue) {
 
-        return (context, item, templateItem, metadataValue, extraParams) -> expectedMetadataValue;
+        return (context, item, templateItem, extraParams) -> expectedMetadataValue;
     }
 }

@@ -13,7 +13,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataValue;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
@@ -44,9 +43,8 @@ public class GroupValueGenerator implements TemplateValueGenerator {
 
 
     @Override
-    public MetadataValue generator(final Context context, final Item targetItem, final Item templateItem,
-                                   final MetadataValue metadataValue,
-                                   final String extraParams) {
+    public String generator(final Context context, final Item targetItem, final Item templateItem,
+                            final String extraParams) {
 
         String[] params = StringUtils.split(extraParams, "\\.");
         String prefix = params[0];
@@ -97,7 +95,6 @@ public class GroupValueGenerator implements TemplateValueGenerator {
         if (group != null) {
             result = "" + group.getID();
         }
-        metadataValue.setValue(result);
-        return metadataValue;
+        return result;
     }
 }
