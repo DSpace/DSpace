@@ -82,6 +82,7 @@
 		<property name="mimeType" value="application/xml; charset=UTF-8"/>
 		<property name="fileName" value="project.xml"/>
 		<property name="entityType" value="Project"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/projects-xml.template"/>
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
 		<property name="converter" ref="xmlValueConverter" />
 	</bean>
@@ -91,6 +92,7 @@
 		<property name="mimeType" value="application/json; charset=UTF-8"/>
 		<property name="fileName" value="project.json"/>
 		<property name="entityType" value="Project"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/projects-json.template"/>
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
 		<property name="converter" ref="jsonValueConverter" />
 		<property name="linesPostProcessor" ref="jsonPostProcessor" />
