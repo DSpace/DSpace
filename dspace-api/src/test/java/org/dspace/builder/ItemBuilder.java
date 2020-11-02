@@ -315,10 +315,6 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "oairecerif", "project", "endDate", endDate);
     }
 
-    public ItemBuilder withType(String type) {
-        return addMetadataValue(item, "dc", "type", null, type);
-    }
-
     public ItemBuilder withLanguage(String language) {
         return addMetadataValue(item, "dc", "language", "iso", language);
     }
