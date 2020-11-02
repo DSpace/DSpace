@@ -331,6 +331,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "crispj", "coinvestigators", null, coinvestigators);
     }
 
+    public ItemBuilder withProjectCoordinator(String coordinator) {
+        return addMetadataValue(item, "crispj", "coordinator", null, coordinator);
+    }
+
     public ItemBuilder withProjectCoordinator(String coordinator, String authority) {
         return addMetadataValue(item, "crispj", "coordinator", null, null, coordinator, authority, 600);
     }
