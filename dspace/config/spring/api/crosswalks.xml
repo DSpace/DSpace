@@ -28,6 +28,9 @@
 				<entry key="project-pdf" value-ref="pdfCrosswalkProject"></entry>
 				<entry key="project-csv" value-ref="csvCrosswalkProject"></entry>
 				<entry key="project-xls" value-ref="xlsCrosswalkProject"></entry>
+				
+				<entry key="equipment-xml" value-ref="referCrosswalkEquipmentXml"></entry>
+				<entry key="equipment-json" value-ref="referCrosswalkEquipmentJson"></entry>
 			</map>
 		</constructor-arg>
 	</bean>
@@ -95,6 +98,25 @@
 		<property name="fileName" value="project.json"/>
 		<property name="entityType" value="Project"/>
 		<property name="multipleItemsTemplateFileName" value="crosswalks/template/projects-json.template"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+		<property name="converter" ref="jsonValueConverter" />
+		<property name="linesPostProcessor" ref="jsonPostProcessor" />
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkEquipmentXml">
+		<property name="templateFileName" value="crosswalks/template/equipment-xml.template"/>
+		<property name="mimeType" value="application/xml; charset=UTF-8"/>
+		<property name="fileName" value="equipment.xml"/>
+		<property name="entityType" value="Equipment"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+		<property name="converter" ref="xmlValueConverter" />
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkEquipmentJson">
+		<property name="templateFileName" value="crosswalks/template/equipment-json.template"/>
+		<property name="mimeType" value="application/json; charset=UTF-8"/>
+		<property name="fileName" value="equipment.json"/>
+		<property name="entityType" value="Equipment"/>
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
 		<property name="converter" ref="jsonValueConverter" />
 		<property name="linesPostProcessor" ref="jsonPostProcessor" />

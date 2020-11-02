@@ -1,0 +1,8 @@
+{
+	"name": "Test Equipment",
+	"acronym": "T-EQ",
+	"identifier": "ID-01",
+	"description": "This is an equipment to test the export functionality",
+	"ownerOrgUnit": "Test OrgUnit",
+	"ownerPerson": "Walter White"
+}
