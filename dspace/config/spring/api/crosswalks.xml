@@ -25,6 +25,7 @@
 				
 				<entry key="project-xml" value-ref="referCrosswalkProjectXml"></entry>
 				<entry key="project-json" value-ref="referCrosswalkProjectJson"></entry>
+				<entry key="project-pdf" value-ref="pdfCrosswalkProject"></entry>
 			</map>
 		</constructor-arg>
 	</bean>
@@ -117,6 +118,14 @@
 		<property name="mimeType" value="application/pdf"/>
 		<property name="entityType" value="Publication"/>
 		<property name="referCrosswalk" ref="referCrosswalkPublicationXml"/>
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.DocumentCrosswalk" id="pdfCrosswalkProject">
+		<property name="templateFileName" value="crosswalks/template/project-template.xsl"/>
+		<property name="fileName" value="project.pdf"/>
+		<property name="mimeType" value="application/pdf"/>
+		<property name="entityType" value="Project"/>
+		<property name="referCrosswalk" ref="referCrosswalkProjectXml"/>
 	</bean>
 	
 	<bean class="org.dspace.content.integration.crosswalks.CsvCrosswalk" id="csvCrosswalkPerson">
