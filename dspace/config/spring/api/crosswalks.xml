@@ -22,6 +22,10 @@
 				<entry key="person-rtf" value-ref="rtfCrosswalkPerson"></entry>
 				<entry key="person-csv" value-ref="csvCrosswalkPerson"></entry>
 				<entry key="person-xls" value-ref="xlsCrosswalkPerson"></entry>
+				
+				<entry key="project-xml" value-ref="referCrosswalkProjectXml"></entry>
+				<entry key="project-json" value-ref="referCrosswalkProjectJson"></entry>
+				<entry key="project-pdf" value-ref="pdfCrosswalkProject"></entry>
 			</map>
 		</constructor-arg>
 	</bean>
@@ -73,6 +77,25 @@
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE}"/>
 	</bean>
 	
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkProjectXml">
+		<property name="templateFileName" value="crosswalks/template/project-xml.template"/>
+		<property name="mimeType" value="application/xml; charset=UTF-8"/>
+		<property name="fileName" value="project.xml"/>
+		<property name="entityType" value="Project"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+		<property name="converter" ref="xmlValueConverter" />
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkProjectJson">
+		<property name="templateFileName" value="crosswalks/template/project-json.template"/>
+		<property name="mimeType" value="application/json; charset=UTF-8"/>
+		<property name="fileName" value="project.json"/>
+		<property name="entityType" value="Project"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+		<property name="converter" ref="jsonValueConverter" />
+		<property name="linesPostProcessor" ref="jsonPostProcessor" />
+	</bean>
+	
 	<bean class="org.dspace.content.integration.crosswalks.DocumentCrosswalk" id="pdfCrosswalkPerson">
 		<property name="templateFileName" value="crosswalks/template/person-template.xsl"/>
 		<property name="fileName" value="person.pdf"/>
@@ -95,6 +118,14 @@
 		<property name="mimeType" value="application/pdf"/>
 		<property name="entityType" value="Publication"/>
 		<property name="referCrosswalk" ref="referCrosswalkPublicationXml"/>
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.DocumentCrosswalk" id="pdfCrosswalkProject">
+		<property name="templateFileName" value="crosswalks/template/project-template.xsl"/>
+		<property name="fileName" value="project.pdf"/>
+		<property name="mimeType" value="application/pdf"/>
+		<property name="entityType" value="Project"/>
+		<property name="referCrosswalk" ref="referCrosswalkProjectXml"/>
 	</bean>
 	
 	<bean class="org.dspace.content.integration.crosswalks.CsvCrosswalk" id="csvCrosswalkPerson">

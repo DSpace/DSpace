@@ -290,6 +290,75 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
     }
 
+    @Test
+    public void testPdfCrosswalkProjectDisseminate() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item coordinator = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("OrgUnit")
+            .withTitle("Coordinator OrgUnit")
+            .withAcronym("COU")
+            .build();
+
+        Item project = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Project")
+            .withAcronym("TP")
+            .withTitle("Test Project")
+            .withOpenaireId("11-22-33")
+            .withOpenaireId("44-55-66")
+            .withUrlIdentifier("www.project.test")
+            .withUrlIdentifier("www.test.project")
+            .withProjectStartDate("2020-01-01")
+            .withProjectEndDate("2020-12-31")
+            .withProjectStatus("OPEN")
+            .withProjectCoordinator("Coordinator OrgUnit", coordinator.getID().toString())
+            .withProjectPartner("Partner OrgUnit")
+            .withProjectPartner("Another Partner OrgUnit")
+            .withProjectOrganization("First Member OrgUnit")
+            .withProjectOrganization("Second Member OrgUnit")
+            .withProjectOrganization("Third Member OrgUnit")
+            .withProjectInvestigator("Investigator")
+            .withProjectCoinvestigators("First coinvestigator")
+            .withProjectCoinvestigators("Second coinvestigator")
+            .withRelationEquipment("Test equipment")
+            .withSubject("project")
+            .withSubject("test")
+            .withDescriptionAbstract("This is a project to test the export")
+            .withOAMandate("true")
+            .withOAMandateURL("oamandate-url")
+            .build();
+
+        ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Funding")
+            .withTitle("Test funding")
+            .withType("Award")
+            .withFunder("OrgUnit Funder")
+            .withRelationProject("Test Project", project.getID().toString())
+            .build();
+
+        ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Funding")
+            .withTitle("Another Test funding")
+            .withType("Award")
+            .withFunder("Another OrgUnit Funder")
+            .withRelationProject("Test Project", project.getID().toString())
+            .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        StreamDisseminationCrosswalk streamCrosswalkDefault = (StreamDisseminationCrosswalk) CoreServiceFactory
+            .getInstance().getPluginService().getNamedPlugin(StreamDisseminationCrosswalk.class, "project-pdf");
+
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            streamCrosswalkDefault.disseminate(context, project, out);
+            assertThat(out.toString(), not(isEmptyString()));
+            assertThatPdfHasContent(out, content -> assertThatProjectDocumentHasContent(content));
+        }
+
+    }
+
     private Item buildPersonItem() {
         Item item = createItem(context, collection)
             .withRelationshipType("Person")
@@ -432,6 +501,36 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         assertThat(content, containsString("Fundings"));
         assertThat(content, containsString("Another Test Funding ( ATF-01 ) - Funder: Another Test Funder"));
+    }
+
+    private void assertThatProjectDocumentHasContent(String content) {
+        assertThat(content, containsString("Test Project"));
+        assertThat(content, containsString("This is a project to test the export"));
+
+        assertThat(content, containsString("Basic informations"));
+        assertThat(content, containsString("Project Acronym: TP"));
+        assertThat(content, containsString("OpenAIRE id(s): 11-22-33, 44-55-66"));
+        assertThat(content, containsString("URL(s): www.project.test, www.test.project"));
+        assertThat(content, containsString("Start date: 2020-01-01"));
+        assertThat(content, containsString("End date: 2020-12-31"));
+        assertThat(content, containsString("Status: OPEN"));
+
+        assertThat(content, containsString("Consortium"));
+        assertThat(content, containsString("Consortium Coordinator(s): Coordinator OrgUnit"));
+        assertThat(content, containsString("Partner Organization(s): Partner OrgUnit, Another Partner OrgUnit"));
+        assertThat(content, containsString("Participant Organization(s): First Member OrgUnit, "
+            + "Second Member OrgUnit, Third Member OrgUnit"));
+
+        assertThat(content, containsString("Team"));
+        assertThat(content, containsString("Project Coordinator: Investigator"));
+        assertThat(content, containsString("Co-Investigator(s): First coinvestigator, Second coinvestigator"));
+
+        assertThat(content, containsString("Other informations"));
+        assertThat(content, containsString("Uses equipment(s): Test equipment"));
+        assertThat(content, containsString("Keyword(s): project, test"));
+        assertThat(content, containsString("OA Mandate: true"));
+        assertThat(content, containsString("OA Policy URL: oamandate-url"));
+
     }
 
     private FileInputStream getFileInputStream(String name) throws FileNotFoundException {
