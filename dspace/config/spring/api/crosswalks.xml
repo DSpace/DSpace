@@ -26,6 +26,8 @@
 				<entry key="project-xml" value-ref="referCrosswalkProjectXml"></entry>
 				<entry key="project-json" value-ref="referCrosswalkProjectJson"></entry>
 				<entry key="project-pdf" value-ref="pdfCrosswalkProject"></entry>
+				<entry key="project-csv" value-ref="csvCrosswalkProject"></entry>
+				<entry key="project-xls" value-ref="xlsCrosswalkProject"></entry>
 			</map>
 		</constructor-arg>
 	</bean>
@@ -157,6 +159,21 @@
 		<property name="fileName" value="publications.xls"/>
 		<property name="sheetName" value="Publications"/>
 		<property name="entityType" value="Publication"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.CsvCrosswalk" id="csvCrosswalkProject">
+		<property name="templateFileName" value="crosswalks/template/project-table.template"/>
+		<property name="fileName" value="projects.csv"/>
+		<property name="entityType" value="Project"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.XlsCrosswalk" id="xlsCrosswalkProject">
+		<property name="templateFileName" value="crosswalks/template/project-table.template"/>
+		<property name="fileName" value="projects.xls"/>
+		<property name="sheetName" value="Projects"/>
+		<property name="entityType" value="Project"/>
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
 	</bean>
 	
