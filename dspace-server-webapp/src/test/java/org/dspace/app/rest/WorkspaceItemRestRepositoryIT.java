@@ -26,6 +26,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -62,6 +64,7 @@ import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.EntityTypeService;
+import org.dspace.content.service.ItemService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -86,6 +89,10 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     private ConfigurationService configurationService;
     @Autowired
     EntityTypeService entityTypeService;
+
+    @Autowired
+    private ItemService itemService;
+
     private Group embargoedGroups;
     private Group embargoedGroup1;
     private Group embargoedGroup2;
@@ -1787,6 +1794,43 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         ;
 
         pdf.close();
+    }
+
+    @Test
+    public void createSingleWorkspaceItemWithTemplate() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .withRelationshipType("Publication")
+                                           .withSubmissionDefinition("traditional")
+                                           .withTemplateItem()
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+
+        itemService.addMetadata(context, col1.getTemplateItem(), "dc", "title", null, null, "SimpleTitle");
+        itemService.addMetadata(context, col1.getTemplateItem(), "dc", "date", "issued", null, "###DATE.yyyy-MM-dd###");
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        context.restoreAuthSystemState();
+
+        final String today = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(LocalDate.now());
+
+        getClient(authToken).perform(post("/api/submission/workspaceitems")
+                                         .param("owningCollection", col1.getID().toString())
+                                         .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                            .andExpect(status().isCreated())
+                            .andExpect(jsonPath("$._embedded.item.metadata['dc.title'][0].value", is("SimpleTitle")))
+                            .andExpect(jsonPath("$._embedded.item.metadata['dc.date.issued'][0].value",
+                                                is(today)))
+                            .andExpect(jsonPath("$._embedded.collection.id", is(col1.getID().toString())));
     }
 
     @Test
