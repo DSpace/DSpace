@@ -17,8 +17,8 @@ env:
     # Suppress all Maven "downloading" messages in Travis logs (see https://stackoverflow.com/a/35653426)
     # This also slightly speeds builds in Travis, as there is less logging
     - HIDE_MAVEN_DOWNLOADS="-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
-    # Give Maven 1GB of memory to work with
-    - MAVEN_OPTS="-Xmx1024M $HIDE_MAVEN_DOWNLOADS"
+    # Give Maven 2GB of memory to work with
+    - MAVEN_OPTS="-Xmx2048M $HIDE_MAVEN_DOWNLOADS"
     # Maven options which will skip ALL code validation checks. Includes skipping:
     #  - enforcer.skip     => Skip maven-enforcer-plugin rules
     #  - checkstyle.skip   => Skip all checkstyle checks by maven-checkstyle-plugin
