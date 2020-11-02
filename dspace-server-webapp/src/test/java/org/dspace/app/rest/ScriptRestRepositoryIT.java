@@ -158,7 +158,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", ScriptMatcher
                                 .matchMockScript(
-                                        scriptConfigurations.get(scriptConfigurations.size() - 5).getOptions())));
+                                        scriptConfigurations.get(scriptConfigurations.size() - 1).getOptions())));
     }
 
     @Test

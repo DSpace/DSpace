@@ -102,5 +102,7 @@
         <mapping class="org.dspace.app.orcid.OrcidQueue" />
         <mapping class="org.dspace.app.orcid.OrcidHistory" />
         
+        <mapping class="org.dspace.statistics.export.OpenURLTracker"/>
+
     </session-factory>
 </hibernate-configuration>

@@ -64,6 +64,7 @@
     <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.PoolTaskDAOImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.WorkflowItemRoleDAOImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.XmlWorkflowItemDAOImpl"/>
+    <bean class="org.dspace.statistics.export.dao.impl.OpenURLTrackerDAOImpl"/>
 
     <bean class="org.dspace.batch.dao.impl.ImpBitstreamDAOImpl"/>
     <bean class="org.dspace.batch.dao.impl.ImpMetadatavalueDAOImpl"/>

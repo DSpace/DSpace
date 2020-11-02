@@ -8,16 +8,14 @@
 package org.dspace.storage.rdbms.xmlworkflow;
 
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.dspace.core.Constants;
 import org.dspace.storage.rdbms.DatabaseUtils;
+import org.dspace.storage.rdbms.migration.MigrationUtils;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
-import org.flywaydb.core.api.migration.MigrationChecksumProvider;
-import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
-import org.flywaydb.core.internal.util.scanner.classpath.ClassPathResource;
+import org.flywaydb.core.api.migration.BaseJavaMigration;
+import org.flywaydb.core.api.migration.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * @author Tim Donohue
  */
 public class V5_0_2014_11_04__Enable_XMLWorkflow_Migration
-    implements JdbcMigration, MigrationChecksumProvider {
+    extends BaseJavaMigration {
     /**
      * logging category
      */
@@ -50,12 +48,12 @@ public class V5_0_2014_11_04__Enable_XMLWorkflow_Migration
     /**
      * Actually migrate the existing database
      *
-     * @param connection SQL Connection object
+     * @param context Flyway Migration Context
      * @throws IOException  A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     @Override
-    public void migrate(Connection connection)
+    public void migrate(Context context)
         throws IOException, SQLException {
         // Make sure XML Workflow is enabled, shouldn't even be needed since this class is only loaded if the service
         // is enabled.
@@ -64,13 +62,13 @@ public class V5_0_2014_11_04__Enable_XMLWorkflow_Migration
             // migration, as it is incompatible
             // with a 6.x database. In that scenario the corresponding 6.x XML Workflow migration will create
             // necessary tables.
-            && DatabaseUtils.getCurrentFlywayDSpaceState(connection) < 6) {
+            && DatabaseUtils.getCurrentFlywayDSpaceState(context.getConnection()) < 6) {
             // Now, check if the XMLWorkflow table (cwf_workflowitem) already exists in this database
             // If XMLWorkflow Table does NOT exist in this database, then lets do the migration!
             // If XMLWorkflow Table ALREADY exists, then this migration is a noop, we assume you manually ran the sql
             // scripts
-            if (!DatabaseUtils.tableExists(connection, "cwf_workflowitem")) {
-                String dbtype = connection.getMetaData().getDatabaseProductName();
+            if (!DatabaseUtils.tableExists(context.getConnection(), "cwf_workflowitem")) {
+                String dbtype = context.getConnection().getMetaData().getDatabaseProductName();
                 String dbFileLocation = null;
                 if (dbtype.toLowerCase().contains("postgres")) {
                     dbFileLocation = "postgres";
@@ -88,27 +86,21 @@ public class V5_0_2014_11_04__Enable_XMLWorkflow_Migration
 
                 // Get the contents of our DB Schema migration script, based on path & DB type
                 // (e.g. /src/main/resources/[path-to-this-class]/postgres/xml_workflow_migration.sql)
-                String dbMigrateSQL = new ClassPathResource(packagePath + "/" +
-                                                                dbFileLocation +
-                                                                "/xml_workflow_migration.sql",
-                                                            getClass().getClassLoader())
-                    .loadAsString(Constants.DEFAULT_ENCODING);
+                String dbMigrateSQL = MigrationUtils.getResourceAsString(packagePath + "/" + dbFileLocation +
+                                                                             "/xml_workflow_migration.sql");
 
                 // Actually execute the Database schema migration SQL
                 // This will create the necessary tables for the XMLWorkflow feature
-                DatabaseUtils.executeSql(connection, dbMigrateSQL);
+                DatabaseUtils.executeSql(context.getConnection(), dbMigrateSQL);
 
                 // Get the contents of our data migration script, based on path & DB type
                 // (e.g. /src/main/resources/[path-to-this-class]/postgres/data_workflow_migration.sql)
-                String dataMigrateSQL = new ClassPathResource(packagePath + "/" +
-                                                                  dbFileLocation +
-                                                                  "/data_workflow_migration.sql",
-                                                              getClass().getClassLoader())
-                    .loadAsString(Constants.DEFAULT_ENCODING);
+                String dataMigrateSQL = MigrationUtils.getResourceAsString(packagePath + "/" + dbFileLocation +
+                                                                               "/data_workflow_migration.sql");
 
                 // Actually execute the Data migration SQL
                 // This will migrate all existing traditional workflows to the new XMLWorkflow system & tables
-                DatabaseUtils.executeSql(connection, dataMigrateSQL);
+                DatabaseUtils.executeSql(context.getConnection(), dataMigrateSQL);
 
                 // Assuming both succeeded, save the size of the scripts for getChecksum() below
                 migration_file_size = dbMigrateSQL.length() + dataMigrateSQL.length();

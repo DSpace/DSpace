@@ -28,6 +28,11 @@ public interface TaskListItemService {
 
     public void deleteByWorkflowItem(Context context, BasicWorkflowItem workflowItem) throws SQLException;
 
+    public void deleteByWorkflowItemAndEPerson(Context context, BasicWorkflowItem workflowItem, EPerson ePerson)
+        throws SQLException;
+
+    public void deleteByEPerson(Context context, EPerson ePerson) throws SQLException;
+
     public void update(Context context, TaskListItem taskListItem) throws SQLException;
 
     public List<TaskListItem> findByEPerson(Context context, EPerson ePerson) throws SQLException;

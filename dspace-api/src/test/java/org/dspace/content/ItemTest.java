@@ -1598,8 +1598,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         assertThat("testGetAdminObject 0", (Item) itemService.getAdminObject(context, it, Constants.REMOVE),
                    equalTo(it));
         assertThat("testGetAdminObject 1", (Item) itemService.getAdminObject(context, it, Constants.ADD), equalTo(it));
-        assertThat("testGetAdminObject 2", (Collection) itemService.getAdminObject(context, it, Constants.DELETE),
-                   equalTo(collection));
+        assertThat("testGetAdminObject 2", (Item) itemService.getAdminObject(context, it, Constants.DELETE),
+                   equalTo(it));
         assertThat("testGetAdminObject 3", (Item) itemService.getAdminObject(context, it, Constants.ADMIN),
                    equalTo(it));
     }
