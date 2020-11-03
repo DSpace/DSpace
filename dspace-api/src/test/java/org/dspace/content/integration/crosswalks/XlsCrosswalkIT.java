@@ -394,6 +394,71 @@ public class XlsCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             "www.oamandate.com"));
     }
 
+    @Test
+    public void testDisseminateOrgUnits() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item firstItem = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("OrgUnit")
+            .withAcronym("TOU")
+            .withTitle("Test OrgUnit")
+            .withOrgUnitLegalName("Test OrgUnit LegalName")
+            .withType("Strategic Research Insitute")
+            .withParentOrganization("Parent OrgUnit")
+            .withOrgUnitIdentifier("ID-01")
+            .withOrgUnitIdentifier("ID-02")
+            .withUrlIdentifier("www.orgUnit.com")
+            .withUrlIdentifier("www.orgUnit.it")
+            .build();
+
+        Item secondItem = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("OrgUnit")
+            .withAcronym("ATOU")
+            .withTitle("Another Test OrgUnit")
+            .withType("Private non-profit")
+            .withParentOrganization("Parent OrgUnit")
+            .withOrgUnitIdentifier("ID-03")
+            .build();
+
+        Item thirdItem = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("OrgUnit")
+            .withAcronym("TTOU")
+            .withTitle("Third Test OrgUnit")
+            .withType("Private non-profit")
+            .withOrgUnitIdentifier("ID-03")
+            .withUrlIdentifier("www.orgUnit.test")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        xlsCrosswalk = (XlsCrosswalk) crosswalkMapper.getByType("orgUnit-xls");
+        assertThat(xlsCrosswalk, notNullValue());
+        xlsCrosswalk.setDCInputsReader(dcInputsReader);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        xlsCrosswalk.disseminate(context, Arrays.asList(firstItem, secondItem, thirdItem).iterator(), baos);
+
+        Workbook workbook = WorkbookFactory.create(new ByteArrayInputStream(baos.toByteArray()));
+        assertThat(workbook.getNumberOfSheets(), equalTo(1));
+
+        Sheet sheet = workbook.getSheetAt(0);
+        assertThat(sheet.getPhysicalNumberOfRows(), equalTo(4));
+
+        assertThat(getRowValues(sheet.getRow(0)), contains("Name", "Legal name", "Acronym", "Type", "Parent OrgUnit",
+            "Identifier(s)", "URL(s)"));
+
+        assertThat(getRowValues(sheet.getRow(1)), contains("Test OrgUnit", "Test OrgUnit LegalName", "TOU",
+            "https://w3id.org/cerif/vocab/OrganisationTypes#StrategicResearchInsitute", "Parent OrgUnit",
+            "ID-01||ID-02", "www.orgUnit.com||www.orgUnit.it"));
+
+        assertThat(getRowValues(sheet.getRow(2)), contains("Another Test OrgUnit", "", "ATOU",
+            "https://w3id.org/cerif/vocab/OrganisationTypes#Privatenonprofit", "Parent OrgUnit", "ID-03", ""));
+
+        assertThat(getRowValues(sheet.getRow(3)), contains("Third Test OrgUnit", "", "TTOU",
+            "https://w3id.org/cerif/vocab/OrganisationTypes#Privatenonprofit", "", "ID-03", "www.orgUnit.test"));
+    }
+
     private Item createFullPersonItem() {
         Item item = createItem(context, collection)
             .withTitle("John Smith")
