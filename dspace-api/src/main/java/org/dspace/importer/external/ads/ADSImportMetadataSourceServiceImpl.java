@@ -71,12 +71,12 @@ public class ADSImportMetadataSourceServiceImpl
     }
 
     @Override
-    public int getNbRecords(String query) throws MetadataSourceException {
+    public int getRecordsCount(String query) throws MetadataSourceException {
         return retry(new CountByQueryCallable(query));
     }
 
     @Override
-    public int getNbRecords(Query query) throws MetadataSourceException {
+    public int getRecordsCount(Query query) throws MetadataSourceException {
         return retry(new CountByQueryCallable(query));
     }
 
