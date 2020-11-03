@@ -136,17 +136,22 @@ public class JWTTokenHandlerTest {
     //Try if we can change the expiration date
     @Test
     public void testTokenTampering() throws Exception {
+        final String origin = "https://dspace.org";
         when(loginJWTTokenHandler.getExpirationPeriod()).thenReturn(-99999999L);
         when(ePersonClaimProvider.getEPerson(any(Context.class), any(JWTClaimsSet.class))).thenReturn(ePerson);
+        MockHttpServletRequest mockRequest = new MockHttpServletRequest();
+        mockRequest.addHeader("Origin", origin);
+        // Create a token which is valid for a specific origin
         String token = loginJWTTokenHandler
-            .createTokenForEPerson(context, new MockHttpServletRequest(), previousLoginDate, new ArrayList<>());
+            .createTokenForEPerson(context, mockRequest, previousLoginDate, new ArrayList<>());
+        // Now attempt to change the expiration date on that token
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder().claim("eid", "epersonID").expirationTime(
             new Date(System.currentTimeMillis() + 99999999)).build();
         String tamperedPayload = new String(Base64.getUrlEncoder().encode(jwtClaimsSet.toString().getBytes()));
         String[] splitToken = token.split("\\.");
         String tamperedToken = splitToken[0] + "." + tamperedPayload + "." + splitToken[2];
-        EPerson parsed = loginJWTTokenHandler.parseEPersonFromToken(tamperedToken, new MockHttpServletRequest(),
-                                                                    context);
+        // Try to use the tampered token from the same origin
+        EPerson parsed = loginJWTTokenHandler.parseEPersonFromToken(tamperedToken, mockRequest, context);
         assertEquals(null, parsed);
     }
 
