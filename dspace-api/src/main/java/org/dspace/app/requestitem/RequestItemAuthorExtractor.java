@@ -19,6 +19,15 @@ import org.dspace.core.Context;
  * @author Andrea Bollini
  */
 public interface RequestItemAuthorExtractor {
-    public RequestItemAuthor getRequestItemAuthor(Context context, Item item)
-        throws SQLException;
+
+    /**
+     * Retrieve the auhtor to contact for a request copy of the give item.
+     *
+     * @param context DSpace context object
+     * @param item item to request
+     * @return An object containing name an email address to send the request to
+     *         or null if no valid email address was found.
+     * @throws SQLException if database error
+     */
+    public RequestItemAuthor getRequestItemAuthor(Context context, Item item) throws SQLException;
 }

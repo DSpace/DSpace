@@ -615,6 +615,12 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     }
 
     @Override
+    public void removeAllEPersonPolicies(Context c, EPerson e)
+        throws SQLException, AuthorizeException {
+        resourcePolicyService.removeAllEPersonPolicies(c, e);
+    }
+
+    @Override
     public List<Group> getAuthorizedGroups(Context c, DSpaceObject o,
                                            int actionID) throws java.sql.SQLException {
         List<ResourcePolicy> policies = getPoliciesActionFilter(c, o, actionID);

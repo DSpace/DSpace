@@ -137,8 +137,9 @@ public class ItemConverter
     }
 
     private Optional<List<DCInputSet>> submissionDefinitionInputs() {
-        return Optional.ofNullable((String)requestService.getCurrentRequest().getAttribute("submission-name"))
-                       .map(this::dcInputsSet);
+        return Optional.ofNullable(requestService.getCurrentRequest())
+                .map(rq -> (String )rq.getAttribute("submission-name"))
+                .map(this::dcInputsSet);
     }
 
     // private method to catch checked exception that might occur during a lambda call
