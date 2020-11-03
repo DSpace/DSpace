@@ -18,6 +18,11 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataExportCli"/>
     </bean>
 
+    <bean id="retry-tracker" class="org.dspace.statistics.export.RetryFailedOpenUrlTrackerScriptConfiguration" scope="prototype">
+        <property name="description" value="Retry all failed commits to the OpenURLTracker"/>
+        <property name="dspaceRunnableClass" value="org.dspace.statistics.export.RetryFailedOpenUrlTracker"/>
+    </bean>
+
     <bean id="curate" class="org.dspace.curate.CurationCliScriptConfiguration">
         <property name="description" value="Curation tasks"/>
         <property name="dspaceRunnableClass" value="org.dspace.curate.CurationCli"/>

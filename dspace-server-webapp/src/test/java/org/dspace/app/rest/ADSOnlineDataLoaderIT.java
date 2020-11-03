@@ -42,7 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author David Vivarelli
  */
-public class ADSOnlineDataLoaderTest extends AbstractControllerIntegrationTest {
+public class ADSOnlineDataLoaderIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     MetadataListener metadataListener;
@@ -315,7 +315,7 @@ public class ADSOnlineDataLoaderTest extends AbstractControllerIntegrationTest {
                     "while ensuring load balance and a better distribution of resources. The " +
                     "experimental results show that our approach gives very promising results for an " +
                     "effective tasks planning. - See more at: http://thesai.org/Publications/ViewPaper" +
-                    "?Volume=6&amp;Issue=10&amp;Code=IJACSA&amp;SerialNo=36#sthash.aV1fxMaQ.dpuf <P />")));
+                    "?Volume=6&amp;Issue=10&amp;Code=IJACSA&amp;SerialNo=36#sthash.aV1fxMaQ.dpuf")));
 
 
         getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID()))
@@ -344,7 +344,7 @@ public class ADSOnlineDataLoaderTest extends AbstractControllerIntegrationTest {
                     "while ensuring load balance and a better distribution of resources. The " +
                     "experimental results show that our approach gives very promising results for an " +
                     "effective tasks planning. - See more at: http://thesai.org/Publications/ViewPaper" +
-                    "?Volume=6&amp;Issue=10&amp;Code=IJACSA&amp;SerialNo=36#sthash.aV1fxMaQ.dpuf <P />")));
+                    "?Volume=6&amp;Issue=10&amp;Code=IJACSA&amp;SerialNo=36#sthash.aV1fxMaQ.dpuf")));
 
 
     }

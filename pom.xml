@@ -4,7 +4,7 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-parent</artifactId>
     <packaging>pom</packaging>
-    <version>7.0-beta4-SNAPSHOT</version>
+    <version>7.0-beta5-SNAPSHOT</version>
     <name>DSpace Parent Project</name>
     <description>
    	DSpace open source software is a turnkey institutional repository application.
@@ -333,7 +333,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.2.0</version>
                     <configuration>
                         <!-- Never fail a build based on Javadoc errors -->
                         <failOnError>false</failOnError>
@@ -376,8 +376,9 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5.3</version>
                 <configuration>
-                    <!-- During release:perform, enable the "release" profile (see below) -->
-                    <releaseProfiles>release</releaseProfiles>
+                    <!-- During release:prepare and release:perform, pass the "release" property to enable the
+                     "release" profile (and enable/disable other profiles based on whether they need releasing) -->
+                    <arguments>-Drelease</arguments>
                     <goals>deploy</goals>
                     <!-- Suggest tagging the release in SCM as "dspace-[version]" -->
                     <tagNameFormat>dspace-@{project.version}</tagNameFormat>
@@ -505,6 +506,10 @@
                 <file>
                     <exists>src/main/assembly/testEnvironment.xml</exists>
                 </file>
+                <!-- Disable if we are doing a release (-Drelease) -->
+                <property>
+                    <name>!release</name>
+                </property>
             </activation>
             <build>
                 <plugins>
@@ -829,6 +834,10 @@
            <id>dspace-rest</id>
            <activation>
                <activeByDefault>false</activeByDefault>
+               <!-- Enable if we are doing a release (-Drelease), to tag/release this optional module -->
+               <property>
+                   <name>release</name>
+               </property>
            </activation>
            <modules>
                <module>dspace-rest</module>
@@ -838,14 +847,14 @@
                    <dependency>
                        <groupId>org.dspace</groupId>
                        <artifactId>dspace-rest</artifactId>
-                       <version>7.0-beta4-SNAPSHOT</version>
+                       <version>7.0-beta5-SNAPSHOT</version>
                        <type>jar</type>
                        <classifier>classes</classifier>
                    </dependency>
                    <dependency>
                        <groupId>org.dspace</groupId>
                        <artifactId>dspace-rest</artifactId>
-                       <version>7.0-beta4-SNAPSHOT</version>
+                       <version>7.0-beta5-SNAPSHOT</version>
                        <type>war</type>
                    </dependency>
                </dependencies>
@@ -903,25 +912,19 @@
          The 'release' profile is used by the 'maven-release-plugin' (see above)
          to actually perform a DSpace software release to Maven central.
          This profile contains settings which are ONLY enabled when performing
-         a DSpace release. See alse https://wiki.duraspace.org/display/DSPACE/Release+Procedure
+         a DSpace release. See also https://wiki.duraspace.org/display/DSPACE/Release+Procedure
+         NOTE: You MUST trigger this profile by running "-Drelease"
+         (as that flag also triggers other modules to be enabled/disabled as necessary for release)
         -->
         <profile>
             <id>release</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
+                <!-- Enable this profile if we are doing a release (-Drelease) -->
+                <property>
+                    <name>release</name>
+                </property>
             </activation>
-            <!-- Activate all modules *except* for the 'dspace' module,
-                 as it does not include any Java source code to release. -->
-            <modules>
-                <module>dspace-api</module>
-                <module>dspace-oai</module>
-                <module>dspace-rdf</module>
-                <module>dspace-rest</module>
-                <module>dspace-services</module>
-                <module>dspace-sword</module>
-                <module>dspace-swordv2</module>
-                <module>dspace-server-webapp</module>
-            </modules>
             <build>
                 <plugins>
                     <!-- Configure Nexus plugin for new releases via Sonatype.
@@ -952,7 +955,7 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <!-- For new releases, generate JavaDocs -->
+                    <!-- For new releases, generate JavaDocs for each module -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
@@ -960,7 +963,7 @@
                             <execution>
                                 <id>attach-javadocs</id>
                                 <goals>
-                                    <goal>aggregate-jar</goal>
+                                    <goal>jar</goal>
                                 </goals>
                             </execution>
                         </executions>
@@ -998,62 +1001,64 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
-                <version>7.0-beta4-SNAPSHOT</version>
+                <version>7.0-beta5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
                 <type>test-jar</type>
-                <version>7.0-beta4-SNAPSHOT</version>
+                <version>7.0-beta5-SNAPSHOT</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace.modules</groupId>
                 <artifactId>additions</artifactId>
-                <version>7.0-beta4-SNAPSHOT</version>
+                <version>7.0-beta5-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-sword</artifactId>
-                <version>7.0-beta4-SNAPSHOT</version>
+                <version>7.0-beta5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-swordv2</artifactId>
-                <version>7.0-beta4-SNAPSHOT</version>
+                <version>7.0-beta5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-oai</artifactId>
-                <version>7.0-beta4-SNAPSHOT</version>
+                <version>7.0-beta5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-services</artifactId>
-                <version>7.0-beta4-SNAPSHOT</version>
+                <version>7.0-beta5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
                 <type>test-jar</type>
-                <version>7.0-beta4-SNAPSHOT</version>
+                <version>7.0-beta5-SNAPSHOT</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-rdf</artifactId>
-                <version>7.0-beta4-SNAPSHOT</version>
+                <version>7.0-beta5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>7.0-beta4-SNAPSHOT</version>
+                <version>7.0-beta5-SNAPSHOT</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>7.0-beta4-SNAPSHOT</version>
+                <version>7.0-beta5-SNAPSHOT</version>
                 <type>war</type>
             </dependency>
             <!-- DSpace API Localization Packages -->
@@ -1228,17 +1233,19 @@
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-analyzers-smartcn</artifactId>
                 <version>${solr.client.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-analyzers-stempel</artifactId>
                 <version>${solr.client.version}</version>
+                <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.ant</groupId>
                 <artifactId>ant</artifactId>
-                <version>1.9.1</version>
+                <version>1.9.15</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.jena</groupId>
@@ -1312,7 +1319,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-configuration2</artifactId>
-                <version>2.3</version>
+                <version>2.7</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -1582,7 +1589,7 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.12</version>
+                <version>4.13.1</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -1854,8 +1861,13 @@
         </repository>
     </distributionManagement>
 
-    <!-- Enable access to artifacts in Sonatype's snapshot repo for Snapshots ONLY -->
     <repositories>
+        <!-- Check Maven Central first (before other repos below) -->
+        <repository>
+            <id>maven-central</id>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </repository>
+        <!-- Enable access to artifacts in Sonatype's snapshot repo for Snapshots ONLY -->
         <repository>
             <id>maven-snapshots</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
