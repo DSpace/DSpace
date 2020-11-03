@@ -70,8 +70,8 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                    .andExpect(jsonPath("$.page.number", is(0)))
                    .andExpect(
                        jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL + "config/submissionforms")))
-                   //The array of submissionforms should have a size of 21
-                   .andExpect(jsonPath("$._embedded.submissionforms", hasSize(equalTo(21))))
+                   //The array of submissionforms should have a size of 20 (default pagination size)
+                   .andExpect(jsonPath("$._embedded.submissionforms", hasSize(equalTo(20))))
         ;
     }
 
@@ -87,7 +87,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                 .andExpect(jsonPath("$.page.number", is(0)))
                 .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL
                            + "config/submissionforms")))
-                .andExpect(jsonPath("$._embedded.submissionforms", hasSize(equalTo(21))));
+                .andExpect(jsonPath("$._embedded.submissionforms", hasSize(equalTo(20))));
     }
 
     @Test
