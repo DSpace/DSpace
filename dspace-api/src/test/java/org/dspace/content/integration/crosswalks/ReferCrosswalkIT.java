@@ -1125,6 +1125,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
         context.commit();
+
         ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("equipment-json");
         assertThat(referCrossWalk, notNullValue());
 
@@ -1152,6 +1153,8 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withEquipmentOwnerPerson("Walter White")
             .build();
 
+        context.restoreAuthSystemState();
+        context.commit();
 
         ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("equipment-xml");
         assertThat(referCrossWalk, notNullValue());
@@ -1160,6 +1163,84 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         referCrossWalk.disseminate(context, equipment, out);
 
         try (FileInputStream fis = getFileInputStream("equipment.xml")) {
+            String expectedContent = IOUtils.toString(fis, Charset.defaultCharset());
+            compareEachLine(out.toString(), expectedContent);
+        }
+    }
+
+    @Test
+    public void testManyEquipmentJsonDisseminate() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item firstEquipment = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Equipment")
+            .withAcronym("FT-EQ")
+            .withTitle("First Test Equipment")
+            .withInternalId("ID-01")
+            .withDescription("This is an equipment to test the export functionality")
+            .withEquipmentOwnerOrgUnit("Test OrgUnit")
+            .withEquipmentOwnerPerson("Walter White")
+            .build();
+
+        Item secondEquipment = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Equipment")
+            .withAcronym("ST-EQ")
+            .withTitle("Second Test Equipment")
+            .withInternalId("ID-02")
+            .withDescription("This is another equipment to test the export functionality")
+            .withEquipmentOwnerPerson("John Smith")
+            .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("equipment-json");
+        assertThat(referCrossWalk, notNullValue());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        referCrossWalk.disseminate(context, Arrays.asList(firstEquipment, secondEquipment).iterator(), out);
+
+        try (FileInputStream fis = getFileInputStream("equipments.json")) {
+            String expectedContent = IOUtils.toString(fis, Charset.defaultCharset());
+            compareEachLine(out.toString(), expectedContent);
+        }
+    }
+
+    @Test
+    public void testManyEquipmentXmlDisseminate() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item firstEquipment = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Equipment")
+            .withAcronym("FT-EQ")
+            .withTitle("First Test Equipment")
+            .withInternalId("ID-01")
+            .withDescription("This is an equipment to test the export functionality")
+            .withEquipmentOwnerOrgUnit("Test OrgUnit")
+            .withEquipmentOwnerPerson("Walter White")
+            .build();
+
+        Item secondEquipment = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Equipment")
+            .withAcronym("ST-EQ")
+            .withTitle("Second Test Equipment")
+            .withInternalId("ID-02")
+            .withDescription("This is another equipment to test the export functionality")
+            .withEquipmentOwnerPerson("John Smith")
+            .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("equipment-xml");
+        assertThat(referCrossWalk, notNullValue());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        referCrossWalk.disseminate(context, Arrays.asList(firstEquipment, secondEquipment).iterator(), out);
+
+        try (FileInputStream fis = getFileInputStream("equipments.xml")) {
             String expectedContent = IOUtils.toString(fis, Charset.defaultCharset());
             compareEachLine(out.toString(), expectedContent);
         }
