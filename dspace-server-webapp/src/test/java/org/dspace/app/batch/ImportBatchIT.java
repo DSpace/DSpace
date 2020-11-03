@@ -180,7 +180,8 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
             Item item = wi.getItem();
 
             List<MetadataValue> metadata = item.getMetadata();
-            assertEquals("Only one metadata found", 1, metadata.size());
+            // one metadata is explicit the other is the cris.sourceid
+            assertEquals("Only two metadata founds", 2, metadata.size());
 
             String defLanguage = ConfigurationManager.getProperty("default.language");
             metadata = itemService.getMetadata(item, MetadataSchemaEnum.DC.getName(), "title", null, defLanguage);
@@ -383,7 +384,8 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
                 Item item = wi.getItem();
 
                 List<MetadataValue> metadata = item.getMetadata();
-                assertEquals("Only one metadata found", 1, metadata.size());
+                // one metadata is explicit the other is the cris.sourceid
+                assertEquals("Only two metadata founds", 2, metadata.size());
 
                 String defLanguage = ConfigurationManager.getProperty("default.language");
                 metadata = itemService.getMetadata(item, MetadataSchemaEnum.DC.getName(), "title", null, defLanguage);
@@ -433,7 +435,8 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
                 Item item = wi.getItem();
                 List<MetadataValue> metadata = wi.getItem().getMetadata();
 
-                assertEquals("Only two metadata found", 2, metadata.size());
+                // two metadata are explicit the other is the cris.sourceid
+                assertEquals("Only three metadata founds", 3, metadata.size());
 
                 for (MetadataValue m : metadata) {
                     if ("title".equals(m.getElement())) {
