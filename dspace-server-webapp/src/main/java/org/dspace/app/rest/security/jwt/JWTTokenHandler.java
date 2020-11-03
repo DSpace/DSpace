@@ -33,6 +33,7 @@ import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.jwt.util.DateUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.security.RestAuthenticationService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
@@ -77,6 +78,9 @@ public abstract class JWTTokenHandler {
 
     @Autowired
     private ClientInfoService clientInfoService;
+
+    @Autowired
+    private RestAuthenticationService restAuthenticationService;
 
     private String generatedJwtKey;
     private String generatedEncryptionKey;
@@ -430,7 +434,7 @@ public abstract class JWTTokenHandler {
         // First we check for "Origin" header, as it is the most trustworthy.
         // It is set automatically by most browsers & modification is usually blocked by browser.
         String source = request.getHeader("Origin");
-        if (StringUtils.isBlank(source)) {
+        if (StringUtils.isEmpty(source)) {
             // If empty fallback to "Referer" header.
             // Again, it is set automatically & modification is usually blocked by browser.
             source = request.getHeader("Referer");
@@ -439,9 +443,18 @@ public abstract class JWTTokenHandler {
         // If both of the above headers are empty, then this may be a non-browser access.
         // This may occur with our Angular UI when Server Side Rendering (SSR) sent the request, as
         // Angular Universal (SSR) doesn't always provide Origin or Referer headers.
-        if (StringUtils.isBlank(source)) {
+        if (StringUtils.isEmpty(source)) {
             // Check for our custom X-DSpace-UI header which is passed by our UI in every request
             source = request.getHeader("X-DSpace-UI");
+        }
+
+        // If nothing is found in the Headers, check for a possible redirect in the current auth request.
+        // When a redirect occurs during authentication, the Headers are lost (as headers cannot be sent via a
+        // redirect). In that specific situation, we use the redirect URL as the Origin of our JWT, as the redirect
+        // URL corresponds to the origin which initiated the auth request. NOTE: in getOriginRedirectUrl() we
+        // are already verifying this URL is trusted and also that a redirect is required by the auth service.
+        if (StringUtils.isEmpty(source)) {
+            source = restAuthenticationService.getOriginRedirectUrl(request);
         }
 
         // Return base URL (this removes any path, etc)

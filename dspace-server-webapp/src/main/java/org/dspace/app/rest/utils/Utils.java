@@ -950,4 +950,30 @@ public class Utils {
             context.restoreAuthSystemState();
         }
     }
+
+    /**
+     * Return true if the given URL is trusted, false otherwise.
+     * <P>
+     * A trusted URL is one whose hostname is listed in our CORS allowed-origins and/or matches the
+     * hostname of our server webapp.
+     * @param url url to match against
+     * @return true if trusted, false otherwise
+     */
+    public boolean isTrustedUrl(String url) {
+        // Get hostname of current URL
+        String hostName = org.dspace.core.Utils.getHostName(url);
+
+        // Build array of trusted hostnames, including hostnames of server webapp & all CORS trusted origins
+        ArrayList<String> allowedHostNames = new ArrayList<>();
+        String serverHostName =
+            org.dspace.core.Utils.getHostName(configurationService.getProperty("dspace.server.url"));
+        allowedHostNames.add(serverHostName);
+        String[] allowedUrls = configurationService.getArrayProperty("rest.cors.allowed-origins");
+        for (String allowedUrl : allowedUrls) {
+            allowedHostNames.add(org.dspace.core.Utils.getHostName(allowedUrl));
+        }
+
+        // return whether our hostname is in that trusted list
+        return StringUtils.equalsAnyIgnoreCase(hostName, allowedHostNames.toArray(new String[0]));
+    }
 }

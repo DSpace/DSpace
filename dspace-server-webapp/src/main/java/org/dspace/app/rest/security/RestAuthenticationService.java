@@ -118,13 +118,26 @@ public interface RestAuthenticationService {
      * This method should also be used by getAuthenticatedEPerson() to determine whether single-use
      * cookies can be read from to provide trusted authentication information.
      * <P>
-     * WARNING: Ideally, a RestAuthenticationService will only support single-use cookies in _very specific_ scenarios.
-     * Keep in mind that storing any authentication data in a cookie makes DSpace potentially susceptible to CSRF
-     * (cross site request forgery) attacks. So, when in doubt, this method should return 'false'.
+     * WARNING: Ideally, a RestAuthenticationService will only support single-use cookies in _very specific_ scenarios
+     * (e.g. when a redirect is needed, per getOriginRedirectUrl()). Keep in mind that storing any authentication data
+     * in a cookie makes DSpace potentially susceptible to CSRF (cross site request forgery) attacks. So, when in doubt,
+     * this method should return 'false'.
      * @param request current request
      * @param response current response
      * @return true if single-use cookies can be trusted in current request and/or written to current response.
      * false if they cannot be trusted or used in request and/or response.
      */
     boolean allowSingleUseAuthCookie(HttpServletRequest request, HttpServletResponse response);
+
+    /**
+     * When allowSingleUseAuthCookie() is true, the most likely scenario is a *redirect* will occur during the
+     * authentication of the user. Since an HTTP redirect cannot send HTTP headers, it must send the auth token via
+     * a temporary cookie. One example is Shibboleth.
+     * <P>
+     * This method checks the current request (usually query string params) for a possible pending redirect back to
+     * the origin of the authentication request, and returns the URL.
+     * @param request current request
+     * @return URL of origin to be redirected to (if any), or null
+     */
+    String getOriginRedirectUrl(HttpServletRequest request);
 }

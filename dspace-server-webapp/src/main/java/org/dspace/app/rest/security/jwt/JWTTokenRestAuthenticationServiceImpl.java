@@ -24,6 +24,7 @@ import org.dspace.app.rest.model.wrapper.AuthenticationToken;
 import org.dspace.app.rest.security.DSpaceAuthentication;
 import org.dspace.app.rest.security.RestAuthenticationService;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authenticate.ShibAuthentication;
 import org.dspace.authenticate.service.AuthenticationService;
@@ -31,6 +32,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.services.ConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -67,6 +69,12 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     @Autowired
     private AuthenticationService authenticationService;
 
+    @Autowired
+    private ConfigurationService configurationService;
+
+    @Autowired
+    private Utils utils;
+
     @Override
     public void afterPropertiesSet() throws Exception {
 
@@ -101,6 +109,12 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     public void addAuthenticationDataForUser(HttpServletRequest request, HttpServletResponse response,
             DSpaceAuthentication authentication, boolean addSingleUseCookie) throws IOException {
         try {
+            // If an auth cookie was requested, but they are NOT allowed
+            if (addSingleUseCookie && !allowSingleUseAuthCookie(request, response)) {
+                // do not allow single use cookie to be added to response
+                addSingleUseCookie = false;
+            }
+
             Context context = ContextUtil.obtainContext(request);
             context.setCurrentUser(ePersonService.findByEmail(context, authentication.getName()));
 
@@ -109,11 +123,6 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
             String token = loginJWTTokenHandler.createTokenForEPerson(context, request,
                                                                  authentication.getPreviousLoginDate(), groups);
 
-            // If an auth cookie was requested, but they are NOT allowed
-            if (addSingleUseCookie && !allowSingleUseAuthCookie(request, response)) {
-                // do not allow single use cookie to be added to response
-                addSingleUseCookie = false;
-            }
             addTokenToResponse(response, token, addSingleUseCookie);
             context.commit();
 
@@ -246,26 +255,87 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     }
 
     /**
-     * For DSpace, we currently ONLY allow for single-use Authentication cookies when Shibboleth is enabled. Even then,
-     * they will ONLY be created from teh ShibbolethAuthenticationFilter (to ensure non-Shibboleth requests don't
-     * accidentally create these cookies.
+     * For DSpace, we currently ONLY allow for single-use Authentication cookies when a redirect is required during
+     * the authentication process (e.g. Shibboleth requires redirects, see ShibbolethRestController for more details).
      * <P>
-     * For Shibboleth, authentication cookies are required to pass auth info back to the UI/client via a redirect (as
-     * headers cannot be passed on a redirect). See ShibbolethRestController comments for more details on Shib auth.
+     * By default we do NOT support single-use Auth cookies as they are less secure than sending authentication tokens
+     * via HTTP Headers.
      * @param request current request
      * @param response current response
-     * @return true if Shibboleth is enabled, false otherwise.
+     * @return true if redirect URL is found (e.g. Shibboleth), false otherwise.
      */
     @Override
     public boolean allowSingleUseAuthCookie(HttpServletRequest request, HttpServletResponse response) {
-        String shibbolethPluginName = new ShibAuthentication().getName();
+        // Only allow single-use auth cookies if a redirect is necessary during authentication
+        // (e.g. Shibboleth requires a redirect, see ShibAuthentication.loginPageUrl())
+        String redirectUrl = getOriginRedirectUrl(request);
 
-        // Only return true if the Shibboleth Authentication Plugin is enabled. When enabled then
-        // its plugin name will be included in the WWW-Authenticate header value.
-        if (getWwwAuthenticateHeaderValue(request, response).contains(shibbolethPluginName)) {
+        // If a redirect is required, then we need to support single-auth cookies
+        if (StringUtils.isNotEmpty(redirectUrl)) {
             return true;
         }
+        // Default to not allowing single-use auth cookies.
         return false;
+    }
+
+    /**
+     * When allowSingleUseAuthCookie() is true, the most likely scenario is a *redirect* will occur during the
+     * authentication of the user. Since an HTTP redirect cannot send HTTP headers, it must send the auth
+     * token via a cookie. One example is Shibboleth.
+     * <P>
+     * This method first checks if a redirect is necessary during the authentication process (e.g. Shibboleth is
+     * enabled). If a redirect is not needed, null is returned. If a redirect is needed, then it checks the current
+     * request for the redirect URL in a querystring param, or defaults to our UI URL if not found.
+     * <P>
+     * In this implementation, we're also saving the redirect URL to an internal attribute, so that it can be used
+     * when generating/signing the JWT (as the origin of the JWT auth request). When redirects are involved, Origin
+     * headers are lost, so we cannot depend on those headers existing when generating/signing the JWT.
+     * @param request current HTTP request
+     * @return If redirection unnecessary, null is returned. If redirection is necessary, returns URL of redirect.
+     */
+    public String getOriginRedirectUrl(HttpServletRequest request) {
+        final String requestAttr = "origin-redirect-url";
+        final String shibPluginName = new ShibAuthentication().getName();
+
+        // Redirects during authentication are ONLY required when the Shibboleth plugin is enabled.
+        // So, loop through all enabled plugins to see if Shibboleth is one of them.
+        boolean redirectRequired = false;
+        Iterator<AuthenticationMethod> authenticationMethodIterator =
+            authenticationService.authenticationMethodIterator();
+        while (authenticationMethodIterator.hasNext()) {
+            if (shibPluginName.equals(authenticationMethodIterator.next().getName())) {
+                redirectRequired = true;
+                break;
+            }
+        }
+
+        // If a redirect is required, then check for a redirectURL.
+        if (redirectRequired) {
+            // First, check to see if we've previously saved the redirect url in an internal request attribute
+            String redirectUrl = (String) request.getAttribute(requestAttr);
+
+            // If found in an internal attribute, unset that attribute (it can only be read once) and return value
+            if (StringUtils.isNotEmpty(redirectUrl)) {
+                request.removeAttribute(requestAttr);
+                return redirectUrl;
+            } else {
+                // If not in an internal attribute, check querystring param "redirectUrl"
+                redirectUrl = request.getParameter("redirectUrl");
+
+                // If still empty, default to assuming we'd redirect back to the UI
+                if (StringUtils.isEmpty(redirectUrl)) {
+                    redirectUrl = configurationService.getProperty("dspace.ui.url");
+                }
+
+                // Verify the origin is trusted & save it to our internal request attribute before returning
+                if (utils.isTrustedUrl(redirectUrl)) {
+                    request.setAttribute(requestAttr, redirectUrl);
+                    return redirectUrl;
+                }
+            }
+        }
+        // Either redirect is not required, or an untrusted redirect URL was found
+        return null;
     }
 
     /**

@@ -8,13 +8,11 @@
 package org.dspace.app.rest;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.AuthnRest;
-import org.dspace.core.Utils;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.services.ConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +54,9 @@ public class ShibbolethRestController implements InitializingBean {
     private static final Logger log = LoggerFactory.getLogger(ShibbolethRestController.class);
 
     @Autowired
+    protected Utils utils;
+
+    @Autowired
     ConfigurationService configurationService;
 
     @Autowired
@@ -77,17 +78,8 @@ public class ShibbolethRestController implements InitializingBean {
             redirectUrl = configurationService.getProperty("dspace.ui.url");
         }
 
-        // Validate that the redirectURL matches either the server or UI hostname. It *cannot* be an arbitrary URL.
-        String redirectHostName = Utils.getHostName(redirectUrl);
-        String serverHostName = Utils.getHostName(configurationService.getProperty("dspace.server.url"));
-        ArrayList<String> allowedHostNames = new ArrayList<String>();
-        allowedHostNames.add(serverHostName);
-        String[] allowedUrls = configurationService.getArrayProperty("rest.cors.allowed-origins");
-        for (String url : allowedUrls) {
-            allowedHostNames.add(Utils.getHostName(url));
-        }
-
-        if (StringUtils.equalsAnyIgnoreCase(redirectHostName, allowedHostNames.toArray(new String[0]))) {
+        // Redirect URL *cannot* be an arbitrary URL. Must be trusted.
+        if (utils.isTrustedUrl(redirectUrl)) {
             log.debug("Shibboleth redirecting to " + redirectUrl);
             response.sendRedirect(redirectUrl);
         } else {
@@ -97,5 +89,4 @@ public class ShibbolethRestController implements InitializingBean {
                                "Invalid redirectURL! Must match server or ui hostname.");
         }
     }
-
 }
