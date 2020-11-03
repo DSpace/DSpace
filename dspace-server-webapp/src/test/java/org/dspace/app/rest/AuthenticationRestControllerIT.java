@@ -15,12 +15,14 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
@@ -132,45 +134,61 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
     @Test
     public void testShibAuthenticatedWithSingleUseCookie() throws Exception {
-        //Enable Shibboleth login
+        //Enable Shibboleth login only
         configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
 
-        //Simulate that a shibboleth authentication has happened
-        String token = getClient().perform(post("/api/authn/login")
-                .requestAttr("SHIB-MAIL", eperson.getEmail())
-                .requestAttr("SHIB-SCOPED-AFFILIATION", "faculty;staff"))
-            .andExpect(status().isOk())
-            .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER).replace("Bearer ", "");
+        String uiURL = configurationService.getProperty("dspace.ui.url");
 
-        Cookie[] cookies = new Cookie[1];
-        cookies[0] = new Cookie(AUTHORIZATION_COOKIE, token);
+        // In order to fully simulate a Shibboleth authentication, we'll call
+        // /api/authn/shibboleth?redirectUrl=[UI-URL] , with valid Shibboleth request attributes.
+        // In this situation, we are mocking how Shibboleth works from our UI (see also ShibbolethRestController):
+        // (1) The UI sends the user to Shibboleth to login
+        // (2) After a successful login, Shibboleth redirects user to /api/authn/shibboleth?redirectUrl=[url]
+        // (3) That triggers generation of the auth token (JWT), and redirects the user to 'redirectUrl', sending along
+        //     a single-use cookie containing the auth token.
+        // In below call, we're sending a GET request (as that's what a redirect is), without any normal headers
+        // (like Origin) to simulate this redirect coming from the Shibboleth server. We are then verifying the user
+        // will be redirected to the 'redirectUrl' with a single-use auth cookie
+        Cookie authCookie = getClient().perform(get("/api/authn/shibboleth")
+                                                    .param("redirectUrl", uiURL)
+                                                    .requestAttr("SHIB-MAIL", eperson.getEmail())
+                                                    .requestAttr("SHIB-SCOPED-AFFILIATION", "faculty;staff"))
+                                       .andExpect(status().is3xxRedirection())
+                                       .andExpect(redirectedUrl(uiURL))
+                                       .andExpect(cookie().exists(AUTHORIZATION_COOKIE))
+                                       .andReturn().getResponse().getCookie(AUTHORIZATION_COOKIE);
 
-        // Check if we are authenticated with a status request with a single use authorization cookie
-        // This simulates what happens after Shibboleth login occurs. Shibboleth redirects back to REST API
-        // to generate the token & then redirects to UI with token in a Cookie. UI sends token back in order
-        // to get access to the Authorization header
-        getClient().perform(get("/api/authn/status")
-                .secure(true)
-                .cookie(cookies))
-                .andExpect(status().isOk())
-                //We expect the content type to be "application/hal+json;charset=UTF-8"
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$.okay", is(true)))
-                .andExpect(jsonPath("$.authenticated", is(true)))
-                .andExpect(jsonPath("$.type", is("status")))
-                // Cookie is single use, so its value should now be cleared in response
-                .andExpect(cookie().value(AUTHORIZATION_COOKIE, ""));
+        // Verify the single-use cookie now exists & obtain its token for use below
+        assertNotNull(authCookie);
+        String token = authCookie.getValue();
 
-        // Test token passed as Header still works though (even after cookie is cleared)
-        getClient(token).perform(get("/api/authn/status"))
+        // Now, simulate the UI sending the cookie back to the REST API in order to complete the authentication.
+        // This is where the single-use cookie will be read, verified & destroyed. After this point, the UI will
+        // only use the Authorization header for all future requests.
+        // NOTE that this call has an "Origin" matching the UI, to better mock that the request came from there &
+        // to verify the single-use auth cookie is valid for the UI's origin.
+        getClient().perform(get("/api/authn/status").header("Origin", uiURL)
+                                                    .secure(true)
+                                                    .cookie(authCookie))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.okay", is(true)))
+                   .andExpect(jsonPath("$.authenticated", is(true)))
+                   .andExpect(jsonPath("$.type", is("status")))
+                   // Cookie is single use, so its value should now be cleared in response
+                   .andExpect(cookie().value(AUTHORIZATION_COOKIE, ""));
+
+        // Now that the single use cookie is cleared, all future requests (from UI)
+        // should be made via the Authorization header. So, this tests the token is still valid if sent via headers.
+        getClient(token).perform(get("/api/authn/status").header("Origin", uiURL))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$.okay", is(true)))
                    .andExpect(jsonPath("$.authenticated", is(true)))
                    .andExpect(jsonPath("$.type", is("status")));
 
-        // Logout
-        getClient(token).perform(post("/api/authn/logout"))
+        // Logout, invalidating the token
+        getClient(token).perform(post("/api/authn/logout").header("Origin", uiURL))
                         .andExpect(status().isNoContent());
     }
 
@@ -210,7 +228,6 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         getClient(token).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
     }
-
 
     @Test
     public void testTwoAuthenticationTokens() throws Exception {
