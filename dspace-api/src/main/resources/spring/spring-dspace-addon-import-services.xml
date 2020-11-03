@@ -39,6 +39,36 @@
          </property>
     </bean>
 
+    <bean id="PubmedEuropeImportService" class="org.dspace.importer.external.pubmedeurope.PubmedEuropeMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="PubmedEuropeMetadataFieldMapping"/>
+    </bean>
+    <bean id="PubmedEuropeMetadataFieldMapping"
+          class="org.dspace.importer.external.pubmedeurope.PubmedEuropeFieldMapping">
+    </bean>
+
+    <bean id="ADSImportService" class="org.dspace.importer.external.ads.ADSImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="ADSMetadataFieldMapping"/>
+    </bean>
+    <bean id="ADSMetadataFieldMapping"
+          class="org.dspace.importer.external.ads.ADSFieldMapping">
+    </bean>
+
+    <bean id="CiniiImportService"
+          class="org.dspace.importer.external.cinii.CiniiImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="CiniiMetadataFieldMapping"/>
+    </bean>
+    <bean id="CiniiMetadataFieldMapping"
+          class="org.dspace.importer.external.cinii.CiniiFieldMapping">
+    </bean>
+
+    <bean id="CrossRefImportService"
+          class="org.dspace.importer.external.crossref.CrossRefImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="CrossRefMetadataFieldMapping"/>
+    </bean>
+    <bean id="CrossRefMetadataFieldMapping"
+          class="org.dspace.importer.external.crossref.CrossRefFieldMapping">
+    </bean>
+
     <bean id="ArXivImportService"
           class="org.dspace.importer.external.arxiv.service.ArXivImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="ArXivMetadataFieldMapping"/>
