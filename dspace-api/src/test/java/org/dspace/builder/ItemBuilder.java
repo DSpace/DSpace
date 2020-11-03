@@ -251,6 +251,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "oairecerif", "affiliation", "role", role);
     }
 
+    public ItemBuilder withDescription(String description) {
+        return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "description", null, description);
+    }
+
     public ItemBuilder withDescriptionAbstract(String description) {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "description", "abstract", description);
     }
@@ -422,6 +426,14 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withOAMandateURL(String oamandateUrl) {
         return addMetadataValue(item, "oairecerif", "oamandate", "url", oamandateUrl);
+    }
+
+    public ItemBuilder withEquipmentOwnerOrgUnit(String ownerOrgUnit) {
+        return addMetadataValue(item, "crisequipment", "ownerou", null, ownerOrgUnit);
+    }
+
+    public ItemBuilder withEquipmentOwnerPerson(String ownerPerson) {
+        return addMetadataValue(item, "crisequipment", "ownerrp", null, ownerPerson);
     }
 
     public ItemBuilder withOrgUnitLegalName(String legalName) {

@@ -362,6 +362,35 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    public void testPdfCrosswalkEquipmentDisseminate() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item equipment = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Equipment")
+            .withAcronym("T-EQ")
+            .withTitle("Test Equipment")
+            .withInternalId("ID-01")
+            .withDescription("This is an equipment to test the export functionality")
+            .withEquipmentOwnerOrgUnit("Test OrgUnit")
+            .withEquipmentOwnerPerson("Walter White")
+            .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        StreamDisseminationCrosswalk streamCrosswalkDefault = (StreamDisseminationCrosswalk) CoreServiceFactory
+            .getInstance().getPluginService().getNamedPlugin(StreamDisseminationCrosswalk.class, "equipment-pdf");
+
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            streamCrosswalkDefault.disseminate(context, equipment, out);
+            assertThat(out.toString(), not(isEmptyString()));
+            assertThatPdfHasContent(out, content -> assertThatEquipmentDocumentHasContent(content));
+        }
+
+    }
+
+    @Test
     public void testPdfCrosswalkOrgUnitDisseminate() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -596,6 +625,18 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         assertThat(content, containsString("Identifier(s): ID-01, ID-02"));
         assertThat(content, containsString("URL(s): www.orgUnit.com, www.orgUnit.it"));
         assertThat(content, containsString("People: Walter White, Jesse Pinkman"));
+    }
+
+    private void assertThatEquipmentDocumentHasContent(String content) {
+        assertThat(content, containsString("Test Equipment"));
+        assertThat(content, containsString("This is an equipment to test the export functionality"));
+
+        assertThat(content, containsString("Basic informations"));
+        assertThat(content, containsString("Equipment Acronym: T-EQ"));
+        assertThat(content, containsString("Institution Unique Identifier: ID-01"));
+        assertThat(content, containsString("Owner (Organization): Test OrgUnit"));
+        assertThat(content, containsString("Owner (Person): Walter White"));
+
     }
 
     private FileInputStream getFileInputStream(String name) throws FileNotFoundException {
