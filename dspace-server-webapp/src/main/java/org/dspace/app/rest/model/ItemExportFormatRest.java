@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.model;
 
+import org.dspace.app.rest.RestResourceController;
+
 /**
  * The ItemExportFormatRest REST resource.
  *
@@ -36,7 +38,7 @@ public class ItemExportFormatRest extends BaseObjectRest<String> {
 
     @Override
     public Class<?> getController() {
-        return ItemExportFormatRest.class;
+        return RestResourceController.class;
     }
 
 	public String getMimeType() {

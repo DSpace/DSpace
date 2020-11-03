@@ -58,14 +58,21 @@ public class ItemExportFormatServiceImpl implements ItemExportFormatService {
 
         Map<String, StreamDisseminationCrosswalk> map = this.streamDissiminatorCrosswalkMapper.getAll().entrySet()
                 .stream()
+                // filter molteplicity
                 .filter(entry -> {
                     if (entry.getValue().getCrosswalkMode().equals(CrosswalkMode.SINGLE_AND_MULTIPLE)) {
                         return true;
                     }
                     return entry.getValue().getCrosswalkMode().equals(molteplicity);
                 })
-                .filter(entry -> entry.getValue().getEntityType().isPresent()
-                        && entry.getValue().getEntityType().get().equals(entityTypeId))
+                // filter entityType
+                .filter(entry -> {
+                    if (entityTypeId == null) {
+                        return true;
+                    }
+                    return entry.getValue().getEntityType().isPresent()
+                            && entry.getValue().getEntityType().get().equals(entityTypeId);
+                })
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         List<ItemExportFormat> formats = map.entrySet().stream()

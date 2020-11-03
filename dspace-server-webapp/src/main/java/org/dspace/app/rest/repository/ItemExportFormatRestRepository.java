@@ -71,7 +71,7 @@ public class ItemExportFormatRestRepository extends DSpaceRestRepository<ItemExp
 	@SearchRestMethod(name = "byEntityTypeAndMolteplicity")
 	@PreAuthorize("hasAuthority('AUTHENTICATED')")
     public Page<ItemExportFormatRest> byEntityTypeAndMolteplicity(
-        @Parameter(value = "entityTypeId", required = true) String entityTypeId,
+        @Parameter(value = "entityTypeId") String entityTypeId,
         @Parameter(value = "molteplicity") String molteplicity,
         Pageable pageable) {
 		
