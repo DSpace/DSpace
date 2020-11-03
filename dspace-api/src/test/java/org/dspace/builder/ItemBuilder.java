@@ -235,6 +235,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "oairecerif", "person", "affiliation", affiliation);
     }
 
+    public ItemBuilder withPersonAffiliationName(String name, String authority) {
+        return addMetadataValue(item, "person", "affiliation", "name", null, name, authority, 600);
+    }
+
     public ItemBuilder withPersonAffiliationStartDate(String startDate) {
         return addMetadataValue(item, "oairecerif", "affiliation", "startDate", startDate);
     }
@@ -418,6 +422,18 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withOAMandateURL(String oamandateUrl) {
         return addMetadataValue(item, "oairecerif", "oamandate", "url", oamandateUrl);
+    }
+
+    public ItemBuilder withOrgUnitLegalName(String legalName) {
+        return addMetadataValue(item, "organization", "legalName", null, legalName);
+    }
+
+    public ItemBuilder withParentOrganization(String parent, String authority) {
+        return addMetadataValue(item, "organization", "parentOrganization", null, null, parent, authority, 600);
+    }
+
+    public ItemBuilder withOrgUnitIdentifier(String identifier) {
+        return addMetadataValue(item, "organization", "identifier", null, identifier);
     }
 
     public ItemBuilder withHandle(String handle) {
