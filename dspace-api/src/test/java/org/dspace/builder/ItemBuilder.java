@@ -428,6 +428,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "organization", "legalName", null, legalName);
     }
 
+    public ItemBuilder withParentOrganization(String parent) {
+        return addMetadataValue(item, "organization", "parentOrganization", null, parent);
+    }
+
     public ItemBuilder withParentOrganization(String parent, String authority) {
         return addMetadataValue(item, "organization", "parentOrganization", null, null, parent, authority, 600);
     }

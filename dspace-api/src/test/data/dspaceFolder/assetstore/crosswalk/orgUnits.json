@@ -1,0 +1,38 @@
+{
+	"orgUnits": [
+		{
+			"name": "Test OrgUnit",
+			"legalName": "Test OrgUnit LegalName",
+			"acronym": "TOU",
+			"type": "https:\/\/w3id.org\/cerif\/vocab\/OrganisationTypes#StrategicResearchInsitute",
+			"parentOrganization": {
+				"name": "Parent OrgUnit"
+			},
+			"identifiers": [
+				"ID-01",
+				"ID-02"
+			],
+			"url-identifiers": [
+				"www.orgUnit.com",
+				"www.orgUnit.it"
+			],
+			"People": [
+			]
+		},
+		{
+			"name": "Another Test OrgUnit",
+			"acronym": "ATOU",
+			"type": "https:\/\/w3id.org\/cerif\/vocab\/OrganisationTypes#Privatenonprofit",
+			"parentOrganization": {
+				"name": "Parent OrgUnit"
+			},
+			"identifiers": [
+				"ID-03"
+			],
+			"url-identifiers": [
+			],
+			"People": [
+			]
+		}
+	]
+}

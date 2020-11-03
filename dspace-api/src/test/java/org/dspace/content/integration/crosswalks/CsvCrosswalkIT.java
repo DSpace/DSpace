@@ -315,6 +315,57 @@ public class CsvCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         }
     }
 
+    @Test
+    public void testDisseminateOrgUnits() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item firstItem = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("OrgUnit")
+            .withAcronym("TOU")
+            .withTitle("Test OrgUnit")
+            .withOrgUnitLegalName("Test OrgUnit LegalName")
+            .withType("Strategic Research Insitute")
+            .withParentOrganization("Parent OrgUnit")
+            .withOrgUnitIdentifier("ID-01")
+            .withOrgUnitIdentifier("ID-02")
+            .withUrlIdentifier("www.orgUnit.com")
+            .withUrlIdentifier("www.orgUnit.it")
+            .build();
+
+        Item secondItem = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("OrgUnit")
+            .withAcronym("ATOU")
+            .withTitle("Another Test OrgUnit")
+            .withType("Private non-profit")
+            .withParentOrganization("Parent OrgUnit")
+            .withOrgUnitIdentifier("ID-03")
+            .build();
+
+        Item thirdItem = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("OrgUnit")
+            .withAcronym("TTOU")
+            .withTitle("Third Test OrgUnit")
+            .withType("Private non-profit")
+            .withOrgUnitIdentifier("ID-03")
+            .withUrlIdentifier("www.orgUnit.test")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        csvCrosswalk = (CsvCrosswalk) crosswalkMapper.getByType("orgUnit-csv");
+        assertThat(csvCrosswalk, notNullValue());
+        csvCrosswalk.setDCInputsReader(dcInputsReader);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        csvCrosswalk.disseminate(context, Arrays.asList(firstItem, secondItem, thirdItem).iterator(), out);
+
+        try (FileInputStream fis = getFileInputStream("orgUnits.csv")) {
+            String expectedCsv = IOUtils.toString(fis, Charset.defaultCharset());
+            assertThat(out.toString(), equalTo(expectedCsv));
+        }
+    }
+
     private Item createFullPersonItem() {
         Item item = createItem(context, collection)
             .withTitle("John Smith")

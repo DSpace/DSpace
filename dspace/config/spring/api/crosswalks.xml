@@ -32,6 +32,8 @@
 				<entry key="orgUnit-xml" value-ref="referCrosswalkOrgUnitXml"></entry>
 				<entry key="orgUnit-json" value-ref="referCrosswalkOrgUnitJson"></entry>
 				<entry key="orgUnit-pdf" value-ref="pdfCrosswalkOrgUnit"></entry>
+				<entry key="orgUnit-csv" value-ref="csvCrosswalkOrgUnit"></entry>
+				<entry key="orgUnit-xls" value-ref="xlsCrosswalkOrgUnit"></entry>
 				
 			</map>
 		</constructor-arg>
@@ -110,6 +112,7 @@
 		<property name="mimeType" value="application/xml; charset=UTF-8"/>
 		<property name="fileName" value="orgUnit.xml"/>
 		<property name="entityType" value="OrgUnit"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/orgUnits-xml.template"/>
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
 		<property name="converter" ref="xmlValueConverter" />
 	</bean>
@@ -119,6 +122,7 @@
 		<property name="mimeType" value="application/json; charset=UTF-8"/>
 		<property name="fileName" value="orgUnit.json"/>
 		<property name="entityType" value="OrgUnit"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/orgUnits-json.template"/>
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
 		<property name="converter" ref="jsonValueConverter" />
 		<property name="linesPostProcessor" ref="jsonPostProcessor" />
@@ -206,6 +210,21 @@
 		<property name="fileName" value="projects.xls"/>
 		<property name="sheetName" value="Projects"/>
 		<property name="entityType" value="Project"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.CsvCrosswalk" id="csvCrosswalkOrgUnit">
+		<property name="templateFileName" value="crosswalks/template/orgUnit-table.template"/>
+		<property name="fileName" value="orgUnits.csv"/>
+		<property name="entityType" value="OrgUnit"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.XlsCrosswalk" id="xlsCrosswalkOrgUnit">
+		<property name="templateFileName" value="crosswalks/template/orgUnit-table.template"/>
+		<property name="fileName" value="orgUnits.xls"/>
+		<property name="sheetName" value="OrgUnits"/>
+		<property name="entityType" value="OrgUnit"/>
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
 	</bean>
 	
