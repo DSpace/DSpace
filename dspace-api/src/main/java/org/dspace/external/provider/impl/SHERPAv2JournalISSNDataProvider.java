@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.sherpa.SHERPAService;
 import org.dspace.app.sherpa.v2.SHERPAJournal;
@@ -27,14 +26,17 @@ import org.dspace.external.provider.ExternalDataProvider;
 
 /**
  * This class is the implementation of the ExternalDataProvider interface that will deal with SherpaJournal External
- * data lookups.
+ * data lookups based on ISSN (to match functinoality offered by legacy SHERPASubmitService for policy lookups
+ * at the time of submission).
  * This provider is a refactored version of SherpaJournalDataPublisher, rewritten to work with SHERPA v2 API
  *
  * @author Kim Shepherd
  */
-public class SHERPAv2JournalDataProvider implements ExternalDataProvider {
+public class SHERPAv2JournalISSNDataProvider implements ExternalDataProvider {
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SHERPAv2JournalDataProvider.class);
+    private static final Logger log =
+        org.apache.logging.log4j.LogManager.getLogger(
+            org.dspace.external.provider.impl.SHERPAv2JournalISSNDataProvider.class);
 
     // Source identifier (configured in spring configuration)
     private String sourceIdentifier;
@@ -48,34 +50,36 @@ public class SHERPAv2JournalDataProvider implements ExternalDataProvider {
     }
 
     /**
-     * Initialise the client that we need to call the endpoint
+     * Initialise the provider - this no longer starts client since that is handled by SHERPAService
      * @throws IOException  If something goes wrong
      */
-    public void init() throws IOException {}
+    public void init() throws IOException {
+    }
 
     /**
-     * Get a single journal based on a "title equals string" query
-     * @param id    The journal title which will be used as query string
+     * Get a single journal based on a "issn equals string" query
+     * @param issn    The ISSN which will be used as query string
      * @return external data object representing journal
      */
     @Override
-    public Optional<ExternalDataObject> getExternalDataObject(String id) {
+    public Optional<ExternalDataObject> getExternalDataObject(String issn) {
+
         // Sanitise ID / title query string (strips some special characters)
-        id = SHERPAUtils.sanitiseQuery(id);
+        issn = SHERPAUtils.sanitiseQuery(issn);
 
-        // Perform request using the SHERPA service (first row only)
-        SHERPAResponse sherpaResponse = sherpaService.performRequest("publication", "title", "equals", id,
-            0, 1);
+        log.debug("Searching SHERPA for ISSN: " + issn);
 
-        // If a journal was returned, get it and convert it to an ExternalDataObject
+        // Get SHERPA response from base service
+        // Get SHERPA response from the API for all objects matching this ISSN
+        SHERPAResponse sherpaResponse = sherpaService.performRequest(
+            "publication", "issn", "equals", issn, 0, 1);
+
+        // Construct external data objects
         if (CollectionUtils.isNotEmpty(sherpaResponse.getJournals())) {
             SHERPAJournal sherpaJournal = sherpaResponse.getJournals().get(0);
-
             ExternalDataObject externalDataObject = constructExternalDataObjectFromSherpaJournal(sherpaJournal);
             return Optional.of(externalDataObject);
         }
-
-        // If no journal was returned, return an empty Optional object
         return Optional.empty();
     }
 
@@ -100,39 +104,47 @@ public class SHERPAv2JournalDataProvider implements ExternalDataProvider {
         // Set ISSNs in external object
         if (CollectionUtils.isNotEmpty(sherpaJournal.getIssns())) {
             String issn = sherpaJournal.getIssns().get(0);
+            externalDataObject.setId(issn);
             externalDataObject.addMetadata(new MetadataValueDTO(
-                    "dc", "identifier", "issn", null, issn));
+                "dc", "identifier", "issn", null, issn));
 
         }
+
+        log.debug("New external data object. Title=" + externalDataObject.getValue() + ". ID="
+            + externalDataObject.getId());
 
         return externalDataObject;
     }
 
     /**
      * Search SHERPA v2 API for journal results based on a 'contains word' query
-     * @param query The query for the search
+     * @param query The term to query for the search
      * @param start The start of the search
      * @param limit The max amount of records to be returned by the search
      * @return a list of external data objects
      */
     @Override
     public List<ExternalDataObject> searchExternalDataObjects(String query, int start, int limit) {
-        // Search SHERPA for journals with the query term in the title
-        SHERPAResponse sherpaResponse = sherpaService.performRequest("publication", "title",
-            "contains word", query, start, limit);
 
-        // Convert SHERPA response to a Collection and return the list
+        // Get SHERPA response from the API for all objects matching this ISSN
+        SHERPAResponse sherpaResponse = sherpaService.performRequest(
+            "publication", "issn", "equals", query, start, limit);
+
+        // Construct a list of external data objects and return it
         if (CollectionUtils.isNotEmpty(sherpaResponse.getJournals())) {
+            log.debug("Found " + sherpaResponse.getJournals().size() + " matching journals for ISSN " + query);
             List<ExternalDataObject> list = sherpaResponse.getJournals().stream().map(
                 sherpaJournal -> constructExternalDataObjectFromSherpaJournal(sherpaJournal)).collect(
                 Collectors.toList());
 
-            // Unlike the previous API version we can request offset and limit, so no need to build a
+            // Unlike the previous API version we can request offset and limit, so no need to build aF
             // sublist from this list, we can just return the list.
             return list;
+        } else {
+            log.debug("Empty response from SHERPA v2 API for ISSN " + query);
         }
 
-        // If nothing has been returned yet, return an empty list
+        // If nothing was returned from the response, return an empty list
         return Collections.emptyList();
     }
 
@@ -143,17 +155,18 @@ public class SHERPAv2JournalDataProvider implements ExternalDataProvider {
 
     /**
      * Get number of results returned from a SHERPA v2 publication search
-     * @param query The query to be search on and give the total amount of results
+     * @param issn The query to be search on and give the total amount of results
      * @return int representing number of journal results
      */
     @Override
-    public int getNumberOfResults(String query) {
-        // Search SHERPA for journals with the query term in the title
-        // Limit = 0 means the limit parameter will not be added to the API query
-        SHERPAResponse sherpaResponse = sherpaService.performRequest("publication", "title",
-            "contains word", query, 0, 0);
+    public int getNumberOfResults(String issn) {
 
-        // Get number of journals returned in response
+        // Get SHERPA response from the API for all objects matching this ISSN.
+        // The limit of 0 means a limit parameter will not be added to the API query
+        SHERPAResponse sherpaResponse = sherpaService.performRequest(
+            "publication", "issn", "equals", issn, 0, 0);
+
+        // Return the size of the journal collection
         if (CollectionUtils.isNotEmpty(sherpaResponse.getJournals())) {
             return sherpaResponse.getJournals().size();
         }
@@ -164,18 +177,17 @@ public class SHERPAv2JournalDataProvider implements ExternalDataProvider {
 
     /**
      * Generic setter for the sourceIdentifier
-     * @param sourceIdentifier   The sourceIdentifier to be set on this SHERPAv2JournalDataProvider
+     * @param sourceIdentifier   The sourceIdentifier to be set on this SHERPAv2JournalISSNDataProvider
      */
     public void setSourceIdentifier(String sourceIdentifier) {
         this.sourceIdentifier = sourceIdentifier;
     }
 
     /**
-     * Generic setter for the SHERPA service
-     * @param sherpaService   The sherpaService to be set on this SHERPAv2JournalDataProvider
+     * Generic setter for the SHERPA Service
+     * @param sherpaService     THe SHERPA service to be set on this SHERPAv2JournalISSNDataProvider
      */
     public void setSherpaService(SHERPAService sherpaService) {
         this.sherpaService = sherpaService;
     }
-
 }

@@ -8,35 +8,21 @@
 package org.dspace.external.provider.impl;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.sherpa.SHERPAService;
 import org.dspace.app.sherpa.v2.SHERPAPublisher;
 import org.dspace.app.sherpa.v2.SHERPAPublisherResponse;
 import org.dspace.app.sherpa.v2.SHERPAUtils;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
-import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * This class is the implementation of the ExternalDataProvider interface that will deal with SHERPAPublisher External
@@ -49,14 +35,14 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  */
 public class SHERPAv2PublisherDataProvider implements ExternalDataProvider {
 
+    // Logger
     private static final Logger log =
         org.apache.logging.log4j.LogManager.getLogger(SHERPAv2PublisherDataProvider.class);
 
+    // Source identifier (eg 'sherpaPublisher') configured in spring configuration
     private String sourceIdentifier;
-    private String url;
-    private String apiKey;
-
-    private CloseableHttpClient client = null;
+    // SHERPA service configured in spring configuration
+    private SHERPAService sherpaService;
 
     @Override
     public String getSourceIdentifier() {
@@ -67,20 +53,7 @@ public class SHERPAv2PublisherDataProvider implements ExternalDataProvider {
      * Initialise the client that we need to call the endpoint
      * @throws IOException  If something goes wrong
      */
-    public void init() throws IOException {
-        HttpClientBuilder builder = HttpClientBuilder.create();
-        // httpclient 4.3+ doesn't appear to have any sensible defaults any more. Setting conservative defaults as
-        // not to hammer the SHERPA service too much.
-        client = builder
-            .disableAutomaticRetries()
-            .setMaxConnTotal(5)
-            .build();
-
-        // Initialise API key and base URL from configuration service
-        apiKey = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("sherpa.romeo.apikey");
-        url = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("sherpa.romeo.url",
-            "https://v2.sherpa.ac.uk/cgi/retrieve");
-    }
+    public void init() throws IOException {}
 
     /**
      * Get a single publisher based on a "id equals string" query
@@ -89,69 +62,14 @@ public class SHERPAv2PublisherDataProvider implements ExternalDataProvider {
      */
     @Override
     public Optional<ExternalDataObject> getExternalDataObject(String id) {
-
-        HttpGet method = null;
-        SHERPAPublisherResponse sherpaResponse = null;
-        int timeout = 5000;
-        URIBuilder uriBuilder = null;
-
         // Sanitise the given ID / title query
         id = SHERPAUtils.sanitiseQuery(id);
 
-        try {
-            // Construct URI for an exact match on journal title
-            uriBuilder = new URIBuilder(url);
-            uriBuilder.addParameter("item-type", "publisher");
-            uriBuilder.addParameter("filter", "[[\"id\",\"equals\",\"" + id + "\"]]");
-            uriBuilder.addParameter("format", "Json");
-            if (StringUtils.isNotBlank(apiKey)) {
-                uriBuilder.addParameter("api-key", apiKey);
-            }
+        // Search for publishers matching this ID in SHERPA. Limit to 1 result since this is for a single object
+        SHERPAPublisherResponse sherpaResponse =
+            sherpaService.performPublisherRequest("publisher", "id", "equals", id, 0, 1);
 
-            // Build HTTP method
-            method = new HttpGet(uriBuilder.build());
-            method.setConfig(RequestConfig.custom()
-                .setConnectionRequestTimeout(timeout)
-                .setConnectTimeout(timeout)
-                .setSocketTimeout(timeout)
-                .build());
-
-            // Execute the method
-            HttpResponse response = client.execute(method);
-            int statusCode = response.getStatusLine().getStatusCode();
-
-            if (statusCode != HttpStatus.SC_OK) {
-                sherpaResponse = new SHERPAPublisherResponse("SHERPA/RoMEO return not OK status: "
-                    + statusCode);
-                String errorBody = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
-                log.error("Error from SHERPA HTTP request: " + errorBody);
-            }
-
-            HttpEntity responseBody = response.getEntity();
-
-            // Get InputStream from API response and parse JSON
-            if (null != responseBody) {
-                InputStream content = null;
-                try {
-                    content = responseBody.getContent();
-                    sherpaResponse = new SHERPAPublisherResponse(content, SHERPAPublisherResponse.SHERPAFormat.JSON);
-                } catch (IOException e) {
-                    log.error("Encountered exception while contacting SHERPA/RoMEO: " + e.getMessage(), e);
-                } finally {
-                    if (content != null) {
-                        content.close();
-                    }
-                }
-            } else {
-                sherpaResponse = new SHERPAPublisherResponse("SHERPA/RoMEO returned no response");
-            }
-        } catch (Exception e) {
-            log.error("SHERPA/RoMEO query failed: ", e);
-        }
-
-        if (sherpaResponse == null) {
-            sherpaResponse = new SHERPAPublisherResponse("Error processing the SHERPA/RoMEO answer");
-        }
+        // If there is at least one publisher, retrieve it and transform it to an ExternalDataObject
         if (CollectionUtils.isNotEmpty(sherpaResponse.getPublishers())) {
             SHERPAPublisher sherpaPublisher = sherpaResponse.getPublishers().get(0);
             // Construct external data object from returned publisher
@@ -170,100 +88,23 @@ public class SHERPAv2PublisherDataProvider implements ExternalDataProvider {
      */
     @Override
     public List<ExternalDataObject> searchExternalDataObjects(String query, int start, int limit) {
-        // query args to add to SHERPA/RoMEO request URL
-        HttpGet get = null;
-        try {
-            get = constructHttpGet(query, start, limit);
-            HttpClient hc = new DefaultHttpClient();
-            HttpResponse response = hc.execute(get);
-            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                // Get response input stream and parse JSON into new SHERPAResponse object
-                InputStream content = null;
-                try {
-                    content = response.getEntity().getContent();
-                    SHERPAPublisherResponse sherpaResponse =
-                        new SHERPAPublisherResponse(content, SHERPAPublisherResponse.SHERPAFormat.JSON);
-                    if (CollectionUtils.isNotEmpty(sherpaResponse.getPublishers())) {
-                        List<ExternalDataObject> list = sherpaResponse.getPublishers().stream().map(
-                            sherpaPublisher -> constructExternalDataObjectFromSherpaPublisher(sherpaPublisher)).collect(
-                            Collectors.toList());
+        // Search SHERPA for publishers with the query term in the title (name)
+        SHERPAPublisherResponse sherpaResponse = sherpaService.performPublisherRequest(
+            "publication", "title", "contains word", query, start, limit);
 
-                        // Unlike the previous API version we can request offset and limit, so no need to build a
-                        // sublist from this list, we can just return the list.
-                        return list;
-                    }
-                } catch (IOException e) {
-                    log.error("Error parsing SHERPA response input stream: " + e.getMessage());
-                    throw new IOException(e);
-                } finally {
-                    if (content != null) {
-                        content.close();
-                    }
-                }
-            } else {
-                String errorBody = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
-                log.error("Error from SHERPA HTTP request: " + errorBody);
-            }
-        } catch (IOException | URISyntaxException e) {
-            log.error("SHERPA/RoMEO query failed: ", e);
-            return null;
-        } finally {
-            if (get != null) {
-                get.releaseConnection();
-            }
+        // If at least one publisher was found, convert to a list of ExternalDataObjects and return
+        if (CollectionUtils.isNotEmpty(sherpaResponse.getPublishers())) {
+            List<ExternalDataObject> list = sherpaResponse.getPublishers().stream().map(
+                sherpaPublisher -> constructExternalDataObjectFromSherpaPublisher(sherpaPublisher)).collect(
+                Collectors.toList());
+
+            // Unlike the previous API version we can request offset and limit, so no need to build a
+            // sublist from this list, we can just return the list.
+            return list;
         }
+
+        // Return an empty list if nothing was found
         return Collections.emptyList();
-    }
-
-    /**
-     * Construct HTTP GET object for a "publisher name contains word" query using default start/limit parameters
-     * @param query a word or phrase to search for in publisher name
-     * @return HttpGet method which can then be executed by the client
-     * @throws URISyntaxException if the URL build fails
-     */
-    private HttpGet constructHttpGet(String query) throws URISyntaxException {
-        return constructHttpGet(query, -1, -1);
-    }
-
-    /**
-     * Construct HTTP GET object for a "publisher name contains word" query
-     * @param query the search query
-     * @param start row offset
-     * @param limit number of results to return
-     * @return HttpGet object to be executed by the client
-     * @throws URISyntaxException
-     */
-    private HttpGet constructHttpGet(String query, int start, int limit) throws URISyntaxException {
-        // Sanitise the query string
-        query = SHERPAUtils.sanitiseQuery(query);
-
-        // Build URL based on search query
-        URIBuilder uriBuilder = new URIBuilder(url);
-        uriBuilder.addParameter("item-type", "publisher");
-        uriBuilder.addParameter("filter", "[[\"name\",\"contains word\",\"" + query + "\"]]");
-        uriBuilder.addParameter("format", "Json");
-        // Set optional start (offset) and limit parameters
-        if (start >= 0) {
-            uriBuilder.addParameter("offset", String.valueOf(start));
-        }
-        if (limit > 0) {
-            uriBuilder.addParameter("limit", String.valueOf(limit));
-        }
-        if (StringUtils.isNotBlank(apiKey)) {
-            uriBuilder.addParameter("api-key", apiKey);
-        }
-
-        // Create HTTP GET object
-        HttpGet method = new HttpGet(uriBuilder.build());
-
-        // Set connection parameters
-        int timeout = 5000;
-        method.setConfig(RequestConfig.custom()
-            .setConnectionRequestTimeout(timeout)
-            .setConnectTimeout(timeout)
-            .setSocketTimeout(timeout)
-            .build());
-        return new HttpGet(uriBuilder.build());
     }
 
     private ExternalDataObject constructExternalDataObjectFromSherpaPublisher(SHERPAPublisher sherpaPublisher) {
@@ -306,41 +147,16 @@ public class SHERPAv2PublisherDataProvider implements ExternalDataProvider {
      */
     @Override
     public int getNumberOfResults(String query) {
-        HttpGet get = null;
-        try {
-            get = constructHttpGet(query);
-            HttpClient hc = new DefaultHttpClient();
-            HttpResponse response = hc.execute(get);
-            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                // Read response and parse as SHERPAResponse object
-                InputStream content = null;
-                try {
-                    content = response.getEntity().getContent();
-                    SHERPAPublisherResponse sherpaResponse =
-                        new SHERPAPublisherResponse(content, SHERPAPublisherResponse.SHERPAFormat.JSON);
-                    if (CollectionUtils.isNotEmpty(sherpaResponse.getPublishers())) {
-                        return sherpaResponse.getPublishers().size();
-                    }
-                } catch (IOException e) {
-                    log.error("Error reading input stream for SHERPAResponse: " + e.getMessage());
-                    throw new IOException(e);
-                } finally {
-                    if (content != null) {
-                        content.close();
-                    }
-                }
-            } else {
-                String errorBody = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
-                log.error("Error from SHERPA HTTP request: " + errorBody);
-            }
-        } catch (IOException | URISyntaxException e) {
-            log.error("SHERPA/RoMEO query failed: ", e);
-            return 0;
-        } finally {
-            if (get != null) {
-                get.releaseConnection();
-            }
+        // Search SHERPA for publishers with the query term in the title (name)
+        // a limit of 0 means the limit parameter won't be added to the API query
+        SHERPAPublisherResponse sherpaResponse = sherpaService.performPublisherRequest(
+            "publication", "title", "contains word", query, 0, 0);
+
+        // Return the number of publishers in the response object
+        if (CollectionUtils.isNotEmpty(sherpaResponse.getPublishers())) {
+            return sherpaResponse.getPublishers().size();
         }
+
         // If other checks have failed return 0
         return 0;
     }
@@ -351,6 +167,14 @@ public class SHERPAv2PublisherDataProvider implements ExternalDataProvider {
      */
     public void setSourceIdentifier(String sourceIdentifier) {
         this.sourceIdentifier = sourceIdentifier;
+    }
+
+    /**
+     * Generic setter for the SHERPA Service
+     * @param sherpaService     THe SHERPA service to be set on this SHERPAv2PublisherDataProvider
+     */
+    public void setSherpaService(SHERPAService sherpaService) {
+        this.sherpaService = sherpaService;
     }
 
 }
