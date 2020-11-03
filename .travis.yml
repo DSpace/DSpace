@@ -17,8 +17,7 @@ env:
     # Suppress all Maven "downloading" messages in Travis logs (see https://stackoverflow.com/a/35653426)
     # This also slightly speeds builds in Travis, as there is less logging
     - HIDE_MAVEN_DOWNLOADS="-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
-    # Give Maven 2GB of memory to work with
-    - MAVEN_OPTS="-Xmx2048M $HIDE_MAVEN_DOWNLOADS"
+    - MAVEN_OPTS="-Xmx1024M $HIDE_MAVEN_DOWNLOADS"
     # Maven options which will skip ALL code validation checks. Includes skipping:
     #  - enforcer.skip     => Skip maven-enforcer-plugin rules
     #  - checkstyle.skip   => Skip all checkstyle checks by maven-checkstyle-plugin
@@ -34,7 +33,7 @@ jobs:
   include:
     - name: "Run Unit Tests & Check Code"
       # NOTE: unit tests include deprecated REST API v6 (as it has unit tests)
-      env: TEST_FLAGS="-DskipUnitTests=false -Pdspace-rest"
+      env: TEST_FLAGS="-Dtest.argLine=-Xmx2048m -DskipUnitTests=false -Pdspace-rest"
     - name: "Run Integration Tests"
       # NOTE: skips code checks, as they are already done by Unit Test job
       env: TEST_FLAGS="-DskipIntegrationTests=false $SKIP_CODE_CHECKS"
