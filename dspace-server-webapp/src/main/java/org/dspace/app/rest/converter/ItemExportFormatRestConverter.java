@@ -22,18 +22,18 @@ import org.springframework.stereotype.Component;
 public class ItemExportFormatRestConverter implements DSpaceConverter<ItemExportFormat, ItemExportFormatRest> {
 
     @Override
-	public ItemExportFormatRest convert(ItemExportFormat modelObject, Projection projection) {
-    	ItemExportFormatRest itemExportFormatRest = new ItemExportFormatRest();
-		itemExportFormatRest.setId(modelObject.getId());
-		itemExportFormatRest.setMolteplicity(modelObject.getMolteplicity());
-		itemExportFormatRest.setEntityType(modelObject.getEntityType());
-		itemExportFormatRest.setMimeType(modelObject.getMimeType());
-		return itemExportFormatRest;
-	}
+    public ItemExportFormatRest convert(ItemExportFormat modelObject, Projection projection) {
+        ItemExportFormatRest itemExportFormatRest = new ItemExportFormatRest();
+        itemExportFormatRest.setId(modelObject.getId());
+        itemExportFormatRest.setMolteplicity(modelObject.getMolteplicity());
+        itemExportFormatRest.setEntityType(modelObject.getEntityType());
+        itemExportFormatRest.setMimeType(modelObject.getMimeType());
+        return itemExportFormatRest;
+    }
 
-	@Override
-	public Class<ItemExportFormat> getModelClass() {
-		return ItemExportFormat.class;
-	}
+    @Override
+    public Class<ItemExportFormat> getModelClass() {
+        return ItemExportFormat.class;
+    }
 
 }

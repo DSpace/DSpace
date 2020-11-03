@@ -25,7 +25,7 @@ public class ItemExportFormatRest extends BaseObjectRest<String> {
     private String mimeType;
     private String entityType;
     private String molteplicity;
-    
+
     @Override
     public String getType() {
         return NAME;
@@ -41,28 +41,28 @@ public class ItemExportFormatRest extends BaseObjectRest<String> {
         return RestResourceController.class;
     }
 
-	public String getMimeType() {
-		return mimeType;
-	}
+    public String getMimeType() {
+        return mimeType;
+    }
 
-	public void setMimeType(String mimeType) {
-		this.mimeType = mimeType;
-	}
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
+    }
 
-	public String getEntityType() {
-		return entityType;
-	}
+    public String getEntityType() {
+        return entityType;
+    }
 
-	public void setEntityType(String entityTypeId) {
-		this.entityType = entityTypeId;
-	}
+    public void setEntityType(String entityTypeId) {
+        this.entityType = entityTypeId;
+    }
 
-	public String getMolteplicity() {
-		return molteplicity;
-	}
+    public String getMolteplicity() {
+        return molteplicity;
+    }
 
-	public void setMolteplicity(String molteplicity) {
-		this.molteplicity = molteplicity;
-	}
+    public void setMolteplicity(String molteplicity) {
+        this.molteplicity = molteplicity;
+    }
 
 }

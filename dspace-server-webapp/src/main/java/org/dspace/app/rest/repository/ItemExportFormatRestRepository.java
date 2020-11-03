@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import com.google.common.base.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
@@ -26,7 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Strings;
+
 
 /**
  * This is the repository responsible to manage ItemExportFormat Rest object
@@ -37,60 +38,60 @@ import com.google.common.base.Strings;
 public class ItemExportFormatRestRepository extends DSpaceRestRepository<ItemExportFormatRest, String> {
 
     public static Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemExportFormatRestRepository.class);
-    
+
     @Autowired
     public ItemExportFormatService itemExportFormatService;
-   
-	@Override
-	@PreAuthorize("hasAuthority('AUTHENTICATED')")
-	public ItemExportFormatRest findOne(Context context, String id) {
 
-		ItemExportFormat ief = this.itemExportFormatService.get(context, id);
-		
-		if (ief == null) {
-			return null;
-		}
-		 
-		return converter.toRest(ief, utils.obtainProjection());
-	}
+    @Override
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    public ItemExportFormatRest findOne(Context context, String id) {
 
-	@Override
-	@PreAuthorize("hasAuthority('AUTHENTICATED')")
-	public Page<ItemExportFormatRest> findAll(Context context, Pageable pageable) {
-		
-    	List<ItemExportFormat> formats = this.itemExportFormatService.getAll(context);
-    	
-    	return converter.toRestPage(formats, pageable, utils.obtainProjection());
-	}
+        ItemExportFormat ief = this.itemExportFormatService.get(context, id);
 
-	@Override
-	public Class<ItemExportFormatRest> getDomainClass() {
-		return ItemExportFormatRest.class;
-	}
+        if (ief == null) {
+            return null;
+        }
 
-	@SearchRestMethod(name = "byEntityTypeAndMolteplicity")
-	@PreAuthorize("hasAuthority('AUTHENTICATED')")
+        return converter.toRest(ief, utils.obtainProjection());
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    public Page<ItemExportFormatRest> findAll(Context context, Pageable pageable) {
+
+        List<ItemExportFormat> formats = this.itemExportFormatService.getAll(context);
+
+        return converter.toRestPage(formats, pageable, utils.obtainProjection());
+    }
+
+    @Override
+    public Class<ItemExportFormatRest> getDomainClass() {
+        return ItemExportFormatRest.class;
+    }
+
+    @SearchRestMethod(name = "byEntityTypeAndMolteplicity")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public Page<ItemExportFormatRest> byEntityTypeAndMolteplicity(
-        @Parameter(value = "entityTypeId") String entityTypeId,
-        @Parameter(value = "molteplicity") String molteplicity,
-        Pageable pageable) {
-		
-		// molteplicity validation and conversion to enum
-		Optional<CrosswalkMode> molteplicityEnum;
-		if (Strings.isNullOrEmpty(molteplicity)) {
-			molteplicityEnum = Optional.of(CrosswalkMode.SINGLE_AND_MULTIPLE);
-		} else {
-			molteplicityEnum = Arrays.stream(CrosswalkMode.values())
-					.filter(e -> molteplicity.equals(e.name())).findFirst();
-			if (molteplicityEnum.isEmpty()) {
-				throw new DSpaceBadRequestException("Thie given molteplicity is unknown.");
-			}	
-		}
+            @Parameter(value = "entityTypeId") String entityTypeId,
+            @Parameter(value = "molteplicity") String molteplicity,
+            Pageable pageable) {
 
-		List<ItemExportFormat> formats = this.itemExportFormatService
-				.byEntityTypeAndMolteplicity(obtainContext(), entityTypeId, molteplicityEnum.get());
-    	
-    	return converter.toRestPage(formats, pageable, utils.obtainProjection());
+        // molteplicity validation and conversion to enum
+        Optional<CrosswalkMode> molteplicityEnum;
+        if (Strings.isNullOrEmpty(molteplicity)) {
+            molteplicityEnum = Optional.of(CrosswalkMode.SINGLE_AND_MULTIPLE);
+        } else {
+            molteplicityEnum = Arrays.stream(CrosswalkMode.values())
+                    .filter(e -> molteplicity.equals(e.name())).findFirst();
+            if (molteplicityEnum.isEmpty()) {
+                throw new DSpaceBadRequestException("Thie given molteplicity is unknown.");
+            }
+        }
+
+        List<ItemExportFormat> formats = this.itemExportFormatService
+                .byEntityTypeAndMolteplicity(obtainContext(), entityTypeId, molteplicityEnum.get());
+
+        return converter.toRestPage(formats, pageable, utils.obtainProjection());
     }
 
 }
