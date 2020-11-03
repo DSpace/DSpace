@@ -32,6 +32,8 @@
 				<entry key="equipment-xml" value-ref="referCrosswalkEquipmentXml"></entry>
 				<entry key="equipment-json" value-ref="referCrosswalkEquipmentJson"></entry>
 				<entry key="equipment-pdf" value-ref="pdfCrosswalkEquipment"></entry>
+				<entry key="equipment-csv" value-ref="csvCrosswalkEquipment"></entry>
+				<entry key="equipment-xls" value-ref="xlsCrosswalkEquipment"></entry>
 			</map>
 		</constructor-arg>
 	</bean>
@@ -109,6 +111,7 @@
 		<property name="mimeType" value="application/xml; charset=UTF-8"/>
 		<property name="fileName" value="equipment.xml"/>
 		<property name="entityType" value="Equipment"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/equipments-xml.template"/>
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
 		<property name="converter" ref="xmlValueConverter" />
 	</bean>
@@ -118,6 +121,7 @@
 		<property name="mimeType" value="application/json; charset=UTF-8"/>
 		<property name="fileName" value="equipment.json"/>
 		<property name="entityType" value="Equipment"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/equipments-json.template"/>
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
 		<property name="converter" ref="jsonValueConverter" />
 		<property name="linesPostProcessor" ref="jsonPostProcessor" />
@@ -205,6 +209,21 @@
 		<property name="fileName" value="projects.xls"/>
 		<property name="sheetName" value="Projects"/>
 		<property name="entityType" value="Project"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.CsvCrosswalk" id="csvCrosswalkEquipment">
+		<property name="templateFileName" value="crosswalks/template/equipment-table.template"/>
+		<property name="fileName" value="equipments.csv"/>
+		<property name="entityType" value="Equipment"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.XlsCrosswalk" id="xlsCrosswalkEquipment">
+		<property name="templateFileName" value="crosswalks/template/equipment-table.template"/>
+		<property name="fileName" value="equipments.xls"/>
+		<property name="sheetName" value="Equipments"/>
+		<property name="entityType" value="Equipment"/>
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
 	</bean>
 	

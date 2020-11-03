@@ -1,0 +1,17 @@
+<Equipments>
+	<Equipment id="mock-id">
+		<Name>First Test Equipment</Name>
+		<Acronym>FT-EQ</Acronym>
+		<Identifier type="Institution assigned unique equipment identifier">ID-01</Identifier>
+		<Description>This is an equipment to test the export functionality</Description>
+		<Owner> <OrgUnit> <Name>Test OrgUnit</Name> </OrgUnit> </Owner>
+		<Owner> <Person displayName="Walter White" ></Person> </Owner>
+	</Equipment>
+	<Equipment id="mock-id">
+		<Name>Second Test Equipment</Name>
+		<Acronym>ST-EQ</Acronym>
+		<Identifier type="Institution assigned unique equipment identifier">ID-02</Identifier>
+		<Description>This is another equipment to test the export functionality</Description>
+		<Owner> <Person displayName="John Smith" ></Person> </Owner>
+	</Equipment>
+</Equipments>

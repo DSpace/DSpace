@@ -394,6 +394,64 @@ public class XlsCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             "www.oamandate.com"));
     }
 
+    @Test
+    public void testDisseminateEquipments() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item firstItem = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Equipment")
+            .withAcronym("FT-EQ")
+            .withTitle("First Test Equipment")
+            .withInternalId("ID-01")
+            .withDescription("This is an equipment to test the export functionality")
+            .withEquipmentOwnerOrgUnit("Test OrgUnit")
+            .withEquipmentOwnerPerson("Walter White")
+            .build();
+
+        Item secondItem = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Equipment")
+            .withAcronym("ST-EQ")
+            .withTitle("Second Test Equipment")
+            .withInternalId("ID-02")
+            .withDescription("This is another equipment to test the export functionality")
+            .withEquipmentOwnerPerson("John Smith")
+            .build();
+
+        Item thirdItem = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Equipment")
+            .withAcronym("TT-EQ")
+            .withTitle("Third Test Equipment")
+            .withInternalId("ID-03")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        xlsCrosswalk = (XlsCrosswalk) crosswalkMapper.getByType("equipment-xls");
+        assertThat(xlsCrosswalk, notNullValue());
+        xlsCrosswalk.setDCInputsReader(dcInputsReader);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        xlsCrosswalk.disseminate(context, Arrays.asList(firstItem, secondItem, thirdItem).iterator(), baos);
+
+        Workbook workbook = WorkbookFactory.create(new ByteArrayInputStream(baos.toByteArray()));
+        assertThat(workbook.getNumberOfSheets(), equalTo(1));
+
+        Sheet sheet = workbook.getSheetAt(0);
+        assertThat(sheet.getPhysicalNumberOfRows(), equalTo(4));
+
+        assertThat(getRowValues(sheet.getRow(0)), contains("Name", "Acronym", "Institution assigned identifier",
+            "Description", "Owner organization", "Owner person"));
+
+        assertThat(getRowValues(sheet.getRow(1)), contains("First Test Equipment", "FT-EQ", "ID-01",
+            "This is an equipment to test the export functionality", "Test OrgUnit", "Walter White"));
+
+        assertThat(getRowValues(sheet.getRow(2)), contains("Second Test Equipment", "ST-EQ", "ID-02",
+            "This is another equipment to test the export functionality", "", "John Smith"));
+
+        assertThat(getRowValues(sheet.getRow(3)), contains("Third Test Equipment", "TT-EQ", "ID-03", "", "", ""));
+    }
+
     private Item createFullPersonItem() {
         Item item = createItem(context, collection)
             .withTitle("John Smith")
