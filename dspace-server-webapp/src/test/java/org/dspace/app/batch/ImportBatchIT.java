@@ -181,7 +181,7 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
 
             List<MetadataValue> metadata = item.getMetadata();
             // one metadata is explicit the other is the cris.sourceid
-            assertEquals("Only two metadata founds", 2, metadata.size());
+            assertEquals("Only two metadata found", 2, metadata.size());
 
             String defLanguage = ConfigurationManager.getProperty("default.language");
             metadata = itemService.getMetadata(item, MetadataSchemaEnum.DC.getName(), "title", null, defLanguage);
@@ -385,7 +385,7 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
 
                 List<MetadataValue> metadata = item.getMetadata();
                 // one metadata is explicit the other is the cris.sourceid
-                assertEquals("Only two metadata founds", 2, metadata.size());
+                assertEquals("Only two metadata found", 2, metadata.size());
 
                 String defLanguage = ConfigurationManager.getProperty("default.language");
                 metadata = itemService.getMetadata(item, MetadataSchemaEnum.DC.getName(), "title", null, defLanguage);
@@ -436,7 +436,7 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
                 List<MetadataValue> metadata = wi.getItem().getMetadata();
 
                 // two metadata are explicit the other is the cris.sourceid
-                assertEquals("Only three metadata founds", 3, metadata.size());
+                assertEquals("Only three metadata found", 3, metadata.size());
 
                 for (MetadataValue m : metadata) {
                     if ("title".equals(m.getElement())) {
@@ -470,6 +470,8 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
                         }
                     } else if ("contributor".equals(m.getElement())) {
                         assertEquals("The contributor.author is: ", "Francesco Cadili", m.getValue());
+                    } else if ("sourceId".equals(m.getElement())) {
+                        assertNotNull("The source id is null ", m.getValue());
                     } else {
                         assertEquals("Invalid Metadata", null, m.getValue());
                     }
@@ -505,7 +507,7 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
                 Item item = wi.getItem();
                 List<MetadataValue> metadata = wi.getItem().getMetadata();
 
-                assertEquals("Only two metadata found", 2, metadata.size());
+                assertEquals("Only three metadata found", 3, metadata.size());
 
                 for (MetadataValue m : metadata) {
                     if ("title".equals(m.getElement())) {
@@ -531,6 +533,8 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
                         }
                     } else if ("contributor".equals(m.getElement())) {
                         assertEquals("The contributor.author is: ", "Francesco Cadili", m.getValue());
+                    } else if ("sourceId".equals(m.getElement())) {
+                        assertNotNull("The source id is null ", m.getValue());
                     } else {
                         assertEquals("Invalid Metadata", null, m.getValue());
                     }
@@ -562,9 +566,9 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
                 List<MetadataValue> metadata = wi.getItem().getMetadata();
 
                 if (!wi.getID().equals(upd02.getID()) && !wi.getID().equals(upd10.getID())) {
-                    assertEquals("Only two metadata found", 2, metadata.size());
-                } else {
                     assertEquals("Only three metadata found", 3, metadata.size());
+                } else {
+                    assertEquals("Only four metadata found", 4, metadata.size());
                 }
 
                 for (MetadataValue m : metadata) {
@@ -597,6 +601,8 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
                     } else if ("date".equals(m.getElement())) {
                         assertEquals("The dc.date is: ", "2020/03/23", m.getValue());
                         assertEquals("The workspace item is: ", upd10.getID(), wi.getID());
+                    } else if ("sourceId".equals(m.getElement())) {
+                        assertNotNull("The source id is null ", m.getValue());
                     } else {
                         assertEquals("Invalid Metadata", null, m.getValue());
                     }
