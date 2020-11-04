@@ -11,10 +11,10 @@ import static org.dspace.builder.CollectionBuilder.createCollection;
 import static org.dspace.builder.CommunityBuilder.createCommunity;
 import static org.dspace.builder.ItemBuilder.createItem;
 import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -166,6 +166,100 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         referCrossWalk.disseminate(context, personItem, out);
 
         try (FileInputStream fis = getFileInputStream("person.xml")) {
+            String expectedXml = IOUtils.toString(fis, Charset.defaultCharset());
+            compareEachLine(out.toString(), expectedXml);
+        }
+    }
+
+    @Test
+    public void testPersonXmlCerifDisseminate() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Item personItem = createItem(context, collection)
+            .withRelationshipType("Person")
+            .withTitle("Smith, John")
+            .withVariantName("J.S.")
+            .withVariantName("Smith John")
+            .withGender("M")
+            .withPersonMainAffiliation("University")
+            .withOrcidIdentifier("0000-0002-9079-5932")
+            .withScopusAuthorIdentifier("SA-01")
+            .withPersonEmail("test@test.com")
+            .withResearcherIdentifier("R-01")
+            .withResearcherIdentifier("R-02")
+            .withPersonAffiliation("Company")
+            .withPersonAffiliationStartDate("2018-01-01")
+            .withPersonAffiliationEndDate(PLACEHOLDER_PARENT_METADATA_VALUE)
+            .withPersonAffiliationRole("Developer")
+            .withPersonAffiliation("Another Company")
+            .withPersonAffiliationStartDate("2017-01-01")
+            .withPersonAffiliationEndDate("2017-12-31")
+            .withPersonAffiliationRole("Developer")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("person-xml-cerif");
+        assertThat(referCrossWalk, notNullValue());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        referCrossWalk.disseminate(context, personItem, out);
+
+        try (FileInputStream fis = getFileInputStream("person-cerif.xml")) {
+            String expectedXml = IOUtils.toString(fis, Charset.defaultCharset());
+            compareEachLine(out.toString(), expectedXml);
+        }
+    }
+
+    @Test
+    public void testManyPersonsXmlCerifDisseminate() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Item firstPerson = createItem(context, collection)
+            .withRelationshipType("Person")
+            .withTitle("Smith, John")
+            .withVariantName("J.S.")
+            .withVariantName("Smith John")
+            .withGender("M")
+            .withPersonMainAffiliation("University")
+            .withOrcidIdentifier("0000-0002-9079-5932")
+            .withScopusAuthorIdentifier("SA-01")
+            .withPersonEmail("test@test.com")
+            .withResearcherIdentifier("R-01")
+            .withResearcherIdentifier("R-02")
+            .withPersonAffiliation("Company")
+            .withPersonAffiliationStartDate("2018-01-01")
+            .withPersonAffiliationEndDate(PLACEHOLDER_PARENT_METADATA_VALUE)
+            .withPersonAffiliationRole("Developer")
+            .withPersonAffiliation("Another Company")
+            .withPersonAffiliationStartDate("2017-01-01")
+            .withPersonAffiliationEndDate("2017-12-31")
+            .withPersonAffiliationRole("Developer")
+            .build();
+
+        Item secondPerson = createItem(context, collection)
+            .withRelationshipType("Person")
+            .withTitle("White, Walter")
+            .withGender("M")
+            .withPersonMainAffiliation("University")
+            .withOrcidIdentifier("0000-0002-9079-5938")
+            .withPersonEmail("w.w@test.com")
+            .withResearcherIdentifier("R-03")
+            .withPersonAffiliation("Company")
+            .withPersonAffiliationStartDate("2018-01-01")
+            .withPersonAffiliationEndDate(PLACEHOLDER_PARENT_METADATA_VALUE)
+            .withPersonAffiliationRole("Developer")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("person-xml-cerif");
+        assertThat(referCrossWalk, notNullValue());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        referCrossWalk.disseminate(context, Arrays.asList(firstPerson, secondPerson).iterator(), out);
+
+        try (FileInputStream fis = getFileInputStream("persons-cerif.xml")) {
             String expectedXml = IOUtils.toString(fis, Charset.defaultCharset());
             compareEachLine(out.toString(), expectedXml);
         }

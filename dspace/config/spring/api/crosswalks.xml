@@ -17,6 +17,7 @@
 				<entry key="publication-xls" value-ref="xlsCrosswalkPublication"></entry>
 				
 				<entry key="person-xml" value-ref="referCrosswalkPersonXml"></entry>
+				<entry key="person-xml-cerif" value-ref="referCrosswalkPersonXmlCerif"></entry>
 				<entry key="person-json" value-ref="referCrosswalkPersonJson"></entry>
 				<entry key="person-pdf" value-ref="pdfCrosswalkPerson"></entry>
 				<entry key="person-rtf" value-ref="rtfCrosswalkPerson"></entry>
@@ -34,7 +35,6 @@
 				<entry key="orgUnit-pdf" value-ref="pdfCrosswalkOrgUnit"></entry>
 				<entry key="orgUnit-csv" value-ref="csvCrosswalkOrgUnit"></entry>
 				<entry key="orgUnit-xls" value-ref="xlsCrosswalkOrgUnit"></entry>
-
 
 				<entry key="equipment-xml" value-ref="referCrosswalkEquipmentXml"></entry>
 				<entry key="equipment-json" value-ref="referCrosswalkEquipmentJson"></entry>
@@ -60,6 +60,16 @@
 		<property name="entityType" value="Person"/>
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
 		<property name="multipleItemsTemplateFileName" value="crosswalks/template/persons-xml.template"/>
+		<property name="converter" ref="xmlValueConverter" />
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkPersonXmlCerif">
+		<property name="templateFileName" value="crosswalks/template/person-xml-cerif.template"/>
+		<property name="mimeType" value="application/xml; charset=UTF-8"/>
+		<property name="fileName" value="person.xml"/>
+		<property name="entityType" value="Person"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/persons-xml-cerif.template"/>
 		<property name="converter" ref="xmlValueConverter" />
 	</bean>
 	
@@ -303,6 +313,7 @@
 				<entry key="fullpage" value-ref="virtualFieldPageNumber" />
 				<entry key="bitstream" value-ref="virtualFieldBitstream" />
 				<entry key="mapConverter" value-ref="virtualFieldMapConverter" />
+				<entry key="personName" value-ref="virtualFieldPersonName" />
 			</map>
 		</constructor-arg>
 	</bean>
@@ -311,6 +322,7 @@
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldRefererType" id="virtualFieldRefererType"/>
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldAuthors" id="virtualFieldAuthors"/>
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldPageNumber" id="virtualFieldPageNumber"/>	
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldPersonName" id="virtualFieldPersonName"/>
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldBitstream" id="virtualFieldBitstream">
 		<constructor-arg name="bitstreamTypeMap">
 			<map>
