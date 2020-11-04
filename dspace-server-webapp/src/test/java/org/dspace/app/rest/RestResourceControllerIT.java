@@ -75,18 +75,18 @@ public class RestResourceControllerIT extends AbstractControllerIntegrationTest 
 
     @Test
     public void selfLinkContainsRequestParametersWhenProvided() throws Exception {
-        // When we call the root endpoint
+        // When we call a search endpoint with additional parameters
         getClient().perform(get("/api/core/metadatafields/search/byFieldName?schema=dc&offset=0"))
-                   // The status has to be 404 Not Found
+                   // The self link should contain those same parameters
                    .andExpect(jsonPath("$._links.self.href", endsWith(
                            "/api/core/metadatafields/search/byFieldName?schema=dc&offset=0")));
     }
 
     @Test
     public void selfLinkDevoidOfRequestParametersWhenNoneProvided() throws Exception {
-        // When we call the root endpoint
+        // When we call a search endpoint without additional parameters
         getClient().perform(get("/api/core/metadatafields/search/byFieldName"))
-                   // The status has to be 404 Not Found
+                   // The self link should match the initial request exactly
                    .andExpect(jsonPath("$._links.self.href",
                                        endsWith("/api/core/metadatafields/search/byFieldName")));
     }
