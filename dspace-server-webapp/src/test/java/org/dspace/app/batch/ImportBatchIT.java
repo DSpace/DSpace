@@ -555,7 +555,8 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
                     "date", null, null, "2020/03/23");
 
             // Create a new item
-            argv = new String[] { "-E", admin.getEmail(), "-m", "dc.title", "-m", "dc.contributor.author", "-s" };
+            argv = new String[] { "-E", admin.getEmail(), "-m", "dc.title", "-m", "dc.contributor.author", "-m",
+                    "cris.sourceId", "-s" };
             ItemImportMainOA.main(argv);
 
             wis = workspaceItemService.findByEPerson(context, admin);
