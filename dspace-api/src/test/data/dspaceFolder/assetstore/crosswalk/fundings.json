@@ -1,0 +1,47 @@
+{
+	"fundings": [
+		{
+			"type": "https:\/\/www.openaire.eu\/cerif-profile\/vocab\/OpenAIRE_Funding_Types#Gift",
+			"name": "Test Funding",
+			"acronym": "T-FU",
+			"fundingCode": "ID-01",
+			"grantNumber": "0001",
+			"amount": {
+				"currency": "EUR",
+				"value": "30.000,00"
+			},
+			"description": "Funding to test export",
+			"funder": {
+				"name": "OrgUnit Funder"
+			},
+			"duration": {
+				"startDate": "2015-01-01",
+				"endDate": "2020-01-01"
+			},
+			"OAMandate": {
+				"mandated": "true",
+				"URL": "www.mandate.url"
+			}
+		},
+		{
+			"type": "https:\/\/www.openaire.eu\/cerif-profile\/vocab\/OpenAIRE_Funding_Types#Grant",
+			"name": "Another Test Funding",
+			"acronym": "AT-FU",
+			"fundingCode": "ID-02",
+			"grantNumber": "0002",
+			"amount": {
+				"value": "10.000,00"
+			},
+			"funder": {
+				"name": "Test Funder"
+			},
+			"duration": {
+				"startDate": "2020-01-01"
+			},
+			"OAMandate": {
+				"mandated": "true",
+				"URL": "www.mandate.url"
+			}
+		}
+	]
+}
