@@ -94,6 +94,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets")))
                 //We have 4 facets in the default configuration, they need to all be present in the embedded section
                 .andExpect(jsonPath("$._embedded.facets", containsInAnyOrder(
+                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.dateIssuedFacet(false),
@@ -861,6 +864,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                    //There needs to be a section where these filters as specified as they're the default filters
                    // given in the configuration
                    .andExpect(jsonPath("$.filters", containsInAnyOrder(
+                       SearchFilterMatcher.barDateIssuedYearFilter(),
+                       SearchFilterMatcher.pieItemtypeFilter(),
+                       SearchFilterMatcher.typeFilter(),
                        SearchFilterMatcher.titleFilter(),
                        SearchFilterMatcher.authorFilter(),
                        SearchFilterMatcher.subjectFilter(),
@@ -956,6 +962,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
@@ -1043,6 +1052,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //We do however exceed the limit for the authors, so this property has to be true for the author
                 // facet
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(true),
                         FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
@@ -1133,6 +1145,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //We do however exceed the limit for the subject, so this property has to be true for the subject
                 // facet
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(true),
@@ -1213,6 +1228,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
@@ -1298,6 +1316,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
@@ -1378,6 +1399,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
@@ -1413,6 +1437,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
@@ -1449,6 +1476,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
@@ -1489,6 +1519,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
@@ -1576,6 +1609,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
@@ -1788,6 +1824,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                         SearchResultMatcher.match()
                 )))
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(true),
                         FacetEntryMatcher.subjectFacet(true),
                         FacetEntryMatcher.dateIssuedFacet(false),
@@ -1878,6 +1917,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
@@ -1964,6 +2006,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
@@ -2288,6 +2333,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
@@ -2432,6 +2480,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore property
                 // because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
@@ -2506,6 +2557,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore property
                 // because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
@@ -2591,6 +2645,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                         SearchResultMatcher.match()
                 )))
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacetWithMinMax(true, "Doe, Jane", "Testing, Works"),
                         FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(true),
@@ -2660,6 +2717,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //The type has to be 'discover'
                 .andExpect(jsonPath("$.type", is("discover")))
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacetWithMinMax(true, "Doe, Jane", "Testing, Works"),
                         FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(true),
@@ -2734,6 +2794,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore property
                 // because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
@@ -2809,6 +2872,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore property
                 // because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
@@ -2883,6 +2949,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore property
                 // because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
@@ -3303,6 +3372,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                     //These facets have to show up in the embedded.facets section as well with the given hasMore
                     // property because we don't exceed their default limit for a hasMore true (the default is 10)
                     .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                            FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
+                            FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                            FacetEntryMatcher.typeFacet(false),
                             FacetEntryMatcher.authorFacet(false),
                             FacetEntryMatcher.subjectFacet(false),
                             FacetEntryMatcher.dateIssuedFacet(false),
