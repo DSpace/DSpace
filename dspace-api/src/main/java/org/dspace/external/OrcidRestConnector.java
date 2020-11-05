@@ -7,7 +7,6 @@
  */
 package org.dspace.external;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Scanner;
 
@@ -16,7 +15,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -56,14 +54,6 @@ public class OrcidRestConnector {
             result = getResponse.getEntity().getContent();
         } catch (Exception e) {
             getGotError(e, fullPath);
-        } finally {
-            if (getResponse != null) {
-                try {
-                    EntityUtils.consume(getResponse.getEntity());
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
         }
 
         return result;

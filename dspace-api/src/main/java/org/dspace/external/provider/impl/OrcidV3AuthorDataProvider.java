@@ -17,7 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -61,14 +60,13 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
 
     public static final String ORCID_ID_SYNTAX = "\\d{4}-\\d{4}-\\d{4}-(\\d{3}X|\\d{4})";
 
-    @PostConstruct
-    private void setup() {
-        this.converter =  new XMLtoBio();
-    }
-
     @Override
     public String getSourceIdentifier() {
         return sourceIdentifier;
+    }
+
+    public OrcidV3AuthorDataProvider() {
+        converter = new XMLtoBio();
     }
 
     /**
@@ -285,11 +283,4 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
         this.orcidRestConnector = orcidRestConnector;
     }
 
-    public XMLtoBio getConverter() {
-        return converter;
-    }
-
-    public void setConverter(XMLtoBio converter) {
-        this.converter = converter;
-    }
 }
