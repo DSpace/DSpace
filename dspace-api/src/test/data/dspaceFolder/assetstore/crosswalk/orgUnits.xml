@@ -1,0 +1,28 @@
+<OrgUnits>
+	<OrgUnit id="mock-id">
+		<Name>Test OrgUnit</Name>
+		<Name>Test OrgUnit LegalName</Name>
+		<Acronym>TOU</Acronym>
+		<Type scheme="https://w3id.org/cerif/vocab/OrganisationTypes">https://w3id.org/cerif/vocab/OrganisationTypes#StrategicResearchInsitute</Type>
+		<PartOf>
+			<OrgUnit> <Name>Parent OrgUnit</Name> </OrgUnit>
+		</PartOf>
+		<Identifier>ID-01</Identifier>
+		<Identifier>ID-02</Identifier>
+		<Identifier type="URL">www.orgUnit.com</Identifier>
+		<Identifier type="URL">www.orgUnit.it</Identifier>
+		<People>
+		</People>
+	</OrgUnit>
+	<OrgUnit id="mock-id">
+		<Name>Another Test OrgUnit</Name>
+		<Acronym>ATOU</Acronym>
+		<Type scheme="https://w3id.org/cerif/vocab/OrganisationTypes">https://w3id.org/cerif/vocab/OrganisationTypes#Privatenonprofit</Type>
+		<PartOf>
+			<OrgUnit> <Name>Parent OrgUnit</Name> </OrgUnit>
+		</PartOf>
+		<Identifier>ID-03</Identifier>
+		<People>
+		</People>
+	</OrgUnit>
+</OrgUnits>

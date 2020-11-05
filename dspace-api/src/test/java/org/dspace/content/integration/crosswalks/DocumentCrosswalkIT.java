@@ -361,6 +361,85 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
     }
 
+    @Test
+    public void testPdfCrosswalkEquipmentDisseminate() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item equipment = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Equipment")
+            .withAcronym("T-EQ")
+            .withTitle("Test Equipment")
+            .withInternalId("ID-01")
+            .withDescription("This is an equipment to test the export functionality")
+            .withEquipmentOwnerOrgUnit("Test OrgUnit")
+            .withEquipmentOwnerPerson("Walter White")
+            .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        StreamDisseminationCrosswalk streamCrosswalkDefault = (StreamDisseminationCrosswalk) CoreServiceFactory
+            .getInstance().getPluginService().getNamedPlugin(StreamDisseminationCrosswalk.class, "equipment-pdf");
+
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            streamCrosswalkDefault.disseminate(context, equipment, out);
+            assertThat(out.toString(), not(isEmptyString()));
+            assertThatPdfHasContent(out, content -> assertThatEquipmentDocumentHasContent(content));
+        }
+
+    }
+
+    @Test
+    public void testPdfCrosswalkOrgUnitDisseminate() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item parent = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("OrgUnit")
+            .withAcronym("POU")
+            .withTitle("Parent OrgUnit")
+            .build();
+
+        Item orgUnit = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("OrgUnit")
+            .withAcronym("TOU")
+            .withTitle("Test OrgUnit")
+            .withOrgUnitLegalName("Test OrgUnit LegalName")
+            .withType("Strategic Research Insitute")
+            .withParentOrganization("Parent OrgUnit", parent.getID().toString())
+            .withOrgUnitIdentifier("ID-01")
+            .withOrgUnitIdentifier("ID-02")
+            .withUrlIdentifier("www.orgUnit.com")
+            .withUrlIdentifier("www.orgUnit.it")
+            .build();
+
+        ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Person")
+            .withTitle("Walter White")
+            .withPersonAffiliationName("Test OrgUnit", orgUnit.getID().toString())
+            .build();
+
+        ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Person")
+            .withTitle("Jesse Pinkman")
+            .withPersonAffiliationName("Test OrgUnit", orgUnit.getID().toString())
+            .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        StreamDisseminationCrosswalk streamCrosswalkDefault = (StreamDisseminationCrosswalk) CoreServiceFactory
+            .getInstance().getPluginService().getNamedPlugin(StreamDisseminationCrosswalk.class, "orgUnit-pdf");
+
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            streamCrosswalkDefault.disseminate(context, orgUnit, out);
+            assertThat(out.toString(), not(isEmptyString()));
+            assertThatPdfHasContent(out, content -> assertThatOrgUnitDocumentHasContent(content));
+        }
+
+    }
+
     private Item buildPersonItem() {
         Item item = createItem(context, collection)
             .withRelationshipType("Person")
@@ -532,6 +611,31 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         assertThat(content, containsString("Keyword(s): project, test"));
         assertThat(content, containsString("OA Mandate: true"));
         assertThat(content, containsString("OA Policy URL: oamandate-url"));
+
+    }
+
+    private void assertThatOrgUnitDocumentHasContent(String content) {
+        assertThat(content, containsString("Test OrgUnit"));
+
+        assertThat(content, containsString("Basic informations"));
+        assertThat(content, containsString("Acronym: TOU"));
+        assertThat(content, containsString("Type: https://w3id.org/cerif/vocab/OrganisationTypes"
+            + "#StrategicResearchInsitute"));
+        assertThat(content, containsString("Parent Organization: Parent OrgUnit"));
+        assertThat(content, containsString("Identifier(s): ID-01, ID-02"));
+        assertThat(content, containsString("URL(s): www.orgUnit.com, www.orgUnit.it"));
+        assertThat(content, containsString("People: Walter White, Jesse Pinkman"));
+    }
+
+    private void assertThatEquipmentDocumentHasContent(String content) {
+        assertThat(content, containsString("Test Equipment"));
+        assertThat(content, containsString("This is an equipment to test the export functionality"));
+
+        assertThat(content, containsString("Basic informations"));
+        assertThat(content, containsString("Equipment Acronym: T-EQ"));
+        assertThat(content, containsString("Institution Unique Identifier: ID-01"));
+        assertThat(content, containsString("Owner (Organization): Test OrgUnit"));
+        assertThat(content, containsString("Owner (Person): Walter White"));
 
     }
 
