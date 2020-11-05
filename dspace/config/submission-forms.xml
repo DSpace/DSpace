@@ -1960,6 +1960,8 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <required />
           <hint />
         </field>
+      </row>
+      <row>
         <field>
           <dc-schema>oairecerif</dc-schema>
           <dc-element>funding</dc-element>
