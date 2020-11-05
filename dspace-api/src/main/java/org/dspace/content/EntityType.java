@@ -7,6 +7,7 @@
  */
 package org.dspace.content;
 
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -15,6 +16,8 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.core.ReloadableEntity;
 
 /**
@@ -45,7 +48,8 @@ public class EntityType implements ReloadableEntity<Integer> {
 
     /**
      * The standard setter for the ID of this EntityType
-     * @param id    The ID that this EntityType's ID will be set to
+     *
+     * @param id The ID that this EntityType's ID will be set to
      */
     public void setId(Integer id) {
         this.id = id;
@@ -53,7 +57,8 @@ public class EntityType implements ReloadableEntity<Integer> {
 
     /**
      * The standard getter for the label of this EntityType
-     * @return  The label for this EntityType
+     *
+     * @return The label for this EntityType
      */
     public String getLabel() {
         return label;
@@ -61,6 +66,7 @@ public class EntityType implements ReloadableEntity<Integer> {
 
     /**
      * The standard setter for the label of this EntityType
+     *
      * @param label The label that this EntityType's label will be set to
      */
     public void setLabel(String label) {
@@ -69,9 +75,40 @@ public class EntityType implements ReloadableEntity<Integer> {
 
     /**
      * The standard getter for the ID of this EntityType
-     * @return  The ID for this EntityType
+     *
+     * @return The ID for this EntityType
      */
     public Integer getID() {
         return id;
+    }
+
+    /**
+     * Determines whether two entity types are equal based on the id and the label
+     * @param obj   object to be compared
+     * @return
+     */
+    public boolean equals(Object obj) {
+        if (!(obj instanceof EntityType)) {
+            return false;
+        }
+        EntityType entityType = (EntityType) obj;
+
+        if (!Objects.equals(this.getID(), entityType.getID())) {
+            return false;
+        }
+
+        if (!StringUtils.equals(this.getLabel(), entityType.getLabel())) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Returns a hash code value for the object.
+     * @return  hash code value
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(getID()).toHashCode();
     }
 }
