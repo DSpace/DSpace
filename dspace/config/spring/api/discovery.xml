@@ -135,6 +135,7 @@
 
     <!--The default configuration settings for discovery-->
     <bean id="defaultConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
+        <property name="id" value="defaultConfiguration"/>
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
             <list>
@@ -561,9 +562,14 @@
 
     <!--The Homepage specific configuration settings for discovery-->
     <bean id="homepageConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
+        <property name="indexAlways" value="true"/>
+        <property name="id" value="homepageConfiguration"/>
         <!--Which sidebar facets are to be displayed (same as defaultConfiguration above)-->
         <property name="sidebarFacets">
             <list>
+                <ref bean="searchFilterType" />
+                <ref bean="graphPublicationByType" />
+                <ref bean="graphPublicationByDate" />
                 <ref bean="searchFilterAuthor" />
                 <ref bean="searchFilterSubject" />
                 <ref bean="searchFilterIssued" />
@@ -576,6 +582,9 @@
         <!--The search filters which can be used on the discovery search page (same as defaultConfiguration above)-->
         <property name="searchFilters">
             <list>
+                <ref bean="searchFilterType" />
+                <ref bean="graphPublicationByType" />
+                <ref bean="graphPublicationByDate" />
                 <ref bean="searchFilterTitle" />
                 <ref bean="searchFilterAuthor" />
                 <ref bean="searchFilterSubject" />
@@ -2567,6 +2576,19 @@
         <property name="pageSize" value="10"/>
     </bean>
 
+    <!-- Configurations for GraphDiscoverSearchFilterFacet -->
+    <bean id="graphPublicationByDate" class="org.dspace.discovery.configuration.GraphDiscoverSearchFilterFacet">
+    	<property name="facetLimit" value="100"/>
+        <property name="sortOrderSidebar" value="VALUE"/>
+        <property name="dataFacet" ref="searchFilterIssued" />
+        <property name="graphType" value="bar" />
+    </bean> 
+
+    <bean id="graphPublicationByType" class="org.dspace.discovery.configuration.GraphDiscoverSearchFilterFacet">
+    	<property name="facetLimit" value="100"/>
+        <property name="dataFacet" ref="searchFilterType" />
+        <property name="graphType" value="pie" />
+    </bean> 
     <!--Sort properties-->
     <bean id="sortTitle" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
         <property name="metadataField" value="dc.title"/>
