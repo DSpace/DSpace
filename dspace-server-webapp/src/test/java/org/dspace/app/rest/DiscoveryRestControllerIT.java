@@ -4624,4 +4624,128 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 ))
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
     }
+
+    @Test
+    public void graphDiscoverSearchFilterFacetByDateTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community").build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 2").build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Michel, Boychuk")
+                                      .withSubject("ExtraEntry").build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 2")
+                                      .withIssueDate("2016-02-13")
+                                      .withAuthor("Michel, Boychuk")
+                                      .withAuthor("Andrea, Bollini")
+                                      .withSubject("ExtraEntry").build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 3")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Michel, Boychuk")
+                                      .withSubject("ExtraEntry").build();
+
+
+        Item publicItem4 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 4")
+                                      .withIssueDate("2020-02-13")
+                                      .withAuthor("Volodymyr, Trus")
+                                      .withSubject("AnotherTest")
+                                      .withSubject("ExtraEntry").build();
+
+        Item publicItem5 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 5")
+                                      .withIssueDate("2019-06-17")
+                                      .withAuthor("Luca, Bruschetti")
+                                      .withSubject("ExtraEntry").build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/discover/facets/chart.bar.dateIssued.year")
+                   .param("size", "4"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.type", is("discover")))
+                   .andExpect(jsonPath("$.name", is("chart.bar.dateIssued.year")))
+                   .andExpect(jsonPath("$.facetType", is("chart.bar")))
+                   .andExpect(jsonPath("$._links.self.href", containsString(
+                                       "api/discover/facets/chart.bar.dateIssued.year")))
+                   .andExpect(jsonPath("$.page", is(PageMatcher.pageEntry(0, 4))))
+                   .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                              FacetValueMatcher.entryDateIssuedWithLabelAndCount("2016", 1),
+                              FacetValueMatcher.entryDateIssuedWithLabelAndCount("2017", 2),
+                              FacetValueMatcher.entryDateIssuedWithLabelAndCount("2019", 1),
+                              FacetValueMatcher.entryDateIssuedWithLabelAndCount("2020", 1)
+                              )));
+    }
+
+    @Test
+    public void graphDiscoverSearchFilterFacetByType() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community").build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 2").build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Michele, Boychuk")
+                                      .withType("book").build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 2")
+                                      .withIssueDate("2016-02-13")
+                                      .withAuthor("Andrea, Bollini")
+                                      .withType("manuscript").build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 3")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Michele, Boychuk")
+                                      .withSubject("AnotherTest")
+                                      .withType("manuscript").build();
+
+        Item publicItem4 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 4")
+                                      .withIssueDate("2020-02-13")
+                                      .withAuthor("Volodymyr, Trus")
+                                      .withSubject("AnotherTest")
+                                      .withType("Journal Article")
+                                      .withSubject("ExtraEntry").build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/discover/facets/chart.pie.itemtype_filter")
+                   .param("size", "4"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.type", is("discover")))
+                   .andExpect(jsonPath("$.name", is("chart.pie.itemtype_filter")))
+                   .andExpect(jsonPath("$.facetType", is("chart.pie")))
+                   .andExpect(jsonPath("$.page", is(PageMatcher.pageEntry(0, 4))))
+                   .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                              FacetValueMatcher.entryDateIssuedWithLabelAndCount("manuscript", 2),
+                              FacetValueMatcher.entryDateIssuedWithLabelAndCount("book", 1),
+                              FacetValueMatcher.entryDateIssuedWithLabelAndCount("Journal Article", 1)
+                              )));
+    }
 }
