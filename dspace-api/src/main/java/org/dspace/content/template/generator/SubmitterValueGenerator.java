@@ -41,12 +41,5 @@ public class SubmitterValueGenerator implements TemplateValueGenerator {
         }
         return ePersonService.getMetadata(eperson, extraParams);
 
-//        if (StringUtils.isNotBlank(m[0].value)){
-//            return m;
-//        }
-//        else {
-//            return new Metadatum[0];
-//        }
-//    }
     }
 }

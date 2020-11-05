@@ -63,18 +63,13 @@ public class GroupValueGenerator implements TemplateValueGenerator {
 
                 value = communityService.getMetadata(parentObject, metadata);
 
-//                value = templateItem.getParentObject().getParentObject()
-//                                    .getMetadata(metadata);
-
             } else if (StringUtils.startsWith(prefix, "collection")) {
                 String metadata = prefix.substring("collection[".length(),
                                                    prefix.length() - 1);
                 final Collection owningCollection = templateItem.getOwningCollection();
                 value = collectionService.getMetadata(owningCollection, metadata);
-//                value = templateItem.getParentObject().getMetadata(metadata);
             } else if (StringUtils.startsWith(prefix, "item")) {
                 value = itemService.getMetadata(targetItem, prefix.replace("_", "."));
-//                value = targetItem.getMetadata(prefix.replace("_", "."));
             }
         } catch (SQLException e) {
             log.error(e.getMessage());
@@ -87,7 +82,6 @@ public class GroupValueGenerator implements TemplateValueGenerator {
         Group group = null;
         try {
             group = groupService.findByName(context, value);
-//            group = Group.findByName(context, value);
         } catch (SQLException e) {
             log.error(e.getMessage());
         }

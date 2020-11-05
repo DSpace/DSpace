@@ -40,8 +40,7 @@ public class TemplateItemValueService {
         return templateItemValues.stream().filter(tiv -> tiv.appliesTo(metadataValue.getValue()))
                                  .findFirst()
                                  .map(tiv -> tiv.value(context, targetItem, templateItem, metadataValue))
-                                 .orElseThrow(() -> new IllegalArgumentException(
-                                     "Unable to find a valid value converter for value " + metadataValue));
+                                 .orElseGet(metadataValue::getValue);
     }
 
 

@@ -41,7 +41,7 @@ public class DateValueGenerator implements TemplateValueGenerator {
 
     private String buildValue(String extraParams) {
 
-        //FIXME : do we need import of logic around DateMathParser?
+        //FIXME : This logic has to be uncommented and adapted
 //        String[] params = StringUtils.split(extraParams, "\\.");
 //        String formatter = "";
 

@@ -8,7 +8,8 @@
 package org.dspace.content.template;
 
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -18,7 +19,6 @@ import java.util.Collections;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
-import org.hamcrest.core.Is;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -38,8 +38,8 @@ public class TemplateItemValueServiceTest {
                                                                     metadataValue("aValue"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void templateItemValueNotFoundThrowsException() {
+    @Test
+    public void templateItemValueNotFoundReturnsSimpleValue() {
 
         final Context context = mock(Context.class);
         final Item item = mock(Item.class);
@@ -48,7 +48,9 @@ public class TemplateItemValueServiceTest {
         final TemplateItemValueService templateItemValueService = new TemplateItemValueService(
             Collections.singletonList(fakeTemplateItemValue(false, "value")));
 
-        templateItemValueService.value(context, item, templateItem, metadataValue("aValue"));
+        final String value = templateItemValueService.value(context, item, templateItem, metadataValue("aValue"));
+
+        assertThat(value, is("aValue"));
 
     }
 
@@ -67,7 +69,7 @@ public class TemplateItemValueServiceTest {
         final String valueFromService = templateItemValueService.value(context, item, templateItem,
                                                                               metadataValue("aValue"));
 
-        assertThat(valueFromService, Is.is("RETURNED Value"));
+        assertThat(valueFromService, is("RETURNED Value"));
 
     }
 

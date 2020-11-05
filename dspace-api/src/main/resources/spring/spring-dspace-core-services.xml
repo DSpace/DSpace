@@ -49,13 +49,11 @@
           class="org.dspace.content.template.TemplateItemValueService">
         <constructor-arg>
             <list>
-                <ref bean="simpleTemplateItemValue"/>
                 <ref bean="placeholderTemplateItemValue"/>
             </list>
         </constructor-arg>
     </bean>
 
-    <bean id="simpleTemplateItemValue" class="org.dspace.content.template.SimpleTemplateItemValue"/>
     <bean id="placeholderTemplateItemValue" class="org.dspace.content.template.PlaceholderTemplateItemValue">
         <constructor-arg>
             <map>
