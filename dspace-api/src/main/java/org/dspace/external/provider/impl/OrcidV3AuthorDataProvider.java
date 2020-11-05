@@ -31,9 +31,9 @@ import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
 import org.dspace.external.provider.orcid.xml.XMLtoBio;
 import org.json.JSONObject;
-import org.orcid.jaxb.model.common_v3.OrcidId;
-import org.orcid.jaxb.model.record_v3.Person;
-import org.orcid.jaxb.model.search_v3.Result;
+import org.orcid.jaxb.model.v3.release.common.OrcidIdentifier;
+import org.orcid.jaxb.model.v3.release.record.Person;
+import org.orcid.jaxb.model.v3.release.search.Result;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -120,12 +120,12 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
         String lastName = "";
         String firstName = "";
         if (person.getName().getFamilyName() != null) {
-            lastName = person.getName().getFamilyName().getValue();
+            lastName = person.getName().getFamilyName().getContent();
             externalDataObject.addMetadata(new MetadataValueDTO("person", "familyName", null, null,
                                                                 lastName));
         }
         if (person.getName().getGivenNames() != null) {
-            firstName = person.getName().getGivenNames().getValue();
+            firstName = person.getName().getGivenNames().getContent();
             externalDataObject.addMetadata(new MetadataValueDTO("person", "givenName", null, null,
                                                                 firstName));
 
@@ -189,10 +189,10 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
         List<Result> results = converter.convert(bioDocument);
         List<Person> bios = new LinkedList<>();
         for (Result result : results) {
-            OrcidId orcidIdentifier = result.getOrcidIdentifier();
+            OrcidIdentifier orcidIdentifier = result.getOrcidIdentifier();
             if (orcidIdentifier != null) {
                 log.debug("Found OrcidId=" + orcidIdentifier.toString());
-                String orcid = orcidIdentifier.getUriPath();
+                String orcid = orcidIdentifier.getPath();
                 Person bio = getBio(orcid);
                 if (bio != null) {
                     bios.add(bio);
