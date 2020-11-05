@@ -44,6 +44,7 @@
 
 				<entry key="funding-xml" value-ref="referCrosswalkFundingXml"></entry>
 				<entry key="funding-json" value-ref="referCrosswalkFundingJson"></entry>
+				<entry key="funding-pdf" value-ref="pdfCrosswalkFunding"></entry>
 			</map>
 		</constructor-arg>
 	</bean>
@@ -235,6 +236,14 @@
 		<property name="mimeType" value="application/pdf"/>
 		<property name="entityType" value="OrgUnit"/>
 		<property name="referCrosswalk" ref="referCrosswalkOrgUnitXml"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.DocumentCrosswalk" id="pdfCrosswalkFunding">
+		<property name="templateFileName" value="crosswalks/template/funding-template.xsl"/>
+		<property name="fileName" value="funding.pdf"/>
+		<property name="mimeType" value="application/pdf"/>
+		<property name="entityType" value="Funding"/>
+		<property name="referCrosswalk" ref="referCrosswalkFundingXml"/>
 	</bean>
 
 	<bean class="org.dspace.content.integration.crosswalks.CsvCrosswalk" id="csvCrosswalkPerson">
