@@ -857,6 +857,14 @@
 		          <groupId>javax.validation</groupId>
 		          <artifactId>validation-api</artifactId>
 		        </exclusion>
+		        <exclusion>
+		          <groupId>com.fasterxml.jackson.jaxrs</groupId>
+		          <artifactId>jackson-jaxrs-json-provider</artifactId>
+		        </exclusion>
+		        <exclusion>
+		          <groupId>org.yaml</groupId>
+		          <artifactId>snakeyaml</artifactId>
+		        </exclusion>
             </exclusions>
         </dependency>
 
