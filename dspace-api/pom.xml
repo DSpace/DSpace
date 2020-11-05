@@ -847,13 +847,19 @@
             <artifactId>aws-java-sdk-s3</artifactId>
             <version>1.10.50</version>
         </dependency>
-        
+
         <dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>orcid-jaxb-api</artifactId>
-			<version>3.0.0</version>
-		</dependency>
-        
+            <groupId>org.orcid</groupId>
+            <artifactId>orcid-model</artifactId>
+            <version>3.0.2</version>
+            <exclusions>
+                <exclusion>
+		          <groupId>javax.validation</groupId>
+		          <artifactId>validation-api</artifactId>
+		        </exclusion>
+            </exclusions>
+        </dependency>
+
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
