@@ -3,7 +3,7 @@
 
 <item-submission>
   <submission-map>
-    <name-map collection-handle="default" submission-name="publication" />
+    <name-map collection-handle="default" submission-name="product" />
   </submission-map>
   <step-definitions>
     <step id="collection" mandatory="true">
