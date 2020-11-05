@@ -8,7 +8,6 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
@@ -97,7 +96,11 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 ScriptMatcher.matchScript(scriptConfigurations.get(7).getName(),
                                                           scriptConfigurations.get(7).getDescription()),
                                 ScriptMatcher.matchScript(scriptConfigurations.get(8).getName(),
-                                                          scriptConfigurations.get(8).getDescription())
+                                                          scriptConfigurations.get(8).getDescription()),
+                                ScriptMatcher.matchScript(scriptConfigurations.get(9).getName(),
+                                                          scriptConfigurations.get(9).getDescription()),
+                                ScriptMatcher.matchScript(scriptConfigurations.get(10).getName(),
+                                                          scriptConfigurations.get(10).getDescription())
                         )));
 
     }
@@ -109,9 +112,12 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient(token).perform(get("/api/system/scripts"))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$._embedded.scripts", hasSize(1)))
-                        .andExpect(jsonPath("$._embedded.scripts", contains(
-                            ScriptMatcher.matchScript("item-export", "Perform the item export in the given format"))));
+                        .andExpect(jsonPath("$._embedded.scripts", hasSize(2)))
+                        .andExpect(jsonPath("$._embedded.scripts", containsInAnyOrder(
+                            ScriptMatcher.matchScript("item-export", "Perform the item export in the given format"),
+                            ScriptMatcher.matchScript("bulk-item-export",
+                                    "Perform the multiple items export in the given format")
+                            )));
 
     }
 
@@ -154,7 +160,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", ScriptMatcher
                                 .matchMockScript(
-                                        scriptConfigurations.get(scriptConfigurations.size() - 4).getOptions())));
+                                        scriptConfigurations.get(scriptConfigurations.size() - 1).getOptions())));
     }
 
     @Test

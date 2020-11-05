@@ -224,6 +224,13 @@ public abstract class AbstractBuilder<T, S> {
     }
 
     /**
+     * This method will cleanup the map of builders
+     */
+    public static void cleanupBuilderCache() {
+        abstractBuilderCleanupUtil.cleanupMap();
+    }
+
+    /**
      * This method will ensure that the DSpaceObject contained within the Builder will be cleaned up properly
      * @throws Exception    If something goes wrong
      */

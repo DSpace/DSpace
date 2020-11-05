@@ -255,6 +255,163 @@ public class CsvCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         }
     }
 
+    @Test
+    public void testDisseminateProjects() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item firstItem = createFullProjectItem();
+
+        Item secondItem = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Project")
+            .withAcronym("STP")
+            .withTitle("Second Test Project")
+            .withOpenaireId("55-66-77")
+            .withOpenaireId("11-33-22")
+            .withUrlIdentifier("www.project.test")
+            .withProjectStartDate("2010-01-01")
+            .withProjectEndDate("2012-12-31")
+            .withProjectStatus("Status")
+            .withProjectCoordinator("Second Coordinator OrgUnit")
+            .withProjectInvestigator("Second investigator")
+            .withProjectCoinvestigators("Coinvestigator")
+            .withRelationEquipment("Another test equipment")
+            .withOAMandateURL("oamandate")
+            .build();
+
+        Item thirdItem = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Project")
+            .withAcronym("TTP")
+            .withTitle("Third Test Project")
+            .withOpenaireId("88-22-33")
+            .withUrlIdentifier("www.project.test")
+            .withProjectStartDate("2020-01-01")
+            .withProjectEndDate("2020-12-31")
+            .withProjectStatus("OPEN")
+            .withProjectCoordinator("Third Coordinator OrgUnit")
+            .withProjectPartner("Partner OrgUnit")
+            .withProjectOrganization("Member OrgUnit")
+            .withProjectInvestigator("Investigator")
+            .withProjectCoinvestigators("First coinvestigator")
+            .withProjectCoinvestigators("Second coinvestigator")
+            .withSubject("project")
+            .withSubject("test")
+            .withOAMandate("false")
+            .withOAMandateURL("www.oamandate.com")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        csvCrosswalk = (CsvCrosswalk) crosswalkMapper.getByType("project-csv");
+        assertThat(csvCrosswalk, notNullValue());
+        csvCrosswalk.setDCInputsReader(dcInputsReader);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        csvCrosswalk.disseminate(context, Arrays.asList(firstItem, secondItem, thirdItem).iterator(), out);
+
+        try (FileInputStream fis = getFileInputStream("projects.csv")) {
+            String expectedCsv = IOUtils.toString(fis, Charset.defaultCharset());
+            assertThat(out.toString(), equalTo(expectedCsv));
+        }
+    }
+
+    @Test
+    public void testDisseminateOrgUnits() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item firstItem = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("OrgUnit")
+            .withAcronym("TOU")
+            .withTitle("Test OrgUnit")
+            .withOrgUnitLegalName("Test OrgUnit LegalName")
+            .withType("Strategic Research Insitute")
+            .withParentOrganization("Parent OrgUnit")
+            .withOrgUnitIdentifier("ID-01")
+            .withOrgUnitIdentifier("ID-02")
+            .withUrlIdentifier("www.orgUnit.com")
+            .withUrlIdentifier("www.orgUnit.it")
+            .build();
+
+        Item secondItem = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("OrgUnit")
+            .withAcronym("ATOU")
+            .withTitle("Another Test OrgUnit")
+            .withType("Private non-profit")
+            .withParentOrganization("Parent OrgUnit")
+            .withOrgUnitIdentifier("ID-03")
+            .build();
+
+        Item thirdItem = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("OrgUnit")
+            .withAcronym("TTOU")
+            .withTitle("Third Test OrgUnit")
+            .withType("Private non-profit")
+            .withOrgUnitIdentifier("ID-03")
+            .withUrlIdentifier("www.orgUnit.test")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        csvCrosswalk = (CsvCrosswalk) crosswalkMapper.getByType("orgUnit-csv");
+        assertThat(csvCrosswalk, notNullValue());
+        csvCrosswalk.setDCInputsReader(dcInputsReader);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        csvCrosswalk.disseminate(context, Arrays.asList(firstItem, secondItem, thirdItem).iterator(), out);
+
+        try (FileInputStream fis = getFileInputStream("orgUnits.csv")) {
+            String expectedCsv = IOUtils.toString(fis, Charset.defaultCharset());
+            assertThat(out.toString(), equalTo(expectedCsv));
+        }
+    }
+
+    @Test
+    public void testDisseminateEquipments() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item firstItem = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Equipment")
+            .withAcronym("FT-EQ")
+            .withTitle("First Test Equipment")
+            .withInternalId("ID-01")
+            .withDescription("This is an equipment to test the export functionality")
+            .withEquipmentOwnerOrgUnit("Test OrgUnit")
+            .withEquipmentOwnerPerson("Walter White")
+            .build();
+
+        Item secondItem = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Equipment")
+            .withAcronym("ST-EQ")
+            .withTitle("Second Test Equipment")
+            .withInternalId("ID-02")
+            .withDescription("This is another equipment to test the export functionality")
+            .withEquipmentOwnerPerson("John Smith")
+            .build();
+
+        Item thirdItem = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Equipment")
+            .withAcronym("TT-EQ")
+            .withTitle("Third Test Equipment")
+            .withInternalId("ID-03")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        csvCrosswalk = (CsvCrosswalk) crosswalkMapper.getByType("equipment-csv");
+        assertThat(csvCrosswalk, notNullValue());
+        csvCrosswalk.setDCInputsReader(dcInputsReader);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        csvCrosswalk.disseminate(context, Arrays.asList(firstItem, secondItem, thirdItem).iterator(), out);
+
+        try (FileInputStream fis = getFileInputStream("equipments.csv")) {
+            String expectedCsv = IOUtils.toString(fis, Charset.defaultCharset());
+            assertThat(out.toString(), equalTo(expectedCsv));
+        }
+    }
+
     private Item createFullPersonItem() {
         Item item = createItem(context, collection)
             .withTitle("John Smith")
@@ -333,6 +490,34 @@ public class CsvCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withEditorAffiliation("Editor Affiliation")
             .withRelationConference("The best Conference")
             .withRelationDataset("DataSet")
+            .build();
+    }
+
+    private Item createFullProjectItem() {
+        return ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Project")
+            .withAcronym("TP")
+            .withTitle("Test Project")
+            .withOpenaireId("11-22-33")
+            .withUrlIdentifier("www.project.test")
+            .withProjectStartDate("2020-01-01")
+            .withProjectEndDate("2020-12-31")
+            .withProjectStatus("OPEN")
+            .withProjectCoordinator("Coordinator OrgUnit")
+            .withProjectPartner("Partner OrgUnit")
+            .withProjectPartner("Another Partner OrgUnit")
+            .withProjectOrganization("First Member OrgUnit")
+            .withProjectOrganization("Second Member OrgUnit")
+            .withProjectOrganization("Third Member OrgUnit")
+            .withProjectInvestigator("Investigator")
+            .withProjectCoinvestigators("First coinvestigator")
+            .withProjectCoinvestigators("Second coinvestigator")
+            .withRelationEquipment("Test equipment")
+            .withSubject("project")
+            .withSubject("test")
+            .withDescriptionAbstract("This is a project to test the export")
+            .withOAMandate("true")
+            .withOAMandateURL("oamandate-url")
             .build();
     }
 

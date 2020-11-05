@@ -27,12 +27,12 @@
         <property name="dspaceRunnableClass" value="org.dspace.curate.CurationCli"/>
     </bean>
 
-    <bean id="another-mock-script" class="org.dspace.scripts.MockDSpaceRunnableScriptConfiguration" scope="prototype">
-        <property name="description" value="Mocking a script for testing purposes" />
-        <property name="dspaceRunnableClass" value="org.dspace.scripts.impl.MockDSpaceRunnableScript"/>
+    <bean id="retry-tracker" class="org.dspace.statistics.export.RetryFailedOpenUrlTrackerScriptConfiguration" scope="prototype">
+        <property name="description" value="Retry all failed commits to the OpenURLTracker"/>
+        <property name="dspaceRunnableClass" value="org.dspace.statistics.export.RetryFailedOpenUrlTracker"/>
     </bean>
-    <!-- Keep as last script; for test ScriptRestRepository#findOneScriptByNameTest -->
-    <bean id="mock-script" class="org.dspace.scripts.MockDSpaceRunnableScriptConfiguration" scope="prototype">
+
+    <bean id="another-mock-script" class="org.dspace.scripts.MockDSpaceRunnableScriptConfiguration" scope="prototype">
         <property name="description" value="Mocking a script for testing purposes" />
         <property name="dspaceRunnableClass" value="org.dspace.scripts.impl.MockDSpaceRunnableScript"/>
     </bean>
@@ -55,6 +55,12 @@
     <bean id="bulk-item-export" class="org.dspace.content.integration.crosswalks.script.BulkItemExportCliScriptConfiguration">
         <property name="description" value="Perform the multiple items export in the given format"/>
         <property name="dspaceRunnableClass" value="org.dspace.content.integration.crosswalks.script.BulkItemExportCli"/>
+    </bean>
+
+    <!-- Keep as last script; for test ScriptRestRepository#findOneScriptByNameTest -->
+    <bean id="mock-script" class="org.dspace.scripts.MockDSpaceRunnableScriptConfiguration" scope="prototype">
+        <property name="description" value="Mocking a script for testing purposes" />
+        <property name="dspaceRunnableClass" value="org.dspace.scripts.impl.MockDSpaceRunnableScript"/>
     </bean>
     
 </beans>

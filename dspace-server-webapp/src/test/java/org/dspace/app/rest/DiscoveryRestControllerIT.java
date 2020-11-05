@@ -59,6 +59,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.http.MediaType;
 
+@Ignore
 public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest {
 
 

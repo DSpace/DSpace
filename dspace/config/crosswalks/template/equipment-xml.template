@@ -1,0 +1,8 @@
+<Equipment id="@virtual.id@">
+	<Name>@dc.title@</Name>
+	<Acronym>@oairecerif.acronym@</Acronym>
+	<Identifier type="Institution assigned unique equipment identifier">@oairecerif.internalid@</Identifier>
+	<Description>@dc.description@</Description>
+	<Owner> <OrgUnit> <Name>@crisequipment.ownerou@</Name> </OrgUnit> </Owner>
+	<Owner> <Person displayName="@crisequipment.ownerrp@" ></Person> </Owner>
+</Equipment>

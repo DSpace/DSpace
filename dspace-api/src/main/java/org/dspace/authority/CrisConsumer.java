@@ -277,7 +277,9 @@ public class CrisConsumer implements Consumer {
     }
 
     private String generateCrisSourceId(MetadataValue metadata) {
-        if (isUuidStrategyEnabled(metadata)) {
+        if (StringUtils.startsWith(metadata.getAuthority(), AuthorityValueService.GENERATE)) {
+            return metadata.getAuthority().substring(AuthorityValueService.GENERATE.length());
+        } else if (isUuidStrategyEnabled(metadata)) {
             return UUID.randomUUID().toString();
         } else {
             return DigestUtils.md5Hex(metadata.getValue().toUpperCase());

@@ -17,7 +17,6 @@ env:
     # Suppress all Maven "downloading" messages in Travis logs (see https://stackoverflow.com/a/35653426)
     # This also slightly speeds builds in Travis, as there is less logging
     - HIDE_MAVEN_DOWNLOADS="-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
-    # Give Maven 1GB of memory to work with
     - MAVEN_OPTS="-Xmx1024M $HIDE_MAVEN_DOWNLOADS"
     # Maven options which will skip ALL code validation checks. Includes skipping:
     #  - enforcer.skip     => Skip maven-enforcer-plugin rules
@@ -27,12 +26,6 @@ env:
     # (Useful for builds which don't need to repeat code checks)
     - SKIP_CODE_CHECKS="-Denforcer.skip=true -Dcheckstyle.skip=true -Dlicense.skip=true -Dxml.skip=true"
 
-before_install:
-  - ./dspace-api/src/test/data/dspaceFolder/bin/install_grobid.sh
-  # Remove outdated settings.xml from Travis builds. Workaround for https://github.com/travis-ci/travis-ci/issues/4629
-  - sed -i 's/^orcid\.clientid.*/orcid.clientid='$ORCID_CLIENTID'/g' dspace-api/src/test/data/dspaceFolder/config/local.cfg
-  - sed -i 's/^orcid\.clientsecret.*/orcid.clientsecret='$ORCID_CLIENTSECRET'/g' dspace-api/src/test/data/dspaceFolder/config/local.cfg
-  - rm ~/.m2/settings.xml
 # Create two jobs to run Unit & Integration tests in parallel.
 # These jobs only differ in the TEST_FLAGS defined below,
 # and otherwise share all the other configs in this file
@@ -40,10 +33,14 @@ jobs:
   include:
     - name: "Run Unit Tests & Check Code"
       # NOTE: unit tests include deprecated REST API v6 (as it has unit tests)
-      env: TEST_FLAGS="-DskipUnitTests=false -Pdspace-rest"
+      env: TEST_FLAGS="-Dtest.argLine=-Xmx2048m -DskipUnitTests=false -Pdspace-rest"
     - name: "Run Integration Tests"
       # NOTE: skips code checks, as they are already done by Unit Test job
       env: TEST_FLAGS="-DskipIntegrationTests=false $SKIP_CODE_CHECKS"
+      before_install:
+      - ./dspace-api/src/test/data/dspaceFolder/bin/install_grobid.sh
+      - sed -i 's/^orcid\.clientid.*/orcid.clientid='$ORCID_CLIENTID'/g' dspace-api/src/test/data/dspaceFolder/config/local.cfg
+      - sed -i 's/^orcid\.clientsecret.*/orcid.clientsecret='$ORCID_CLIENTSECRET'/g' dspace-api/src/test/data/dspaceFolder/config/local.cfg
 
 # Skip 'install' process to save time. We build/install/test all at once in "script" below.
 install: skip
