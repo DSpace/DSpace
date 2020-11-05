@@ -7,13 +7,11 @@
  */
 package org.dspace.storage.rdbms;
 
-import java.sql.Connection;
-
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.eperson.service.GroupService;
-import org.flywaydb.core.api.MigrationInfo;
-import org.flywaydb.core.api.callback.FlywayCallback;
+import org.flywaydb.core.api.callback.Callback;
+import org.flywaydb.core.api.callback.Event;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -22,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class GroupServiceInitializer implements FlywayCallback {
+public class GroupServiceInitializer implements Callback {
 
     private final Logger log = org.apache.logging.log4j.LogManager.getLogger(GroupServiceInitializer.class);
 
@@ -53,73 +51,36 @@ public class GroupServiceInitializer implements FlywayCallback {
 
     }
 
+    /**
+     * Events supported by this callback.
+     * @param event Flyway event
+     * @param context Flyway context
+     * @return true if AFTER_MIGRATE event
+     */
     @Override
-    public void beforeClean(Connection connection) {
-
+    public boolean supports(Event event, org.flywaydb.core.api.callback.Context context) {
+        // Must run AFTER all migrations complete, since it is dependent on Hibernate
+        return event.equals(Event.AFTER_MIGRATE);
     }
 
+    /**
+     * Whether event can be handled in a transaction or whether it must be handle outside of transaction.
+     * @param event Flyway event
+     * @param context Flyway context
+     * @return true
+     */
     @Override
-    public void afterClean(Connection connection) {
-
+    public boolean canHandleInTransaction(Event event, org.flywaydb.core.api.callback.Context context) {
+        return true;
     }
 
+    /**
+     * What to run when the callback is triggered.
+     * @param event Flyway event
+     * @param context Flyway context
+     */
     @Override
-    public void beforeMigrate(Connection connection) {
-
-    }
-
-    @Override
-    public void afterMigrate(Connection connection) {
+    public void handle(Event event, org.flywaydb.core.api.callback.Context context) {
         initGroups();
-    }
-
-    @Override
-    public void beforeEachMigrate(Connection connection, MigrationInfo migrationInfo) {
-
-    }
-
-    @Override
-    public void afterEachMigrate(Connection connection, MigrationInfo migrationInfo) {
-
-    }
-
-    @Override
-    public void beforeValidate(Connection connection) {
-
-    }
-
-    @Override
-    public void afterValidate(Connection connection) {
-
-    }
-
-    @Override
-    public void beforeBaseline(Connection connection) {
-
-    }
-
-    @Override
-    public void afterBaseline(Connection connection) {
-
-    }
-
-    @Override
-    public void beforeRepair(Connection connection) {
-
-    }
-
-    @Override
-    public void afterRepair(Connection connection) {
-
-    }
-
-    @Override
-    public void beforeInfo(Connection connection) {
-
-    }
-
-    @Override
-    public void afterInfo(Connection connection) {
-
     }
 }

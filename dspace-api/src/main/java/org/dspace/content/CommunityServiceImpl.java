@@ -629,6 +629,10 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
             case Constants.DELETE:
                 if (AuthorizeConfiguration.canCommunityAdminPerformSubelementDeletion()) {
                     adminObject = getParentObject(context, community);
+                    if (adminObject == null) {
+                        //top-level community, has to be admin of the current community
+                        adminObject = community;
+                    }
                 }
                 break;
             case Constants.ADD:
