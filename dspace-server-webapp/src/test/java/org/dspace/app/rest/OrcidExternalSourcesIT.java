@@ -14,19 +14,20 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.InputStream;
+
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.external.OrcidRestConnector;
 import org.dspace.external.provider.impl.OrcidV3AuthorDataProvider;
-import org.dspace.external.provider.orcid.xml.XMLtoBio;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.Assume;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
-import org.orcid.jaxb.model.record_v3.NameType;
-import org.orcid.jaxb.model.record_v3.NameType.FamilyName;
-import org.orcid.jaxb.model.record_v3.Person;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -52,7 +53,6 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findOneExternalSourcesExistingSources() throws Exception {
-        onlyRunIfConfigExists();
         getClient().perform(get("/api/integration/externalsources/orcid"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$", Matchers.allOf(
@@ -65,6 +65,7 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findOneExternalSourcesExistingSourcesWithentryValueTest() throws Exception {
+        // this test will query the real ORCID API if configured in the CI otherwise will be skipped
         onlyRunIfConfigExists();
         String entry = "0000-0002-9029-1854";
         getClient().perform(get("/api/integration/externalsources/orcid/entryValues/" + entry))
@@ -83,7 +84,8 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void findOneExternalSourceEntriesApplicableQuery() throws Exception {
+    public void findOneExternalSourceEntriesApplicableQueryTest() throws Exception {
+        // this test will query the real ORCID API if configured in the CI otherwise will be skipped
         onlyRunIfConfigExists();
         String q = "orcid:0000-0002-9029-1854";
         getClient().perform(get("/api/integration/externalsources/orcid/entries")
@@ -108,17 +110,19 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findOneExternalSourceEntriesApplicableQueryFamilyNameAndGivenNamesTest() throws Exception {
+        // this test will query the real ORCID API if configured in the CI otherwise will be skipped
         onlyRunIfConfigExists();
         String q = "family-name:bollini AND given-names:andrea";
         getClient().perform(get("/api/integration/externalsources/orcid/entries")
                    .param("query", q))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$._embedded.externalSourceEntries[0]", Matchers.allOf(
-                           hasJsonPath("$.id", is("0000-0002-9029-1854")),
-                           hasJsonPath("$.display", is("Bollini, Andrea")),
-                           hasJsonPath("$.value", is("Bollini, Andrea")),
-                           hasJsonPath("$.externalSource", is("orcid")),
-                           hasJsonPath("$.type", is("externalSourceEntry"))
+                   .andExpect(jsonPath("$._embedded.externalSourceEntries", Matchers.hasItem(
+                           Matchers.allOf(
+                               hasJsonPath("$.id", is("0000-0002-9029-1854")),
+                               hasJsonPath("$.display", is("Bollini, Andrea")),
+                               hasJsonPath("$.value", is("Bollini, Andrea")),
+                               hasJsonPath("$.externalSource", is("orcid")),
+                               hasJsonPath("$.type", is("externalSourceEntry")))
                    )))
                   .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.uri'][0].value",
                                    is("https://orcid.org/0000-0002-9029-1854")))
@@ -132,21 +136,17 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findOneExternalSourcesMockitoTest() throws Exception {
-
-        XMLtoBio converter = Mockito.mock(XMLtoBio.class);
-        orcidV3AuthorDataProvider.setConverter(converter);
+        OrcidRestConnector orcidConnector = Mockito.mock(OrcidRestConnector.class);
+        OrcidRestConnector realConnector = orcidV3AuthorDataProvider.getOrcidRestConnector();
+        orcidV3AuthorDataProvider.setOrcidRestConnector(orcidConnector);
+        when(orcidConnector.get(ArgumentMatchers.endsWith("/person"), ArgumentMatchers.any()))
+                .thenAnswer(new Answer<InputStream>() {
+                    public InputStream answer(InvocationOnMock invocation) {
+                        return getClass().getResourceAsStream("orcid-person-record.xml");
+                    }
+                });
 
         String entry = "0000-0002-9029-1854";
-
-        NameType name = new NameType();
-        name.setFamilyName(new FamilyName("Bollini, Andrea"));
-
-        Person person = new Person();
-        person.setName(name);
-        name.setPath(entry);
-
-        when(converter.convertSinglePerson(ArgumentMatchers.any())).thenReturn(person);
-
         getClient().perform(get("/api/integration/externalsources/orcid/entryValues/" + entry))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$", Matchers.allOf(
@@ -157,6 +157,94 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
                            hasJsonPath("$.type", is("externalSourceEntry"))
                            )));
 
-        orcidV3AuthorDataProvider.setConverter(new XMLtoBio());
+        orcidV3AuthorDataProvider.setOrcidRestConnector(realConnector);
     }
+
+    @Test
+    public void findOneExternalSourceEntriesApplicableQueryMockitoTest() throws Exception {
+        OrcidRestConnector orcidConnector = Mockito.mock(OrcidRestConnector.class);
+        OrcidRestConnector realConnector = orcidV3AuthorDataProvider.getOrcidRestConnector();
+        orcidV3AuthorDataProvider.setOrcidRestConnector(orcidConnector);
+        try {
+            when(orcidConnector.get(ArgumentMatchers.startsWith("search?"), ArgumentMatchers.any()))
+                    .thenAnswer(new Answer<InputStream>() {
+                        public InputStream answer(InvocationOnMock invocation) {
+                            return getClass().getResourceAsStream("orcid-search.xml");
+                        }
+                    });
+            when(orcidConnector.get(ArgumentMatchers.endsWith("/person"), ArgumentMatchers.any()))
+                    .thenAnswer(new Answer<InputStream>() {
+                        public InputStream answer(InvocationOnMock invocation) {
+                            return getClass().getResourceAsStream("orcid-person-record.xml");
+                        }
+                    });
+            String q = "orcid:0000-0002-9029-1854";
+            getClient().perform(get("/api/integration/externalsources/orcid/entries")
+                       .param("query", q))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0]", Matchers.allOf(
+                               hasJsonPath("$.id", is("0000-0002-9029-1854")),
+                               hasJsonPath("$.display", is("Bollini, Andrea")),
+                               hasJsonPath("$.value", is("Bollini, Andrea")),
+                               hasJsonPath("$.externalSource", is("orcid")),
+                               hasJsonPath("$.type", is("externalSourceEntry"))
+                       )))
+                      .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.uri'][0].value",
+                                       is("https://orcid.org/0000-0002-9029-1854")))
+                      .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['person.familyName'][0].value",
+                                       is("Bollini")))
+                      .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['person.givenName'][0].value",
+                                       is("Andrea")))
+                      .andExpect(jsonPath(
+                            "$._embedded.externalSourceEntries[0].metadata['person.identifier.orcid'][0].value",
+                            is("0000-0002-9029-1854")));
+        } finally {
+            orcidV3AuthorDataProvider.setOrcidRestConnector(realConnector);
+        }
+    }
+
+    @Test
+    public void findOneExternalSourceEntriesApplicableQueryFamilyNameAndGivenNamesMockitoTest() throws Exception {
+        OrcidRestConnector orcidConnector = Mockito.mock(OrcidRestConnector.class);
+        OrcidRestConnector realConnector = orcidV3AuthorDataProvider.getOrcidRestConnector();
+        orcidV3AuthorDataProvider.setOrcidRestConnector(orcidConnector);
+        try {
+            when(orcidConnector.get(ArgumentMatchers.startsWith("search?"), ArgumentMatchers.any()))
+                    .thenAnswer(new Answer<InputStream>() {
+                        public InputStream answer(InvocationOnMock invocation) {
+                            return getClass().getResourceAsStream("orcid-search.xml");
+                        }
+                    });
+            when(orcidConnector.get(ArgumentMatchers.endsWith("/person"), ArgumentMatchers.any()))
+                    .thenAnswer(new Answer<InputStream>() {
+                        public InputStream answer(InvocationOnMock invocation) {
+                            return getClass().getResourceAsStream("orcid-person-record.xml");
+                        }
+                    });
+            String q = "family-name:bollini AND given-names:andrea";
+            getClient().perform(get("/api/integration/externalsources/orcid/entries")
+                       .param("query", q))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries", Matchers.hasItem(
+                               Matchers.allOf(
+                                   hasJsonPath("$.id", is("0000-0002-9029-1854")),
+                                   hasJsonPath("$.display", is("Bollini, Andrea")),
+                                   hasJsonPath("$.value", is("Bollini, Andrea")),
+                                   hasJsonPath("$.externalSource", is("orcid")),
+                                   hasJsonPath("$.type", is("externalSourceEntry")))
+                       )))
+                      .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.uri'][0].value",
+                                       is("https://orcid.org/0000-0002-9029-1854")))
+                      .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['person.familyName'][0].value",
+                                       is("Bollini")))
+                      .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['person.givenName'][0].value",
+                                       is("Andrea")))
+                      .andExpect(jsonPath(
+                                "$._embedded.externalSourceEntries[0].metadata['person.identifier.orcid'][0].value",
+                                           is("0000-0002-9029-1854")));
+        } finally {
+            orcidV3AuthorDataProvider.setOrcidRestConnector(realConnector);
+        }
+    }
+
 }
