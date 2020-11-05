@@ -1394,7 +1394,7 @@
                 <ref bean="searchFilterJobtitle"/>
                 <ref bean="searchFilterKnowsLanguage"/>
                 <ref bean="searchFilterPersonOrgUnit"/>
-<!--                <ref bean="searchFilterBirthdate"/>-->
+                <ref bean="searchFilterBirthdate"/>
             </list>
         </property>
         <!--The search filters which can be used on the discovery search page-->
@@ -1405,7 +1405,7 @@
                 <ref bean="searchFilterJobtitle"/>
                 <ref bean="searchFilterKnowsLanguage"/>
                 <ref bean="searchFilterPersonOrgUnit"/>
-<!--                <ref bean="searchFilterBirthdate"/>-->
+                <ref bean="searchFilterBirthdate"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -1571,7 +1571,7 @@
             <list>
                 <ref bean="searchFilterOrganizationAddressCountry"/>
                 <ref bean="searchFilterOrganizationAddressLocality"/>
-<!--                <ref bean="searchFilterOrganizationFoundingDate"/>-->
+                <ref bean="searchFilterOrganizationFoundingDate"/>
             </list>
         </property>
         <!--The search filters which can be used on the discovery search page-->
@@ -1580,7 +1580,7 @@
                 <ref bean="searchFilterOrganizationLegalName"/>
                 <ref bean="searchFilterOrganizationAddressCountry"/>
                 <ref bean="searchFilterOrganizationAddressLocality"/>
-<!--                <ref bean="searchFilterOrganizationFoundingDate"/>-->
+                <ref bean="searchFilterOrganizationFoundingDate"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
