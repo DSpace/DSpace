@@ -11,10 +11,10 @@ import static org.dspace.builder.CollectionBuilder.createCollection;
 import static org.dspace.builder.CommunityBuilder.createCommunity;
 import static org.dspace.builder.ItemBuilder.createItem;
 import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -515,6 +515,88 @@ public class XlsCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             "This is another equipment to test the export functionality", "", "John Smith"));
 
         assertThat(getRowValues(sheet.getRow(3)), contains("Third Test Equipment", "TT-EQ", "ID-03", "", "", ""));
+    }
+
+    @Test
+    public void testDisseminateFundings() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item firstItem = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Funding")
+            .withAcronym("T-FU")
+            .withTitle("Test Funding")
+            .withType("Gift")
+            .withInternalId("ID-01")
+            .withFundingIdentifier("0001")
+            .withDescription("Funding to test export")
+            .withAmount("30.000,00")
+            .withAmountCurrency("EUR")
+            .withFunder("OrgUnit Funder")
+            .withFundingStartDate("2015-01-01")
+            .withFundingEndDate("2020-01-01")
+            .withOAMandate("true")
+            .withOAMandateURL("www.mandate.url")
+            .build();
+
+        Item secondItem = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Funding")
+            .withAcronym("AT-FU")
+            .withTitle("Another Test Funding")
+            .withType("Grant")
+            .withInternalId("ID-02")
+            .withFundingIdentifier("0002")
+            .withAmount("10.000,00")
+            .withFunder("Test Funder")
+            .withFundingStartDate("2020-01-01")
+            .withOAMandate("true")
+            .withOAMandateURL("www.mandate.url")
+            .build();
+
+        Item thirdItem = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Funding")
+            .withAcronym("TT-FU")
+            .withTitle("Third Test Funding")
+            .withType("Grant")
+            .withInternalId("ID-03")
+            .withFundingIdentifier("0003")
+            .withAmount("20.000,00")
+            .withAmountCurrency("EUR")
+            .withFundingEndDate("2010-01-01")
+            .withOAMandate("false")
+            .withOAMandateURL("www.mandate.com")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        xlsCrosswalk = (XlsCrosswalk) crosswalkMapper.getByType("funding-xls");
+        assertThat(xlsCrosswalk, notNullValue());
+        xlsCrosswalk.setDCInputsReader(dcInputsReader);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        xlsCrosswalk.disseminate(context, Arrays.asList(firstItem, secondItem, thirdItem).iterator(), baos);
+
+        Workbook workbook = WorkbookFactory.create(new ByteArrayInputStream(baos.toByteArray()));
+        assertThat(workbook.getNumberOfSheets(), equalTo(1));
+
+        Sheet sheet = workbook.getSheetAt(0);
+        assertThat(sheet.getPhysicalNumberOfRows(), equalTo(4));
+
+        assertThat(getRowValues(sheet.getRow(0)), contains("Name", "Acronym", "Type", "Funding Code", "Grant Number",
+            "Amount", "Amount currency", "Description", "Funder", "Start date", "End date", "OA Mandate",
+            "OA Policy URL"));
+
+        assertThat(getRowValues(sheet.getRow(1)), contains("Test Funding", "T-FU",
+            "https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#Gift", "ID-01", "0001", "30.000,00",
+            "EUR", "Funding to test export", "OrgUnit Funder", "2015-01-01", "2020-01-01", "true", "www.mandate.url"));
+
+        assertThat(getRowValues(sheet.getRow(2)), contains("Another Test Funding", "AT-FU",
+            "https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#Grant", "ID-02", "0002", "10.000,00",
+            "", "", "Test Funder", "2020-01-01", "", "true", "www.mandate.url"));
+
+        assertThat(getRowValues(sheet.getRow(3)), contains("Third Test Funding", "TT-FU",
+            "https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#Grant", "ID-03", "0003", "20.000,00",
+            "EUR", "", "", "", "2010-01-01", "false", "www.mandate.com"));
     }
 
     private Item createFullPersonItem() {

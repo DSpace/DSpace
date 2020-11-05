@@ -45,6 +45,8 @@
 				<entry key="funding-xml" value-ref="referCrosswalkFundingXml"></entry>
 				<entry key="funding-json" value-ref="referCrosswalkFundingJson"></entry>
 				<entry key="funding-pdf" value-ref="pdfCrosswalkFunding"></entry>
+				<entry key="funding-csv" value-ref="csvCrosswalkFunding"></entry>
+				<entry key="funding-xls" value-ref="xlsCrosswalkFunding"></entry>
 			</map>
 		</constructor-arg>
 	</bean>
@@ -306,7 +308,6 @@
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
 	</bean>
 
-
 	<bean class="org.dspace.content.integration.crosswalks.CsvCrosswalk" id="csvCrosswalkEquipment">
 		<property name="templateFileName" value="crosswalks/template/equipment-table.template"/>
 		<property name="fileName" value="equipments.csv"/>
@@ -319,6 +320,21 @@
 		<property name="fileName" value="equipments.xls"/>
 		<property name="sheetName" value="Equipments"/>
 		<property name="entityType" value="Equipment"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.CsvCrosswalk" id="csvCrosswalkFunding">
+		<property name="templateFileName" value="crosswalks/template/funding-table.template"/>
+		<property name="fileName" value="fundings.csv"/>
+		<property name="entityType" value="Funding"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.XlsCrosswalk" id="xlsCrosswalkFunding">
+		<property name="templateFileName" value="crosswalks/template/funding-table.template"/>
+		<property name="fileName" value="fundings.xls"/>
+		<property name="sheetName" value="Fundings"/>
+		<property name="entityType" value="Funding"/>
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
 	</bean>
 
