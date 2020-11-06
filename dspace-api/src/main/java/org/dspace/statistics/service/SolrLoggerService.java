@@ -246,36 +246,6 @@ public interface SolrLoggerService {
             throws SolrServerException, IOException;
 
     /**
-     * Perform a solr query.
-     *
-     * @param query         the query to be used
-     * @param filterQuery   filter query
-     * @param facetField    field to facet the results by
-     * @param rows          the max number of results to return
-     * @param max           the max number of facets to return
-     * @param dateType      the type to be used (example: DAY, MONTH, YEAR)
-     * @param dateStart     the start date Format:(-3, -2, ..) the date is calculated
-     *                      relatively on today
-     * @param dateEnd       the end date stop Format (-2, +1, ..) the date is calculated
-     *                      relatively on today
-     * @param facetQueries  list of facet queries
-     * @param sort          the sort field
-     * @param ascending     the sort direction (true: ascending)
-     * @param facetMinCount Minimum count of results facet must have to return a result
-     * @param defaultFilterQueries
-     *                      use the default filter queries
-     * @param includeShardField
-     *                      include the shard field in the result documents
-     * @throws SolrServerException Exception from the Solr server to the solrj Java client.
-     * @throws java.io.IOException passed through.
-     */
-    public QueryResponse query(String query, String filterQuery,
-                               String facetField, int rows, int max, String dateType, String dateStart,
-                               String dateEnd, List<String> facetQueries, String sort, boolean ascending,
-                               int facetMinCount, boolean defaultFilterQueries, boolean includeShardField)
-            throws SolrServerException, IOException;
-
-    /**
      * Returns in a filterQuery string all the ip addresses that should be ignored
      *
      * @return a string query with ip addresses
@@ -303,14 +273,7 @@ public interface SolrLoggerService {
     /**
      * Commit the solr core.
      */
-    public void commit() throws Exception;
-
-    /**
-     * Commit a solr shard.
-     * @param shard
-     *      The shard to commit.
-     */
-    public void commitShard(String shard) throws Exception;
+    public void commit() throws IOException, SolrServerException;
 
     /**
      * Anonymize a given ip
