@@ -22,6 +22,7 @@ import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DSpaceObjectService;
@@ -85,6 +86,7 @@ public class MetadataConverter implements DSpaceConverter<MetadataValueList, Met
     public <T extends DSpaceObject> void setMetadata(Context context, T dso, MetadataRest metadataRest)
             throws SQLException, AuthorizeException {
         DSpaceObjectService<T> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
+        dsoService.clearMetadata(context, dso, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
         persistMetadataRest(context, dso, metadataRest, dsoService);
     }
 
