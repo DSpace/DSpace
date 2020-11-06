@@ -12,22 +12,25 @@ import static org.dspace.content.Item.ANY;
 
 import java.text.ParseException;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
+import com.google.gson.GsonBuilder;
 import de.undercouch.citeproc.ListItemDataProvider;
 import de.undercouch.citeproc.csl.CSLItemData;
 import de.undercouch.citeproc.csl.CSLItemDataBuilder;
 import de.undercouch.citeproc.csl.CSLName;
 import de.undercouch.citeproc.csl.CSLType;
+import de.undercouch.citeproc.helper.json.JsonBuilder;
+import de.undercouch.citeproc.helper.json.MapJsonBuilderFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCPersonName;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
+import org.dspace.util.SimpleMapConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link ListItemDataProvider} to provide {@link CSLItemData}
@@ -37,6 +40,8 @@ import org.dspace.content.service.ItemService;
  *
  */
 public class DSpaceListItemDataProvider extends ListItemDataProvider {
+
+    public static final Logger LOGGER = LoggerFactory.getLogger(DSpaceListItemDataProvider.class);
 
     private final ItemService itemService;
 
@@ -119,21 +124,19 @@ public class DSpaceListItemDataProvider extends ListItemDataProvider {
     private String volume;
     private String yearSuffix;
 
-    private Map<String, CSLType> CSLTypeMap;
-
-    private CSLItemDataBuilder itemBuilder;
+    private SimpleMapConverter typeConverter;
 
     public DSpaceListItemDataProvider(ItemService itemService) {
         this.itemService = itemService;
-        this.itemBuilder = new CSLItemDataBuilder();
     }
 
     public void processItem(Item item) {
+        CSLItemDataBuilder itemBuilder = new CSLItemDataBuilder();
         itemBuilder.id(String.valueOf(item.getID()));
 
-        handleStringFields(item);
-        handleCslNameFields(item);
-        handleCslDateFields(item);
+        handleStringFields(item, itemBuilder);
+        handleCslNameFields(item, itemBuilder);
+        handleCslDateFields(item, itemBuilder);
 
         CSLItemData cslItemData = itemBuilder.build();
         this.items.put(cslItemData.getId(), cslItemData);
@@ -145,9 +148,15 @@ public class DSpaceListItemDataProvider extends ListItemDataProvider {
         }
     }
 
-    protected CSLItemDataBuilder handleStringFields(Item item) {
+    public String toJson() {
+        JsonBuilder jsonBuilder = new MapJsonBuilderFactory().createJsonBuilder();
+        jsonBuilder.add("items", jsonBuilder.toJson(this.items.values()));
+        return prettyPrint(jsonBuilder.build());
+    }
 
-        consumeMetadataIfNotBlank(type, item, value -> itemBuilder.type(CSLTypeMap.get(value)));
+    protected CSLItemDataBuilder handleStringFields(Item item, CSLItemDataBuilder itemBuilder) {
+
+        consumeMetadataIfNotBlank(type, item, value -> itemBuilder.type(getPublicationType(value)));
         consumeIfNotBlank(categories, value -> itemBuilder.categories(getMetadataValues(item, value)));
         consumeMetadataIfNotBlank(language, item, value -> itemBuilder.language(value));
         consumeMetadataIfNotBlank(journalAbbreviation, item, value -> itemBuilder.journalAbbreviation(value));
@@ -209,7 +218,7 @@ public class DSpaceListItemDataProvider extends ListItemDataProvider {
         return itemBuilder;
     }
 
-    protected CSLItemDataBuilder handleCslNameFields(Item item) {
+    protected CSLItemDataBuilder handleCslNameFields(Item item, CSLItemDataBuilder itemBuilder) {
 
         consumeCSLNamesIfNotBlank(author, item, names -> itemBuilder.author(names));
         consumeCSLNamesIfNotBlank(collectionEditor, item, names -> itemBuilder.collectionEditor(names));
@@ -228,7 +237,7 @@ public class DSpaceListItemDataProvider extends ListItemDataProvider {
         return itemBuilder;
     }
 
-    protected CSLItemDataBuilder handleCslDateFields(Item item) {
+    protected CSLItemDataBuilder handleCslDateFields(Item item, CSLItemDataBuilder itemBuilder) {
 
         consumeDateIfNotBlank(accessed, item,
             dcDate -> itemBuilder.accessed(dcDate.getYear(), dcDate.getMonth(), dcDate.getDay()));
@@ -262,31 +271,28 @@ public class DSpaceListItemDataProvider extends ListItemDataProvider {
     }
 
     protected CSLName[] getCslNameFromMetadataValue(Item item, String metadataField) {
-
         String[] mdf = parseMetadataField(metadataField);
-        List<MetadataValue> list = itemService.getMetadata(item, mdf[0], mdf[1], mdf.length > 2 ? mdf[2] : null, ANY);
-        List<CSLName> cslNames = new LinkedList<>();
-        for (MetadataValue mdv : list) {
-            String author = mdv.getValue();
-            DCPersonName name = new DCPersonName(author);
-            CSLName cslName = new CSLName(name.getLastName(), name.getFirstNames(), null, null, null, null, null, null,
-                null, null, null, null);
-            cslNames.add(cslName);
-        }
+        return itemService.getMetadata(item, mdf[0], mdf[1], mdf.length > 2 ? mdf[2] : null, ANY).stream()
+            .map(metadata -> new DCPersonName(metadata.getValue()))
+            .map(name -> toCSLName(name))
+            .toArray(CSLName[]::new);
+    }
 
-        return cslNames.toArray(new CSLName[0]);
+    private CSLName toCSLName(DCPersonName name) {
+        String lastName = StringUtils.isNotBlank(name.getLastName()) ? name.getLastName() : null;
+        String firstName = StringUtils.isNotBlank(name.getFirstNames()) ? name.getFirstNames() : null;
+        return new CSLName(lastName, firstName, null, null, null, null, null, null, null, null, null, null);
     }
 
     protected String[] getMetadataValues(Item item, String metadataField) {
-
         String[] mdf = parseMetadataField(metadataField);
+        return itemService.getMetadata(item, mdf[0], mdf[1], mdf.length > 2 ? mdf[2] : null, ANY).stream()
+            .map(MetadataValue::getValue)
+            .toArray(String[]::new);
+    }
 
-        List<MetadataValue> list = itemService.getMetadata(item, mdf[0], mdf[1], mdf.length > 2 ? mdf[2] : null, ANY);
-        List<String> metadataValueList = new LinkedList<>();
-        for (MetadataValue metadataValue : list) {
-            metadataValueList.add(metadataValue.getValue());
-        }
-        return metadataValueList.toArray(new String[metadataValueList.size()]);
+    private String prettyPrint(Object json) {
+        return new GsonBuilder().setPrettyPrinting().create().toJson(json);
     }
 
     private String[] parseMetadataField(String metadataField) {
@@ -305,7 +311,10 @@ public class DSpaceListItemDataProvider extends ListItemDataProvider {
 
     private void consumeMetadataIfNotBlank(String value, Item item, Consumer<String> consumer) {
         if (StringUtils.isNotBlank(value)) {
-            consumer.accept(getMetadataFirstValue(item, value));
+            String metadataFirstValue = getMetadataFirstValue(item, value);
+            if (StringUtils.isNotBlank(metadataFirstValue)) {
+                consumer.accept(metadataFirstValue);
+            }
         }
     }
 
@@ -321,6 +330,15 @@ public class DSpaceListItemDataProvider extends ListItemDataProvider {
             if (dcDate.toDate() != null) {
                 consumer.accept(dcDate);
             }
+        }
+    }
+
+    private CSLType getPublicationType(String value) {
+        try {
+            return CSLType.fromString(typeConverter.getValue(value));
+        } catch (IllegalArgumentException ex) {
+            LOGGER.warn("No CSL type found by type: " + value);
+            return null;
         }
     }
 
@@ -948,11 +966,7 @@ public class DSpaceListItemDataProvider extends ListItemDataProvider {
         this.yearSuffix = yearSuffix;
     }
 
-    public void setCSLTypeMap(Map<String, CSLType> cslTypeMap) {
-        this.CSLTypeMap = cslTypeMap;
-    }
-
-    public Map<String, CSLType> getCSLTypeMap() {
-        return CSLTypeMap;
+    public void setTypeConverter(SimpleMapConverter typeConverter) {
+        this.typeConverter = typeConverter;
     }
 }

@@ -85,14 +85,21 @@ public class CSLItemDataCrosswalk implements StreamDisseminationCrosswalk, FileN
             dSpaceListItemDataProvider.processItem((Item) dso);
         }
 
-        CSL citeproc = new CSL(dSpaceListItemDataProvider, style);
-        citeproc.setOutputFormat(format);
-        citeproc.registerCitationItems(dSpaceListItemDataProvider.getIds());
-
-        try (PrintWriter writer = new PrintWriter(out, true, StandardCharsets.UTF_8)) {
-            writer.print(citeproc.makeBibliography().makeString());
+        if (getMIMEType() != null && getMIMEType().startsWith("application/json")) {
+            print(out, dSpaceListItemDataProvider.toJson());
+        } else {
+            CSL citeproc = new CSL(dSpaceListItemDataProvider, style);
+            citeproc.setOutputFormat(format);
+            citeproc.registerCitationItems(dSpaceListItemDataProvider.getIds());
+            print(out, citeproc.makeBibliography().makeString());
         }
 
+    }
+
+    private void print(OutputStream out, String value) {
+        try (PrintWriter writer = new PrintWriter(out, true, StandardCharsets.UTF_8)) {
+            writer.print(value);
+        }
     }
 
     @Override
