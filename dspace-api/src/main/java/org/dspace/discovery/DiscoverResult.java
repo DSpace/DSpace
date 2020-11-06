@@ -15,8 +15,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
+import org.dspace.discovery.configuration.GraphDiscoverSearchFilterFacet;
 
 /**
  * This class represents the result that the discovery search impl returns
@@ -104,7 +106,11 @@ public class DiscoverResult {
     }
 
     public List<FacetResult> getFacetResult(DiscoverySearchFilterFacet field) {
-        List<DiscoverResult.FacetResult> facetValues = getFacetResult(field.getIndexFieldName());
+        String facetName = field.getIndexFieldName();
+        if (StringUtils.startsWith(field.getIndexFieldName(), GraphDiscoverSearchFilterFacet.TYPE_PREFIX)) {
+            facetName = facetName.split("\\.", 3)[2];
+        }
+        List<DiscoverResult.FacetResult> facetValues = getFacetResult(facetName);
         // Check if we are dealing with a date, sometimes the facet values arrive as dates !
         if (facetValues.size() == 0 && field.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)) {
             facetValues = getFacetResult(field.getIndexFieldName() + ".year");
