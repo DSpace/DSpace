@@ -13,6 +13,12 @@ import java.util.UUID;
 
 import org.springframework.core.io.AbstractResource;
 
+/**
+ * This class acts as a {@link AbstractResource} used by Spring's framework to send the data in a proper and
+ * streamlined way inside the {@link org.springframework.http.ResponseEntity} body.
+ * This class' attributes are being used by Spring's framework in the overridden methods so that the proper
+ * attributes are given and used in the response.
+ */
 public class BitstreamResource extends AbstractResource {
 
     private InputStream inputStream;
