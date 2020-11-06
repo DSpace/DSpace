@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>7.0-beta4-SNAPSHOT</version>
+        <version>7.0-beta5-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -155,6 +155,19 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>src/test/resources/**</exclude>
+                        <exclude>src/test/data/**</exclude>
+                        <!-- Ignore license header requirements on Flyway upgrade scripts -->
+                        <exclude>src/main/resources/org/dspace/storage/rdbms/flywayupgrade/**</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
 
         </plugins>
@@ -739,7 +752,7 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>4.0.3</version>
+            <version>6.5.5</version>
         </dependency>
 
         <!-- Google Analytics -->
@@ -846,12 +859,19 @@
             <artifactId>json</artifactId>
             <version>20180130</version>
         </dependency>
+        
+        <!-- To extract metadata from Json response, e.g. SimpleJsonPathMetadataContributor -->
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <version>${json-path.version}</version>
+        </dependency>
 
         <!-- Used for Solr core export/import -->
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
-            <version>4.5</version>
+            <version>5.2</version>
         </dependency>
 
         <!-- Email templating -->

@@ -63,15 +63,15 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                    .andExpect(status().isOk())
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
-                   //The configuration file for the test env includes 19 forms
+                   //The configuration file for the test env includes 21 forms
                    .andExpect(jsonPath("$.page.size", is(20)))
-                   .andExpect(jsonPath("$.page.totalElements", equalTo(19)))
-                   .andExpect(jsonPath("$.page.totalPages", equalTo(1)))
+                   .andExpect(jsonPath("$.page.totalElements", equalTo(21)))
+                   .andExpect(jsonPath("$.page.totalPages", equalTo(2)))
                    .andExpect(jsonPath("$.page.number", is(0)))
                    .andExpect(
                        jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL + "config/submissionforms")))
-                   //The array of submissionforms should have a size of 19
-                   .andExpect(jsonPath("$._embedded.submissionforms", hasSize(equalTo(19))))
+                   //The array of submissionforms should have a size of 20 (default pagination size)
+                   .andExpect(jsonPath("$._embedded.submissionforms", hasSize(equalTo(20))))
         ;
     }
 
@@ -82,12 +82,12 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.page.size", is(20)))
-                .andExpect(jsonPath("$.page.totalElements", equalTo(19)))
-                .andExpect(jsonPath("$.page.totalPages", equalTo(1)))
+                .andExpect(jsonPath("$.page.totalElements", equalTo(21)))
+                .andExpect(jsonPath("$.page.totalPages", equalTo(2)))
                 .andExpect(jsonPath("$.page.number", is(0)))
                 .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL
                            + "config/submissionforms")))
-                .andExpect(jsonPath("$._embedded.submissionforms", hasSize(equalTo(19))));
+                .andExpect(jsonPath("$._embedded.submissionforms", hasSize(equalTo(20))));
     }
 
     @Test

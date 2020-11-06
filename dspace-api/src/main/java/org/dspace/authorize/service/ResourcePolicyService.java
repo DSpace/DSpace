@@ -39,6 +39,16 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
 
     public List<ResourcePolicy> find(Context context, Group group) throws SQLException;
 
+    /**
+     * Retrieve a list of ResourcePolicies by EPerson
+     *
+     * @param c         context
+     * @param ePerson   the EPerson for which to look up the resource policies
+     * @return a list of ResourcePolicies for the provided EPerson
+     * @throws SQLException if there's a database problem
+     */
+    public List<ResourcePolicy> find(Context c, EPerson ePerson) throws SQLException;
+
     public List<ResourcePolicy> find(Context c, EPerson e, List<Group> groups, int action, int type_id)
         throws SQLException;
 
@@ -71,6 +81,16 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
 
     public void removeDsoEPersonPolicies(Context context, DSpaceObject dso, EPerson ePerson)
         throws SQLException, AuthorizeException;
+
+    /**
+     *  Removes all ResourcePolicies related to an EPerson
+     *
+     * @param context   context
+     * @param ePerson   the EPerson for which the ResourcePolicies will be deleted
+     * @throws SQLException if there's a database problem
+     * @throws AuthorizeException when the current user is not authorized
+     */
+    public void removeAllEPersonPolicies(Context context, EPerson ePerson) throws SQLException, AuthorizeException;
 
     public void removeGroupPolicies(Context c, Group group) throws SQLException;
 

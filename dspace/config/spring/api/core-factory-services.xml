@@ -58,4 +58,6 @@
 	<bean id="orcidQueueServiceFactory" class="org.dspace.app.orcid.factory.OrcidQueueServiceFactoryImpl"/>
 	<bean id="orcidHistoryServiceFactory" class="org.dspace.app.orcid.factory.OrcidHistoryServiceFactoryImpl"/>
 
+    <bean id="openURLTrackerLoggerServiceFactory" class="org.dspace.statistics.export.factory.OpenURLTrackerLoggerServiceFactoryImpl"/>
+
 </beans>

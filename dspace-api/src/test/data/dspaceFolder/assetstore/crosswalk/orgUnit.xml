@@ -1,0 +1,20 @@
+<OrgUnit id="mock-id">
+	<Name>Test OrgUnit</Name>
+	<Name>Test OrgUnit LegalName</Name>
+	<Acronym>TOU</Acronym>
+	<Type scheme="https://w3id.org/cerif/vocab/OrganisationTypes">https://w3id.org/cerif/vocab/OrganisationTypes#StrategicResearchInsitute</Type>
+	<PartOf>
+		<OrgUnit id="mock-id">
+			<Name>Parent OrgUnit</Name>
+			<Acronym>POU</Acronym>
+		</OrgUnit>
+	</PartOf>
+	<Identifier>ID-01</Identifier>
+	<Identifier>ID-02</Identifier>
+	<Identifier type="URL">www.orgUnit.com</Identifier>
+	<Identifier type="URL">www.orgUnit.it</Identifier>
+	<People>
+		<Person displayName="Walter White"/>
+		<Person displayName="Jesse Pinkman"/>
+	</People>
+</OrgUnit>

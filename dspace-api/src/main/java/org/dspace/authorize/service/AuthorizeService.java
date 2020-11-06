@@ -450,6 +450,16 @@ public interface AuthorizeService {
     public void removeEPersonPolicies(Context c, DSpaceObject o, EPerson e) throws SQLException, AuthorizeException;
 
     /**
+     * Removes all policies from an eperson that belong to an EPerson.
+     *
+     * @param c current context
+     * @param e the eperson
+     * @throws SQLException if there's a database problem
+     * @throws AuthorizeException if authorization error
+     */
+    public void removeAllEPersonPolicies(Context c, EPerson e) throws SQLException, AuthorizeException;
+
+    /**
      * Returns all groups authorized to perform an action on an object. Returns
      * empty array if no matches.
      *
