@@ -14,7 +14,6 @@ import static java.util.Arrays.asList;
 import static java.util.Calendar.DAY_OF_YEAR;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.cli.Option.builder;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.apache.commons.lang.time.DateFormatUtils.format;
 import static org.apache.log4j.Logger.getLogger;
 import static org.dspace.core.LogManager.getHeader;
@@ -25,8 +24,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -197,30 +194,17 @@ public class AnonymizeStatistics {
 
                 // list of the processing callables to execute
                 Collection<DoProcessing> callables = new ArrayList<>();
-                // list of the shards to commit
-                Set<String> shards = new HashSet<>();
 
                 for (SolrDocument document : documents.getResults()) {
                     updated++;
-
                     callables.add(new DoProcessing(document, updated));
-                    String shard = (String) document.getFieldValue("[shard]");
-
-                    if (isNotBlank(shard)) {
-                        shards.add(shard);
-                    }
                 }
 
                 // execute the processing callables
                 executorService.invokeAll(callables);
 
-                // Commit the main core
+                // Commit the solr core
                 solrLoggerService.commit();
-
-                // Commit all relevant solr shards
-                for (String shard : shards) {
-                    solrLoggerService.commitShard(shard);
-                }
 
                 System.out.println("processed " + updated + " records");
             } while (documents.getResults().getNumFound() > 0);
@@ -231,7 +215,6 @@ public class AnonymizeStatistics {
             } else {
                 printWarning("not all relevant documents were updated, check the DSpace logs for more details");
             }
-
         } catch (Exception e) {
             printError(e);
         }
@@ -259,7 +242,7 @@ public class AnonymizeStatistics {
             "ip:*",
             "time:[* TO " + TIME_LIMIT + "] AND -dns:" + DNS_MASK,
             null, batchSize, -1, null, null, null, null,
-            null, false, -1, false, true
+            null, false, -1, false
         );
     }
 

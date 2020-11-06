@@ -1385,7 +1385,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         }
         solrStatisticsCore.getSolr().add(document);
     }
-    
+
     private SolrDocument getSolrDocumentById(String id) throws IOException, SolrServerException {
         SolrDocumentList results = solrStatisticsCore.getSolr().query(new SolrQuery("id:" + id)).getResults();
         if (results.isEmpty()) {

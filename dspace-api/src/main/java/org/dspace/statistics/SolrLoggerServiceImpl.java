@@ -7,8 +7,6 @@
  */
 package org.dspace.statistics;
 
-import static org.apache.commons.lang.StringUtils.substringAfterLast;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -129,7 +127,6 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     protected boolean useProxies;
 
     private static final List<String> statisticYearCores = new ArrayList<>();
-    private static final Map<String, HttpSolrClient> statisticYearCoreServers = new HashMap<>();
     private static boolean statisticYearCoresInit = false;
 
     private static final String IP_V4_REGEX = "^((?:\\d{1,3}\\.){3})\\d{1,3}$";
@@ -658,7 +655,6 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             Map<String, String> params = new HashMap<>();
             params.put("q", query);
             params.put("rows", "10");
-            params.put("fl","[shard],*");
             if (0 < statisticYearCores.size()) {
                 params.put(ShardParams.SHARDS, StringUtils.join(statisticYearCores.iterator(), ','));
             }
@@ -828,12 +824,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         for (int i = 0; i < docsToUpdate.size(); i++) {
             SolrInputDocument solrDocument = docsToUpdate.get(i);
 
-            // Get the relevant shard client
-            // For a non-sharded core, the shard variable will reference the main core
-            HttpSolrClient shard = getSolrServer(solrDocument.getFieldValue("[shard]").toString());
-
-            // Delete the document from the shard client
-            shard.deleteByQuery("uid:" + solrDocument.getFieldValue("uid"));
+            // Delete the document from the solr client
+            solr.deleteByQuery("uid:" + solrDocument.getFieldValue("uid"));
 
             // Now loop over our fieldname actions
             for (int j = 0; j < fieldNames.size(); j++) {
@@ -851,7 +843,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 } else if (action.equals("remOne")) {
                     // Remove the field
                     java.util.Collection<Object> values = solrDocument
-                            .getFieldValues(fieldName);
+                        .getFieldValues(fieldName);
                     solrDocument.removeField(fieldName);
                     for (Object value : values) {
                         // Keep all the values besides the one we need to remove
@@ -864,15 +856,11 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
             // see https://stackoverflow.com/questions/26941260/normalizing-solr-records-for-sharding-version-issues
             solrDocument.removeField("_version_");
-            // this field will not work with a non-sharded core
-            solrDocument.removeField("[shard]");
 
-            // Add the updated document to the shard client
-            shard.add(solrDocument);
+            solr.add(solrDocument);
 
             if (commit) {
-                shard.commit();
-                solr.commit();
+                commit();
             }
         }
         // System.out.println("SolrLogger.update(\""+query+"\"):"+(new
@@ -1040,16 +1028,6 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                                String dateStart, String dateEnd, List<String> facetQueries, String sort,
                                boolean ascending, int facetMinCount, boolean defaultFilterQueries)
             throws SolrServerException, IOException {
-        return query(query, filterQuery, facetField, rows, max, dateType, dateStart, dateEnd, facetQueries, sort,
-                ascending, facetMinCount, defaultFilterQueries, false);
-    }
-
-    @Override
-    public QueryResponse query(String query, String filterQuery, String facetField, int rows, int max, String dateType,
-                               String dateStart, String dateEnd, List<String> facetQueries, String sort,
-                               boolean ascending, int facetMinCount, boolean defaultFilterQueries,
-                               boolean includeShardField)
-            throws SolrServerException, IOException {
 
         if (solr == null) {
             return null;
@@ -1059,10 +1037,6 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         SolrQuery solrQuery = new SolrQuery().setRows(rows).setQuery(query)
                                              .setFacetMinCount(facetMinCount);
         addAdditionalSolrYearCores(solrQuery);
-
-        if (includeShardField) {
-            solrQuery.setParam("fl", "[shard],*");
-        }
 
         // Set the date facet if present
         if (dateType != null) {
@@ -1344,7 +1318,6 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             SolrPingResponse ping = returnServer.ping();
             log.debug("Ping of Solr Core {} returned with Status {}",
                     coreName, ping.getStatus());
-            statisticYearCoreServers.put(coreName, returnServer);
             return returnServer;
         } catch (IOException | RemoteSolrException | SolrServerException e) {
             log.debug("Ping of Solr Core {} failed with {}.  New Core Will be Created",
@@ -1566,17 +1539,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     }
 
     @Override
-    public void commit() throws Exception {
+    public void commit() throws IOException, SolrServerException {
         solr.commit();
-    }
-
-    @Override
-    public void commitShard(String shard) throws IOException, SolrServerException {
-        getSolrServer(shard).commit();
-    }
-
-    private HttpSolrClient getSolrServer(String shard) {
-        return statisticYearCoreServers.get(substringAfterLast(shard, "/"));
     }
 
     protected void addDocumentsToFile(Context context, SolrDocumentList docs, File exportOutput)
