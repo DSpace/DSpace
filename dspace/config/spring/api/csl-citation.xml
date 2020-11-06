@@ -5,35 +5,29 @@
     default-lazy-init="true">
 
     <bean id="DSpaceListItemDataProvider" class="org.dspace.content.integration.crosswalks.csl.DSpaceListItemDataProvider" scope="prototype">
-        <property name="CSLTypeMap">
-            <util:map id="CSLTypeMap">
-                <entry key="Article" value="#{ T(de.undercouch.citeproc.csl.CSLType).ARTICLE}"/>
-                <entry key="Book" value="#{ T(de.undercouch.citeproc.csl.CSLType).BOOK}"/>
-                <entry key="Book chapter" value="#{ T(de.undercouch.citeproc.csl.CSLType).CHAPTER}"/>
-                <entry key="Patent" value="#{ T(de.undercouch.citeproc.csl.CSLType).PATENT}"/>
-                <entry key="Technical Report" value="#{ T(de.undercouch.citeproc.csl.CSLType).REPORT}"/>
-                <entry key="Thesis" value="#{ T(de.undercouch.citeproc.csl.CSLType).THESIS}"/>
-                <entry key="Dataset" value="#{ T(de.undercouch.citeproc.csl.CSLType).DATASET}"/>
-                <entry key="Image" value="#{ T(de.undercouch.citeproc.csl.CSLType).FIGURE}"/>
-                <entry key="Image, 3-D" value="#{ T(de.undercouch.citeproc.csl.CSLType).FIGURE}"/>
-                <entry key="Map" value="#{ T(de.undercouch.citeproc.csl.CSLType).MAP}"/>
-                <entry key="Musical Score" value="#{ T(de.undercouch.citeproc.csl.CSLType).MUSICAL_SCORE}"/>
-                <entry key="Recording, acoustical" value="#{ T(de.undercouch.citeproc.csl.CSLType).MUSICAL_SCORE}"/>
-                <entry key="Recording, musical" value="#{ T(de.undercouch.citeproc.csl.CSLType).MUSICAL_SCORE}"/>
-                <entry key="Recording, oral" value="#{ T(de.undercouch.citeproc.csl.CSLType).MUSICAL_SCORE}"/>
-                <entry key="Video" value="#{ T(de.undercouch.citeproc.csl.CSLType).MOTION_PICTURE}"/>
-            </util:map>
-        </property>
+    	<property name="typeConverter" ref="mapConverterPublicationTypes"/>
+    	<property name="type" value="dc.type"/>
+    	<property name="language" value="dc.language.iso"/>
         <property name="abstrct" value="dc.description.abstract"/>
-        <property name="genre" value="dc.type"/>
+        <property name="DOI" value="dc.identifier.doi"/>
         <property name="ISBN" value="dc.identifier.isbn"/>
         <property name="ISSN" value="dc.identifier.issn"/>
-        <property name="keyword" value="dc.subject.*"/>
+        <property name="keyword" value="dc.subject"/>
         <property name="publisher" value="dc.publisher"/>
+        <property name="volume" value="oaire.citation.volume"/>
+        <property name="issue" value="oaire.citation.issue"/>
+        <property name="event" value="dc.relation.conference"/>
         <property name="title" value="dc.title"/>
         <property name="URL" value="dc.identifier.uri"/>
         <property name="issued" value="dc.date.issued"/>
         <property name="author" value="dc.contributor.author"/>
         <property name="editor" value="dc.contributor.editor"/>
     </bean>
+    
+    <bean name="mapConverterPublicationTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
+		<constructor-arg value="mapConverterPublicationTypes" />
+		<property name="converterNameFile" value="mapConverter-publicationTypes.properties" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+		<property name="defaultValue" value=""/>
+	</bean>
 </beans>
