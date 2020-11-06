@@ -84,14 +84,15 @@ public class CrisLayoutSectionRestRepositoryIT extends AbstractControllerIntegra
 
         String[] expectedBrowseNames = new String[] { "rodept", "author", "title", "type", "dateissued", "subject" };
 
-        getClient().perform(get("/api/layout/sections/{id}", "publications"))
+        getClient().perform(get("/api/layout/sections/{id}", "researchoutputs"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id", is("publications")))
+            .andExpect(jsonPath("$.id", is("researchoutputs")))
             .andExpect(jsonPath("$", withBrowseComponent(0, 0, "col-md-4", expectedBrowseNames)))
-            .andExpect(jsonPath("$", withSearchComponent(0, 1, "col-md-8", "publication")))
-            .andExpect(jsonPath("$", withTopComponent(1, 0, "col-md-6", "publication", "dc.date.accessioned", "desc")))
-            .andExpect(jsonPath("$", withTopComponent(1, 1, "col-md-6", "publication", "dc.title", "asc")))
-            .andExpect(jsonPath("$", withFacetComponent(2, 0, "col-md-12", "publication")));
+            .andExpect(jsonPath("$", withSearchComponent(0, 1, "col-md-8", "researchoutputs")))
+            .andExpect(jsonPath("$", withTopComponent(1, 0, "col-md-6", "researchoutputs",
+                                                      "dc.date.accessioned", "desc")))
+            .andExpect(jsonPath("$", withTopComponent(1, 1, "col-md-6", "researchoutputs", "dc.title", "asc")))
+            .andExpect(jsonPath("$", withFacetComponent(2, 0, "col-md-12", "researchoutputs")));
     }
 
     @Test
