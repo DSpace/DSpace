@@ -25,12 +25,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 
 /**
- * Utility class to send an input stream with Range header and ETag support.
- * Based on https://github.com/davinkevin/Podcast-Server/blob/v1.0.0/src/main/java/lan/dk/podcastserver/service
- * /MultiPartFileSenderService.java
- *
- * @author Tom Desair (tom dot desair at atmire dot com)
- * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
+ * This class takes data from the Bitstream/File that has to be send. It'll then digest this input and save it in
+ * its local variables.
+ * When calling {{@link #initialiseHeaders()}}, the input and information will be used to set the proper headers
+ * with this info and return an Object of {@link HttpHeaders} to be used in the response that'll be generated
  */
 public class HttpHeadersInitializer {
 
@@ -132,7 +130,12 @@ public class HttpHeadersInitializer {
         return this;
     }
 
-    //TODO rename to initialiseHeaders
+    /**
+     * This method will be called to create a {@link HttpHeaders} object which will contain the headers needed
+     * to form a proper response when returning the Bitstream/File
+     * @return  A {@link HttpHeaders} object containing the information for the Bitstream/File to be sent
+     * @throws IOException If something goes wrong
+     */
     public HttpHeaders initialiseHeaders() throws IOException {
 
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -140,7 +143,6 @@ public class HttpHeadersInitializer {
 
         log.debug("Content-Type : {}", contentType);
         // Initialize response.
-        //TODO response.reset => Can be re-instated if we bump to 5.2.9
         response.setBufferSize(bufferSize);
         if (contentType != null) {
             httpHeaders.put(CONTENT_TYPE, Collections.singletonList(contentType));
@@ -182,6 +184,14 @@ public class HttpHeadersInitializer {
 
     }
 
+    /**
+     * This method will validate whether or not the given Response/Request/Information/Variables are valid.
+     * If they're invalid, the Response shouldn't be given.
+     * This will do null checks on the response, request, inputstream and filename.
+     * Other than this, it'll check Request headers to see if their information is correct.
+     * @return
+     * @throws IOException
+     */
     public boolean isValid() throws IOException {
         if (response == null || request == null) {
             return false;
