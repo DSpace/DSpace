@@ -90,7 +90,7 @@
                 <entry key="RELATION.OrgUnit.organizations" value-ref="relationOrgunitOrgunitsConfiguration"/>
                 <!-- Project Related items -->
                 <entry key="RELATION.Project.projects" value-ref="relationProjectProjectsConfiguration"/>
-                <entry key="RELATION.Project.grants" value-ref="relatioProjectFundingsConfiguration"/>
+                <entry key="RELATION.Project.grants" value-ref="relationProjectFundingsConfiguration"/>
                 <entry key="RELATION.Project.researchoutputs" value-ref="relatioProjectPublicationConfiguration"/>
             </map>
         </property>
@@ -1205,7 +1205,7 @@
     </bean>
 
     <!-- fundings related to a project -->
-    <bean id="relatioProjectFundingsConfiguration" class="org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration">
+    <bean id="relationProjectFundingsConfiguration" class="org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration">
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
