@@ -144,9 +144,6 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
                 itemService.addMetadata(context, item, metadataSchema.getName(), metadataField.getElement(),
                                         metadataField.getQualifier(), aMd.getLanguage(),
                                         valueFromTemplate);
-//                itemService.addMetadata(context, item, metadataSchema.getName(), metadataField.getElement(),
-//                                        metadataField.getQualifier(), aMd.getLanguage(),
-//                                        aMd.getValue());
             }
         }
 
