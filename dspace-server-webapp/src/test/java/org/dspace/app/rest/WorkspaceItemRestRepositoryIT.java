@@ -3847,21 +3847,20 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         Integer workspaceItemId = null;
+        AtomicReference<Integer> idRef = new AtomicReference<>();
 
-        ObjectMapper mapper = new ObjectMapper();
+        try {
+
         String token = getAuthToken(eperson.getEmail(), password);
-        MvcResult mvcResult = getClient(token).perform(post("/api/submission/workspaceitems?owningCollection="
-                                          + col1.getID().toString())
-                                     .contentType(parseMediaType(
-                                         TEXT_URI_LIST_VALUE))
-                                     .content("https://localhost:8080/server/api/integration/externalsources/" +
-                                                  "mock/entryValues/one"))
-                                    .andExpect(status().isCreated()).andReturn();
-
-        String content = mvcResult.getResponse().getContentAsString();
-        Map<String,Object> map = mapper.readValue(content, Map.class);
-        workspaceItemId = (Integer) map.get("id");
-        String itemUuidString = String.valueOf(((Map) ((Map) map.get("_embedded")).get("item")).get("uuid"));
+        getClient(token).perform(post("/api/submission/workspaceitems")
+                            .param("owningCollection", col1.getID().toString())
+                            .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                            .content("https://localhost:8080/server/api/integration/externalsources/" +
+                                                          "mock/entryValues/one"))
+                            .andExpect(status().isCreated())
+                            .andExpect(jsonPath("$._embedded.collection.id", is(col1.getID().toString())))
+                            .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+        workspaceItemId = idRef.get();
 
         getClient(token).perform(get("/api/submission/workspaceitems/" + workspaceItemId))
         .andExpect(status().isOk())
@@ -3869,13 +3868,18 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             hasJsonPath("$.id", is(workspaceItemId)),
             hasJsonPath("$.type", is("workspaceitem")),
             hasJsonPath("$._embedded.item", Matchers.allOf(
-                hasJsonPath("$.id", is(itemUuidString)),
-                hasJsonPath("$.uuid", is(itemUuidString)),
-                hasJsonPath("$.type", is("item")),
                 hasJsonPath("$.metadata", Matchers.allOf(
                     MetadataMatcher.matchMetadata("dc.contributor.author", "Donald, Smith")
-                )))))
-        ));
+            )))),
+            hasJsonPath("$._embedded.collection", Matchers.allOf(
+                hasJsonPath("$.id", is(col1.getID().toString())
+            )))
+        )));
+
+        } finally {
+            WorkspaceItemBuilder.deleteWorkspaceItem(idRef.get());
+        }
+
     }
 
     @Test
