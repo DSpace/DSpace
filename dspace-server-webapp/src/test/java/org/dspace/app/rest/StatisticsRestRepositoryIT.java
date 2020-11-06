@@ -1284,7 +1284,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
 
         // collection document which should be anonymized
         addSolrDocument(asList(
-            Pair.of("id", "community_view_old"),
+            Pair.of("id", "collection_view_old"),
             Pair.of("type", COLLECTION),
             Pair.of("ip", "16f4:0586:3148:3a8a:f307:e13e:2614:21a2"),
             Pair.of("dns", "dns_3"),
@@ -1293,7 +1293,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
 
         // community document which should be anonymized
         addSolrDocument(asList(
-            Pair.of("id", "collection_view_old"),
+            Pair.of("id", "community_view_old"),
             Pair.of("type", COMMUNITY),
             Pair.of("ip", "5b02:f3ed:635f:98b1:d2c5:f292:90d9:3982"),
             Pair.of("dns", "dns_4"),
@@ -1305,75 +1305,75 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         runDSpaceScript("anonymize-statistics");
 
         assertEquals(
-            getSolrDocumentById("bitstream_view_recent").getFieldValue("ip"),
-            "75.133.248.54"
+            "75.133.248.54",
+            getSolrDocumentById("bitstream_view_recent").getFieldValue("ip")
         );
         assertEquals(
-            getSolrDocumentById("bitstream_view_recent").getFieldValue("dns"),
-            "dns_1"
-        );
-
-        assertEquals(
-            getSolrDocumentById("item_view_recent").getFieldValue("ip"),
-            "195.11.13.244"
-        );
-        assertEquals(
-            getSolrDocumentById("item_view_recent").getFieldValue("dns"),
-            "dns_2"
+            "dns_1",
+            getSolrDocumentById("bitstream_view_recent").getFieldValue("dns")
         );
 
         assertEquals(
-            getSolrDocumentById("collection_view_recent").getFieldValue("ip"),
-            "16f4:0586:3148:3a8a:f307:e13e:2614:21a2"
+            "195.11.13.244",
+            getSolrDocumentById("item_view_recent").getFieldValue("ip")
         );
         assertEquals(
-            getSolrDocumentById("collection_view_recent").getFieldValue("dns"),
-            "dns_3"
-        );
-
-        assertEquals(
-            getSolrDocumentById("community_view_recent").getFieldValue("ip"),
-            "5b02:f3ed:635f:98b1:d2c5:f292:90d9:3982"
-        );
-        assertEquals(
-            getSolrDocumentById("community_view_recent").getFieldValue("dns"),
-            "dns_4"
+            "dns_2",
+            getSolrDocumentById("item_view_recent").getFieldValue("dns")
         );
 
         assertEquals(
-            getSolrDocumentById("bitstream_view_old").getFieldValue("ip"),
-            "75.133.248.255"
+            "16f4:0586:3148:3a8a:f307:e13e:2614:21a2",
+            getSolrDocumentById("collection_view_recent").getFieldValue("ip")
         );
         assertEquals(
-            getSolrDocumentById("bitstream_view_old").getFieldValue("dns"),
-            "anonymized"
-        );
-
-        assertEquals(
-            getSolrDocumentById("item_view_old").getFieldValue("ip"),
-            "195.11.13.255"
-        );
-        assertEquals(
-            getSolrDocumentById("item_view_old").getFieldValue("dns"),
-            "anonymized"
+            "dns_3",
+            getSolrDocumentById("collection_view_recent").getFieldValue("dns")
         );
 
         assertEquals(
-            getSolrDocumentById("collection_view_old").getFieldValue("ip"),
-            "16f4:0586:3148:3a8a:f307:e13e:ffff:ffff"
+            "5b02:f3ed:635f:98b1:d2c5:f292:90d9:3982",
+            getSolrDocumentById("community_view_recent").getFieldValue("ip")
         );
         assertEquals(
-            getSolrDocumentById("collection_view_old").getFieldValue("dns"),
-            "anonymized"
+            "dns_4",
+            getSolrDocumentById("community_view_recent").getFieldValue("dns")
         );
 
         assertEquals(
-            getSolrDocumentById("community_view_old").getFieldValue("ip"),
-            "5b02:f3ed:635f:98b1:d2c5:f292:ffff:ffff"
+            "75.133.248.255",
+            getSolrDocumentById("bitstream_view_old").getFieldValue("ip")
         );
         assertEquals(
-            getSolrDocumentById("community_view_old").getFieldValue("dns"),
-            "anonymized"
+            "anonymized",
+            getSolrDocumentById("bitstream_view_old").getFieldValue("dns")
+        );
+
+        assertEquals(
+            "195.11.13.255",
+            getSolrDocumentById("item_view_old").getFieldValue("ip")
+        );
+        assertEquals(
+            "anonymized",
+            getSolrDocumentById("item_view_old").getFieldValue("dns")
+        );
+
+        assertEquals(
+            "16f4:0586:3148:3a8a:f307:e13e:FFFF:FFFF",
+            getSolrDocumentById("collection_view_old").getFieldValue("ip")
+        );
+        assertEquals(
+            "anonymized",
+            getSolrDocumentById("collection_view_old").getFieldValue("dns")
+        );
+
+        assertEquals(
+            "5b02:f3ed:635f:98b1:d2c5:f292:FFFF:FFFF",
+            getSolrDocumentById("community_view_old").getFieldValue("ip")
+        );
+        assertEquals(
+            "anonymized",
+            getSolrDocumentById("community_view_old").getFieldValue("dns")
         );
     }
 
@@ -1396,7 +1396,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
 
     private String getTimeNDaysAgo(int daysAgo) {
         Calendar calendar = Calendar.getInstance();
-        calendar.add(DAY_OF_YEAR, daysAgo);
+        calendar.add(DAY_OF_YEAR, -daysAgo);
         return format(calendar, DATE_FORMAT_8601);
     }
 
