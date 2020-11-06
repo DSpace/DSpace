@@ -1340,6 +1340,182 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         }
     }
 
+    @Test
+    public void testFundingXmlDisseminate() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item funding = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Funding")
+            .withAcronym("T-FU")
+            .withTitle("Test Funding")
+            .withType("Gift")
+            .withInternalId("ID-01")
+            .withFundingIdentifier("0001")
+            .withDescription("Funding to test export")
+            .withAmount("30.000,00")
+            .withAmountCurrency("EUR")
+            .withFunder("OrgUnit Funder")
+            .withFundingStartDate("2015-01-01")
+            .withFundingEndDate("2020-01-01")
+            .withOAMandate("true")
+            .withOAMandateURL("www.mandate.url")
+            .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("funding-xml");
+        assertThat(referCrossWalk, notNullValue());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        referCrossWalk.disseminate(context, funding, out);
+
+        try (FileInputStream fis = getFileInputStream("funding.xml")) {
+            String expectedContent = IOUtils.toString(fis, Charset.defaultCharset());
+            compareEachLine(out.toString(), expectedContent);
+        }
+    }
+
+    @Test
+    public void testFundingJsonDisseminate() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item funding = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Funding")
+            .withAcronym("T-FU")
+            .withTitle("Test Funding")
+            .withType("Gift")
+            .withInternalId("ID-01")
+            .withFundingIdentifier("0001")
+            .withDescription("Funding to test export")
+            .withAmount("30.000,00")
+            .withAmountCurrency("EUR")
+            .withFunder("OrgUnit Funder")
+            .withFundingStartDate("2015-01-01")
+            .withFundingEndDate("2020-01-01")
+            .withOAMandate("true")
+            .withOAMandateURL("www.mandate.url")
+            .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("funding-json");
+        assertThat(referCrossWalk, notNullValue());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        referCrossWalk.disseminate(context, funding, out);
+
+        try (FileInputStream fis = getFileInputStream("funding.json")) {
+            String expectedContent = IOUtils.toString(fis, Charset.defaultCharset());
+            compareEachLine(out.toString(), expectedContent);
+        }
+    }
+
+    @Test
+    public void testManyFundingsXmlDisseminate() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item firstFunding = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Funding")
+            .withAcronym("T-FU")
+            .withTitle("Test Funding")
+            .withType("Gift")
+            .withInternalId("ID-01")
+            .withFundingIdentifier("0001")
+            .withDescription("Funding to test export")
+            .withAmount("30.000,00")
+            .withAmountCurrency("EUR")
+            .withFunder("OrgUnit Funder")
+            .withFundingStartDate("2015-01-01")
+            .withFundingEndDate("2020-01-01")
+            .withOAMandate("true")
+            .withOAMandateURL("www.mandate.url")
+            .build();
+
+        Item secondFunding = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Funding")
+            .withAcronym("AT-FU")
+            .withTitle("Another Test Funding")
+            .withType("Grant")
+            .withInternalId("ID-02")
+            .withFundingIdentifier("0002")
+            .withAmount("10.000,00")
+            .withFunder("Test Funder")
+            .withFundingStartDate("2020-01-01")
+            .withOAMandate("true")
+            .withOAMandateURL("www.mandate.url")
+            .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("funding-xml");
+        assertThat(referCrossWalk, notNullValue());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        referCrossWalk.disseminate(context, Arrays.asList(firstFunding, secondFunding).iterator(), out);
+
+        try (FileInputStream fis = getFileInputStream("fundings.xml")) {
+            String expectedContent = IOUtils.toString(fis, Charset.defaultCharset());
+            compareEachLine(out.toString(), expectedContent);
+        }
+    }
+
+    @Test
+    public void testManyFundingsJsonDisseminate() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item firstFunding = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Funding")
+            .withAcronym("T-FU")
+            .withTitle("Test Funding")
+            .withType("Gift")
+            .withInternalId("ID-01")
+            .withFundingIdentifier("0001")
+            .withDescription("Funding to test export")
+            .withAmount("30.000,00")
+            .withAmountCurrency("EUR")
+            .withFunder("OrgUnit Funder")
+            .withFundingStartDate("2015-01-01")
+            .withFundingEndDate("2020-01-01")
+            .withOAMandate("true")
+            .withOAMandateURL("www.mandate.url")
+            .build();
+
+        Item secondFunding = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Funding")
+            .withAcronym("AT-FU")
+            .withTitle("Another Test Funding")
+            .withType("Grant")
+            .withInternalId("ID-02")
+            .withFundingIdentifier("0002")
+            .withAmount("10.000,00")
+            .withFunder("Test Funder")
+            .withFundingStartDate("2020-01-01")
+            .withOAMandate("true")
+            .withOAMandateURL("www.mandate.url")
+            .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("funding-json");
+        assertThat(referCrossWalk, notNullValue());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        referCrossWalk.disseminate(context, Arrays.asList(firstFunding, secondFunding).iterator(), out);
+
+        try (FileInputStream fis = getFileInputStream("fundings.json")) {
+            String expectedContent = IOUtils.toString(fis, Charset.defaultCharset());
+            compareEachLine(out.toString(), expectedContent);
+        }
+    }
+
     private void compareEachLine(String result, String expectedResult) {
 
         String[] resultLines = result.split("\n");

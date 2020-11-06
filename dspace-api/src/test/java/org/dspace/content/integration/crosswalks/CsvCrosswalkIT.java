@@ -11,9 +11,9 @@ import static org.dspace.builder.CollectionBuilder.createCollection;
 import static org.dspace.builder.CommunityBuilder.createCommunity;
 import static org.dspace.builder.ItemBuilder.createItem;
 import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -407,6 +407,71 @@ public class CsvCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         csvCrosswalk.disseminate(context, Arrays.asList(firstItem, secondItem, thirdItem).iterator(), out);
 
         try (FileInputStream fis = getFileInputStream("equipments.csv")) {
+            String expectedCsv = IOUtils.toString(fis, Charset.defaultCharset());
+            assertThat(out.toString(), equalTo(expectedCsv));
+        }
+    }
+
+    @Test
+    public void testDisseminateFundings() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item firstItem = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Funding")
+            .withAcronym("T-FU")
+            .withTitle("Test Funding")
+            .withType("Gift")
+            .withInternalId("ID-01")
+            .withFundingIdentifier("0001")
+            .withDescription("Funding to test export")
+            .withAmount("30.000,00")
+            .withAmountCurrency("EUR")
+            .withFunder("OrgUnit Funder")
+            .withFundingStartDate("2015-01-01")
+            .withFundingEndDate("2020-01-01")
+            .withOAMandate("true")
+            .withOAMandateURL("www.mandate.url")
+            .build();
+
+        Item secondItem = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Funding")
+            .withAcronym("AT-FU")
+            .withTitle("Another Test Funding")
+            .withType("Grant")
+            .withInternalId("ID-02")
+            .withFundingIdentifier("0002")
+            .withAmount("10.000,00")
+            .withFunder("Test Funder")
+            .withFundingStartDate("2020-01-01")
+            .withOAMandate("true")
+            .withOAMandateURL("www.mandate.url")
+            .build();
+
+        Item thirdItem = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Funding")
+            .withAcronym("TT-FU")
+            .withTitle("Third Test Funding")
+            .withType("Grant")
+            .withInternalId("ID-03")
+            .withFundingIdentifier("0003")
+            .withAmount("20.000,00")
+            .withAmountCurrency("EUR")
+            .withFundingEndDate("2010-01-01")
+            .withOAMandate("false")
+            .withOAMandateURL("www.mandate.com")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        csvCrosswalk = (CsvCrosswalk) crosswalkMapper.getByType("funding-csv");
+        assertThat(csvCrosswalk, notNullValue());
+        csvCrosswalk.setDCInputsReader(dcInputsReader);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        csvCrosswalk.disseminate(context, Arrays.asList(firstItem, secondItem, thirdItem).iterator(), out);
+
+        try (FileInputStream fis = getFileInputStream("fundings.csv")) {
             String expectedCsv = IOUtils.toString(fis, Charset.defaultCharset());
             assertThat(out.toString(), equalTo(expectedCsv));
         }
