@@ -5,7 +5,7 @@
     </ns2:title>
     <ns2:citation>
         <ns2:citation-type>bibtex</ns2:citation-type>
-        <ns2:citation-value> @misc{Josiah_2013, title={A Methodology for the Emulation of Architecture}, url={http://localhost:4000/handle/123456789/yyy}, author={Josiah, Carberry}, year={2013}, month={Aug}}
+        <ns2:citation-value> @misc{Josiah_2013, title={A Methodology for the Emulation of Architecture}, url={http://localhost:4000/handle/123456789/yyy}, DOI={10.1000/182}, author={Josiah, Carberry}, year={2013}, month={Aug}}
 </ns2:citation-value>
     </ns2:citation>
     <ns2:type>other</ns2:type>
