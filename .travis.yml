@@ -39,8 +39,6 @@ jobs:
       env: TEST_FLAGS="-DskipIntegrationTests=false $SKIP_CODE_CHECKS"
       before_install:
       - ./dspace-api/src/test/data/dspaceFolder/bin/install_grobid.sh
-      - sed -i 's/^orcid\.clientid.*/orcid.clientid='$ORCID_CLIENTID'/g' dspace-api/src/test/data/dspaceFolder/config/local.cfg
-      - sed -i 's/^orcid\.clientsecret.*/orcid.clientsecret='$ORCID_CLIENTSECRET'/g' dspace-api/src/test/data/dspaceFolder/config/local.cfg
 
 # Skip 'install' process to save time. We build/install/test all at once in "script" below.
 install: skip
