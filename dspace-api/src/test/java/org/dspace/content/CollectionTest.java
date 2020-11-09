@@ -38,6 +38,8 @@ import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.LicenseService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.services.ConfigurationService;
+import org.dspace.utils.DSpace;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -159,6 +161,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     public void testCreate() throws Exception {
         // Allow Community ADD perms
         doNothing().when(authorizeServiceSpy).authorizeAction(context, owningCommunity, Constants.ADD);
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, owningCommunity, Constants.ADD, true);
 
         Collection created = collectionService.create(context, owningCommunity);
         assertThat("testCreate 0", created, notNullValue());
@@ -172,6 +175,14 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     public void testCreateWithValidHandle() throws Exception {
         // Allow Community ADD perms
         doNothing().when(authorizeServiceSpy).authorizeAction(context, owningCommunity, Constants.ADD);
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, owningCommunity, Constants.ADD, true);
+
+        // provide additional prefixes to the configuration in order to support them
+        final ConfigurationService configurationService = new DSpace().getConfigurationService();
+        String handleAdditionalPrefixes = configurationService.getProperty("handle.additional.prefixes");
+
+        try {
+        configurationService.setProperty("handle.additional.prefixes", "987654321");
 
         // test creating collection with a specified handle which is NOT already in use
         // (this handle should not already be used by system, as it doesn't start with "1234567689" prefix)
@@ -180,6 +191,10 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         // check that collection was created, and that its handle was set to proper value
         assertThat("testCreateWithValidHandle 0", created, notNullValue());
         assertThat("testCreateWithValidHandle 1", created.getHandle(), equalTo("987654321/100"));
+
+        } finally {
+            configurationService.setProperty("handle.additional.prefixes", handleAdditionalPrefixes);
+        }
     }
 
 
