@@ -94,17 +94,6 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
         Community newCommunity = communityDAO.create(context, new Community());
 
-        try {
-            if (handle == null) {
-                identifierService.register(context, newCommunity);
-            } else {
-                identifierService.register(context, newCommunity, handle);
-            }
-        }  catch (IllegalStateException | IdentifierException ex) {
-            throw new IllegalStateException(ex);
-        }
-
-
         if (parent != null) {
             parent.addSubCommunity(newCommunity);
             newCommunity.addParentCommunity(parent);
@@ -127,6 +116,16 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
             context.addEvent(new Event(Event.ADD, Constants.SITE, siteService.findSite(context).getID(),
                                        Constants.COMMUNITY, newCommunity.getID(), newCommunity.getHandle(),
                                        getIdentifiers(context, newCommunity)));
+        }
+
+        try {
+            if (handle == null) {
+                identifierService.register(context, newCommunity);
+            } else {
+                identifierService.register(context, newCommunity, handle);
+            }
+        }  catch (IllegalStateException | IdentifierException ex) {
+            throw new IllegalStateException(ex);
         }
 
         log.info(LogManager.getHeader(context, "create_community",
