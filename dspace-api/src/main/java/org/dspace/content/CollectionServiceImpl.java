@@ -135,17 +135,6 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         //Add our newly created collection to our community, authorization checks occur in THIS method
         communityService.addCollection(context, community, newCollection);
 
-        //Update our collection so we have a collection identifier
-        try {
-            if (handle == null) {
-                identifierService.register(context, newCollection);
-            } else {
-                identifierService.register(context, newCollection, handle);
-            }
-        } catch (IllegalStateException | IdentifierException ex) {
-            throw new IllegalStateException(ex);
-        }
-
         // create the default authorization policy for collections
         // of 'anonymous' READ
         Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
@@ -158,6 +147,18 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         authorizeService
             .createResourcePolicy(context, newCollection, anonymousGroup, null, Constants.DEFAULT_BITSTREAM_READ, null);
 
+        collectionDAO.save(context, newCollection);
+
+        //Update our collection so we have a collection identifier
+        try {
+            if (handle == null) {
+                identifierService.register(context, newCollection);
+            } else {
+                identifierService.register(context, newCollection, handle);
+            }
+        } catch (IllegalStateException | IdentifierException ex) {
+            throw new IllegalStateException(ex);
+        }
 
         context.addEvent(new Event(Event.CREATE, Constants.COLLECTION,
                                    newCollection.getID(), newCollection.getHandle(),
@@ -167,7 +168,6 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                                       "collection_id=" + newCollection.getID())
                      + ",handle=" + newCollection.getHandle());
 
-        collectionDAO.save(context, newCollection);
         return newCollection;
     }
 
