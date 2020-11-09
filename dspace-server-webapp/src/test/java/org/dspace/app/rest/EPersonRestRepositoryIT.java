@@ -1411,6 +1411,40 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void patchPasswordMissingValue() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String originalPw = "testpass79bC";
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@example.com")
+                                        .withPassword(originalPw)
+                                        .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<>();
+        AddOperation addOperation = new AddOperation("/password", null);
+        ops.add(addOperation);
+        String patchBody = getPatchContent(ops);
+
+        // adding null pw should return bad request
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isBadRequest());
+
+        // login with original password
+        token = getAuthToken(ePerson.getEmail(), originalPw);
+        getClient(token).perform(get("/api/"))
+                        .andExpect(status().isOk());
+
+    }
+
+    @Test
     public void patchPasswordNotInitialised() throws Exception {
 
         context.turnOffAuthorisationSystem();
