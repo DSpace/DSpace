@@ -1700,7 +1700,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                         is("Multistep microreactions with proteins using electrocapture technology.")))
                 .andExpect(
                         jsonPath(
-                        "$._embedded.workspaceitems[0].sections.traditionalpageone['dc.identifier.other'][0].value",
+                        "$._embedded.workspaceitems[0].sections.traditionalpageone['dc.identifier.pmid'][0].value",
                         is("15117179")))
                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone"
                         + "['dc.contributor.author'][0].value",
@@ -1721,7 +1721,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 is("Multistep microreactions with proteins using electrocapture technology.")))
             .andExpect(
                 jsonPath(
-                "$._embedded.workspaceitems[0].sections.traditionalpageone['dc.identifier.other'][0].value",
+                "$._embedded.workspaceitems[0].sections.traditionalpageone['dc.identifier.pmid'][0].value",
                 is("15117179")))
             .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone"
                 + "['dc.contributor.author'][0].value",
