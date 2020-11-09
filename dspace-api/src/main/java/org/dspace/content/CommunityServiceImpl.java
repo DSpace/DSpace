@@ -108,16 +108,6 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
         communityDAO.save(context, newCommunity);
 
-        context.addEvent(new Event(Event.CREATE, Constants.COMMUNITY, newCommunity.getID(), newCommunity.getHandle(),
-                                   getIdentifiers(context, newCommunity)));
-
-        // if creating a top-level Community, simulate an ADD event at the Site.
-        if (parent == null) {
-            context.addEvent(new Event(Event.ADD, Constants.SITE, siteService.findSite(context).getID(),
-                                       Constants.COMMUNITY, newCommunity.getID(), newCommunity.getHandle(),
-                                       getIdentifiers(context, newCommunity)));
-        }
-
         try {
             if (handle == null) {
                 identifierService.register(context, newCommunity);
@@ -126,6 +116,16 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
             }
         }  catch (IllegalStateException | IdentifierException ex) {
             throw new IllegalStateException(ex);
+        }
+
+        context.addEvent(new Event(Event.CREATE, Constants.COMMUNITY, newCommunity.getID(), newCommunity.getHandle(),
+                getIdentifiers(context, newCommunity)));
+
+        // if creating a top-level Community, simulate an ADD event at the Site.
+        if (parent == null) {
+            context.addEvent(new Event(Event.ADD, Constants.SITE, siteService.findSite(context).getID(),
+                    Constants.COMMUNITY, newCommunity.getID(), newCommunity.getHandle(),
+                    getIdentifiers(context, newCommunity)));
         }
 
         log.info(LogManager.getHeader(context, "create_community",
