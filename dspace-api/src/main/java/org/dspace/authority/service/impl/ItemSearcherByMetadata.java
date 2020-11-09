@@ -5,12 +5,12 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.bulkimport.service.impl;
+package org.dspace.authority.service.impl;
 
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.dspace.app.bulkimport.service.ItemSearcher;
+import org.dspace.authority.service.ItemSearcher;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
@@ -20,6 +20,12 @@ import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.indexobject.IndexableItem;
 
+/**
+ * Implementation of {@link ItemSearcher} to search the item by the configured metadata.
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ */
 public class ItemSearcherByMetadata implements ItemSearcher {
 
     private String metadata;

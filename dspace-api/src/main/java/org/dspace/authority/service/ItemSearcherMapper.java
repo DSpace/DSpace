@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.bulkimport.service;
+package org.dspace.authority.service;
 
 import java.util.Collection;
 import java.util.Map;

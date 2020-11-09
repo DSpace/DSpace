@@ -5,17 +5,23 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.bulkimport.service.impl;
+package org.dspace.authority.service.impl;
 
 import java.sql.SQLException;
 import java.util.UUID;
 
-import org.dspace.app.bulkimport.service.ItemSearcher;
+import org.dspace.authority.service.ItemSearcher;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.util.UUIDUtils;
 
+/**
+ * Implementation of {@link ItemSearcher} to search the item by id.
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ */
 public class ItemSearcherById implements ItemSearcher {
 
     private ItemService itemService;
