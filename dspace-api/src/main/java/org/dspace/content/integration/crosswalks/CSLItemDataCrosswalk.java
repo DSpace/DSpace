@@ -24,7 +24,6 @@ import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.CrosswalkMode;
 import org.dspace.content.crosswalk.CrosswalkObjectNotSupported;
-import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
 import org.dspace.content.integration.crosswalks.csl.DSpaceListItemDataProvider;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
@@ -33,14 +32,14 @@ import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Implementation of {@link StreamDisseminationCrosswalk} to serialize the given
- * items using the CSL processor with the configured style and producing the result
- * in the given output format.
+ * Implementation of {@link ItemExportCrosswalk} to serialize the given items
+ * using the CSL processor with the configured style and producing the result in
+ * the given output format.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public class CSLItemDataCrosswalk implements StreamDisseminationCrosswalk, FileNameDisseminator {
+public class CSLItemDataCrosswalk implements ItemExportCrosswalk {
 
     @Autowired
     private ObjectFactory<DSpaceListItemDataProvider> dSpaceListItemDataProviderObjectFactory;
@@ -142,7 +141,7 @@ public class CSLItemDataCrosswalk implements StreamDisseminationCrosswalk, FileN
     }
 
     public CrosswalkMode getCrosswalkMode() {
-        return this.crosswalkMode != null ? this.crosswalkMode : StreamDisseminationCrosswalk.super.getCrosswalkMode();
+        return this.crosswalkMode != null ? this.crosswalkMode : ItemExportCrosswalk.super.getCrosswalkMode();
     }
 
     @Override
