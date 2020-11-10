@@ -45,7 +45,7 @@ import org.dspace.scripts.service.ScriptService;
 import org.junit.Before;
 import org.junit.Test;
 
-public class MetadataImportTest extends AbstractIntegrationTestWithDatabase {
+public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
 
     private ItemService itemService
         = ContentServiceFactory.getInstance().getItemService();
