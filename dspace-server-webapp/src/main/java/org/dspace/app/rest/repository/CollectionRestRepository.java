@@ -41,14 +41,13 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.EntityType;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataField;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.ItemService;
-import org.dspace.content.service.MetadataFieldService;
-import org.dspace.content.service.MetadataValueService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
@@ -116,13 +115,10 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     private CollectionRoleService collectionRoleService;
 
     @Autowired
+    private EntityTypeService entityTypeService ;
+
+    @Autowired
     SearchService searchService;
-
-    @Autowired
-    MetadataFieldService metadataFieldService;
-
-    @Autowired
-    MetadataValueService metadataValueService;
 
     @Autowired
     CollectionService collectionService;
@@ -187,10 +183,10 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
                     CommunityRest.CATEGORY + "." + CommunityRest.NAME + " with id: " + communityUuid
                         + " not found");
             }
-            List<Collection> collections = cs.findCollectionsWithSubmit(q, context, com, null, null,
+            List<Collection> collections = cs.findCollectionsWithSubmit(q, context, com, null,
                                               Math.toIntExact(pageable.getOffset()),
                                               Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
-            int tot = cs.countCollectionsWithSubmit(q, context, com, null, null);
+            int tot = cs.countCollectionsWithSubmit(q, context, com, null);
             return converter.toRestPage(collections, pageable, tot , utils.obtainProjection());
         } catch (SQLException | SearchServiceException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -202,60 +198,60 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
                                                 Pageable pageable) throws SearchServiceException {
         try {
             Context context = obtainContext();
-            List<Collection> collections = cs.findCollectionsWithSubmit(q, context, null, null, null,
+            List<Collection> collections = cs.findCollectionsWithSubmit(q, context, null, null,
                                               Math.toIntExact(pageable.getOffset()),
                                               Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
-            int tot = cs.countCollectionsWithSubmit(q, context, null, null, null);
+            int tot = cs.countCollectionsWithSubmit(q, context, null, null);
             return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
-    @SearchRestMethod(name = "findSubmitAuthorizedAndMetadata")
-    public Page<CollectionRest> findSubmitAuthorizedAndMetadata(@Parameter(value = "query") String q,
-          @Parameter(value = "metadata", required = true) String metadata,
-          @Parameter(value = "metadatavalue") String metadataValue,
-           Pageable pageable)
+    @SearchRestMethod(name = "findSubmitAuthorizedByEntityType")
+    public Page<CollectionRest> findSubmitAuthorizedByEntityType(
+            @Parameter(value = "query") String query,
+            @Parameter(value = "entityType", required = true) String entityTypeLabel,
+            Pageable pageable)
            throws SearchServiceException {
         try {
             Context context = obtainContext();
-            MetadataField metadataField = this.metadataFieldService.findByString(context, metadata, '.');
-            if (metadataField == null) {
-                throw new ResourceNotFoundException("MetadataField " + metadata + " does not found");
+            EntityType entityType = this.entityTypeService.findByEntityType(context, entityTypeLabel);
+            if (entityType == null) {
+                throw new ResourceNotFoundException("There was no entityType found with label: " + entityTypeLabel);
             }
-            List<Collection> collections = cs.findCollectionsWithSubmit(q, context, null, metadata, metadataValue,
+            List<Collection> collections = cs.findCollectionsWithSubmit(query, context, null, entityTypeLabel,
                                               Math.toIntExact(pageable.getOffset()),
                                               Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
-            int tot = cs.countCollectionsWithSubmit(q, context, null, metadata, metadataValue);
+            int tot = cs.countCollectionsWithSubmit(query, context, null, entityTypeLabel);
             return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
-    @SearchRestMethod(name = "findSubmitAuthorizedByCommunityAndMetadata")
-    public Page<CollectionRest> findSubmitAuthorizedByCommunityAndMetadata(
-        @Parameter(value = "uuid", required = true) UUID communityUuid,
-        @Parameter(value = "metadata", required = true) String metadata,
-        @Parameter(value = "metadatavalue") String metadataValue,
-        @Parameter(value = "query") String q,
-        Pageable pageable) {
+    @SearchRestMethod(name = "findSubmitAuthorizedByCommunityAndEntityType")
+    public Page<CollectionRest> findSubmitAuthorizedByCommunityAndEntityType(
+            @Parameter(value = "query") String query,
+            @Parameter(value = "uuid", required = true) UUID communityUuid,
+            @Parameter(value = "entityType", required = true) String entityTypeLabel,
+            Pageable pageable) {
         try {
             Context context = obtainContext();
-            MetadataField metadataField = this.metadataFieldService.findByString(context, metadata, '.');
-            if (metadataField == null) {
-                throw new ResourceNotFoundException( "MetadataField " + metadata + " does not found");
+            EntityType entityType = this.entityTypeService.findByEntityType(context, entityTypeLabel);
+            if (entityType == null) {
+                throw new ResourceNotFoundException("There was no entityType found with label: " + entityTypeLabel);
             }
             Community com = communityService.find(context, communityUuid);
             if (com == null) {
                 throw new ResourceNotFoundException(
                     CommunityRest.CATEGORY + "." + CommunityRest.NAME + " with id: " + communityUuid + " not found");
             }
-            List<Collection> collections = cs.findCollectionsWithSubmit(q, context, com, metadata, metadataValue,
+            List<Collection> collections = cs.findCollectionsWithSubmit(query, context, com, entityTypeLabel,
                                               Math.toIntExact(pageable.getOffset()),
                                               Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
-            return converter.toRestPage(collections, pageable, utils.obtainProjection());
+            int tot = cs.countCollectionsWithSubmit(query, context, com, entityTypeLabel);
+            return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
         } catch (SQLException | SearchServiceException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

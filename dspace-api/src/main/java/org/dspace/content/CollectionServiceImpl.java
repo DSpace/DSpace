@@ -920,7 +920,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public List<Collection> findCollectionsWithSubmit(String q, Context context, Community community,
-        String metadata, String metadataValue, int offset, int limit) throws SQLException, SearchServiceException {
+        String entityType, int offset, int limit) throws SQLException, SearchServiceException {
 
         List<Collection> collections = new ArrayList<Collection>();
         DiscoverQuery discoverQuery = new DiscoverQuery();
@@ -928,7 +928,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         discoverQuery.setStart(offset);
         discoverQuery.setMaxResults(limit);
         DiscoverResult resp = retrieveCollectionsWithSubmit(context, discoverQuery,
-                                             metadata, metadataValue, community, q);
+                entityType, community, q);
         for (IndexableObject solrCollections : resp.getIndexableObjects()) {
             Collection c = ((IndexableCollection) solrCollections).getIndexedObject();
             collections.add(c);
@@ -937,15 +937,13 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
-    public int countCollectionsWithSubmit(String q, Context context, Community community, String metadata,
-            String metadataValue)
+    public int countCollectionsWithSubmit(String q, Context context, Community community, String entityType)
         throws SQLException, SearchServiceException {
 
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setMaxResults(0);
         discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
-        DiscoverResult resp = retrieveCollectionsWithSubmit(context, discoverQuery, metadata, metadataValue,
-                community, q);
+        DiscoverResult resp = retrieveCollectionsWithSubmit(context, discoverQuery, entityType, community, q);
         return (int)resp.getTotalSearchResults();
     }
 
@@ -956,6 +954,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
      * 
      * @param context                    DSpace context
      * @param discoverQuery
+     * @param entityType                 limit the returned collection to those related to given entity type
      * @param community                  parent community, could be null
      * @param q                          limit the returned collection to those with metadata values matching the query
      *                                   terms. The terms are used to make also a prefix query on SOLR
@@ -965,7 +964,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
      * @throws SearchServiceException    if search error
      */
     private DiscoverResult retrieveCollectionsWithSubmit(Context context, DiscoverQuery discoverQuery,
-        String metadata, String metadataValue, Community community, String q)
+        String entityType, Community community, String q)
         throws SQLException, SearchServiceException {
 
         StringBuilder query = new StringBuilder();
@@ -976,9 +975,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                 userId = currentUser.getID().toString();
             }
             query.append("submit:(e").append(userId);
-            if (StringUtils.isNotBlank(metadata)) {
-                query.append(" OR ").append(metadata);
-            }
+
             Set<Group> groups = groupService.allMemberGroupsSet(context, currentUser);
             for (Group group : groups) {
                 query.append(" OR g").append(group.getID());
@@ -990,16 +987,11 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         if (community != null) {
             buildFilter.append("location.comm:").append(community.getID().toString());
         }
-        if (StringUtils.isNotBlank(metadata)) {
-            if (buildFilter.length() > 0) {
+        if (StringUtils.isNotBlank(entityType)) {
+        	if (buildFilter.length() > 0) {
                 buildFilter.append(" AND ");
             }
-            buildFilter.append(metadata).append(":");
-            if (StringUtils.isNotBlank(metadataValue)) {
-                buildFilter.append("\"").append(metadataValue).append("\"");
-            } else {
-                buildFilter.append("*");
-            }
+            buildFilter.append("entityType_text:").append(entityType);
         }
         if (StringUtils.isNotBlank(q)) {
             StringBuilder buildQuery = new StringBuilder();

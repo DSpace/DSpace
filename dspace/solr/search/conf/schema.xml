@@ -295,8 +295,9 @@
     <field name="lastModified" type="date" indexed="true" stored="true" default="NOW" multiValued="false" omitNorms="true" />
     <field name="lastModified_dt" type="date" indexed="true" stored="true" default="NOW" multiValued="false" omitNorms="true" docValues="true"/>
 
-     <!-- Dynamic field used to store the relation metadata as a keywordFilter -->
-     <dynamicField name="relation.*" type="keywordFilter" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
+    <!-- Dynamic field used to store the relation metadata as a keywordFilter -->
+    <dynamicField name="relation.*" type="keywordFilter" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
+    <field name="entityType_text" type="string" indexed="true" stored="true" required="false" />
 
  	<!--Dynamic field used to store metadata for projection-->
     <dynamicField name="*_stored" type="dspaceMetadataProjection" indexed="false" stored="true" multiValued="true"/>
@@ -366,5 +367,6 @@
  <copyField source="lastModified" dest="lastModified_dt"/>
  <copyField source="title" dest="itemauthoritylookup"/>
  <copyField source="title" dest="itemauthoritylookupexactmatch"/>
+ <copyField source="relationship.type" dest="entityType_text"/>
 
 </schema>
