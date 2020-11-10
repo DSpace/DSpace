@@ -31,7 +31,7 @@ public class ItemSearcherMapper {
         return this.itemSearcherMap.keySet();
     }
 
-    public Item search(Context context, String searchType, String searchParam) throws Exception {
+    public Item search(Context context, String searchType, String searchParam) {
         ItemSearcher itemSearcher = this.itemSearcherMap.get(searchType);
         if (itemSearcher == null) {
             itemSearcher = this.defaultItemSearcher;

@@ -10,12 +10,14 @@ package org.dspace.authority.service.impl;
 import static org.dspace.content.Item.ANY;
 import static org.dspace.content.MetadataSchemaEnum.CRIS;
 
+import java.sql.SQLException;
 import java.util.Iterator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.authority.service.ItemSearchService;
 import org.dspace.authority.service.ItemSearcherMapper;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
@@ -29,8 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  */
 public class ItemSearchServiceImpl implements ItemSearchService {
-
-    private static final String UUID_PREFIX = "UUID";
 
     @Autowired
     private ItemSearcherMapper mapper;
@@ -47,17 +47,18 @@ public class ItemSearchServiceImpl implements ItemSearchService {
     public Item search(Context context, String searchParam, String relationshipType) {
         try {
             return performSearch(context, searchParam, relationshipType);
-        } catch (Exception ex) {
+        } catch (SQLException | AuthorizeException ex) {
             String msg = "An error occurs searching an item by " + searchParam;
             msg = StringUtils.isBlank(relationshipType) ? msg : " and relationship type " + relationshipType;
             throw new RuntimeException(msg, ex);
         }
     }
 
-    private Item performSearch(Context context, String searchParam, String relationshipType) throws Exception {
+    private Item performSearch(Context context, String searchParam, String relationshipType)
+        throws SQLException, AuthorizeException {
 
         if (UUIDUtils.fromString(searchParam) != null) {
-            Item item = mapper.search(context, UUID_PREFIX, searchParam);
+            Item item = itemService.findByIdOrLegacyId(context, searchParam);
             return item != null && hasRelationshipTypeEqualsTo(item, relationshipType) ? item : null;
         }
 
@@ -76,7 +77,7 @@ public class ItemSearchServiceImpl implements ItemSearchService {
     }
 
     private Item findByCrisSourceIdAndRelationshipType(Context context, String crisSourceId, String relationshipType)
-        throws Exception {
+        throws SQLException, AuthorizeException {
 
         Iterator<Item> items = itemService.findUnfilteredByMetadataField(context, CRIS.getName(),
             "sourceId", null, crisSourceId);
