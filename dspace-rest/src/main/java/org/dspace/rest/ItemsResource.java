@@ -928,7 +928,7 @@ public class ItemsResource extends Resource {
             context = createContext();
 
             Iterator<org.dspace.content.Item> itemIterator = itemService
-                .findByMetadataField(context, metadataEntry.getSchema(),
+                .findArchivedByMetadataField(context, metadataEntry.getSchema(),
                                      metadataEntry.getElement(), metadataEntry.getQualifier(),
                                      metadataEntry.getValue());
 

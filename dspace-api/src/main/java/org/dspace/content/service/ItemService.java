@@ -550,9 +550,8 @@ public interface ItemService
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      */
-    public Iterator<Item> findByMetadataField(Context context,
-                                              String schema, String element, String qualifier, String value)
-        throws SQLException, AuthorizeException;
+    public Iterator<Item> findArchivedByMetadataField(Context context, String schema, String element,
+        String qualifier, String value) throws SQLException, AuthorizeException;
 
     public Iterator<Item> findUnfilteredByMetadataField(Context context, String schema, String element,
         String qualifier, String value) throws SQLException, AuthorizeException;

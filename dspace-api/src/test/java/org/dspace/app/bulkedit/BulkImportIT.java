@@ -864,7 +864,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
     }
 
     private Item findItemByMetadata(String schema, String element, String qualifier, String value) throws Exception {
-        Iterator<Item> iterator = itemService.findByMetadataField(context, schema, element, qualifier, value);
+        Iterator<Item> iterator = itemService.findArchivedByMetadataField(context, schema, element, qualifier, value);
         return iterator.hasNext() ? iterator.next() : null;
     }
 
