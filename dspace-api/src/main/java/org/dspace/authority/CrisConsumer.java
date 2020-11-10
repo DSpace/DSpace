@@ -141,6 +141,11 @@ public class CrisConsumer implements Consumer {
                 continue;
             }
 
+            boolean skipEmptyAuthority = configurationService.getBooleanProperty("cris-consumer.skip-empty-authority");
+            if (skipEmptyAuthority && StringUtils.isBlank(authority)) {
+                continue;
+            }
+
             String fieldKey = getFieldKey(metadata);
 
             if (!choiceAuthorityService.isChoicesConfigured(fieldKey, null)) {
