@@ -912,7 +912,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
     }
     
     @Test
-    public void findAuthorizedCollectionsByEntityTypeUnexistentEnityTest() throws Exception {
+    public void findAuthorizedCollectionsByEntityTypeUnexistentEntityTest() throws Exception {
         getClient().perform(get("/api/core/collections/search/findSubmitAuthorizedByEntityType")
                                 .param("entityType", "test"))
                    .andExpect(status().isNotFound());
@@ -2052,7 +2052,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
     
     
     @Test
-    public void findSubmitAuthorizedByCommunityAndEntityTypeUnexistentEnityTest() throws Exception {
+    public void findSubmitAuthorizedByCommunityAndEntityTypeUnexistentEntityTest() throws Exception {
         getClient().perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunityAndEntityType")
                                 .param("entityType", "test")
                                 .param("uuid", UUID.randomUUID().toString()))
