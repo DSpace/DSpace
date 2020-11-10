@@ -25,7 +25,6 @@ public interface ItemSearcher {
      * @param context the DSpace context
      * @param searchParam the search param
      * @return the found item
-     * @throws Exception if some error occurs during the search
      */
-    public Item searchBy(Context context, String searchParam) throws Exception;
+    public Item searchBy(Context context, String searchParam);
 }

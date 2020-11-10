@@ -36,12 +36,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.dspace.authority.service.AuthorityValueService;
+import org.dspace.authority.service.ItemSearchService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.batch.ImpRecord;
-import org.dspace.batch.ImpRecordToItem;
 import org.dspace.batch.service.ImpRecordService;
-import org.dspace.batch.service.ImpRecordToItemService;
 import org.dspace.batch.service.ImpServiceFactory;
+import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataFieldService;
@@ -53,6 +54,7 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.utils.DSpace;
 
 public class ItemImportMainOA {
 
@@ -63,6 +65,8 @@ public class ItemImportMainOA {
     private static final String BATCH_USER = "batchjob@%";
 
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    private ItemSearchService itemSearchService = new DSpace().getSingletonService(ItemSearchService.class);
 
     public static void main(String[] argv) {
         Context context = null;
@@ -369,16 +373,18 @@ public class ItemImportMainOA {
                 if (ep == null) {
                     recordEvent(commandOptions, sb, "Error, eperson not found: " + epersonId, true);
                 } else {
-                    ImpRecordToItem record_item = getImpRecordToItemService().findByPK(subcontext, record_id);
-                    if (record_item != null && StringUtils.equals(sourceref, record_item.getImpSourceref())) {
-                        itemId = record_item.getImpItemId();
+
+                    String searchParam = sourceref + AuthorityValueService.SPLIT + record_id;
+                    Item item = itemSearchService.search(subcontext, searchParam);
+                    if (item != null) {
+                        itemId = item.getID();
                     }
 
                     if (operation.equals("delete")) {
                         op = "d";
                         argvTemp.add("-o " + itemId);
                     } else {
-                        if (operation.equals("update") && record_item != null) {
+                        if (operation.equals("update") && item != null) {
                             op = "r";
                             argvTemp.add("-o " + itemId);
                         } else {
@@ -657,9 +663,5 @@ public class ItemImportMainOA {
 
     private ImpRecordService getImpRecordService() {
         return ImpServiceFactory.getInstance().getImpRecordService();
-    }
-
-    private ImpRecordToItemService getImpRecordToItemService() {
-        return ImpServiceFactory.getInstance().getImpRecordToItemService();
     }
 }

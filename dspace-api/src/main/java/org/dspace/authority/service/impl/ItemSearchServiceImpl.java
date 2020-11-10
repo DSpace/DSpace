@@ -13,6 +13,7 @@ import static org.dspace.content.MetadataSchemaEnum.CRIS;
 import java.util.Iterator;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.authority.service.ItemSearchService;
 import org.dspace.authority.service.ItemSearcherMapper;
 import org.dspace.content.Item;
@@ -38,24 +39,34 @@ public class ItemSearchServiceImpl implements ItemSearchService {
     private ItemService itemService;
 
     @Override
-    public Item search(Context context, String searchParam) throws Exception {
+    public Item search(Context context, String searchParam) {
         return search(context, searchParam, null);
     }
 
     @Override
-    public Item search(Context context, String searchParam, String relationshipType) throws Exception {
+    public Item search(Context context, String searchParam, String relationshipType) {
+        try {
+            return performSearch(context, searchParam, relationshipType);
+        } catch (Exception ex) {
+            String msg = "An error occurs searching an item by " + searchParam;
+            msg = StringUtils.isBlank(relationshipType) ? msg : " and relationship type " + relationshipType;
+            throw new RuntimeException(msg, ex);
+        }
+    }
+
+    private Item performSearch(Context context, String searchParam, String relationshipType) throws Exception {
 
         if (UUIDUtils.fromString(searchParam) != null) {
             Item item = mapper.search(context, UUID_PREFIX, searchParam);
             return item != null && hasRelationshipTypeEqualsTo(item, relationshipType) ? item : null;
         }
 
-        Item item = findByCrisSourceId(context, searchParam, relationshipType);
+        Item item = findByCrisSourceIdAndRelationshipType(context, searchParam, relationshipType);
         if (item != null) {
             return item;
         }
 
-        String[] searchParamSections = searchParam.split("::");
+        String[] searchParamSections = searchParam.split(AuthorityValueService.SPLIT);
         if (searchParamSections.length == 2) {
             item = mapper.search(context, searchParamSections[0], searchParamSections[1]);
             return item != null && hasRelationshipTypeEqualsTo(item, relationshipType) ? item : null;
@@ -64,16 +75,15 @@ public class ItemSearchServiceImpl implements ItemSearchService {
         return null;
     }
 
-    private Item findByCrisSourceId(Context context, String crisSourceId, String relationshipType) throws Exception {
+    private Item findByCrisSourceIdAndRelationshipType(Context context, String crisSourceId, String relationshipType)
+        throws Exception {
 
-        Iterator<Item> items = itemService.findByMetadataField(context, CRIS.getName(), "sourceId", null, crisSourceId);
-        if (StringUtils.isBlank(relationshipType)) {
-            return items.hasNext() ? items.next() : null;
-        }
+        Iterator<Item> items = itemService.findUnfilteredByMetadataField(context, CRIS.getName(),
+            "sourceId", null, crisSourceId);
 
         while (items.hasNext()) {
             Item item = items.next();
-            if (relationshipType.equals(itemService.getMetadataFirstValue(item, "relationship", "type", null, ANY))) {
+            if (hasRelationshipTypeEqualsTo(item, relationshipType)) {
                 return item;
             }
         }

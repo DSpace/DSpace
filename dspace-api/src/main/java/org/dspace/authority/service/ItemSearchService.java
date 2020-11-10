@@ -24,9 +24,8 @@ public interface ItemSearchService {
      * @param context the DSpace context
      * @param searchParam the searchParam
      * @return the found item
-     * @throws Exception if an error occurs
      */
-    public Item search(Context context, String searchParam) throws Exception;
+    public Item search(Context context, String searchParam);
 
     /**
      * Search an item with the given searchParam and relationship type.
@@ -35,8 +34,7 @@ public interface ItemSearchService {
      * @param searchParam the searchParam
      * @param relationshipType the item relationshipType
      * @return the found item
-     * @throws Exception if an error occurs
      */
-    public Item search(Context context, String searchParam, String relationshipType) throws Exception;
+    public Item search(Context context, String searchParam, String relationshipType);
 
 }

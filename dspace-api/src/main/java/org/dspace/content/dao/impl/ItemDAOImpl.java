@@ -156,6 +156,23 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         return iterate(query);
     }
 
+    @Override
+    public Iterator<Item> findByMetadataField(Context context, MetadataField metadataField, String value)
+        throws SQLException {
+        String hqlQueryString = "SELECT item FROM Item as item join item.metadata metadatavalue " +
+            "WHERE metadatavalue.metadataField = :metadata_field";
+        if (value != null) {
+            hqlQueryString += " AND STR(metadatavalue.value) = :text_value";
+        }
+        Query query = createQuery(context, hqlQueryString);
+
+        query.setParameter("metadata_field", metadataField);
+        if (value != null) {
+            query.setParameter("text_value", value);
+        }
+        return iterate(query);
+    }
+
     enum OP {
         equals {
             public Criterion buildPredicate(String val, String regexClause) {

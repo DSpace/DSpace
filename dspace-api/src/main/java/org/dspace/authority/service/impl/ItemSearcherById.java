@@ -31,9 +31,13 @@ public class ItemSearcherById implements ItemSearcher {
     }
 
     @Override
-    public Item searchBy(Context context, String searchParam) throws SQLException {
+    public Item searchBy(Context context, String searchParam) {
         UUID uuid = UUIDUtils.fromString(searchParam);
-        return itemService.find(context, uuid);
+        try {
+            return itemService.find(context, uuid);
+        } catch (SQLException e) {
+            throw new RuntimeException("An SQL error occurs searching the item by uuid", e);
+        }
     }
 
     public void setItemService(ItemService itemService) {

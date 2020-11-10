@@ -38,8 +38,16 @@ public class ItemSearcherByMetadata implements ItemSearcher {
     }
 
     @Override
+    public Item searchBy(Context context, String searchParam) {
+        try {
+            return performSearchByMetadata(context, searchParam);
+        } catch (SearchServiceException e) {
+            throw new RuntimeException("An error occurs searching the item by metadata", e);
+        }
+    }
+
     @SuppressWarnings("rawtypes")
-    public Item searchBy(Context context, String searchParam) throws Exception {
+    private Item performSearchByMetadata(Context context, String searchParam) throws SearchServiceException {
         String query = metadata + ":" + searchParam;
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setDSpaceObjectFilter(IndexableItem.TYPE);
