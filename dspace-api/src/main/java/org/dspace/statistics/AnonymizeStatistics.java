@@ -206,7 +206,7 @@ public class AnonymizeStatistics {
                 // Commit the solr core
                 solrLoggerService.commit();
 
-                System.out.println("processed " + updated + " records");
+                printInfo("processed " + updated + " records");
             } while (documents.getResults().getNumFound() > 0);
 
             printInfo(updated + " documents updated");
