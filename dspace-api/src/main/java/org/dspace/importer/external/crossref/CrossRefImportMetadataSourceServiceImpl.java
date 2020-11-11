@@ -8,17 +8,16 @@
 package org.dspace.importer.external.crossref;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.el.MethodNotFoundException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
@@ -44,6 +43,14 @@ import org.dspace.importer.external.service.components.QuerySource;
 public class CrossRefImportMetadataSourceServiceImpl
     extends AbstractImportMetadataSourceService<String> implements QuerySource {
 
+    private static final List<String> DOI_PATTERNS =
+        Arrays
+            .asList(
+                "/^10.\\d{4,9}/[-._;()/:A-Z0-9]+$/i",
+                "/^10.1002/[^\\s]+$/i",
+                "/^10.\\d{4}/\\d+-\\d+X?(\\d+)\\d+<[\\d\\w]+:[\\d\\w]*>\\d+.\\d+.\\w+;\\d$/i",
+                "/^10.1021/\\w\\w\\d++$/i",
+                "/^10.1207/[\\w\\d]+\\&\\d+_\\d+$/i");
     private WebTarget webTarget;
 
 
@@ -178,18 +185,20 @@ public class CrossRefImportMetadataSourceServiceImpl
     }
 
     private boolean existingDoi(final String value) {
-        final Builder request = webTarget.request();
-        final Response head = request.head();
+        final Response head = webTarget.path(value).request().head();
         return head.getStatus() == 200;
     }
 
     private boolean isDoi(final String value) {
-        final String patternString = "/^10.\\d{4,9}/[-._;()/:A-Z0-9]+$/i";
+        return DOI_PATTERNS
+                     .stream()
+                     .anyMatch(s -> matches(value, s));
+    }
+
+    private boolean matches(final String value, final String patternString) {
         Pattern pattern = Pattern.compile(patternString);
 
-        Matcher matcher = pattern.matcher(value);
-        boolean matches = matcher.matches();
-        return matches;
+        return pattern.matcher(value).matches();
     }
 
     private class SearchByIdCallable implements Callable<List<ImportRecord>> {
