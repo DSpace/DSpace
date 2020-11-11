@@ -12,21 +12,12 @@
     file: ../customizations/institusjoner.yml
     name: kundedata
 
-- name: Sjekk at kunde som skal igangsettes er angitt
-  fail:
-    msg: "Vet ikke hvilken kunde du vil igangsette! Angi kunde som extra var, f.eks: -e kunde=ntnu"
-  when: kunde is not defined
-
-- name: Sjekk at angitt kunde er gyldig
-  fail:
-    msg: "Ukjent kunde: {{ kunde }}"
-  when: kundedata[kunde] is not defined
-
 - name: Sjekk at Jenkins workspace er angitt
   fail:
     msg: "Hvor er Jenkins workspace? Angi som extra var, f.eks: -e jenkins_workspace=/development/build/workspace"
   when: jenkins_workspace is not defined
 
-- name: Definer *.brage.unit.no virtualhost
+- name: Hent AJP secret
   set_fact:
-    bragevirtualhost: "{{ (fase == 'produksjon') | ternary(kunde ~ '.brage.unit.no', 'brage-' ~ fase ~ '.bibsys.no') }}"
+    ajpsecret: "{{ lookup('hashi_vault', 'secret=secret/service/brage/produksjon:ajpsecret auth_method=approle role_id=brage-client-produksjon secret_id=' ~ vault_secret ~ ' url=https://vault.bibsys.no:8200')}}"
+  when: fase == "produksjon"

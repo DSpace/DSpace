@@ -1,5 +1,5 @@
 dspace.dir = /brage/{{ kunde }}/app
-dspace.hostname = {{ kundedata[kunde]["virtualhost"] | default(bragevirtualhost) }}
+dspace.hostname = {{ kundedata[kunde]["virtualhost"] | default((fase == 'produksjon') | ternary(kunde ~ '.brage.unit.no', 'brage-' ~ fase ~ '.bibsys.no')) }}
 dspace.baseUrl = {{ (fase == "produksjon") | ternary("https:","http:") }}//${dspace.hostname}{{ (fase == "produksjon") | ternary("",":8080") }}
 dspace.ui = {{ kunde }}-xmlui
 dspace.url = ${dspace.baseUrl}/${dspace.ui}
