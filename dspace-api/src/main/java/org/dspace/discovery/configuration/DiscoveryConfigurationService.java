@@ -31,6 +31,16 @@ public class DiscoveryConfigurationService {
 
     public void setMap(Map<String, DiscoveryConfiguration> map) {
         this.map = map;
+        if (map != null) {
+            // improve the configuration assigning the map key as id to any configuration
+            // that doesn't have one
+            for (Map.Entry<String, DiscoveryConfiguration> entry : map.entrySet()) {
+                DiscoveryConfiguration conf = entry.getValue();
+                if (StringUtils.isBlank(conf.getId())) {
+                    conf.setId(entry.getKey());
+                }
+            }
+        }
     }
 
     public Map<Integer, List<String>> getToIgnoreMetadataFields() {

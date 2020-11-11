@@ -147,13 +147,19 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
         DiscoveryConfiguration discoveryConfiguration = searchConfigurationService
             .getDiscoveryConfigurationByNameOrDso(configuration, scopeObject);
 
+        boolean isRelatedItem = discoveryConfiguration != null &&
+                discoveryConfiguration instanceof DiscoveryRelatedItemConfiguration;
+
         DiscoverResult searchResult = null;
         DiscoverQuery discoverQuery = null;
         try {
             discoverQuery = queryBuilder.buildFacetQuery(context, scopeObject, discoveryConfiguration, prefix, query,
                     searchFilters, dsoTypes, page, facetName);
-            searchResult = searchService.search(context, scopeObject, discoverQuery);
-
+            if (isRelatedItem) {
+                searchResult = searchService.search(context, discoverQuery);
+            } else {
+                searchResult = searchService.search(context, scopeObject, discoverQuery);
+            }
         } catch (SearchServiceException e) {
             log.error("Error while searching with Discovery", e);
             //TODO TOM handle search exception
@@ -174,12 +180,21 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
         DiscoveryConfiguration discoveryConfiguration = searchConfigurationService
             .getDiscoveryConfigurationByNameOrDso(configuration, scopeObject);
 
+        boolean isRelatedItem = discoveryConfiguration != null &&
+                discoveryConfiguration instanceof DiscoveryRelatedItemConfiguration;
+
         DiscoverResult searchResult = null;
         DiscoverQuery discoverQuery = null;
 
         try {
             discoverQuery = queryBuilder
                 .buildQuery(context, scopeObject, discoveryConfiguration, query, searchFilters, dsoTypes, page);
+
+            if (isRelatedItem) {
+                searchResult = searchService.search(context, discoverQuery);
+            } else {
+                searchResult = searchService.search(context, scopeObject, discoverQuery);
+            }
             searchResult = searchService.search(context, scopeObject, discoverQuery);
 
         } catch (SearchServiceException e) {
