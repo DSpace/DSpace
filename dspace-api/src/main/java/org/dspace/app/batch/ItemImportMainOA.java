@@ -64,6 +64,8 @@ public class ItemImportMainOA {
     /** Email buffer **/
     private static final String BATCH_USER = "batchjob@%";
 
+    private static final String CRIS_SOURCE_ID = "cris.sourceId";
+
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     private ItemSearchService itemSearchService = new DSpace().getSingletonService(ItemSearchService.class);
@@ -121,15 +123,15 @@ public class ItemImportMainOA {
             options.addOption("b", "delete_bitstream", false,
                     "Delete bitstream related to the item in the update phase");
             options.addOption("h", "help", false, "help");
-            options.addOption("m", "metadata", true,
-                    "List of metadata to remove first and after do an update [by default all metadata are delete,"
+            options.addOption("m", "metadata", true, "List of metadata to remove first and after do an update "
+                            + "[by default all metadata are delete except cris.sourceId,"
                             + " specifying only the dc.title it will obtain an append on the other metadata];"
                             + " use this option many times on the single metadata"
                             + " e.g. -m dc.title -m dc.contributor.*");
             options.addOption("s", "switch", false,
                     "Invert the logic for the -m option, using the option -s only the metadata list"
                             + " with the option -m are saved (ad es. -m dc.description.provenance)"
-                            + " the other will be delete");
+                            + " the other will be delete except cris.sourceId");
             options.addOption("S", "silent", false, "muted logs");
             options.addOption("t", "threads", true, "Threads numbers (default 0, if omitted read by configuration)");
 //            options.addOption("q", "query", true, "Find by query (work only in singlethread mode)");
@@ -172,6 +174,10 @@ public class ItemImportMainOA {
                     metadataClean = optionValues;
                 } else {
                     List<String> mOptions = Arrays.asList(optionValues);
+                    if (!mOptions.contains(CRIS_SOURCE_ID)) {
+                        mOptions = new ArrayList<String>(mOptions);
+                        mOptions.add(CRIS_SOURCE_ID);
+                    }
                     List<MetadataField> mdfs = getMetadataFieldService().findAll(context);
                     metadataClean = new String[mdfs.size() - optionValues.length];
                     int idx = 0;

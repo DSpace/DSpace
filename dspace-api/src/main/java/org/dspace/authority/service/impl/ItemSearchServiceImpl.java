@@ -12,6 +12,11 @@ import static org.dspace.content.MetadataSchemaEnum.CRIS;
 
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.Optional;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.UUID;
+import java.util.stream.StreamSupport;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.authority.service.AuthorityValueService;
@@ -57,40 +62,46 @@ public class ItemSearchServiceImpl implements ItemSearchService {
     private Item performSearch(Context context, String searchParam, String relationshipType)
         throws SQLException, AuthorizeException {
 
-        if (UUIDUtils.fromString(searchParam) != null) {
-            Item item = itemService.findByIdOrLegacyId(context, searchParam);
-            return item != null && hasRelationshipTypeEqualsTo(item, relationshipType) ? item : null;
-        }
-
-        Item item = findByCrisSourceIdAndRelationshipType(context, searchParam, relationshipType);
-        if (item != null) {
-            return item;
-        }
-
-        String[] searchParamSections = searchParam.split(AuthorityValueService.SPLIT);
-        if (searchParamSections.length == 2) {
-            item = mapper.search(context, searchParamSections[0], searchParamSections[1]);
-            return item != null && hasRelationshipTypeEqualsTo(item, relationshipType) ? item : null;
-        }
-
-        return null;
+        return findByUuid(context, searchParam, relationshipType)
+            .or(() -> findByCrisSourceIdAndRelationshipType(context, searchParam, relationshipType))
+            .or(() -> findByItemSearcher(context, searchParam, relationshipType))
+            .orElse(null);
     }
 
-    private Item findByCrisSourceIdAndRelationshipType(Context context, String crisSourceId, String relationshipType)
-        throws SQLException, AuthorizeException {
-
-        Iterator<Item> items = itemService.findUnfilteredByMetadataField(context, CRIS.getName(),
-            "sourceId", null, crisSourceId);
-
-        while (items.hasNext()) {
-            Item item = items.next();
-            if (hasRelationshipTypeEqualsTo(item, relationshipType)) {
-                return item;
-            }
+    private Optional<Item> findByUuid(Context context, String searchParam, String relationshipType)
+        throws SQLException {
+        UUID uuid = UUIDUtils.fromString(searchParam);
+        if (uuid == null) {
+            return Optional.empty();
         }
+        Item item = itemService.find(context, uuid);
+        return Optional.ofNullable(item)
+            .filter(i -> hasRelationshipTypeEqualsTo(i, relationshipType));
+    }
 
-        return null;
+    private Optional<Item> findByCrisSourceIdAndRelationshipType(Context context, String crisSourceId,
+        String relationshipType) {
+        Iterator<Item> items = findByCrisSourceId(context, crisSourceId);
+        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(items, Spliterator.ORDERED), false)
+            .filter(item -> hasRelationshipTypeEqualsTo(item, relationshipType))
+            .findFirst();
+    }
 
+    private Optional<Item> findByItemSearcher(Context context, String searchParam, String relationshipType) {
+        String[] searchParamSections = searchParam.split(AuthorityValueService.SPLIT);
+        if (searchParamSections.length != 2) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(mapper.search(context, searchParamSections[0], searchParamSections[1]))
+            .filter(item -> hasRelationshipTypeEqualsTo(item, relationshipType));
+    }
+
+    private Iterator<Item> findByCrisSourceId(Context context, String crisSourceId) {
+        try {
+            return itemService.findUnfilteredByMetadataField(context, CRIS.getName(), "sourceId", null, crisSourceId);
+        } catch (SQLException | AuthorizeException e) {
+            throw new RuntimeException("An error occurs searching items by crisSourceId " + crisSourceId, e);
+        }
     }
 
     private boolean hasRelationshipTypeEqualsTo(Item item, String relationshipType) {

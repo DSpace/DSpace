@@ -319,7 +319,7 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
                     "contributor", "author", null, "Francesco Cadili");
 
             // Create a new item
-            String argv[] = new String[] { "-E", admin.getEmail(), "-m", "dc.title", "-m", "cris.sourceId", "-s" };
+            String argv[] = new String[] { "-E", admin.getEmail(), "-m", "dc.title", "-s" };
 
             ItemImportMainOA.main(argv);
 
@@ -940,7 +940,7 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
             assertEquals("Is the workflow item the right one?", item, xwil.get(0).getItem());
 
             List<MetadataValue> metadata = item.getMetadata();
-            assertEquals("Two metadata found", 3, metadata.size());
+            assertEquals("Four metadata found", 4, metadata.size());
             for (MetadataValue m : metadata) {
                 if ("contributor".equals(m.getElement())) {
                     assertEquals("The dc.contibutor.autor is the right one!", m.getValue(), "Francesco Cadili");
@@ -951,6 +951,8 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
                             m.getValue().indexOf("Submitted by first (admin) last (admin) (admin@email.com) on ") == 0);
                     assertTrue("The dc.description.provenance value is the right one!",
                             m.getValue().indexOf("workflow start=Step: reviewstep - action:claimaction") > 0);
+                } else if ("sourceId".equals(m.getElement())) {
+                    assertNotNull("The source id is the right one! ", "TEST::1");
                 } else {
                     assertTrue("Metadata is not valid.", m == null);
                 }
@@ -1002,7 +1004,7 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
             assertEquals("Is item archived ?", true, item.isArchived());
 
             List<MetadataValue> metadata = item.getMetadata();
-            assertEquals("Three metadata found", 3, metadata.size());
+            assertEquals("Four metadata found", 4, metadata.size());
             for (MetadataValue m : metadata) {
                 if ("contributor".equals(m.getElement())) {
                     assertEquals("The dc.contibutor.autor is the right one!", m.getValue(), "Francesco Cadili");
@@ -1012,6 +1014,8 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
                     assertTrue("The dc.description.provenance value is the right one!",
                             m.getValue()
                             .indexOf("Item reinstated by first (admin) last (admin) (admin@email.com) on ") == 0);
+                } else if ("sourceId".equals(m.getElement())) {
+                    assertNotNull("The source id is the right one! ", "TEST::1");
                 } else {
                     assertTrue("Metadata is not valid.", m == null);
                 }
