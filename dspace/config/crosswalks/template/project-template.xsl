@@ -2,7 +2,6 @@
 <xsl:stylesheet version="1.1"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	xmlns:fo="http://www.w3.org/1999/XSL/Format"
-	xmlns:pt="https://www.openaire.eu/cerif-profile/vocab/COAR_Publication_Types"
 	exclude-result-prefixes="fo">
 	
 	<xsl:param name="imageDir" />

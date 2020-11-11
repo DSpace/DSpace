@@ -10,9 +10,9 @@ package org.dspace.content.integration.crosswalks;
 import static org.dspace.builder.CollectionBuilder.createCollection;
 import static org.dspace.builder.CommunityBuilder.createCommunity;
 import static org.dspace.builder.ItemBuilder.createItem;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -85,7 +85,7 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
 
         try (FileInputStream fis = getFileInputStream("publication-ieee.html")) {
             String expectedHtml = IOUtils.toString(fis, Charset.defaultCharset());
-            compareEachLine(out.toString(), expectedHtml);
+            compareEachLine(out.toString(), expectedHtml, false);
         }
     }
 
@@ -117,21 +117,32 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
 
         try (FileInputStream fis = getFileInputStream("publications-ieee.html")) {
             String expectedHtml = IOUtils.toString(fis, Charset.defaultCharset());
-            compareEachLine(out.toString(), expectedHtml);
+            compareEachLine(out.toString(), expectedHtml, false);
         }
     }
 
     @Test
-    public void testBibtextDisseminate() throws Exception {
+    public void testBibtexDisseminate() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
         Item item = createItem(context, collection)
             .withRelationshipType("Publication")
+            .withType("Controlled Vocabulary for Resource Type Genres::text::periodical::journal")
+            .withLanguage("en")
+            .withDoiIdentifier("10.1000/182")
+            .withIsbnIdentifier("11-22-33")
+            .withIssnIdentifier("0002")
+            .withSubject("publication")
+            .withPublisher("Publisher")
+            .withVolume("V01")
+            .withIssue("03")
+            .withRelationConference("Conference")
             .withTitle("Publication title")
             .withIssueDate("2018-05-17")
-            .withAuthor("John Smith")
-            .withAuthor("Edward Red")
+            .withAuthor("Smith, John")
+            .withAuthor("Red, Edward")
+            .withEditor("Editor")
             .withHandle("123456789/0001")
             .build();
 
@@ -145,11 +156,98 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
 
         try (FileInputStream fis = getFileInputStream("publication.bib")) {
             String expectedBibtex = IOUtils.toString(fis, Charset.defaultCharset());
-            compareEachLine(out.toString(), expectedBibtex);
+            compareEachLine(out.toString(), expectedBibtex, false);
         }
     }
 
-    private void compareEachLine(String result, String expectedResult) {
+    @Test
+    public void testSingleItemJsonDisseminate() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Item item = createItem(context, collection)
+            .withRelationshipType("Publication")
+            .withType("Controlled Vocabulary for Resource Type Genres::text::periodical::journal")
+            .withLanguage("en")
+            .withDoiIdentifier("10.1000/182")
+            .withIsbnIdentifier("11-22-33")
+            .withIssnIdentifier("0002")
+            .withSubject("publication")
+            .withPublisher("Publisher")
+            .withVolume("V01")
+            .withIssue("03")
+            .withRelationConference("Conference")
+            .withTitle("Publication title")
+            .withIssueDate("2018-05-17")
+            .withAuthor("Smith, John")
+            .withAuthor("Red, Edward")
+            .withEditor("Editor")
+            .withHandle("123456789/0001")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        StreamDisseminationCrosswalk crosswalk = crosswalkMapper.getByType("publication-json");
+        assertThat(crosswalk, notNullValue());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        crosswalk.disseminate(context, item, out);
+
+        try (FileInputStream fis = getFileInputStream("publication.json")) {
+            String expectedJson = IOUtils.toString(fis, Charset.defaultCharset());
+            compareEachLine(out.toString(), expectedJson, true);
+        }
+    }
+
+    @Test
+    public void testMutlipleItemsJsonDisseminate() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Item item = createItem(context, collection)
+            .withRelationshipType("Publication")
+            .withType("Controlled Vocabulary for Resource Type Genres::text::periodical::journal")
+            .withLanguage("en")
+            .withDoiIdentifier("10.1000/182")
+            .withIsbnIdentifier("11-22-33")
+            .withIssnIdentifier("0002")
+            .withSubject("publication")
+            .withPublisher("Publisher")
+            .withVolume("V01")
+            .withIssue("03")
+            .withRelationConference("Conference")
+            .withTitle("Publication title")
+            .withIssueDate("2018-05-17")
+            .withAuthor("Smith, John")
+            .withAuthor("Red, Edward")
+            .withEditor("Editor")
+            .withHandle("123456789/0001")
+            .build();
+
+        Item anotherItem = createItem(context, collection)
+            .withRelationshipType("Publication")
+            .withType("Controlled Vocabulary for Resource Type Genres::text::book")
+            .withLanguage("en")
+            .withDoiIdentifier("10.1000/183")
+            .withTitle("Another Publication title")
+            .withIssueDate("2020-01-01")
+            .withAuthor("White, Walter")
+            .withHandle("123456789/0002")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        StreamDisseminationCrosswalk crosswalk = crosswalkMapper.getByType("publication-json");
+        assertThat(crosswalk, notNullValue());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        crosswalk.disseminate(context, Arrays.asList(item, anotherItem).iterator(), out);
+
+        try (FileInputStream fis = getFileInputStream("publications.json")) {
+            String expectedJson = IOUtils.toString(fis, Charset.defaultCharset());
+            compareEachLine(out.toString(), expectedJson, true);
+        }
+    }
+
+    private void compareEachLine(String result, String expectedResult, boolean skipId) {
 
         String[] resultLines = result.split("\n");
         String[] expectedResultLines = expectedResult.split("\n");
@@ -158,7 +256,11 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
             resultLines.length, equalTo(expectedResultLines.length));
 
         for (int i = 0; i < resultLines.length; i++) {
-            assertThat(resultLines[i], equalTo(expectedResultLines[i]));
+            String expectedResultLine = expectedResultLines[i];
+            if (skipId && expectedResultLine.contains("id")) {
+                continue;
+            }
+            assertThat(resultLines[i], equalTo(expectedResultLine));
         }
     }
 

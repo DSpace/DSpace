@@ -26,6 +26,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.content.template.TemplateItemValueService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -61,6 +62,8 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     private MetadataFieldService metadataFieldService;
     @Autowired
     private MetadataValueService metadataValueService;
+    @Autowired
+    private TemplateItemValueService templateItemValueService;
 
     protected WorkspaceItemServiceImpl() {
 
@@ -134,9 +137,13 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
             for (MetadataValue aMd : md) {
                 MetadataField metadataField = aMd.getMetadataField();
                 MetadataSchema metadataSchema = metadataField.getMetadataSchema();
+
+                final String valueFromTemplate = templateItemValueService.value(context, item,
+                                                                                       templateItem, aMd);
+
                 itemService.addMetadata(context, item, metadataSchema.getName(), metadataField.getElement(),
                                         metadataField.getQualifier(), aMd.getLanguage(),
-                                        aMd.getValue());
+                                        valueFromTemplate);
             }
         }
 

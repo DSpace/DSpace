@@ -9,13 +9,14 @@
 	<bean class="org.dspace.content.integration.crosswalks.StreamDisseminationCrosswalkMapper">
 		<constructor-arg>
 			<map>
-				<entry key="bibtex" value-ref="referCrosswalkBibtex"></entry>
+				<entry key="bibtex" value-ref="cslItemDataCrosswalkBibtex"></entry>
 				<entry key="endnote" value-ref="referCrosswalkEndnote"></entry>
 				<entry key="publication-xml" value-ref="referCrosswalkPublicationXml"></entry>
+				<entry key="publication-json" value-ref="cslItemDataCrosswalkJson"></entry>
 				<entry key="publication-pdf" value-ref="pdfCrosswalkPublication"></entry>
 				<entry key="publication-csv" value-ref="csvCrosswalkPublication"></entry>
 				<entry key="publication-xls" value-ref="xlsCrosswalkPublication"></entry>
-				
+
 				<entry key="person-xml" value-ref="referCrosswalkPersonXml"></entry>
 				<entry key="person-xml-cerif" value-ref="referCrosswalkPersonXmlCerif"></entry>
 				<entry key="person-json" value-ref="referCrosswalkPersonJson"></entry>
@@ -23,7 +24,7 @@
 				<entry key="person-rtf" value-ref="rtfCrosswalkPerson"></entry>
 				<entry key="person-csv" value-ref="csvCrosswalkPerson"></entry>
 				<entry key="person-xls" value-ref="xlsCrosswalkPerson"></entry>
-				
+
 				<entry key="project-xml" value-ref="referCrosswalkProjectXml"></entry>
 				<entry key="project-json" value-ref="referCrosswalkProjectJson"></entry>
 				<entry key="project-pdf" value-ref="pdfCrosswalkProject"></entry>
@@ -41,11 +42,17 @@
 				<entry key="equipment-pdf" value-ref="pdfCrosswalkEquipment"></entry>
 				<entry key="equipment-csv" value-ref="csvCrosswalkEquipment"></entry>
 				<entry key="equipment-xls" value-ref="xlsCrosswalkEquipment"></entry>
+
+				<entry key="funding-xml" value-ref="referCrosswalkFundingXml"></entry>
+				<entry key="funding-json" value-ref="referCrosswalkFundingJson"></entry>
+				<entry key="funding-pdf" value-ref="pdfCrosswalkFunding"></entry>
+				<entry key="funding-csv" value-ref="csvCrosswalkFunding"></entry>
+				<entry key="funding-xls" value-ref="xlsCrosswalkFunding"></entry>
 			</map>
 		</constructor-arg>
 	</bean>
 	
-	<bean class="org.dspace.content.integration.crosswalks.CSLItemDataCrosswalk" id="referCrosswalkBibtex">
+	<bean class="org.dspace.content.integration.crosswalks.CSLItemDataCrosswalk" id="cslItemDataCrosswalkBibtex">
 		<property name="style" value="bibtex.csl"/>
 		<property name="mimeType" value="application/x-bibtex; charset=UTF-8"/>
 		<property name="format" value="text"/>
@@ -53,6 +60,12 @@
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE}"/>
 	</bean>
 	
+	<bean class="org.dspace.content.integration.crosswalks.CSLItemDataCrosswalk" id="cslItemDataCrosswalkJson">
+		<property name="mimeType" value="application/json; charset=UTF-8"/>
+		<property name="fileName" value="publications.json"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+	</bean>
+
 	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkPersonXml">
 		<property name="templateFileName" value="crosswalks/template/person-xml.template"/>
 		<property name="mimeType" value="application/xml; charset=UTF-8"/>
@@ -62,7 +75,7 @@
 		<property name="multipleItemsTemplateFileName" value="crosswalks/template/persons-xml.template"/>
 		<property name="converter" ref="xmlValueConverter" />
 	</bean>
-	
+
 	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkPersonXmlCerif">
 		<property name="templateFileName" value="crosswalks/template/person-xml-cerif.template"/>
 		<property name="mimeType" value="application/xml; charset=UTF-8"/>
@@ -72,7 +85,7 @@
 		<property name="multipleItemsTemplateFileName" value="crosswalks/template/persons-xml-cerif.template"/>
 		<property name="converter" ref="xmlValueConverter" />
 	</bean>
-	
+
 	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkPersonJson">
 		<property name="templateFileName" value="crosswalks/template/person-json.template"/>
 		<property name="mimeType" value="application/json; charset=UTF-8"/>
@@ -111,7 +124,7 @@
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
 		<property name="converter" ref="xmlValueConverter" />
 	</bean>
-	
+
 	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkProjectJson">
 		<property name="templateFileName" value="crosswalks/template/project-json.template"/>
 		<property name="mimeType" value="application/json; charset=UTF-8"/>
@@ -122,7 +135,7 @@
 		<property name="converter" ref="jsonValueConverter" />
 		<property name="linesPostProcessor" ref="jsonPostProcessor" />
 	</bean>
-	
+
 	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkEquipmentXml">
 		<property name="templateFileName" value="crosswalks/template/equipment-xml.template"/>
 		<property name="mimeType" value="application/xml; charset=UTF-8"/>
@@ -160,6 +173,27 @@
 		<property name="fileName" value="orgUnit.json"/>
 		<property name="entityType" value="OrgUnit"/>
 		<property name="multipleItemsTemplateFileName" value="crosswalks/template/orgUnits-json.template"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+		<property name="converter" ref="jsonValueConverter" />
+		<property name="linesPostProcessor" ref="jsonPostProcessor" />
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkFundingXml">
+		<property name="templateFileName" value="crosswalks/template/funding-xml.template"/>
+		<property name="mimeType" value="application/xml; charset=UTF-8"/>
+		<property name="fileName" value="funding.xml"/>
+		<property name="entityType" value="Funding"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/fundings-xml.template"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+		<property name="converter" ref="xmlValueConverter" />
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkFundingJson">
+		<property name="templateFileName" value="crosswalks/template/funding-json.template"/>
+		<property name="mimeType" value="application/json; charset=UTF-8"/>
+		<property name="fileName" value="funding.json"/>
+		<property name="entityType" value="Funding"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/fundings-json.template"/>
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
 		<property name="converter" ref="jsonValueConverter" />
 		<property name="linesPostProcessor" ref="jsonPostProcessor" />
@@ -213,6 +247,14 @@
 		<property name="referCrosswalk" ref="referCrosswalkOrgUnitXml"/>
 	</bean>
 
+	<bean class="org.dspace.content.integration.crosswalks.DocumentCrosswalk" id="pdfCrosswalkFunding">
+		<property name="templateFileName" value="crosswalks/template/funding-template.xsl"/>
+		<property name="fileName" value="funding.pdf"/>
+		<property name="mimeType" value="application/pdf"/>
+		<property name="entityType" value="Funding"/>
+		<property name="referCrosswalk" ref="referCrosswalkFundingXml"/>
+	</bean>
+
 	<bean class="org.dspace.content.integration.crosswalks.CsvCrosswalk" id="csvCrosswalkPerson">
 		<property name="templateFileName" value="crosswalks/template/person-table.template"/>
 		<property name="fileName" value="persons.csv"/>
@@ -234,7 +276,7 @@
 		<property name="entityType" value="Publication"/>
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
 	</bean>
-	
+
 	<bean class="org.dspace.content.integration.crosswalks.XlsCrosswalk" id="xlsCrosswalkPublication">
 		<property name="templateFileName" value="crosswalks/template/publication-table.template"/>
 		<property name="fileName" value="publications.xls"/>
@@ -242,14 +284,14 @@
 		<property name="entityType" value="Publication"/>
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
 	</bean>
-	
+
 	<bean class="org.dspace.content.integration.crosswalks.CsvCrosswalk" id="csvCrosswalkProject">
 		<property name="templateFileName" value="crosswalks/template/project-table.template"/>
 		<property name="fileName" value="projects.csv"/>
 		<property name="entityType" value="Project"/>
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
 	</bean>
-	
+
 	<bean class="org.dspace.content.integration.crosswalks.XlsCrosswalk" id="xlsCrosswalkProject">
 		<property name="templateFileName" value="crosswalks/template/project-table.template"/>
 		<property name="fileName" value="projects.xls"/>
@@ -273,7 +315,6 @@
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
 	</bean>
 
-
 	<bean class="org.dspace.content.integration.crosswalks.CsvCrosswalk" id="csvCrosswalkEquipment">
 		<property name="templateFileName" value="crosswalks/template/equipment-table.template"/>
 		<property name="fileName" value="equipments.csv"/>
@@ -286,6 +327,21 @@
 		<property name="fileName" value="equipments.xls"/>
 		<property name="sheetName" value="Equipments"/>
 		<property name="entityType" value="Equipment"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.CsvCrosswalk" id="csvCrosswalkFunding">
+		<property name="templateFileName" value="crosswalks/template/funding-table.template"/>
+		<property name="fileName" value="fundings.csv"/>
+		<property name="entityType" value="Funding"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.XlsCrosswalk" id="xlsCrosswalkFunding">
+		<property name="templateFileName" value="crosswalks/template/funding-table.template"/>
+		<property name="fileName" value="fundings.xls"/>
+		<property name="sheetName" value="Fundings"/>
+		<property name="entityType" value="Funding"/>
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
 	</bean>
 
@@ -368,10 +424,15 @@
 		<constructor-arg name="conditionEvaluators">
 			<map>
 				<entry key="authority" value-ref="authorityConditionEvaluator" />
+				<entry key="metadata" value-ref="metadataConditionEvaluator" />
 			</map>
 		</constructor-arg>
 	</bean>
 	
 	<bean class="org.dspace.content.integration.crosswalks.evaluators.AuthorityNotBlankCondition" id="authorityConditionEvaluator"/>
-	
+	<bean class="org.dspace.content.integration.crosswalks.evaluators.HasMetadataCondition" id="metadataConditionEvaluator"/>
+
+	<!-- Item export format SERVICE -->
+	<bean class="org.dspace.content.integration.crosswalks.service.ItemExportFormatServiceImpl"/>
+
 </beans>

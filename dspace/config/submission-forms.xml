@@ -605,18 +605,6 @@ it, please enter the types and the actual numbers or codes.</hint>
         <field>
           <dc-schema>dc</dc-schema>
           <dc-element>relation</dc-element>
-          <dc-qualifier>ispartofseries</dc-qualifier>
-          <label>Series/Report No.</label>
-          <input-type>series</input-type>
-          <repeatable>true</repeatable>
-          <required />
-          <hint>Enter the series and number assigned to this item by your community.</hint>
-        </field>
-      </row>
-      <row>
-        <field>
-          <dc-schema>dc</dc-schema>
-          <dc-element>relation</dc-element>
           <dc-qualifier>issn</dc-qualifier>
           <label>ISSN</label>
           <input-type>onebox</input-type>
@@ -1972,12 +1960,24 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <required />
           <hint />
         </field>
+      </row>
+      <row>
         <field>
           <dc-schema>oairecerif</dc-schema>
           <dc-element>funding</dc-element>
-          <dc-qualifier>duration</dc-qualifier>
-          <label>Duration</label>
-          <input-type>onebox</input-type>
+          <dc-qualifier>startDate</dc-qualifier>
+          <label>Start date</label>
+          <input-type>date</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint />
+        </field>
+        <field>
+          <dc-schema>oairecerif</dc-schema>
+          <dc-element>funding</dc-element>
+          <dc-qualifier>endDate</dc-qualifier>
+          <label>End date</label>
+          <input-type>date</input-type>
           <repeatable>false</repeatable>
           <required />
           <hint />

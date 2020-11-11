@@ -1,0 +1,13 @@
+Name = dc.title
+Acronym = oairecerif.acronym
+Type = virtual.mapConverter.fundingTypes.dc-type
+Funding Code = oairecerif.internalid
+Grant Number = oairecerif.funding.identifier
+Amount = oairecerif.amount
+Amount currency = oairecerif.amount.currency
+Description = dc.description
+Funder = oairecerif.funder
+Start date = oairecerif.funding.startDate
+End date = oairecerif.funding.endDate
+OA Mandate = oairecerif.oamandate
+OA Policy URL = oairecerif.oamandate.url

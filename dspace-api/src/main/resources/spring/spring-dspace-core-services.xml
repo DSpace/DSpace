@@ -45,4 +45,35 @@
     <bean class="org.dspace.storage.rdbms.PostgreSQLCryptoChecker"/>
     <bean class="org.dspace.storage.rdbms.SiteServiceInitializer"/>
 
+    <bean id="org.dspace.content.template.TemplateItemValueService"
+          class="org.dspace.content.template.TemplateItemValueService">
+        <constructor-arg>
+            <list>
+                <ref bean="placeholderTemplateItemValue"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="placeholderTemplateItemValue" class="org.dspace.content.template.PlaceholderTemplateItemValue">
+        <constructor-arg>
+            <map>
+                <entry key="submitter">
+                    <bean class="org.dspace.content.template.generator.SubmitterValueGenerator" />
+                </entry>
+                <entry key="date">
+                    <bean class="org.dspace.content.template.generator.DateValueGenerator" />
+                </entry>
+                <entry key="identifier">
+                    <bean class="org.dspace.content.template.generator.IdentifierValueGenerator" />
+                </entry>
+                <entry key="group">
+                    <bean class="org.dspace.content.template.generator.GroupValueGenerator" />
+                </entry>
+                <entry key="eperson">
+                    <bean class="org.dspace.content.template.generator.EPersonValueGenerator" />
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
 </beans>

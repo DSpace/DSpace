@@ -452,6 +452,26 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "organization", "identifier", null, identifier);
     }
 
+    public ItemBuilder withFundingIdentifier(String identifier) {
+        return addMetadataValue(item, "oairecerif", "funding", "identifier", identifier);
+    }
+
+    public ItemBuilder withAmount(String amount) {
+        return addMetadataValue(item, "oairecerif", "amount", null, amount);
+    }
+
+    public ItemBuilder withAmountCurrency(String currency) {
+        return addMetadataValue(item, "oairecerif", "amount", "currency", currency);
+    }
+
+    public ItemBuilder withFundingStartDate(String startDate) {
+        return addMetadataValue(item, "oairecerif", "funding", "startDate", startDate);
+    }
+
+    public ItemBuilder withFundingEndDate(String endDate) {
+        return addMetadataValue(item, "oairecerif", "funding", "endDate", endDate);
+    }
+
     public ItemBuilder withHandle(String handle) {
         this.handle = handle;
         return this;

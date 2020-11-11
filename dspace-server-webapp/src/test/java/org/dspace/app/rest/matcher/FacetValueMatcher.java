@@ -58,4 +58,13 @@ public class FacetValueMatcher {
             hasJsonPath("$._links.search.href", containsString(",equals"))
         );
     }
+
+    public static Matcher<? super Object> entryDateIssuedWithLabelAndCount(String label, int count) {
+        return allOf(
+            hasJsonPath("$.label", is(label)),
+            hasJsonPath("$.count", is(count)),
+            hasJsonPath("$.type", is("discover")),
+            hasJsonPath("$._links.search.href", containsString(",equals"))
+        );
+    }
 }

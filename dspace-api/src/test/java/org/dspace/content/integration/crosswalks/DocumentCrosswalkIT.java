@@ -11,10 +11,10 @@ import static org.dspace.builder.CollectionBuilder.createCollection;
 import static org.dspace.builder.CommunityBuilder.createCommunity;
 import static org.dspace.builder.ItemBuilder.createItem;
 import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.isEmptyString;
 import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -440,6 +440,42 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
     }
 
+    @Test
+    public void testPdfCrosswalkFundingDisseminate() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item funding = ItemBuilder.createItem(context, collection)
+            .withRelationshipType("Funding")
+            .withAcronym("T-FU")
+            .withTitle("Test Funding")
+            .withType("Gift")
+            .withInternalId("ID-01")
+            .withFundingIdentifier("0001")
+            .withDescription("Funding to test export")
+            .withAmount("30.000,00")
+            .withAmountCurrency("EUR")
+            .withFunder("OrgUnit Funder")
+            .withFundingStartDate("2015-01-01")
+            .withFundingEndDate("2020-01-01")
+            .withOAMandate("true")
+            .withOAMandateURL("www.mandate.url")
+            .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        StreamDisseminationCrosswalk streamCrosswalkDefault = (StreamDisseminationCrosswalk) CoreServiceFactory
+            .getInstance().getPluginService().getNamedPlugin(StreamDisseminationCrosswalk.class, "funding-pdf");
+
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            streamCrosswalkDefault.disseminate(context, funding, out);
+            assertThat(out.toString(), not(isEmptyString()));
+            assertThatPdfHasContent(out, content -> assertThatFundingDocumentHasContent(content));
+        }
+
+    }
+
     private Item buildPersonItem() {
         Item item = createItem(context, collection)
             .withRelationshipType("Person")
@@ -637,6 +673,23 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         assertThat(content, containsString("Owner (Organization): Test OrgUnit"));
         assertThat(content, containsString("Owner (Person): Walter White"));
 
+    }
+
+    private void assertThatFundingDocumentHasContent(String content) {
+        assertThat(content, containsString("Test Funding"));
+        assertThat(content, containsString("Funding to test export"));
+
+        assertThat(content, containsString("Basic informations"));
+        assertThat(content, containsString("Acronym: T-FU"));
+        assertThat(content, containsString("Type: https://www.openaire.eu/cerif-profile/vocab/"
+            + "OpenAIRE_Funding_Types#Gift"));
+        assertThat(content, containsString("Funding Code: ID-01"));
+        assertThat(content, containsString("Grant Number: 0001"));
+        assertThat(content, containsString("Amount: 30.000,00 (EUR)"));
+        assertThat(content, containsString("Funder: OrgUnit Funder"));
+        assertThat(content, containsString("Duration: from 2015-01-01 to 2020-01-01"));
+        assertThat(content, containsString("OA Mandate: true"));
+        assertThat(content, containsString("OA Policy URL: www.mandate.url"));
     }
 
     private FileInputStream getFileInputStream(String name) throws FileNotFoundException {

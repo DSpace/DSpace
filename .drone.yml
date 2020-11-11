@@ -8,14 +8,8 @@ steps:
   image: maven:3.6.3-jdk-11
   environment:
     MAVEN_OPTS: -Xmx1024M -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-    submission__P__lookup__P__ads__P__apikey:
-      from_secret: ADS_APIKEY
-    submission__P__lookup__P__epo__P__consumerKey:
-      from_secret: EPO_APIKEY
-    submission__P__lookup__P__epo__P__consumerSecretKey:
-      from_secret: EPO_APISECRET
   commands:         
-  - mvn install -B -V -P-assembly -Pcoverage-report -DskipUnitTests=false -Pdspace-rest 
+  - mvn install -B -V -P-assembly -Pcoverage-report -Dtest.argLine=-Xmx2048m -DskipUnitTests=false -Pdspace-rest
 
 ---
 kind: pipeline
@@ -33,6 +27,10 @@ steps:
       from_secret: EPO_APIKEY
     submission__P__lookup__P__epo__P__consumerSecretKey:
       from_secret: EPO_APISECRET
+    orcid__P__clientid:
+      from_secret: ORCID_APIKEY
+    orcid__P__clientsecret:
+      from_secret: ORCID_APISECRET
   commands:
   - ./dspace-api/src/test/data/dspaceFolder/bin/install_grobid.sh
   - mvn install -B -V -P-assembly -Pcoverage-report -DskipIntegrationTests=false -Denforcer.skip=true -Dcheckstyle.skip=true -Dlicense.skip=true -Dxml.skip=true

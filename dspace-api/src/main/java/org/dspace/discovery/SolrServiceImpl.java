@@ -65,6 +65,7 @@ import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.configuration.DiscoveryMoreLikeThisConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
+import org.dspace.discovery.configuration.GraphDiscoverSearchFilterFacet;
 import org.dspace.discovery.indexobject.IndexableCollection;
 import org.dspace.discovery.indexobject.IndexableCommunity;
 import org.dspace.discovery.indexobject.IndexableItem;
@@ -1211,6 +1212,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             }
         } else if (facetFieldConfig.getType().equals(DiscoveryConfigurationParameters.TYPE_STANDARD)) {
             return field;
+        } else if (StringUtils.startsWith(facetFieldConfig.getType(), GraphDiscoverSearchFilterFacet.TYPE_PREFIX) &&
+                   StringUtils.startsWith(field, GraphDiscoverSearchFilterFacet.TYPE_PREFIX)) {
+            return field.split("\\.", 3)[2];
         } else {
             return field;
         }

@@ -147,4 +147,13 @@ public class FacetEntryMatcher {
             hasJsonPath("$._links", matchNextLink(hasNext, "api/discover/facets/entityType"))
         );
     }
+
+    public static Matcher<? super Object> anyFacet(String name, String facetType) {
+        return allOf(
+            hasJsonPath("$.name", is(name)),
+            hasJsonPath("$.facetType", is(facetType)),
+            hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$._links.self.href", containsString("api/discover/facets/" + name))
+        );
+    }
 }

@@ -3,7 +3,7 @@
 
 <item-submission>
   <submission-map>
-    <name-map collection-handle="default" submission-name="publication" />
+    <name-map collection-handle="default" submission-name="product" />
   </submission-map>
   <step-definitions>
     <step id="collection" mandatory="true">
@@ -129,12 +129,24 @@
       <step id="upload" />
       <step id="license" />
     </submission-process>
+    <submission-process name="product-edit">
+      <step id="product" />
+      <step id="product_indexing" />
+      <step id="product_references" />
+      <step id="detect-duplicate" />
+      <step id="upload" />
+    </submission-process>
     <submission-process name="orgunit">
       <step id="collection" />
       <step id="orgunit" />
       <step id="detect-duplicate" />
       <step id="upload" />
       <step id="license" />
+    </submission-process>
+    <submission-process name="orgunit-edit">
+      <step id="orgunit" />
+      <step id="detect-duplicate" />
+      <step id="upload" />
     </submission-process>
     <submission-process name="project">
       <step id="collection" />
@@ -143,12 +155,23 @@
       <step id="upload" />
       <step id="license" />
     </submission-process>
+    <submission-process name="project-edit">
+      <step id="collection" />
+      <step id="project" />
+      <step id="detect-duplicate" />
+      <step id="upload" />
+    </submission-process>
     <submission-process name="journal">
       <step id="collection" />
       <step id="journal" />
       <step id="detect-duplicate" />
       <step id="upload" />
       <step id="license" />
+    </submission-process>
+    <submission-process name="journal-edit">
+      <step id="journal" />
+      <step id="detect-duplicate" />
+      <step id="upload" />
     </submission-process>
     <submission-process name="publication">
       <step id="collection" />
@@ -161,12 +184,26 @@
       <step id="upload" />
       <step id="license" />
     </submission-process>
+    <submission-process name="publication-edit">
+      <step id="extraction" />
+      <step id="publication" />
+      <step id="publication_indexing" />
+      <step id="publication_bibliographic_details" />
+      <step id="publication_references" />
+      <step id="detect-duplicate" />
+      <step id="upload" />
+    </submission-process>
     <submission-process name="person">
       <step id="collection" />
       <step id="person" />
       <step id="detect-duplicate" />
       <step id="upload" />
       <step id="license" />
+    </submission-process>
+    <submission-process name="person-edit">
+      <step id="person" />
+      <step id="detect-duplicate" />
+      <step id="upload" />
     </submission-process>
     <submission-process name="event">
       <step id="collection" />
@@ -175,12 +212,22 @@
       <step id="upload" />
       <step id="license" />
     </submission-process>
+    <submission-process name="event-edit">
+      <step id="event" />
+      <step id="detect-duplicate" />
+      <step id="upload" />
+    </submission-process>
     <submission-process name="equipment">
       <step id="collection" />
       <step id="equipment" />
       <step id="detect-duplicate" />
       <step id="upload" />
       <step id="license" />
+    </submission-process>
+    <submission-process name="equipment-edit">
+      <step id="equipment" />
+      <step id="detect-duplicate" />
+      <step id="upload" />
     </submission-process>
     <submission-process name="patent">
       <step id="collection" />
@@ -191,12 +238,24 @@
       <step id="upload" />
       <step id="license" />
     </submission-process>
+    <submission-process name="patent-edit">
+      <step id="patent" />
+      <step id="patent_indexing" />
+      <step id="patent_references" />
+      <step id="detect-duplicate" />
+      <step id="upload" />
+    </submission-process>
     <submission-process name="funding">
       <step id="collection" />
       <step id="funding" />
       <step id="detect-duplicate" />
       <step id="upload" />
       <step id="license" />
+    </submission-process>
+    <submission-process name="funding-edit">
+      <step id="funding" />
+      <step id="detect-duplicate" />
+      <step id="upload" />
     </submission-process>
   </submission-definitions>
 </item-submission>
