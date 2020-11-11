@@ -10,6 +10,7 @@ package org.dspace.app.bulkedit;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.split;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.dspace.app.bulkimport.utils.WorkbookUtils.getCellValue;
 import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
@@ -47,7 +48,6 @@ import org.dspace.app.bulkimport.model.MetadataGroup;
 import org.dspace.app.bulkimport.model.MetadataValueVO;
 import org.dspace.app.bulkimport.service.ItemSearcherMapper;
 import org.dspace.app.bulkimport.utils.WorkbookUtils;
-import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionConfigReader;
@@ -90,28 +90,29 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BulkImport.class);
 
+    public static final String AUTHORITY_SEPARATOR = "::";
+
+    public static final String METADATA_SEPARATOR = "||";
+
+    public static final String LANGUAGE_SEPARATOR_PREFIX = "[";
+
+    public static final String LANGUAGE_SEPARATOR_SUFFIX = "]";
+
+    public static final String ID_CELL = "ID";
+
+    public static final String PARENT_ID_CELL = "PARENT-ID";
+
+    public static final String ROW_ID = "ROW-ID";
+
+    public static final String ID_SEPARATOR = "::";
 
     private static final int ID_CELL_INDEX = 0;
 
     private static final int ACTION_CELL_INDEX = 1;
 
-    private static final String ID_CELL = "ID";
-
     private static final String ACTION_CELL = "ACTION";
 
-    private static final String PARENT_ID_CELL = "PARENT-ID";
-
     private static final String UUID_PREFIX = "UUID";
-
-    private static final String ID_SEPARATOR = "::";
-
-    private static final String AUTHORITY_SEPARATOR = "::";
-
-    private static final String METADATA_SEPARATOR = "\\|\\|";
-
-    private static final String LANGUAGE_SEPARATOR = "/";
-
-    private static final String ROW_ID = "ROW-ID";
 
 
     private CollectionService collectionService;
@@ -338,22 +339,11 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
     }
 
     private List<String> getSubmissionFormMetadata(boolean group) {
-
         try {
-            return this.reader.getInputsByCollection(getCollection()).stream()
-                .flatMap(dcInputSet -> Arrays.stream(dcInputSet.getFields()))
-                .flatMap(dcInputs -> Arrays.stream(dcInputs))
-                .filter(dcInput -> group ? isGroupType(dcInput) : !isGroupType(dcInput))
-                .map(dcInput -> dcInput.getFieldName())
-                .collect(Collectors.toList());
+            return this.reader.getSubmissionFormMetadata(getCollection(), group);
         } catch (DCInputsReaderException e) {
             throw new BulkImportException("An error occurs reading the input configuration by collection", e);
         }
-
-    }
-
-    private boolean isGroupType(DCInput dcInput) {
-        return "group".equals(dcInput.getInputType());
     }
 
     private List<EntityRow> getValidEntityRows(Workbook workbook) {
@@ -622,11 +612,14 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
     }
 
     private String getMetadataField(String field) {
-        return field.split(LANGUAGE_SEPARATOR)[0];
+        return field.contains(LANGUAGE_SEPARATOR_PREFIX) ? split(field, LANGUAGE_SEPARATOR_PREFIX)[0] : field;
     }
 
     private String getMetadataLanguage(String field) {
-        return field.contains(LANGUAGE_SEPARATOR) ? field.split(LANGUAGE_SEPARATOR)[1] : null;
+        if (field.contains(LANGUAGE_SEPARATOR_PREFIX)) {
+            return split(field, LANGUAGE_SEPARATOR_PREFIX)[1].replace(LANGUAGE_SEPARATOR_SUFFIX, "");
+        }
+        return null;
     }
 
     private String getIdFromRow(Row row) {
@@ -649,7 +642,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
             if (index >= firstMetadataIndex) {
 
                 String cellValue = WorkbookUtils.getCellValue(row, index);
-                String[] values = isNotBlank(cellValue) ? cellValue.split(METADATA_SEPARATOR) : new String[] { "" };
+                String[] values = isNotBlank(cellValue) ? split(cellValue, METADATA_SEPARATOR) : new String[] { "" };
 
                 List<MetadataValueVO> metadataValues = Arrays.stream(values)
                     .map(value -> buildMetadataValueVO(row, value, isEntityRowSheet))
@@ -752,7 +745,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         for (int index = firstMetadataIndex; index < row.getLastCellNum(); index++) {
 
             String cellValue = WorkbookUtils.getCellValue(row, index);
-            String[] values = isNotBlank(cellValue) ? cellValue.split(METADATA_SEPARATOR) : new String[] { "" };
+            String[] values = isNotBlank(cellValue) ? split(cellValue, METADATA_SEPARATOR) : new String[] { "" };
             if (values.length > 1) {
                 handleValidationErrorOnRow(row, "Multiple metadata value on the same cell not allowed "
                     + "in the metadata group sheets: " + cellValue);

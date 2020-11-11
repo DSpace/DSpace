@@ -467,6 +467,32 @@ public class DCInput {
     }
 
     /**
+     * Gets all the stored values in the value-pairs.
+     *
+     * @return all the stored values
+     */
+    public List<String> getAllStoredValues() {
+        List<String> storedString = new ArrayList<String>();
+        for (int i = 1; i < valueList.size(); i += 2) {
+            storedString.add(valueList.get(i));
+        }
+        return storedString;
+    }
+
+    /**
+     * Gets all the stored value languages in the value-pairs.
+     *
+     * @return all the stored values
+     */
+    public List<String> getAllLanguageValues() {
+        List<String> storedString = new ArrayList<String>();
+        for (int i = 1; i < valueLanguageList.size(); i += 2) {
+            storedString.add(valueLanguageList.get(i));
+        }
+        return storedString;
+    }
+
+    /**
      * The closed attribute of the vocabulary tag for this field as set in
      * submission-forms.xml
      *

@@ -82,4 +82,10 @@ public final class WorkbookUtils {
         DataFormatter formatter = new DataFormatter();
         return formatter.formatCellValue(cell).trim();
     }
+
+    public static Cell createCell(Row row, int column, String value) {
+        Cell cell = row.createCell(column);
+        cell.setCellValue(value);
+        return cell;
+    }
 }

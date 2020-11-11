@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.servlet.ServletException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -829,6 +830,40 @@ public class DCInputsReader {
             }
         }
         throw new DCInputsReaderException("No field configuration found!");
+    }
+
+    public List<String> getSubmissionFormMetadata(Collection collection, boolean group) throws DCInputsReaderException {
+        return getAllInputsByCollection(collection)
+            .filter(dcInput -> group ? isGroupType(dcInput) : !isGroupType(dcInput))
+            .flatMap(dcInput -> getMetadataFieldsFromDcInput(dcInput))
+            .collect(Collectors.toList());
+    }
+
+    public List<String> getLanguagesForMetadata(Collection collection, String metadata) throws DCInputsReaderException {
+        return getAllInputsByCollection(collection)
+            .filter(dcInput -> dcInput.getFieldName().equals(metadata))
+            .findFirst()
+            .orElseThrow(() -> new DCInputsReaderException("No DCInput found for the metadata field " + metadata))
+            .getAllLanguageValues();
+    }
+
+    private Stream<DCInput> getAllInputsByCollection(Collection collection) throws DCInputsReaderException {
+        return getInputsByCollection(collection).stream()
+            .flatMap(dcInputSet -> Arrays.stream(dcInputSet.getFields()))
+            .flatMap(dcInputs -> Arrays.stream(dcInputs));
+    }
+
+    private Stream<String> getMetadataFieldsFromDcInput(DCInput dcInput) {
+        if (!"qualdrop_value".equals(dcInput.getInputType())) {
+            return Stream.of(dcInput.getFieldName());
+        }
+
+        return dcInput.getAllStoredValues().stream()
+            .map(storedValue -> dcInput.getFieldName() + '.' + storedValue);
+    }
+
+    private boolean isGroupType(DCInput dcInput) {
+        return "group".equals(dcInput.getInputType());
     }
 
 }
