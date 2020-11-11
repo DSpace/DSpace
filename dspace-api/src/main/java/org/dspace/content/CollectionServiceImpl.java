@@ -988,7 +988,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             buildFilter.append("location.comm:").append(community.getID().toString());
         }
         if (StringUtils.isNotBlank(entityType)) {
-        	if (buildFilter.length() > 0) {
+            if (buildFilter.length() > 0) {
                 buildFilter.append(" AND ");
             }
             buildFilter.append("search.entitytype:").append(entityType);

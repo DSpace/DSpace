@@ -910,7 +910,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient().perform(get("/api/core/collections/search/findSubmitAuthorizedByEntityType"))
                    .andExpect(status().isBadRequest());
     }
-    
+
     @Test
     public void findAuthorizedCollectionsByEntityTypeUnexistentEntityTest() throws Exception {
         getClient().perform(get("/api/core/collections/search/findSubmitAuthorizedByEntityType")
@@ -2036,21 +2036,19 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                         .param("uuid", parentCommunity.getID().toString())
                         .param("entityType", entityType2)
                         .param("query", "publication"))
-		        .andExpect(status().isOk()).andExpect(content().contentType(contentType))
-		        .andExpect(jsonPath("$.page.totalElements", equalTo(1)))
-		        .andExpect(jsonPath("$._embedded.collections", contains(CollectionMatcher.matchCollection(col3))))
-		        .andExpect(jsonPath("$._embedded.collections",
-		                not(contains(CollectionMatcher.matchCollection(colWithoutEntity)))));
+                .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.page.totalElements", equalTo(1)))
+                .andExpect(jsonPath("$._embedded.collections", contains(CollectionMatcher.matchCollection(col3))))
+                .andExpect(jsonPath("$._embedded.collections",
+                        not(contains(CollectionMatcher.matchCollection(colWithoutEntity)))));
     }
-    
 
     @Test
     public void findSubmitAuthorizedAllCollectionsByCommunityAndEntityWithoutParamsTest() throws Exception {
         getClient().perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunityAndEntityType"))
                    .andExpect(status().isBadRequest());
     }
-    
-    
+
     @Test
     public void findSubmitAuthorizedByCommunityAndEntityTypeUnexistentEntityTest() throws Exception {
         getClient().perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunityAndEntityType")
@@ -2058,7 +2056,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                 .param("uuid", UUID.randomUUID().toString()))
                    .andExpect(status().isNotFound());
     }
-    
+
     @Test
     public void findSubmitAuthorizedByCommunityAndEntityTypeUnexistentUUIDTest() throws Exception {
         String entityType = "OrgUnit";
@@ -2084,9 +2082,9 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         String token = getAuthToken(eperson.getEmail(), password);
 
         getClient(token).perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunityAndEntityType")
-                				.param("entityType", entityType)
-                				.param("uuid", UUID.randomUUID().toString()))
-        				.andExpect(status().isNotFound());
+                                .param("entityType", entityType)
+                                .param("uuid", UUID.randomUUID().toString()))
+                        .andExpect(status().isNotFound());
 
     }
 }
