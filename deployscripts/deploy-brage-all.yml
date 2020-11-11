@@ -1,5 +1,6 @@
 - hosts: appservers-{{fase}}
   gather_facts: false
+  strategy: free
   tasks:
     - name: Bootstrap and sanity checks
       import_tasks:
@@ -13,6 +14,7 @@
 
 - hosts: webservers
   gather_facts: false
+  strategy: free
   tags:
     - webconf
   tasks:
