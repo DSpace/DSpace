@@ -2837,4 +2837,93 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                         )));
     }
 
+    @Test
+    public void findByMetadataUsingFirstNamePaginationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("John", "Doe")
+                .withEmail("Johndoe@example.com").build();
+
+        EPerson ePerson2 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Jane", "Smith")
+                .withEmail("janesmith@example.com").build();
+
+        EPerson ePerson3 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("John", "Smith")
+                .withEmail("tomdoe@example.com")
+                .build();
+
+        EPerson ePerson4 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("John-Postfix", "Smath")
+                .withEmail("dirkdoepostfix@example.com")
+                .build();
+
+        EPerson ePerson5 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Prefix-John", "Smoth")
+                .withEmail("harrydoeprefix@example.com")
+                .build();
+
+        EPerson ePerson6 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("John", "Boychuk")
+                .withEmail("johnboychuk@example.com")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
+                 .param("query", ePerson.getFirstName())
+                 .param("page", "0")
+                 .param("size", "2"))
+                 .andExpect(status().isOk())
+                 .andExpect(content().contentType(contentType))
+                 .andExpect(jsonPath("$._embedded.epersons[0].type", is("eperson")))
+                 .andExpect(jsonPath("$._embedded.epersons[1].type", is("eperson")))
+                 .andExpect(jsonPath("$._embedded.epersons[2]").doesNotExist())
+                 .andExpect(jsonPath("$.page.size", is(2)))
+                 .andExpect(jsonPath("$.page.number", is(0)))
+                 .andExpect(jsonPath("$.page.totalPages", is(3)))
+                 .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+        getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
+                .param("query", ePerson.getFirstName())
+                .param("page", "1")
+                .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.epersons[0].type", is("eperson")))
+                .andExpect(jsonPath("$._embedded.epersons[1].type", is("eperson")))
+                .andExpect(jsonPath("$._embedded.epersons[2]").doesNotExist())
+                .andExpect(jsonPath("$.page.size", is(2)))
+                .andExpect(jsonPath("$.page.number", is(1)))
+                .andExpect(jsonPath("$.page.totalPages", is(3)))
+                .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+        getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
+                .param("query", ePerson.getFirstName())
+                .param("page", "2")
+                .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.epersons[0].type", is("eperson")))
+                .andExpect(jsonPath("$._embedded.epersons[1]").doesNotExist())
+                .andExpect(jsonPath("$.page.size", is(2)))
+                .andExpect(jsonPath("$.page.number", is(2)))
+                .andExpect(jsonPath("$.page.totalPages", is(3)))
+                .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+        getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
+                .param("query", ePerson.getFirstName())
+                .param("page", "3")
+                .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.epersons").doesNotExist())
+                .andExpect(jsonPath("$.page.size", is(2)))
+                .andExpect(jsonPath("$.page.number", is(3)))
+                .andExpect(jsonPath("$.page.totalPages", is(3)))
+                .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+    }
+
 }
