@@ -20,8 +20,9 @@ import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 /**
- * This class automatically adding rptype to the resource policy created with a migration into XML-based Configurable
- * Workflow system
+ * Insert a 'dc.idendifier.uri' metadata record for each Community and Collection in the database.
+ * The value is calculated concatenating the canonicalPrefix extracted from the configuration
+ * (default is "http://hdl.handle.net/) and the object's handle suffix stored inside the handle table.
  *
  * @author Alessandro Martelli (alessandro.martelli at 4science.it)
  */
