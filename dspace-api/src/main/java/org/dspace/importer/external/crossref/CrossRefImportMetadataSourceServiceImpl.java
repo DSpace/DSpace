@@ -8,12 +8,12 @@
 package org.dspace.importer.external.crossref;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.concurrent.Callable;
-import java.util.regex.Pattern;
 import javax.el.MethodNotFoundException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -43,16 +43,7 @@ import org.dspace.importer.external.service.components.QuerySource;
 public class CrossRefImportMetadataSourceServiceImpl
     extends AbstractImportMetadataSourceService<String> implements QuerySource {
 
-    private static final List<String> DOI_PATTERNS =
-        Arrays
-            .asList(
-                "/^10.\\d{4,9}/[-._;()/:A-Z0-9]+$/i",
-                "/^10.1002/[^\\s]+$/i",
-                "/^10.\\d{4}/\\d+-\\d+X?(\\d+)\\d+<[\\d\\w]+:[\\d\\w]*>\\d+.\\d+.\\w+;\\d$/i",
-                "/^10.1021/\\w\\w\\d++$/i",
-                "/^10.1207/[\\w\\d]+\\&\\d+_\\d+$/i");
     private WebTarget webTarget;
-
 
     @Override
     public String getImportSource() {
@@ -83,19 +74,31 @@ public class CrossRefImportMetadataSourceServiceImpl
     @Override
     public int getRecordsCount(Query query) throws MetadataSourceException {
         //TODO if a doi check if exists (making a head http request to the https://api.crossref.org/works/<id>)
-        return retry(new CountByQueryCallable(query));
+        final Entry entry = (Entry) query.getParameters().entrySet().iterator().next();
+        if (validExistingDoi((String) entry.getValue())) {
+            return retry(new CountByQueryCallable(query));
+        }
+        return 0;
     }
+
 
     @Override
     public Collection<ImportRecord> getRecords(String query, int start, int count) throws MetadataSourceException {
         //TODO if a doi call SearchByIdCallable
-        return retry(new SearchByQueryCallable(query, count, start));
+        if (isDoi(query)) {
+            return retry(new SearchByQueryCallable(query, count, start));
+        }
+        return Collections.emptyList();
     }
 
     @Override
     public Collection<ImportRecord> getRecords(Query query) throws MetadataSourceException {
         //TODO if a doi call SearchByIdCallable
-        return retry(new SearchByQueryCallable(query));
+        final Entry entry = (Entry) query.getParameters().entrySet().iterator().next();
+        if (isDoi((String) entry.getValue())) {
+            return retry(new SearchByQueryCallable(query));
+        }
+        return Collections.emptyList();
     }
 
     @Override
@@ -107,7 +110,19 @@ public class CrossRefImportMetadataSourceServiceImpl
     @Override
     public Collection<ImportRecord> findMatchingRecords(Query query) throws MetadataSourceException {
         //TODO if a doi call SearchByIdCallable
-        return retry(new FindMatchingRecordCallable(query));
+        final Entry entry = (Entry) query.getParameters().entrySet().iterator().next();
+        if (isDoi((String) entry.getValue())) {
+            return retry(new FindMatchingRecordCallable(query));
+        }
+        return Collections.emptyList();
+    }
+
+    private boolean isDoi(final String value) {
+        return new CrossRefDoiCheck(webTarget).isDoi(value);
+    }
+
+    private boolean validExistingDoi(final String value) {
+        return new CrossRefDoiCheck(webTarget).validExistingDoi(value);
     }
 
     @Override
@@ -173,32 +188,6 @@ public class CrossRefImportMetadataSourceServiceImpl
             }
         }
 
-    }
-
-    private boolean validExistingDoi(final String query) {
-        final String value = query.replaceAll(",", "");
-        final boolean doi = isDoi(value);
-        if (!doi) {
-            return true;
-        }
-        return existingDoi(value);
-    }
-
-    private boolean existingDoi(final String value) {
-        final Response head = webTarget.path(value).request().head();
-        return head.getStatus() == 200;
-    }
-
-    private boolean isDoi(final String value) {
-        return DOI_PATTERNS
-                     .stream()
-                     .anyMatch(s -> matches(value, s));
-    }
-
-    private boolean matches(final String value, final String patternString) {
-        Pattern pattern = Pattern.compile(patternString);
-
-        return pattern.matcher(value).matches();
     }
 
     private class SearchByIdCallable implements Callable<List<ImportRecord>> {
