@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
 
 
 /**
@@ -38,23 +37,10 @@ public class CrossRefDoiCheck {
         this.webTarget = webTarget;
     }
 
-    public boolean validExistingDoi(final String query) {
-        final boolean doi = isDoi(query);
-        if (!doi) {
-            return true;
-        }
-        return existingDoi(query);
-    }
-
     public boolean isDoi(final String value) {
 
         Matcher m = PATTERN.matcher(purgeDoiValue(value));
         return m.matches();
-    }
-
-    private boolean existingDoi(final String value) {
-        final Response head = webTarget.path(purgeDoiValue(value)).request().head();
-        return head.getStatus() == 200;
     }
 
 

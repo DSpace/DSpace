@@ -65,49 +65,6 @@ public class CrossRefDoiCheckTest {
         assertThat(isDoi, is(false));
     }
 
-    @Test
-    public void existingDoi() {
-
-        final Response response = response(200);
-        when(builder.head()).thenReturn(response);
-        final boolean validDoi = crossRefDoiCheck.validExistingDoi("10.1111/jfbc.13557");
-        assertThat(validDoi, is(true));
-    }
-
-    @Test
-    public void notExistingDoi() {
-
-        final Response response = response(404);
-        when(builder.head()).thenReturn(response);
-        final boolean validDoi = crossRefDoiCheck.validExistingDoi("10.1111/jfbc.13557");
-        assertThat(validDoi, is(false));
-    }
-
-    @Test
-    public void existingCommaPrefix() {
-        final Response response = response(200);
-        when(builder.head()).thenReturn(response);
-        final boolean validDoi = crossRefDoiCheck.validExistingDoi(",10.1111/jfbc.13557");
-        assertThat(validDoi, is(true));
-    }
-
-
-    @Test
-    public void existingHttpDoi() {
-        final Response response = response(200);
-        when(builder.head()).thenReturn(response);
-        final boolean validDoi = crossRefDoiCheck.validExistingDoi(",http://dx.doi.org/10.1175/JPO3002.1");
-        assertThat(validDoi, is(true));
-    }
-
-    @Test
-    public void existingHttpsDoi() {
-        final Response response = response(200);
-        when(builder.head()).thenReturn(response);
-        final boolean validDoi = crossRefDoiCheck.validExistingDoi(",https://dx.doi.org/10.1175/JPO3002.1");
-        assertThat(validDoi, is(true));
-    }
-
     private Response response(final int code) {
         final Response response = mock(Response.class);
         when(response.getStatus()).thenReturn(code);
