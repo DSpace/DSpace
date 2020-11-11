@@ -12,10 +12,13 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.el.MethodNotFoundException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
@@ -63,21 +66,28 @@ public class CrossRefImportMetadataSourceServiceImpl
 
     @Override
     public int getRecordsCount(String query) throws MetadataSourceException {
-        return retry(new CountByQueryCallable(query));
+        //TODO if a doi check if exists
+        if (validExistingDoi(query)) {
+            return retry(new CountByQueryCallable(query));
+        }
+        return 0;
     }
 
     @Override
     public int getRecordsCount(Query query) throws MetadataSourceException {
+        //TODO if a doi check if exists (making a head http request to the https://api.crossref.org/works/<id>)
         return retry(new CountByQueryCallable(query));
     }
 
     @Override
     public Collection<ImportRecord> getRecords(String query, int start, int count) throws MetadataSourceException {
+        //TODO if a doi call SearchByIdCallable
         return retry(new SearchByQueryCallable(query, count, start));
     }
 
     @Override
     public Collection<ImportRecord> getRecords(Query query) throws MetadataSourceException {
+        //TODO if a doi call SearchByIdCallable
         return retry(new SearchByQueryCallable(query));
     }
 
@@ -89,6 +99,7 @@ public class CrossRefImportMetadataSourceServiceImpl
 
     @Override
     public Collection<ImportRecord> findMatchingRecords(Query query) throws MetadataSourceException {
+        //TODO if a doi call SearchByIdCallable
         return retry(new FindMatchingRecordCallable(query));
     }
 
@@ -154,6 +165,31 @@ public class CrossRefImportMetadataSourceServiceImpl
                 }
             }
         }
+
+    }
+
+    private boolean validExistingDoi(final String query) {
+        final String value = query.replaceAll(",", "");
+        final boolean doi = isDoi(value);
+        if (!doi) {
+            return true;
+        }
+        return existingDoi(value);
+    }
+
+    private boolean existingDoi(final String value) {
+        final Builder request = webTarget.request();
+        final Response head = request.head();
+        return head.getStatus() == 200;
+    }
+
+    private boolean isDoi(final String value) {
+        final String patternString = "/^10.\\d{4,9}/[-._;()/:A-Z0-9]+$/i";
+        Pattern pattern = Pattern.compile(patternString);
+
+        Matcher matcher = pattern.matcher(value);
+        boolean matches = matcher.matches();
+        return matches;
     }
 
     private class SearchByIdCallable implements Callable<List<ImportRecord>> {
