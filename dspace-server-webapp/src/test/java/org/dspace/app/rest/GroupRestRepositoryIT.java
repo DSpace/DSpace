@@ -2901,4 +2901,67 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                         )));
     }
 
+    @Test
+    public void findByMetadataPaginationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group group1 = GroupBuilder.createGroup(context)
+                                   .withName("Test group")
+                                   .build();
+        Group group2 = GroupBuilder.createGroup(context)
+                                   .withName("Test group 2")
+                                   .build();
+        Group group3 = GroupBuilder.createGroup(context)
+                                   .withName("Test group 3")
+                                   .build();
+        Group group4 = GroupBuilder.createGroup(context)
+                                   .withName("Test group 4")
+                                   .build();
+        Group group5 = GroupBuilder.createGroup(context)
+                                   .withName("Test other group")
+                                   .build();
+
+        context.restoreAuthSystemState();
+
+        String authTokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(authTokenAdmin).perform(get("/api/eperson/groups/search/byMetadata")
+                .param("query", "group")
+                .param("page", "0")
+                .param("size", "2"))
+                .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.groups[0].type", is("group")))
+                .andExpect(jsonPath("$._embedded.groups[1].type", is("group")))
+                .andExpect(jsonPath("$._embedded.groups[2]").doesNotExist())
+                .andExpect(jsonPath("$.page.size", is(2)))
+                .andExpect(jsonPath("$.page.number", is(0)))
+                .andExpect(jsonPath("$.page.totalPages", is(3)))
+                .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+        getClient(authTokenAdmin).perform(get("/api/eperson/groups/search/byMetadata")
+                .param("query", "group")
+                .param("page", "1")
+                .param("size", "2"))
+                .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.groups[0].type", is("group")))
+                .andExpect(jsonPath("$._embedded.groups[1].type", is("group")))
+                .andExpect(jsonPath("$._embedded.groups[2]").doesNotExist())
+                .andExpect(jsonPath("$.page.size", is(2)))
+                .andExpect(jsonPath("$.page.number", is(1)))
+                .andExpect(jsonPath("$.page.totalPages", is(3)))
+                .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+        getClient(authTokenAdmin).perform(get("/api/eperson/groups/search/byMetadata")
+                .param("query", "group")
+                .param("page", "2")
+                .param("size", "2"))
+                .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.groups[0].type", is("group")))
+                .andExpect(jsonPath("$._embedded.groups[1]").doesNotExist())
+                .andExpect(jsonPath("$.page.size", is(2)))
+                .andExpect(jsonPath("$.page.number", is(2)))
+                .andExpect(jsonPath("$.page.totalPages", is(3)))
+                .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+    }
+
 }
