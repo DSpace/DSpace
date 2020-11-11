@@ -31,8 +31,12 @@ import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * This test suite includes end to end test to verify the integration with ORCID as an External Source.
- * The test run only if the orcid.clientid property is configured.
+ * This test suite includes static test with mock data and end to end test to
+ * verify the integration with ORCID as an External Source. The end to end test
+ * run only if the orcid.clientid property is configured but of course also
+ * orcid.clientsecret is needed to successful run the tests. This can be enabled
+ * setting the orcid credentials via env variables, see the comments in the
+ * override section of the config-definition.xml
  * 
  * @author Mykhaylo Boychuk (4Science.it)
  *
@@ -135,6 +139,13 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    /**
+     * This test uses mock data in the orcid-person-record.xml file to simulate the
+     * response from ORCID and verify that it is properly consumed and exposed by
+     * the REST API
+     *
+     * @throws Exception
+     */
     public void findOneExternalSourcesMockitoTest() throws Exception {
         OrcidRestConnector orcidConnector = Mockito.mock(OrcidRestConnector.class);
         OrcidRestConnector realConnector = orcidV3AuthorDataProvider.getOrcidRestConnector();
@@ -161,6 +172,16 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    /**
+     * This test uses mock data in the orcid-search.xml and orcid-person-record.xml
+     * file to simulate the response from ORCID and verify that it is properly
+     * consumed and exposed by the REST API. The orcid-search.xml file indeed
+     * contains the ORCID matching the user query, for each of them our integration
+     * need to grab details making a second call to the ORCID profile (this is due
+     * to the ORCID API structure and cannot be avoid)
+     *
+     * @throws Exception
+     */
     public void findOneExternalSourceEntriesApplicableQueryMockitoTest() throws Exception {
         OrcidRestConnector orcidConnector = Mockito.mock(OrcidRestConnector.class);
         OrcidRestConnector realConnector = orcidV3AuthorDataProvider.getOrcidRestConnector();
@@ -204,6 +225,16 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    /**
+     * This test uses mock data in the orcid-search.xml and orcid-person-record.xml
+     * file to simulate the response from ORCID and verify that it is properly
+     * consumed and exposed by the REST API. The orcid-search.xml file indeed
+     * contains the ORCID matching the user query, for each of them our integration
+     * need to grab details making a second call to the ORCID profile (this is due
+     * to the ORCID API structure and cannot be avoid)
+     *
+     * @throws Exception
+     */
     public void findOneExternalSourceEntriesApplicableQueryFamilyNameAndGivenNamesMockitoTest() throws Exception {
         OrcidRestConnector orcidConnector = Mockito.mock(OrcidRestConnector.class);
         OrcidRestConnector realConnector = orcidV3AuthorDataProvider.getOrcidRestConnector();

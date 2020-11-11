@@ -27,9 +27,6 @@ env:
     # (Useful for builds which don't need to repeat code checks)
     - SKIP_CODE_CHECKS="-Denforcer.skip=true -Dcheckstyle.skip=true -Dlicense.skip=true -Dxml.skip=true"
 
-before_install:
-  # Remove outdated settings.xml from Travis builds. Workaround for https://github.com/travis-ci/travis-ci/issues/4629
-  - rm ~/.m2/settings.xml
 # Create two jobs to run Unit & Integration tests in parallel.
 # These jobs only differ in the TEST_FLAGS defined below,
 # and otherwise share all the other configs in this file
