@@ -75,6 +75,7 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -959,7 +960,8 @@ public class Utils {
      * @param url url to match against
      * @return true if trusted, false otherwise
      */
-    public boolean isTrustedUrl(String url) {
+    public static boolean isTrustedUrl(String url) {
+        ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         // Get hostname of current URL
         String hostName = org.dspace.core.Utils.getHostName(url);
 

@@ -24,15 +24,12 @@ import org.dspace.app.rest.model.wrapper.AuthenticationToken;
 import org.dspace.app.rest.security.DSpaceAuthentication;
 import org.dspace.app.rest.security.RestAuthenticationService;
 import org.dspace.app.rest.utils.ContextUtil;
-import org.dspace.app.rest.utils.Utils;
 import org.dspace.authenticate.AuthenticationMethod;
-import org.dspace.authenticate.ShibAuthentication;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
-import org.dspace.services.ConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -68,12 +65,6 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
 
     @Autowired
     private AuthenticationService authenticationService;
-
-    @Autowired
-    private ConfigurationService configurationService;
-
-    @Autowired
-    private Utils utils;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -265,77 +256,20 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
      * @return true if redirect URL is found (e.g. Shibboleth), false otherwise.
      */
     @Override
-    public boolean allowSingleUseAuthCookie(HttpServletRequest request, HttpServletResponse response) {
-        // Only allow single-use auth cookies if a redirect is necessary during authentication
-        // (e.g. Shibboleth requires a redirect, see ShibAuthentication.loginPageUrl())
-        String redirectUrl = getOriginRedirectUrl(request);
+    public boolean allowSingleUseAuthCookie(final HttpServletRequest request, final HttpServletResponse response) {
+        // Get the value of our WWW-Authenticate header (see previous method)
+        String wwwAuthHeaderValue = getWwwAuthenticateHeaderValue(request, response);
 
-        // If a redirect is required, then we need to support single-auth cookies
-        if (StringUtils.isNotEmpty(redirectUrl)) {
+        // If the WWW-Authenticate header includes *at least one* authentication plugin with a "location" parameter,
+        // then we MUST allow single-use authentication cookies.
+        // The reason is that the "location" param is only set if authenticationMethod.loginPageUrl() returns a value,
+        // and that method ONLY returns a value if the plugin requires an *external* login page to be redirected to
+        // for authentication. External login pages need single-auth cookies since we cannot send headers via redirects.
+        if (StringUtils.isNotEmpty(wwwAuthHeaderValue) && wwwAuthHeaderValue.contains("location=\"")) {
             return true;
         }
         // Default to not allowing single-use auth cookies.
         return false;
-    }
-
-    /**
-     * When allowSingleUseAuthCookie() is true, the most likely scenario is a *redirect* will occur during the
-     * authentication of the user. Since an HTTP redirect cannot send HTTP headers, it must send the auth
-     * token via a cookie. One example is Shibboleth.
-     * <P>
-     * This method first checks if a redirect is necessary during the authentication process (e.g. Shibboleth is
-     * enabled). If a redirect is not needed, null is returned. If a redirect is needed, then it checks the current
-     * request for the redirect URL in a querystring param, or defaults to our UI URL if not found.
-     * <P>
-     * In this implementation, we're also saving the redirect URL to an internal attribute, so that it can be used
-     * when generating/signing the JWT (as the origin of the JWT auth request). When redirects are involved, Origin
-     * headers are lost, so we cannot depend on those headers existing when generating/signing the JWT.
-     * @param request current HTTP request
-     * @return If redirection unnecessary, null is returned. If redirection is necessary, returns URL of redirect.
-     */
-    public String getOriginRedirectUrl(HttpServletRequest request) {
-        final String requestAttr = "origin-redirect-url";
-        final String shibPluginName = new ShibAuthentication().getName();
-
-        // Redirects during authentication are ONLY required when the Shibboleth plugin is enabled.
-        // So, loop through all enabled plugins to see if Shibboleth is one of them.
-        boolean redirectRequired = false;
-        Iterator<AuthenticationMethod> authenticationMethodIterator =
-            authenticationService.authenticationMethodIterator();
-        while (authenticationMethodIterator.hasNext()) {
-            if (shibPluginName.equals(authenticationMethodIterator.next().getName())) {
-                redirectRequired = true;
-                break;
-            }
-        }
-
-        // If a redirect is required, then check for a redirectURL.
-        if (redirectRequired) {
-            // First, check to see if we've previously saved the redirect url in an internal request attribute
-            String redirectUrl = (String) request.getAttribute(requestAttr);
-
-            // If found in an internal attribute, unset that attribute (it can only be read once) and return value
-            if (StringUtils.isNotEmpty(redirectUrl)) {
-                request.removeAttribute(requestAttr);
-                return redirectUrl;
-            } else {
-                // If not in an internal attribute, check querystring param "redirectUrl"
-                redirectUrl = request.getParameter("redirectUrl");
-
-                // If still empty, default to assuming we'd redirect back to the UI
-                if (StringUtils.isEmpty(redirectUrl)) {
-                    redirectUrl = configurationService.getProperty("dspace.ui.url");
-                }
-
-                // Verify the origin is trusted & save it to our internal request attribute before returning
-                if (utils.isTrustedUrl(redirectUrl)) {
-                    request.setAttribute(requestAttr, redirectUrl);
-                    return redirectUrl;
-                }
-            }
-        }
-        // Either redirect is not required, or an untrusted redirect URL was found
-        return null;
     }
 
     /**

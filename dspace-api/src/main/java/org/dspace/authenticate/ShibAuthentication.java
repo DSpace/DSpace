@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -88,6 +89,17 @@ public class ShibAuthentication implements AuthenticationMethod {
      * Maximum length for eperson additional metadata fields
      **/
     protected final int METADATA_MAX_SIZE = 1024;
+
+    /**
+     * Path of the Controller in DSpace which will redirect back to the UI/client after successful authentication
+     * This is the path of the ShibbolethRestController in the Server Webapp
+     */
+    public static final String REDIRECT_CONTROLLER_PATH = "/api/authn/shibboleth";
+
+    /**
+     * Name of the redirect URL param used to redirect back to the UI/client after successful authentication
+     */
+    public static final String REDIRECT_URL_PARAM = "redirectUrl";
 
     protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
@@ -513,10 +525,10 @@ public class ShibAuthentication implements AuthenticationMethod {
             }
 
             // Determine the server return URL, where shib will send the user after authenticating.
-            // We need it to go back to DSpace's shibboleth-login url so we will extract the user's information
-            // and locally authenticate them.
-            String returnURL = configurationService.getProperty("dspace.server.url") + "/api/authn/shibboleth"
-                    + ((redirectUrl != null) ? "?redirectUrl=" + redirectUrl : "");
+            // We need it to go back to DSpace's ShibbolethRestController so we will extract the user's information,
+            // locally authenticate them & then redirect back to the UI.
+            String returnURL = configurationService.getProperty("dspace.server.url") + REDIRECT_CONTROLLER_PATH
+                    + ((redirectUrl != null) ? "?" + REDIRECT_URL_PARAM + "=" + redirectUrl : "");
 
             try {
                 shibURL += "?target=" + URLEncoder.encode(returnURL, "UTF-8");
@@ -537,6 +549,25 @@ public class ShibAuthentication implements AuthenticationMethod {
     @Override
     public String getName() {
         return "shibboleth";
+    }
+
+    /**
+     * Check if Shibboleth plugin is enabled
+     * @return true if enabled, false otherwise
+     */
+    public static boolean isEnabled() {
+        final String shibPluginName = new ShibAuthentication().getName();
+        boolean shibEnabled = false;
+        // Loop through all enabled authentication plugins to see if Shibboleth is one of them.
+        Iterator<AuthenticationMethod> authenticationMethodIterator =
+            AuthenticateServiceFactory.getInstance().getAuthenticationService().authenticationMethodIterator();
+        while (authenticationMethodIterator.hasNext()) {
+            if (shibPluginName.equals(authenticationMethodIterator.next().getName())) {
+                shibEnabled = true;
+                break;
+            }
+        }
+        return shibEnabled;
     }
 
     /**

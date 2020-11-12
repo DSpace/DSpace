@@ -146,10 +146,12 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         // (2) After a successful login, Shibboleth redirects user to /api/authn/shibboleth?redirectUrl=[url]
         // (3) That triggers generation of the auth token (JWT), and redirects the user to 'redirectUrl', sending along
         //     a single-use cookie containing the auth token.
-        // In below call, we're sending a GET request (as that's what a redirect is), without any normal headers
-        // (like Origin) to simulate this redirect coming from the Shibboleth server. We are then verifying the user
-        // will be redirected to the 'redirectUrl' with a single-use auth cookie
+        // In below call, we're sending a GET request (as that's what a redirect is), with a Referer of a "fake"
+        // Shibboleth server to simulate this request coming back from Shibboleth (after a successful login).
+        // We are then verifying the user will be redirected to the 'redirectUrl' with a single-use auth cookie
+        // (NOTE: Additional tests of this /api/authn/shibboleth endpoint can be found in ShibbolethRestControllerIT)
         Cookie authCookie = getClient().perform(get("/api/authn/shibboleth")
+                                                    .header("Referer", "https://myshib.example.com")
                                                     .param("redirectUrl", uiURL)
                                                     .requestAttr("SHIB-MAIL", eperson.getEmail())
                                                     .requestAttr("SHIB-SCOPED-AFFILIATION", "faculty;staff"))

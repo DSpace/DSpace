@@ -431,30 +431,33 @@ public abstract class JWTTokenHandler {
      * @return found origin (or null if not able to determine)
      */
     private String getRequestOrigin(HttpServletRequest request) {
-        // First we check for "Origin" header, as it is the most trustworthy.
+        // First, check to see if one of our LoginFilters has found a pending redirect in the current auth request.
+        // Some auth plugins (like Shibboleth) require a redirect back to the client after a successful login.
+        // In that specific situation, we use the redirect URL as the Origin of our JWT, as it corresponds to the
+        // (client) Origin which initiated the auth request. We check for a redirect *first* because this implies the
+        // current request is NOT from our client, but instead from the external authentication system (and we'll be
+        // redirecting back to the client shortly). NOTE: Keep in mind this URL is validated by the LoginFilter before
+        // it is saved to the request attribute, see e.g. ShibbolethLoginFilter
+        String source = (String) request.getAttribute(RestAuthenticationService.REDIRECT_URL_REQUEST_ATTRIBUTE);
+
+        // If no pending redirect, check for "Origin" header, as it is the most trustworthy.
         // It is set automatically by most browsers & modification is usually blocked by browser.
-        String source = request.getHeader("Origin");
         if (StringUtils.isEmpty(source)) {
-            // If empty fallback to "Referer" header.
-            // Again, it is set automatically & modification is usually blocked by browser.
+            source = request.getHeader("Origin");
+        }
+
+        // If empty fallback to "Referer" header.
+        // Again, it is set automatically & modification is usually blocked by browser.
+        if (StringUtils.isEmpty(source)) {
             source = request.getHeader("Referer");
         }
 
-        // If both of the above headers are empty, then this may be a non-browser access.
-        // This may occur with our Angular UI when Server Side Rendering (SSR) sent the request, as
+        // If both of the above headers are empty, then this may be a non-browser request.
+        // This scenario may occur with our Angular UI when Server Side Rendering (SSR) sent the request, as
         // Angular Universal (SSR) doesn't always provide Origin or Referer headers.
         if (StringUtils.isEmpty(source)) {
-            // Check for our custom X-DSpace-UI header which is passed by our UI in every request
+            // Check for our custom X-DSpace-UI header which is passed by our UI in every request (even via SSR)
             source = request.getHeader("X-DSpace-UI");
-        }
-
-        // If nothing is found in the Headers, check for a possible redirect in the current auth request.
-        // When a redirect occurs during authentication, the Headers are lost (as headers cannot be sent via a
-        // redirect). In that specific situation, we use the redirect URL as the Origin of our JWT, as the redirect
-        // URL corresponds to the origin which initiated the auth request. NOTE: in getOriginRedirectUrl() we
-        // are already verifying this URL is trusted and also that a redirect is required by the auth service.
-        if (StringUtils.isEmpty(source)) {
-            source = restAuthenticationService.getOriginRedirectUrl(request);
         }
 
         // Return base URL (this removes any path, etc)
