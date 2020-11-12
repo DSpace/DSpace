@@ -8,6 +8,7 @@ pipeline {
     environment {
         VERSION = "${env.BRANCH_NAME}".replaceAll('/', '_').toLowerCase()
         CUSTOMZ = "customizations"
+		SLACK_CHANNEL = '#sandbox_playground'
     }
 
     stages {
@@ -45,31 +46,16 @@ pipeline {
                         echo "Release aborted"
                         throw err
                     }
-                }
-            }
-        }
-
-        stage('Bootstrap workspace') {
-            steps {
-                dir("${env.WORKSPACE}/deployscripts") {
-                    withCredentials([string(credentialsId: 'brage_vault_' + inputResult.devstep, variable: 'VAULTSECRET')]) {
-                        ansiblePlaybook(
-                                playbook: 'pre-build.yml',
-                                inventory: 'localhost,',
-                                extraVars: [
-                                        fase             : inputResult.devstep,
-                                        jenkins_workspace: env.WORKSPACE,
-                                        kunde            : inputResult.kunde,
-                                        vault_secret     : "$VAULTSECRET"
-                                ]
-                        )
-                    }
+					if ( inputResult == 'produksjon' )
+						SLACK_CHANNEL = '#brage'
+					slackSend channel: SLACK_CHANNEL, iconEmoji: ':information_source:', message: 'Deployment av alle Brage-instanser på *' + inputResult + '* starter', username: 'BrageDeployment', tokenCredentialId: 'brage_slack', teamDomain: 'unit-norge'
                 }
             }
         }
 
         stage('Maven Build') {
             steps {
+				slackSend channel: SLACK_CHANNEL, iconEmoji: ':information_source:', message: 'Bygger applikasjonen..', username: 'BrageDeployment', tokenCredentialId: 'brage_slack', teamDomain: 'unit-norge'
                 echo "Building with maven"
                 sh 'mvn package -Dmirage2.on=true -P !dspace-lni,!dspace-sword,!dspace-jspui,!dspace-rdf'
             }
@@ -77,6 +63,7 @@ pipeline {
 
         stage('Deploy Brage') {
             steps {
+				slackSend channel: SLACK_CHANNEL, iconEmoji: ':information_source:', message: 'Bygging ferdig. Klargjør installasjonspakke..', username: 'BrageDeployment', tokenCredentialId: 'brage_slack', teamDomain: 'unit-norge'
                 println("Deploying branch $VERSION for ${inputResult.kunde} to ${inputResult.devstep}")
                 dir("${env.WORKSPACE}/deployscripts") {
                     withCredentials([string(credentialsId: 'brage_vault_' + inputResult.devstep, variable: 'VAULTSECRET')]) {
@@ -92,6 +79,7 @@ pipeline {
                         )
                     }
                 }
+				slackSend channel: SLACK_CHANNEL, iconEmoji: ':information_source:', message: 'Installasjon ferdig. Ny versjon av Brage er rullet ut til ' + inputResult, username: 'BrageDeployment', tokenCredentialId: 'brage_slack', teamDomain: 'unit-norge'
             }
         }
 
