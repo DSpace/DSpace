@@ -14,10 +14,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,6 +30,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.bulkimport.utils.WorkbookUtils;
+import org.dspace.app.util.DCInputsReader;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
@@ -141,10 +143,6 @@ public class XlsCollectionCrosswalkIT extends AbstractIntegrationTestWithDatabas
         Workbook workbook = WorkbookFactory.create(new ByteArrayInputStream(baos.toByteArray()));
         assertThat(workbook.getNumberOfSheets(), equalTo(4));
 
-        try (FileOutputStream fos = new FileOutputStream("/home/luca/Scrivania/test.xls")) {
-            workbook.write(fos);
-        }
-
         String firstItemId = firstItem.getID().toString();
         String secondItemId = secondItem.getID().toString();
 
@@ -158,18 +156,18 @@ public class XlsCollectionCrosswalkIT extends AbstractIntegrationTestWithDatabas
             "dc.relation.issn", "dc.coverage.publication", "dc.coverage.isbn", "dc.coverage.doi",
             "dc.description.sponsorship", "dc.description.volume", "dc.description.issue", "dc.description.startpage",
             "dc.description.endpage", "dc.relation.conference", "dc.relation.dataset",
-            "dc.identifier.citation", "dc.description", "dc.description.sponsorship" };
+            "dc.identifier.citation", "dc.description" };
         String[] mainSheetFirstRow = { firstItemId, "doi:111.111/publication", "99999999",
             "111-222-333", "", "", "", "2049-3630", "", "", "", "http://localhost:4000/handle/123456789/001",
             "978-3-16-148410-0", "Test Publication", "Alternative publication title", "2020-01-01",
-            "Controlled Vocabulary for Resource Type Genres::text::review", "en::2::500", "test||export",
+            "Controlled Vocabulary for Resource Type Genres::text::review", "en$$2$$500", "test||export",
             "Description Abstract", "Published in publication", "ISBN-01", "doi:10.3972/test", "Journal", "", "", "",
-            "", "", "", "", "", "", "", "The best Conference", "DataSet", "", "Description", "" };
+            "", "", "", "", "", "", "", "The best Conference", "DataSet", "", "Description" };
         String[] mainSheetSecondRow = { secondItemId, "", "SCOPUS-002", "ISI-002", "", "",
             "", "ISSN-002||ISSN-003", "", "", "", "http://localhost:4000/handle/123456789/002", "ISBN-002",
             "Second Publication", "", "2020-01-01", "Controlled Vocabulary for Resource Type Genres::text::review", "",
             "export", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "Conference1||Conference2", "DataSet",
-            "CIT-01", "Publication Description", "" };
+            "CIT-01", "Publication Description" };
 
         asserThatSheetHas(mainSheet, "items", 3, Arrays.asList(mainSheetHeader, mainSheetFirstRow, mainSheetSecondRow));
 
@@ -190,11 +188,113 @@ public class XlsCollectionCrosswalkIT extends AbstractIntegrationTestWithDatabas
 
         Sheet projectSheet = workbook.getSheetAt(3);
         String[] projectSheetHeader = { "PARENT-ID", "dc.relation.project", "dc.relation.grantno" };
-        String[] projectSheetFirstRow = { firstItemId, "Test Project::d9471fee-34fa-4a39-9658-443c4bb47b22::600", "" };
+        String[] projectSheetFirstRow = { firstItemId, "Test Project$$d9471fee-34fa-4a39-9658-443c4bb47b22$$600", "" };
         String[] projectSheetSecondRow = { secondItemId, "Test Project", "01" };
 
         asserThatSheetHas(projectSheet, "dc.relation.project", 3, asList(projectSheetHeader, projectSheetFirstRow,
             projectSheetSecondRow));
+    }
+
+    @Test
+    public void testDisseminateWithMockSubmissionFormConfiguration() throws Exception {
+
+        try {
+            DCInputsReader reader = mock(DCInputsReader.class);
+
+            context.turnOffAuthorisationSystem();
+
+            Collection collection = createCollection(context, community)
+                .withSubmissionDefinition("publication")
+                .withAdminGroup(eperson)
+                .build();
+
+            List<String> publicationMetadataFields = asList("dc.title", "dc.date.issued", "dc.subject");
+            List<String> publicationMetadataFieldGroups = asList("dc.contributor.author");
+            List<String> authorGroup = asList("dc.contributor.author", "oairecerif.author.affiliation");
+
+            when(reader.getLanguagesForMetadata(collection, "dc.title")).thenReturn(Arrays.asList("en", "it"));
+            when(reader.getSubmissionFormMetadata(collection, false)).thenReturn(publicationMetadataFields);
+            when(reader.getSubmissionFormMetadata(collection, true)).thenReturn(publicationMetadataFieldGroups);
+            when(reader.getAllNestedMetadataByGroupName(collection, "dc.contributor.author")).thenReturn(authorGroup);
+
+            xlsCollectionCrosswalk.setReader(reader);
+
+            Item firstPublication = ItemBuilder.createItem(context, collection)
+                .withRelationshipType("Publication")
+                .withTitle("First publication")
+                .withTitleForLanguage("Prima pubblicazione", "it")
+                .withTitleForLanguage("Primera publicacion", "es")
+                .withIssueDate("2020-01-01")
+                .withAuthor("Walter White", "0ecd5452-aae2-4c18-9aec-0471bdcbadbc")
+                .withAuthorAffiliation(CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE)
+                .withAuthor("Jesse Pinkman")
+                .withAuthorAffiliation("Company")
+                .build();
+
+            Item secondPublication = ItemBuilder.createItem(context, collection)
+                .withRelationshipType("Publication")
+                .withTitleForLanguage("Second publication", "en")
+                .withIssueDate("2019-01-01")
+                .build();
+
+            Item thirdPublication = ItemBuilder.createItem(context, collection)
+                .withRelationshipType("Publication")
+                .withTitle("Third publication")
+                .withTitleForLanguage("Terza pubblicazione", "it")
+                .withIssueDate("2018-01-01")
+                .withAuthor("Carl Johnson")
+                .build();
+
+            Item fourthPublication = ItemBuilder.createItem(context, collection)
+                .withRelationshipType("Publication")
+                .withTitle("Fourth publication")
+                .withIssueDate("2017-01-01")
+                .withAuthor("Carl Johnson")
+                .withAuthorAffiliation(CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE)
+                .withAuthor("Red White")
+                .withAuthorAffiliation(CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE)
+                .withSubject("test")
+                .withSubject("export")
+                .build();
+
+            context.restoreAuthSystemState();
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            xlsCollectionCrosswalk.disseminate(context, collection, baos);
+
+            Workbook workbook = WorkbookFactory.create(new ByteArrayInputStream(baos.toByteArray()));
+
+            assertThat(workbook.getNumberOfSheets(), equalTo(2));
+
+            String firstId = firstPublication.getID().toString();
+            String secondId = secondPublication.getID().toString();
+            String thirdId = thirdPublication.getID().toString();
+            String fourthId = fourthPublication.getID().toString();
+
+            Sheet mainSheet = workbook.getSheetAt(0);
+            String[] header = { "ID", "dc.title", "dc.date.issued", "dc.subject", "dc.title[it]", "dc.title[en]" };
+            String[] firstRow = { firstId, "First publication", "2020-01-01", "", "Prima pubblicazione", "" };
+            String[] secondRow = { secondId, "", "2019-01-01", "", "", "Second publication" };
+            String[] thirdRow = { thirdId, "Third publication", "2018-01-01", "", "Terza pubblicazione", "" };
+            String[] fourthRow = { fourthId, "Fourth publication", "2017-01-01", "test||export", "", "" };
+
+            asserThatSheetHas(mainSheet, "items", 5, asList(header, firstRow, secondRow, thirdRow, fourthRow));
+
+            Sheet authorSheet = workbook.getSheetAt(1);
+            String[] authorSheetHeader = { "PARENT-ID", "dc.contributor.author", "oairecerif.author.affiliation" };
+            String[] authorSheetFirstRow = { firstId, "Walter White$$0ecd5452-aae2-4c18-9aec-0471bdcbadbc$$600", "" };
+            String[] authorSheetSecondRow = { firstId, "Jesse Pinkman", "Company" };
+            String[] authorSheetThirdRow = { thirdId, "Carl Johnson", "" };
+            String[] authorSheetFourthRow = { fourthId, "Carl Johnson", "" };
+            String[] authorSheetFifthRow = { fourthId, "Red White", "" };
+
+            asserThatSheetHas(authorSheet, "dc.contributor.author", 6, asList(authorSheetHeader, authorSheetFirstRow,
+                authorSheetSecondRow, authorSheetThirdRow, authorSheetFourthRow, authorSheetFifthRow));
+
+        } finally {
+            this.xlsCollectionCrosswalk.setReader(new DCInputsReader());
+        }
+
     }
 
     private void asserThatSheetHas(Sheet sheet, String name, int rowsNumber, List<String[]> rows) {

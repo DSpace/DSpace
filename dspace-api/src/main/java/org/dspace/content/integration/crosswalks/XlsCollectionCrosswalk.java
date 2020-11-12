@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -263,7 +264,8 @@ public class XlsCollectionCrosswalk implements StreamDisseminationCrosswalk {
 
     private boolean isLanguageSupported(Collection collection, String language, String metadataField) {
         try {
-            return this.reader.getLanguagesForMetadata(collection, metadataField).contains(language);
+            List<String> languages = this.reader.getLanguagesForMetadata(collection, metadataField);
+            return CollectionUtils.isNotEmpty(languages) ? languages.contains(language) : false;
         } catch (DCInputsReaderException e) {
             throw new RuntimeException("An error occurs reading the input configuration by collection", e);
         }
