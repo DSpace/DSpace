@@ -26,7 +26,7 @@ pipeline {
                         echo "Release aborted"
                         throw err
                     }
-					slackSend channel: SLACK_CHANNEL, iconEmoji: ':information_source:', message: 'Deployment av alle Brage-instanser på *' + inputResult + '* starter', username: 'BrageDeployment', tokenCredentialId: 'brage_slack'
+					slackSend channel: SLACK_CHANNEL, iconEmoji: ':information_source:', message: 'Deployment av alle Brage-instanser på *' + inputResult + '* starter', username: 'BrageDeployment', tokenCredentialId: 'brage_slack', teamDomain: 'unit-norge'
                 }
             }
         }
@@ -45,7 +45,7 @@ pipeline {
 
         stage('Maven Build') {
             steps {
-				slackSend channel: SLACK_CHANNEL, iconEmoji: ':information_source:', message: 'Bygger applikasjonen..', username: 'BrageDeployment', tokenCredentialId: 'brage_slack'
+				slackSend channel: SLACK_CHANNEL, iconEmoji: ':information_source:', message: 'Bygger applikasjonen..', username: 'BrageDeployment', tokenCredentialId: 'brage_slack', teamDomain: 'unit-norge'
                 echo "Building with maven"
                 sh 'mvn package -Dmirage2.on=true -P !dspace-lni,!dspace-sword,!dspace-jspui,!dspace-rdf'
             }
@@ -53,7 +53,7 @@ pipeline {
 
         stage('Deploy Brage') {
             steps {
-				slackSend channel: SLACK_CHANNEL, iconEmoji: ':information_source:', message: 'Bygging ferdig. Klargjør installasjonspakke..', username: 'BrageDeployment', tokenCredentialId: 'brage_slack'
+				slackSend channel: SLACK_CHANNEL, iconEmoji: ':information_source:', message: 'Bygging ferdig. Klargjør installasjonspakke..', username: 'BrageDeployment', tokenCredentialId: 'brage_slack', teamDomain: 'unit-norge'
                 println("Deploying branch $VERSION to ${inputResult}")
                 dir("${env.WORKSPACE}/deployscripts") {
                     withCredentials([string(credentialsId: 'brage_vault_' + inputResult, variable: 'VAULTSECRET')]) {
@@ -69,7 +69,7 @@ pipeline {
                         )
                     }
                 }
-				slackSend channel: SLACK_CHANNEL, iconEmoji: ':information_source:', message: 'Installasjon ferdig. Ny versjon av Brage er rullet ut til ' + inputResult, username: 'BrageDeployment', tokenCredentialId: 'brage_slack'
+				slackSend channel: SLACK_CHANNEL, iconEmoji: ':information_source:', message: 'Installasjon ferdig. Ny versjon av Brage er rullet ut til ' + inputResult, username: 'BrageDeployment', tokenCredentialId: 'brage_slack', teamDomain: 'unit-norge'
             }
         }
 
