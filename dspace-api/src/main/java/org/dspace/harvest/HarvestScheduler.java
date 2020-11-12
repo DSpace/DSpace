@@ -95,7 +95,7 @@ public class HarvestScheduler implements Runnable {
         interruptValue = newInterruptValue;
     }
 
-    public static int getInterrupt() {
+    public static synchronized int getInterrupt() {
         return interrupt;
     }
 
