@@ -26,7 +26,7 @@ pipeline {
                         echo "Release aborted"
                         throw err
                     }
-					slackSend channel: SLACK_CHANNEL, iconEmoji: ':information_source:', message: 'Deployment av alle Brage-instanser på *' + inputResult.devstep + '* starter', username: 'BrageDeployment'
+					slackSend channel: SLACK_CHANNEL, iconEmoji: ':information_source:', message: "Deployment av alle Brage-instanser på *${inputResult.devstep}* starter", username: 'BrageDeployment'
                 }
             }
         }
