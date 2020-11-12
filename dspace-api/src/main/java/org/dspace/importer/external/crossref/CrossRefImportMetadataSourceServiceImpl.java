@@ -9,10 +9,8 @@ package org.dspace.importer.external.crossref;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import javax.el.MethodNotFoundException;
@@ -66,7 +64,7 @@ public class CrossRefImportMetadataSourceServiceImpl
     @Override
     public int getRecordsCount(String query) throws MetadataSourceException {
         //TODO if a doi check if exists
-        if (new CrossRefDoiCheck(webTarget).isDoi(query)) {
+        if (CrossRefDoiCheck.isDoi(query)) {
             return retry(new DoiCheckCallable(query));
         }
         return retry(new CountByQueryCallable(query));
@@ -76,9 +74,7 @@ public class CrossRefImportMetadataSourceServiceImpl
     public int getRecordsCount(Query query) throws MetadataSourceException {
         //TODO if a doi check if exists (making a head http request to the https://api.crossref.org/works/<id>)
 
-        final boolean isDoi = doi(query);
-
-        if (isDoi) {
+        if (isDoi(query)) {
             return retry(new DoiCheckCallable(query));
         }
         return retry(new CountByQueryCallable(query));
@@ -88,7 +84,7 @@ public class CrossRefImportMetadataSourceServiceImpl
     @Override
     public Collection<ImportRecord> getRecords(String query, int start, int count) throws MetadataSourceException {
         //TODO if a doi call SearchByIdCallable
-        if (new CrossRefDoiCheck(webTarget).isDoi(query)) {
+        if (CrossRefDoiCheck.isDoi(query)) {
             return retry(new SearchByIdCallable(query));
         }
         return retry(new SearchByQueryCallable(query, count, start));
@@ -97,7 +93,7 @@ public class CrossRefImportMetadataSourceServiceImpl
     @Override
     public Collection<ImportRecord> getRecords(Query query) throws MetadataSourceException {
         //TODO if a doi call SearchByIdCallable
-        final boolean isDoi = doi(query);
+        final boolean isDoi = isDoi(query);
         if (isDoi) {
             return retry(new SearchByIdCallable(query));
         }
@@ -113,11 +109,10 @@ public class CrossRefImportMetadataSourceServiceImpl
     @Override
     public Collection<ImportRecord> findMatchingRecords(Query query) throws MetadataSourceException {
         //TODO if a doi call SearchByIdCallable
-        final Entry entry = (Entry) query.getParameters().entrySet().iterator().next();
-        if (new CrossRefDoiCheck(webTarget).isDoi((String) entry.getValue())) {
-            return retry(new FindMatchingRecordCallable(query));
+        if (isDoi(query)) {
+            return retry(new SearchByIdCallable(query));
         }
-        return Collections.emptyList();
+        return retry(new FindMatchingRecordCallable(query));
     }
 
 
@@ -126,12 +121,12 @@ public class CrossRefImportMetadataSourceServiceImpl
         throw new MethodNotFoundException("This method is not implemented for CrossRef");
     }
 
-    private boolean doi(final Query query) {
+    private boolean isDoi(final Query query) {
         return Optional.ofNullable(query.getParameter("id"))
                        .filter(c -> !c.isEmpty())
                        .map(c -> c.iterator().next())
                        .map(o -> (String) o)
-                       .filter(value -> new CrossRefDoiCheck(webTarget).isDoi(value))
+                       .filter(value -> CrossRefDoiCheck.isDoi(value))
                        .isPresent();
     }
 

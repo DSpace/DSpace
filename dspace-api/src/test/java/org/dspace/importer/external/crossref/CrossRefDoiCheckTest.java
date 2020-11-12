@@ -10,17 +10,8 @@ package org.dspace.importer.external.crossref;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import javax.ws.rs.client.Invocation.Builder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
-
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 /**
  * Unit tests for {@link CrossRefDoiCheck}
@@ -29,52 +20,59 @@ import org.mockito.Mockito;
  */
 public class CrossRefDoiCheckTest {
 
-    private CrossRefDoiCheck crossRefDoiCheck;
-
-    private WebTarget webTarget = Mockito.mock(WebTarget.class);
-    private Builder builder = Mockito.mock(Builder.class);
-    private WebTarget request = mock(WebTarget.class);
-
-    @Before
-    public void setUp() throws Exception {
-        when(webTarget.path(anyString())).thenReturn(request);
-        when(request.request()).thenReturn(builder);
-        crossRefDoiCheck = new CrossRefDoiCheck(webTarget);
-    }
 
     @Test
     public void validDoi() {
-        final boolean isDoi = crossRefDoiCheck.isDoi("10.1111/jfbc.13557");
+        final boolean isDoi = CrossRefDoiCheck.isDoi("10.1111/jfbc.13557");
         assertThat(isDoi, is(true));
     }
 
     @Test
     public void validDoiCommaPrefix() {
-        final boolean isDoi = crossRefDoiCheck.isDoi(",10.1111/jfbc.13557");
+        final boolean isDoi = CrossRefDoiCheck.isDoi(",10.1111/jfbc.13557");
+        assertThat(isDoi, is(true));
+    }
+
+    @Test
+    public void validDoiWithSpaces() {
+        final boolean isDoi = CrossRefDoiCheck.isDoi(" 10.1111/jfbc.13557 ");
+        assertThat(isDoi, is(true));
+    }
+
+    @Test
+    public void validDoiCommaPrefixAndSpaces() {
+        final boolean isDoi = CrossRefDoiCheck.isDoi(", 10.1111/jfbc.13557 ");
         assertThat(isDoi, is(true));
     }
 
     @Test
     public void httpDoi() {
-        final boolean isDoi = crossRefDoiCheck.isDoi(",http://dx.doi.org/10.1175/JPO3002.1");
+        final boolean isDoi = CrossRefDoiCheck.isDoi(",http://dx.doi.org/10.1175/JPO3002.1");
         assertThat(isDoi, is(true));
     }
 
     @Test
     public void httpsDoi() {
-        final boolean isDoi = crossRefDoiCheck.isDoi(",https://dx.doi.org/10.1175/JPO3002.1");
+        final boolean isDoi = CrossRefDoiCheck.isDoi(",https://dx.doi.org/10.1175/JPO3002.1");
+        assertThat(isDoi, is(true));
+    }
+
+    @Test
+    public void httpDoiAndSpaces() {
+        final boolean isDoi = CrossRefDoiCheck.isDoi(", http://dx.doi.org/10.1175/JPO3002.1 ");
+        assertThat(isDoi, is(true));
+    }
+
+    @Test
+    public void httpsDoiAndSpaces() {
+        final boolean isDoi = CrossRefDoiCheck.isDoi(", https://dx.doi.org/10.1175/JPO3002.1 ");
         assertThat(isDoi, is(true));
     }
 
     @Test
     public void invalidDoi() {
-        final boolean isDoi = crossRefDoiCheck.isDoi("invalid");
+        final boolean isDoi = CrossRefDoiCheck.isDoi("invalid");
         assertThat(isDoi, is(false));
     }
 
-    private Response response(final int code) {
-        final Response response = mock(Response.class);
-        when(response.getStatus()).thenReturn(code);
-        return response;
-    }
 }

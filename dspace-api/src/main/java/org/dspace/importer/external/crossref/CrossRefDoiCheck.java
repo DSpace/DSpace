@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.ws.rs.client.WebTarget;
 
 
 /**
@@ -31,25 +30,23 @@ public class CrossRefDoiCheck {
                                                                "|10.1207/[\\w\\d]+\\&\\d+_\\d+",
                                                            Pattern.CASE_INSENSITIVE);
 
-    private final WebTarget webTarget;
 
-    public CrossRefDoiCheck(final WebTarget webTarget) {
-        this.webTarget = webTarget;
+    private CrossRefDoiCheck() {
     }
 
-    public boolean isDoi(final String value) {
+    public static boolean isDoi(final String value) {
 
         Matcher m = PATTERN.matcher(purgeDoiValue(value));
         return m.matches();
     }
 
 
-    private String purgeDoiValue(final String query) {
+    private static String purgeDoiValue(final String query) {
         String value = query.replaceAll(",", "");
         for (final String prefix : DOI_PREFIXES) {
             value = value.replaceAll(prefix, "");
         }
-        return value;
+        return value.trim();
     }
 
 }
