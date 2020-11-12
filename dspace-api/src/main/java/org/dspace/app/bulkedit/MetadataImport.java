@@ -1688,19 +1688,39 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                             // Add to errors if Realtionship.type cannot be derived.
                             Item originItem = null;
                             if (itemService.find(c, UUID.fromString(targetUUID)) != null) {
-                                originItem = itemService.find(c, UUID.fromString(originRefererUUID));
-                                List<MetadataValue> relTypes = itemService.
-                                                                              getMetadata(originItem, "relationship",
-                                                                                          "type", null, Item.ANY);
-                                String relTypeValue = null;
-                                if (relTypes.size() > 0) {
-                                    relTypeValue = relTypes.get(0).getValue();
+                                DSpaceCSVLine dSpaceCSVLine = this.csv.getCSVLines()
+                                                                      .get(Integer.valueOf(originRow) - 1);
+                                List<String> relTypes = dSpaceCSVLine.get("relationship.type");
+                                if (relTypes == null || relTypes.isEmpty()) {
+                                    dSpaceCSVLine.get("relationship.type[]");
+                                }
+
+                                if (relTypes != null && relTypes.size() > 0) {
+                                    String relTypeValue = relTypes.get(0);
+                                    relTypeValue = StringUtils.remove(relTypeValue, "\"").trim();
                                     originType = entityTypeService.findByEntityType(c, relTypeValue).getLabel();
                                     validateTypesByTypeByTypeName(c, targetType, originType, typeName, originRow);
                                 } else {
-                                    relationValidationErrors.add("Error on CSV row " + originRow + ":" + "\n" +
-                                                                     "Cannot resolve Entity type for reference: "
-                                                                     + originRefererUUID);
+                                    originItem = itemService.find(c, UUID.fromString(originRefererUUID));
+                                    if (originItem != null) {
+                                        List<MetadataValue> mdv = itemService.getMetadata(originItem,
+                                                                                          "relationship",
+                                                                                          "type", null,
+                                                                                          Item.ANY);
+                                        if (!mdv.isEmpty()) {
+                                            String relTypeValue = mdv.get(0).getValue();
+                                            originType = entityTypeService.findByEntityType(c, relTypeValue).getLabel();
+                                            validateTypesByTypeByTypeName(c, targetType, originType, typeName,
+                                                                          originRow);
+                                        } else {
+                                            relationValidationErrors.add("Error on CSV row " + originRow + ":" + "\n" +
+                                                     "Cannot resolve Entity type for reference: " + originRefererUUID);
+                                        }
+                                    } else {
+                                        relationValidationErrors.add("Error on CSV row " + originRow + ":" + "\n" +
+                                                                         "Cannot resolve Entity type for reference: "
+                                                                         + originRefererUUID);
+                                    }
                                 }
 
                             } else {
