@@ -79,7 +79,7 @@ public class ResearcherProfileClaimByEmail implements PostLoggedInAction {
         String email = currentUser.getEmail();
         String fullName = currentUser.getFullName();
 
-        List<Item> items = toList(itemService.findByMetadataField(context, "person", "email", null, email));
+        List<Item> items = toList(itemService.findArchivedByMetadataField(context, "person", "email", null, email));
 
         if (CollectionUtils.isEmpty(items)) {
             return;

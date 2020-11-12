@@ -2,8 +2,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:util="http://www.springframework.org/schema/util"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
-	default-lazy-init="true">
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
 	<util:constant id="CrisConsumer-SOURCE_INTERNAL" static-field="org.dspace.authority.CrisConsumer.SOURCE_INTERNAL" />
 
@@ -83,4 +82,43 @@
 		</property>
 	</bean>
 
+	<bean class="org.dspace.authority.service.ItemSearcherMapper" name="org.dspace.authority.service.ItemSearcherMapper">
+		<constructor-arg index="0">
+			<map>
+				<entry key="UUID">
+					<bean class="org.dspace.authority.service.impl.ItemSearcherById"></bean>
+				</entry>
+				<entry key="ORCID">
+					<bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata">
+						<constructor-arg ref="org.dspace.discovery.SearchService"></constructor-arg>
+						<constructor-arg value="person.identifier.orcid"></constructor-arg>
+					</bean>
+				</entry>
+				<entry key="RID">
+					<bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata">
+						<constructor-arg ref="org.dspace.discovery.SearchService"></constructor-arg>
+						<constructor-arg value="person.identifier.rid"></constructor-arg>
+					</bean>
+				</entry>
+				<entry key="ISNI">
+					<bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata">
+						<constructor-arg ref="org.dspace.discovery.SearchService"></constructor-arg>
+						<constructor-arg value="person.identifier.isni"></constructor-arg>
+					</bean>
+				</entry>
+				<entry key="DOI">
+					<bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata">
+						<constructor-arg ref="org.dspace.discovery.SearchService"></constructor-arg>
+						<constructor-arg value="dc.identifier.doi"></constructor-arg>
+					</bean>
+				</entry>
+			</map>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<bean class="org.dspace.authority.service.impl.ItemSearcherById"></bean>
+		</constructor-arg>
+	</bean>
+	
+	<bean class="org.dspace.authority.service.impl.ItemSearchServiceImpl" name="org.dspace.authority.service.ItemSearchService"/>
+	
 </beans>

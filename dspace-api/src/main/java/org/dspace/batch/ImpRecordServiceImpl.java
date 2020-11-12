@@ -10,12 +10,10 @@ package org.dspace.batch;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.logging.log4j.Logger;
 import org.dspace.batch.dao.ImpBitstreamDAO;
 import org.dspace.batch.dao.ImpBitstreamMetadatavalueDAO;
 import org.dspace.batch.dao.ImpMetadatavalueDAO;
 import org.dspace.batch.dao.ImpRecordDAO;
-import org.dspace.batch.dao.ImpRecordToItemDAO;
 import org.dspace.batch.dao.ImpWorkflowNStateDAO;
 import org.dspace.batch.service.ImpRecordService;
 import org.dspace.content.Collection;
@@ -32,10 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  */
 public class ImpRecordServiceImpl implements ImpRecordService {
-    /**
-     * log4j category
-     */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ImpRecordService.class);
 
     @Autowired(required = true)
     private ImpRecordDAO impRecordDAO;
@@ -48,9 +42,6 @@ public class ImpRecordServiceImpl implements ImpRecordService {
 
     @Autowired(required = true)
     private ImpMetadatavalueDAO impMetadatavalueDAO;
-
-    @Autowired(required = true)
-    private ImpRecordToItemDAO impRecordToItemDAO;
 
     @Autowired(required = true)
     private ImpWorkflowNStateDAO impWorkflowNStateDAO;
@@ -116,7 +107,6 @@ public class ImpRecordServiceImpl implements ImpRecordService {
     @Override
     public void cleanupTables(Context context) throws SQLException {
         // removes the data from the reverse order of creating the tables
-        impRecordToItemDAO.deleteAll(context);
         impBitstreamMetadatavalueDAO.deleteAll(context);
         impBitstreamDAO.deleteAll(context);
         impMetadatavalueDAO.deleteAll(context);
