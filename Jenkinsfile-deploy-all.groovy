@@ -26,6 +26,8 @@ pipeline {
                         echo "Release aborted"
                         throw err
                     }
+					if ( inputResult == 'produksjon' )
+						SLACK_CHANNEL = '#brage'
 					slackSend channel: SLACK_CHANNEL, iconEmoji: ':information_source:', message: 'Deployment av alle Brage-instanser på *' + inputResult + '* starter', username: 'BrageDeployment', tokenCredentialId: 'brage_slack', teamDomain: 'unit-norge'
                 }
             }
