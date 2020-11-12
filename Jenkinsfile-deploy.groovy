@@ -48,7 +48,7 @@ pipeline {
                     }
 					if ( inputResult == 'produksjon' )
 						SLACK_CHANNEL = '#brage'
-					slackSend channel: SLACK_CHANNEL, iconEmoji: ':information_source:', message: 'Deployment av alle Brage-instanser på *' + inputResult + '* starter', username: 'BrageDeployment', tokenCredentialId: 'brage_slack', teamDomain: 'unit-norge'
+					slackSend channel: SLACK_CHANNEL, iconEmoji: ':information_source:', message: 'Deployment av Brage-instans `' + inputResult.kunde + '` på *' + inputResult.devstep + '* starter', username: 'BrageDeployment', tokenCredentialId: 'brage_slack', teamDomain: 'unit-norge'
                 }
             }
         }
@@ -74,12 +74,13 @@ pipeline {
                                         fase             : inputResult.devstep,
                                         jenkins_workspace: env.WORKSPACE,
                                         kunde            : inputResult.kunde,
+										slack_channel    : SLACK_CHANNEL,
                                         vault_secret     : "$VAULTSECRET"
                                 ]
                         )
                     }
                 }
-				slackSend channel: SLACK_CHANNEL, iconEmoji: ':information_source:', message: 'Installasjon ferdig. Ny versjon av Brage er rullet ut til ' + inputResult, username: 'BrageDeployment', tokenCredentialId: 'brage_slack', teamDomain: 'unit-norge'
+				slackSend channel: SLACK_CHANNEL, iconEmoji: ':information_source:', message: 'Installasjon ferdig. Ny versjon av `' + inputResult.kunde + '` er rullet ut til *' + inputResult.devstep + '*', username: 'BrageDeployment', tokenCredentialId: 'brage_slack', teamDomain: 'unit-norge'
             }
         }
 
