@@ -863,7 +863,7 @@ it, please enter the types and the actual numbers or codes.</hint>
           <dc-element>relation</dc-element>
           <dc-qualifier>project</dc-qualifier>
           <label>Projects</label>
-          <input-type>onebox</input-type>
+          <input-type>group</input-type>
           <repeatable>true</repeatable>
           <required />
           <hint>Enter the name of project, if any, that has produced this publication.</hint>

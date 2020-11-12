@@ -7,6 +7,12 @@
  */
 package org.dspace.app.bulkedit;
 
+/**
+ * Extension of {@link BulkImportScriptConfiguration} for CLI.
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ */
 public class BulkImportCliScriptConfiguration<T extends BulkImportCli> extends BulkImportScriptConfiguration<T> {
 
 

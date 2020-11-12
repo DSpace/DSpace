@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.emptyCollectionOf;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
@@ -260,7 +261,6 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         assertThat(metadata, hasItems(with("dc.contributor.author", "Luca Stone", null, null, 1, -1)));
         assertThat(metadata, hasItems(with("dc.contributor.author", "Edward Red", null, null, 2, -1)));
         assertThat(metadata, hasItems(with("dc.publisher", "Publisher", null, null, 0, -1)));
-        assertThat(metadata, hasItems(with("dc.identifier.patentno", "", null, null, 0, -1)));
 
     }
 
@@ -306,7 +306,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         assertThat(metadata, hasItems(with("dc.contributor.author", "Tom Jones", null, null, 0, -1)));
         assertThat(metadata, hasItems(with("dc.contributor.author", "Edward Red", null, null, 1, -1)));
         assertThat(metadata, hasItems(with("dc.publisher", "Publisher", null, null, 0, -1)));
-        assertThat(metadata, hasItems(with("dc.identifier.patentno", "", null, null, 0, -1)));
+        assertThat(metadata, not(hasItems(with("dc.identifier.patentno", "888-444-333", null, null, 0, -1))));
 
     }
 

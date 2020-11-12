@@ -175,6 +175,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "dc", "identifier", "patentno", patentNo);
     }
 
+    public ItemBuilder withCitationIdentifier(String citation) {
+        return addMetadataValue(item, "dc", "identifier", "citation", citation);
+    }
+
     public ItemBuilder withFullName(String fullname) {
         return setMetadataSingleValue(item, "crisrp", "name", null, fullname);
     }
@@ -375,8 +379,16 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "dc", "relation", "doi", doi);
     }
 
+    public ItemBuilder withRelationIsbn(String isbn) {
+        return addMetadataValue(item, "dc", "relation", "isbn", isbn);
+    }
+
     public ItemBuilder withRelationProject(String project) {
         return addMetadataValue(item, "dc", "relation", "project", project);
+    }
+
+    public ItemBuilder withRelationGrantno(String grantno) {
+        return addMetadataValue(item, "dc", "relation", "grantno", grantno);
     }
 
     public ItemBuilder withRelationFunding(String funding) {

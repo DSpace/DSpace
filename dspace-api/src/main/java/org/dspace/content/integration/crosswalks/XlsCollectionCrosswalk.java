@@ -34,8 +34,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.dspace.app.bulkedit.BulkImport;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
-import org.dspace.app.util.SubmissionConfigReader;
-import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
@@ -68,14 +66,11 @@ public class XlsCollectionCrosswalk implements StreamDisseminationCrosswalk {
 
     private DCInputsReader reader;
 
-    private SubmissionConfigReader submissionConfigReader;
-
     @PostConstruct
     private void postConstruct() {
         try {
             this.reader = new DCInputsReader();
-            this.submissionConfigReader = new SubmissionConfigReader();
-        } catch (DCInputsReaderException | SubmissionConfigReaderException e) {
+        } catch (DCInputsReaderException e) {
             throw new RuntimeException(e);
         }
     }
@@ -128,7 +123,7 @@ public class XlsCollectionCrosswalk implements StreamDisseminationCrosswalk {
         mainSheet.appendHeader(ID_CELL);
         List<String> metadataFields = getSubmissionFormMetadata(collection, false);
         for (String metadataField : metadataFields) {
-            mainSheet.appendHeader(metadataField);
+            mainSheet.appendHeaderIfNotPresent(metadataField);
         }
         return mainSheet;
     }
@@ -151,6 +146,7 @@ public class XlsCollectionCrosswalk implements StreamDisseminationCrosswalk {
             Item item = itemIterator.next();
             writeMainSheet(context, item, mainSheet);
             nestedMetadataSheets.forEach(sheet -> writeNestedMetadataSheet(context, item, sheet));
+            context.uncacheEntity(item);
         }
 
     }
@@ -250,10 +246,7 @@ public class XlsCollectionCrosswalk implements StreamDisseminationCrosswalk {
 
     private List<String> getSubmissionFormMetadataGroup(Collection collection, String groupName) {
         try {
-            String submissionName = this.submissionConfigReader.getSubmissionConfigByCollection(collection)
-                .getSubmissionName();
-            String formName = submissionName + "-" + groupName.replaceAll("\\.", "-");
-            return this.reader.getAllFieldNamesByFormName(formName);
+            return this.reader.getAllNestedMetadataByGroupName(collection, groupName);
         } catch (DCInputsReaderException e) {
             throw new RuntimeException("An error occurs reading the input configuration "
                 + "by group name " + groupName, e);
@@ -301,10 +294,6 @@ public class XlsCollectionCrosswalk implements StreamDisseminationCrosswalk {
 
     public void setReader(DCInputsReader reader) {
         this.reader = reader;
-    }
-
-    public void setSubmissionConfigReader(SubmissionConfigReader submissionConfigReader) {
-        this.submissionConfigReader = submissionConfigReader;
     }
 
 }

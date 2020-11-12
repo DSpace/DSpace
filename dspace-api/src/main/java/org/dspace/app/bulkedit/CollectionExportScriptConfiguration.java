@@ -7,7 +7,6 @@
  */
 package org.dspace.app.bulkedit;
 
-import java.io.InputStream;
 import java.sql.SQLException;
 
 import org.apache.commons.cli.Options;
@@ -17,13 +16,13 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Script configuration for {@link BulkImport}.
+ * Script configuration for {@link CollectionExport}.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
- * @param  <T> the {@link BulkImport} type
+ * @param  <T> the {@link CollectionExport} type
  */
-public class BulkImportScriptConfiguration<T extends BulkImport> extends ScriptConfiguration<T> {
+public class CollectionExportScriptConfiguration<T extends CollectionExport> extends ScriptConfiguration<T> {
 
     @Autowired
     private AuthorizeService authorizeService;
@@ -44,21 +43,9 @@ public class BulkImportScriptConfiguration<T extends BulkImport> extends ScriptC
         if (options == null) {
             Options options = new Options();
 
-            options.addOption("c", "collection", true, "the own collection of the imported items");
+            options.addOption("c", "collection", true, "the collection for which to export all archived items");
             options.getOption("c").setType(String.class);
             options.getOption("c").setRequired(true);
-
-            options.addOption("f", "file", true, "source file");
-            options.getOption("f").setType(InputStream.class);
-            options.getOption("f").setRequired(true);
-
-            options.addOption("w", "workflow", false, "when adding new items, use collection workflow");
-            options.getOption("w").setType(boolean.class);
-            options.getOption("w").setRequired(false);
-
-            options.addOption("e", "concludeOnError", false, "conclude the import at the first error");
-            options.getOption("e").setType(boolean.class);
-            options.getOption("e").setRequired(false);
 
             super.options = options;
         }
@@ -70,12 +57,6 @@ public class BulkImportScriptConfiguration<T extends BulkImport> extends ScriptC
         return dspaceRunnableClass;
     }
 
-    /**
-     * Generic setter for the dspaceRunnableClass
-     *
-     * @param dspaceRunnableClass The dspaceRunnableClass to be set on this
-     *                            BulkImportScriptConfiguration
-     */
     @Override
     public void setDspaceRunnableClass(Class<T> dspaceRunnableClass) {
         this.dspaceRunnableClass = dspaceRunnableClass;

@@ -50,8 +50,6 @@ import org.dspace.app.bulkimport.service.ItemSearcherMapper;
 import org.dspace.app.bulkimport.utils.WorkbookUtils;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
-import org.dspace.app.util.SubmissionConfigReader;
-import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -133,8 +131,6 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
     private DCInputsReader reader;
 
-    private SubmissionConfigReader submissionConfigReader;
-
 
     private String collectionId;
 
@@ -163,8 +159,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
         try {
             this.reader = new DCInputsReader();
-            this.submissionConfigReader = new SubmissionConfigReader();
-        } catch (DCInputsReaderException | SubmissionConfigReaderException e) {
+        } catch (DCInputsReaderException e) {
             throw new RuntimeException(e);
         }
 
@@ -328,10 +323,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
     private List<String> getSubmissionFormMetadataGroup(String groupName) {
         try {
-            String submissionName = this.submissionConfigReader.getSubmissionConfigByCollection(getCollection())
-                .getSubmissionName();
-            String formName = submissionName + "-" + groupName.replaceAll("\\.", "-");
-            return this.reader.getAllFieldNamesByFormName(formName);
+            return this.reader.getAllNestedMetadataByGroupName(getCollection(), groupName);
         } catch (DCInputsReaderException e) {
             throw new BulkImportException("An error occurs reading the input configuration "
                 + "by group name " + groupName, e);
@@ -576,7 +568,9 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
                 String authority = metadataValue.getAuthority();
                 int confidence = metadataValue.getConfidence();
                 String value = metadataValue.getValue();
-                itemService.addMetadata(context, item, metadataField, language, value, authority, confidence);
+                if (StringUtils.isNotEmpty(value)) {
+                    itemService.addMetadata(context, item, metadataField, language, value, authority, confidence);
+                }
             }
         }
 
