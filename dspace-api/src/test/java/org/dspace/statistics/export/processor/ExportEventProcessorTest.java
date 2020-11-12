@@ -241,6 +241,24 @@ public class ExportEventProcessorTest extends AbstractIntegrationTestWithDatabas
 
     }
 
+    @Test
+    /**
+     * Test the ShouldProcessEntityType method where no entityType is present
+     */
+    public void testShouldProcessEntityTypeWhenNotPresent() throws SQLException {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
+        context.restoreAuthSystemState();
+
+        ExportEventProcessor exportEventProcessor = new ItemEventProcessor(context, request, item);
+
+        boolean result = exportEventProcessor.shouldProcessEntityType(item);
+
+        assertTrue(result);
+    }
+
 
     @Test
     /**

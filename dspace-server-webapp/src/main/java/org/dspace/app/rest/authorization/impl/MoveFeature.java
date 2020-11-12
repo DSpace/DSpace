@@ -28,14 +28,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * The move feature. It can be used to verify if item can be moved to a different collection.
+ * The move feature. It can be used to verify if an item can be moved to a different collection.
  *
  * Authorization is granted if the current user has WRITE permissions on the given item and REMOVE permissions on the
  * item’s owning collection
  */
 @Component
 @AuthorizationFeatureDocumentation(name = MoveFeature.NAME,
-    description = "It can be used to verify if item can be moved to a different collection")
+    description = "It can be used to verify if an item can be moved to a different collection")
 public class MoveFeature implements AuthorizationFeature {
 
     Logger log = Logger.getLogger(MoveFeature.class);
