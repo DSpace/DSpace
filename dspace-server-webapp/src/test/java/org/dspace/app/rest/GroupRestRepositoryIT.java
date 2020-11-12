@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
@@ -2929,9 +2930,10 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .param("page", "0")
                 .param("size", "2"))
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.groups[0].type", is("group")))
-                .andExpect(jsonPath("$._embedded.groups[1].type", is("group")))
-                .andExpect(jsonPath("$._embedded.groups[2]").doesNotExist())
+                .andExpect(jsonPath("$._embedded.groups", Matchers.everyItem(
+                        hasJsonPath("$.type", is("group")))
+                        ))
+                .andExpect(jsonPath("$._embedded.groups").value(Matchers.hasSize(2)))
                 .andExpect(jsonPath("$.page.size", is(2)))
                 .andExpect(jsonPath("$.page.number", is(0)))
                 .andExpect(jsonPath("$.page.totalPages", is(3)))
@@ -2942,9 +2944,10 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .param("page", "1")
                 .param("size", "2"))
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.groups[0].type", is("group")))
-                .andExpect(jsonPath("$._embedded.groups[1].type", is("group")))
-                .andExpect(jsonPath("$._embedded.groups[2]").doesNotExist())
+                .andExpect(jsonPath("$._embedded.groups", Matchers.everyItem(
+                        hasJsonPath("$.type", is("group")))
+                        ))
+                .andExpect(jsonPath("$._embedded.groups").value(Matchers.hasSize(2)))
                 .andExpect(jsonPath("$.page.size", is(2)))
                 .andExpect(jsonPath("$.page.number", is(1)))
                 .andExpect(jsonPath("$.page.totalPages", is(3)))
@@ -2955,8 +2958,10 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .param("page", "2")
                 .param("size", "2"))
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.groups[0].type", is("group")))
-                .andExpect(jsonPath("$._embedded.groups[1]").doesNotExist())
+                .andExpect(jsonPath("$._embedded.groups", Matchers.everyItem(
+                        hasJsonPath("$.type", is("group")))
+                        ))
+                .andExpect(jsonPath("$._embedded.groups").value(Matchers.hasSize(1)))
                 .andExpect(jsonPath("$.page.size", is(2)))
                 .andExpect(jsonPath("$.page.number", is(2)))
                 .andExpect(jsonPath("$.page.totalPages", is(3)))
