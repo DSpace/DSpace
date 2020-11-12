@@ -54,22 +54,22 @@ pipeline {
         stage('Deploy Brage') {
             steps {
 				slackSend channel: SLACK_CHANNEL, iconEmoji: ':information_source:', message: 'Bygging ferdig. Klargjør installasjonspakke..', username: 'BrageDeployment'
-                println("Deploying branch $VERSION to ${inputResult.devstep}")
+                println("Deploying branch $VERSION to ${inputResult}")
                 dir("${env.WORKSPACE}/deployscripts") {
-                    withCredentials([string(credentialsId: 'brage_vault_' + inputResult.devstep, variable: 'VAULTSECRET')]) {
+                    withCredentials([string(credentialsId: 'brage_vault_' + inputResult, variable: 'VAULTSECRET')]) {
                         ansiblePlaybook(
                                 playbook: 'deploy-brage-all.yml',
                                 inventory: 'hosts',
 								forks: 5,
                                 extraVars: [
-                                        fase             : inputResult.devstep,
+                                        fase             : inputResult,
                                         jenkins_workspace: env.WORKSPACE,
                                         vault_secret     : "$VAULTSECRET"
                                 ]
                         )
                     }
                 }
-				slackSend channel: SLACK_CHANNEL, iconEmoji: ':information_source:', message: 'Installasjon ferdig. Ny versjon av Brage er rullet ut til ' + inputResult.devstep, username: 'BrageDeployment'
+				slackSend channel: SLACK_CHANNEL, iconEmoji: ':information_source:', message: 'Installasjon ferdig. Ny versjon av Brage er rullet ut til ' + inputResult, username: 'BrageDeployment'
             }
         }
 
