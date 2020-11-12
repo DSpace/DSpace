@@ -202,7 +202,8 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
             .getID().toString();
         String[] csv = {"id,collection,dc.title,relationship.type,relation." + relationshipTypeLabel, csvLineString};
         performImportScript(csv);
-        Iterator<Item> itemIteratorItem = itemService.findByMetadataField(context, "dc", "title", null, itemTitle);
+        Iterator<Item> itemIteratorItem = itemService.findArchivedByMetadataField(context, "dc", "title",
+            null, itemTitle);
         Item item = itemIteratorItem.next();
 
         List<Relationship> relationships = relationshipService.findByItem(context, item);
@@ -234,7 +235,8 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
             .getHandle() + "," + itemTitle + "," + relationshipType + "," + idStringRelatedItems;
         String[] csv = {"id,collection,dc.title,relationship.type,relation." + relationshipTypeLabel, csvLineString};
         performImportScript(csv);
-        Iterator<Item> itemIteratorItem = itemService.findByMetadataField(context, "dc", "title", null, itemTitle);
+        Iterator<Item> itemIteratorItem = itemService.findArchivedByMetadataField(context, "dc", "title",
+            null, itemTitle);
         Item item = itemIteratorItem.next();
 
 
@@ -339,7 +341,8 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
             ProcessBuilder.deleteProcess(idRef.get());
         }
 
-        Iterator<Item> itemIteratorItem = itemService.findByMetadataField(context, "dc", "title", null, "TestItemB");
+        Iterator<Item> itemIteratorItem = itemService.findArchivedByMetadataField(context, "dc", "title",
+            null, "TestItemB");
         assertFalse(itemIteratorItem.hasNext());
     }
 }

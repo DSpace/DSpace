@@ -492,6 +492,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "oairecerif", "funding", "endDate", endDate);
     }
 
+    public ItemBuilder withCrisSourceId(String sourceId) {
+        return addMetadataValue(item, "cris", "sourceId", null, sourceId);
+    }
+
     public ItemBuilder withHandle(String handle) {
         this.handle = handle;
         return this;

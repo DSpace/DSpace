@@ -46,10 +46,11 @@ import org.dspace.app.bulkimport.model.EntityRow;
 import org.dspace.app.bulkimport.model.ImportAction;
 import org.dspace.app.bulkimport.model.MetadataGroup;
 import org.dspace.app.bulkimport.model.MetadataValueVO;
-import org.dspace.app.bulkimport.service.ItemSearcherMapper;
 import org.dspace.app.bulkimport.utils.WorkbookUtils;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
+import org.dspace.authority.service.ItemSearchService;
+import org.dspace.authority.service.ItemSearcherMapper;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -88,7 +89,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BulkImport.class);
 
-    public static final String AUTHORITY_SEPARATOR = "::";
+    public static final String AUTHORITY_SEPARATOR = "$$";
 
     public static final String METADATA_SEPARATOR = "||";
 
@@ -104,13 +105,12 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
     public static final String ID_SEPARATOR = "::";
 
+
     private static final int ID_CELL_INDEX = 0;
 
     private static final int ACTION_CELL_INDEX = 1;
 
     private static final String ACTION_CELL = "ACTION";
-
-    private static final String UUID_PREFIX = "UUID";
 
 
     private CollectionService collectionService;
@@ -126,6 +126,8 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
     private WorkflowService<XmlWorkflowItem> workflowService;
 
     private ItemSearcherMapper itemSearcherMapper;
+
+    private ItemSearchService itemSearchService;
 
     private AuthorizeService authorizeService;
 
@@ -154,8 +156,8 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         this.installItemService = ContentServiceFactory.getInstance().getInstallItemService();
         this.workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
         this.authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
-        this.itemSearcherMapper = new DSpace().getServiceManager().getServiceByName("itemSearcherMapper",
-            ItemSearcherMapper.class);
+        this.itemSearcherMapper = new DSpace().getSingletonService(ItemSearcherMapper.class);
+        this.itemSearchService = new DSpace().getSingletonService(ItemSearchService.class);
 
         try {
             this.reader = new DCInputsReader();
@@ -528,18 +530,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
     }
 
     private Item findItem(EntityRow entityRow) throws Exception {
-
-        String id = entityRow.getId();
-        if (id == null) {
-            return null;
-        }
-
-        if (UUIDUtils.fromString(id) != null) {
-            return itemSearcherMapper.search(context, UUID_PREFIX, id);
-        }
-
-        String[] idSections = entityRow.getId().split(ID_SEPARATOR);
-        return itemSearcherMapper.search(context, idSections[0].toUpperCase(), idSections[1]);
+        return entityRow.getId() != null ? itemSearchService.search(context, entityRow.getId()) : null;
     }
 
     private void addMetadata(Item item, EntityRow entityRow, boolean replace) throws SQLException {
@@ -659,7 +650,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
             return new MetadataValueVO(metadataValue, null, -1);
         }
 
-        String[] valueSections = metadataValue.split(AUTHORITY_SEPARATOR);
+        String[] valueSections = StringUtils.split(metadataValue, AUTHORITY_SEPARATOR);
 
         String value = valueSections[0];
         String authority = valueSections[1];
@@ -749,7 +740,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
             String value = values[0];
             if (value.contains(AUTHORITY_SEPARATOR)) {
 
-                String[] valueSections = value.split(AUTHORITY_SEPARATOR);
+                String[] valueSections = StringUtils.split(value, AUTHORITY_SEPARATOR);
                 if (valueSections.length > 3) {
                     handleValidationErrorOnRow(row, "Invalid metadata value " + value + ": too many sections "
                         + "splitted by " + AUTHORITY_SEPARATOR);

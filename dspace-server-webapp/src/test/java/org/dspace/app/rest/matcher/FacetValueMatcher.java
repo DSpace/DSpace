@@ -67,4 +67,15 @@ public class FacetValueMatcher {
             hasJsonPath("$._links.search.href", containsString(",equals"))
         );
     }
+
+    public static Matcher<? super Object> entryText(String facetName, String label, int count) {
+        return allOf(
+            hasJsonPath("$.label", is(label)),
+            hasJsonPath("$.count", is(count)),
+            hasJsonPath("$.type", is("discover")),
+            hasJsonPath("$._links.search.href", containsString("api/discover/search/objects")),
+            hasJsonPath("$._links.search.href", containsString("f." + facetName + "=" + label + ",equals"))
+        );
+    }
+
 }

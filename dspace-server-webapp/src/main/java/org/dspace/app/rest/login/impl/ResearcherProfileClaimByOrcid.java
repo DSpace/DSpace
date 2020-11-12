@@ -83,7 +83,7 @@ public class ResearcherProfileClaimByOrcid implements PostLoggedInAction {
 
         String fullName = currentUser.getFullName();
 
-        List<Item> items = toList(itemService.findByMetadataField(context, "crisrp", "orcid", null, orcid));
+        List<Item> items = toList(itemService.findArchivedByMetadataField(context, "crisrp", "orcid", null, orcid));
 
         if (CollectionUtils.isEmpty(items)) {
             return;

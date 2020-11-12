@@ -36,12 +36,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.dspace.authority.service.AuthorityValueService;
+import org.dspace.authority.service.ItemSearchService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.batch.ImpRecord;
-import org.dspace.batch.ImpRecordToItem;
 import org.dspace.batch.service.ImpRecordService;
-import org.dspace.batch.service.ImpRecordToItemService;
 import org.dspace.batch.service.ImpServiceFactory;
+import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataFieldService;
@@ -53,6 +54,7 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.utils.DSpace;
 
 public class ItemImportMainOA {
 
@@ -62,7 +64,11 @@ public class ItemImportMainOA {
     /** Email buffer **/
     private static final String BATCH_USER = "batchjob@%";
 
+    private static final String CRIS_SOURCE_ID = "cris.sourceId";
+
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    private ItemSearchService itemSearchService = new DSpace().getSingletonService(ItemSearchService.class);
 
     public static void main(String[] argv) {
         Context context = null;
@@ -117,15 +123,15 @@ public class ItemImportMainOA {
             options.addOption("b", "delete_bitstream", false,
                     "Delete bitstream related to the item in the update phase");
             options.addOption("h", "help", false, "help");
-            options.addOption("m", "metadata", true,
-                    "List of metadata to remove first and after do an update [by default all metadata are delete,"
+            options.addOption("m", "metadata", true, "List of metadata to remove first and after do an update "
+                            + "[by default all metadata are delete except cris.sourceId,"
                             + " specifying only the dc.title it will obtain an append on the other metadata];"
                             + " use this option many times on the single metadata"
                             + " e.g. -m dc.title -m dc.contributor.*");
             options.addOption("s", "switch", false,
                     "Invert the logic for the -m option, using the option -s only the metadata list"
                             + " with the option -m are saved (ad es. -m dc.description.provenance)"
-                            + " the other will be delete");
+                            + " the other will be delete except cris.sourceId");
             options.addOption("S", "silent", false, "muted logs");
             options.addOption("t", "threads", true, "Threads numbers (default 0, if omitted read by configuration)");
 //            options.addOption("q", "query", true, "Find by query (work only in singlethread mode)");
@@ -168,6 +174,10 @@ public class ItemImportMainOA {
                     metadataClean = optionValues;
                 } else {
                     List<String> mOptions = Arrays.asList(optionValues);
+                    if (!mOptions.contains(CRIS_SOURCE_ID)) {
+                        mOptions = new ArrayList<String>(mOptions);
+                        mOptions.add(CRIS_SOURCE_ID);
+                    }
                     List<MetadataField> mdfs = getMetadataFieldService().findAll(context);
                     metadataClean = new String[mdfs.size() - optionValues.length];
                     int idx = 0;
@@ -369,16 +379,18 @@ public class ItemImportMainOA {
                 if (ep == null) {
                     recordEvent(commandOptions, sb, "Error, eperson not found: " + epersonId, true);
                 } else {
-                    ImpRecordToItem record_item = getImpRecordToItemService().findByPK(subcontext, record_id);
-                    if (record_item != null && StringUtils.equals(sourceref, record_item.getImpSourceref())) {
-                        itemId = record_item.getImpItemId();
+
+                    String searchParam = sourceref + AuthorityValueService.SPLIT + record_id;
+                    Item item = itemSearchService.search(subcontext, searchParam);
+                    if (item != null) {
+                        itemId = item.getID();
                     }
 
                     if (operation.equals("delete")) {
                         op = "d";
                         argvTemp.add("-o " + itemId);
                     } else {
-                        if (operation.equals("update") && record_item != null) {
+                        if (operation.equals("update") && item != null) {
                             op = "r";
                             argvTemp.add("-o " + itemId);
                         } else {
@@ -657,9 +669,5 @@ public class ItemImportMainOA {
 
     private ImpRecordService getImpRecordService() {
         return ImpServiceFactory.getInstance().getImpRecordService();
-    }
-
-    private ImpRecordToItemService getImpRecordToItemService() {
-        return ImpServiceFactory.getInstance().getImpRecordToItemService();
     }
 }
