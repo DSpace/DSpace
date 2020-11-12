@@ -63,12 +63,11 @@
     
 - name: Notify Slack
   slack:
-    channel: "{{ SlackConfig.channel }}"
+    channel: "{{ slack_channel | default(SlackConfig.channel) }}"
     icon_emoji: "{{ SlackConfig.icon }}"
     msg: "`[{{kunde}}]` Installasjonspakke ferdig. Starter installasjon."
     token: "{{ SlackConfig.token }}"
     username: "{{ SlackConfig.sender }}"
-  when: fase == "produksjon"
 
 - name: Install application
   register: result
@@ -152,9 +151,8 @@
 
 - name: Notify Slack
   slack:
-    channel: "{{ SlackConfig.channel }}"
+    channel: "{{ slack_channel | default(SlackConfig.channel) }}"
     icon_emoji: "{{ SlackConfig.icon }}"
     msg: "`[{{kunde}}]` Installasjon utført."
     token: "{{ SlackConfig.token }}"
     username: "{{ SlackConfig.sender }}"
-  when: fase == "produksjon"
