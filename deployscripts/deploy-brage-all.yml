@@ -31,7 +31,7 @@
 
     - name: Notify Slack
       slack:
-        channel: "{{ SlackConfig.channel }}"
+    channel: "{{ slack_channel | default(SlackConfig.channel) }}"
         icon_emoji: "{{ SlackConfig.icon }}"
         msg: "Webserver {{inventory_hostname_short|upper}} konfigurert."
         token: "{{ SlackConfig.token }}"
