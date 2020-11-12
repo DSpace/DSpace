@@ -25,12 +25,17 @@ import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.EntityType;
 import org.dspace.content.Item;
+import org.dspace.content.Relationship;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipService;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.scripts.DSpaceRunnable;
@@ -38,19 +43,16 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ScriptService;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
-public class MetadataImportTest extends AbstractIntegrationTestWithDatabase {
+public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
 
-    private final ItemService itemService
+    private ItemService itemService
         = ContentServiceFactory.getInstance().getItemService();
-    private final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-    private Collection collection;
+    private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    private RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+    Collection collection;
 
     @Before
     @Override
@@ -68,38 +70,16 @@ public class MetadataImportTest extends AbstractIntegrationTestWithDatabase {
             "+," + collection.getHandle() + ",\"Test Import 1\"," + "\"Donald, SmithImported\""};
         performImportScript(csv);
         Item importedItem = findItemByName("Test Import 1");
-
         assertTrue(
             StringUtils.equals(
                 itemService.getMetadata(importedItem, "dc", "contributor", "author", Item.ANY).get(0).getValue(),
                 "Donald, SmithImported"));
-
         eperson = ePersonService.findByEmail(context, eperson.getEmail());
         assertEquals(importedItem.getSubmitter(), eperson);
 
         context.turnOffAuthorisationSystem();
         itemService.delete(context, itemService.find(context, importedItem.getID()));
         context.restoreAuthSystemState();
-    }
-
-    @Test
-    public void metadataImportRemovingValueTestTest() throws Exception {
-
-        context.turnOffAuthorisationSystem();
-        Item item = ItemBuilder.createItem(context, collection).withAuthor("TestAuthorToRemove").withTitle("title")
-                               .build();
-        context.restoreAuthSystemState();
-
-        assertTrue(
-            StringUtils.equals(
-                itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).get(0).getValue(),
-                "TestAuthorToRemove"));
-
-        String[] csv = {"id,collection,dc.title,dc.contributor.author[*]",
-            item.getID().toString() + "," + collection.getHandle() + "," + item.getName() + ","};
-        performImportScript(csv);
-        item = findItemByName("title");
-        assertEquals(itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).size(), 0);
     }
 
     @Test(expected = ParseException.class)
@@ -120,6 +100,56 @@ public class MetadataImportTest extends AbstractIntegrationTestWithDatabase {
             script.initialize(args, testDSpaceRunnableHandler, null);
             script.run();
         }
+    }
+
+    @Test
+    public void relationshipMetadataImportTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, collection).withRelationshipType("Publication")
+                               .withTitle("Publication1").build();
+        EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType person = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+        RelationshipTypeBuilder.createRelationshipTypeBuilder(context, publication, person, "isAuthorOfPublication",
+                                                              "isPublicationOfAuthor", 0, 10, 0, 10);
+        context.restoreAuthSystemState();
+
+        String[] csv = {"id,collection,dc.title,relation.isPublicationOfAuthor,relationship.type",
+            "+," + collection.getHandle() + ",\"Test Import 1\"," + item.getID() + ",Person"};
+        performImportScript(csv);
+        Item importedItem = findItemByName("Test Import 1");
+
+
+        assertEquals(relationshipService.findByItem(context, importedItem).size(), 1);
+        context.turnOffAuthorisationSystem();
+        itemService.delete(context, itemService.find(context, importedItem.getID()));
+        context.restoreAuthSystemState();
+    }
+
+    @Test
+    public void relationshipMetadataImporAlreadyExistingItemTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item personItem = ItemBuilder.createItem(context, collection).withRelationshipType("Person")
+                                     .withTitle("Person1").build();
+        List<Relationship> relationshipList = relationshipService.findByItem(context, personItem);
+        assertEquals(0, relationshipList.size());
+        Item publicationItem = ItemBuilder.createItem(context, collection).withRelationshipType("Publication")
+                                          .withTitle("Publication1").build();
+
+        EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType person = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+        RelationshipTypeBuilder.createRelationshipTypeBuilder(context, publication, person, "isAuthorOfPublication",
+                                                              "isPublicationOfAuthor", 0, 10, 0, 10);
+        context.restoreAuthSystemState();
+
+
+        String[] csv = {"id,collection,relation.isPublicationOfAuthor",
+            personItem.getID() + "," + collection.getHandle() + "," + publicationItem.getID()};
+        performImportScript(csv);
+        Item importedItem = findItemByName("Person1");
+
+
+        assertEquals(relationshipService.findByItem(context, importedItem).size(), 1);
+
     }
 
     private Item findItemByName(String name) throws SQLException {
