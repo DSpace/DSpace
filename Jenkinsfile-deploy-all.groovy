@@ -66,6 +66,7 @@ pipeline {
                                 extraVars: [
                                         fase             : inputResult,
                                         jenkins_workspace: env.WORKSPACE,
+										slack_channel    : SLACK_CHANNEL,
                                         vault_secret     : "$VAULTSECRET"
                                 ]
                         )
