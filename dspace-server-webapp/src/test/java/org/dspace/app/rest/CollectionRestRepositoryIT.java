@@ -1849,13 +1849,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                             CollectionMatcher.matchProperties(col1.getName(), col1.getID(), col1.getHandle()),
                             CollectionMatcher.matchProperties(col2.getName(), col2.getID(), col2.getHandle())
                             )))
-                 .andExpect(jsonPath("$._embedded.collections", Matchers.not(Matchers.anyOf(
-                                  is(CollectionMatcher.matchProperties(col3.getName(), col3.getID(), col3.getHandle())),
-                                  is(CollectionMatcher.matchProperties(col4.getName(), col4.getID(), col4.getHandle())),
-                                  is(CollectionMatcher.matchProperties(col5.getName(), col5.getID(), col5.getHandle())),
-                                  is(CollectionMatcher.matchProperties(col6.getName(), col6.getID(), col6.getHandle())),
-                                  is(CollectionMatcher.matchProperties(col7.getName(), col7.getID(), col7.getHandle()))
-                                  ))))
+                 .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(2)))
                  .andExpect(jsonPath("$.page.size", is(2)))
                  .andExpect(jsonPath("$.page.totalPages", is(4)))
                  .andExpect(jsonPath("$.page.number", is(0)))
@@ -1870,13 +1864,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                            CollectionMatcher.matchProperties(col3.getName(), col3.getID(), col3.getHandle()),
                            CollectionMatcher.matchProperties(col4.getName(), col4.getID(), col4.getHandle())
                            )))
-                .andExpect(jsonPath("$._embedded.collections", Matchers.not(Matchers.anyOf(
-                        is(CollectionMatcher.matchProperties(col1.getName(), col1.getID(), col1.getHandle())),
-                        is(CollectionMatcher.matchProperties(col2.getName(), col2.getID(), col2.getHandle())),
-                        is(CollectionMatcher.matchProperties(col5.getName(), col5.getID(), col5.getHandle())),
-                        is(CollectionMatcher.matchProperties(col6.getName(), col6.getID(), col6.getHandle())),
-                        is(CollectionMatcher.matchProperties(col7.getName(), col7.getID(), col7.getHandle()))
-                        ))))
+                .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(2)))
                 .andExpect(jsonPath("$.page.size", is(2)))
                 .andExpect(jsonPath("$.page.totalPages", is(4)))
                 .andExpect(jsonPath("$.page.number", is(1)))
@@ -1891,13 +1879,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                            CollectionMatcher.matchProperties(col5.getName(), col5.getID(), col5.getHandle()),
                            CollectionMatcher.matchProperties(col6.getName(), col6.getID(), col6.getHandle())
                            )))
-                .andExpect(jsonPath("$._embedded.collections", Matchers.not(Matchers.anyOf(
-                        is(CollectionMatcher.matchProperties(col1.getName(), col1.getID(), col1.getHandle())),
-                        is(CollectionMatcher.matchProperties(col2.getName(), col2.getID(), col2.getHandle())),
-                        is(CollectionMatcher.matchProperties(col3.getName(), col3.getID(), col3.getHandle())),
-                        is(CollectionMatcher.matchProperties(col4.getName(), col4.getID(), col4.getHandle())),
-                        is(CollectionMatcher.matchProperties(col7.getName(), col7.getID(), col7.getHandle()))
-                        ))))
+                .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(2)))
                 .andExpect(jsonPath("$.page.size", is(2)))
                 .andExpect(jsonPath("$.page.totalPages", is(4)))
                 .andExpect(jsonPath("$.page.number", is(2)))
@@ -1913,12 +1895,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                            CollectionMatcher.matchProperties(col5.getName(), col5.getID(), col5.getHandle()),
                            CollectionMatcher.matchProperties(col6.getName(), col6.getID(), col6.getHandle())
                            )))
-                .andExpect(jsonPath("$._embedded.collections", Matchers.not(Matchers.anyOf(
-                        is(CollectionMatcher.matchProperties(col1.getName(), col1.getID(), col1.getHandle())),
-                        is(CollectionMatcher.matchProperties(col2.getName(), col2.getID(), col2.getHandle())),
-                        is(CollectionMatcher.matchProperties(col3.getName(), col3.getID(), col3.getHandle())),
-                        is(CollectionMatcher.matchProperties(col7.getName(), col7.getID(), col7.getHandle()))
-                        ))))
+                .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(3)))
                 .andExpect(jsonPath("$.page.size", is(3)))
                 .andExpect(jsonPath("$.page.totalPages", is(3)))
                 .andExpect(jsonPath("$.page.number", is(1)))
@@ -2047,11 +2024,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                             CollectionMatcher.matchProperties(col1.getName(), col1.getID(), col1.getHandle()),
                             CollectionMatcher.matchProperties(col2.getName(), col2.getID(), col2.getHandle())
                             )))
-                 .andExpect(jsonPath("$._embedded.collections", Matchers.not(Matchers.anyOf(
-                         is(CollectionMatcher.matchProperties(col3.getName(), col3.getID(), col3.getHandle())),
-                         is(CollectionMatcher.matchProperties(col4.getName(), col4.getID(), col4.getHandle())),
-                         is(CollectionMatcher.matchProperties(col5.getName(), col5.getID(), col5.getHandle()))
-                         ))))
+                 .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(2)))
                  .andExpect(jsonPath("$.page.size", is(2)))
                  .andExpect(jsonPath("$.page.totalPages", is(3)))
                  .andExpect(jsonPath("$.page.number", is(0)))
@@ -2067,11 +2040,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                            CollectionMatcher.matchProperties(col3.getName(), col3.getID(), col3.getHandle()),
                            CollectionMatcher.matchProperties(col4.getName(), col4.getID(), col4.getHandle())
                            )))
-                .andExpect(jsonPath("$._embedded.collections", Matchers.not(Matchers.anyOf(
-                        is(CollectionMatcher.matchProperties(col1.getName(), col1.getID(), col1.getHandle())),
-                        is(CollectionMatcher.matchProperties(col2.getName(), col2.getID(), col2.getHandle())),
-                        is(CollectionMatcher.matchProperties(col5.getName(), col5.getID(), col5.getHandle()))
-                        ))))
+                .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(2)))
                 .andExpect(jsonPath("$.page.size", is(2)))
                 .andExpect(jsonPath("$.page.totalPages", is(3)))
                 .andExpect(jsonPath("$.page.number", is(1)))
@@ -2086,12 +2055,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
                            CollectionMatcher.matchProperties(col5.getName(), col5.getID(), col5.getHandle())
                            )))
-                .andExpect(jsonPath("$._embedded.collections", Matchers.not(Matchers.anyOf(
-                        is(CollectionMatcher.matchProperties(col1.getName(), col1.getID(), col1.getHandle())),
-                        is(CollectionMatcher.matchProperties(col2.getName(), col2.getID(), col2.getHandle())),
-                        is(CollectionMatcher.matchProperties(col3.getName(), col3.getID(), col3.getHandle())),
-                        is(CollectionMatcher.matchProperties(col4.getName(), col4.getID(), col4.getHandle()))
-                        ))))
+                .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(1)))
                 .andExpect(jsonPath("$.page.size", is(2)))
                 .andExpect(jsonPath("$.page.totalPages", is(3)))
                 .andExpect(jsonPath("$.page.number", is(2)))
