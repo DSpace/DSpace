@@ -70,6 +70,14 @@ public final class WorkbookUtils {
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(sheet.rowIterator(), 0), false);
     }
 
+    public static List<String> getRowValues(Row row, int size) {
+        List<String> values = new ArrayList<String>();
+        for (int i = 0; i < size; i++) {
+            values.add(getCellValue(row, i));
+        }
+        return values;
+    }
+
     public static String getCellValue(Row row, int index) {
         Cell cell = row.getCell(index);
         return getCellValue(cell);

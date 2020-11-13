@@ -394,7 +394,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         assertThat("Expected 6 info messages", infoMessages, hasSize(6));
 
         assertThat(infoMessages.get(0), containsString("Start reading all the metadata group rows"));
-        assertThat(infoMessages.get(1), containsString("Found 4 metadata groups to process"));
+        assertThat(infoMessages.get(1), containsString("Found 6 metadata groups to process"));
         assertThat(infoMessages.get(2), containsString("Found 3 items to process"));
         assertThat(infoMessages.get(3), containsString("Row 2 - Item created successfully"));
         assertThat(infoMessages.get(4), containsString("Row 3 - Item updated successfully"));
@@ -415,6 +415,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         assertThat(metadata, hasItems(with("oairecerif.author.affiliation", PLACEHOLDER, null, null, 1, -1)));
         assertThat(metadata, hasItems(with("dc.contributor.editor", "Editor", null, null, 0, -1)));
         assertThat(metadata, hasItems(with("oairecerif.editor.affiliation", "EditorAffiliation", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("dc.identifier.doi", "10.1000/183", null, null, 0, -1)));
 
         // verify updated item (ROW 3)
         Item itemUpdated = itemService.find(context, itemToUpdateByRid.getID());
@@ -426,6 +427,11 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         assertThat(metadata, hasItems(with("dc.date.issued", "01/07/95", null, null, 0, -1)));
         assertThat(metadata, hasItems(with("dc.contributor.author", "John Smith", null, null, 0, -1)));
         assertThat(metadata, hasItems(with("oairecerif.author.affiliation", PLACEHOLDER, null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("dc.identifier.doi", "10.1000/184", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("dc.relation.project", "Test Project", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("dc.relation.grantno", "1", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("dc.relation.project", "Another Test Project", null, null, 1, -1)));
+        assertThat(metadata, hasItems(with("dc.relation.grantno", PLACEHOLDER, null, null, 1, -1)));
 
         // verify deleted item (ROW 4)
         assertThat("Item expected to be deleted", itemService.find(context, itemToDelete.getID()), nullValue());
@@ -464,7 +470,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         assertThat("Expected 5 info messages", infoMessages, hasSize(5));
 
         assertThat(infoMessages.get(0), containsString("Start reading all the metadata group rows"));
-        assertThat(infoMessages.get(1), containsString("Found 4 metadata groups to process"));
+        assertThat(infoMessages.get(1), containsString("Found 6 metadata groups to process"));
         assertThat(infoMessages.get(2), containsString("Found 3 items to process"));
         assertThat(infoMessages.get(3), containsString("Row 2 - Item created successfully"));
         assertThat(infoMessages.get(4), containsString("Row 4 - Item deleted successfully"));
@@ -484,6 +490,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         assertThat(metadata, hasItems(with("oairecerif.author.affiliation", PLACEHOLDER, null, null, 1, -1)));
         assertThat(metadata, hasItems(with("dc.contributor.editor", "Editor", null, null, 0, -1)));
         assertThat(metadata, hasItems(with("oairecerif.editor.affiliation", "EditorAffiliation", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("dc.identifier.doi", "10.1000/183", null, null, 0, -1)));
 
         // verify deleted item (ROW 4)
         assertThat("Item expected to be deleted", itemService.find(context, itemToDelete.getID()), nullValue());
@@ -522,7 +529,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         assertThat("Expected 5 info messages", infoMessages, hasSize(4));
 
         assertThat(infoMessages.get(0), containsString("Start reading all the metadata group rows"));
-        assertThat(infoMessages.get(1), containsString("Found 4 metadata groups to process"));
+        assertThat(infoMessages.get(1), containsString("Found 6 metadata groups to process"));
         assertThat(infoMessages.get(2), containsString("Found 3 items to process"));
         assertThat(infoMessages.get(3), containsString("Row 2 - Item created successfully"));
 
@@ -541,6 +548,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         assertThat(metadata, hasItems(with("oairecerif.author.affiliation", PLACEHOLDER, null, null, 1, -1)));
         assertThat(metadata, hasItems(with("dc.contributor.editor", "Editor", null, null, 0, -1)));
         assertThat(metadata, hasItems(with("oairecerif.editor.affiliation", "EditorAffiliation", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("dc.identifier.doi", "10.1000/183", null, null, 0, -1)));
 
         // verify deleted item (ROW 4)
         assertThat("Item expected not to be deleted", itemService.find(context, itemToDelete.getID()), notNullValue());

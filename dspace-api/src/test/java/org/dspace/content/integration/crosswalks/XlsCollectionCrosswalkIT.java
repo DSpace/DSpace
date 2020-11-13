@@ -8,6 +8,7 @@
 package org.dspace.content.integration.crosswalks;
 
 import static java.util.Arrays.asList;
+import static org.dspace.app.bulkimport.utils.WorkbookUtils.getRowValues;
 import static org.dspace.builder.CollectionBuilder.createCollection;
 import static org.dspace.builder.CommunityBuilder.createCommunity;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -20,16 +21,13 @@ import static org.mockito.Mockito.when;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.dspace.AbstractIntegrationTestWithDatabase;
-import org.dspace.app.bulkimport.utils.WorkbookUtils;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.ItemBuilder;
@@ -196,6 +194,33 @@ public class XlsCollectionCrosswalkIT extends AbstractIntegrationTestWithDatabas
     }
 
     @Test
+    public void testDisseminateWithEmptyCollection() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        Collection collection = createCollection(context, community)
+            .withAdminGroup(eperson)
+            .build();
+        context.restoreAuthSystemState();
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        xlsCollectionCrosswalk.disseminate(context, collection, baos);
+
+        Workbook workbook = WorkbookFactory.create(new ByteArrayInputStream(baos.toByteArray()));
+        assertThat(workbook.getNumberOfSheets(), equalTo(1));
+
+        Sheet mainSheet = workbook.getSheetAt(0);
+        String[] mainSheetHeader = { "ID", "dc.contributor.author", "dc.title", "dc.title.alternative",
+            "dc.date.issued", "dc.publisher", "dc.identifier.citation", "dc.relation.ispartofseries",
+            "dc.identifier.doi", "dc.identifier.scopus", "dc.identifier.isi", "dc.identifier.adsbibcode",
+            "dc.identifier.pmid", "dc.identifier.arxiv", "dc.identifier.issn", "dc.identifier.other",
+            "dc.identifier.ismn", "dc.identifier.govdoc", "dc.identifier.uri", "dc.identifier.isbn",
+            "dc.type", "dc.language.iso", "dc.subject", "dc.description.abstract", "dc.description.sponsorship",
+            "dc.description" };
+        assertThat(mainSheet.getPhysicalNumberOfRows(), equalTo(1));
+        assertThat(getRowValues(mainSheet.getRow(0), mainSheetHeader.length), contains(mainSheetHeader));
+    }
+
+    @Test
     public void testDisseminateWithMockSubmissionFormConfiguration() throws Exception {
 
         try {
@@ -304,15 +329,6 @@ public class XlsCollectionCrosswalkIT extends AbstractIntegrationTestWithDatabas
         for (String[] row : rows) {
             assertThat(getRowValues(sheet.getRow(rowCount++), row.length), contains(row));
         }
-
-    }
-
-    private List<String> getRowValues(Row row, int size) {
-        List<String> values = new ArrayList<String>();
-        for (int i = 0; i < size; i++) {
-            values.add(WorkbookUtils.getCellValue(row, i));
-        }
-        return values;
     }
 
 }
