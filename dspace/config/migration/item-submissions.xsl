@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsm="http://www.w3.org/1999/XSL/Transform">
   <xsl:output method="xml" doctype-system="submission-forms.dtd" indent="yes"/>
@@ -20,8 +21,12 @@
         <xsl:attribute name="id">
           <xsl:value-of select="@id"/>
         </xsl:attribute>
-        <heading><xsm:value-of select="./heading"/></heading>
-        <processing-class><xsm:value-of select="./processing-class"/></processing-class>
+        <heading>
+          <xsm:value-of select="./heading"/>
+        </heading>
+        <processing-class>
+          <xsm:value-of select="./processing-class"/>
+        </processing-class>
         <type>
           <xsl:choose>
             <xsl:when test="@id='collection' or @id='upload' or @id='licence' or @id='sample'">
@@ -44,5 +49,3 @@
     </xsl:for-each>
   </xsl:template>
 </xsl:stylesheet>
-
-
