@@ -272,7 +272,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
             PoolTask task = uriListHandlerService.handle(context, request, list, PoolTask.class);
             if (task == null) {
                 throw
-                    new IllegalArgumentException("No PoolTask record found, the uri-list does not contait a resource");
+                    new ResourceNotFoundException("No PoolTask record found, the uri-list does not contait a resource");
             }
             XmlWorkflowServiceFactory factory = (XmlWorkflowServiceFactory) XmlWorkflowServiceFactory.getInstance();
             Workflow workflow = factory.getWorkflowFactory().getWorkflow(task.getWorkflowItem().getCollection());

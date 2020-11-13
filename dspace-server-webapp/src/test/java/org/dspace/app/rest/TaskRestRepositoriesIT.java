@@ -10,6 +10,7 @@ package org.dspace.app.rest;
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -54,6 +55,7 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.RestMediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 
@@ -572,9 +574,11 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         String reviewerToken = getAuthToken(reviewer.getEmail(), password);
 
-        getClient(reviewerToken).perform(post("/api/workflow/pooltasks/" + poolTask.getID())
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-            .andExpect(status().isNoContent());
+        getClient(reviewerToken).perform(post("/api/workflow/claimedtasks")
+                 .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                 .content("/api/workflow/pooltasks/" + poolTask.getID()))
+                 .andExpect(status().isCreated())
+                 .andExpect(jsonPath("$", Matchers.allOf(hasJsonPath("$.type", is("claimedtask")))));
 
         // verify that the pool task no longer exists
         getClient(reviewerToken).perform(get("/api/workflow/pooltasks/" + poolTask.getID()))
@@ -647,9 +651,10 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String reviewerToken = getAuthToken(reviewer.getEmail(), password);
 
         // try to claim the task with an anonymous user
-        getClient().perform(post("/api/workflow/pooltasks/" + poolTask.getID())
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-            .andExpect(status().isUnauthorized());
+        getClient().perform(post("/api/workflow/claimedtasks")
+                   .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                   .content("/api/workflow/pooltasks/" + poolTask.getID()))
+                   .andExpect(status().isUnauthorized());
 
         // verify that the pool task is still here
         getClient(reviewerToken).perform(get("/api/workflow/pooltasks/" + poolTask.getID()))
@@ -711,9 +716,10 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String reviewer2Token = getAuthToken(reviewer2.getEmail(), password);
 
         // reviewer2 try to claim a task that is only available for reviewer1
-        getClient(reviewer2Token).perform(post("/api/workflow/pooltasks/" + poolTask.getID())
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-            .andExpect(status().isForbidden());
+        getClient(reviewer2Token).perform(post("/api/workflow/claimedtasks")
+                 .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                 .content("/api/workflow/pooltasks/" + poolTask.getID()))
+                 .andExpect(status().isForbidden());
 
         // verify that the pool task is still here
         getClient(reviewerToken).perform(get("/api/workflow/pooltasks/" + poolTask.getID()))
@@ -723,9 +729,10 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
     @Test
     public void claimTaskNotExistingTest() throws Exception {
         String adminToken = getAuthToken(admin.getEmail(), password);
-        getClient(adminToken).perform(post("/api/workflow/pooltasks/" + Integer.MAX_VALUE)
-            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-            .andExpect(status().isNotFound());
+        getClient(adminToken).perform(post("/api/workflow/claimedtasks")
+                             .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                             .content("/api/workflow/pooltasks/" + Integer.MAX_VALUE))
+                             .andExpect(status().isNotFound());
     }
 
     @Test
@@ -1816,6 +1823,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRefClaimedTask = new AtomicReference<Integer>();
 
         Step step = xmlWorkflowFactory.getStepByName("reviewstep");
         // step 1
@@ -1837,9 +1845,12 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                         .set(read(result.getResponse().getContentAsString(), "$._embedded.pooltasks[0].id"))));
 
         // claim the task
-        getClient(reviewer1Token).perform(post("/api/workflow/pooltasks/" + idRef.get())
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-            .andExpect(status().isNoContent());
+        getClient(reviewer1Token).perform(post("/api/workflow/claimedtasks")
+                .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                .content("/api/workflow/pooltasks/" + idRef.get()))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$", Matchers.allOf(hasJsonPath("$.type", is("claimedtask")))))
+                .andDo(result -> idRefClaimedTask.set(read(result.getResponse().getContentAsString(), "$.id")));
 
         WorkflowActionConfig workflowAction = xmlWorkflowFactory.getActionByName("reviewaction");
 
@@ -1863,6 +1874,8 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$.page.totalElements", is(1)))
                 .andDo((result -> idRef
                         .set(read(result.getResponse().getContentAsString(), "$._embedded.claimedtasks[0].id"))));
+
+        assertEquals(idRefClaimedTask.get(), idRef.get());
 
         // approve the claimedTask, wf step 1
         getClient(reviewer1Token).perform(post("/api/workflow/claimedtasks/" + idRef.get())
@@ -1896,9 +1909,12 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                         .set(read(result.getResponse().getContentAsString(), "$._embedded.pooltasks[0].id"))));
 
         // claim the task
-        getClient(reviewer2Token).perform(post("/api/workflow/pooltasks/" + idRef.get())
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-            .andExpect(status().isNoContent());
+        getClient(reviewer2Token).perform(post("/api/workflow/claimedtasks")
+                .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                .content("/api/workflow/pooltasks/" + idRef.get()))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$", Matchers.allOf(hasJsonPath("$.type", is("claimedtask")))))
+                .andDo(result -> idRefClaimedTask.set(read(result.getResponse().getContentAsString(), "$.id")));
 
         workflowAction = xmlWorkflowFactory.getActionByName("editaction");
 
@@ -1922,6 +1938,8 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$.page.totalElements", is(1)))
                 .andDo((result -> idRef
                         .set(read(result.getResponse().getContentAsString(), "$._embedded.claimedtasks[0].id"))));
+
+        assertEquals(idRefClaimedTask.get(), idRef.get());
 
         // approve the claimedTask, wf step 2
         getClient(reviewer2Token).perform(post("/api/workflow/claimedtasks/" + idRef.get())
@@ -1955,9 +1973,12 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                         .set(read(result.getResponse().getContentAsString(), "$._embedded.pooltasks[0].id"))));
 
         // claim the task
-        getClient(reviewer3Token).perform(post("/api/workflow/pooltasks/" + idRef.get())
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-            .andExpect(status().isNoContent());
+        getClient(reviewer3Token).perform(post("/api/workflow/claimedtasks")
+                .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                .content("/api/workflow/pooltasks/" + idRef.get()))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$", Matchers.allOf(hasJsonPath("$.type", is("claimedtask")))))
+                .andDo(result -> idRefClaimedTask.set(read(result.getResponse().getContentAsString(), "$.id")));
 
         workflowAction = xmlWorkflowFactory.getActionByName("finaleditaction");
         // get the id of the claimed task
@@ -1980,6 +2001,8 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$.page.totalElements", is(1)))
                 .andDo((result -> idRef
                         .set(read(result.getResponse().getContentAsString(), "$._embedded.claimedtasks[0].id"))));
+
+        assertEquals(idRefClaimedTask.get(), idRef.get());
 
         // approve the claimedTask, wf step 3
         getClient(reviewer3Token).perform(post("/api/workflow/claimedtasks/" + idRef.get())
@@ -2043,6 +2066,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRefClaimedTask = new AtomicReference<Integer>();
 
         // step 1
         getClient(reviewer1Token).perform(get("/api/workflow/pooltasks/search/findByUser")
@@ -2062,9 +2086,12 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .set(read(result.getResponse().getContentAsString(), "$._embedded.pooltasks[0].id"))));
 
         // claim the task
-        getClient(reviewer1Token).perform(post("/api/workflow/pooltasks/" + idRef.get())
-            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-            .andExpect(status().isNoContent());
+        getClient(reviewer1Token).perform(post("/api/workflow/claimedtasks")
+                .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                .content("/api/workflow/pooltasks/" + idRef.get()))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$", Matchers.allOf(hasJsonPath("$.type", is("claimedtask")))))
+                .andDo(result -> idRefClaimedTask.set(read(result.getResponse().getContentAsString(), "$.id")));
 
         // get the id of the claimed task
         getClient(reviewer1Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
@@ -2083,6 +2110,8 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$.page.totalElements", is(1)))
             .andDo((result -> idRef
                 .set(read(result.getResponse().getContentAsString(), "$._embedded.claimedtasks[0].id"))));
+
+        assertEquals(idRefClaimedTask.get(), idRef.get());
 
         // reject the claimedTask with reason, default wf step 1 - review step
         getClient(reviewer1Token).perform(post("/api/workflow/claimedtasks/" + idRef.get())
@@ -2155,6 +2184,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
 
         AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRefClaimedTask = new AtomicReference<Integer>();
 
         // step 1
         getClient(reviewer1Token).perform(get("/api/workflow/pooltasks/search/findByUser")
@@ -2174,9 +2204,12 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .set(read(result.getResponse().getContentAsString(), "$._embedded.pooltasks[0].id"))));
 
         // claim the task
-        getClient(reviewer1Token).perform(post("/api/workflow/pooltasks/" + idRef.get())
-            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-            .andExpect(status().isNoContent());
+        getClient(reviewer1Token).perform(post("/api/workflow/claimedtasks")
+                .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                .content("/api/workflow/pooltasks/" + idRef.get()))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$", Matchers.allOf(hasJsonPath("$.type", is("claimedtask")))))
+                .andDo(result -> idRefClaimedTask.set(read(result.getResponse().getContentAsString(), "$.id")));
 
         // get the id of the claimed task
         getClient(reviewer1Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
@@ -2195,6 +2228,8 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$.page.totalElements", is(1)))
             .andDo((result -> idRef
                 .set(read(result.getResponse().getContentAsString(), "$._embedded.claimedtasks[0].id"))));
+
+        assertEquals(idRefClaimedTask.get(), idRef.get());
 
         // try non valid option (submit_edit_metadata), in default wf step 1 (review step)
         getClient(reviewer1Token).perform(post("/api/workflow/claimedtasks/" + idRef.get())
@@ -2257,6 +2292,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRefClaimedTask = new AtomicReference<Integer>();
 
         // step 2
         getClient(reviewer2Token).perform(get("/api/workflow/pooltasks/search/findByUser")
@@ -2276,9 +2312,12 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .set(read(result.getResponse().getContentAsString(), "$._embedded.pooltasks[0].id"))));
 
         // claim the task
-        getClient(reviewer2Token).perform(post("/api/workflow/pooltasks/" + idRef.get())
-            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-            .andExpect(status().isNoContent());
+        getClient(reviewer2Token).perform(post("/api/workflow/claimedtasks")
+                .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                .content("/api/workflow/pooltasks/" + idRef.get()))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$", Matchers.allOf(hasJsonPath("$.type", is("claimedtask")))))
+                .andDo(result -> idRefClaimedTask.set(read(result.getResponse().getContentAsString(), "$.id")));
 
         // get the id of the claimed task
         getClient(reviewer2Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
@@ -2297,6 +2336,8 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$.page.totalElements", is(1)))
             .andDo((result -> idRef
                 .set(read(result.getResponse().getContentAsString(), "$._embedded.claimedtasks[0].id"))));
+
+        assertEquals(idRefClaimedTask.get(), idRef.get());
 
         // reject the claimedTask, default wf step 2 (edit step)
         getClient(reviewer2Token).perform(post("/api/workflow/claimedtasks/" + idRef.get())
@@ -2370,6 +2411,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRefClaimedTask = new AtomicReference<Integer>();
 
         // step 2
         getClient(reviewer2Token).perform(get("/api/workflow/pooltasks/search/findByUser")
@@ -2389,9 +2431,15 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .set(read(result.getResponse().getContentAsString(), "$._embedded.pooltasks[0].id"))));
 
         // claim the task
-        getClient(reviewer2Token).perform(post("/api/workflow/pooltasks/" + idRef.get())
-            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-            .andExpect(status().isNoContent());
+//        getClient(reviewer2Token).perform(post("/api/workflow/pooltasks/" + idRef.get())
+//            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+//            .andExpect(status().isNoContent());
+        getClient(reviewer2Token).perform(post("/api/workflow/claimedtasks")
+                .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                .content("/api/workflow/pooltasks/" + idRef.get()))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$", Matchers.allOf(hasJsonPath("$.type", is("claimedtask")))))
+                .andDo(result -> idRefClaimedTask.set(read(result.getResponse().getContentAsString(), "$.id")));
 
         // get the id of the claimed task
         getClient(reviewer2Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
@@ -2410,6 +2458,8 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$.page.totalElements", is(1)))
             .andDo((result -> idRef
                 .set(read(result.getResponse().getContentAsString(), "$._embedded.claimedtasks[0].id"))));
+
+        assertEquals(idRefClaimedTask.get(), idRef.get());
 
         // try non valid option (submit_edit_metadata), default wf step 2 (edit step)
         getClient(reviewer2Token).perform(post("/api/workflow/claimedtasks/" + idRef.get())
@@ -2478,6 +2528,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRefClaimedTask = new AtomicReference<Integer>();
 
         // step 3
         getClient(reviewer3Token).perform(get("/api/workflow/pooltasks/search/findByUser")
@@ -2497,9 +2548,12 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .set(read(result.getResponse().getContentAsString(), "$._embedded.pooltasks[0].id"))));
 
         // claim the task
-        getClient(reviewer3Token).perform(post("/api/workflow/pooltasks/" + idRef.get())
-            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-            .andExpect(status().isNoContent());
+        getClient(reviewer3Token).perform(post("/api/workflow/claimedtasks")
+                 .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                 .content("/api/workflow/pooltasks/" + idRef.get()))
+                 .andExpect(status().isCreated())
+                 .andExpect(jsonPath("$", Matchers.allOf(hasJsonPath("$.type", is("claimedtask")))))
+                 .andDo(result -> idRefClaimedTask.set(read(result.getResponse().getContentAsString(), "$.id")));
 
         // get the id of the claimed task
         getClient(reviewer3Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
@@ -2518,6 +2572,8 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$.page.totalElements", is(1)))
             .andDo((result -> idRef
                 .set(read(result.getResponse().getContentAsString(), "$._embedded.claimedtasks[0].id"))));
+
+        assertEquals(idRefClaimedTask.get(), idRef.get());
 
         // reject the claimedTask, default wf step 3 (final edit step)
         getClient(reviewer3Token).perform(post("/api/workflow/claimedtasks/" + idRef.get())
@@ -2586,6 +2642,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRefClaimedTask = new AtomicReference<Integer>();
 
         // step 3
         getClient(reviewer3Token).perform(get("/api/workflow/pooltasks/search/findByUser")
@@ -2605,9 +2662,12 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .set(read(result.getResponse().getContentAsString(), "$._embedded.pooltasks[0].id"))));
 
         // claim the task
-        getClient(reviewer3Token).perform(post("/api/workflow/pooltasks/" + idRef.get())
-            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-            .andExpect(status().isNoContent());
+        getClient(reviewer3Token).perform(post("/api/workflow/claimedtasks")
+                .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                .content("/api/workflow/pooltasks/" + idRef.get()))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$", Matchers.allOf(hasJsonPath("$.type", is("claimedtask")))))
+                .andDo(result -> idRefClaimedTask.set(read(result.getResponse().getContentAsString(), "$.id")));
 
         // get the id of the claimed task
         getClient(reviewer3Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
@@ -2626,6 +2686,8 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$.page.totalElements", is(1)))
             .andDo((result -> idRef
                 .set(read(result.getResponse().getContentAsString(), "$._embedded.claimedtasks[0].id"))));
+
+        assertEquals(idRefClaimedTask.get(), idRef.get());
 
         // edit metadata of the claimedTask, default wf step 3 (final edit step)
         getClient(reviewer3Token).perform(post("/api/workflow/claimedtasks/" + idRef.get())
@@ -2684,6 +2746,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRefClaimedTask = new AtomicReference<Integer>();
 
         // step 3
         getClient(reviewer3Token).perform(get("/api/workflow/pooltasks/search/findByUser")
@@ -2703,9 +2766,12 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .set(read(result.getResponse().getContentAsString(), "$._embedded.pooltasks[0].id"))));
 
         // claim the task
-        getClient(reviewer3Token).perform(post("/api/workflow/pooltasks/" + idRef.get())
-            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-            .andExpect(status().isNoContent());
+        getClient(reviewer3Token).perform(post("/api/workflow/claimedtasks")
+                .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                .content("/api/workflow/pooltasks/" + idRef.get()))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$", Matchers.allOf(hasJsonPath("$.type", is("claimedtask")))))
+                .andDo(result -> idRefClaimedTask.set(read(result.getResponse().getContentAsString(), "$.id")));
 
         // get the id of the claimed task
         getClient(reviewer3Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
@@ -2724,6 +2790,8 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$.page.totalElements", is(1)))
             .andDo((result -> idRef
                 .set(read(result.getResponse().getContentAsString(), "$._embedded.claimedtasks[0].id"))));
+
+        assertEquals(idRefClaimedTask.get(), idRef.get());
 
         // non valid option in the default wf step 3 (final edit step)
         getClient(reviewer3Token).perform(post("/api/workflow/claimedtasks/" + idRef.get())
@@ -3012,9 +3080,11 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .set(read(result.getResponse().getContentAsString(), "$._embedded.pooltasks[0].id"))));
 
         // claim the task
-        getClient(reviewer1Token).perform(post("/api/workflow/pooltasks/" + idRef.get())
-            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-            .andExpect(status().isNoContent());
+        getClient(reviewer1Token).perform(post("/api/workflow/claimedtasks")
+                 .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                 .content("/api/workflow/pooltasks/" + idRef.get()))
+                 .andExpect(status().isCreated())
+                 .andExpect(jsonPath("$", Matchers.allOf(hasJsonPath("$.type", is("claimedtask")))));
 
         // try to patch a workspace item while it is in a step that does not have the edit_metadata option (review step)
         String authToken = getAuthToken(eperson.getEmail(), password);
