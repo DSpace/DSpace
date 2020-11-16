@@ -142,12 +142,6 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
         List<ClaimedTask> tasks = null;
         try {
             Context context = obtainContext();
-            EPerson currentUser = context.getCurrentUser();
-            if (currentUser == null) {
-                throw new RESTAuthorizationException(
-                    "This endpoint is available only to logged-in user to search for their"
-                    + " own claimed tasks or the admins");
-            }
             Item item = itemService.find(context, itemUUID);
             if (item == null) {
                 return null;
@@ -184,6 +178,9 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
                 return null;
             } else {
                 claimedTask = claimedTaskService.findByWorkflowIdAndEPerson(context, xmlWFI, currentUser);
+            }
+            if (claimedTask == null) {
+                return null;
             }
             return converter.toRest(claimedTask, utils.obtainProjection());
         } catch (SQLException e) {
