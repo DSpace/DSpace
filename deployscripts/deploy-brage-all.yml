@@ -1,0 +1,39 @@
+- hosts: appservers-{{fase}}
+  gather_facts: false
+  strategy: free
+  tasks:
+    - name: Bootstrap and sanity checks
+      import_tasks:
+        file: bootstrap.yml
+
+    - name: ApplicationDeployment
+      include_tasks: appdeployment.yml
+      loop: "{{kunder}}"
+      loop_control:
+        loop_var: kunde
+
+- hosts: webservers
+  gather_facts: false
+  strategy: free
+  tags:
+    - webconf
+  tasks:
+    - name: Bootstrap and sanity checks
+      import_tasks:
+        file: bootstrap.yml
+
+    - name: WebserverConfigDeployment
+      include_tasks: webconf-appserver.yml
+      loop: "{{ groups['appservers-' ~ fase] }}"
+      loop_control:
+        loop_var: appserver
+      when: fase == "produksjon"
+
+    - name: Notify Slack
+      slack:
+        channel: "{{ slack_channel | default(SlackConfig.channel) }}"
+        icon_emoji: "{{ SlackConfig.icon }}"
+        msg: "Webserver {{inventory_hostname_short|upper}} konfigurert."
+        token: "{{ SlackConfig.token }}"
+        username: "{{ SlackConfig.sender }}"
+      when: fase == "produksjon"

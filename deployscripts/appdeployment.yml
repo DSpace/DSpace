@@ -1,37 +1,54 @@
-- name: Notify Slack
-  slack:
-    channel: "{{ SlackConfig.channel }}"
-    icon_emoji: "{{ SlackConfig.icon }}"
-    msg: "`[{{kunde}}]` Bygging ferdig. Starter deployment."
-    token: "{{ SlackConfig.token }}"
-    username: "{{ SlackConfig.sender }}"
-  when: fase == "produksjon"
+- name: Definer *.brage.unit.no virtualhost
+  set_fact:
+    bragevirtualhost: "{{ (fase == 'produksjon') | ternary(kunde ~ '.brage.unit.no', 'brage-' ~ fase ~ '.bibsys.no') }}"
 
 - name: Create target paths
   file:
     mode: "755"
     path: "{{item}}"
     state: directory
-  with_items:
+  loop:
     - /brage/{{ kunde }}
     - /brage/{{ kunde }}/app
     - /brage/{{ kunde }}/data
     - /brage/{{ kunde }}/install
     - /brage/{{ kunde }}/tmp
 
-- name: Customize theme for customer
-  shell: "cat {{ jenkins_workspace }}/customizations/themes/{{ kunde }}/style.css   >> {{ jenkins_workspace }}/dspace/target/dspace-installer/webapps/xmlui/themes/Mirage2/styles/main.css"
-  delegate_to: localhost
-
-- name: Adding logo, favicon and other images for customer
-  shell: "rsync -avh {{ jenkins_workspace }}/customizations/themes/{{ kunde }}/overlay/  {{ jenkins_workspace }}/dspace/target/dspace-installer/webapps/xmlui/themes/Mirage2/"
-  delegate_to: localhost
-
 - name: Deploy DSpace Installer
   synchronize:
     delete: yes
     dest: /brage/{{ kunde }}/install/dspace-installer/
     src: "{{ jenkins_workspace }}/dspace/target/dspace-installer/"
+
+- name: Customize theme - create CSS dir
+  file:
+    path: /brage/{{ kunde }}/install/dspace-installer/custom_css_assembly
+    state: directory
+
+- name: Customize theme - copy base CSS
+  copy:
+    src: "{{ jenkins_workspace }}/dspace/target/dspace-installer/webapps/xmlui/themes/Mirage2/styles/main.css"
+    dest: /brage/{{ kunde }}/install/dspace-installer/custom_css_assembly/1.css
+
+- name: Customize theme - copy custom CSS
+  copy:
+    src: "{{ jenkins_workspace }}/customizations/themes/{{ kunde }}/style.css"
+    dest: /brage/{{ kunde }}/install/dspace-installer/custom_css_assembly/2.css
+
+- name: Customize theme - add logo, favicon and other images
+  synchronize:
+    dest: /brage/{{ kunde }}/install/dspace-installer/webapps/xmlui/themes/Mirage2/
+    src: "{{ jenkins_workspace }}/customizations/themes/{{ kunde }}/overlay/"
+
+- name: Customize theme - assemble CSS
+  assemble:
+    src: /brage/{{ kunde }}/install/dspace-installer/custom_css_assembly
+    dest: /brage/{{ kunde }}/install/dspace-installer/webapps/xmlui/themes/Mirage2/styles/main.css
+
+- name: Create local.cfg
+  template:
+    src: local.cfg.j2
+    dest: /brage/{{ kunde }}/install/dspace-installer/config/local.cfg
 
 - name: Make sure brage-{{ kunde }} database is present
   postgresql_db:
@@ -46,12 +63,11 @@
     
 - name: Notify Slack
   slack:
-    channel: "{{ SlackConfig.channel }}"
+    channel: "{{ slack_channel | default(SlackConfig.channel) }}"
     icon_emoji: "{{ SlackConfig.icon }}"
-    msg: "`[{{kunde}}]` Deployment ferdig. Starter installasjon."
+    msg: "`[{{kunde}}]` Installasjonspakke ferdig. Starter installasjon."
     token: "{{ SlackConfig.token }}"
     username: "{{ SlackConfig.sender }}"
-  when: fase == "produksjon"
 
 - name: Install application
   register: result
@@ -75,7 +91,7 @@
 
 - name: Undeploy Apps
   shell: "curl -s -n 'http://localhost:8080/manager/text/undeploy?path=/{{kunde}}-{{item}}'"
-  with_items:
+  loop:
     - xmlui
     - oai
     - rest
@@ -135,9 +151,8 @@
 
 - name: Notify Slack
   slack:
-    channel: "{{ SlackConfig.channel }}"
+    channel: "{{ slack_channel | default(SlackConfig.channel) }}"
     icon_emoji: "{{ SlackConfig.icon }}"
-    msg: "`[{{kunde}}]` Installasjon utført. Konfigurerer webserver."
+    msg: "`[{{kunde}}]` Installasjon utført."
     token: "{{ SlackConfig.token }}"
     username: "{{ SlackConfig.sender }}"
-  when: fase == "produksjon"

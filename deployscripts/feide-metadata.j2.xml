@@ -1,6 +1,6 @@
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="{{ FeideEntityID }}">
   <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
-    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://{{ kundedata[kunde]['virtualhost'] | default(bragevirtualhost) }}/{{ kunde }}-xmlui/feideLogout"/>
-    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://{{ kundedata[kunde]['virtualhost'] | default(bragevirtualhost) }}/{{ kunde }}-xmlui/feideLogin" index="0"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://{{ kundedata[kunde]['virtualhost'] | default((fase == 'produksjon') | ternary(kunde ~ '.brage.unit.no', 'brage-' ~ fase ~ '.bibsys.no')) }}/{{ kunde }}-xmlui/feideLogout"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://{{ kundedata[kunde]['virtualhost'] | default((fase == 'produksjon') | ternary(kunde ~ '.brage.unit.no', 'brage-' ~ fase ~ '.bibsys.no')) }}/{{ kunde }}-xmlui/feideLogin" index="0"/>
   </md:SPSSODescriptor>
 </md:EntityDescriptor>

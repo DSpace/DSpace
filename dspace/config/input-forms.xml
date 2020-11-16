@@ -343,7 +343,7 @@
                     <dc-schema>dc</dc-schema>
                     <dc-element>description</dc-element>
                     <dc-qualifier>localcode</dc-qualifier>
-                    <repeatable>false</repeatable>
+                    <repeatable>true</repeatable>
                     <label>Local code</label>
                     <input-type>onebox</input-type>
                     <hint></hint>
