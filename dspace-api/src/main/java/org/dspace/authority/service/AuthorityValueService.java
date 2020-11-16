@@ -24,6 +24,7 @@ import org.dspace.core.Context;
 public interface AuthorityValueService {
     public static final String SPLIT = "::";
     public static final String GENERATE = "will be generated" + SPLIT;
+    public static final String REFERENCE = "will be referenced" + SPLIT;
 
     public AuthorityValue generate(Context context, String authorityKey, String content, String field);
 

@@ -89,7 +89,6 @@
 		<mapping class="org.dspace.batch.ImpBitstream"/>
 		<mapping class="org.dspace.batch.ImpBitstreamMetadatavalue"/>
 		<mapping class="org.dspace.batch.ImpMetadatavalue"/>
-		<mapping class="org.dspace.batch.ImpRecordToItem"/>
 
         <!-- Configurable Layout -->
         <mapping class="org.dspace.layout.CrisLayoutTab" />

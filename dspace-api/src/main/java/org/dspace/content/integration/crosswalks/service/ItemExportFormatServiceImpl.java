@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import org.dspace.content.crosswalk.CrosswalkMode;
 import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
+import org.dspace.content.integration.crosswalks.ItemExportCrosswalk;
 import org.dspace.content.integration.crosswalks.StreamDisseminationCrosswalkMapper;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * This class should never be accessed directly.
  * 
  * @author Alessandro Martelli (alessandro.martelli at 4science.it)
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
 public class ItemExportFormatServiceImpl implements ItemExportFormatService {
@@ -34,21 +36,16 @@ public class ItemExportFormatServiceImpl implements ItemExportFormatService {
     public ItemExportFormat get(Context context, String id) {
 
         StreamDisseminationCrosswalk sdc = this.streamDissiminatorCrosswalkMapper.getByType((String)id);
-        ItemExportFormat format = create(id, sdc);
-        return format;
+        return sdc instanceof ItemExportCrosswalk ? create(id, (ItemExportCrosswalk) sdc) : null;
 
     }
 
     @Override
     public List<ItemExportFormat> getAll(Context context) {
 
-        Map<String, StreamDisseminationCrosswalk> byEntityType = this.streamDissiminatorCrosswalkMapper.getAll();
-
-        List<ItemExportFormat> formats = byEntityType.entrySet().stream()
+        return this.streamDissiminatorCrosswalkMapper.getAllItemExportCrosswalks().entrySet().stream()
             .map(entry -> create(entry.getKey(), entry.getValue()))
             .collect(Collectors.toList());
-
-        return formats;
 
     }
 
@@ -56,8 +53,8 @@ public class ItemExportFormatServiceImpl implements ItemExportFormatService {
     public List<ItemExportFormat> byEntityTypeAndMolteplicity(Context context, String entityTypeId,
             CrosswalkMode molteplicity) {
 
-        Map<String, StreamDisseminationCrosswalk> map = this.streamDissiminatorCrosswalkMapper.getAll().entrySet()
-                .stream()
+        Map<String, ItemExportCrosswalk> map = this.streamDissiminatorCrosswalkMapper.getAllItemExportCrosswalks()
+                .entrySet().stream()
                 // filter molteplicity
                 .filter(entry -> {
                     if (entry.getValue().getCrosswalkMode().equals(CrosswalkMode.SINGLE_AND_MULTIPLE)) {
@@ -83,7 +80,7 @@ public class ItemExportFormatServiceImpl implements ItemExportFormatService {
 
     }
 
-    private ItemExportFormat create(String id, StreamDisseminationCrosswalk sdc) {
+    private ItemExportFormat create(String id, ItemExportCrosswalk sdc) {
         ItemExportFormat itemExportFormatRest = new ItemExportFormat();
         itemExportFormatRest.setId(id);
         itemExportFormatRest.setMolteplicity(sdc.getCrosswalkMode().name());

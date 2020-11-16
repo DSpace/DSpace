@@ -16,6 +16,13 @@ import org.dspace.core.Context;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Script configuration for {@link BulkImport}.
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ * @param  <T> the {@link BulkImport} type
+ */
 public class BulkImportScriptConfiguration<T extends BulkImport> extends ScriptConfiguration<T> {
 
     @Autowired

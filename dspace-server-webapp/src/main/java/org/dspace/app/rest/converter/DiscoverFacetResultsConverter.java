@@ -81,7 +81,9 @@ public class DiscoverFacetResultsConverter {
         facetResultsRest.setPrefix(prefix);
         facetResultsRest.setScope(dsoScope);
         facetResultsRest.setDsoTypes(dsoTypes);
-
+        if (configuration != null) {
+            facetResultsRest.setConfiguration(configuration.getId());
+        }
         facetResultsRest.setFacetEntry(convertFacetEntry(facetName, searchResult, configuration, page, projection));
 
         facetResultsRest.setSort(SearchResultsRest.Sorting.fromPage(page));

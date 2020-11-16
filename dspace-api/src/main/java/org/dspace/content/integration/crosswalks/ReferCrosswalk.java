@@ -47,7 +47,6 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.CrosswalkMode;
 import org.dspace.content.crosswalk.CrosswalkObjectNotSupported;
-import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
 import org.dspace.content.integration.crosswalks.evaluators.ConditionEvaluator;
 import org.dspace.content.integration.crosswalks.evaluators.ConditionEvaluatorMapper;
 import org.dspace.content.integration.crosswalks.model.TemplateLine;
@@ -67,13 +66,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 
 /**
- * Implementation of {@StreamDisseminationCrosswalk} to produce an output from
- * an Item starting from a template.
+ * Implementation of {@link ItemExportCrosswalk} to produce an output from an
+ * Item starting from a template.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDisseminator {
+public class ReferCrosswalk implements ItemExportCrosswalk {
 
     private static Logger log = Logger.getLogger(ReferCrosswalk.class);
 
@@ -533,7 +532,7 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
     }
 
     public CrosswalkMode getCrosswalkMode() {
-        return this.crosswalkMode != null ? this.crosswalkMode : StreamDisseminationCrosswalk.super.getCrosswalkMode();
+        return Optional.ofNullable(this.crosswalkMode).orElse(ItemExportCrosswalk.super.getCrosswalkMode());
     }
 
 }

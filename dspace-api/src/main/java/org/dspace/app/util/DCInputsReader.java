@@ -7,6 +7,8 @@
  */
 package org.dspace.app.util;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.servlet.ServletException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -829,6 +832,99 @@ public class DCInputsReader {
             }
         }
         throw new DCInputsReaderException("No field configuration found!");
+    }
+
+    /**
+     * Returns all the metadata fields configured in the submission form of the
+     * given collection that are not group inputs.
+     *
+     * @param  collection              the collection
+     * @return                         the metadata fields
+     * @throws DCInputsReaderException if an error occurs reading the form
+     *                                 configuration
+     */
+    public List<String> getSubmissionFormMetadata(Collection collection) throws DCInputsReaderException {
+        return getSubmissionFormMetadata(collection, false);
+    }
+
+    /**
+     * Returns all the metadata fields configured in the submission form of the
+     * given collection that are group inputs.
+     *
+     * @param  collection              the collection
+     * @return                         the metadata fields
+     * @throws DCInputsReaderException if an error occurs reading the form
+     *                                 configuration
+     */
+    public List<String> getSubmissionFormMetadataGroups(Collection collection) throws DCInputsReaderException {
+        return getSubmissionFormMetadata(collection, true);
+    }
+
+    private List<String> getSubmissionFormMetadata(Collection collection, boolean group)
+        throws DCInputsReaderException {
+        return getAllInputsByCollection(collection)
+            .filter(dcInput -> group ? isGroupType(dcInput) : !isGroupType(dcInput))
+            .flatMap(dcInput -> getMetadataFieldsFromDcInput(dcInput))
+            .collect(Collectors.toList());
+    }
+
+    public List<String> getLanguagesForMetadata(Collection collection, String metadata) throws DCInputsReaderException {
+        return getAllInputsByCollection(collection)
+            .filter(dcInput -> dcInput.getFieldName().equals(metadata) && !isGroupType(dcInput))
+            .findFirst()
+            .orElseThrow(() -> new DCInputsReaderException("No DCInput found for the metadata field " + metadata))
+            .getAllLanguageValues();
+    }
+
+    public List<String> getAllNestedMetadataByGroupName(Collection collection, String groupName)
+        throws DCInputsReaderException {
+
+        DCInputSet groupInputSet = findGroupInputSetByMetadataGroupName(collection, groupName);
+
+        return Arrays.stream(groupInputSet.getFields())
+            .flatMap(dcInputs -> Arrays.stream(dcInputs))
+            .flatMap(dcInput -> getMetadataFieldsFromDcInput(dcInput))
+            .collect(Collectors.toList());
+
+    }
+
+
+    private DCInputSet findGroupInputSetByMetadataGroupName(Collection collection, String groupName)
+        throws DCInputsReaderException {
+
+        return getInputsByCollection(collection).stream()
+            .filter(inputSet -> inputSet.isFieldPresent(groupName))
+            .findFirst()
+            .map(inputSet -> getInputByMetadataGroupName(inputSet, groupName))
+            .orElseThrow(() -> new DCInputsReaderException("No nested metadata group found by name: " + groupName));
+
+    }
+
+    private DCInputSet getInputByMetadataGroupName(DCInputSet dcInputSet, String groupName) {
+        try {
+            return getInputsByFormName(dcInputSet.getFormName() + "-" + groupName.replaceAll("\\.", "-"));
+        } catch (DCInputsReaderException ex) {
+            throw new RuntimeException("An error occurs searching a DCInputSet by metadata group name", ex);
+        }
+    }
+
+    private Stream<DCInput> getAllInputsByCollection(Collection collection) throws DCInputsReaderException {
+        return getInputsByCollection(collection).stream()
+            .flatMap(dcInputSet -> Arrays.stream(dcInputSet.getFields()))
+            .flatMap(dcInputs -> Arrays.stream(dcInputs));
+    }
+
+    private Stream<String> getMetadataFieldsFromDcInput(DCInput dcInput) {
+        if (!"qualdrop_value".equals(dcInput.getInputType())) {
+            return Stream.of(dcInput.getFieldName());
+        }
+
+        return dcInput.getAllStoredValues().stream()
+            .map(value -> isNotBlank(value) ? dcInput.getFieldName() + '.' + value : dcInput.getFieldName());
+    }
+
+    private boolean isGroupType(DCInput dcInput) {
+        return "group".equals(dcInput.getInputType());
     }
 
 }

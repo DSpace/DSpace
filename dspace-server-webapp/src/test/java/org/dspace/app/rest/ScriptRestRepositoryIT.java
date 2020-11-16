@@ -8,11 +8,11 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -100,7 +100,9 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 ScriptMatcher.matchScript(scriptConfigurations.get(9).getName(),
                                                           scriptConfigurations.get(9).getDescription()),
                                 ScriptMatcher.matchScript(scriptConfigurations.get(10).getName(),
-                                                          scriptConfigurations.get(10).getDescription())
+                                                          scriptConfigurations.get(10).getDescription()),
+                                ScriptMatcher.matchScript(scriptConfigurations.get(11).getName(),
+                                                          scriptConfigurations.get(11).getDescription())
                         )));
 
     }
@@ -129,8 +131,8 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(get("/api/system/scripts").param("size", "1"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$._embedded.scripts", Matchers.not(Matchers.hasItem(
-                                ScriptMatcher.matchScript(scriptConfigurations.get(6).getName(),
-                                                          scriptConfigurations.get(6).getDescription())
+                                ScriptMatcher.matchScript(scriptConfigurations.get(10).getName(),
+                                                          scriptConfigurations.get(10).getDescription())
                         ))))
                         .andExpect(jsonPath("$._embedded.scripts", hasItem(
                                 ScriptMatcher.matchScript(scriptConfigurations.get(7).getName(),
@@ -142,8 +144,8 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(get("/api/system/scripts").param("size", "1").param("page", "1"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$._embedded.scripts", hasItem(
-                                ScriptMatcher.matchScript(scriptConfigurations.get(6).getName(),
-                                                          scriptConfigurations.get(6).getDescription())
+                                ScriptMatcher.matchScript(scriptConfigurations.get(10).getName(),
+                                                          scriptConfigurations.get(10).getDescription())
                         )))
                         .andExpect(jsonPath("$._embedded.scripts", Matchers.not(hasItem(
                                 ScriptMatcher.matchScript(scriptConfigurations.get(7).getName(),

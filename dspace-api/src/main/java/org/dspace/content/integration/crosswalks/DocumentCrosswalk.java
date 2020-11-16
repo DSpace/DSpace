@@ -29,7 +29,6 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.CrosswalkObjectNotSupported;
-import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -37,13 +36,13 @@ import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Implementation of {@link StreamDisseminationCrosswalk} to produce a document
- * in a specific format (pdf, rtf etc...) from an item.
+ * Implementation of {@link ItemExportCrosswalk} to produce a document in a
+ * specific format (pdf, rtf etc...) from an item.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public class DocumentCrosswalk implements StreamDisseminationCrosswalk, FileNameDisseminator {
+public class DocumentCrosswalk implements ItemExportCrosswalk {
 
     @Autowired
     private ConfigurationService configurationService;

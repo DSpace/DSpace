@@ -40,7 +40,6 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.CrosswalkMode;
 import org.dspace.content.crosswalk.CrosswalkObjectNotSupported;
-import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
 import org.dspace.content.integration.crosswalks.model.TabularTemplateLine;
 import org.dspace.content.integration.crosswalks.virtualfields.VirtualField;
 import org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldMapper;
@@ -52,13 +51,13 @@ import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Abstract class that implements {@StreamDisseminationCrosswalk} that provided common logic to
- * export items in tabular format.
+ * Abstract class that implements {@link ItemExportCrosswalk} that provided
+ * common logic to export items in tabular format.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public abstract class TabularCrosswalk implements StreamDisseminationCrosswalk, FileNameDisseminator {
+public abstract class TabularCrosswalk implements ItemExportCrosswalk {
 
     private static Logger log = Logger.getLogger(TabularCrosswalk.class);
 
@@ -332,6 +331,6 @@ public abstract class TabularCrosswalk implements StreamDisseminationCrosswalk, 
     }
 
     public CrosswalkMode getCrosswalkMode() {
-        return this.crosswalkMode != null ? this.crosswalkMode : StreamDisseminationCrosswalk.super.getCrosswalkMode();
+        return Optional.ofNullable(this.crosswalkMode).orElse(ItemExportCrosswalk.super.getCrosswalkMode());
     }
 }

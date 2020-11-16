@@ -42,5 +42,10 @@
         <property name="description" value="Perform the multiple items export in the given format"/>
         <property name="dspaceRunnableClass" value="org.dspace.content.integration.crosswalks.script.BulkItemExport"/>
     </bean>
+    
+    <bean id="collection-export" class="org.dspace.app.bulkedit.CollectionExportCliScriptConfiguration" primary="true">
+        <property name="description" value="Perform the export of all the archived items of the given collection in xls format"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.CollectionExportCli"/>
+    </bean>
 
 </beans>

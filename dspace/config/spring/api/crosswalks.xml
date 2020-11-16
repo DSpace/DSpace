@@ -48,6 +48,8 @@
 				<entry key="funding-pdf" value-ref="pdfCrosswalkFunding"></entry>
 				<entry key="funding-csv" value-ref="csvCrosswalkFunding"></entry>
 				<entry key="funding-xls" value-ref="xlsCrosswalkFunding"></entry>
+				
+				<entry key="collection-xls" value-ref="xlsCrosswalkCollection"></entry>
 			</map>
 		</constructor-arg>
 	</bean>
@@ -352,6 +354,8 @@
 		<property name="fileName" value="publications-ieee.html"/>
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
 	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.XlsCollectionCrosswalk" id="xlsCrosswalkCollection"/>
 	
 	<bean class="org.dspace.content.integration.crosswalks.converter.XmlValueConverter" id="xmlValueConverter" />
 	<bean class="org.dspace.content.integration.crosswalks.converter.JsonValueConverter" id="jsonValueConverter" />

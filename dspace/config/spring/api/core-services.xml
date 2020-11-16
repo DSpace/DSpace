@@ -136,7 +136,6 @@
     <bean class="org.dspace.batch.ImpBitstreamServiceImpl"/>
     <bean class="org.dspace.batch.ImpMetadatavalueServiceImpl"/>
     <bean class="org.dspace.batch.ImpRecordServiceImpl"/>
-    <bean class="org.dspace.batch.ImpRecordToItemServiceImpl"/>
     <bean class="org.dspace.batch.ImpBitstreamMetadatavalueServiceImpl"/>
     <bean class="org.dspace.batch.ImpWorkflowNStateServiceImpl"/>
 
