@@ -292,7 +292,11 @@ public class SetupCollectionHarvestingForm extends AbstractDSpaceTransformer {
 		settings.addItem().addContent(harvestMessageValue);
 		Text harvestStarttime = settings.addItem().addText("harvest_starttime");
 		harvestStarttime.setSize(20);
-		harvestStarttime.setValue(harvestStartTimeValue.toString());
+		if (null != harvestStartTimeValue) {
+			harvestStarttime.setValue(harvestStartTimeValue.toString());
+		} else {
+			harvestStarttime.setValue(new Date().toString());
+		}
 
 		Para buttonList = main.addPara();
 		buttonList.addButton("submit_save").setValue(T_submit_save);
