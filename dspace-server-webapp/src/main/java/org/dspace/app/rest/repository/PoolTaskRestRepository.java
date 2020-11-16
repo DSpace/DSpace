@@ -140,12 +140,6 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
         List<PoolTask> poolTasks = null;
         try {
             Context context = obtainContext();
-            EPerson currentUser = context.getCurrentUser();
-            if (currentUser == null) {
-                throw new RESTAuthorizationException(
-                    "This endpoint is available only to logged-in user to search for their"
-                    + " own claimed tasks or the admins");
-            }
             Item item = itemService.find(context, itemUUID);
             if (item == null) {
                 return null;
@@ -173,19 +167,18 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
                     "This endpoint is available only to logged-in user to search for their"
                     + " own claimed tasks or the admins");
             }
-            if (authorizeService.isAdmin(context)) {
-                Item item = itemService.find(context, itemUUID);
-                if (item == null) {
-                    return null;
-                }
-                XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemService.findByItem(context, item);
-                if (xmlWorkflowItem == null) {
-                    return null;
-                } else {
-                    poolTask = poolTaskService.findByWorkflowIdAndEPerson(context, xmlWorkflowItem, currentUser);
-                }
+            Item item = itemService.find(context, itemUUID);
+            if (item == null) {
+                return null;
+            }
+            XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemService.findByItem(context, item);
+            if (xmlWorkflowItem == null) {
+                return null;
             } else {
-                throw new RESTAuthorizationException("Only administrators can search for pool tasks of other users");
+                poolTask = poolTaskService.findByWorkflowIdAndEPerson(context, xmlWorkflowItem, currentUser);
+            }
+            if (poolTask == null) {
+                return null;
             }
             return converter.toRest(poolTask, utils.obtainProjection());
         } catch (SQLException | AuthorizeException | IOException e) {
