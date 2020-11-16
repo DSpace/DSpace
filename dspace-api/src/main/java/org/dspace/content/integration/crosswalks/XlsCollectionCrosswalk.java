@@ -17,11 +17,13 @@ import static org.dspace.app.bulkedit.BulkImport.PARENT_ID_CELL;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -103,7 +105,9 @@ public class XlsCollectionCrosswalk implements StreamDisseminationCrosswalk {
 
             writeWorkbookContent(context, collection, mainSheet, nestedMetadataSheets);
 
-            autoSizeColumns(mainSheet, nestedMetadataSheets);
+            List<XlsCollectionSheet> sheets = new ArrayList<XlsCollectionSheet>(nestedMetadataSheets);
+            sheets.add(mainSheet);
+            autoSizeColumns(sheets);
 
             workbook.write(out);
 
@@ -114,7 +118,7 @@ public class XlsCollectionCrosswalk implements StreamDisseminationCrosswalk {
     }
 
     private List<XlsCollectionSheet> writeNestedMetadataSheetsHeader(Collection collection, Workbook workbook) {
-        return getSubmissionFormMetadata(collection, true).stream()
+        return getSubmissionFormMetadataGroups(collection).stream()
             .map(metadataGroup -> writeNestedMetadataSheetHeader(collection, workbook, metadataGroup))
             .collect(Collectors.toList());
     }
@@ -122,7 +126,7 @@ public class XlsCollectionCrosswalk implements StreamDisseminationCrosswalk {
     private XlsCollectionSheet writeMainSheetHeader(Context context, Collection collection, Workbook workbook) {
         XlsCollectionSheet mainSheet = new XlsCollectionSheet(workbook, "items");
         mainSheet.appendHeader(ID_CELL);
-        List<String> metadataFields = getSubmissionFormMetadata(collection, false);
+        List<String> metadataFields = getSubmissionFormMetadata(collection);
         for (String metadataField : metadataFields) {
             mainSheet.appendHeaderIfNotPresent(metadataField);
         }
@@ -177,9 +181,8 @@ public class XlsCollectionCrosswalk implements StreamDisseminationCrosswalk {
 
         Map<String, List<MetadataValue>> metadataValues = new HashMap<>();
 
-        for (int groupIndex = 0; groupIndex < groupSize; groupIndex++) {
-            writeNestedMetadataRow(item, nestedMetadataSheet, metadataValues, headers, groupIndex);
-        }
+        IntStream.range(0, groupSize).forEach(
+            groupIndex -> writeNestedMetadataRow(item, nestedMetadataSheet, metadataValues, headers, groupIndex));
 
     }
 
@@ -254,9 +257,17 @@ public class XlsCollectionCrosswalk implements StreamDisseminationCrosswalk {
         }
     }
 
-    private List<String> getSubmissionFormMetadata(Collection collection, boolean group) {
+    private List<String> getSubmissionFormMetadata(Collection collection) {
         try {
-            return this.reader.getSubmissionFormMetadata(collection, group);
+            return this.reader.getSubmissionFormMetadata(collection);
+        } catch (DCInputsReaderException e) {
+            throw new RuntimeException("An error occurs reading the input configuration by collection", e);
+        }
+    }
+
+    private List<String> getSubmissionFormMetadataGroups(Collection collection) {
+        try {
+            return this.reader.getSubmissionFormMetadataGroups(collection);
         } catch (DCInputsReaderException e) {
             throw new RuntimeException("An error occurs reading the input configuration by collection", e);
         }
@@ -279,9 +290,8 @@ public class XlsCollectionCrosswalk implements StreamDisseminationCrosswalk {
         return itemService.getMetadataByMetadataString(item, metadataField);
     }
 
-    private void autoSizeColumns(XlsCollectionSheet mainSheet, List<XlsCollectionSheet> nestedMetadataSheets) {
-        autoSizeColumns(mainSheet.getSheet());
-        nestedMetadataSheets.forEach(sheet -> autoSizeColumns(sheet.getSheet()));
+    private void autoSizeColumns(List<XlsCollectionSheet> sheets) {
+        sheets.forEach(sheet -> autoSizeColumns(sheet.getSheet()));
     }
 
     private void autoSizeColumns(Sheet sheet) {

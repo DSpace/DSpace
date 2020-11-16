@@ -238,8 +238,8 @@ public class XlsCollectionCrosswalkIT extends AbstractIntegrationTestWithDatabas
             List<String> authorGroup = asList("dc.contributor.author", "oairecerif.author.affiliation");
 
             when(reader.getLanguagesForMetadata(collection, "dc.title")).thenReturn(Arrays.asList("en", "it"));
-            when(reader.getSubmissionFormMetadata(collection, false)).thenReturn(publicationMetadataFields);
-            when(reader.getSubmissionFormMetadata(collection, true)).thenReturn(publicationMetadataFieldGroups);
+            when(reader.getSubmissionFormMetadata(collection)).thenReturn(publicationMetadataFields);
+            when(reader.getSubmissionFormMetadataGroups(collection)).thenReturn(publicationMetadataFieldGroups);
             when(reader.getAllNestedMetadataByGroupName(collection, "dc.contributor.author")).thenReturn(authorGroup);
 
             xlsCollectionCrosswalk.setReader(reader);

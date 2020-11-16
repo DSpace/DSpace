@@ -532,7 +532,7 @@ public class ReferCrosswalk implements ItemExportCrosswalk {
     }
 
     public CrosswalkMode getCrosswalkMode() {
-        return this.crosswalkMode != null ? this.crosswalkMode : ItemExportCrosswalk.super.getCrosswalkMode();
+        return Optional.ofNullable(this.crosswalkMode).orElse(ItemExportCrosswalk.super.getCrosswalkMode());
     }
 
 }

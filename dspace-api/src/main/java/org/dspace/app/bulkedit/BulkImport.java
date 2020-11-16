@@ -230,7 +230,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
             throw new BulkImportException("The Workbook should have at least one sheet");
         }
 
-        List<String> groups = getSubmissionFormMetadata(true);
+        List<String> groups = getSubmissionFormMetadataGroups();
 
         for (Sheet sheet : workbook) {
             String name = sheet.getSheetName();
@@ -289,7 +289,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         List<String> metadataFields = headers.subList(getFirstMetadataIndex(sheet), headers.size());
         List<String> invalidMetadataMessages = new ArrayList<>();
 
-        List<String> submissionMetadata = isEntityRowSheet ? getSubmissionFormMetadata(false)
+        List<String> submissionMetadata = isEntityRowSheet ? getSubmissionFormMetadata()
             : getSubmissionFormMetadataGroup(sheetName);
 
         for (String metadataField : metadataFields) {
@@ -332,9 +332,17 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         }
     }
 
-    private List<String> getSubmissionFormMetadata(boolean group) {
+    private List<String> getSubmissionFormMetadata() {
         try {
-            return this.reader.getSubmissionFormMetadata(getCollection(), group);
+            return this.reader.getSubmissionFormMetadata(getCollection());
+        } catch (DCInputsReaderException e) {
+            throw new BulkImportException("An error occurs reading the input configuration by collection", e);
+        }
+    }
+
+    private List<String> getSubmissionFormMetadataGroups() {
+        try {
+            return this.reader.getSubmissionFormMetadataGroups(getCollection());
         } catch (DCInputsReaderException e) {
             throw new BulkImportException("An error occurs reading the input configuration by collection", e);
         }

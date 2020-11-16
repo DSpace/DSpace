@@ -834,7 +834,34 @@ public class DCInputsReader {
         throw new DCInputsReaderException("No field configuration found!");
     }
 
-    public List<String> getSubmissionFormMetadata(Collection collection, boolean group) throws DCInputsReaderException {
+    /**
+     * Returns all the metadata fields configured in the submission form of the
+     * given collection that are not group inputs.
+     *
+     * @param  collection              the collection
+     * @return                         the metadata fields
+     * @throws DCInputsReaderException if an error occurs reading the form
+     *                                 configuration
+     */
+    public List<String> getSubmissionFormMetadata(Collection collection) throws DCInputsReaderException {
+        return getSubmissionFormMetadata(collection, false);
+    }
+
+    /**
+     * Returns all the metadata fields configured in the submission form of the
+     * given collection that are group inputs.
+     *
+     * @param  collection              the collection
+     * @return                         the metadata fields
+     * @throws DCInputsReaderException if an error occurs reading the form
+     *                                 configuration
+     */
+    public List<String> getSubmissionFormMetadataGroups(Collection collection) throws DCInputsReaderException {
+        return getSubmissionFormMetadata(collection, true);
+    }
+
+    private List<String> getSubmissionFormMetadata(Collection collection, boolean group)
+        throws DCInputsReaderException {
         return getAllInputsByCollection(collection)
             .filter(dcInput -> group ? isGroupType(dcInput) : !isGroupType(dcInput))
             .flatMap(dcInput -> getMetadataFieldsFromDcInput(dcInput))
