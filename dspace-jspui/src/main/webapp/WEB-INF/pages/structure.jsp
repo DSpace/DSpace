@@ -78,7 +78,7 @@
                         <table align="center" width="95%" border="1">
                             <tr><th class="evenRowEvenCol">Матеріал</th><th class="evenRowEvenCol">Назва формату</th><th class="evenRowEvenCol">Розширення</th></tr>
 
-                            <tr><th class="evenRowOddCol">Текст</td><th class="evenRowOddCol">Adobe PDF</td><th class="evenRowOddCol">pdf</td></tr>
+                            <tr><th class="evenRowOddCol">Текст</td><th class="evenRowOddCol">Adobe PDF</td><th class="evenRowOddCol"><a href="https://zakon.rada.gov.ua/laws/show/835-2015-%D0%BF#Text" target="_blank">pdf у машиночитаному форматі</a></td></tr>
                             <tr><th class="evenRowOddCol">Презентація</td><th class="evenRowOddCol">Microsoft Powerpoint</td><th class="evenRowOddCol">ppt</td></tr>
                             <tr><th class="evenRowOddCol">Таблиці</td> <th class="evenRowOddCol">Microsoft Excel</td><th class="evenRowOddCol">xls</td></tr>
                             <tr><th class="evenRowOddCol">Зображення</td><th class="evenRowOddCol">JPEG, GIF</td><th class="evenRowOddCol">jpg, gif</td></tr>
