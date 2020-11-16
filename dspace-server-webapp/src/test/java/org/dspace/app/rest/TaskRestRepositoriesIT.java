@@ -3318,6 +3318,50 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void findAllPooltasksByItemWrongUuidTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+                                          .withEmail("reviewer1@example.com")
+                                          .withPassword(password).build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .withWorkflowGroup(1, reviewer1, admin).build();
+
+        // create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                                          .withEmail("submitter@example.com")
+                                          .withPassword(password).build();
+
+        context.setCurrentUser(submitter);
+
+        PoolTask poolTask = PoolTaskBuilder.createPoolTask(context, col1, reviewer1)
+                                           .withTitle("Workflow Item 1")
+                                           .withIssueDate("2017-10-17")
+                                           .withAuthor("Smith, Donald")
+                                           .withAuthor("Doe, John")
+                                           .withSubject("ExtraEntry").build();
+
+        Item item1 = poolTask.getWorkflowItem().getItem();
+
+        context.restoreAuthSystemState();
+
+        // Only Admin has access to this end point
+
+        String tokenSubmitter = getAuthToken(admin.getEmail(), password);
+        getClient(tokenSubmitter).perform(get("/api/workflow/pooltasks/search/findAllByItem")
+                                 .param("uuid", UUID.randomUUID().toString()))
+                                 .andExpect(status().isOk())
+                                 .andExpect(jsonPath("$._embedded.pooltasks").doesNotExist())
+                                 .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+    }
+    @Test
     public void findPooltaskByItemTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
