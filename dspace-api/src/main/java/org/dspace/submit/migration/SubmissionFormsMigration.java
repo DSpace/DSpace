@@ -17,6 +17,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.cli.ParseException;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
@@ -59,19 +60,11 @@ public class SubmissionFormsMigration extends DSpaceRunnable<SubmissionFormsMigr
             return;
         }
         if (this.inputFormsFilePath != null) {
-            this.transformToSubmissionForms(this.inputFormsFilePath);
+            this.transform(inputFormsFilePath, PATH_XSL_SUBMISSION_FORMS, PATH_OUT_INPUT_FORMS);
         }
         if (this.itemSubmissionsFilePath != null) {
-            this.transformToItemSubmission(this.itemSubmissionsFilePath);
+            this.transform(itemSubmissionsFilePath, PATH_XSL_ITEM_SUBMISSION, PATH_OUT_ITEM_SUBMISSION);
         }
-    }
-
-    private void transformToSubmissionForms(String inputFormsFilePath) throws TransformerException {
-        this.transform(inputFormsFilePath, PATH_XSL_SUBMISSION_FORMS, PATH_OUT_INPUT_FORMS);
-    }
-
-    private void transformToItemSubmission(String itemSubmissionsFilePath) throws TransformerException {
-        this.transform(itemSubmissionsFilePath, PATH_XSL_ITEM_SUBMISSION, PATH_OUT_ITEM_SUBMISSION);
     }
 
     /**
@@ -111,7 +104,7 @@ public class SubmissionFormsMigration extends DSpaceRunnable<SubmissionFormsMigr
     }
 
     @Override
-    public void setup() {
+    public void setup() throws ParseException {
         if (commandLine.hasOption('h')) {
             help = true;
             return;
@@ -125,27 +118,27 @@ public class SubmissionFormsMigration extends DSpaceRunnable<SubmissionFormsMigr
             checkIfValidXMLFile(itemSubmissionsFilePath);
         }
         if (!(commandLine.hasOption('s') || commandLine.hasOption('f'))) {
-            this.throwIllegalArgumentException("Please fill in either -f <source-input-forms-path> or -s " +
-                                               "<source-item-submissions-path>; or both.");
+            this.throwParseException("Please fill in either -f <source-input-forms-path> or -s " +
+                                     "<source-item-submissions-path>; or both.");
         }
     }
 
-    private void checkIfValidXMLFile(String filePath) {
+    private void checkIfValidXMLFile(String filePath) throws ParseException {
         File file = new File(filePath);
         if (!file.exists()) {
-            this.throwIllegalArgumentException("There is no file at path: " + filePath);
+            this.throwParseException("There is no file at path: " + filePath);
         }
         if (!file.isFile() && file.isDirectory()) {
-            this.throwIllegalArgumentException("This is a dir, not a file: " + filePath);
+            this.throwParseException("This is a dir, not a file: " + filePath);
         }
         if (!file.getName().endsWith(".xml")) {
-            this.throwIllegalArgumentException("This is not an XML file (doesn't end in .xml): " + filePath);
+            this.throwParseException("This is not an XML file (doesn't end in .xml): " + filePath);
         }
     }
 
-    private void throwIllegalArgumentException(String message) {
+    private void throwParseException(String message) throws ParseException {
         super.handler.logError(message);
-        throw new IllegalArgumentException(message);
+        throw new ParseException(message);
     }
 
     @Override
