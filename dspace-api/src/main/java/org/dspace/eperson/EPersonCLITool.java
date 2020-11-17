@@ -7,6 +7,8 @@
  */
 package org.dspace.eperson;
 
+import static org.dspace.eperson.service.EPersonService.MD_PHONE;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -188,7 +190,8 @@ public class EPersonCLITool {
         eperson.setLastName(context, command.getOptionValue(OPT_SURNAME.getOpt()));
         eperson.setLanguage(context, command.getOptionValue(OPT_LANGUAGE.getOpt(),
                                                             Locale.getDefault().getLanguage()));
-        ePersonService.setMetadata(context, eperson, "phone", command.getOptionValue(OPT_PHONE.getOpt()));
+        ePersonService.setMetadataSingleValue(context, eperson, MD_PHONE,
+                command.getOptionValue(OPT_PHONE.getOpt()), null);
         eperson.setNetid(command.getOptionValue(OPT_NETID.getOpt()));
         ePersonService.setPassword(eperson, command.getOptionValue('p'));
         if (command.hasOption(OPT_REQUIRE_CERTIFICATE.getOpt())) {
@@ -367,7 +370,8 @@ public class EPersonCLITool {
                 modified = true;
             }
             if (command.hasOption(OPT_PHONE.getOpt())) {
-                ePersonService.setMetadata(context, eperson, "phone", command.getOptionValue(OPT_PHONE.getOpt()));
+                ePersonService.setMetadataSingleValue(context, eperson, MD_PHONE,
+                        command.getOptionValue(OPT_PHONE.getOpt()), null);
                 modified = true;
             }
             if (command.hasOption(OPT_LANGUAGE.getOpt())) {

@@ -7,7 +7,7 @@
  */
 package org.dspace.eperson.service;
 
-import static org.dspace.content.MetadataSchemaEnum.DC;
+import static org.dspace.content.MetadataSchemaEnum.EPERSON;
 
 import java.sql.SQLException;
 import java.util.Date;
@@ -48,13 +48,13 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
     // Common metadata fields which must be defined.
 
     public static final MetadataFieldName MD_FIRSTNAME
-            = new MetadataFieldName(DC, "firstname");
+            = new MetadataFieldName(EPERSON, "firstname");
     public static final MetadataFieldName MD_LASTNAME
-            = new MetadataFieldName(DC, "lastname");
+            = new MetadataFieldName(EPERSON, "lastname");
     public static final MetadataFieldName MD_PHONE
-            = new MetadataFieldName(DC, "phone");
+            = new MetadataFieldName(EPERSON, "phone");
     public static final MetadataFieldName MD_LANGUAGE
-            = new MetadataFieldName(DC, "language");
+            = new MetadataFieldName(EPERSON, "language");
 
     /**
      * Find the eperson by their email address.
@@ -199,19 +199,6 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
      * @return boolean successful/unsuccessful
      */
     public boolean checkPassword(Context context, EPerson ePerson, String attempt);
-
-    /**
-     * Set a metadata value (in the metadatavalue table) of the metadata field
-     * specified by 'field'.
-     *
-     * @param context The relevant DSpace Context.
-     * @param ePerson EPerson whose metadata we want to set.
-     * @param field   Metadata field we want to set (e.g. "phone").
-     * @param value   Metadata value we want to set
-     * @throws SQLException if the requested metadata field doesn't exist
-     */
-    @Deprecated
-    public void setMetadata(Context context, EPerson ePerson, String field, String value) throws SQLException;
 
     /**
      * Retrieve all accounts which have a password but do not have a digest algorithm

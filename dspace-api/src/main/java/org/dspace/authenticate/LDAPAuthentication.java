@@ -7,6 +7,8 @@
  */
 package org.dspace.authenticate;
 
+import static org.dspace.eperson.service.EPersonService.MD_PHONE;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -321,7 +323,8 @@ public class LDAPAuthentication
                                         eperson.setLastName(context, ldap.ldapSurname);
                                     }
                                     if (StringUtils.isNotEmpty(ldap.ldapPhone)) {
-                                        ePersonService.setMetadata(context, eperson, "phone", ldap.ldapPhone);
+                                        ePersonService.setMetadataSingleValue(context, eperson,
+                                                MD_PHONE, ldap.ldapPhone, null);
                                     }
                                     eperson.setNetid(netid.toLowerCase());
                                     eperson.setCanLogIn(true);
