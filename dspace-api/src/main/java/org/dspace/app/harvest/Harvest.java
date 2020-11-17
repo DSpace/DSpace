@@ -32,7 +32,6 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.harvest.HarvestedCollection;
-import org.dspace.harvest.HarvestingException;
 import org.dspace.harvest.OAIHarvester;
 import org.dspace.harvest.factory.HarvestServiceFactory;
 import org.dspace.harvest.service.HarvestedCollectionService;
@@ -50,6 +49,7 @@ public class Harvest {
     private static final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     private static final CollectionService collectionService =
         ContentServiceFactory.getInstance().getCollectionService();
+    private static final OAIHarvester harvester = HarvestServiceFactory.getInstance().getOAIHarvester();
 
     public static void main(String[] argv) throws Exception {
         // create an options object and populate it
@@ -379,31 +379,24 @@ public class Harvest {
         System.out.println("Running: a harvest cycle on " + collectionID);
 
         System.out.print("Initializing the harvester... ");
-        OAIHarvester harvester = null;
         try {
+
             Collection collection = resolveCollection(collectionID);
             HarvestedCollection hc = harvestedCollectionService.find(context, collection);
-            harvester = new OAIHarvester(context, collection, hc);
-            System.out.println("success. ");
-        } catch (HarvestingException hex) {
-            System.out.print("failed. ");
-            System.out.println(hex.getMessage());
-            throw new IllegalStateException("Unable to harvest", hex);
-        } catch (SQLException se) {
-            System.out.print("failed. ");
-            System.out.println(se.getMessage());
-            throw new IllegalStateException("Unable to access database", se);
-        }
 
-        try {
             // Harvest will not work for an anonymous user
             EPerson eperson = ePersonService.findByEmail(context, email);
             System.out.println("Harvest started... ");
             context.setCurrentUser(eperson);
-            harvester.runHarvest();
+            harvester.runHarvest(context, hc);
             context.complete();
-        } catch (SQLException e) {
-            throw new IllegalStateException("Failed to run harvester", e);
+
+            System.out.println("success. ");
+
+        } catch (SQLException se) {
+            System.out.print("failed. ");
+            System.out.println(se.getMessage());
+            throw new IllegalStateException("Unable to access database", se);
         } catch (AuthorizeException e) {
             throw new IllegalStateException("Failed to run harvester", e);
         } catch (IOException e) {

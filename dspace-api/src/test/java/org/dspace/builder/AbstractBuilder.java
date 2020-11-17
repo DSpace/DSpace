@@ -44,6 +44,8 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.RegistrationDataService;
+import org.dspace.harvest.factory.HarvestServiceFactory;
+import org.dspace.harvest.service.HarvestedCollectionService;
 import org.dspace.layout.factory.CrisLayoutServiceFactory;
 import org.dspace.layout.service.CrisLayoutBoxService;
 import org.dspace.layout.service.CrisLayoutFieldService;
@@ -105,6 +107,7 @@ public abstract class AbstractBuilder<T, S> {
     static OrcidQueueService orcidQueueService;
     static OrcidHistoryService orcidHistoryService;
     static AuditService auditService;
+    static HarvestedCollectionService harvestedCollectionService;
 
     protected Context context;
 
@@ -165,6 +168,8 @@ public abstract class AbstractBuilder<T, S> {
         orcidQueueService = OrcidQueueServiceFactory.getInstance().getOrcidQueueService();
         orcidHistoryService = OrcidHistoryServiceFactory.getInstance().getOrcidHistoryService();
         auditService = new DSpace().getSingletonService(AuditService.class);
+        harvestedCollectionService = HarvestServiceFactory.getInstance().getHarvestedCollectionService();
+
     }
 
 
@@ -200,7 +205,7 @@ public abstract class AbstractBuilder<T, S> {
         crisLayoutFieldService = null;
         orcidQueueService = null;
         orcidHistoryService = null;
-
+        harvestedCollectionService = null;
     }
 
     public static void cleanupObjects() throws Exception {

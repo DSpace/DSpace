@@ -11,6 +11,7 @@ import static org.dspace.harvest.OAIHarvester.OAI_ADDRESS_ERROR;
 import static org.dspace.harvest.OAIHarvester.OAI_DMD_ERROR;
 import static org.dspace.harvest.OAIHarvester.OAI_ORE_ERROR;
 import static org.dspace.harvest.OAIHarvester.OAI_SET_ERROR;
+import static org.dspace.harvest.util.NamespaceUtils.getORENamespace;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -25,6 +26,8 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.harvest.dao.HarvestedCollectionDAO;
 import org.dspace.harvest.service.HarvestedCollectionService;
+import org.dspace.harvest.service.OAIHarvesterClient;
+import org.dspace.harvest.util.NamespaceUtils;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -45,6 +48,9 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
 
     @Autowired(required = true)
     protected HarvestedCollectionDAO harvestedCollectionDAO;
+
+    @Autowired(required = true)
+    protected OAIHarvesterClient oaiHarvesterClient;
 
     protected HarvestedCollectionServiceImpl() {
     }
@@ -195,7 +201,7 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
         }
 
         // Next, make sure the metadata we need is supported by the target server
-        Namespace DMD_NS = OAIHarvester.getDMDNamespace(metaPrefix);
+        Namespace DMD_NS = NamespaceUtils.getDMDNamespace(metaPrefix);
         if (null == DMD_NS) {
             errorSet.add(OAI_DMD_ERROR + ":  " + metaPrefix);
             return errorSet;
@@ -205,8 +211,8 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
         String DMDOAIPrefix = null;
 
         try {
-            OREOAIPrefix = OAIHarvester.oaiResolveNamespaceToPrefix(oaiSource, OAIHarvester.getORENamespace().getURI());
-            DMDOAIPrefix = OAIHarvester.oaiResolveNamespaceToPrefix(oaiSource, DMD_NS.getURI());
+            OREOAIPrefix = oaiHarvesterClient.resolveNamespaceToPrefix(oaiSource, getORENamespace().getURI());
+            DMDOAIPrefix = oaiHarvesterClient.resolveNamespaceToPrefix(oaiSource, DMD_NS.getURI());
         } catch (Exception ex) {
             errorSet.add(OAI_ADDRESS_ERROR
                 + ": OAI did not respond to ListMetadataFormats query  ("
