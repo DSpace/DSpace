@@ -7,6 +7,11 @@
  */
 package org.dspace.rest.common;
 
+import static org.dspace.content.service.DSpaceObjectService.MD_COPYRIGHT_TEXT;
+import static org.dspace.content.service.DSpaceObjectService.MD_INTRODUCTORY_TEXT;
+import static org.dspace.content.service.DSpaceObjectService.MD_SHORT_DESCRIPTION;
+import static org.dspace.content.service.DSpaceObjectService.MD_SIDEBAR_TEXT;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,10 +26,6 @@ import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
-import static org.dspace.content.service.DSpaceObjectService.MD_COPYRIGHT_TEXT;
-import static org.dspace.content.service.DSpaceObjectService.MD_INTRODUCTORY_TEXT;
-import static org.dspace.content.service.DSpaceObjectService.MD_SHORT_DESCRIPTION;
-import static org.dspace.content.service.DSpaceObjectService.MD_SIDEBAR_TEXT;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 
