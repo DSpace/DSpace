@@ -149,4 +149,13 @@
             insert into dspaceobject(uuid) select uuid from chair where chair_id = 101;
         </sql>
     </changeSet>
+
+    <changeSet author="Sergey Petrov" id="22">
+        <sql>
+            INSERT INTO chair(chair_name, chair_id, uuid, faculty_id) VALUES ('Кафедра екстренної медичної допомоги та медицини катастроф', 102, gen_random_uuid(), 10);
+        </sql>
+        <sql>
+            insert into dspaceobject(uuid) select uuid from chair where chair_id = 102;
+        </sql>
+    </changeSet>
 </databaseChangeLog>
