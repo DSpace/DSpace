@@ -7,9 +7,13 @@
  */
 package org.dspace.content.integration.crosswalks;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -18,6 +22,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import de.undercouch.citeproc.CSL;
+import org.apache.commons.io.IOUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -28,6 +33,7 @@ import org.dspace.content.integration.crosswalks.csl.DSpaceListItemDataProvider;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -46,6 +52,9 @@ public class CSLItemDataCrosswalk implements ItemExportCrosswalk {
 
     @Autowired
     private ItemService itemService;
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     private String mimeType;
 
@@ -87,12 +96,28 @@ public class CSLItemDataCrosswalk implements ItemExportCrosswalk {
         if (getMIMEType() != null && getMIMEType().startsWith("application/json")) {
             print(out, dSpaceListItemDataProvider.toJson());
         } else {
-            CSL citeproc = new CSL(dSpaceListItemDataProvider, style);
+            CSL citeproc = new CSL(dSpaceListItemDataProvider, getStyle());
             citeproc.setOutputFormat(format);
             citeproc.registerCitationItems(dSpaceListItemDataProvider.getIds());
             print(out, citeproc.makeBibliography().makeString());
         }
 
+    }
+
+    private String getStyle() throws IOException {
+        return CSL.supportsStyle(style) ? style : readXmlStyleContent();
+    }
+
+    private String readXmlStyleContent() throws IOException {
+        String parent = configurationService.getProperty("dspace.dir") + File.separator + "config" + File.separator;
+        File styleFile = new File(parent, style);
+        if (!styleFile.exists()) {
+            throw new FileNotFoundException("Could not find style in " + styleFile.getAbsolutePath());
+        }
+
+        try (FileInputStream fis = new FileInputStream(styleFile)) {
+            return IOUtils.toString(fis, Charset.defaultCharset());
+        }
     }
 
     private void print(OutputStream out, String value) {
