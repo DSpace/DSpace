@@ -21,6 +21,10 @@ import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
+import static org.dspace.content.service.DSpaceObjectService.MD_COPYRIGHT_TEXT;
+import static org.dspace.content.service.DSpaceObjectService.MD_INTRODUCTORY_TEXT;
+import static org.dspace.content.service.DSpaceObjectService.MD_SHORT_DESCRIPTION;
+import static org.dspace.content.service.DSpaceObjectService.MD_SIDEBAR_TEXT;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 
@@ -50,9 +54,9 @@ public class Community extends DSpaceObject {
     private String sidebarText;
     private Integer countItems;
 
-    private List<Community> subcommunities = new ArrayList<Community>();
+    private List<Community> subcommunities = new ArrayList<>();
 
-    private List<Collection> collections = new ArrayList<Collection>();
+    private List<Collection> collections = new ArrayList<>();
 
     public Community() {
     }
@@ -67,17 +71,19 @@ public class Community extends DSpaceObject {
     private void setup(org.dspace.content.Community community, ServletContext servletContext, String expand,
                        Context context)
         throws SQLException {
-        List<String> expandFields = new ArrayList<String>();
+        List<String> expandFields = new ArrayList<>();
         if (expand != null) {
             expandFields = Arrays.asList(expand.split(","));
         }
 
-        this.setCopyrightText(communityService.getMetadata(community, org.dspace.content.Community.COPYRIGHT_TEXT));
-        this.setIntroductoryText(
-            communityService.getMetadata(community, org.dspace.content.Community.INTRODUCTORY_TEXT));
-        this.setShortDescription(
-            communityService.getMetadata(community, org.dspace.content.Community.SHORT_DESCRIPTION));
-        this.setSidebarText(communityService.getMetadata(community, org.dspace.content.Community.SIDEBAR_TEXT));
+        this.setCopyrightText(communityService.getMetadataFirstValue(community,
+                MD_COPYRIGHT_TEXT, org.dspace.content.Item.ANY));
+        this.setIntroductoryText(communityService.getMetadataFirstValue(community,
+                MD_INTRODUCTORY_TEXT, org.dspace.content.Item.ANY));
+        this.setShortDescription(communityService.getMetadataFirstValue(community,
+                MD_SHORT_DESCRIPTION, org.dspace.content.Item.ANY));
+        this.setSidebarText(communityService.getMetadataFirstValue(community,
+                MD_SIDEBAR_TEXT, org.dspace.content.Item.ANY));
         this.setCountItems(itemService.countItems(context, community));
 
         if (expandFields.contains("parentCommunity") || expandFields.contains("all")) {
@@ -108,7 +114,7 @@ public class Community extends DSpaceObject {
 
         if (expandFields.contains("subCommunities") || expandFields.contains("all")) {
             List<org.dspace.content.Community> communities = community.getSubcommunities();
-            subcommunities = new ArrayList<Community>();
+            subcommunities = new ArrayList<>();
             for (org.dspace.content.Community subCommunity : communities) {
                 if (authorizeService.authorizeActionBoolean(context, subCommunity, org.dspace.core.Constants.READ)) {
                     subcommunities.add(new Community(subCommunity, servletContext, null, context));

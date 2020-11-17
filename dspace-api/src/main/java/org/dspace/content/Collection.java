@@ -94,18 +94,6 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
     @Transient
     private transient CollectionService collectionService;
 
-    // Keys for accessing Collection metadata
-    @Transient
-    public static final String COPYRIGHT_TEXT = "copyright_text";
-    @Transient
-    public static final String INTRODUCTORY_TEXT = "introductory_text";
-    @Transient
-    public static final String SHORT_DESCRIPTION = "short_description";
-    @Transient
-    public static final String SIDEBAR_TEXT = "side_bar_text";
-    @Transient
-    public static final String PROVENANCE_TEXT = "provenance_description";
-
     /**
      * Protected constructor, create object using:
      * {@link org.dspace.content.service.CollectionService#create(Context, Community)}
