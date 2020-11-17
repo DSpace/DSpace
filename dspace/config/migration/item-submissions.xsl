@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsm="http://www.w3.org/1999/XSL/Transform">
-  <xsl:output method="xml" doctype-system="submission-forms.dtd" indent="yes"/>
+  <xsl:output method="xml" doctype-system="item-submission.dtd" indent="yes"/>
 
   <xsl:template match="/">
     <item-submission>
