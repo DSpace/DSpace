@@ -7,6 +7,8 @@
  */
 package org.dspace.browse;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -48,10 +50,13 @@ public class ItemCountDAOFactory {
             dao = new ItemCountDAOSolr();
         } else {
             try {
-                dao = (ItemCountDAO) Class
-                    .forName(className.trim()).newInstance();
+                dao = (ItemCountDAO) Class.forName(className.trim())
+                        .getDeclaredConstructor()
+                        .newInstance();
             } catch (ClassNotFoundException | IllegalAccessException
-                    | InstantiationException e) {
+                    | InstantiationException | NoSuchMethodException
+                    | SecurityException | IllegalArgumentException
+                    | InvocationTargetException e) {
                 throw new ItemCountException("The configuration for ItemCountDAO is invalid: " + className, e);
             }
         }
