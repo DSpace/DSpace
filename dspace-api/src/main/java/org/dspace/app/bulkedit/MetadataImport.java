@@ -1403,16 +1403,16 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                         //Populate the EntityRelationMap
                         populateEntityRelationMap(uuid, key, originId.toString());
                     }
+                } else {
+                    newLine.add(key, null);
                 }
             } else {
-                if (line.get(key).size() > 1) {
+                if (line.get(key).size() > 0) {
                     for (String value : line.get(key)) {
                         newLine.add(key, value);
                     }
                 } else {
-                    if (line.get(key).size() > 0) {
-                        newLine.add(key, line.get(key).get(0));
-                    }
+                    newLine.add(key, null);
                 }
             }
         }
