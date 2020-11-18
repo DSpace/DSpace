@@ -29,7 +29,7 @@
         <entry key-ref="oaire.citation.volume" value-ref="volumeContrib"/>
         <entry key-ref="oaire.citation.issue" value-ref="issueContrib"/>
         <entry key-ref="dc.identifier.doi" value-ref="doiContrib"/>
-        <entry key-ref="dc.type" value-ref="doiContrib"/>
+        <entry key-ref="dc.type" value-ref="typeContrib"/>
 
     </util:map>
 
