@@ -117,17 +117,20 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
         throws SQLException;
 
     /**
-     * @param context   The relevant DSpace Context.
-     * @param sortField which field to sort EPersons by
-     * @return list of EPerson objects
-     * @throws SQLException An exception that provides information on a database access error or other errors.
-     * @deprecated use the paginated method. Find all the epeople in a specific order
+     * Find all the {@code EPerson}s in a specific order by field.
+     * The sortable fields are:
      * <ul>
      * <li><code>ID</code></li>
      * <li><code>LASTNAME</code></li>
      * <li><code>EMAIL</code></li>
      * <li><code>NETID</code></li>
      * </ul>
+     *
+     * @param context   The relevant DSpace Context.
+     * @param sortField which field to sort EPersons by
+     * @return list of EPerson objects
+     * @throws SQLException An exception that provides information on a database access error or other errors.
+     * @deprecated use the paginated method {@link findAll(Context, int)}.
      */
     @Deprecated
     public List<EPerson> findAll(Context context, int sortField)

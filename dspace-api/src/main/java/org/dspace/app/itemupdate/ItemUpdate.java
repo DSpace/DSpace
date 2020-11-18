@@ -275,7 +275,8 @@ public class ItemUpdate {
                         Class<?> cfilter = Class.forName(filterClassname);
                         pr("BitstreamFilter class to instantiate: " + cfilter.toString());
 
-                        filter = (BitstreamFilter) cfilter.newInstance();  //unfortunate cast, an erasure consequence
+                        filter = (BitstreamFilter) cfilter.getDeclaredConstructor()
+                                .newInstance();  //unfortunate cast, an erasure consequence
                     } catch (Exception e) {
                         pr("Error:  Failure instantiating bitstream filter class: " + filterClassname);
                         System.exit(1);
