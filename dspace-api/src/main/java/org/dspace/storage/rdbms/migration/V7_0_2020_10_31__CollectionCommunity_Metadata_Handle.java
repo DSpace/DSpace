@@ -12,6 +12,7 @@ import java.sql.SQLException;
 
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.storage.rdbms.DatabaseUtils;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.dao.DataAccessException;
@@ -38,39 +39,15 @@ public class V7_0_2020_10_31__CollectionCommunity_Metadata_Handle extends BaseJa
 
         final String prefix = handleService.getCanonicalPrefix();
 
-        final String SQL_INSERT = "insert into metadatavalue "
-                + " (metadata_field_id, text_value, text_lang, place, authority, confidence, dspace_object_id) "
+        // Step 1 Preparation (creation of the tmp_handleprefix containing one record with the prefix)
+        String createTmpTable = "CREATE TABLE tmp_handleprefix (handleprefix text NOT NULL);";
+        DatabaseUtils.executeSql(context.getConnection(), createTmpTable);
 
-                + " select distinct T1.metadata_field_id as metadata_field_id, concat(?, h.handle) as text_value, "
-                + "  null as text_lang, 0 as place, null as authority, -1 as confidence, c.uuid as dspace_object_id  "
-
-                + "  from %s c "
-                + "  left outer join handle h on h.resource_id = c.uuid "
-                + "  left outer join metadatavalue mv on mv.dspace_object_id = c.uuid "
-                + "  left outer join metadatafieldregistry mfr on mv.metadata_field_id = mfr.metadata_field_id "
-                + "  left outer join metadataschemaregistry msr on mfr.metadata_schema_id = msr.metadata_schema_id "
-
-                + "  cross join (select mfr.metadata_field_id as metadata_field_id from metadatafieldregistry mfr "
-                + "     left outer join metadataschemaregistry msr on mfr.metadata_schema_id = msr.metadata_schema_id "
-                + "     where msr.short_id = 'dc' "
-                + "      and mfr.element = 'identifier' "
-                + "      and mfr.qualifier = 'uri') T1 "
-                + ";";
-
-        final String COLLECTIONS_SQL_INDEX = String.format(SQL_INSERT, "collection");
-        final String COMMUNITIES_SQL_INDEX = String.format(SQL_INSERT, "community");
-
+        // Step 2 Preparation (insertion of the prefix value into tmp_handleprefix)
+        String insertPrefixSql = "INSERT INTO tmp_handleprefix (handleprefix) VALUES (?)";
         try {
             new JdbcTemplate(new SingleConnectionDataSource(context.getConnection(), true))
-                .update(COLLECTIONS_SQL_INDEX, new PreparedStatementSetter() {
-                    @Override
-                    public void setValues(PreparedStatement ps) throws SQLException {
-                        ps.setString(1, prefix);
-                    }
-                });
-
-            new JdbcTemplate(new SingleConnectionDataSource(context.getConnection(), true))
-                .update(COMMUNITIES_SQL_INDEX, new PreparedStatementSetter() {
+                .update(insertPrefixSql, new PreparedStatementSetter() {
                     @Override
                     public void setValues(PreparedStatement ps) throws SQLException {
                         ps.setString(1, prefix);
@@ -80,7 +57,14 @@ public class V7_0_2020_10_31__CollectionCommunity_Metadata_Handle extends BaseJa
             throw new SQLException("Flyway executeSql() error occurred", dae);
         }
 
-        migration_file_size = COLLECTIONS_SQL_INDEX.length() + COMMUNITIES_SQL_INDEX.length();
+        // Step 3 Populate (sql script execution)
+        String dbtype = DatabaseUtils.getDbType(context.getConnection());
+        String sqlMigrationPath = "org/dspace/storage/rdbms/sqlmigration/metadata/" + dbtype + "/";
+        String dataMigrateSQL = MigrationUtils.getResourceAsString(
+                sqlMigrationPath + "V7.0_2020.10.31__CollectionCommunity_Metadata_Handle.sql");
+        DatabaseUtils.executeSql(context.getConnection(), dataMigrateSQL);
+
+        migration_file_size = dataMigrateSQL.length();
 
     }
 
