@@ -7,8 +7,8 @@
  */
 package org.dspace.statistics.export.processor;
 
-import static org.hamcrest.core.Is.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
