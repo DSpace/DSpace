@@ -76,8 +76,7 @@ public class SubmissionFormsMigration extends DSpaceRunnable<SubmissionFormsMigr
      */
     private void transform(String sourceFilePath, String xsltFilePath, String outputPath)
         throws TransformerException {
-        super.handler
-            .logInfo("Transforming " + sourceFilePath + " with xsl: " + xsltFilePath + " to output: " + outputPath);
+        handler.logInfo("Transforming " + sourceFilePath + " with xsl: " + xsltFilePath + " to output: " + outputPath);
 
         Source xmlSource = new StreamSource(new File(sourceFilePath));
         Source xsltSource = new StreamSource(new File(xsltFilePath));
@@ -91,14 +90,14 @@ public class SubmissionFormsMigration extends DSpaceRunnable<SubmissionFormsMigr
         try {
             trans = transformerFactory.newTransformer(xsltSource);
         } catch (TransformerConfigurationException e) {
-            super.handler.logError("Error: the stylesheet at '" + xsltFilePath + "' couldn't be used");
+            handler.logError("Error: the stylesheet at '" + xsltFilePath + "' couldn't be used");
             throw e;
         }
 
         try {
             trans.transform(xmlSource, result);
         } catch (Throwable t) {
-            super.handler.logError("Error: couldn't convert the metadata file at '" + sourceFilePath);
+            handler.logError("Error: couldn't convert the metadata file at '" + sourceFilePath);
             throw t;
         }
     }
@@ -137,7 +136,7 @@ public class SubmissionFormsMigration extends DSpaceRunnable<SubmissionFormsMigr
     }
 
     private void throwParseException(String message) throws ParseException {
-        super.handler.logError(message);
+        handler.logError(message);
         throw new ParseException(message);
     }
 
