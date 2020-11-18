@@ -8,6 +8,7 @@
 package org.dspace.statistics.export.service;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doCallRealMethod;
@@ -26,7 +27,6 @@ import java.util.List;
 
 import org.dspace.core.Context;
 import org.dspace.statistics.export.OpenURLTracker;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -128,7 +128,7 @@ public class OpenUrlServiceImplTest {
         String failedUrl = "failed-url";
         openUrlService.logfailed(context, failedUrl);
 
-        Assert.assertThat(tracker1.getUrl(), is(failedUrl));
+        assertThat(tracker1.getUrl(), is(failedUrl));
 
     }
 }
