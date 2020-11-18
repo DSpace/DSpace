@@ -9,10 +9,13 @@ package org.dspace.harvest.util;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom.Namespace;
 
 public final class NamespaceUtils {
+
+    public static final String METADATA_FORMATS_KEY = "oai.harvester.metadataformats";
 
     private static final Namespace ATOM_NS = Namespace.getNamespace("http://www.w3.org/2005/Atom");
 
@@ -21,39 +24,25 @@ public final class NamespaceUtils {
     }
 
     /**
-     * Cycle through the options and find the metadata namespace matching the
-     * provided key.
+     * Search the configuration for metadata formats and return the namespace.
      *
      * @param  metadataKey the metadata key
      * @return             Namespace of the designated metadata format. Returns null
      *                     of not found.
      */
     public static Namespace getDMDNamespace(String metadataKey) {
-        String metadataString = null;
-        String metaString = "oai.harvester.metadataformats";
-
-        List<String> keys = DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyKeys(metaString);
-
-        for (String key : keys) {
-            if (key.substring(metaString.length() + 1).equals((metadataKey))) {
-                metadataString = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(key);
-                String namespacePiece;
-                if (metadataString.indexOf(',') != -1) {
-                    namespacePiece = metadataString.substring(0, metadataString.indexOf(','));
-                } else {
-                    namespacePiece = metadataString;
-                }
-
-                return Namespace.getNamespace(namespacePiece);
-            }
+        String key = METADATA_FORMATS_KEY + "." + metadataKey;
+        String value = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(key);
+        if (StringUtils.isEmpty(value)) {
+            return null;
         }
-        return null;
+        return Namespace.getNamespace(value.indexOf(',') != -1 ? value.substring(0, value.indexOf(',')) : value);
     }
 
     /**
      * Search the configuration options and find the ORE serialization string
      *
-     * @return Namespace of the supported ORE format. Returns null if not found.
+     * @return Namespace of the supported ORE format.
      */
     public static Namespace getORENamespace() {
         String ORESerializationString = null;

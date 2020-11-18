@@ -7,7 +7,6 @@
  */
 package org.dspace.app.harvest;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
@@ -18,7 +17,6 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -397,10 +395,6 @@ public class Harvest {
             System.out.print("failed. ");
             System.out.println(se.getMessage());
             throw new IllegalStateException("Unable to access database", se);
-        } catch (AuthorizeException e) {
-            throw new IllegalStateException("Failed to run harvester", e);
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to run harvester", e);
         }
 
         System.out.println("Harvest complete. ");

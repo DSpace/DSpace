@@ -203,7 +203,7 @@ public class HarvestedCollection implements ReloadableEntity<Integer> {
         return harvestMessage;
     }
 
-    public Date getHarvestDate() {
+    public Date getLastHarvestDate() {
         return lastHarvested;
     }
 

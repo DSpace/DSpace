@@ -14,13 +14,13 @@ package org.dspace.util;
  *
  */
 @FunctionalInterface
-public interface ThrowingSupplier<T> {
+public interface ThrowingSupplier<T, E extends Exception> {
 
     /**
      * Returns an object.
      *
-     * @return           an object
-     * @throws Exception if some error occurs
+     * @return   an object
+     * @throws E if some error occurs
      */
-    T get() throws Exception;
+    T get() throws E;
 }

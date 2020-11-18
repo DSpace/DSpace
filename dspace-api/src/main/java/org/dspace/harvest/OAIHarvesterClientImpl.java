@@ -19,7 +19,6 @@ import org.dspace.harvest.service.OAIHarvesterClient;
 import org.dspace.util.ThrowingSupplier;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.input.DOMBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,8 +31,6 @@ import org.slf4j.LoggerFactory;
 public class OAIHarvesterClientImpl implements OAIHarvesterClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OAIHarvesterClientImpl.class);
-
-    private DOMBuilder domBuilder = new DOMBuilder();
 
     @Override
     public OAIHarvesterResponseDTO listRecords(String baseURL, String from, String until, String set,
@@ -66,7 +63,7 @@ public class OAIHarvesterClientImpl implements OAIHarvesterClient {
 
         // Query the OAI server for the metadata
         OAIHarvesterResponseDTO responseDTO = listMetadataFormats(baseUrl);
-        Document response = domBuilder.build(responseDTO.getDocument());
+        Document response = responseDTO.getDocument();
         List<Element> mdFormats = response.getRootElement().getChild("ListMetadataFormats", OAI_NS)
             .getChildren("metadataFormat", OAI_NS);
 
@@ -77,7 +74,7 @@ public class OAIHarvesterClientImpl implements OAIHarvesterClient {
             .orElse(null);
     }
 
-    private OAIHarvesterResponseDTO harvest(ThrowingSupplier<? extends HarvesterVerb> supplier) {
+    private OAIHarvesterResponseDTO harvest(ThrowingSupplier<? extends HarvesterVerb, Exception> supplier) {
         try {
             HarvesterVerb harvesterVerb = supplier.get();
             LOGGER.info("HTTP Request: " + harvesterVerb.getRequestURL());

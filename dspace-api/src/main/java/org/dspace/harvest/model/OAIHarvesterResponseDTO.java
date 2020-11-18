@@ -14,7 +14,8 @@ import javax.xml.transform.TransformerException;
 
 import ORG.oclc.oai.harvester2.verb.HarvesterVerb;
 import ORG.oclc.oai.harvester2.verb.ListRecords;
-import org.w3c.dom.Document;
+import org.jdom.Document;
+import org.jdom.input.DOMBuilder;
 import org.w3c.dom.NodeList;
 
 /**
@@ -25,6 +26,8 @@ import org.w3c.dom.NodeList;
  *
  */
 public class OAIHarvesterResponseDTO {
+
+    private final static DOMBuilder DOM_BUILDER = new DOMBuilder();
 
     private final Document document;
 
@@ -45,7 +48,7 @@ public class OAIHarvesterResponseDTO {
      * @return      the OAIHarvesterResponseDTO instance
      */
     public static OAIHarvesterResponseDTO fromHarvesterVerb(HarvesterVerb verb) {
-        Document document = verb.getDocument();
+        Document document = DOM_BUILDER.build(verb.getDocument());
         String resumptionToken = getResumptionTokenFromVerb(verb);
         Set<String> errors = retrieveErrors(verb);
         return new OAIHarvesterResponseDTO(document, resumptionToken, errors);

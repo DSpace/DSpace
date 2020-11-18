@@ -7,6 +7,13 @@
  */
 package org.dspace.harvest;
 
+import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.dspace.harvest.HarvestedCollection.STATUS_BUSY;
+import static org.dspace.harvest.HarvestedCollection.STATUS_READY;
+import static org.dspace.harvest.HarvestedCollection.STATUS_UNKNOWN_ERROR;
+import static org.dspace.harvest.util.NamespaceUtils.METADATA_FORMATS_KEY;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -24,11 +31,14 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.UUID;
 import javax.annotation.PostConstruct;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -40,7 +50,6 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
-import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.IngestionCrosswalk;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
@@ -53,6 +62,7 @@ import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.Utils;
+import org.dspace.core.exception.SQLRuntimeException;
 import org.dspace.core.service.PluginService;
 import org.dspace.handle.service.HandleService;
 import org.dspace.harvest.model.OAIHarvesterResponseDTO;
@@ -65,7 +75,6 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
-import org.jdom.input.DOMBuilder;
 import org.jdom.output.XMLOutputter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.xml.sax.SAXException;
@@ -128,9 +137,7 @@ public class OAIHarvester {
     @Autowired
     private OAIHarvesterClient oaiHarvesterClient;
 
-    private DOMBuilder domBuilder = new DOMBuilder();
-
-    private Namespace ORESerialNS;
+    private String ORESerialURI;
 
     private String ORESerialKey;
 
@@ -140,7 +147,7 @@ public class OAIHarvester {
     @PostConstruct
     private void setup() {
         Namespace ORESerializationNamespace = NamespaceUtils.getORENamespace();
-        ORESerialNS = Namespace.getNamespace(ORESerializationNamespace.getURI());
+        ORESerialURI = ORESerializationNamespace.getURI();
         ORESerialKey = ORESerializationNamespace.getPrefix();
     }
 
@@ -157,403 +164,414 @@ public class OAIHarvester {
      *                            context does not have permission to perform a
      *                            particular action.
      */
-    public void runHarvest(Context context, HarvestedCollection harvestRow)
-        throws SQLException, IOException, AuthorizeException {
-
-        if (harvestRow == null || !harvestedCollectionService.isHarvestable(harvestRow)) {
-            throw new IllegalArgumentException("Provided collection is not set up for harvesting");
-        }
-
-        Collection targetCollection = harvestRow.getCollection();
+    public void runHarvest(Context context, HarvestedCollection harvestRow) {
 
         Context.Mode originalMode = context.getCurrentMode();
         context.setMode(Context.Mode.BATCH_EDIT);
 
-        // figure out the relevant parameters
-        String oaiSource = harvestRow.getOaiSource();
-        String oaiSetId = harvestRow.getOaiSetId();
-
-        // Set the metadata options
-        String metadataKey = harvestRow.getHarvestMetadataConfig();
-        Namespace metadataNS = NamespaceUtils.getDMDNamespace(metadataKey);
-
-        if (metadataNS == null) {
-            log.error(
-                "No matching metadata namespace found for \"" + metadataKey + "\", see oai.cfg option \"oai.harvester" +
-                    ".metadataformats.{MetadataKey} = {MetadataNS},{Display Name}\"");
-            throw new IllegalArgumentException("Metadata declaration not found");
-        }
-
-        //If we have all selected then make sure that we do not include a set filter
-        if ("all".equals(oaiSetId)) {
-            oaiSetId = null;
-        }
-
-        Date lastHarvestDate = harvestRow.getHarvestDate();
-        String fromDate = null;
-        if (lastHarvestDate != null) {
-            fromDate = processDate(harvestRow.getHarvestDate());
-        }
-
-        long totalListSize = 0;
-        long currentRecord = 0;
-        Date startTime = new Date();
-        String toDate = processDate(startTime, 0);
-
-        String dateGranularity;
-
         try {
-            // obtain the desired descriptive metadata format and verify that the OAI server actually provides it
-            // do the same thing for ORE, which should be encoded in Atom and carry its namespace
-            String descMDPrefix = null;
-            String OREPrefix;
-            dateGranularity = oaiGetDateGranularity(oaiSource);
-            if (fromDate != null) {
-                fromDate = fromDate.substring(0, dateGranularity.length());
-            }
-            toDate = toDate.substring(0, dateGranularity.length());
 
-            descMDPrefix = oaiHarvesterClient.resolveNamespaceToPrefix(oaiSource, metadataNS.getURI());
-            OREPrefix = oaiHarvesterClient.resolveNamespaceToPrefix(oaiSource, ORESerialNS.getURI());
-            if (descMDPrefix == null) {
-                log.error("The OAI server does not support this metadata format");
-                throw new HarvestingException(
-                    "The OAI server does not support this metadata format: " + metadataNS.getURI());
-            }
-            if (OREPrefix == null && harvestRow.getHarvestType() != HarvestedCollection.TYPE_DMD) {
-                throw new HarvestingException(
-                    "The OAI server does not support ORE dissemination in the configured serialization format: " +
-                        ORESerialNS
-                            .getURI());
-            }
-
-            Document oaiResponse = null;
-            Element root = null;
-            String resumptionToken;
-
-            // set the status indicating the collection is currently being processed
-            harvestRow.setHarvestStatus(HarvestedCollection.STATUS_BUSY);
-            harvestRow.setHarvestMessage("Collection harvesting is initializing...");
-            harvestRow.setHarvestStartTime(startTime);
-            harvestedCollectionService.update(context, harvestRow);
-
-            context.commit();
             harvestRow = context.reloadEntity(harvestRow);
-
-            // expiration timer starts
-            int expirationInterval = configurationService.getIntProperty("oai.harvester.threadTimeout");
-            if (expirationInterval == 0) {
-                expirationInterval = 24;
+            if (harvestRow == null || !harvestedCollectionService.isHarvestable(harvestRow)) {
+                throw new HarvestingException("Provided collection is not set up for harvesting");
             }
 
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(startTime);
-            calendar.add(Calendar.HOUR, expirationInterval);
-            Date expirationTime = calendar.getTime();
+            String oaiSource = harvestRow.getOaiSource();
 
-            // main loop to keep requesting more objects until we're done
-            List<Element> records;
+            Date fromDate = harvestRow.getLastHarvestDate();
+            Date toDate = new Date();
 
-            OAIHarvesterResponseDTO responseDTO = oaiHarvesterClient.listRecords(oaiSource, fromDate,
-                toDate, oaiSetId, descMDPrefix);
+            String inizializingMessage = "Collection harvesting is initializing...";
+            harvestRow = updateHarvestRow(context, harvestRow, STATUS_BUSY, inizializingMessage, fromDate, toDate);
 
-            while (responseDTO != null) {
-                records = new ArrayList<Element>();
-                oaiResponse = domBuilder.build(responseDTO.getDocument());
+            startHarvest(context, harvestRow, fromDate, toDate);
+            updateHarvestRow(context, harvestRow, STATUS_READY, "Harvest from " + oaiSource + " successful");
 
-                if (responseDTO.hasErrors()) {
-                    Set<String> errorSet = responseDTO.getErrors();
-                    if (errorSet.contains("noRecordsMatch")) {
-                        log.info("noRecordsMatch: OAI server did not contain any updates");
-                        harvestRow.setHarvestStartTime(new Date());
-                        harvestRow.setHarvestMessage("OAI server did not contain any updates");
-                        harvestRow.setHarvestStatus(HarvestedCollection.STATUS_READY);
-                        harvestedCollectionService.update(context, harvestRow);
-                        return;
-                    } else {
-                        throw new HarvestingException(errorSet.toString());
-                    }
-                }
-
-                root = oaiResponse.getRootElement();
-                records.addAll(root.getChild("ListRecords", OAI_NS).getChildren("record", OAI_NS));
-                Element resumptionElement = root.getChild("ListRecords", OAI_NS)
-                    .getChild("resumptionToken", OAI_NS);
-                if (resumptionElement != null && resumptionElement.getAttribute("completeListSize") != null) {
-                    String value = resumptionElement.getAttribute("completeListSize").getValue();
-                    if (StringUtils.isNotBlank(value)) {
-                        totalListSize = Long.parseLong(value);
-                    }
-                }
-
-                // Process the obtained records
-                if (records != null && records.size() > 0) {
-                    log.info("Found " + records.size() + " records to process");
-                    for (Element record : records) {
-                        // check for STOP interrupt from the scheduler
-                        if (HarvestScheduler.getInterrupt() == HarvestScheduler.HARVESTER_INTERRUPT_STOP) {
-                            throw new HarvestingException("Harvest process for " + targetCollection
-                                .getID() + " interrupted by stopping the scheduler.");
-                        }
-                        // check for timeout
-                        if (expirationTime.before(new Date())) {
-                            throw new HarvestingException(
-                                "runHarvest method timed out for collection " + targetCollection.getID());
-                        }
-
-                        currentRecord++;
-
-                        processRecord(context, harvestRow, record, metadataKey, OREPrefix);
-                        context.commit();
-                        harvestRow = context.reloadEntity(harvestRow);
-                    }
-                }
-
-                // keep going if there are more records to process
-                resumptionToken = responseDTO.getResumptionToken();
-                if (StringUtils.isEmpty(resumptionToken)) {
-                    responseDTO = null;
-                } else {
-                    responseDTO = oaiHarvesterClient.listRecords(oaiSource, resumptionToken);
-                }
-
-                context.turnOffAuthorisationSystem();
-                try {
-                    collectionService.update(context, targetCollection);
-
-                    harvestRow.setHarvestMessage(String
-                                                     .format("Collection is currently being harvested (item %d of %d)",
-                                                             currentRecord, totalListSize));
-                    harvestedCollectionService.update(context, harvestRow);
-                } finally {
-                    //In case of an exception, make sure to restore our authentication state to the previous state
-                    context.restoreAuthSystemState();
-                }
-
-                context.dispatchEvents();
-                context.commit();
-            }
-        } catch (HarvestingException hex) {
-            log.error("Harvesting error occurred while processing an OAI record: " + hex.getMessage(), hex);
-            harvestRow.setHarvestMessage("Error occurred while processing an OAI record");
-
-            // if the last status is also an error, alert the admin
-            if (harvestRow.getHarvestMessage().contains("Error")) {
-                alertAdmin(targetCollection, HarvestedCollection.STATUS_OAI_ERROR, hex);
-            }
-            harvestRow.setHarvestStatus(HarvestedCollection.STATUS_OAI_ERROR);
-            harvestedCollectionService.update(context, harvestRow);
-            context.complete();
-            return;
         } catch (Exception ex) {
-            ex.printStackTrace();
-            harvestRow.setHarvestMessage("Unknown error occurred while generating an OAI response");
-            harvestRow.setHarvestStatus(HarvestedCollection.STATUS_UNKNOWN_ERROR);
-            harvestedCollectionService.update(context, harvestRow);
-            alertAdmin(targetCollection, HarvestedCollection.STATUS_UNKNOWN_ERROR, ex);
-            log.error("Error occurred while generating an OAI response: " + ex.getMessage() + " " + ex.getCause(), ex);
-            context.complete();
-            return;
+            String message = "An error occurred: " + getRootExceptionMessage(ex);
+            log.error(message, ex);
+            updateHarvestRow(context, harvestRow, STATUS_UNKNOWN_ERROR, message);
+            alertAdmin(harvestRow.getCollection(), STATUS_UNKNOWN_ERROR, ex);
         } finally {
-            harvestedCollectionService.update(context, harvestRow);
-            context.turnOffAuthorisationSystem();
-            collectionService.update(context, targetCollection);
-            context.restoreAuthSystemState();
+            context.setMode(originalMode);
         }
 
-        // If we got to this point, it means the harvest was completely successful
-        Date finishTime = new Date();
-        long timeTaken = finishTime.getTime() - startTime.getTime();
-        harvestRow.setHarvestStartTime(startTime);
-        harvestRow.setHarvestMessage("Harvest from " + oaiSource + " successful");
-        harvestRow.setHarvestStatus(HarvestedCollection.STATUS_READY);
-        log.info(
-            "Harvest from " + oaiSource + " successful. The process took " + timeTaken + " milliseconds. Harvested "
-                + currentRecord + " items.");
-        harvestedCollectionService.update(context, harvestRow);
-
-        context.setMode(originalMode);
     }
 
-    private void processRecord(Context context, HarvestedCollection harvestRow, Element record, String metadataKey,
-        String OREPrefix)
-        throws SQLException, AuthorizeException, IOException, CrosswalkException, HarvestingException,
-        ParserConfigurationException, SAXException, TransformerException {
-        WorkspaceItem wi = null;
+    private void startHarvest(Context context, HarvestedCollection harvestRow, Date fromDate, Date toDate) {
+
+        String oaiSource = harvestRow.getOaiSource();
+        String oaiSetId = harvestRow.getOaiSetId();
+        String metadataKey = harvestRow.getHarvestMetadataConfig();
+
+        String descriptiveMetadataFormat = getDescriptiveMetadataFormat(oaiSource, metadataKey);
+
+        String dateFormat = getDateFormat(harvestRow.getOaiSource());
+        String fromDateAsString = fromDate != null ? formatDate(fromDate, dateFormat) : null;
+        String toDateAsString = formatDate(toDate, 0, dateFormat);
+
+        OAIHarvesterResponseDTO responseDTO = oaiHarvesterClient.listRecords(oaiSource, fromDateAsString,
+            toDateAsString, oaiSetId, descriptiveMetadataFormat);
+
+        processOAIHarvesterResponse(context, harvestRow, oaiSource, responseDTO);
+
+    }
+
+    private void processOAIHarvesterResponse(Context context, HarvestedCollection harvestRow, String oaiSource,
+        OAIHarvesterResponseDTO responseDTO) {
+
+        Document oaiResponse = responseDTO.getDocument();
+
+        if (responseDTO.hasErrors()) {
+            Set<String> errors = responseDTO.getErrors();
+            if (errors.size() == 1 && errors.contains("noRecordsMatch")) {
+                String message = "noRecordsMatch: OAI server did not contain any updates";
+                updateHarvestRow(context, harvestRow, STATUS_READY, message);
+                log.info(message);
+                return;
+            } else {
+                throw new HarvestingException(errors.toString());
+            }
+        }
+
+        List<Element> records = getAllRecords(oaiResponse);
+
+        if (CollectionUtils.isEmpty(records)) {
+            log.info("No records to process found");
+            return;
+        }
+
+        // Process the obtained records
+        harvestRow = processRecords(context, harvestRow, records);
+
+        // keep going if there are more records to process
+        String token = responseDTO.getResumptionToken();
+        if (isNotEmpty(token)) {
+            OAIHarvesterResponseDTO nextResponseDTO = oaiHarvesterClient.listRecords(oaiSource, token);
+            processOAIHarvesterResponse(context, harvestRow, oaiSource, nextResponseDTO);
+        }
+
+    }
+
+    private HarvestedCollection processRecords(Context context, HarvestedCollection harvestRow, List<Element> records) {
+
+        UUID collectionId = harvestRow.getCollection().getID();
+        Date expirationDate = getExpirationDate();
+
+        log.info("Found " + records.size() + " records to process");
+        for (Element record : records) {
+
+            // check for STOP interrupt from the scheduler
+            if (HarvestScheduler.getInterrupt() == HarvestScheduler.HARVESTER_INTERRUPT_STOP) {
+                throw new HarvestingException(
+                    "Harvest process for " + collectionId + " interrupted by stopping the scheduler.");
+            }
+
+            // check for timeout
+            if (expirationDate.before(new Date())) {
+                throw new HarvestingException("runHarvest method timed out for collection " + collectionId);
+            }
+
+            try {
+
+                processRecord(context, harvestRow, record);
+
+                context.commit();
+                harvestRow = context.reloadEntity(harvestRow);
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                log.error("An error occurs while process the record " + getItemIdentifier(record), ex);
+            }
+
+        }
+
+        return harvestRow;
+    }
+
+    private void processRecord(Context context, HarvestedCollection harvestRow, Element record) throws Exception {
 
         Collection targetCollection = harvestRow.getCollection();
+        String itemOaiID = getItemIdentifier(record);
 
-        // grab the oai identifier
-        String itemOaiID = record.getChild("header", OAI_NS).getChild("identifier", OAI_NS).getText();
-        Element header = record.getChild("header", OAI_NS);
+        HarvestedItem harvestedItem = harvestedItemService.findByOAIId(context, itemOaiID, targetCollection);
+        Item item = harvestedItem != null ? harvestedItem.getItem() : null;
 
-        // look up the item corresponding to the OAI identifier
-        Item item = harvestedItemService.getItemByOAIId(context, itemOaiID, targetCollection);
-
-        // Make sure the item hasn't been deleted in the mean time
-        if (header.getAttribute("status") != null && header.getAttribute("status").getValue().equals("deleted")) {
+        if (hasDeletedStatus(record)) {
             log.info("Item " + itemOaiID + " has been marked as deleted on the OAI server.");
             if (item != null) {
                 collectionService.removeItem(context, targetCollection, item);
             }
-
-            context.restoreAuthSystemState();
             return;
         }
 
-        // If we are only harvesting descriptive metadata, the record should already contain all we need
-        List<Element> descMD = record.getChild("metadata", OAI_NS).getChildren();
-        IngestionCrosswalk MDxwalk = (IngestionCrosswalk) pluginService.getNamedPlugin(IngestionCrosswalk.class,
-            metadataKey);
-
-        // Otherwise, obtain the ORE ReM and initiate the ORE crosswalk
-        IngestionCrosswalk ORExwalk = null;
         Element oreREM = null;
         if (harvestRow.getHarvestType() > 1) {
-            oreREM = getMDrecord(harvestRow.getOaiSource(), itemOaiID, OREPrefix).get(0);
-            ORExwalk = (IngestionCrosswalk) pluginService.getNamedPlugin(IngestionCrosswalk.class, this.ORESerialKey);
+            String OREPrefix = getOREPrefix(harvestRow.getOaiSource(), harvestRow);
+            oreREM = getMetadataRecord(harvestRow.getOaiSource(), itemOaiID, OREPrefix).get(0);
         }
 
-        // Ignore authorization
         context.turnOffAuthorisationSystem();
 
-        HarvestedItem hi;
-
-        // found an item so we modify
         if (item != null) {
-            log.debug("Item " + item.getHandle() + " was found locally. Using it to harvest " + itemOaiID + ".");
-
-            // FIXME: check for null pointer if for some odd reason we don't have a matching hi
-            hi = harvestedItemService.find(context, item);
-
-            // Compare last-harvest on the item versus the last time the item was updated on the OAI provider side
-            // If ours is more recent, forgo this item, since it's probably a left-over from a previous harvesting
-            // attempt
-            Date OAIDatestamp = Utils.parseISO8601Date(header.getChildText("datestamp", OAI_NS));
-            Date itemLastHarvest = hi.getHarvestDate();
-            if (itemLastHarvest != null && OAIDatestamp.before(itemLastHarvest)) {
-                log.info("Item " + item
-                    .getHandle() + " was harvested more recently than the last update time reported by the OAI " +
-                             "server; skipping.");
-                return;
-            }
-
-            // Otherwise, clear and re-import the metadata and bitstreams
-            itemService.clearMetadata(context, item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-            if (descMD.size() == 1) {
-                MDxwalk.ingest(context, item, descMD.get(0), true);
-            } else {
-                MDxwalk.ingest(context, item, descMD, true);
-            }
-
-            // Import the actual bitstreams
-            if (harvestRow.getHarvestType() == 3) {
-                log.info("Running ORE ingest on: " + item.getHandle());
-
-                List<Bundle> allBundles = item.getBundles();
-                for (Bundle bundle : allBundles) {
-                    itemService.removeBundle(context, item, bundle);
-                }
-                ORExwalk.ingest(context, item, oreREM, true);
-            }
+            harvestedItem = updateItem(context, item, harvestedItem, harvestRow, record, oreREM);
         } else {
-            // NOTE: did not find, so we create (presumably, there will never be a case where an item already
-            // exists in a harvest collection but does not have an OAI_id)
-
-            wi = workspaceItemService.create(context, targetCollection, false);
-            item = wi.getItem();
-
-            hi = harvestedItemService.create(context, item, itemOaiID);
-            //item.setOaiID(itemOaiID);
-
-            if (descMD.size() == 1) {
-                MDxwalk.ingest(context, item, descMD.get(0), true);
-            } else {
-                MDxwalk.ingest(context, item, descMD, true);
-            }
-
-            if (harvestRow.getHarvestType() == 3) {
-                ORExwalk.ingest(context, item, oreREM, true);
-            }
-
-            // see if a handle can be extracted for the item
-            String handle = extractHandle(item);
-
-            if (handle != null) {
-                DSpaceObject dso = handleService.resolveToObject(context, handle);
-                if (dso != null) {
-                    throw new HarvestingException(
-                        "Handle collision: attempted to re-assign handle '" + handle + "' to an incoming harvested " +
-                            "item '" + hi
-                            .getOaiID() + "'.");
-                }
-            }
-
-            try {
-                item = installItemService.installItem(context, wi, handle);
-                // item = InstallItem.installItem(context, wi);
-            } catch (SQLException | IOException | AuthorizeException se) {
-                // clean up the workspace item if something goes wrong before
-                workspaceItemService.deleteWrapper(context, wi);
-                throw se;
-            }
+            harvestedItem = createItem(context, harvestRow, record, itemOaiID, oreREM);
+            item = harvestedItem.getItem();
         }
 
-        // Now create the special ORE bundle and drop the ORE document in it
-        if (harvestRow.getHarvestType() == 2 || harvestRow.getHarvestType() == 3) {
-            Bundle OREBundle = null;
-            List<Bundle> OREBundles = itemService.getBundles(item, "ORE");
-            Bitstream OREBitstream = null;
-
-            if (OREBundles.size() > 0) {
-                OREBundle = OREBundles.get(0);
-            } else {
-                OREBundle = bundleService.create(context, item, "ORE");
-            }
-
-            XMLOutputter outputter = new XMLOutputter();
-            String OREString = outputter.outputString(oreREM);
-            ByteArrayInputStream OREStream = new ByteArrayInputStream(OREString.getBytes());
-
-            OREBitstream = bundleService.getBitstreamByName(OREBundle, "ORE.xml");
-
-            if (OREBitstream != null) {
-                bundleService.removeBitstream(context, OREBundle, OREBitstream);
-            }
-
-            OREBitstream = bitstreamService.create(context, OREBundle, OREStream);
-            OREBitstream.setName(context, "ORE.xml");
-
-            BitstreamFormat bf = bitstreamFormatService.guessFormat(context, OREBitstream);
-            bitstreamService.setFormat(context, OREBitstream, bf);
-            bitstreamService.update(context, OREBitstream);
-
-            bundleService.addBitstream(context, OREBundle, OREBitstream);
-            bundleService.update(context, OREBundle);
+        if (harvestRow.getHarvestType() > 1) {
+            createOREBundle(context, item, oreREM);
         }
 
-        //item.setHarvestDate(new Date());
-        hi.setHarvestDate(new Date());
+        harvestedItem.setHarvestDate(new Date());
 
         // Add provenance that this item was harvested via OAI
         String provenanceMsg = "Item created via OAI harvest from source: "
-            + harvestRow.getOaiSource() + " on " + new DCDate(hi.getHarvestDate())
-            + " (GMT).  Item's OAI Record identifier: " + hi.getOaiID();
+            + harvestRow.getOaiSource() + " on " + new DCDate(harvestedItem.getHarvestDate())
+            + " (GMT).  Item's OAI Record identifier: " + harvestedItem.getOaiID();
         itemService.addMetadata(context, item, "dc", "description", "provenance", "en", provenanceMsg);
 
         itemService.update(context, item);
-        harvestedItemService.update(context, hi);
+        harvestedItemService.update(context, harvestedItem);
 
+        context.uncacheEntity(harvestedItem.getItem());
+        context.uncacheEntity(harvestedItem);
 
-        //Clear the context cache
-        context.uncacheEntity(wi);
-        context.uncacheEntity(hi);
-        context.uncacheEntity(item);
-
-        // Stop ignoring authorization
         context.restoreAuthSystemState();
     }
 
+    private HarvestedItem updateItem(Context context, Item item, HarvestedItem harvestedItem,
+        HarvestedCollection harvestRow, Element record, Element oreREM) throws Exception {
+
+        String itemOaiID = harvestedItem.getOaiID();
+        log.debug("Item " + item.getHandle() + " was found locally. Using it to harvest " + itemOaiID + ".");
+
+        if (isLocalItemMoreRecent(harvestedItem, getHeader(record))) {
+            log.info("Item " + item.getHandle() + " was harvested more recently than the last update time "
+                + "reported by the OAI server; skipping.");
+            return harvestedItem;
+        }
+
+        ingestItem(context, harvestRow, record, item, oreREM);
+
+        return harvestedItem;
+    }
+
+    private HarvestedItem createItem(Context context, HarvestedCollection harvestRow, Element record,
+        String itemOaiID, Element oreREM) throws Exception {
+
+        Collection targetCollection = harvestRow.getCollection();
+
+        WorkspaceItem workspaceItem = workspaceItemService.create(context, targetCollection, false);
+        Item item = workspaceItem.getItem();
+
+        HarvestedItem harvestedItem = harvestedItemService.create(context, item, itemOaiID);
+
+        ingestItem(context, harvestRow, record, item, oreREM);
+
+        // see if a handle can be extracted for the item
+        String handle = extractHandle(item);
+
+        if (handle != null) {
+            DSpaceObject dso = handleService.resolveToObject(context, handle);
+            if (dso != null) {
+                throw new HarvestingException("Handle collision: attempted to re-assign handle '" + handle + "' "
+                    + "to an incoming harvested item '" + harvestedItem.getOaiID() + "'.");
+            }
+        }
+
+        try {
+            item = installItemService.installItem(context, workspaceItem, handle);
+        } catch (SQLException | IOException | AuthorizeException se) {
+            workspaceItemService.deleteWrapper(context, workspaceItem);
+            throw se;
+        }
+
+        context.uncacheEntity(workspaceItem);
+
+        return harvestedItem;
+    }
+
+    private void ingestItem(Context context, HarvestedCollection harvestRow, Element record, Item item, Element oreREM)
+        throws Exception {
+
+        IngestionCrosswalk metadataElementCrosswalk = getIngestionCrosswalk(harvestRow.getHarvestMetadataConfig());
+
+        List<Element> metadataElements = getMetadataElements(record);
+        metadataElementCrosswalk.ingest(context, item, metadataElements, true);
+
+        if (harvestRow.getHarvestType() == 3) {
+
+            IngestionCrosswalk oreCrosswalk = getIngestionCrosswalk(this.ORESerialKey);
+
+            List<Bundle> allBundles = item.getBundles();
+            for (Bundle bundle : allBundles) {
+                itemService.removeBundle(context, item, bundle);
+            }
+
+            oreCrosswalk.ingest(context, item, oreREM, true);
+        }
+
+    }
+
+    private void createOREBundle(Context context, Item item, Element oreREM) throws Exception {
+
+        List<Bundle> OREBundles = itemService.getBundles(item, "ORE");
+        Bundle OREBundle = OREBundles.size() > 0 ? OREBundles.get(0) : bundleService.create(context, item, "ORE");
+
+        XMLOutputter outputter = new XMLOutputter();
+        String OREString = outputter.outputString(oreREM);
+        ByteArrayInputStream OREStream = new ByteArrayInputStream(OREString.getBytes());
+
+        Bitstream OREBitstream = bundleService.getBitstreamByName(OREBundle, "ORE.xml");
+
+        if (OREBitstream != null) {
+            bundleService.removeBitstream(context, OREBundle, OREBitstream);
+        }
+
+        OREBitstream = bitstreamService.create(context, OREBundle, OREStream);
+        OREBitstream.setName(context, "ORE.xml");
+
+        BitstreamFormat bf = bitstreamFormatService.guessFormat(context, OREBitstream);
+        bitstreamService.setFormat(context, OREBitstream, bf);
+        bitstreamService.update(context, OREBitstream);
+
+        bundleService.addBitstream(context, OREBundle, OREBitstream);
+        bundleService.update(context, OREBundle);
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Element> getAllRecords(Document document) {
+        return document.getRootElement().getChild("ListRecords", OAI_NS).getChildren("record", OAI_NS);
+    }
+
+    private String getOREPrefix(String oaiSource, HarvestedCollection harvestRow) {
+        String OREPrefix = oaiHarvesterClient.resolveNamespaceToPrefix(oaiSource, ORESerialURI);
+        if (OREPrefix == null && harvestRow.getHarvestType() != HarvestedCollection.TYPE_DMD) {
+            String message = "The OAI server doesn't support ORE dissemination in the format: " + ORESerialURI;
+            log.error(message);
+            throw new HarvestingException(message);
+        }
+        return OREPrefix;
+    }
+
+    private String getDescriptiveMetadataFormat(String oaiSource, String metadataKey) {
+
+        Namespace metadataNS = NamespaceUtils.getDMDNamespace(metadataKey);
+
+        if (metadataNS == null) {
+            String message = format("No matching metadata namespace found for '%s', see oai.cfg property '%s'",
+                metadataKey, METADATA_FORMATS_KEY);
+            log.error(message);
+            throw new HarvestingException(message);
+        }
+
+        String metadataURI = metadataNS.getURI();
+        String descriptiveMetadataFormat = oaiHarvesterClient.resolveNamespaceToPrefix(oaiSource, metadataURI);
+        if (descriptiveMetadataFormat == null) {
+            String message = "The OAI server does not support this metadata format: " + metadataURI;
+            log.error(message);
+            throw new HarvestingException(message);
+        }
+
+        return descriptiveMetadataFormat;
+    }
+
+    private String getRootExceptionMessage(Exception ex) {
+        String message = ExceptionUtils.getRootCauseMessage(ex);
+        return StringUtils.isNotEmpty(message) ? message : "Unknown error";
+    }
+
+    private HarvestedCollection updateHarvestRow(Context context, HarvestedCollection harvestRow, int status,
+        String message, Date fromDate, Date toDate) {
+
+        harvestRow.setHarvestStatus(status);
+        harvestRow.setHarvestMessage(message);
+        harvestRow.setHarvestStartTime(fromDate);
+        harvestRow.setLastHarvested(toDate);
+        return updateHarvestRow(context, harvestRow);
+
+    }
+
+    private HarvestedCollection updateHarvestRow(Context context, HarvestedCollection harvestRow, int status,
+        String message) {
+
+        harvestRow.setHarvestStatus(status);
+        harvestRow.setHarvestMessage(message);
+        return updateHarvestRow(context, harvestRow);
+
+    }
+
+    private HarvestedCollection updateHarvestRow(Context context, HarvestedCollection harvestRow) {
+        try {
+            harvestedCollectionService.update(context, harvestRow);
+            context.commit();
+            return context.reloadEntity(harvestRow);
+        } catch (SQLException e) {
+            throw new SQLRuntimeException(e);
+        }
+    }
+
+    private Date getExpirationDate() {
+        int expirationInterval = configurationService.getIntProperty("oai.harvester.threadTimeout");
+        if (expirationInterval == 0) {
+            expirationInterval = 24;
+        }
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.HOUR, expirationInterval);
+        Date expirationTime = calendar.getTime();
+        return expirationTime;
+    }
+
+    private String getDateFormat(String oaiSource) {
+        String dateFormat = getDateGranularityFromServer(oaiSource);
+        dateFormat = StringUtils.isEmpty(dateFormat) ? "yyyy-MM-dd'T'HH:mm:ss'Z'" : dateFormat;
+        return dateFormat;
+    }
+
+    private Element getHeader(Element record) {
+        return record.getChild("header", OAI_NS);
+    }
+
+    private boolean hasDeletedStatus(Element record) {
+        Element header = getHeader(record);
+        return header.getAttribute("status") != null && header.getAttribute("status").getValue().equals("deleted");
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Element> getMetadataElements(Element record) {
+        return record.getChild("metadata", OAI_NS).getChildren();
+    }
+
+    /**
+     * Compare last-harvest on the item versus the last time the item was updated on
+     * the OAI provider side. If ours is more recent, forgot this item, since it's
+     * probably a left-over from a previous harvesting attempt
+     * @param  harvestedItem stored harvested item
+     * @param  header        the header element
+     * @return               true if the local item last harvest is after the OAI
+     *                       provided datestamp, false otherwise
+     */
+    private boolean isLocalItemMoreRecent(HarvestedItem harvestedItem, Element header) {
+        Date OAIDatestamp = Utils.parseISO8601Date(header.getChildText("datestamp", OAI_NS));
+        Date itemLastHarvest = harvestedItem.getHarvestDate();
+        return itemLastHarvest != null && OAIDatestamp.before(itemLastHarvest);
+    }
+
+    private IngestionCrosswalk getIngestionCrosswalk(String name) {
+        Object crosswalk = pluginService.getNamedPlugin(IngestionCrosswalk.class, name);
+        if (crosswalk == null) {
+            throw new IllegalArgumentException("No IngestionCrosswalk found by name: " + name);
+        }
+        return (IngestionCrosswalk) crosswalk;
+    }
+
+    private String getItemIdentifier(Element record) {
+        return getHeader(record).getChild("identifier", OAI_NS).getText();
+    }
 
     /**
      * Scan an item's metadata, looking for the value "identifier.*". If it meets the parameters that identify it as
@@ -578,24 +596,26 @@ public class OAIHarvester {
 
         List<MetadataValue> values = itemService.getMetadata(item, "dc", "identifier", Item.ANY, Item.ANY);
 
-        if (values.size() > 0 && acceptedHandleServers != null) {
-            for (MetadataValue value : values) {
-                //     0   1       2         3   4
-                //   http://hdl.handle.net/1234/12
-                String[] urlPieces = value.getValue().split("/");
-                if (urlPieces.length != 5) {
-                    continue;
-                }
+        if (CollectionUtils.isEmpty(values)) {
+            return null;
+        }
 
-                for (String server : acceptedHandleServers) {
-                    if (urlPieces[2].equals(server)) {
-                        for (String prefix : rejectedHandlePrefixes) {
-                            if (!urlPieces[3].equals(prefix)) {
-                                return urlPieces[3] + "/" + urlPieces[4];
-                            }
+        for (MetadataValue value : values) {
+            //     0   1       2         3   4
+            //   http://hdl.handle.net/1234/12
+            String[] urlPieces = value.getValue().split("/");
+            if (urlPieces.length != 5) {
+                continue;
+            }
+
+            for (String server : acceptedHandleServers) {
+                if (urlPieces[2].equals(server)) {
+                    for (String prefix : rejectedHandlePrefixes) {
+                        if (!urlPieces[3].equals(prefix)) {
+                            return urlPieces[3] + "/" + urlPieces[4];
                         }
-
                     }
+
                 }
             }
         }
@@ -605,33 +625,37 @@ public class OAIHarvester {
 
 
     /**
-     * Process a date, converting it to RFC3339 format, setting the timezone to UTC and subtracting time padding
-     * from the config file.
+     * Process a date, converting it to RFC3339 format, setting the timezone to UTC
+     * and subtracting time padding from the config file.
      *
-     * @param date source Date
-     * @return a string in the format 'yyyy-mm-ddThh:mm:ssZ' and converted to UTC timezone
+     * @param  date       source Date
+     * @param  dateFormat the date format
+     * @return            a string in the format 'yyyy-mm-ddThh:mm:ssZ' and
+     *                    converted to UTC timezone
      */
-    private String processDate(Date date) {
-        Integer timePad = configurationService.getIntProperty("oai.harvester.timePadding");
+    private String formatDate(Date date, String dateFormat) {
+        int timePad = configurationService.getIntProperty("oai.harvester.timePadding");
 
         if (timePad == 0) {
             timePad = 120;
         }
 
-        return processDate(date, timePad);
+        return formatDate(date, timePad, dateFormat);
     }
 
     /**
-     * Process a date, converting it to RFC3339 format, setting the timezone to UTC and subtracting time padding
-     * from the config file.
+     * Process a date, converting it to RFC3339 format, setting the timezone to UTC
+     * and subtracting time padding from the config file.
      *
-     * @param date       source Date
-     * @param secondsPad number of seconds to subtract from the date
-     * @return a string in the format 'yyyy-mm-ddThh:mm:ssZ' and converted to UTC timezone
+     * @param  date       source Date
+     * @param  secondsPad number of seconds to subtract from the date
+     * @param  dateFormat the date format
+     * @return            a string in the specified format and converted to UTC
+     *                    timezone
      */
-    private String processDate(Date date, int secondsPad) {
+    private String formatDate(Date date, int secondsPad, String dateFormat) {
 
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
         formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         Calendar calendar = Calendar.getInstance();
@@ -646,52 +670,18 @@ public class OAIHarvester {
     /**
      * Query OAI-PMH server for the granularity of its datestamps.
      */
-    private String oaiGetDateGranularity(String oaiSource) {
+    private String getDateGranularityFromServer(String oaiSource) {
         OAIHarvesterResponseDTO iden = oaiHarvesterClient.identify(oaiSource);
-        return iden.getDocument().getElementsByTagNameNS(OAI_NS.getURI(), "granularity").item(0).getTextContent();
-    }
-
-    /**
-     * Generate and send an email to the administrator. Prompted by errors encountered during harvesting.
-     *
-     * @param status the current status of the collection, usually HarvestedCollection.STATUS_OAI_ERROR or
-     *               HarvestedCollection.STATUS_UNKNOWN_ERROR
-     * @param ex     the Exception that prompted this action
-     */
-    private void alertAdmin(Collection targetCollection, int status, Exception ex) {
-        try {
-            String recipient = configurationService.getProperty("alert.recipient");
-
-            if (StringUtils.isNotBlank(recipient)) {
-                Email email = Email.getEmail(I18nUtil.getEmailFilename(Locale.getDefault(), "harvesting_error"));
-                email.addRecipient(recipient);
-                email.addArgument(targetCollection.getID());
-                email.addArgument(new Date());
-                email.addArgument(status);
-
-                String stackTrace;
-
-                if (ex != null) {
-                    email.addArgument(ex.getMessage());
-
-                    StringWriter sw = new StringWriter();
-                    PrintWriter pw = new PrintWriter(sw);
-                    ex.printStackTrace(pw);
-                    pw.flush();
-                    stackTrace = sw.toString();
-                } else {
-                    stackTrace = "No exception";
-                }
-
-                email.addArgument(stackTrace);
-                email.send();
-            }
-        } catch (Exception e) {
-            log.warn("Unable to send email alert", e);
+        Element identifyElement = iden.getDocument().getRootElement().getChild("Identify", OAI_NS);
+        if (identifyElement == null) {
+            return null;
         }
-
+        Element granularityElement = identifyElement.getChild("granularity", OAI_NS);
+        if (granularityElement == null) {
+            return null;
+        }
+        return granularityElement.getText().replace("T", "'T'").replace("Z", "'Z'").replace("DD", "dd");
     }
-
 
     /**
      * Query the OAI-PMH provider for a specific metadata record.
@@ -707,7 +697,8 @@ public class OAIHarvester {
      * @throws TransformerException         if XML transformer error
      * @throws HarvestingException          if harvesting error
      */
-    private List<Element> getMDrecord(String oaiSource, String itemOaiId, String metadataPrefix)
+    @SuppressWarnings("unchecked")
+    private List<Element> getMetadataRecord(String oaiSource, String itemOaiId, String metadataPrefix)
         throws IOException, ParserConfigurationException, SAXException, TransformerException, HarvestingException {
         OAIHarvesterResponseDTO responseDTO = oaiHarvesterClient.getRecord(oaiSource, itemOaiId, metadataPrefix);
         if (responseDTO.hasErrors()) {
@@ -715,9 +706,7 @@ public class OAIHarvester {
                 "OAI server returned the following errors during getDescMD execution: " + responseDTO.getErrors());
         }
 
-        Document record = domBuilder.build(responseDTO.getDocument());
-        Element root = record.getRootElement();
-
+        Element root = responseDTO.getDocument().getRootElement();
         return root.getChild("GetRecord", OAI_NS).getChild("record", OAI_NS).getChild("metadata", OAI_NS).getChildren();
     }
 
@@ -757,6 +746,48 @@ public class OAIHarvester {
         }
 
         return configs;
+    }
+
+    /**
+     * Generate and send an email to the administrator. Prompted by errors
+     * encountered during harvesting.
+     *
+     * @param status the current status of the collection, usually
+     *               HarvestedCollection.STATUS_OAI_ERROR or
+     *               HarvestedCollection.STATUS_UNKNOWN_ERROR
+     * @param ex     the Exception that prompted this action
+     */
+    private void alertAdmin(Collection targetCollection, int status, Exception ex) {
+        try {
+            String recipient = configurationService.getProperty("alert.recipient");
+
+            if (StringUtils.isNotBlank(recipient)) {
+                Email email = Email.getEmail(I18nUtil.getEmailFilename(Locale.getDefault(), "harvesting_error"));
+                email.addRecipient(recipient);
+                email.addArgument(targetCollection.getID());
+                email.addArgument(new Date());
+                email.addArgument(status);
+
+                String stackTrace;
+
+                if (ex != null) {
+                    email.addArgument(ex.getMessage());
+
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw);
+                    ex.printStackTrace(pw);
+                    pw.flush();
+                    stackTrace = sw.toString();
+                } else {
+                    stackTrace = "No exception";
+                }
+
+                email.addArgument(stackTrace);
+                email.send();
+            }
+        } catch (Exception e) {
+            log.warn("Unable to send email alert", e);
+        }
     }
 
     public OAIHarvesterClient getOaiHarvesterClient() {
