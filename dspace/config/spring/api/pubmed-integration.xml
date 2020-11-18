@@ -19,7 +19,7 @@
         </description>
         <entry key-ref="dc.title" value-ref="titleContrib"/>
         <entry key-ref="dc.description.abstract" value-ref="abstractContrib"/>
-        <entry key-ref="dc.identifier.other" value-ref="pubmedContrib"/>
+        <entry key-ref="dc.identifier.pmid" value-ref="pubmedContrib"/>
         <entry key-ref="dc.contributor.author" value-ref="authorContrib"/>
         <entry key-ref="dc.date.issued" value-ref="dateContrib"/>
         <entry key-ref="dc.language.iso" value-ref="pubmedLanguageContrib"/>
@@ -29,6 +29,7 @@
         <entry key-ref="oaire.citation.volume" value-ref="volumeContrib"/>
         <entry key-ref="oaire.citation.issue" value-ref="issueContrib"/>
         <entry key-ref="dc.identifier.doi" value-ref="doiContrib"/>
+        <entry key-ref="dc.type" value-ref="doiContrib"/>
 
     </util:map>
 
@@ -51,7 +52,7 @@
         <property name="field" ref="dc.date.issued"/>
     </bean>
     <bean id="pubmedContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
-        <property name="field" ref="dc.identifier.other"/>
+        <property name="field" ref="dc.identifier.pmid"/>
         <property name="query" value="descendant::MedlineCitation/PMID"/>
         <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
     </bean>
@@ -150,6 +151,12 @@
         <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
     </bean>
 
+    <bean id="typeContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.type"/>
+        <property name="query" value="descendant::PublicationTypeList/PublicationType"/>
+        <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
+    </bean>
+
     <bean id="dc.title" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.title"/>
     </bean>
@@ -176,8 +183,8 @@
         <constructor-arg value="dc.subject"/>
     </bean>
 
-    <bean id="dc.identifier.other" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier.other"/>
+    <bean id="dc.identifier.pmid" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.pmid"/>
     </bean>
 
     <bean id="dc.relation.ispartof" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
@@ -198,6 +205,10 @@
 
     <bean id="dc.identifier.doi" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.identifier.doi"/>
+    </bean>
+
+    <bean id="dc.type" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.type"/>
     </bean>
 
     <util:map id="prefixToNamespaceMapping">

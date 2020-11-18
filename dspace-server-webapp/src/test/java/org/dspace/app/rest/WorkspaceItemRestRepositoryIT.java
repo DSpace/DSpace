@@ -1691,7 +1691,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         context.restoreAuthSystemState();
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+//        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         // create a workspaceitem from a single bibliographic entry file explicitly in the default collection (col1)
         getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(pubmedFile))
