@@ -142,6 +142,7 @@ public class HttpHeadersInitializer {
         // Validate and process range -------------------------------------------------------------
 
         log.debug("Content-Type : {}", contentType);
+        response.reset();
         // Initialize response.
         response.setBufferSize(bufferSize);
         if (contentType != null) {
