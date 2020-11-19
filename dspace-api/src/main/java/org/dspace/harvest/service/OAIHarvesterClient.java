@@ -18,7 +18,9 @@ import org.jdom.Namespace;
  */
 public interface OAIHarvesterClient {
 
-    public static final Namespace OAI_NS = Namespace.getNamespace("http://www.openarchives.org/OAI/2.0/");
+    Namespace OAI_NS = Namespace.getNamespace("http://www.openarchives.org/OAI/2.0/");
+
+    Namespace OAI_IDENTIFIER_NS = Namespace.getNamespace("http://www.openarchives.org/OAI/2.0/oai-identifier");
 
     /**
      * Harvest records from a repository.

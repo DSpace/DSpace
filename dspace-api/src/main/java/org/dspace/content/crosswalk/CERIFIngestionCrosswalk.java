@@ -20,11 +20,15 @@ import javax.xml.transform.stream.StreamSource;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.core.CrisConstants;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMResult;
 import org.jdom.transform.JDOMSource;
 
@@ -40,6 +44,8 @@ public class CERIFIngestionCrosswalk implements IngestionCrosswalk {
     private PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
 
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    private String idPrefix;
 
     @Override
     public void ingest(Context context, DSpaceObject dso, List<Element> metadata, boolean createMissingMetadataFields)
@@ -73,9 +79,19 @@ public class CERIFIngestionCrosswalk implements IngestionCrosswalk {
             TransformerFactory factory = TransformerFactory.newInstance();
 
             Transformer transformer = factory.newTransformer(xslt);
+            transformer.setParameter("nestedMetadataPlaceholder", CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE);
+            if (idPrefix != null) {
+                transformer.setParameter("idPrefix", idPrefix);
+            }
+
             transformer.transform(xml, out);
 
-            return out.getDocument().getRootElement();
+            Document document = out.getDocument();
+            if (document == null) {
+                throw new CrosswalkException("An error occurs converting the CERIF xml to the internal DIM xml");
+            }
+
+            return document.getRootElement();
 
         } catch (TransformerException e) {
             throw new CrosswalkException(e);
@@ -94,6 +110,10 @@ public class CERIFIngestionCrosswalk implements IngestionCrosswalk {
             throw new IllegalArgumentException("No DIM ingestion crosswalk found");
         }
         return (IngestionCrosswalk) crosswalk;
+    }
+
+    public void setIdPrefix(String idPrefix) {
+        this.idPrefix = idPrefix;
     }
 
 }
