@@ -153,6 +153,22 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    public void personMetadataImportTest() throws Exception {
+
+        String[] csv = {"id,collection,dc.title,person.birthDate",
+            "+," + collection.getHandle() + ",\"Test Import 2\"," + "2000"};
+        performImportScript(csv);
+        Item importedItem = findItemByName("Test Import 2");
+        assertTrue(
+            StringUtils.equals(
+                itemService.getMetadata(importedItem, "person", "birthDate", null, Item.ANY)
+                           .get(0).getValue(), "2000"));
+        context.turnOffAuthorisationSystem();
+        itemService.delete(context, importedItem);
+        context.restoreAuthSystemState();
+    }
+
+    @Test
     public void metadataImportRemovingValueTest() throws Exception {
 
         context.turnOffAuthorisationSystem();
