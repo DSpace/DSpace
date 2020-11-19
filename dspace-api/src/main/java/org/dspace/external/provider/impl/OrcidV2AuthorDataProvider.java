@@ -56,6 +56,7 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
     private String orcidUrl;
 
     public static final String ORCID_ID_SYNTAX = "\\d{4}-\\d{4}-\\d{4}-(\\d{3}X|\\d{4})";
+    private static final int MAX_INDEX = 10000;
 
     @Override
     public String getSourceIdentifier() {
@@ -190,6 +191,9 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
         if (limit > 100) {
             throw new IllegalArgumentException("The maximum number of results to retrieve cannot exceed 100.");
         }
+        if (start > MAX_INDEX) {
+            throw new IllegalArgumentException("The starting number of results to retrieve cannot exceed 10000.");
+        }
 
         String searchPath = "search?q=" + URLEncoder.encode(query) + "&start=" + start + "&rows=" + limit;
         log.debug("queryBio searchPath=" + searchPath + " accessToken=" + accessToken);
@@ -231,7 +235,7 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
         log.debug("queryBio searchPath=" + searchPath + " accessToken=" + accessToken);
         InputStream bioDocument = orcidRestConnector.get(searchPath, accessToken);
         XMLtoBio converter = new XMLtoBio();
-        return converter.getNumberOfResultsFromXml(bioDocument);
+        return Math.min(converter.getNumberOfResultsFromXml(bioDocument), MAX_INDEX);
     }
 
 
