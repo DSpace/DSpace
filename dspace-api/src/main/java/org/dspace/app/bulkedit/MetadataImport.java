@@ -113,14 +113,14 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
      *
      * @see #populateRefAndRowMap(DSpaceCSVLine, UUID)
      */
-    protected static HashMap<UUID, String> entityTypeMap = new HashMap<>();
+    protected HashMap<UUID, String> entityTypeMap = new HashMap<>();
 
     /**
      * Map of UUIDs to their relations that are referenced within any import with their referers.
      *
      * @see #populateEntityRelationMap(String, String, String)
      */
-    protected static HashMap<String, HashMap<String, ArrayList<String>>> entityRelationMap = new HashMap<>();
+    protected HashMap<String, HashMap<String, ArrayList<String>>> entityRelationMap = new HashMap<>();
 
 
     /**
@@ -1403,16 +1403,16 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                         //Populate the EntityRelationMap
                         populateEntityRelationMap(uuid, key, originId.toString());
                     }
+                } else {
+                    newLine.add(key, null);
                 }
             } else {
-                if (line.get(key).size() > 1) {
+                if (line.get(key).size() > 0) {
                     for (String value : line.get(key)) {
                         newLine.add(key, value);
                     }
                 } else {
-                    if (line.get(key).size() > 0) {
-                        newLine.add(key, line.get(key).get(0));
-                    }
+                    newLine.add(key, null);
                 }
             }
         }
@@ -1517,6 +1517,9 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 throw new MetadataImportException("Error in CSV row " + rowCount + ":\n" +
                                                       "Not a UUID or indirect entity reference: '" + reference + "'");
             }
+        }
+        if (reference.contains("::virtual::")) {
+            return UUID.fromString(StringUtils.substringBefore(reference, "::virtual::"));
         } else if (!reference.startsWith("rowName:")) { // Not a rowName ref; so it's a metadata value reference
             MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
             MetadataFieldService metadataFieldService =
