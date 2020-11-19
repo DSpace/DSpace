@@ -68,7 +68,7 @@ public class Utils {
 	 * http(s)://doi.org/10.XXXX/XXXX,http(s)://dx.doi.org/10.XXXX/XXXX o doi:10.XXXX/XXXX
 	 */
 	public static boolean isDoi(String identifier) {
-		String doiRegex = "((https?:\\/\\/(dx\\.)?doi.org\\/)|(doi:))10\\.[0-9]{4,9}\\/.{1,200}";
+		String doiRegex = "((https?:\\/\\/(dx\\.)?doi.org\\/)|(doi:)|(DOI:))10\\.[0-9]{4,9}\\/.{1,200}";
 		return java.util.regex.Pattern.matches(doiRegex, identifier);
 	}
 	
