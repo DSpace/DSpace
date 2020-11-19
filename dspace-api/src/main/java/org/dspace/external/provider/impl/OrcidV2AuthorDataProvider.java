@@ -149,7 +149,7 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
                 externalDataObject.setDisplayValue(firstName);
                 externalDataObject.setValue(firstName);
             }
-        } else if (person.getPath() != null ){
+        } else if (person.getPath() != null ) {
             externalDataObject.setId(StringUtils.substringBetween(person.getPath(),"/","/person"));
         }
         return externalDataObject;
