@@ -70,8 +70,8 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
     public void init() throws IOException {
         if (StringUtils.isNotBlank(accessToken) && StringUtils.isNotBlank(clientSecret)) {
             String authenticationParameters = "?client_id=" + clientId +
-                "&client_secret=" + clientSecret +
-                "&scope=/read-public&grant_type=client_credentials";
+                    "&client_secret=" + clientSecret +
+                    "&scope=/read-public&grant_type=client_credentials";
             HttpPost httpPost = new HttpPost(OAUTHUrl + authenticationParameters);
             httpPost.addHeader("Accept", "application/json");
             httpPost.addHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -117,39 +117,46 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
 
     protected ExternalDataObject convertToExternalDataObject(Person person) {
         ExternalDataObject externalDataObject = new ExternalDataObject(sourceIdentifier);
-        String lastName = "";
-        String firstName = "";
-        if (person.getName().getFamilyName() != null) {
-            lastName = person.getName().getFamilyName().getValue();
-            externalDataObject.addMetadata(new MetadataValueDTO("person", "familyName", null, null,
-                                                                lastName));
-        }
-        if (person.getName().getGivenNames() != null) {
-            firstName = person.getName().getGivenNames().getValue();
-            externalDataObject.addMetadata(new MetadataValueDTO("person", "givenName", null, null,
-                                                                firstName));
+        if (person.getName() != null) {
+            String lastName = "";
+            String firstName = "";
+            if (person.getName().getFamilyName() != null) {
+                lastName = person.getName().getFamilyName().getValue();
+                externalDataObject.addMetadata(new MetadataValueDTO("person", "familyName", null, null,
+                                                                    lastName));
+            }
+            if (person.getName().getGivenNames() != null) {
+                firstName = person.getName().getGivenNames().getValue();
+                externalDataObject.addMetadata(new MetadataValueDTO("person", "givenName", null, null,
+                                                                    firstName));
 
-        }
-        externalDataObject.setId(person.getName().getPath());
-        externalDataObject
-            .addMetadata(new MetadataValueDTO("person", "identifier", "orcid", null, person.getName().getPath()));
-        externalDataObject
-            .addMetadata(new MetadataValueDTO("dc", "identifier", "uri", null, orcidUrl + person.getName().getPath()));
-        if (!StringUtils.isBlank(lastName) && !StringUtils.isBlank(firstName)) {
-            externalDataObject.setDisplayValue(lastName + ", " + firstName);
-            externalDataObject.setValue(lastName + ", " + firstName);
-        } else if (StringUtils.isBlank(firstName)) {
-            externalDataObject.setDisplayValue(lastName);
-            externalDataObject.setValue(lastName);
-        } else if (StringUtils.isBlank(lastName)) {
-            externalDataObject.setDisplayValue(firstName);
-            externalDataObject.setValue(firstName);
+            }
+            externalDataObject.setId(person.getName().getPath());
+            externalDataObject
+                    .addMetadata(
+                            new MetadataValueDTO("person", "identifier", "orcid", null, person.getName().getPath()));
+            externalDataObject
+                    .addMetadata(new MetadataValueDTO("dc", "identifier", "uri", null,
+                                                      orcidUrl + person.getName().getPath()));
+            if (!StringUtils.isBlank(lastName) && !StringUtils.isBlank(firstName)) {
+                externalDataObject.setDisplayValue(lastName + ", " + firstName);
+                externalDataObject.setValue(lastName + ", " + firstName);
+            } else if (StringUtils.isBlank(firstName)) {
+                externalDataObject.setDisplayValue(lastName);
+                externalDataObject.setValue(lastName);
+            } else if (StringUtils.isBlank(lastName)) {
+                externalDataObject.setDisplayValue(firstName);
+                externalDataObject.setValue(firstName);
+            }
+        } else if (person.getPath() != null ){
+            externalDataObject.setId(StringUtils.substringBetween(person.getPath(),"/","/person"));
         }
         return externalDataObject;
     }
 
     /**
      * Retrieve a Person object based on a given orcid identifier
+     *
      * @param id orcid identifier
      * @return Person
      */
