@@ -64,7 +64,7 @@ public class ExternalSourceEntryPoolTaskUriListHandler extends ExternalSourceEnt
 
         matcher.find();
         String id = matcher.group(1);
-        Integer poolTaskId = Integer.parseInt(id);
+        int poolTaskId = Integer.parseInt(id);
         try {
             poolTask = poolTaskService.find(context, poolTaskId);
         } catch (SQLException e) {
