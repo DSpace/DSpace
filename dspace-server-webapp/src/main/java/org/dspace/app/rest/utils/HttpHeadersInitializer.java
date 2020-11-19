@@ -142,7 +142,7 @@ public class HttpHeadersInitializer {
         // Validate and process range -------------------------------------------------------------
 
         log.debug("Content-Type : {}", contentType);
-        response.reset();
+        //TODO response.reset() => Can be re-instated/investigated once we upgrade to Spring 5.2.9, see issue #3056
         // Initialize response.
         response.setBufferSize(bufferSize);
         if (contentType != null) {
