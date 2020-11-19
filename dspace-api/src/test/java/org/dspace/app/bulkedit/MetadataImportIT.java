@@ -168,6 +168,26 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
     }
 
+    @Test
+    public void metadataImportRemovingValueTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, collection).withAuthor("TestAuthorToRemove").withTitle("title")
+                               .build();
+        context.restoreAuthSystemState();
+
+        assertTrue(
+            StringUtils.equals(
+                itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).get(0).getValue(),
+                "TestAuthorToRemove"));
+
+        String[] csv = {"id,collection,dc.title,dc.contributor.author[*]",
+            item.getID().toString() + "," + collection.getHandle() + "," + item.getName() + ","};
+        performImportScript(csv);
+        item = findItemByName("title");
+        assertEquals(itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).size(), 0);
+    }
+
     private Item findItemByName(String name) throws SQLException {
         Item importedItem = null;
         List<Item> allItems = IteratorUtils.toList(itemService.findAll(context));
