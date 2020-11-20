@@ -1247,9 +1247,19 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         // login with new password
         token = getAuthToken(ePerson.getEmail(), newPassword);
-        getClient(token).perform(get("/api/"))
-                        .andExpect(status().isOk());
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
 
+        // can't login with old password
+        token = getAuthToken(ePerson.getEmail(), password);
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(false)))
+                        .andExpect(jsonPath("$.type", is("status")));
     }
 
     @Test
@@ -1289,10 +1299,21 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         // login with old password
         token = getAuthToken(ePerson2.getEmail(), password);
-        getClient(token).perform(get("/api/"))
-                        .andExpect(status().isOk());
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
 
+        // can't login with new password
+        token = getAuthToken(ePerson2.getEmail(), newPassword);
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(false)))
+                        .andExpect(jsonPath("$.type", is("status")));
     }
+
     @Test
     public void patchPasswordForNonAdminUser() throws Exception {
 
@@ -1323,14 +1344,23 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         // login with new password
         token = getAuthToken(ePerson.getEmail(), newPassword);
-        getClient(token).perform(get("/api/"))
-                        .andExpect(status().isOk());
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
 
+        // can't login with old password
+        token = getAuthToken(ePerson.getEmail(), password);
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(false)))
+                        .andExpect(jsonPath("$.type", is("status")));
     }
 
     @Test
     public void patchPasswordReplaceOnNonExistentValue() throws Exception {
-
         context.turnOffAuthorisationSystem();
 
         EPerson ePerson = EPersonBuilder.createEPerson(context)
@@ -1354,6 +1384,14 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                 .andExpect(status().isBadRequest());
+
+        // can't login with new password
+        token = getAuthToken(ePerson.getEmail(), newPassword);
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(false)))
+                        .andExpect(jsonPath("$.type", is("status")));
     }
 
     @Test
@@ -1439,9 +1477,19 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         // login with original password
         token = getAuthToken(ePerson.getEmail(), originalPw);
-        getClient(token).perform(get("/api/"))
-                        .andExpect(status().isOk());
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
 
+        // can't login with null password
+        token = getAuthToken(ePerson.getEmail(), null);
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(false)))
+                        .andExpect(jsonPath("$.type", is("status")));
     }
 
     @Test
@@ -1474,8 +1522,19 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         // login with new password => succeeds
         token = getAuthToken(ePerson.getEmail(), newPassword);
-        getClient(token).perform(get("/api/"))
-                        .andExpect(status().isOk());
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
+
+        // can't login with old password
+        token = getAuthToken(ePerson.getEmail(), password);
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(false)))
+                        .andExpect(jsonPath("$.type", is("status")));
     }
 
     @Test
@@ -1509,8 +1568,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         // login with new email address
         token = getAuthToken(newEmail, password);
-        getClient(token).perform(get("/api/"))
-                        .andExpect(status().isOk());
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
 
     }
 
@@ -1569,11 +1631,13 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                         .andExpect(status().isBadRequest());
 
-        // login with original password
+        // login with original email
         token = getAuthToken(ePerson.getEmail(), password);
-        getClient(token).perform(get("/api/"))
-                        .andExpect(status().isOk());
-
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
     }
 
     @Test
