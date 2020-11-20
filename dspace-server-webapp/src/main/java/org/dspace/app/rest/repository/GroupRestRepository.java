@@ -140,7 +140,7 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
             Context context = obtainContext();
             long total = gs.searchResultCount(context, query);
             List<Group> groups = gs.search(context, query, Math.toIntExact(pageable.getOffset()),
-                                           Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+                                                           Math.toIntExact(pageable.getPageSize()));
             return converter.toRestPage(groups, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);

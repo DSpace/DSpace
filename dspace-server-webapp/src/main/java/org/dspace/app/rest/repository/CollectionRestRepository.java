@@ -177,7 +177,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             }
             List<Collection> collections = cs.findCollectionsWithSubmit(q, context, com,
                                               Math.toIntExact(pageable.getOffset()),
-                                              Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+                                              Math.toIntExact(pageable.getPageSize()));
             int tot = cs.countCollectionsWithSubmit(q, context, com);
             return converter.toRestPage(collections, pageable, tot , utils.obtainProjection());
         } catch (SQLException | SearchServiceException e) {
@@ -192,7 +192,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             Context context = obtainContext();
             List<Collection> collections = cs.findCollectionsWithSubmit(q, context, null,
                                               Math.toIntExact(pageable.getOffset()),
-                                              Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+                                              Math.toIntExact(pageable.getPageSize()));
             int tot = cs.countCollectionsWithSubmit(q, context, null);
             return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
         } catch (SQLException e) {
