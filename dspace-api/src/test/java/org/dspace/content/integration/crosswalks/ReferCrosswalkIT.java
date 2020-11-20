@@ -579,9 +579,9 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withIssueDate("2020-01-01")
             .withAuthor("John Smith")
             .withAuthorAffiliation(CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE)
-            .withAuthor("Walter White")
+            .withAuthor("Walter White", "6c36b2b0-b2cf-41a5-8241-11d0ea56ed97")
             .withAuthorAffiliation("Company")
-            .withEditor("Editor")
+            .withEditor("Editor", "25887329-a648-46f9-a2ac-99319b8e9766")
             .withEditorAffiliation("Editor Affiliation")
             .withRelationProject("Test Project", project.getID().toString())
             .withRelationFunding("Another Test Funding", funding.getID().toString())
@@ -651,7 +651,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withScopusIdentifier("99999999")
             .withType("Controlled Vocabulary for Resource Type Genres::text::book::book part")
             .withIssueDate("2020-01-01")
-            .withAuthor("John Smith")
+            .withAuthor("John Smith", "6c36b2b0-b2cf-41a5-8241-11d0ea56ed97")
             .withAuthorAffiliation(CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE)
             .withAuthor("Walter White")
             .withAuthorAffiliation("Company")
@@ -689,9 +689,9 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withDoiIdentifier("doi:111.111/publication")
             .withType("Controlled Vocabulary for Resource Type Genres::learning object")
             .withIssueDate("2019-12-31")
-            .withAuthor("Edward Smith")
+            .withAuthor("Edward Smith", "8556d5b5-14e5-4009-9539-1ef9686d684d")
             .withAuthorAffiliation("Company")
-            .withAuthor("Walter White")
+            .withAuthor("Walter White", "6c36b2b0-b2cf-41a5-8241-11d0ea56ed97")
             .withAuthorAffiliation(CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE)
             .build();
 
@@ -1521,12 +1521,19 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         String[] resultLines = result.split("\n");
         String[] expectedResultLines = expectedResult.split("\n");
 
-        assertThat("The result should have the same lines number of the expected result",
+        assertThat(sameLineCountReason(resultLines, expectedResultLines),
             resultLines.length, equalTo(expectedResultLines.length));
 
         for (int i = 0; i < resultLines.length; i++) {
             assertThat(resultLines[i], equalTo(expectedResultLines[i]));
         }
+    }
+
+    private String sameLineCountReason(String[] resultLines, String[] expectedResultLines) {
+        String message = "The result should have the same lines number of the expected result.";
+        String result = String.join("\n", resultLines);
+        String expectedResult = String.join("\n", expectedResultLines);
+        return message + "\nExpected:\n" + expectedResult + "\nActual:\n" + result;
     }
 
     private FileInputStream getFileInputStream(String name) throws FileNotFoundException {
