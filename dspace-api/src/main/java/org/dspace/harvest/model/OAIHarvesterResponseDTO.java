@@ -7,6 +7,9 @@
  */
 package org.dspace.harvest.model;
 
+import static java.util.Set.of;
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,6 +17,7 @@ import javax.xml.transform.TransformerException;
 
 import ORG.oclc.oai.harvester2.verb.HarvesterVerb;
 import ORG.oclc.oai.harvester2.verb.ListRecords;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jdom.Document;
 import org.jdom.input.DOMBuilder;
 import org.w3c.dom.NodeList;
@@ -48,10 +52,21 @@ public class OAIHarvesterResponseDTO {
      * @return      the OAIHarvesterResponseDTO instance
      */
     public static OAIHarvesterResponseDTO fromHarvesterVerb(HarvesterVerb verb) {
-        Document document = DOM_BUILDER.build(verb.getDocument());
+        Document document = verb.getDocument() != null ? DOM_BUILDER.build(verb.getDocument()) : null;
         String resumptionToken = getResumptionTokenFromVerb(verb);
         Set<String> errors = retrieveErrors(verb);
         return new OAIHarvesterResponseDTO(document, resumptionToken, errors);
+    }
+
+    /**
+     * Builds an instance of OAIHarvesterResponseDTO from an Exception instance.
+     *
+     * @param  ex the exception that occurs trying to harvest from one repository
+     * @return    the OAIHarvesterResponseDTO instance
+     */
+    public static OAIHarvesterResponseDTO fromException(Exception ex) {
+        String errorMessage = ExceptionUtils.getRootCauseMessage(ex);
+        return new OAIHarvesterResponseDTO(null, null, of(isNotEmpty(errorMessage) ? errorMessage : "Generic error"));
     }
 
     private static String getResumptionTokenFromVerb(HarvesterVerb verb) {

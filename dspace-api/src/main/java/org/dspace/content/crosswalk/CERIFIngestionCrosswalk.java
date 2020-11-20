@@ -17,8 +17,11 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.CrisConstants;
 import org.dspace.core.factory.CoreServiceFactory;
@@ -27,8 +30,6 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMResult;
 import org.jdom.transform.JDOMSource;
 
@@ -48,32 +49,42 @@ public class CERIFIngestionCrosswalk implements IngestionCrosswalk {
     private String idPrefix;
 
     @Override
-    public void ingest(Context context, DSpaceObject dso, List<Element> metadata, boolean createMissingMetadataFields)
+    public void ingest(Context context, DSpaceObject dso, List<Element> elements, boolean createMissingMetadataFields)
         throws CrosswalkException, IOException, SQLException, AuthorizeException {
 
-        for (Element singleMetadata : metadata) {
-            ingest(context, dso, singleMetadata, createMissingMetadataFields);
+        if (CollectionUtils.isEmpty(elements)) {
+            throw new CrosswalkException("No CERIF root element to ingest found");
         }
+
+        if (elements.size() > 1) {
+            throw new CrosswalkException("Multiple CERIF elements ingestion not supported");
+        }
+
+        ingest(context, dso, elements.get(0), createMissingMetadataFields);
 
     }
 
     @Override
-    public void ingest(Context context, DSpaceObject dso, Element metadata, boolean createMissingMetadataFields)
+    public void ingest(Context context, DSpaceObject dso, Element cerifRootElement, boolean createMissingMetadataFields)
         throws CrosswalkException, IOException, SQLException, AuthorizeException {
 
-        IngestionCrosswalk dimIngestionCrosswalk = getDIMIngestionCrosswalk();
-        Element dimRoot = buildDIM(metadata);
+        if (dso.getType() != Constants.ITEM) {
+            throw new IllegalArgumentException("Only items can be ingested by the CERIFIngestionCrosswalk");
+        }
 
+        Element dimRoot = buildDIM(cerifRootElement);
+
+        IngestionCrosswalk dimIngestionCrosswalk = getDIMIngestionCrosswalk();
         dimIngestionCrosswalk.ingest(context, dso, dimRoot, createMissingMetadataFields);
 
     }
 
-    private Element buildDIM(Element metadata) throws CrosswalkException {
+    private Element buildDIM(Element cerifRootElement) throws CrosswalkException {
 
         try {
 
             Source xslt = getXslt();
-            Source xml = new JDOMSource(metadata);
+            Source xml = new JDOMSource(cerifRootElement);
             JDOMResult out = new JDOMResult();
 
             TransformerFactory factory = TransformerFactory.newInstance();
@@ -81,7 +92,7 @@ public class CERIFIngestionCrosswalk implements IngestionCrosswalk {
             Transformer transformer = factory.newTransformer(xslt);
             transformer.setParameter("nestedMetadataPlaceholder", CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE);
             if (idPrefix != null) {
-                transformer.setParameter("idPrefix", idPrefix);
+                transformer.setParameter("idPrefix", AuthorityValueService.GENERATE + idPrefix);
             }
 
             transformer.transform(xml, out);
@@ -100,8 +111,7 @@ public class CERIFIngestionCrosswalk implements IngestionCrosswalk {
 
     private StreamSource getXslt() {
         String parent = configurationService.getProperty("dspace.dir") + File.separator + "config" + File.separator;
-        File templateFile = new File(parent, "");
-        return new StreamSource(templateFile);
+        return new StreamSource(new File(parent, "crosswalks/oai/metadataFormats/oai_cerif_to_dim.xsl"));
     }
 
     private IngestionCrosswalk getDIMIngestionCrosswalk() {

@@ -79,8 +79,9 @@ public class OAIHarvesterClientImpl implements OAIHarvesterClient {
             HarvesterVerb harvesterVerb = supplier.get();
             LOGGER.info("HTTP Request: " + harvesterVerb.getRequestURL());
             return OAIHarvesterResponseDTO.fromHarvesterVerb(harvesterVerb);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (Exception ex) {
+            LOGGER.error("An error occurs during the harvesting", ex);
+            return OAIHarvesterResponseDTO.fromException(ex);
         }
     }
 
