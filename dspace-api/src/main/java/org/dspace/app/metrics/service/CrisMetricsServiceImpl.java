@@ -1,0 +1,73 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+package org.dspace.app.metrics.service;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
+
+import org.apache.logging.log4j.Logger;
+import org.dspace.app.metrics.CrisMetrics;
+import org.dspace.app.metrics.DAO.CrisMetricsDAO;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Item;
+import org.dspace.core.Context;
+import org.dspace.core.LogManager;
+import org.springframework.beans.factory.annotation.Autowired;
+
+/**
+ * 
+ * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
+ */
+public class CrisMetricsServiceImpl implements CrisMetricsService {
+
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CrisMetricsServiceImpl.class);
+
+    @Autowired(required = true)
+    protected CrisMetricsDAO crisMetricsDAO;
+
+    @Override
+    public List<CrisMetrics> findAll(Context context) throws SQLException {
+        return  findAll(context, -1, -1);
+    }
+
+    @Override
+    public List<CrisMetrics> findAll(Context context, Integer limit, Integer offset) throws SQLException {
+        return  crisMetricsDAO.findAll(context, limit, offset);
+    }
+
+    @Override
+    public int count(Context context) throws SQLException {
+        return crisMetricsDAO.countRows(context);
+    }
+
+    public CrisMetrics create(Context context, Item item) throws SQLException, AuthorizeException {
+        CrisMetrics cm =  new CrisMetrics();
+        cm.setResource(item);
+        CrisMetrics metric = crisMetricsDAO.create(context, cm);
+        log.info(LogManager.getHeader(context, "create_cris_metrics", "cris_metrics_id=" + metric.getId()));
+        return metric;
+    }
+
+    public void delete(Context context, CrisMetrics crisMetrics) throws SQLException, AuthorizeException {
+        this.crisMetricsDAO.delete(context, crisMetrics);
+    }
+
+    @Override
+    public CrisMetrics findLastMetricByResourceIdAndMetricsTypes(Context context, String metricType, UUID resourceId)
+            throws SQLException {
+        return this.crisMetricsDAO.findLastMetricByResourceIdAndMetricsTypes(context, metricType, resourceId);
+    }
+
+    @Override
+    public CrisMetrics uniqueLastMetricByResourceIdAndResourceTypeIdAndMetricsType(Context context, String metricType,
+            UUID resource, boolean last) throws SQLException {
+        return crisMetricsDAO.uniqueLastMetricByResourceIdAndResourceTypeIdAndMetricsType(
+                              context, metricType, resource, last);
+    }
+
+}
