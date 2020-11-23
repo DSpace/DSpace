@@ -21,7 +21,7 @@
 insert into metadatavalue (metadata_field_id, text_value, text_lang, place, authority, confidence, dspace_object_id) 
   select distinct 
   	T1.metadata_field_id as metadata_field_id, 
-  	concat(T2.handleprefix, h.handle) as text_value, 
+  	concat('${handle.canonical.prefix}', h.handle) as text_value, 
   	null as text_lang, 0 as place, 
   	null as authority, 
   	-1 as confidence, 
@@ -38,8 +38,6 @@ insert into metadatavalue (metadata_field_id, text_value, text_lang, place, auth
 	 	where msr.short_id = 'dc' 
 	  		and mfr.element = 'identifier'
 	  		and mfr.qualifier = 'uri') T1
-
-   	cross join tmp_handleprefix T2
 	  
   	where uuid not in (
 		select c.uuid as uuid from community c 
@@ -60,7 +58,7 @@ insert into metadatavalue (metadata_field_id, text_value, text_lang, place, auth
 insert into metadatavalue (metadata_field_id, text_value, text_lang, place, authority, confidence, dspace_object_id) 
   select distinct 
   	T1.metadata_field_id as metadata_field_id, 
-  	concat(T2.handleprefix, h.handle) as text_value, 
+  	concat('${handle.canonical.prefix}', h.handle) as text_value, 
   	null as text_lang, 0 as place, 
   	null as authority, 
   	-1 as confidence, 
@@ -77,8 +75,6 @@ insert into metadatavalue (metadata_field_id, text_value, text_lang, place, auth
 	 	where msr.short_id = 'dc' 
 	  		and mfr.element = 'identifier'
 	  		and mfr.qualifier = 'uri') T1
-
-   	cross join tmp_handleprefix T2
 	  
   	where uuid not in (
 		select c.uuid as uuid from collection c 
@@ -92,8 +88,3 @@ insert into metadatavalue (metadata_field_id, text_value, text_lang, place, auth
 	)
 ;  	
 
--------------------------------------------------------------
--- This will DROP the temporary table
--------------------------------------------------------------
-
-DROP TABLE tmp_handleprefix;

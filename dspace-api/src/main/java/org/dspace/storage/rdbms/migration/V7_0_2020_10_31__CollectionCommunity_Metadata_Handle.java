@@ -7,18 +7,15 @@
  */
 package org.dspace.storage.rdbms.migration;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.apache.commons.text.StringSubstitutor;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementSetter;
-import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 /**
  * Insert a 'dc.idendifier.uri' metadata record for each Community and Collection in the database.
@@ -37,31 +34,17 @@ public class V7_0_2020_10_31__CollectionCommunity_Metadata_Handle extends BaseJa
         HandleService handleService = DSpaceServicesFactory
                 .getInstance().getServiceManager().getServicesByType(HandleService.class).get(0);
 
-        final String prefix = handleService.getCanonicalPrefix();
-
-        // Step 1 Preparation (creation of the tmp_handleprefix containing one record with the prefix)
-        String createTmpTable = "CREATE TABLE tmp_handleprefix (handleprefix text NOT NULL);";
-        DatabaseUtils.executeSql(context.getConnection(), createTmpTable);
-
-        // Step 2 Preparation (insertion of the prefix value into tmp_handleprefix)
-        String insertPrefixSql = "INSERT INTO tmp_handleprefix (handleprefix) VALUES (?)";
-        try {
-            new JdbcTemplate(new SingleConnectionDataSource(context.getConnection(), true))
-                .update(insertPrefixSql, new PreparedStatementSetter() {
-                    @Override
-                    public void setValues(PreparedStatement ps) throws SQLException {
-                        ps.setString(1, prefix);
-                    }
-                });
-        } catch (DataAccessException dae) {
-            throw new SQLException("Flyway executeSql() error occurred", dae);
-        }
-
-        // Step 3 Populate (sql script execution)
         String dbtype = DatabaseUtils.getDbType(context.getConnection());
         String sqlMigrationPath = "org/dspace/storage/rdbms/sqlmigration/metadata/" + dbtype + "/";
         String dataMigrateSQL = MigrationUtils.getResourceAsString(
                 sqlMigrationPath + "V7.0_2020.10.31__CollectionCommunity_Metadata_Handle.sql");
+
+        // Replace ${handle.canonical.prefix} variable in SQL script with value from Configuration
+        Map<String, String> valuesMap = new HashMap<String, String>();
+        valuesMap.put("handle.canonical.prefix", handleService.getCanonicalPrefix());
+        StringSubstitutor sub = new StringSubstitutor(valuesMap);
+        dataMigrateSQL = sub.replace(dataMigrateSQL);
+
         DatabaseUtils.executeSql(context.getConnection(), dataMigrateSQL);
 
         migration_file_size = dataMigrateSQL.length();
