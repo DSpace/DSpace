@@ -245,7 +245,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             }
             collection = cs.create(context, parent);
             cs.update(context, collection);
-            metadataConverter.setMetadata(context, collection, collectionRest.getMetadata());
+            metadataConverter.mergeMetadata(context, collection, collectionRest.getMetadata());
         } catch (SQLException e) {
             throw new RuntimeException("Unable to create new Collection under parent Community " + id, e);
         }
