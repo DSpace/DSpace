@@ -25,6 +25,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -38,7 +40,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
-import javax.annotation.PostConstruct;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
@@ -149,32 +150,10 @@ public class OAIHarvester {
     @Autowired
     private ItemSearchService itemSearchService;
 
-    private String ORESerialURI;
-
-    private String ORESerialKey;
-
-    /**
-     * Set the ORE options.
-     */
-    @PostConstruct
-    private void setup() {
-        Namespace ORESerializationNamespace = NamespaceUtils.getORENamespace();
-        ORESerialURI = ORESerializationNamespace.getURI();
-        ORESerialKey = ORESerializationNamespace.getPrefix();
-    }
-
     /**
      * Performs a harvest cycle on this collection. This will query the remote
      * OAI-PMH provider, check for updates since last harvest, and ingest the
      * returned items.
-     *
-     * @throws IOException        A general class of exceptions produced by failed
-     *                            or interrupted I/O operations.
-     * @throws SQLException       An exception that provides information on a
-     *                            database access error or other errors.
-     * @throws AuthorizeException Exception indicating the current user of the
-     *                            context does not have permission to perform a
-     *                            particular action.
      */
     public void runHarvest(Context context, HarvestedCollection harvestRow) {
 
@@ -183,7 +162,6 @@ public class OAIHarvester {
 
         try {
 
-            harvestRow = context.reloadEntity(harvestRow);
             if (harvestRow == null || !harvestedCollectionService.isHarvestable(harvestRow)) {
                 throw new HarvestingException("Provided collection is not set up for harvesting");
             }
@@ -217,13 +195,15 @@ public class OAIHarvester {
 
         String oaiSource = harvestRow.getOaiSource();
 
+        Document identifyDocument = identify(oaiSource);
+
         String descriptiveMetadataFormat = getDescriptiveMetadataFormat(harvestRow);
 
-        String dateFormat = getDateFormat(oaiSource);
+        String dateFormat = getDateFormat(oaiSource, identifyDocument);
         String fromDateAsString = fromDate != null ? formatDate(fromDate, dateFormat) : null;
         String toDateAsString = formatDate(toDate, 0, dateFormat);
 
-        String repositoryId = getRepositoryIdentifier(harvestRow);
+        String repositoryId = getRepositoryIdentifier(harvestRow, identifyDocument);
 
         OAIHarvesterResponseDTO responseDTO = oaiHarvesterClient.listRecords(oaiSource, fromDateAsString,
             toDateAsString, harvestRow.getOaiSetId(), descriptiveMetadataFormat);
@@ -298,13 +278,14 @@ public class OAIHarvester {
                 processRecord(context, harvestRow, record, repositoryId);
 
                 context.commit();
-                harvestRow = context.reloadEntity(harvestRow);
+                harvestRow = reloadEntity(context, harvestRow);
 
                 report.incrementSuccessCount();
 
             } catch (Exception ex) {
-                report.incrementFailureCount();
                 log.error("An error occurs while process the record " + getItemIdentifier(record), ex);
+                report.incrementFailureCount();
+                harvestRow = rollbackAndReloadEntity(context, harvestRow);
             }
 
         }
@@ -348,15 +329,7 @@ public class OAIHarvester {
         }
 
         if (harvestRow.getHarvestType() > 1) {
-
-            String OREPrefix = getOREPrefix(harvestRow);
-            Element oreREM = getMetadataRecord(harvestRow.getOaiSource(), itemOaiID, OREPrefix).get(0);
-
-            if (harvestRow.getHarvestType() == 3) {
-                importBitstreams(context, repositoryId, item, oreREM);
-            }
-
-            createOREBundle(context, item, oreREM);
+            handleORE(context, harvestRow, repositoryId, itemOaiID, item);
         }
 
         harvestedItem.setHarvestDate(new Date());
@@ -377,6 +350,25 @@ public class OAIHarvester {
         context.uncacheEntity(harvestedItem);
 
         context.restoreAuthSystemState();
+    }
+
+    private void handleORE(Context context, HarvestedCollection harvestRow, String repositoryId, String itemOaiID,
+        Item item) throws Exception {
+
+        String OREPrefix = getOREPrefix(harvestRow);
+        List<Element> metadata = getMetadataRecord(harvestRow.getOaiSource(), itemOaiID, OREPrefix);
+        if (CollectionUtils.isEmpty(metadata)) {
+            return;
+        }
+
+        Element oreREM = metadata.get(0);
+
+        if (harvestRow.getHarvestType() == 3) {
+            importBitstreams(context, repositoryId, item, oreREM);
+        }
+
+        createOREBundle(context, item, oreREM);
+
     }
 
     private HarvestedItem updateItem(Context context, Item item, HarvestedItem harvestedItem,
@@ -436,7 +428,6 @@ public class OAIHarvester {
         String repositoryId) throws Exception {
 
         String metadataConfig = harvestRow.getHarvestMetadataConfig();
-
         IngestionCrosswalk metadataElementCrosswalk = getIngestionCrosswalk(metadataConfig, repositoryId);
 
         List<Element> metadataElements = getMetadataElements(record);
@@ -450,7 +441,8 @@ public class OAIHarvester {
 
     private void importBitstreams(Context context, String repositoryId, Item item, Element oreREM) throws Exception {
 
-        IngestionCrosswalk oreCrosswalk = getIngestionCrosswalk(this.ORESerialKey, repositoryId);
+        String ORESerialKey = NamespaceUtils.getORENamespace().getPrefix();
+        IngestionCrosswalk oreCrosswalk = getIngestionCrosswalk(ORESerialKey, repositoryId);
 
         List<Bundle> allBundles = item.getBundles();
         for (Bundle bundle : allBundles) {
@@ -496,7 +488,9 @@ public class OAIHarvester {
     }
 
     private String getOREPrefix(HarvestedCollection harvestRow) {
+        String ORESerialURI = NamespaceUtils.getORENamespace().getURI();
         String OREPrefix = oaiHarvesterClient.resolveNamespaceToPrefix(harvestRow.getOaiSource(), ORESerialURI);
+
         if (OREPrefix == null && harvestRow.getHarvestType() != HarvestedCollection.TYPE_DMD) {
             String message = "The OAI server doesn't support ORE dissemination in the format: " + ORESerialURI;
             log.error(message);
@@ -536,6 +530,7 @@ public class OAIHarvester {
     }
 
     private HarvestedCollection setBusyStatus(Context context, HarvestedCollection harvestRow, Date startDate) {
+        harvestRow = reloadEntity(context, harvestRow);
         harvestRow.setHarvestMessage("Collection harvesting is initializing...");
         harvestRow.setHarvestStatus(STATUS_BUSY);
         harvestRow.setHarvestStartTime(startDate);
@@ -544,6 +539,7 @@ public class OAIHarvester {
 
     private HarvestedCollection setReadyStatus(Context context, HarvestedCollection harvestRow, String message,
         Date lastDate) {
+        harvestRow = reloadEntity(context, harvestRow);
         harvestRow.setHarvestMessage(message);
         harvestRow.setHarvestStatus(STATUS_READY);
         harvestRow.setLastHarvested(lastDate);
@@ -551,12 +547,14 @@ public class OAIHarvester {
     }
 
     private HarvestedCollection setUnknownErrorStatus(Context context, HarvestedCollection harvestRow, String message) {
+        harvestRow = reloadEntity(context, harvestRow);
         harvestRow.setHarvestMessage(message);
         harvestRow.setHarvestStatus(STATUS_UNKNOWN_ERROR);
         return updateHarvestRow(context, harvestRow);
     }
 
     private HarvestedCollection setRetryStatus(Context context, HarvestedCollection harvestRow, String message) {
+        harvestRow = reloadEntity(context, harvestRow);
         harvestRow.setHarvestMessage(message);
         harvestRow.setHarvestStatus(STATUS_RETRY);
         return updateHarvestRow(context, harvestRow);
@@ -566,6 +564,14 @@ public class OAIHarvester {
         try {
             harvestedCollectionService.update(context, harvestRow);
             context.commit();
+            return reloadEntity(context, harvestRow);
+        } catch (SQLException e) {
+            throw new SQLRuntimeException(e);
+        }
+    }
+
+    private HarvestedCollection reloadEntity(Context context, HarvestedCollection harvestRow) {
+        try {
             return context.reloadEntity(harvestRow);
         } catch (SQLException e) {
             throw new SQLRuntimeException(e);
@@ -578,15 +584,11 @@ public class OAIHarvester {
             expirationInterval = 24;
         }
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-        calendar.add(Calendar.HOUR, expirationInterval);
-        Date expirationTime = calendar.getTime();
-        return expirationTime;
+        return Date.from(Instant.now().plus(expirationInterval, ChronoUnit.HOURS));
     }
 
-    private String getDateFormat(String oaiSource) {
-        String dateFormat = getDateGranularityFromServer(oaiSource);
+    private String getDateFormat(String oaiSource, Document identifyDocument) {
+        String dateFormat = getDateGranularity(oaiSource, identifyDocument);
         dateFormat = StringUtils.isEmpty(dateFormat) ? "yyyy-MM-dd'T'HH:mm:ss'Z'" : dateFormat;
         return dateFormat;
     }
@@ -739,38 +741,49 @@ public class OAIHarvester {
         return formatter.format(date);
     }
 
-    private String getRepositoryIdentifier(HarvestedCollection harvestRow) {
+    private Document identify(String baseURL) {
+        OAIHarvesterResponseDTO identifyResponse = oaiHarvesterClient.identify(baseURL);
+        if (identifyResponse.hasErrors()) {
+            String errorMessage = "An error occurs identifing the repository: " + identifyResponse.getErrors();
+            log.error(errorMessage);
+            throw new HarvestingException(errorMessage);
+        }
 
-        String oaiSource = harvestRow.getOaiSource();
-        OAIHarvesterResponseDTO iden = oaiHarvesterClient.identify(oaiSource);
+        return identifyResponse.getDocument();
 
-        return Optional.ofNullable(iden.getDocument())
+    }
+
+    private String getRepositoryIdentifier(HarvestedCollection harvestRow, Document identifyDocument) {
+        return Optional.ofNullable(identifyDocument)
             .map( document -> document.getRootElement().getChild("Identify", OAI_NS))
-            .map(identifyElement -> identifyElement.getChild("description", OAI_NS))
-            .map(description -> description.getChild("oai-identifier", OAI_IDENTIFIER_NS))
-            .map(oaiIdentifier -> oaiIdentifier.getChild("repositoryId", OAI_IDENTIFIER_NS))
+            .flatMap(identifyElement -> getOaiIdentifierElement(identifyElement))
+            .map(oaiIdentifier -> oaiIdentifier.getChild("repositoryIdentifier", OAI_IDENTIFIER_NS))
             .map(repositoryId -> repositoryId.getText())
             .orElse(valueOf(harvestRow.getID()));
 
     }
 
+    @SuppressWarnings("unchecked")
+    private Optional<Element> getOaiIdentifierElement(Element identifyElement) {
+        return identifyElement.getChildren("description", OAI_NS).stream()
+            .map(description -> ((Element) description).getChild("oai-identifier", OAI_IDENTIFIER_NS))
+            .filter(identifier -> identifier != null)
+            .findFirst();
+    }
+
     /**
      * Query OAI-PMH server for the granularity of its datestamps.
      */
-    private String getDateGranularityFromServer(String oaiSource) {
-        OAIHarvesterResponseDTO iden = oaiHarvesterClient.identify(oaiSource);
+    private String getDateGranularity(String oaiSource, Document identifyDocument) {
+        return Optional.ofNullable(identifyDocument)
+            .map(document -> document.getRootElement().getChild("Identify", OAI_NS))
+            .map(identifyElement -> identifyElement.getChild("granularity", OAI_NS))
+            .map(granularityElement -> granularityElement.getText())
+            .map(granularity -> adaptDateFormat(granularity))
+            .orElse(null);
+    }
 
-        Element identifyElement = iden.getDocument().getRootElement().getChild("Identify", OAI_NS);
-        if (identifyElement == null) {
-            return null;
-        }
-        Element granularityElement = identifyElement.getChild("granularity", OAI_NS);
-        if (granularityElement == null) {
-            return null;
-        }
-
-        String granularity = granularityElement.getText();
-
+    private String adaptDateFormat(String granularity) {
         if (granularity.contains("T") && !granularity.contains("'T'")) {
             granularity = granularity.replace("T", "'T'");
         }
@@ -780,6 +793,15 @@ public class OAIHarvester {
         }
 
         return granularity.replace("DD", "dd");
+    }
+
+    private HarvestedCollection rollbackAndReloadEntity(Context context, HarvestedCollection harvestRow) {
+        try {
+            context.rollback();
+            return context.reloadEntity(harvestRow);
+        } catch (SQLException ex) {
+            throw new SQLRuntimeException(ex);
+        }
     }
 
     /**
@@ -802,7 +824,7 @@ public class OAIHarvester {
         OAIHarvesterResponseDTO responseDTO = oaiHarvesterClient.getRecord(oaiSource, itemOaiId, metadataPrefix);
         if (responseDTO.hasErrors()) {
             throw new HarvestingException("OAI server returned the following errors during "
-                + "getMetadataRecord execution: " + responseDTO.getErrors());
+                + "getRecord execution to retrieve metadata: " + responseDTO.getErrors());
         }
 
         Element root = responseDTO.getDocument().getRootElement();

@@ -11,4 +11,4 @@
 -----------------------------------------------------------------------------------
 
 ALTER TABLE harvested_item
-ALTER COLUMN oai_id VARCHAR(256);
+ALTER COLUMN oai_id TYPE CHARACTER VARYING(255);

@@ -11,15 +11,27 @@ package org.dspace.harvest;
 import static org.dspace.builder.CollectionBuilder.createCollection;
 import static org.dspace.builder.CommunityBuilder.createCommunity;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.collections4.IteratorUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.HarvestedCollectionBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -27,6 +39,14 @@ import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.harvest.factory.HarvestServiceFactory;
+import org.dspace.harvest.model.OAIHarvesterResponseDTO;
+import org.dspace.harvest.service.HarvestedCollectionService;
+import org.dspace.harvest.service.HarvestedItemService;
+import org.dspace.harvest.service.OAIHarvesterClient;
+import org.dspace.harvest.util.NamespaceUtils;
+import org.jdom.Document;
+import org.jdom.input.SAXBuilder;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,29 +58,64 @@ import org.junit.Test;
  */
 public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
 
+    private static final String BASE_URL = "https://www.test-harvest.it";
+
+    private static final String OAI_PMH_DIR_PATH = "./target/testing/dspace/assetstore/oai-pmh/";
+
+
     private OAIHarvester harvester = HarvestServiceFactory.getInstance().getOAIHarvester();
 
+    private HarvestedCollectionService harvestedCollectionService = HarvestServiceFactory.getInstance()
+        .getHarvestedCollectionService();
+
+    private HarvestedItemService harvestedItemService = HarvestServiceFactory.getInstance().getHarvestedItemService();
+
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
+    private SAXBuilder builder = new SAXBuilder();
+
 
     private Community community;
 
     private Collection collection;
 
+    private OAIHarvesterClient oaiHarvesterClient;
+
+    private OAIHarvesterClient mockClient;
+
+
     @Before
-    public void beforeTests() throws SQLException, AuthorizeException {
+    public void beforeTests() throws Exception {
         context.turnOffAuthorisationSystem();
         community = createCommunity(context).build();
         collection = createCollection(context, community).withAdminGroup(eperson).build();
         context.restoreAuthSystemState();
+
+        oaiHarvesterClient = harvester.getOaiHarvesterClient();
+        mockClient = mock(OAIHarvesterClient.class);
+        harvester.setOaiHarvesterClient(mockClient);
+
+        String metadataURI = NamespaceUtils.getDMDNamespace("cerif").getURI();
+
+        when(mockClient.resolveNamespaceToPrefix(BASE_URL, metadataURI)).thenReturn("oai_cerif_openaire");
+        when(mockClient.identify(BASE_URL)).thenReturn(buildResponseWithoutErrors("test-identify.xml"));
+    }
+
+    @After
+    public void afterTests() {
+        harvester.setOaiHarvesterClient(oaiHarvesterClient);
     }
 
     @Test
     public void testRunHarvest() throws Exception {
 
+        when(mockClient.listRecords(eq(BASE_URL), isNull(), any(), eq("publications"), eq("oai_cerif_openaire")))
+            .thenReturn(buildResponseWithoutErrors("many-publications.xml"));
+
         context.turnOffAuthorisationSystem();
         HarvestedCollection harvestRow = HarvestedCollectionBuilder.create(context, collection)
-            .withOaiSource("https://www.openstarts.units.it/dspace-oai/openairecris")
-            .withOaiSetId("openaire_cris_projects")
+            .withOaiSource(BASE_URL)
+            .withOaiSetId("publications")
             .withMetadataConfigId("cerif")
             .withHarvestType(HarvestedCollection.TYPE_DMD)
             .withHarvestStatus(HarvestedCollection.STATUS_READY)
@@ -69,9 +124,106 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
 
         harvester.runHarvest(context, harvestRow);
 
-        List<Item> items = IteratorUtils.toList(itemService.findAllByCollection(context, collection));
-        System.out.println(items);
-        assertThat(items, not(empty()));
+        verify(mockClient).resolveNamespaceToPrefix(BASE_URL, NamespaceUtils.getDMDNamespace("cerif").getURI());
+        verify(mockClient).identify(BASE_URL);
+        verify(mockClient).listRecords(eq(BASE_URL), isNull(), any(), eq("publications"), eq("oai_cerif_openaire"));
+        verifyNoMoreInteractions(mockClient);
 
+        List<Item> items = IteratorUtils.toList(itemService.findAllByCollection(context, collection));
+        assertThat(items, hasSize(3));
+
+        harvestRow = harvestedCollectionService.find(context, collection);
+        assertThat(harvestRow.getHarvestStatus(), equalTo(HarvestedCollection.STATUS_READY));
+        assertThat(harvestRow.getHarvestStartTime(), notNullValue());
+        assertThat(harvestRow.getLastHarvestDate(), notNullValue());
+        assertThat(harvestRow.getHarvestMessage(), equalTo("Imported 3 records with success"));
+
+        Item item = getItemViaHarvestedItem("oai:test-harvest:Publications/c3ae30ae-ddc4-4c25-b0b8-c87a3f850bca");
+        assertThat(getFirstMetadataValue(item, "dc.title"), equalTo("The International Journal of Digital Curation"));
+        assertThat(getFirstMetadataValue(item, "cris.sourceId"),
+            equalTo("test-harvest::c3ae30ae-ddc4-4c25-b0b8-c87a3f850bca"));
+
+        item = getItemViaHarvestedItem("oai:test-harvest:Publications/123456789/6");
+        assertThat(getFirstMetadataValue(item, "dc.title"), equalTo("Metadata and Semantics Research"));
+        assertThat(getFirstMetadataValue(item, "cris.sourceId"), equalTo("test-harvest::123456789/6"));
+
+        item = getItemViaHarvestedItem("oai:test-harvest:Publications/123456789/7");
+        assertThat(getFirstMetadataValue(item, "dc.title"), equalTo("TEST"));
+        assertThat(getFirstMetadataValue(item, "cris.sourceId"), equalTo("test-harvest::123456789/7"));
+
+    }
+
+    @Test
+    public void testRunHarvestWithOneImportFailure() throws Exception {
+
+        when(mockClient.listRecords(eq(BASE_URL), isNull(), any(), eq("publications"), eq("oai_cerif_openaire")))
+            .thenReturn(buildResponseWithoutErrors("many-publications-with-one-corrupted.xml"));
+
+        context.turnOffAuthorisationSystem();
+        HarvestedCollection harvestRow = HarvestedCollectionBuilder.create(context, collection)
+            .withOaiSource(BASE_URL)
+            .withOaiSetId("publications")
+            .withMetadataConfigId("cerif")
+            .withHarvestType(HarvestedCollection.TYPE_DMD)
+            .withHarvestStatus(HarvestedCollection.STATUS_READY)
+            .build();
+        context.restoreAuthSystemState();
+
+        harvester.runHarvest(context, harvestRow);
+
+        verify(mockClient).resolveNamespaceToPrefix(BASE_URL, NamespaceUtils.getDMDNamespace("cerif").getURI());
+        verify(mockClient).identify(BASE_URL);
+        verify(mockClient).listRecords(eq(BASE_URL), isNull(), any(), eq("publications"), eq("oai_cerif_openaire"));
+        verifyNoMoreInteractions(mockClient);
+
+        List<Item> items = IteratorUtils.toList(itemService.findAllByCollection(context, collection));
+        assertThat(items, hasSize(2));
+
+        harvestRow = harvestedCollectionService.find(context, collection);
+        assertThat(harvestRow.getHarvestStatus(), equalTo(HarvestedCollection.STATUS_RETRY));
+        assertThat(harvestRow.getHarvestStartTime(), notNullValue());
+        assertThat(harvestRow.getLastHarvestDate(), nullValue());
+        assertThat(harvestRow.getHarvestMessage(),
+            equalTo("Imported 2 records with success - Record import failures: 1"));
+
+        Item item = getItemViaHarvestedItem("oai:test-harvest:Publications/c3ae30ae-ddc4-4c25-b0b8-c87a3f850bca");
+        assertThat(getFirstMetadataValue(item, "dc.title"), equalTo("The International Journal of Digital Curation"));
+        assertThat(getFirstMetadataValue(item, "cris.sourceId"),
+            equalTo("test-harvest::c3ae30ae-ddc4-4c25-b0b8-c87a3f850bca"));
+
+        item = getItemViaHarvestedItem("oai:test-harvest:Publications/123456789/7");
+        assertThat(getFirstMetadataValue(item, "dc.title"), equalTo("TEST"));
+        assertThat(getFirstMetadataValue(item, "cris.sourceId"), equalTo("test-harvest::123456789/7"));
+
+        assertThat(harvestedItemService.findByOAIId(context, "oai:test-harvest:Publications/123456789/6", collection),
+            nullValue());
+
+    }
+
+    private Item getItemViaHarvestedItem(String oaiId) throws SQLException {
+
+        HarvestedItem harvestedItem = harvestedItemService.findByOAIId(context, oaiId, collection);
+        assertThat(harvestedItem, notNullValue());
+        assertThat(harvestedItem.getHarvestDate(), notNullValue());
+
+        Item item = harvestedItem.getItem();
+        assertThat(item, notNullValue());
+
+        return item;
+    }
+
+    private String getFirstMetadataValue(Item item, String metadataField) {
+        return itemService.getMetadata(item, metadataField);
+    }
+
+    private OAIHarvesterResponseDTO buildResponseWithoutErrors(String documentPath) throws Exception {
+        Document document = readDocument(OAI_PMH_DIR_PATH, documentPath);
+        return new OAIHarvesterResponseDTO(document, null, Collections.emptySet());
+    }
+
+    private Document readDocument(String dir, String name) throws Exception {
+        try (InputStream inputStream = new FileInputStream(new File(dir, name))) {
+            return builder.build(inputStream);
+        }
     }
 }

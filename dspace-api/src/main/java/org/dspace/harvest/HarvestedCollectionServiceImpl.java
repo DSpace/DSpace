@@ -71,12 +71,7 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
 
     @Override
     public boolean isHarvestable(Context context, Collection collection) throws SQLException {
-        HarvestedCollection hc = find(context, collection);
-        if (hc != null && hc.getHarvestType() > 0 && hc.getOaiSource() != null && hc.getOaiSetId() != null &&
-            hc.getHarvestStatus() != HarvestedCollection.STATUS_UNKNOWN_ERROR) {
-            return true;
-        }
-        return false;
+        return isHarvestable(find(context, collection));
     }
 
     @Override

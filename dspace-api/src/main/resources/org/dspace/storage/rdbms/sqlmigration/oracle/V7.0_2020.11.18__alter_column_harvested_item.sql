@@ -10,5 +10,4 @@
 -- Drop imp_record_to_item table.
 -----------------------------------------------------------------------------------
 
-ALTER TABLE harvested_item
-ALTER COLUMN oai_id VARCHAR(256);
+ALTER TABLE harvested_item MODIFY oai_id VARCHAR(255);

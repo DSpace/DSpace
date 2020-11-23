@@ -72,18 +72,17 @@ public class CERIFIngestionCrosswalk implements IngestionCrosswalk {
             throw new IllegalArgumentException("Only items can be ingested by the CERIFIngestionCrosswalk");
         }
 
-        Element dimRoot = buildDIM(cerifRootElement);
+        Element dimRoot = buildDIMFromCerif(cerifRootElement);
 
-        IngestionCrosswalk dimIngestionCrosswalk = getDIMIngestionCrosswalk();
-        dimIngestionCrosswalk.ingest(context, dso, dimRoot, createMissingMetadataFields);
+        getDIMIngestionCrosswalk().ingest(context, dso, dimRoot, createMissingMetadataFields);
 
     }
 
-    private Element buildDIM(Element cerifRootElement) throws CrosswalkException {
+    private Element buildDIMFromCerif(Element cerifRootElement) throws CrosswalkException {
 
         try {
 
-            Source xslt = getXslt();
+            Source xslt = getCerifToDimXslt();
             Source xml = new JDOMSource(cerifRootElement);
             JDOMResult out = new JDOMResult();
 
@@ -99,7 +98,7 @@ public class CERIFIngestionCrosswalk implements IngestionCrosswalk {
 
             Document document = out.getDocument();
             if (document == null) {
-                throw new CrosswalkException("An error occurs converting the CERIF xml to the internal DIM xml");
+                throw new CrosswalkException("It was not possible to produce an xml in DIM format");
             }
 
             return document.getRootElement();
@@ -109,7 +108,7 @@ public class CERIFIngestionCrosswalk implements IngestionCrosswalk {
         }
     }
 
-    private StreamSource getXslt() {
+    private StreamSource getCerifToDimXslt() {
         String parent = configurationService.getProperty("dspace.dir") + File.separator + "config" + File.separator;
         return new StreamSource(new File(parent, "crosswalks/oai/metadataFormats/oai_cerif_to_dim.xsl"));
     }

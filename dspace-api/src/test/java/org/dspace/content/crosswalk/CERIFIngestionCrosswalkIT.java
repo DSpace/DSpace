@@ -84,8 +84,13 @@ public class CERIFIngestionCrosswalkIT extends AbstractIntegrationTestWithDataba
         List<MetadataValue> values = item.getMetadata();
         assertThat(values, hasItems(with("dc.type", "http://purl.org/coar/resource_type/c_5794", null, null, 0, -1)));
         assertThat(values, hasItems(with("dc.title", "Metadata and Semantics Research", null, null, 0, -1)));
+
         assertThat(values, hasItems(with("dc.title.alternative",
             "6th Research Conference, MTSR 2012, Cádiz, Spain, November 28-30, 2012. Proceedings", null, null, 0, -1)));
+
+        assertThat(values, hasItems(with("dc.relation.ispartof",
+            "The International Journal of Digital Curation", null, null, 0, -1)));
+
         assertThat(values, hasItems(with("dc.date.issued", "2020-03-30", null, null, 0, -1)));
         assertThat(values, hasItems(with("oaire.citation.startPage", "10", null, null, 0, -1)));
         assertThat(values, hasItems(with("oaire.citation.endPage", "20", null, null, 0, -1)));
@@ -135,12 +140,15 @@ public class CERIFIngestionCrosswalkIT extends AbstractIntegrationTestWithDataba
 
         assertThat(values, hasItems(with("dc.contributor.author", "John Smith", null, null, 0, -1)));
         assertThat(values, hasItems(with("oairecerif.author.affiliation", METADATA_PLACEHOLDER, null, null, 0, -1)));
+
         assertThat(values, hasItems(with("dc.contributor.author", "Walter White", null,
             "will be generated::repository-id::6c36b2b0-b2cf-41a5-8241-11d0ea56ed97", 1, 500)));
+
         assertThat(values, hasItems(with("oairecerif.author.affiliation", "Company", null, null, 1, -1)));
 
         assertThat(values, hasItems(with("dc.contributor.editor", "Editor", null,
             "will be generated::repository-id::25887329-a648-46f9-a2ac-99319b8e9766", 0, 500)));
+
         assertThat(values, hasItems(with("oairecerif.editor.affiliation", "Editor Affiliation", null, null, 0, -1)));
 
         assertThat(values, hasItems(with("dc.relation.project", "Test Project", null,

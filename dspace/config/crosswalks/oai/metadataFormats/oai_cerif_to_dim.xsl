@@ -34,6 +34,10 @@
 				<xsl:value-of select="cerif:PublishedIn/cerif:Publication/cerif:Title" />
 			</dim:field>
 			
+			<dim:field mdschema="dc" element="relation" qualifier="ispartof" >
+				<xsl:value-of select="cerif:PartOf/cerif:DisplayName" />
+			</dim:field>
+			
 			<dim:field mdschema="dc" element="relation" qualifier="issn" >
 				<xsl:value-of select="cerif:PublishedIn/cerif:Publication/cerif:ISSN" />
 			</dim:field>

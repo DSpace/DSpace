@@ -87,7 +87,7 @@ public class OAIHarvesterResponseDTO {
         try {
             return verb.getErrors();
         } catch (TransformerException e) {
-            throw new RuntimeException(e);
+            throw new HarvestingException(e);
         }
     }
 
