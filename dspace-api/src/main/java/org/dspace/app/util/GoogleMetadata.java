@@ -193,6 +193,10 @@ public class GoogleMetadata {
      * Dump Metadata field mapping to log
      */
     public static void logConfiguration() {
+        if (!log.isDebugEnabled()) {
+            return;
+        }
+
         log.debug("Google Metadata Configuration Mapping:");
 
         for (String name : googleScholarSettings.keySet()) {
