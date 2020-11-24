@@ -1,9 +1,9 @@
-# DSpace Continuous Integration via GitHub Actions
+# DSpace Continuous Integration/Build via GitHub Actions
 # Concepts borrowed from
 # https://docs.github.com/en/free-pro-team@latest/actions/guides/building-and-testing-java-with-maven
-name: CI
+name: Build
 
-# Run this CI only for pushes / PRs to main branch
+# Run this Build only for pushes / PRs to main branch
 on:
   push:
     branches: main
