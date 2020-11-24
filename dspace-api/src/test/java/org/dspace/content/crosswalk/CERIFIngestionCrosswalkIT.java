@@ -82,7 +82,10 @@ public class CERIFIngestionCrosswalkIT extends AbstractIntegrationTestWithDataba
         crosswalk.ingest(context, item, document.getRootElement(), true);
 
         List<MetadataValue> values = item.getMetadata();
-        assertThat(values, hasItems(with("dc.type", "http://purl.org/coar/resource_type/c_5794", null, null, 0, -1)));
+        assertThat(values, hasItems(with("dc.type",
+            "Controlled Vocabulary for Resource Type Genres::text::conference object::conference proceedings"
+                + "::conference paper", null, null, 0, -1)));
+
         assertThat(values, hasItems(with("dc.title", "Metadata and Semantics Research", null, null, 0, -1)));
 
         assertThat(values, hasItems(with("dc.title.alternative",
@@ -120,7 +123,9 @@ public class CERIFIngestionCrosswalkIT extends AbstractIntegrationTestWithDataba
         crosswalk.ingest(context, item, document.getRootElement(), true);
 
         List<MetadataValue> values = item.getMetadata();
-        assertThat(values, hasItems(with("dc.type", "http://purl.org/coar/resource_type/c_efa0", null, null, 0, -1)));
+        assertThat(values, hasItems(
+            with("dc.type", "Controlled Vocabulary for Resource Type Genres::text::review", null, null, 0, -1)));
+
         assertThat(values, hasItems(with("dc.language.iso", "en", null, null, 0, -1)));
         assertThat(values, hasItems(with("dc.title", "Test Publication", null, null, 0, -1)));
         assertThat(values, hasItems(with("dc.title.alternative", "Alternative publication title", null, null, 0, -1)));

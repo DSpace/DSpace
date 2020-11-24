@@ -28,6 +28,8 @@ import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.util.MapConverters;
+import org.dspace.utils.DSpace;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.transform.JDOMResult;
@@ -42,9 +44,13 @@ import org.jdom.transform.JDOMSource;
  */
 public class CERIFIngestionCrosswalk implements IngestionCrosswalk {
 
+    private static final String CONVERTER_SEPARATOR = "@@";
+
     private PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
 
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    private MapConverters mapConverters = new DSpace().getSingletonService(MapConverters.class);
 
     private String idPrefix;
 
@@ -74,6 +80,8 @@ public class CERIFIngestionCrosswalk implements IngestionCrosswalk {
 
         Element dimRoot = buildDIMFromCerif(cerifRootElement);
 
+        convertDimFields(dimRoot);
+
         getDIMIngestionCrosswalk().ingest(context, dso, dimRoot, createMissingMetadataFields);
 
     }
@@ -90,6 +98,7 @@ public class CERIFIngestionCrosswalk implements IngestionCrosswalk {
 
             Transformer transformer = factory.newTransformer(xslt);
             transformer.setParameter("nestedMetadataPlaceholder", CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE);
+            transformer.setParameter("converterSeparator", CONVERTER_SEPARATOR);
             if (idPrefix != null) {
                 transformer.setParameter("idPrefix", AuthorityValueService.GENERATE + idPrefix);
             }
@@ -105,6 +114,25 @@ public class CERIFIngestionCrosswalk implements IngestionCrosswalk {
 
         } catch (TransformerException e) {
             throw new CrosswalkException(e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void convertDimFields(Element dimRoot) {
+        List<Element> fields = dimRoot.getChildren();
+        for (Element field : fields) {
+
+            String value = field.getText();
+            if (value == null || !value.contains(CONVERTER_SEPARATOR)) {
+                continue;
+            }
+
+            String converterName = value.substring(0, value.indexOf(CONVERTER_SEPARATOR));
+            String valueToConvert = value.substring(value.indexOf(CONVERTER_SEPARATOR) + 2, value.length());
+
+            mapConverters.getConverter(converterName)
+                .ifPresent(converter -> field.setText(converter.getValue(valueToConvert)));
+
         }
     }
 

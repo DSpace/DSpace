@@ -7,12 +7,12 @@
  */
 package org.dspace.content.integration.crosswalks.virtualfields;
 
-import java.util.Map;
 import java.util.Objects;
 
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.util.MapConverters;
 import org.dspace.util.SimpleMapConverter;
 
 /**
@@ -26,9 +26,9 @@ public class VirtualFieldMapConverter implements VirtualField {
 
     private ItemService itemService;
 
-    private final Map<String, SimpleMapConverter> mapConverters;
+    private final MapConverters mapConverters;
 
-    public VirtualFieldMapConverter(ItemService itemService, Map<String, SimpleMapConverter> mapConverters) {
+    public VirtualFieldMapConverter(ItemService itemService, MapConverters mapConverters) {
         this.itemService = itemService;
         this.mapConverters = mapConverters;
     }
@@ -41,10 +41,8 @@ public class VirtualFieldMapConverter implements VirtualField {
             throw new IllegalArgumentException("Invalid virtual field name for map converter: " + fieldName);
         }
 
-        SimpleMapConverter mapConverter = mapConverters.get(virtualFieldName[2]);
-        if (mapConverter == null) {
-            throw new IllegalArgumentException("No MapConverter found for field name: " + fieldName);
-        }
+        SimpleMapConverter mapConverter = mapConverters.getConverter(virtualFieldName[2])
+            .orElseThrow(() -> new IllegalArgumentException("No MapConverter found for field name: " + fieldName));
 
         String metadataField = virtualFieldName[3].replaceAll("-", ".");
         return itemService.getMetadataByMetadataString(item, metadataField).stream()

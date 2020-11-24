@@ -7,13 +7,14 @@
 	xmlns:pt="https://www.openaire.eu/cerif-profile/vocab/COAR_Publication_Types">
 	
 	<xsl:param name="nestedMetadataPlaceholder" />
+	<xsl:param name="converterSeparator" />
 	<xsl:param name="idPrefix" />
 	
 	<xsl:template match="cerif:Publication">
 		<dim:dim>
 		
 			<dim:field mdschema="dc" element="type" >
-				<xsl:value-of select="pt:Type" />
+				<xsl:value-of select="concat('coarToPublicationTypes',$converterSeparator,pt:Type)" />
 			</dim:field>
 		
 			<dim:field mdschema="dc" element="language" qualifier="iso">
