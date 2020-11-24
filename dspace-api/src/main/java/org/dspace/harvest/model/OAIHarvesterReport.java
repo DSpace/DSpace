@@ -19,6 +19,12 @@ public class OAIHarvesterReport {
 
     private int successCount = 0;
 
+    private final int totalRecordSize;
+
+    public OAIHarvesterReport(int totalRecordSize) {
+        this.totalRecordSize = totalRecordSize;
+    }
+
     public boolean noRecordImportFails() {
         return failureCount == 0;
     }
@@ -39,9 +45,12 @@ public class OAIHarvesterReport {
         return failureCount;
     }
 
-    public String getMessage() {
-        String message = "Imported " + successCount + " records with success";
-        return noRecordImportFails() ? message : message + " - Record import failures: " + failureCount;
+    public int getTotalRecordSize() {
+        return totalRecordSize;
+    }
+
+    public int getCurrentRecord() {
+        return successCount + failureCount + 1;
     }
 
 

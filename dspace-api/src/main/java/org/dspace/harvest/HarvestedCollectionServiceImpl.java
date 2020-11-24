@@ -78,7 +78,8 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
     public boolean isHarvestable(HarvestedCollection harvestedCollection) throws SQLException {
         if (harvestedCollection.getHarvestType() > 0 && harvestedCollection.getOaiSource() != null &&
             harvestedCollection.getOaiSetId() != null && harvestedCollection.getCollection() != null &&
-            harvestedCollection.getHarvestStatus() != HarvestedCollection.STATUS_UNKNOWN_ERROR) {
+            harvestedCollection.getHarvestStatus() != HarvestedCollection.STATUS_UNKNOWN_ERROR &&
+            harvestedCollection.getHarvestStatus() != HarvestedCollection.STATUS_BUSY) {
             return true;
         }
 

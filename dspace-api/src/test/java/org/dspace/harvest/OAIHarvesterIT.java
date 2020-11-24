@@ -11,6 +11,7 @@ package org.dspace.harvest;
 import static org.dspace.builder.CollectionBuilder.createCollection;
 import static org.dspace.builder.CommunityBuilder.createCommunity;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.emptyCollectionOf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
@@ -29,6 +30,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.collections4.IteratorUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
@@ -98,7 +100,7 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
         String metadataURI = NamespaceUtils.getDMDNamespace("cerif").getURI();
 
         when(mockClient.resolveNamespaceToPrefix(BASE_URL, metadataURI)).thenReturn("oai_cerif_openaire");
-        when(mockClient.identify(BASE_URL)).thenReturn(buildResponseWithoutErrors("test-identify.xml"));
+        when(mockClient.identify(BASE_URL)).thenReturn(buildResponse("test-identify.xml"));
     }
 
     @After
@@ -110,7 +112,7 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
     public void testRunHarvest() throws Exception {
 
         when(mockClient.listRecords(eq(BASE_URL), isNull(), any(), eq("publications"), eq("oai_cerif_openaire")))
-            .thenReturn(buildResponseWithoutErrors("many-publications.xml"));
+            .thenReturn(buildResponse("many-publications.xml"));
 
         context.turnOffAuthorisationSystem();
         HarvestedCollection harvestRow = HarvestedCollectionBuilder.create(context, collection)
@@ -157,7 +159,7 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
     public void testRunHarvestWithOneImportFailure() throws Exception {
 
         when(mockClient.listRecords(eq(BASE_URL), isNull(), any(), eq("publications"), eq("oai_cerif_openaire")))
-            .thenReturn(buildResponseWithoutErrors("many-publications-with-one-corrupted.xml"));
+            .thenReturn(buildResponse("many-publications-with-one-corrupted.xml"));
 
         context.turnOffAuthorisationSystem();
         HarvestedCollection harvestRow = HarvestedCollectionBuilder.create(context, collection)
@@ -200,6 +202,120 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
 
     }
 
+    @Test
+    public void testRunHarvestWithResumptionToken() throws Exception {
+
+        when(mockClient.listRecords(eq(BASE_URL), isNull(), any(), eq("publications"), eq("oai_cerif_openaire")))
+            .thenReturn(buildResponseWithResumptionToken("publications-with-resumption-token.xml", "token"));
+        when(mockClient.listRecords(BASE_URL, "token")).thenReturn(buildResponse("single-publication.xml"));
+
+        context.turnOffAuthorisationSystem();
+        HarvestedCollection harvestRow = HarvestedCollectionBuilder.create(context, collection)
+            .withOaiSource(BASE_URL)
+            .withOaiSetId("publications")
+            .withMetadataConfigId("cerif")
+            .withHarvestType(HarvestedCollection.TYPE_DMD)
+            .withHarvestStatus(HarvestedCollection.STATUS_READY)
+            .build();
+        context.restoreAuthSystemState();
+
+        harvester.runHarvest(context, harvestRow);
+
+        verify(mockClient).resolveNamespaceToPrefix(BASE_URL, NamespaceUtils.getDMDNamespace("cerif").getURI());
+        verify(mockClient).identify(BASE_URL);
+        verify(mockClient).listRecords(eq(BASE_URL), isNull(), any(), eq("publications"), eq("oai_cerif_openaire"));
+        verify(mockClient).listRecords(BASE_URL, "token");
+        verifyNoMoreInteractions(mockClient);
+
+        List<Item> items = IteratorUtils.toList(itemService.findAllByCollection(context, collection));
+        assertThat(items, hasSize(3));
+
+        harvestRow = harvestedCollectionService.find(context, collection);
+        assertThat(harvestRow.getHarvestStatus(), equalTo(HarvestedCollection.STATUS_READY));
+        assertThat(harvestRow.getHarvestStartTime(), notNullValue());
+        assertThat(harvestRow.getLastHarvestDate(), notNullValue());
+        assertThat(harvestRow.getHarvestMessage(), equalTo("Imported 3 records with success"));
+
+        Item item = getItemViaHarvestedItem("oai:test-harvest:Publications/1");
+        assertThat(getFirstMetadataValue(item, "dc.title"), equalTo("First Publication"));
+        assertThat(getFirstMetadataValue(item, "cris.sourceId"), equalTo("test-harvest::1"));
+
+        item = getItemViaHarvestedItem("oai:test-harvest:Publications/2");
+        assertThat(getFirstMetadataValue(item, "dc.title"), equalTo("Second Publication"));
+        assertThat(getFirstMetadataValue(item, "cris.sourceId"), equalTo("test-harvest::2"));
+
+        item = getItemViaHarvestedItem("oai:test-harvest:Publications/3");
+        assertThat(getFirstMetadataValue(item, "dc.title"), equalTo("Test Publication"));
+        assertThat(getFirstMetadataValue(item, "cris.sourceId"), equalTo("test-harvest::3"));
+    }
+
+    @Test
+    public void testRunHarvestWithNoRecordsMatch() throws Exception {
+        when(mockClient.listRecords(eq(BASE_URL), isNull(), any(), eq("publications"), eq("oai_cerif_openaire")))
+            .thenReturn(buildResponseWithErrors("no-records-match.xml", Set.of("noRecordsMatch")));
+
+        context.turnOffAuthorisationSystem();
+        HarvestedCollection harvestRow = HarvestedCollectionBuilder.create(context, collection)
+            .withOaiSource(BASE_URL)
+            .withOaiSetId("publications")
+            .withMetadataConfigId("cerif")
+            .withHarvestType(HarvestedCollection.TYPE_DMD)
+            .withHarvestStatus(HarvestedCollection.STATUS_READY)
+            .build();
+        context.restoreAuthSystemState();
+
+        harvester.runHarvest(context, harvestRow);
+
+        verify(mockClient).resolveNamespaceToPrefix(BASE_URL, NamespaceUtils.getDMDNamespace("cerif").getURI());
+        verify(mockClient).identify(BASE_URL);
+        verify(mockClient).listRecords(eq(BASE_URL), isNull(), any(), eq("publications"), eq("oai_cerif_openaire"));
+        verifyNoMoreInteractions(mockClient);
+
+        List<Item> items = IteratorUtils.toList(itemService.findAllByCollection(context, collection));
+        assertThat(items, emptyCollectionOf(Item.class));
+
+        harvestRow = harvestedCollectionService.find(context, collection);
+        assertThat(harvestRow.getHarvestStatus(), equalTo(HarvestedCollection.STATUS_READY));
+        assertThat(harvestRow.getHarvestStartTime(), notNullValue());
+        assertThat(harvestRow.getLastHarvestDate(), notNullValue());
+        assertThat(harvestRow.getHarvestMessage(), equalTo("noRecordsMatch: OAI server did not contain any updates"));
+
+    }
+
+    @Test
+    public void testRunHarvestWithErrors() throws Exception {
+        when(mockClient.listRecords(eq(BASE_URL), isNull(), any(), eq("publications"), eq("oai_cerif_openaire")))
+            .thenReturn(buildResponseWithErrors("response-with-errors.xml", Set.of("errorCode1, errorCode2")));
+
+        context.turnOffAuthorisationSystem();
+        HarvestedCollection harvestRow = HarvestedCollectionBuilder.create(context, collection)
+            .withOaiSource(BASE_URL)
+            .withOaiSetId("publications")
+            .withMetadataConfigId("cerif")
+            .withHarvestType(HarvestedCollection.TYPE_DMD)
+            .withHarvestStatus(HarvestedCollection.STATUS_READY)
+            .build();
+        context.restoreAuthSystemState();
+
+        harvester.runHarvest(context, harvestRow);
+
+        verify(mockClient).resolveNamespaceToPrefix(BASE_URL, NamespaceUtils.getDMDNamespace("cerif").getURI());
+        verify(mockClient).identify(BASE_URL);
+        verify(mockClient).listRecords(eq(BASE_URL), isNull(), any(), eq("publications"), eq("oai_cerif_openaire"));
+        verifyNoMoreInteractions(mockClient);
+
+        List<Item> items = IteratorUtils.toList(itemService.findAllByCollection(context, collection));
+        assertThat(items, emptyCollectionOf(Item.class));
+
+        harvestRow = harvestedCollectionService.find(context, collection);
+        assertThat(harvestRow.getHarvestStatus(), equalTo(HarvestedCollection.STATUS_UNKNOWN_ERROR));
+        assertThat(harvestRow.getHarvestStartTime(), notNullValue());
+        assertThat(harvestRow.getLastHarvestDate(), nullValue());
+        assertThat(harvestRow.getHarvestMessage(),
+            equalTo("OAI server response contains the following error codes: [errorCode1, errorCode2]"));
+
+    }
+
     private Item getItemViaHarvestedItem(String oaiId) throws SQLException {
 
         HarvestedItem harvestedItem = harvestedItemService.findByOAIId(context, oaiId, collection);
@@ -216,14 +332,28 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
         return itemService.getMetadata(item, metadataField);
     }
 
-    private OAIHarvesterResponseDTO buildResponseWithoutErrors(String documentPath) throws Exception {
-        Document document = readDocument(OAI_PMH_DIR_PATH, documentPath);
-        return new OAIHarvesterResponseDTO(document, null, Collections.emptySet());
+    private OAIHarvesterResponseDTO buildResponse(String documentPath) {
+        return buildResponse(documentPath, null, Collections.emptySet());
     }
 
-    private Document readDocument(String dir, String name) throws Exception {
+    private OAIHarvesterResponseDTO buildResponseWithErrors(String documentPath, Set<String> errors) {
+        return buildResponse(documentPath, null, errors);
+    }
+
+    private OAIHarvesterResponseDTO buildResponseWithResumptionToken(String documentPath, String resumptionToken) {
+        return buildResponse(documentPath, resumptionToken, Collections.emptySet());
+    }
+
+    private OAIHarvesterResponseDTO buildResponse(String documentPath, String resumptionToken, Set<String> errors) {
+        Document document = readDocument(OAI_PMH_DIR_PATH, documentPath);
+        return new OAIHarvesterResponseDTO(document, resumptionToken, errors);
+    }
+
+    private Document readDocument(String dir, String name) {
         try (InputStream inputStream = new FileInputStream(new File(dir, name))) {
             return builder.build(inputStream);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
         }
     }
 }

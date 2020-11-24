@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href='static/style.xsl' type='text/xsl'?>
+<OAI-PMH
+    xmlns="http://www.openarchives.org/OAI/2.0/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+    <responseDate>2020-11-23T15:56:46Z</responseDate>
+    <request verb="ListRecords" metadataPrefix="oai_cerif_openaire" set="openaire_cris_publications">https://test-harvest/oai/openairecris</request>
+    <ListRecords>
+        <record>
+            <header>
+                <identifier>oai:test-harvest:Publications/1</identifier>
+                <datestamp>2020-03-30T22:25:27Z</datestamp>
+                <setSpec>openaire_cris_publications</setSpec>
+            </header>
+            <metadata>
+                <oai_cerif:Publication
+                    xmlns:oai_cerif="https://www.openaire.eu/cerif-profile/1.1/"
+                    xmlns:doc="http://www.lyncode.com/xoai"
+                    xmlns:dc="http://purl.org/dc/elements/1.1/"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="1">
+                    <oai_cerif:Type
+                        xmlns:oai_cerif="https://www.openaire.eu/cerif-profile/vocab/COAR_Publication_Types">http://purl.org/coar/resource_type/c_0640
+                    </oai_cerif:Type>
+                    <oai_cerif:Title xml:lang="en">First Publication</oai_cerif:Title>
+                    <oai_cerif:ISSN>1746-8256</oai_cerif:ISSN>
+                </oai_cerif:Publication>
+            </metadata>
+        </record>
+        <record>
+            <header>
+                <identifier>oai:test-harvest:Publications/2</identifier>
+                <datestamp>2020-03-30T22:25:27Z</datestamp>
+                <setSpec>com_123456789_1</setSpec>
+                <setSpec>col_123456789_2</setSpec>
+                <setSpec>openaire_cris_publications</setSpec>
+            </header>
+            <metadata>
+                <oai_cerif:Publication
+                    xmlns:oai_cerif="https://www.openaire.eu/cerif-profile/1.1/"
+                    xmlns:doc="http://www.lyncode.com/xoai"
+                    xmlns:dc="http://purl.org/dc/elements/1.1/"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="2">
+                    <oai_cerif:Title xml:lang="en">Second Publication</oai_cerif:Title>
+                </oai_cerif:Publication>
+            </metadata>
+        </record>
+        <resumptionToken completeListSize="3" cursor="0">oai_cerif_openaire////2</resumptionToken>
+    </ListRecords>
+</OAI-PMH>
