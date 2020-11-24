@@ -17,10 +17,9 @@ coverage:
     # Configuration for patch-level checks. This checks the relative coverage of the new PR code ONLY.
     patch:
       default:
-         # For each PR, make sure the coverage of the new code is within 1% of current overall coverage.
-         # We let 'patch' be more lenient as we only require *project* coverage to not drop significantly.
-         target: auto
-         threshold: 1%
+         # Enable informational mode, which just provides info to reviewers & always passes
+         # https://docs.codecov.io/docs/commit-status#section-informational
+         informational: true
 
 # Turn PR comments "off". This feature adds the code coverage summary as a
 # comment on each PR. See https://docs.codecov.io/docs/pull-request-comments
