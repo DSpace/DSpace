@@ -26,17 +26,17 @@ public class MetadataFieldNameTest {
     @Test
     public void testConstruct3() {
         MetadataFieldName instance = new MetadataFieldName("one", "two", "three");
-        assertEquals("Incorrect schema", "one", instance.SCHEMA);
-        assertEquals("Incorrect element", "two", instance.ELEMENT);
-        assertEquals("Incorrect qualifier", "three", instance.QUALIFIER);
+        assertEquals("Incorrect schema", "one", instance.schema);
+        assertEquals("Incorrect element", "two", instance.element);
+        assertEquals("Incorrect qualifier", "three", instance.qualifier);
     }
 
     @Test
     public void testConstruct2() {
         MetadataFieldName instance = new MetadataFieldName("one", "two");
-        assertEquals("Incorrect schema", "one", instance.SCHEMA);
-        assertEquals("Incorrect element", "two", instance.ELEMENT);
-        assertNull("Incorrect qualifier", instance.QUALIFIER);
+        assertEquals("Incorrect schema", "one", instance.schema);
+        assertEquals("Incorrect element", "two", instance.element);
+        assertNull("Incorrect qualifier", instance.qualifier);
     }
 
     @Test(expected = NullPointerException.class)

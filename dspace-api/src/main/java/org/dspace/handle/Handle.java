@@ -105,7 +105,7 @@ public class Handle implements ReloadableEntity<Integer> {
             return true;
         }
 
-        if (o == null || getClass() != o.getClass()) {
+        if (!(o instanceof Handle)) {
             return false;
         }
 

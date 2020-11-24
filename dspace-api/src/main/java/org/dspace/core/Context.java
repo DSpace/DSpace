@@ -46,8 +46,6 @@ import org.springframework.util.CollectionUtils;
  * changes and free up the resources.
  * <P>
  * The context object is also used as a cache for CM API objects.
- *
- * @version $Revision$
  */
 public class Context implements AutoCloseable {
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Context.class);

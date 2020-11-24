@@ -110,7 +110,7 @@ public abstract class InitialArticleWord implements TextFilter {
                     return str.substring(cutPos);
                 } else {
                     // No - move the initial article word to the end
-                    return new StringBuffer(str.substring(cutPos))
+                    return new StringBuilder(str.substring(cutPos))
                         .append(wordSeparator)
                         .append(str.substring(initialStart, initialEnd))
                         .toString();
@@ -124,10 +124,12 @@ public abstract class InitialArticleWord implements TextFilter {
     }
 
     protected InitialArticleWord(boolean stripWord) {
+        this.wordSeparator = ", ";
         stripInitialArticle = stripWord;
     }
 
     protected InitialArticleWord() {
+        this.wordSeparator = ", ";
         stripInitialArticle = false;
     }
 
@@ -138,9 +140,8 @@ public abstract class InitialArticleWord implements TextFilter {
      * @return An array of definite/indefinite article words
      */
     protected abstract String[] getArticleWords(String lang);
-
     // Separator to use when appending article to end
-    private String wordSeparator = ", ";
+    private final String wordSeparator;
 
     // Flag to signify initial article word should be removed
     // If false, then the initial article word is appended to the end

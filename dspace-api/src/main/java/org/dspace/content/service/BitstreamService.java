@@ -33,6 +33,7 @@ import org.dspace.core.Context;
  */
 public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpaceObjectLegacySupportService<Bitstream> {
 
+    @Override
     public Bitstream find(Context context, UUID id) throws SQLException;
 
     public List<Bitstream> findAll(Context context) throws SQLException;

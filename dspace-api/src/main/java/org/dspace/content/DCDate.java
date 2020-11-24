@@ -39,7 +39,6 @@ import org.apache.logging.log4j.Logger;
  *
  * @author Robert Tansley
  * @author Larry Stone
- * @version $Revision$
  */
 public class DCDate {
     /**
@@ -370,6 +369,7 @@ public class DCDate {
      *
      * @return The date as a string.
      */
+    @Override
     public String toString() {
         if (calendar == null) {
             return "null";

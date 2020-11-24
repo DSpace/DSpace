@@ -17,7 +17,6 @@ import org.dspace.eperson.EPerson;
  * which stage of submission they are (in workspace or workflow system)
  *
  * @author Robert Tansley
- * @version $Revision$
  */
 public interface InProgressSubmission extends ReloadableEntity<Integer> {
     /**
@@ -25,6 +24,7 @@ public interface InProgressSubmission extends ReloadableEntity<Integer> {
      *
      * @return the internal identifier
      */
+    @Override
     Integer getID();
 
     /**
