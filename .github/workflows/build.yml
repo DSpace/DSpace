@@ -60,6 +60,5 @@ jobs:
         env:
           TEST_FLAGS: ${{ matrix.mvnflags }}
         run: mvn install -B -V -P-assembly -Pcoverage-report $TEST_FLAGS
-      # https://github.com/codecov/codecov-action
       - name: Upload coverage to Codecov.io
-        uses: codecov/codecov-action@v1
+        run: bash <(curl -s https://codecov.io/bash)
