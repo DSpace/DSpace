@@ -28,16 +28,10 @@ CREATE TABLE cris_metrics
 );
 
 CREATE INDEX metrics_last_idx
-ON public.cris_metrics
-USING btree
-(last);
+ON public.cris_metrics (last);
 
 CREATE INDEX metrics_uuid_idx
-ON public.cris_metrics
-USING btree
-(resource_id);
+ON public.cris_metrics (resource_id);
   
 CREATE INDEX metric_bid_idx
-ON public.cris_metrics
-USING btree
-(resource_id, metricType COLLATE pg_catalog."default");
+ON public.cris_metrics (resource_id, metricType);
