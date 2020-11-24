@@ -34,15 +34,15 @@ jobs:
       # Install NPM, Bower, Grunt, Ruby, Sass, Compass
       - name: Install Mirage 2 prerequisites
         run: |
-          npm install -g npm@3.10.8
+          sudo npm install -g npm@3.10.8
           npm --version
-          npm install -g bower
-          npm install -g grunt && npm install -g grunt-cli
+          sudo npm install -g bower
+          sudo npm install -g grunt && sudo npm install -g grunt-cli
           grunt --version
           ruby -v
-          gem install sass -v 3.4.25
+          sudo gem install sass -v 3.4.25
           sass -v
-          gem install compass -v 1.0.1
+          sudo gem install compass -v 1.0.1
           compass version
       # https://github.com/actions/cache
       - name: Cache Maven dependencies
