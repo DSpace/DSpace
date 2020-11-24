@@ -38,16 +38,16 @@ jobs:
       fail-fast: false
     # These are the actual CI steps to perform per job
     steps:
+      # https://github.com/actions/checkout
       - name: Checkout codebase
-        # https://github.com/actions/checkout
         uses: actions/checkout@v2
+      # https://github.com/actions/setup-java
       - name: Install JDK 11
-        # https://github.com/actions/setup-java
         uses: actions/setup-java@v1
         with:
           java-version: 11
+      # https://github.com/actions/cache
       - name: Cache Maven dependencies
-        # https://github.com/actions/cache
         uses: actions/cache@v2
         with:
           # Cache entire ~/.m2/repository
@@ -60,3 +60,6 @@ jobs:
         env:
           TEST_FLAGS: ${{ matrix.mvnflags }}
         run: mvn install -B -V -P-assembly -Pcoverage-report $TEST_FLAGS
+      # https://github.com/codecov/codecov-action
+      - name: Upload coverage to Codecov.io
+        uses: codecov/codecov-action@v1
