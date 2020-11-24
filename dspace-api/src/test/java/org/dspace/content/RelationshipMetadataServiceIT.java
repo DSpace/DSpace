@@ -36,7 +36,7 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.junit.Before;
 import org.junit.Test;
 
-public class RelationshipMetadataServiceTest extends AbstractIntegrationTestWithDatabase {
+public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDatabase {
 
     protected RelationshipMetadataService relationshipMetadataService = ContentServiceFactory
         .getInstance().getRelationshipMetadataService();
