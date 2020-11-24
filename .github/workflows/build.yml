@@ -40,6 +40,8 @@ jobs:
           sudo npm install -g grunt && sudo npm install -g grunt-cli
           grunt --version
           ruby -v
+          sudo gem update --system
+          gem -v
           sudo gem install sass -v 3.4.25
           sass -v
           sudo gem install compass -v 1.0.1
