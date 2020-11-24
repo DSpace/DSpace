@@ -27,7 +27,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
-import org.apache.log4j.Logger;
 import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -48,17 +47,10 @@ import org.hibernate.proxy.HibernateProxyHelper;
  *
  * @author Robert Tansley
  * @author Martin Hald
- * @version $Revision$
  */
 @Entity
 @Table(name = "item")
 public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
-
-    /**
-     * log4j logger
-     */
-    private static Logger log = Logger.getLogger(Item.class);
-
     /**
      * Wild card for Dublin Core metadata qualifiers/languages
      */
@@ -286,7 +278,7 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
      * @return the bundles in an unordered array
      */
     public List<Bundle> getBundles(String name) {
-        List<Bundle> matchingBundles = new ArrayList<Bundle>();
+        List<Bundle> matchingBundles = new ArrayList<>();
          // now only keep bundles with matching names
         List<Bundle> bunds = getBundles();
         for (Bundle bundle : bunds) {
@@ -317,7 +309,7 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
 
     /**
      * Return <code>true</code> if <code>other</code> is the same Item as
-     * this object, <code>false</code> otherwise
+     * this object, <code>false</code> otherwise.
      *
      * @param obj object to compare to
      * @return <code>true</code> if object passed in represents the same item
@@ -325,7 +317,7 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
+        if (!(obj instanceof Item)) {
             return false;
         }
         Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(obj);
@@ -333,10 +325,7 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
             return false;
         }
         final Item otherItem = (Item) obj;
-        if (!this.getID().equals(otherItem.getID())) {
-            return false;
-        }
-        return true;
+        return this.getID().equals(otherItem.getID());
     }
 
     @Override

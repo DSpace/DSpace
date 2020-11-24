@@ -33,8 +33,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.coverity.security.Escape;
+import java.nio.charset.StandardCharsets;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -43,13 +45,12 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * Utility functions for DSpace.
  *
  * @author Peter Breton
- * @version $Revision$
  */
 public final class Utils {
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(Utils.class);
+    private static final Logger log = LogManager.getLogger(Utils.class);
 
     private static final Pattern DURATION_PATTERN = Pattern
         .compile("(\\d+)([smhdwy])");
@@ -68,12 +69,12 @@ public final class Utils {
 
     private static int counter = 0;
 
-    private static Random random = new Random();
+    private static final Random random = new Random();
 
-    private static VMID vmid = new VMID();
+    private static final VMID vmid = new VMID();
 
     // for parseISO8601Date
-    private static SimpleDateFormat parseFmt[]  = {
+    private static final SimpleDateFormat parseFmt[]  = {
         // first try at parsing, has milliseconds (note General time zone)
         new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSz"),
 
@@ -88,12 +89,14 @@ public final class Utils {
 
     // for formatISO8601Date
     // output canonical format (note RFC22 time zone, easier to hack)
-    private static SimpleDateFormat outFmtSecond = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ssZ");
+    private static final SimpleDateFormat outFmtSecond
+            = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ssZ");
 
     // output format with millsecond precision
-    private static SimpleDateFormat outFmtMillisec = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSZ");
+    private static final SimpleDateFormat outFmtMillisec
+            = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSZ");
 
-    private static Calendar outCal = GregorianCalendar.getInstance();
+    private static final Calendar outCal = GregorianCalendar.getInstance();
 
     /**
      * Private constructor
@@ -107,7 +110,7 @@ public final class Utils {
      * @return MD5 checksum for the data in hex format.
      */
     public static String getMD5(String data) {
-        return getMD5(data.getBytes());
+        return getMD5(data.getBytes(StandardCharsets.UTF_8));
     }
 
     /**
@@ -150,7 +153,7 @@ public final class Utils {
             return null;
         }
 
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
 
         // This is far from the most efficient way to do things...
         for (int i = 0; i < data.length; i++) {
@@ -194,10 +197,14 @@ public final class Utils {
 
         random.nextBytes(junk);
 
-        String input = new StringBuffer().append(vmid).append(
-            new java.util.Date()).append(Arrays.toString(junk)).append(counter++).toString();
+        String input = new StringBuilder()
+                .append(vmid)
+                .append(new java.util.Date())
+                .append(Arrays.toString(junk))
+                .append(counter++)
+                .toString();
 
-        return getMD5Bytes(input.getBytes());
+        return getMD5Bytes(input.getBytes(StandardCharsets.UTF_8));
     }
 
     // The following two methods are taken from the Jakarta IOUtil class.

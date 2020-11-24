@@ -40,7 +40,6 @@ import org.hibernate.proxy.HibernateProxyHelper;
  * when <code>update</code> is called.
  *
  * @author Robert Tansley
- * @version $Revision$
  */
 @Entity
 @Table(name = "bitstreamformatregistry")
@@ -120,6 +119,7 @@ public class BitstreamFormat implements Serializable, ReloadableEntity<Integer> 
      *
      * @return the internal identifier
      */
+    @Override
     public final Integer getID() {
         return id;
     }
@@ -267,7 +267,7 @@ public class BitstreamFormat implements Serializable, ReloadableEntity<Integer> 
      */
     @Override
     public boolean equals(Object other) {
-        if (other == null) {
+        if (!(other instanceof BitstreamFormat)) {
             return false;
         }
         Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(other);
@@ -275,11 +275,7 @@ public class BitstreamFormat implements Serializable, ReloadableEntity<Integer> 
             return false;
         }
         final BitstreamFormat otherBitstreamFormat = (BitstreamFormat) other;
-        if (!this.getID().equals(otherBitstreamFormat.getID())) {
-            return false;
-        }
-
-        return true;
+        return this.getID().equals(otherBitstreamFormat.getID());
     }
 
     @Override
