@@ -4,11 +4,11 @@
 name: Build
 
 # Run this Build only for pushes / PRs to dspace-5_x branch
-on: [push, pull_request]
-  #push:
-  #  branches: dspace-5_x
-  #pull_request:
-  #  branches: dspace-5_x
+on:
+  push:
+    branches: dspace-5_x
+  pull_request:
+    branches: dspace-5_x
 
 jobs:
   tests:
