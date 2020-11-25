@@ -3,12 +3,12 @@
 # https://docs.github.com/en/free-pro-team@latest/actions/guides/building-and-testing-java-with-maven
 name: Build
 
-# Run this Build only for pushes / PRs to main branch
-on: [push, pull_request]
-  #push:
-  #  branches: dspace-6_x
-  #pull_request:
-  #  branches: dspace-6_x
+# Run this Build only for pushes / PRs to dspace-6.x branch
+on:
+  push:
+    branches: dspace-6_x
+  pull_request:
+    branches: dspace-6_x
 
 jobs:
   tests:
