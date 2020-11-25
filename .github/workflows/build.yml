@@ -40,7 +40,7 @@ jobs:
     steps:
       # https://github.com/actions/checkout
       - name: Checkout codebase
-        uses: actions/checkout@v2
+        uses: actions/checkout@v1
       # https://github.com/actions/setup-java
       - name: Install JDK 11
         uses: actions/setup-java@v1
@@ -60,5 +60,6 @@ jobs:
         env:
           TEST_FLAGS: ${{ matrix.mvnflags }}
         run: mvn install -B -V -P-assembly -Pcoverage-report $TEST_FLAGS
+      # https://github.com/codecov/codecov-action
       - name: Upload coverage to Codecov.io
-        run: bash <(curl -s https://codecov.io/bash)
+        uses: codecov/codecov-action@v1
