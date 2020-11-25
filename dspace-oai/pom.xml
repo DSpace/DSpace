@@ -169,12 +169,6 @@
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-solrj</artifactId>
             <version>${solr.client.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.codehaus.woodstox</groupId>
-                    <artifactId>wstx-asl</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- Web API -->

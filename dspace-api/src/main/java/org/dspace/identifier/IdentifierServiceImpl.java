@@ -97,7 +97,7 @@ public class IdentifierServiceImpl implements IdentifierService {
         for (IdentifierProvider service : providers) {
             service.register(context, dso);
         }
-        //Update our item
+        //Update our item / collection / community
         contentServiceFactory.getDSpaceObjectService(dso).update(context, dso);
     }
 
@@ -117,7 +117,7 @@ public class IdentifierServiceImpl implements IdentifierService {
             throw new IdentifierException("Cannot register identifier: Didn't "
                                               + "find a provider that supports this identifier.");
         }
-        //Update our item
+        //Update our item / collection / community
         contentServiceFactory.getDSpaceObjectService(object).update(context, object);
     }
 
