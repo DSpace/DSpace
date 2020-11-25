@@ -124,12 +124,12 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
                 int actionId = Constants.getActionID(action);
                 resourcePolisies = resourcePolicyService.findByResouceUuidAndActionId(context, resourceUuid, actionId,
                     Math.toIntExact(pageable.getOffset()),
-                    Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+                    Math.toIntExact(pageable.getPageSize()));
                 total = resourcePolicyService.countByResouceUuidAndActionId(context, resourceUuid, actionId);
             } else {
                 resourcePolisies = resourcePolicyService.findByResouceUuid(context, resourceUuid,
                     Math.toIntExact(pageable.getOffset()),
-                    Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+                    Math.toIntExact(pageable.getPageSize()));
                 total = resourcePolicyService.countByResourceUuid(context, resourceUuid);
             }
         } catch (SQLException e) {
@@ -163,13 +163,13 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
             if (resourceUuid != null) {
                 resourcePolisies = resourcePolicyService.findByEPersonAndResourceUuid(context, eperson, resourceUuid,
                     Math.toIntExact(pageable.getOffset()),
-                    Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+                    Math.toIntExact(pageable.getPageSize()));
                 total = resourcePolicyService.countResourcePoliciesByEPersonAndResourceUuid(context,
                     eperson, resourceUuid);
             } else {
                 resourcePolisies = resourcePolicyService.findByEPerson(context, eperson,
                     Math.toIntExact(pageable.getOffset()),
-                    Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+                    Math.toIntExact(pageable.getPageSize()));
                 total = resourcePolicyService.countByEPerson(context, eperson);
             }
         } catch (SQLException e) {
@@ -206,12 +206,12 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
             if (resourceUuid != null) {
                 resourcePolisies = resourcePolicyService.findByGroupAndResourceUuid(context, group, resourceUuid,
                     Math.toIntExact(pageable.getOffset()),
-                    Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+                    Math.toIntExact(pageable.getPageSize()));
                 total = resourcePolicyService.countByGroupAndResourceUuid(context, group, resourceUuid);
             } else {
                 resourcePolisies = resourcePolicyService.findByGroup(context, group,
                     Math.toIntExact(pageable.getOffset()),
-                    Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+                    Math.toIntExact(pageable.getPageSize()));
                 total = resourcePolicyService.countResourcePolicyByGroup(context, group);
             }
 

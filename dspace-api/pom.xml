@@ -315,6 +315,13 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-ehcache</artifactId>
+            <exclusions>
+                <!-- Newer version pulled in via Jersey below -->
+                <exclusion>
+                    <groupId>org.javassist</groupId>
+                    <artifactId>javassist</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -325,15 +332,15 @@
             <artifactId>hibernate-validator-cdi</artifactId>
             <version>${hibernate-validator.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.1-api</artifactId>
+            <version>1.0.0.Final</version>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-orm</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>javax.el</artifactId>
-            <version>3.0.1-b10</version>
         </dependency>
 
         <dependency>
@@ -358,10 +365,6 @@
         </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>jargon</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.dspace</groupId>
             <artifactId>mets</artifactId>
         </dependency>
         <dependency>
@@ -369,14 +372,6 @@
             <artifactId>apache-jena-libs</artifactId>
             <type>pom</type>
         </dependency>
-        <!-- Required to support PubMed API call in "PubmedImportMetadataSourceServiceImpl.GetRecord" -->
-        <!-- Makes runtime operations in Jersey Dependency Injection -->
-        <dependency>
-            <groupId>org.glassfish.jersey.inject</groupId>
-            <artifactId>jersey-hk2</artifactId>
-            <version>${jersey.version}</version>
-        </dependency>
-
         <dependency>
             <groupId>commons-cli</groupId>
             <artifactId>commons-cli</artifactId>
@@ -438,10 +433,6 @@
             <artifactId>jdom</artifactId>
         </dependency>
         <dependency>
-            <groupId>oro</groupId>
-            <artifactId>oro</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
         </dependency>
@@ -454,28 +445,12 @@
             <artifactId>poi-scratchpad</artifactId>
         </dependency>
         <dependency>
-            <groupId>rome</groupId>
-            <artifactId>rome</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>rome</groupId>
-            <artifactId>opensearch</artifactId>
-        </dependency>
-        <dependency>
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
         </dependency>
         <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>xml-apis</groupId>
-            <artifactId>xml-apis</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
         </dependency>
         <dependency>
             <groupId>com.ibm.icu</groupId>
@@ -514,6 +489,7 @@
             <artifactId>spring-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Used for RSS / ATOM syndication feeds -->
         <dependency>
             <groupId>org.rometools</groupId>
             <artifactId>rome-modules</artifactId>
@@ -729,7 +705,6 @@
             <artifactId>guava</artifactId>
         </dependency>
 
-
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
@@ -820,6 +795,11 @@
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>*</artifactId>
                 </exclusion>
+                <!-- Exclude Woodstox, as later version provided by Solr dependencies -->
+                <exclusion>
+                    <groupId>org.codehaus.woodstox</groupId>
+                    <artifactId>woodstox-core-asl</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -833,14 +813,28 @@
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>*</artifactId>
                 </exclusion>
+                <!-- Exclude Woodstox, as later version provided by Solr dependencies -->
+                <exclusion>
+                    <groupId>org.codehaus.woodstox</groupId>
+                    <artifactId>woodstox-core-asl</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
+        <!-- Jersey / JAX-RS client (javax.ws.rs.*) dependencies needed to integrate with external sources/services -->
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-client</artifactId>
             <version>${jersey.version}</version>
         </dependency>
+        <!-- Required because Jersey no longer includes a dependency injection provider by default.
+             Needed to support PubMed API call in "PubmedImportMetadataSourceServiceImpl.GetRecord" -->
+        <dependency>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+
         <!-- S3 -->
         <dependency>
             <groupId>com.amazonaws</groupId>
@@ -882,13 +876,7 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.1-api</artifactId>
-            <version>1.0.0.Final</version>
-        </dependency>
-
-        <dependency>
+       <dependency>
             <groupId>org.apache.bcel</groupId>
             <artifactId>bcel</artifactId>
             <version>6.4.0</version>

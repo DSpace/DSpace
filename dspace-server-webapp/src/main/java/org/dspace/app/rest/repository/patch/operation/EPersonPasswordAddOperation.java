@@ -26,19 +26,20 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
 /**
- * Implementation for EPerson password patches.
+ * Implementation for EPerson password patches. This Add Operation will add a new password the an eperson if it had
+ * no password before, or will replace the existing password with the new value.
  *
  * Example: <code>
  * curl -X PATCH http://${dspace.server.url}/api/epersons/eperson/<:id-eperson> -H "
- * Content-Type: application/json" -d '[{ "op": "replace", "path": "
+ * Content-Type: application/json" -d '[{ "op": "add", "path": "
  * /password", "value": "newpassword"]'
  * </code>
  */
 @Component
-public class EPersonPasswordReplaceOperation<R> extends PatchOperation<R> {
+public class EPersonPasswordAddOperation<R> extends PatchOperation<R> {
 
     private static final Logger log = org.apache.logging.log4j.LogManager
-        .getLogger(EPersonPasswordReplaceOperation.class);
+        .getLogger(EPersonPasswordAddOperation.class);
 
     /**
      * Path in json body of patch that uses this operation
@@ -62,14 +63,13 @@ public class EPersonPasswordReplaceOperation<R> extends PatchOperation<R> {
                                                         eperson.getEmail());
             }
             String token = requestService.getCurrentRequest().getHttpServletRequest().getParameter("token");
-            checkModelForExistingValue(eperson);
             if (StringUtils.isNotBlank(token)) {
                 verifyAndDeleteToken(context, eperson, token, operation);
             }
             ePersonService.setPassword(eperson, (String) operation.getValue());
             return object;
         } else {
-            throw new DSpaceBadRequestException("EPersonPasswordReplaceOperation does not support this operation");
+            throw new DSpaceBadRequestException(this.getClass().getName() + " does not support this operation");
         }
     }
 
@@ -91,21 +91,9 @@ public class EPersonPasswordReplaceOperation<R> extends PatchOperation<R> {
         }
     }
 
-    /**
-     * Checks whether the ePerson has a password via the ePersonService to checking if it has a non null password hash
-     *      throws a DSpaceBadRequestException if not pw hash was present
-     * @param ePerson   Object on which patch is being performed
-     */
-    private void checkModelForExistingValue(EPerson ePerson) {
-        if (ePersonService.getPasswordHash(ePerson) == null
-                || ePersonService.getPasswordHash(ePerson).getHash() == null) {
-            throw new DSpaceBadRequestException("Attempting to replace a non-existent value (netID).");
-        }
-    }
-
     @Override
     public boolean supports(Object objectToMatch, Operation operation) {
-        return (objectToMatch instanceof EPerson && operation.getOp().trim().equalsIgnoreCase(OPERATION_REPLACE)
+        return (objectToMatch instanceof EPerson && operation.getOp().trim().equalsIgnoreCase(OPERATION_ADD)
                 && operation.getPath().trim().equalsIgnoreCase(OPERATION_PASSWORD_CHANGE));
     }
 }
