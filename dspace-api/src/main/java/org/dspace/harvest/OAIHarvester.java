@@ -41,6 +41,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
@@ -222,48 +223,36 @@ public class OAIHarvester {
 
     }
 
-    private int getTotalRecordSize(Document document) {
-        return Optional.ofNullable(document)
-            .map(d -> d.getRootElement().getChild("ListRecords", OAI_NS))
-            .map(listRecords -> listRecords.getChild("resumptionToken", OAI_NS))
-            .filter(resumptionElement -> hasCompleteListSizeAttribute(resumptionElement))
-            .map(resumptionElement -> Integer.parseInt(resumptionElement.getAttributeValue("completeListSize")))
-            .orElseGet(() -> getAllRecords(document).size());
-    }
-
-    private boolean hasCompleteListSizeAttribute(Element resumptionElement) {
-        return resumptionElement != null && isNotBlank(resumptionElement.getAttributeValue("completeListSize"));
-    }
-
     private void processOAIHarvesterResponse(Context context, HarvestedCollection harvestRow,
         OAIHarvesterResponseDTO responseDTO, Date toDate, String repositoryId, OAIHarvesterReport report) {
 
-        if (responseDTO.hasErrors()) {
-            Set<String> errors = responseDTO.getErrors();
-            if (errors.size() == 1 && errors.contains("noRecordsMatch")) {
-                throw new NoRecordsMatchException("noRecordsMatch: OAI server did not contain any updates");
-            } else {
-                throw new HarvestingException("OAI server response contains the following error codes: " + errors);
+        while (responseDTO != null) {
+
+            if (responseDTO.hasErrors()) {
+                Set<String> errors = responseDTO.getErrors();
+                if (errors.size() == 1 && errors.contains("noRecordsMatch")) {
+                    throw new NoRecordsMatchException("noRecordsMatch: OAI server did not contain any updates");
+                } else {
+                    throw new HarvestingException("OAI server response contains the following error codes: " + errors);
+                }
             }
-        }
 
-        Document oaiResponse = responseDTO.getDocument();
+            Document oaiResponse = responseDTO.getDocument();
 
-        List<Element> records = getAllRecords(oaiResponse);
+            List<Element> records = getAllRecords(oaiResponse);
 
-        if (CollectionUtils.isEmpty(records)) {
-            log.info("No records to process found");
-            return;
-        }
+            if (CollectionUtils.isEmpty(records)) {
+                log.info("No records to process found");
+                return;
+            }
 
-        // Process the obtained records
-        harvestRow = processRecords(context, harvestRow, records, repositoryId, report);
+            // Process the obtained records
+            harvestRow = processRecords(context, harvestRow, records, repositoryId, report);
 
-        // keep going if there are more records to process
-        String token = responseDTO.getResumptionToken();
-        if (isNotEmpty(token)) {
-            OAIHarvesterResponseDTO nextResponseDTO = oaiHarvesterClient.listRecords(harvestRow.getOaiSource(), token);
-            processOAIHarvesterResponse(context, harvestRow, nextResponseDTO, toDate, repositoryId, report);
+            // keep going if there are more records to process
+            String token = responseDTO.getResumptionToken();
+            responseDTO = isNotEmpty(token) ? oaiHarvesterClient.listRecords(harvestRow.getOaiSource(), token) : null;
+
         }
 
     }
@@ -385,6 +374,7 @@ public class OAIHarvester {
     private HarvestedItem updateItem(Context context, Item item, HarvestedItem harvestedItem,
         HarvestedCollection harvestRow, Element record, String repositoryId, String crisSourceId) throws Exception {
 
+        Collection collection = harvestRow.getCollection();
         String itemOaiID = harvestedItem.getOaiID();
         log.debug("Item " + item.getHandle() + " was found locally. Using it to harvest " + itemOaiID + ".");
 
@@ -394,8 +384,9 @@ public class OAIHarvester {
             return harvestedItem;
         }
 
-        itemService.clearMetadata(context, item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-        fillItemWithMetadata(context, harvestedItem, harvestRow, record, item, repositoryId, crisSourceId);
+        clearMetadata(context, item, collection);
+
+        fillItemWithMetadata(context, harvestRow, record, item, repositoryId, crisSourceId);
 
         return harvestedItem;
     }
@@ -410,7 +401,13 @@ public class OAIHarvester {
 
         HarvestedItem harvestedItem = harvestedItemService.create(context, item, getItemIdentifier(record));
 
-        fillItemWithMetadata(context, harvestedItem, harvestRow, record, item, repositoryId, crisSourceId);
+        fillItemWithMetadata(context, harvestRow, record, item, repositoryId, crisSourceId);
+
+        // Add provenance that this item was harvested via OAI
+        String provenanceMsg = "Item created via OAI harvest from source: "
+            + harvestRow.getOaiSource() + " on " + new DCDate(harvestedItem.getHarvestDate())
+            + " (GMT).  Item's OAI Record identifier: " + harvestedItem.getOaiID();
+        itemService.addMetadata(context, item, "dc", "description", "provenance", "en", provenanceMsg);
 
         // see if a handle can be extracted for the item
         String handle = extractHandle(item);
@@ -435,8 +432,8 @@ public class OAIHarvester {
         return harvestedItem;
     }
 
-    private void fillItemWithMetadata(Context context, HarvestedItem harvestedItem, HarvestedCollection harvestRow,
-        Element record, Item item, String repositoryId, String crisSourceId) throws Exception {
+    private void fillItemWithMetadata(Context context, HarvestedCollection harvestRow, Element record, Item item,
+        String repositoryId, String crisSourceId) throws Exception {
 
         String metadataConfig = harvestRow.getHarvestMetadataConfig();
         IngestionCrosswalk metadataElementCrosswalk = getIngestionCrosswalk(metadataConfig, repositoryId);
@@ -448,17 +445,41 @@ public class OAIHarvester {
             metadataElementCrosswalk.ingest(context, item, metadataElements, true);
         }
 
-        // Add provenance that this item was harvested via OAI
-        String provenanceMsg = "Item created via OAI harvest from source: "
-            + harvestRow.getOaiSource() + " on " + new DCDate(harvestedItem.getHarvestDate())
-            + " (GMT).  Item's OAI Record identifier: " + harvestedItem.getOaiID();
-        itemService.addMetadata(context, item, "dc", "description", "provenance", "en", provenanceMsg);
-
-        // Add cris source id
-        itemService.addMetadata(context, item, CRIS.getName(), "sourceId", null, null, crisSourceId);
+        if (CollectionUtils.isEmpty(itemService.getMetadata(item, CRIS.getName(), "sourceId", null, null))) {
+            itemService.addMetadata(context, item, CRIS.getName(), "sourceId", null, null, crisSourceId);
+        }
 
         itemService.update(context, item);
 
+    }
+
+    private void clearMetadata(Context context, Item item, Collection collection) throws SQLException {
+
+        Set<String> metadataFieldsToKeep = getMetadataFieldsToKeep();
+
+        List<MetadataValue> metadataToRemove = item.getMetadata().stream()
+            .filter(value -> !metadataFieldsToKeep.contains(value.getMetadataField().toString('.')))
+            .collect(Collectors.toList());
+
+        itemService.removeMetadataValues(context, item, metadataToRemove);
+
+    }
+
+    private Set<String> getMetadataFieldsToKeep() {
+        return Set.of(configurationService.getArrayProperty("oai.harvester.update.metadata-to-keep"));
+    }
+
+    private int getTotalRecordSize(Document document) {
+        return Optional.ofNullable(document)
+            .map(d -> d.getRootElement().getChild("ListRecords", OAI_NS))
+            .map(listRecords -> listRecords.getChild("resumptionToken", OAI_NS))
+            .filter(resumptionElement -> hasCompleteListSizeAttribute(resumptionElement))
+            .map(resumptionElement -> Integer.parseInt(resumptionElement.getAttributeValue("completeListSize")))
+            .orElseGet(() -> getAllRecords(document).size());
+    }
+
+    private boolean hasCompleteListSizeAttribute(Element resumptionElement) {
+        return resumptionElement != null && isNotBlank(resumptionElement.getAttributeValue("completeListSize"));
     }
 
     private void importBitstreams(Context context, String repositoryId, Item item, Element oreREM) throws Exception {

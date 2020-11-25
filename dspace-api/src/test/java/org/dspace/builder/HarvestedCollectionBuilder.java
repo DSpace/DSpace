@@ -8,9 +8,11 @@
 package org.dspace.builder;
 
 import java.sql.SQLException;
+import java.util.Date;
 
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
+import org.dspace.core.exception.SQLRuntimeException;
 import org.dspace.harvest.HarvestedCollection;
 import org.dspace.harvest.factory.HarvestServiceFactory;
 import org.dspace.harvest.service.HarvestedCollectionService;
@@ -38,7 +40,7 @@ public class HarvestedCollectionBuilder extends AbstractBuilder<HarvestedCollect
         try {
             this.harvestedCollection = getService().create(context, collection);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SQLRuntimeException(e);
         }
         return this;
     }
@@ -63,6 +65,11 @@ public class HarvestedCollectionBuilder extends AbstractBuilder<HarvestedCollect
         return this;
     }
 
+    public HarvestedCollectionBuilder withLastHarvested(Date lastHarvested) {
+        this.harvestedCollection.setLastHarvested(lastHarvested);
+        return this;
+    }
+
     public HarvestedCollectionBuilder withHarvestStatus(int status) {
         this.harvestedCollection.setHarvestStatus(status);
         return this;
@@ -78,8 +85,8 @@ public class HarvestedCollectionBuilder extends AbstractBuilder<HarvestedCollect
         try {
             getService().update(context, harvestedCollection);
             context.commit();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new SQLRuntimeException(e);
         }
         return harvestedCollection;
     }
