@@ -175,11 +175,14 @@ public class DSpaceCSV implements Serializable {
                     headings.add(element);
                 } else if (!"id".equals(element)) {
                     String authorityPrefix = "";
-                    AuthorityValue authorityValueType = authorityValueService.getAuthorityValueType(element);
-                    if (authorityValueType != null) {
-                        String authorityType = authorityValueType.getAuthorityType();
-                        authorityPrefix = element.substring(0, authorityType.length() + 1);
-                        element = element.substring(authorityPrefix.length());
+                    if (StringUtils.startsWith(element, "[authority]")) {
+                        element = StringUtils.substringAfter(element, "[authority]");
+                        AuthorityValue authorityValueType = authorityValueService.getAuthorityValueType(element);
+                        if (authorityValueType != null) {
+                            String authorityType = authorityValueType.getAuthorityType();
+                            authorityPrefix = element.substring(0, authorityType.length() + 1);
+                            element = element.substring(authorityPrefix.length());
+                        }
                     }
 
                     // Verify that the heading is valid in the metadata registry
