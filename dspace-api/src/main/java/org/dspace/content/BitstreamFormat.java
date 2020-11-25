@@ -9,7 +9,7 @@ package org.dspace.content;
 
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -111,7 +111,7 @@ public class BitstreamFormat implements Serializable, ReloadableEntity<Integer> 
      * {@link org.dspace.content.service.BitstreamFormatService#create(Context)}
      */
     protected BitstreamFormat() {
-        fileExtensions = new LinkedList<>();
+        fileExtensions = new ArrayList<>();
     }
 
     /**

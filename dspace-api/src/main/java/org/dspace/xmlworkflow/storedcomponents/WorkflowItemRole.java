@@ -69,7 +69,7 @@ public class WorkflowItemRole implements ReloadableEntity<Integer> {
 
     }
 
-
+    @Override
     public Integer getID() {
         return id;
     }
@@ -90,8 +90,8 @@ public class WorkflowItemRole implements ReloadableEntity<Integer> {
         return workflowItem;
     }
 
-    public void setEPerson(EPerson eperson) {
-        this.ePerson = eperson;
+    public void setEPerson(EPerson ePerson) {
+        this.ePerson = ePerson;
     }
 
     public EPerson getEPerson() throws SQLException {

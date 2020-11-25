@@ -8,7 +8,7 @@
 package org.dspace.scripts;
 
 import java.io.InputStream;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,7 +37,7 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
     protected CommandLine commandLine;
 
     /**
-     * This EPerson identifier variable is the uuid of the eperson that's running the script
+     * This EPerson identifier variable is the UUID of the EPerson that's running the script
      */
     private UUID epersonIdentifier;
 
@@ -129,7 +129,7 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
      * @return  The list of Strings representing filenames from the options given to the script
      */
     public List<String> getFileNamesFromInputStreamOptions() {
-        List<String> fileNames = new LinkedList<>();
+        List<String> fileNames = new ArrayList<>();
 
         for (Option option : getScriptConfiguration().getOptions().getOptions()) {
             if (option.getType() == InputStream.class &&
@@ -151,8 +151,8 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
     }
 
     /**
-     * Generic setter for the epersonIdentifier
-     * This EPerson identifier variable is the uuid of the eperson that's running the script
+     * Generic setter for the epersonIdentifier.
+     * This EPerson identifier variable is the UUID of the EPerson that's running the script.
      * @param epersonIdentifier   The epersonIdentifier to be set on this DSpaceRunnable
      */
     public void setEpersonIdentifier(UUID epersonIdentifier) {

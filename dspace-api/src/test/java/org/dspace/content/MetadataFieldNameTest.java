@@ -40,8 +40,9 @@ public class MetadataFieldNameTest {
     }
 
     @Test(expected = NullPointerException.class)
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructNull() {
-        MetadataFieldName instance = new MetadataFieldName("one", null);
+        new MetadataFieldName("one", null);
     }
 
     /**
@@ -71,7 +72,7 @@ public class MetadataFieldNameTest {
      */
     @Test(expected = IllegalArgumentException.class)
     public void TestParse1() {
-        String[] results = MetadataFieldName.parse("one");
+        MetadataFieldName.parse("one");
     }
 
     /**
@@ -79,15 +80,16 @@ public class MetadataFieldNameTest {
      */
     @Test(expected = IllegalArgumentException.class)
     public void TestParse0() {
-        String[] results = MetadataFieldName.parse("");
+        MetadataFieldName.parse("");
     }
 
     /**
      * Test of parse method using an illegal null name.
      */
     @Test(expected = NullPointerException.class)
+    @SuppressWarnings("null")
     public void TestParseNull() {
-        String[] results = MetadataFieldName.parse(null);
+        MetadataFieldName.parse(null);
     }
 
     /**

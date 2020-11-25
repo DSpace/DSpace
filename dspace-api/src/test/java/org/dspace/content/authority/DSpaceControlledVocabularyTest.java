@@ -13,7 +13,6 @@ import static org.junit.Assert.assertNotNull;
 import java.io.IOException;
 
 import org.dspace.AbstractDSpaceTest;
-import org.dspace.content.Collection;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -66,6 +65,8 @@ public class DSpaceControlledVocabularyTest extends AbstractDSpaceTest {
 
     /**
      * Test of getMatches method, of class DSpaceControlledVocabulary.
+     * @throws java.io.IOException passed through.
+     * @throws java.lang.ClassNotFoundException passed through.
      */
     @Test
     public void testGetMatches() throws IOException, ClassNotFoundException {
@@ -74,9 +75,7 @@ public class DSpaceControlledVocabularyTest extends AbstractDSpaceTest {
         final String PLUGIN_INTERFACE = "org.dspace.content.authority.ChoiceAuthority";
 
         // Ensure that 'id' attribute is optional
-        String field = null; // not used
         String text = "north 40";
-        Collection collection = null;
         int start = 0;
         int limit = 10;
         String locale = null;

@@ -120,6 +120,7 @@ class DtoMetadata {
         return true;
     }
 
+    @Override
     public String toString() {
         String s = "\tSchema: " + schema + " Element: " + element;
         if (qualifier != null) {

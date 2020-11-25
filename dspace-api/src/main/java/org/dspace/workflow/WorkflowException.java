@@ -27,7 +27,8 @@ public class WorkflowException extends Exception {
         this.reason = reason;
     }
 
-    public String toString() {
+    @Override
+    public String getMessage() {
         return reason;
     }
 }

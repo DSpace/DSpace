@@ -78,12 +78,13 @@ public class PoolTask implements ReloadableEntity<Integer> {
 
     }
 
+    @Override
     public Integer getID() {
         return id;
     }
 
-    public void setEperson(EPerson eperson) {
-        this.ePerson = eperson;
+    public void setEperson(EPerson ePerson) {
+        this.ePerson = ePerson;
     }
 
     public EPerson getEperson() {
@@ -114,16 +115,16 @@ public class PoolTask implements ReloadableEntity<Integer> {
         return this.workflowItem;
     }
 
-    public void setStepID(String stepID) {
-        this.stepId = stepID;
+    public void setStepID(String stepId) {
+        this.stepId = stepId;
     }
 
     public String getStepID() {
         return stepId;
     }
 
-    public void setActionID(String actionID) {
-        this.actionId = actionID;
+    public void setActionID(String actionId) {
+        this.actionId = actionId;
     }
 
     public String getActionID() {

@@ -30,11 +30,9 @@ public class ItemSubmissionLookupDTO implements Serializable {
 
     private static final String MERGED_PUBLICATION_PROVIDER = "merged";
 
-    private static final String UNKNOWN_PROVIDER_STRING = "UNKNOWN-PROVIDER";
+    private final List<Record> publications;
 
-    private List<Record> publications;
-
-    private String uuid;
+    private final String uuid;
 
     public ItemSubmissionLookupDTO(List<Record> publications) {
         this.uuid = UUID.randomUUID().toString();
@@ -46,7 +44,7 @@ public class ItemSubmissionLookupDTO implements Serializable {
     }
 
     public Set<String> getProviders() {
-        Set<String> orderedProviders = new LinkedHashSet<String>();
+        Set<String> orderedProviders = new LinkedHashSet<>();
         for (Record p : publications) {
             orderedProviders.add(SubmissionLookupService.getProviderName(p));
         }

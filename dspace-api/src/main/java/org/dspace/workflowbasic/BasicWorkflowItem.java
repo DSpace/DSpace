@@ -116,6 +116,7 @@ public class BasicWorkflowItem implements WorkflowItem {
      *
      * @return state
      */
+    @Override
     public int getState() {
         return state;
     }

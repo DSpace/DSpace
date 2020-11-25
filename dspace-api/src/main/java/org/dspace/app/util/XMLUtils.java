@@ -8,7 +8,6 @@
 package org.dspace.app.util;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -29,13 +28,13 @@ public class XMLUtils {
 
     /**
      * @param dataRoot the starting node
-     * @param name     the name of the subelement to find
+     * @param name     the tag name of the child element to find.
      * @return the list of all DOM Element with the provided name direct child
      * of the starting node
      */
     public static List<Element> getElementList(Element dataRoot, String name) {
         NodeList list = dataRoot.getElementsByTagName(name);
-        List<Element> listElements = new ArrayList<Element>();
+        List<Element> listElements = new ArrayList<>();
         for (int i = 0; i < list.getLength(); i++) {
             Element item = (Element) list.item(i);
             if (item.getParentNode().equals(dataRoot)) {
@@ -105,7 +104,7 @@ public class XMLUtils {
 
     /**
      * @param rootElement    the starting node
-     * @param subElementName the name of the subelement to find
+     * @param subElementName the tag name of the child element to find.
      * @return a list of string including all the text contents of the sub
      * element with the specified name. If there are not sub element
      * with the supplied name the method will return null
@@ -121,7 +120,7 @@ public class XMLUtils {
             return null;
         }
 
-        List<String> result = new LinkedList<String>();
+        List<String> result = new ArrayList<>();
         for (Element el : subElements) {
             if (StringUtils.isNotBlank(el.getTextContent())) {
                 result.add(el.getTextContent().trim());
@@ -152,7 +151,7 @@ public class XMLUtils {
             return null;
         }
 
-        List<String[]> result = new LinkedList<String[]>();
+        List<String[]> result = new ArrayList<>();
         for (Element el : subElements) {
             String[] tmp = new String[fieldsName.length];
             for (int idx = 0; idx < fieldsName.length; idx++) {

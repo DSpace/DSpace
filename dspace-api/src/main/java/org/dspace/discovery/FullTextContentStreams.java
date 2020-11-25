@@ -179,6 +179,11 @@ public class FullTextContentStreams extends ContentStreamBase {
         }
     }
 
+    /**
+     * {@link Enumeration} is implemented because instances of this class are
+     * passed to a JDK class that requires this obsolete type.
+     */
+    @SuppressWarnings("JdkObsolete")
     private static class FullTextEnumeration implements Enumeration<InputStream> {
 
         private final Iterator<FullTextBitstream> fulltextIterator;
