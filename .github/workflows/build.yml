@@ -48,12 +48,12 @@ jobs:
           sudo npm install -g bower
           sudo npm install -g grunt && sudo npm install -g grunt-cli
           grunt --version
-          ruby -v
-          sudo gem update --system 3.0.6
-          sudo gem install sass -v 3.4.25
+          gem install sass -v 3.4.25
           sass -v
-          sudo gem install compass -v 1.0.1
+          gem install compass -v 1.0.1
           compass version
+          sudo gem env
+          gem env
 
       # https://github.com/actions/cache
       - name: Cache Maven dependencies
