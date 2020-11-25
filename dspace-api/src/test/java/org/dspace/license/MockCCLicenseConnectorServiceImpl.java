@@ -9,8 +9,8 @@ package org.dspace.license;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +51,7 @@ public class MockCCLicenseConnectorServiceImpl extends CCLicenseConnectorService
     }
 
     private List<CCLicenseField> createMockLicenseFields(int count, int[] amountOfFieldsAndEnums) {
-        List<CCLicenseField> ccLicenseFields = new LinkedList<>();
+        List<CCLicenseField> ccLicenseFields = new ArrayList<>(amountOfFieldsAndEnums.length);
         for (int index = 0; index < amountOfFieldsAndEnums.length; index++) {
             String licenseFieldId = "license" + count + "-field" + index;
             String licenseFieldLabel = "License " + count + " - Field " + index + " - Label";
@@ -70,7 +70,7 @@ public class MockCCLicenseConnectorServiceImpl extends CCLicenseConnectorService
     }
 
     private List<CCLicenseFieldEnum> createMockLicenseFields(int count, int index, int amountOfEnums) {
-        List<CCLicenseFieldEnum> ccLicenseFieldEnumList = new LinkedList<>();
+        List<CCLicenseFieldEnum> ccLicenseFieldEnumList = new ArrayList<>(amountOfEnums);
         for (int i = 0; i < amountOfEnums; i++) {
             String enumId = "license" + count + "-field" + index + "-enum" + i;
             String enumLabel = "License " + count + " - Field " + index + " - Enum " + i + " - Label";

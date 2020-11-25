@@ -7,9 +7,9 @@
  */
 package org.dspace.importer.external.datamodel;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
@@ -38,7 +38,7 @@ public class ImportRecord {
      */
     public ImportRecord(List<MetadatumDTO> valueList) {
         //don't want to alter the original list. Also now I can control the type of list
-        this.valueList = new LinkedList<>(valueList);
+        this.valueList = new ArrayList<>(valueList);
     }
 
     /**
@@ -81,7 +81,7 @@ public class ImportRecord {
      * @return the MetadatumDTO's that are related to a given schema/element/qualifier pair/triplet
      */
     public Collection<MetadatumDTO> getValue(String schema, String element, String qualifier) {
-        List<MetadatumDTO> values = new LinkedList<MetadatumDTO>();
+        List<MetadatumDTO> values = new ArrayList<MetadatumDTO>();
         for (MetadatumDTO value : valueList) {
             if (value.getSchema().equals(schema) && value.getElement().equals(element)) {
                 if (qualifier == null && value.getQualifier() == null) {

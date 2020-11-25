@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -228,7 +227,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         // If authorization was given before and cached
         Boolean cachedResult = c.getCachedAuthorizationResult(o, action, e);
         if (cachedResult != null) {
-            return cachedResult.booleanValue();
+            return cachedResult;
         }
 
         // is eperson set? if not, userToCheck = null (anonymous)
@@ -293,7 +292,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
                 }
 
                 if ((rp.getGroup() != null)
-                    && (groupService.isMember(c, e, rp.getGroup()))) {
+                    && groupService.isMember(c, e, rp.getGroup())) {
                     // group was set, and eperson is a member
                     // of that group
                     c.cacheAuthorizedAction(o, action, e, true, rp);
@@ -351,7 +350,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
 
         Boolean cachedResult = c.getCachedAuthorizationResult(o, Constants.ADMIN, e);
         if (cachedResult != null) {
-            return cachedResult.booleanValue();
+            return cachedResult;
         }
 
         //
@@ -368,7 +367,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
                 }
 
                 if ((rp.getGroup() != null)
-                    && (groupService.isMember(c, e, rp.getGroup()))) {
+                    && groupService.isMember(c, e, rp.getGroup())) {
                     // group was set, and eperson is a member
                     // of that group
                     c.cacheAuthorizedAction(o, Constants.ADMIN, e, true, rp);
@@ -428,6 +427,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         }
     }
 
+    @Override
     public boolean isCommunityAdmin(Context c) throws SQLException {
         EPerson e = c.getCurrentUser();
         return isCommunityAdmin(c, e);
@@ -448,6 +448,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         return false;
     }
 
+    @Override
     public boolean isCollectionAdmin(Context c) throws SQLException {
         EPerson e = c.getCurrentUser();
         return isCollectionAdmin(c, e);
@@ -527,7 +528,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         List<ResourcePolicy> policies = getPolicies(c, src);
 
         //Only inherit non-ADMIN policies (since ADMIN policies are automatically inherited)
-        List<ResourcePolicy> nonAdminPolicies = new ArrayList<ResourcePolicy>();
+        List<ResourcePolicy> nonAdminPolicies = new ArrayList<>();
         for (ResourcePolicy rp : policies) {
             if (rp.getAction() != Constants.ADMIN) {
                 nonAdminPolicies.add(rp);
@@ -550,7 +551,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     public void addPolicies(Context c, List<ResourcePolicy> policies, DSpaceObject dest)
         throws SQLException, AuthorizeException {
         // now add them to the destination object
-        List<ResourcePolicy> newPolicies = new LinkedList<>();
+        List<ResourcePolicy> newPolicies = new ArrayList<>(policies.size());
 
         for (ResourcePolicy srp : policies) {
             ResourcePolicy rp = resourcePolicyService.create(c);
@@ -625,7 +626,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
                                            int actionID) throws java.sql.SQLException {
         List<ResourcePolicy> policies = getPoliciesActionFilter(c, o, actionID);
 
-        List<Group> groups = new ArrayList<Group>();
+        List<Group> groups = new ArrayList<>();
         for (ResourcePolicy resourcePolicy : policies) {
             if (resourcePolicy.getGroup() != null && resourcePolicyService.isDateValid(resourcePolicy)) {
                 groups.add(resourcePolicy.getGroup());

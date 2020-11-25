@@ -15,7 +15,8 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Mock OpenUrlService that will ensure that IRUS tracker does need to be contacted in order to test the functionality
+ * Mock OpenUrlService that will ensure that IRUS tracker does need to be
+ * contacted in order to test the functionality.
  */
 public class MockOpenUrlServiceImpl extends OpenUrlServiceImpl {
 
@@ -23,13 +24,14 @@ public class MockOpenUrlServiceImpl extends OpenUrlServiceImpl {
     ArrayList testProcessedUrls;
 
     /**
-     * Returns a response code to simulate contact to the external url
-     * When the url contains "fail", a fail code 500 will be returned
-     * Otherwise the success code 200 will be returned
+     * Returns a response code to simulate contact to the external URL.
+     * When the URL contains "fail", a fail code 500 will be returned.
+     * Otherwise the success code 200 will be returned.
      * @param urlStr
-     * @return 200 or 500 depending on whether the "fail" keyword is present in the url
+     * @return 200 or 500 depending on whether the "fail" keyword is present in the URL.
      * @throws IOException
      */
+    @Override
     protected int getResponseCodeFromUrl(final String urlStr) throws IOException {
         if (StringUtils.contains(urlStr, "fail")) {
             return HttpURLConnection.HTTP_INTERNAL_ERROR;

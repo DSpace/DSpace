@@ -8,13 +8,13 @@
 package org.dspace.core;
 
 import java.sql.SQLException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.Stack;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -79,13 +79,13 @@ public class Context implements AutoCloseable {
     /**
      * A stack with the history of authorisation system check modify
      */
-    private Stack<Boolean> authStateChangeHistory;
+    private ArrayDeque<Boolean> authStateChangeHistory;
 
     /**
      * A stack with the name of the caller class that modify authorisation
      * system check
      */
-    private Stack<String> authStateClassCallHistory;
+    private ArrayDeque<String> authStateClassCallHistory;
 
     /**
      * Group IDs of special groups user is a member of
@@ -115,7 +115,7 @@ public class Context implements AutoCloseable {
     /**
      * Cache that is only used the context is in READ_ONLY mode
      */
-    private ContextReadOnlyCache readOnlyCache = new ContextReadOnlyCache();
+    private final ContextReadOnlyCache readOnlyCache = new ContextReadOnlyCache();
 
     protected EventService eventService;
 
@@ -183,8 +183,8 @@ public class Context implements AutoCloseable {
 
         specialGroups = new ArrayList<>();
 
-        authStateChangeHistory = new Stack<>();
-        authStateClassCallHistory = new Stack<>();
+        authStateChangeHistory = new ArrayDeque<>();
+        authStateClassCallHistory = new ArrayDeque<>();
         setMode(this.mode);
     }
 
@@ -336,7 +336,7 @@ public class Context implements AutoCloseable {
                                       + previousCaller));
             }
         }
-        ignoreAuth = previousState.booleanValue();
+        ignoreAuth = previousState;
     }
 
     /**
@@ -488,7 +488,7 @@ public class Context implements AutoCloseable {
             throw new IllegalStateException("Attempt to mutate object in read-only context");
         }
         if (events == null) {
-            events = new LinkedList<Event>();
+            events = new LinkedList<>();
         }
 
         events.add(event);
@@ -622,11 +622,7 @@ public class Context implements AutoCloseable {
      * @return true if member
      */
     public boolean inSpecialGroup(UUID groupID) {
-        if (specialGroups.contains(groupID)) {
-            return true;
-        }
-
-        return false;
+        return specialGroups.contains(groupID);
     }
 
     /**
@@ -636,7 +632,7 @@ public class Context implements AutoCloseable {
      * @throws SQLException if database error
      */
     public List<Group> getSpecialGroups() throws SQLException {
-        List<Group> myGroups = new ArrayList<Group>();
+        List<Group> myGroups = new ArrayList<>();
         for (UUID groupId : specialGroups) {
             myGroups.add(EPersonServiceFactory.getInstance().getGroupService().find(this, groupId));
         }
@@ -661,7 +657,7 @@ public class Context implements AutoCloseable {
 
         currentUserPreviousState = currentUser;
         specialGroupsPreviousState = specialGroups;
-        specialGroups = new ArrayList<UUID>();
+        specialGroups = new ArrayList<>();
         currentUser = newUser;
     }
 
@@ -703,11 +699,13 @@ public class Context implements AutoCloseable {
 
 
     /**
-     * Returns the size of the cache of all object that have been read from the database so far. A larger number
-     * means that more memory is consumed by the cache. This also has a negative impact on the query performance. In
-     * that case you should consider uncaching entities when they are no longer needed (see
-     * {@link Context#uncacheEntity(ReloadableEntity)} () uncacheEntity}).
+     * Returns the size of the cache of all object that have been read from the
+     * database so far.  A larger number means that more memory is consumed by
+     * the cache. This also has a negative impact on the query performance. In
+     * that case you should consider uncaching entities when they are no longer
+     * needed (see {@link Context#uncacheEntity(ReloadableEntity)} () uncacheEntity}).
      *
+     * @return cache size.
      * @throws SQLException When connecting to the active cache fails.
      */
     public long getCacheSize() throws SQLException {

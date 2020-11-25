@@ -13,7 +13,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
 /**
@@ -24,11 +23,6 @@ import org.xml.sax.SAXException;
  * @author Mark Diggory (markd at atmire dot com)
  */
 public abstract class Converter<T> {
-
-    /**
-     * log4j logger
-     */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(Converter.class);
 
     public abstract T convert(InputStream document);
 

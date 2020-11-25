@@ -24,7 +24,7 @@ public class ResolvedTask {
     private CurationTask cTask;
     private ScriptedTask sTask;
     // local name of task
-    private String taskName;
+    private final String taskName;
     // annotation data
     private boolean distributive = false;
     private boolean mutative = false;
@@ -76,7 +76,7 @@ public class ResolvedTask {
      * @throws IOException if error
      */
     public int perform(DSpaceObject dso) throws IOException {
-        return (unscripted()) ? cTask.perform(dso) : sTask.performDso(dso);
+        return unscripted() ? cTask.perform(dso) : sTask.performDso(dso);
     }
 
     /**
@@ -88,7 +88,7 @@ public class ResolvedTask {
      * @throws IOException if error
      */
     public int perform(Context ctx, String id) throws IOException {
-        return (unscripted()) ? cTask.perform(ctx, id) : sTask.performId(ctx, id);
+        return unscripted() ? cTask.perform(ctx, id) : sTask.performId(ctx, id);
     }
 
     /**

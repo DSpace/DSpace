@@ -8,7 +8,7 @@
 package org.dspace.content.dao.impl;
 
 import java.sql.SQLException;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -63,7 +63,7 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
         Root<MetadataSchema> metadataSchemaRoot = criteriaQuery.from(MetadataSchema.class);
         criteriaQuery.select(metadataSchemaRoot);
 
-        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
+        List<javax.persistence.criteria.Order> orderList = new ArrayList<>();
         orderList.add(criteriaBuilder.asc(metadataSchemaRoot.get(MetadataSchema_.id)));
         criteriaQuery.orderBy(orderList);
 

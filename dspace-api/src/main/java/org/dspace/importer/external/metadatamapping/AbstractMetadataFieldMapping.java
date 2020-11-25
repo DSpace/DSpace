@@ -7,18 +7,19 @@
  */
 package org.dspace.importer.external.metadatamapping;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.importer.external.metadatamapping.contributor.MetadataContributor;
 import org.dspace.importer.external.metadatamapping.transform.MetadataProcessorService;
 
 /**
- * Abstract class that implements {@link MetadataFieldMapping}
- * This class adds a default implementation for the MetadataFieldMapping methods
+ * Abstract class that implements {@link MetadataFieldMapping}.
+ * This class adds a default implementation for the MetadataFieldMapping methods.
  *
  * @author Roeland Dillen (roeland at atmire dot com)
  */
@@ -30,7 +31,7 @@ public abstract class AbstractMetadataFieldMapping<RecordType>
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(AbstractMetadataFieldMapping.class);
+    private static final Logger log = LogManager.getLogger(AbstractMetadataFieldMapping.class);
 
     /* A map containing what processing has to be done on a given metadataFieldConfig.
      * The processing of a value is used to determine the actual value that will be returned used.
@@ -66,6 +67,7 @@ public abstract class AbstractMetadataFieldMapping<RecordType>
      * @param value The value to map to a MetadatumDTO
      * @return A metadatumDTO created from the field and value
      */
+    @Override
     public MetadatumDTO toDCValue(MetadataFieldConfig field, String value) {
         MetadatumDTO dcValue = new MetadatumDTO();
 
@@ -108,14 +110,15 @@ public abstract class AbstractMetadataFieldMapping<RecordType>
     }
 
     /**
-     * Loop over the MetadataContributors and return their concatenated retrieved metadatumDTO objects
+     * Loop over the MetadataContributors and return their concatenated
+     * retrieved metadatumDTO objects.
      *
      * @param record Used to retrieve the MetadatumDTO
      * @return Lit of metadatumDTO
      */
     @Override
     public Collection<MetadatumDTO> resultToDCValueMapping(RecordType record) {
-        List<MetadatumDTO> values = new LinkedList<MetadatumDTO>();
+        List<MetadatumDTO> values = new ArrayList<>();
 
         for (MetadataContributor<RecordType> query : getMetadataFieldMap().values()) {
             try {

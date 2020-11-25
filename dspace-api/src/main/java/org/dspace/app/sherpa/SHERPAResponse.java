@@ -8,12 +8,13 @@
 package org.dspace.app.sherpa;
 
 import java.io.InputStream;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.XMLUtils;
 import org.w3c.dom.Document;
@@ -25,7 +26,7 @@ import org.w3c.dom.Element;
  * @author Andrea Bollini
  */
 public class SHERPAResponse {
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SHERPAResponse.class);
+    private static final Logger log = LogManager.getLogger(SHERPAResponse.class);
 
     private int numHits;
 
@@ -81,7 +82,7 @@ public class SHERPAResponse {
                 publishersElement, "publisher");
 
             if (journalsList != null) {
-                journals = new LinkedList<SHERPAJournal>();
+                journals = new ArrayList<>(journalsList.size());
                 for (Element journalElement : journalsList) {
                     journals.add(new SHERPAJournal(
                         XMLUtils.getElementValue(journalElement, "jtitle"),
@@ -92,7 +93,7 @@ public class SHERPAResponse {
             }
 
             if (publishersList != null) {
-                publishers = new LinkedList<SHERPAPublisher>();
+                publishers = new ArrayList<>(publishersList.size());
                 for (Element publisherElement : publishersList) {
                     Element preprintsElement = XMLUtils.getSingleElement(
                         publisherElement, "preprints");

@@ -65,7 +65,7 @@ import org.junit.Test;
 //@RunWith(MockitoJUnitRunner.class)
 public class ITIrusExportUsageEventListener extends AbstractIntegrationTestWithDatabase {
 
-    private static Logger log = Logger.getLogger(ITIrusExportUsageEventListener.class);
+    private static final Logger log = Logger.getLogger(ITIrusExportUsageEventListener.class);
 
 
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
@@ -86,7 +86,7 @@ public class ITIrusExportUsageEventListener extends AbstractIntegrationTestWithD
                                                                  .getServiceByName("testProcessedUrls",
                                                                                    ArrayList.class);
 
-    private IrusExportUsageEventListener exportUsageEventListener =
+    private final IrusExportUsageEventListener exportUsageEventListener =
             DSpaceServicesFactory.getInstance()
                                  .getServiceManager()
                                  .getServicesByType(IrusExportUsageEventListener.class)
@@ -105,9 +105,11 @@ public class ITIrusExportUsageEventListener extends AbstractIntegrationTestWithD
 
 
     /**
-     * Initializes the test by setting up all objects needed to create a test item
+     * Initializes the test by setting up all objects needed to create a test item.
+     * @throws java.lang.Exception passed through.
      */
     @Before()
+    @Override
     public void setUp() throws Exception {
         super.setUp();
 
@@ -152,11 +154,12 @@ public class ITIrusExportUsageEventListener extends AbstractIntegrationTestWithD
     }
 
     /**
-     * Clean up the created objects
-     * Empty the testProcessedUrls used to store succeeded urls
-     * Empty the database table where the failed urls are logged
+     * Clean up the created objects.
+     * Empty the testProcessedUrls used to store succeeded URLs.
+     * Empty the database table where the failed URLs are logged.
      */
     @After
+    @Override
     public void destroy() throws Exception {
         try {
             context.turnOffAuthorisationSystem();
@@ -377,11 +380,13 @@ public class ITIrusExportUsageEventListener extends AbstractIntegrationTestWithD
 
     /**
      * Test that an object that is not an Item or Bitstream is not processed
+     * @throws java.sql.SQLException passed through.
      */
     @Test
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public void testReceiveEventOnNonRelevantObject() throws SQLException {
 
-        HttpServletRequest request = mock(HttpServletRequest.class);
+        mock(HttpServletRequest.class);
 
         UsageEvent usageEvent = mock(UsageEvent.class);
         when(usageEvent.getObject()).thenReturn(community);
@@ -394,7 +399,6 @@ public class ITIrusExportUsageEventListener extends AbstractIntegrationTestWithD
 
         assertEquals(0, all.size());
         assertEquals(0, testProcessedUrls.size());
-
     }
 
     /**
@@ -408,11 +412,6 @@ public class ITIrusExportUsageEventListener extends AbstractIntegrationTestWithD
 
         Pattern p = Pattern.compile(regex);
 
-        if (p.matcher(string).matches()) {
-            return true;
-        }
-        return false;
+        return p.matcher(string).matches();
     }
-
-
 }
