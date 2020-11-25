@@ -52,7 +52,6 @@ jobs:
           sass -v
           gem install compass -v 1.0.1
           compass version
-          sudo gem env
           gem env
 
       # https://github.com/actions/cache
@@ -70,3 +69,7 @@ jobs:
 
       - name: Assemble DSpace & Build Mirage 2
         run: cd dspace && mvn package -Dmirage2.on=true -Dmirage2.deps.included=false -P !assembly -B -V -Dsurefire.rerunFailingTestsCount=2
+        env:
+          # Set GEM env variables (for Mirage 2) based on output of 'gem env' in "Install Mirage 2 prerequisites" step
+          GEM_HOME: "/home/runner/.gem/ruby/2.4.0"
+          GEM_PATH: "/home/runner/.gem/ruby/2.4.0:/opt/hostedtoolcache/Ruby/2.4.10/x64/lib/ruby/gems/2.4.0"
