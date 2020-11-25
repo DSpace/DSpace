@@ -17,7 +17,7 @@ CREATE TABLE cris_metrics
     id INTEGER NOT NULL,
     metricType CHARACTER VARYING(255),
     metricCount FLOAT,
-    timeStampInfo TIMESTAMP,
+    acquisitionDate TIMESTAMP,
     startDate TIMESTAMP,
     endDate TIMESTAMP,
     resource_id UUID NOT NULL,

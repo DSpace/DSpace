@@ -36,7 +36,7 @@ public class CrisMetrics {
 
     private double metricCount;
 
-    private Date timeStampInfo;
+    private Date acquisitionDate;
 
     private Date startDate;
 
@@ -99,12 +99,12 @@ public class CrisMetrics {
         this.last = last;
     }
 
-    public Date getTimeStampInfo() {
-        return timeStampInfo;
+    public Date getAcquisitionDate() {
+        return acquisitionDate;
     }
 
-    public void setTimeStampInfo(Date timeStampInfo) {
-        this.timeStampInfo = timeStampInfo;
+    public void setAcquisitionDate(Date acquisitionDate) {
+        this.acquisitionDate = acquisitionDate;
     }
 
     public Item getResource() {
