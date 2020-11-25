@@ -11,7 +11,7 @@ on: [push, pull_request]
   #  branches: dspace-6_x
 
 jobs:
-  build:
+  tests:
     runs-on: ubuntu-18.04
     env:
       # Give Maven 1GB of memory to work with
@@ -22,15 +22,24 @@ jobs:
     steps:
       # https://github.com/actions/checkout
       - name: Checkout codebase
-        uses: actions/checkout@v2
+        uses: actions/checkout@v1
+
       # https://github.com/actions/setup-java
       - name: Install JDK 8
         uses: actions/setup-java@v1
         with:
           java-version: 8
-      - name: Install Node.js v6.5
+
+      # https://github.com/actions/setup-ruby
+      - name: Install Ruby 2.4 (for Mirage 2)
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: 2.4
+
+      - name: Install Node.js v6.5 (for Mirage 2)
         shell: bash -l {0}
         run: nvm install 6.5.0
+
       # Install NPM, Bower, Grunt, Ruby, Sass, Compass
       - name: Install Mirage 2 prerequisites
         run: |
@@ -40,12 +49,12 @@ jobs:
           sudo npm install -g grunt && sudo npm install -g grunt-cli
           grunt --version
           ruby -v
-          sudo gem update --system
-          gem -v
+          sudo gem update --system 3.0.6
           sudo gem install sass -v 3.4.25
           sass -v
           sudo gem install compass -v 1.0.1
           compass version
+
       # https://github.com/actions/cache
       - name: Cache Maven dependencies
         uses: actions/cache@v2
@@ -55,7 +64,9 @@ jobs:
           # Cache key is hash of all pom.xml files. Therefore any changes to POMs will invalidate cache
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-maven-
+
       - name: Run Maven Build & Test
         run: mvn clean install license:check -Dmaven.test.skip=false -DskipITs=false -P !assembly -B -V -Dsurefire.rerunFailingTestsCount=2
+
       - name: Assemble DSpace & Build Mirage 2
         run: cd dspace && mvn package -Dmirage2.on=true -Dmirage2.deps.included=false -P !assembly -B -V -Dsurefire.rerunFailingTestsCount=2
