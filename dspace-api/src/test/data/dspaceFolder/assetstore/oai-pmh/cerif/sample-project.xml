@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<oai_cerif:Project xmlns:oai_cerif="https://www.openaire.eu/cerif-profile/1.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:doc="http://www.lyncode.com/xoai" id="3fb43b5b-bef3-4280-b3a1-eb7a1ebcd7c7">
+   <oai_cerif:Title xml:lang="en">GlobalSeaRoutes</oai_cerif:Title>
+   <oai_cerif:StartDate>2013-08-01</oai_cerif:StartDate>
+   <oai_cerif:EndDate>2016-07-31</oai_cerif:EndDate>
+   <oai_cerif:Funded>
+      <oai_cerif:As xmlns:oafunding="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">
+         <oai_cerif:Funding>
+            <oafunding:Type>https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#InternalFunding</oafunding:Type>
+            <oai_cerif:PartOf>
+               <oai_cerif:Funding>
+                  <oafunding:Type>https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#FundingProgramme</oafunding:Type>
+                  <oai_cerif:Name xml:lang="en">«Social Sciences and Humanities» from the Friuli Venezia Giulia Region</oai_cerif:Name>
+               </oai_cerif:Funding>
+            </oai_cerif:PartOf>
+         </oai_cerif:Funding>
+      </oai_cerif:As>
+   </oai_cerif:Funded>
+   <oai_cerif:Abstract xml:lang="en">GlobalSeaRoutes (GSR) is a relational geospatial database</oai_cerif:Abstract>
+</oai_cerif:Project>

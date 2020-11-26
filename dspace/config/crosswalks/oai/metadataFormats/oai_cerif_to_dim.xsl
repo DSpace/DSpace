@@ -4,7 +4,8 @@
 	xmlns:fo="http://www.w3.org/1999/XSL/Format"
 	xmlns:dim="http://www.dspace.org/xmlns/dspace/dim"
 	xmlns:cerif="https://www.openaire.eu/cerif-profile/1.1/"
-	xmlns:pt="https://www.openaire.eu/cerif-profile/vocab/COAR_Publication_Types">
+	xmlns:pt="https://www.openaire.eu/cerif-profile/vocab/COAR_Publication_Types"
+	xmlns:ft="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">
 	
 	<xsl:param name="nestedMetadataPlaceholder" />
 	<xsl:param name="converterSeparator" />
@@ -12,10 +13,12 @@
 	
 	<xsl:template match="cerif:Publication">
 		<dim:dim>
-		
-			<dim:field mdschema="dc" element="type" >
-				<xsl:value-of select="concat('coarToPublicationTypes',$converterSeparator,pt:Type)" />
-			</dim:field>
+			
+			<xsl:if test="pt:Type">
+				<dim:field mdschema="dc" element="type" >
+					<xsl:value-of select="concat('coarToPublicationTypes',$converterSeparator,pt:Type)" />
+				</dim:field>
+			</xsl:if>
 		
 			<dim:field mdschema="dc" element="language" qualifier="iso">
 				<xsl:value-of select="cerif:Language" />
@@ -114,8 +117,7 @@
 			<xsl:for-each select="cerif:Authors/cerif:Author">
 				<dim:field mdschema="dc" element="contributor" qualifier="author" >
 					<xsl:if test="cerif:Person/@id">
-						<xsl:variable name="authorityToSet" select="concat($idPrefix,cerif:Person/@id)" />
-						<xsl:attribute name="authority"><xsl:value-of select="$authorityToSet"/></xsl:attribute>
+						<xsl:attribute name="authority"><xsl:value-of select="concat($idPrefix,cerif:Person/@id)"/></xsl:attribute>
 					</xsl:if>
 					<xsl:call-template name="nestedMetadataValue">
 				    	<xsl:with-param name="value" select="cerif:DisplayName" />
@@ -131,8 +133,7 @@
 			<xsl:for-each select="cerif:Editors/cerif:Editor">
 				<dim:field mdschema="dc" element="contributor" qualifier="editor" >
 					<xsl:if test="cerif:Person/@id">
-						<xsl:variable name="authorityToSet" select="concat($idPrefix,cerif:Person/@id)" />
-						<xsl:attribute name="authority"><xsl:value-of select="$authorityToSet"/></xsl:attribute>
+						<xsl:attribute name="authority"><xsl:value-of select="concat($idPrefix,cerif:Person/@id)"/></xsl:attribute>
 					</xsl:if>
 					<xsl:call-template name="nestedMetadataValue">
 				    	<xsl:with-param name="value" select="cerif:DisplayName" />
@@ -153,8 +154,7 @@
 				<xsl:if test="cerif:Project">
 					<dim:field mdschema="dc" element="relation" qualifier="project" >
 						<xsl:if test="cerif:Project/@id">
-							<xsl:variable name="authorityToSet" select="concat($idPrefix,cerif:Project/@id)" />
-							<xsl:attribute name="authority"><xsl:value-of select="$authorityToSet"/></xsl:attribute>
+							<xsl:attribute name="authority"><xsl:value-of select="concat($idPrefix,cerif:Project/@id)"/></xsl:attribute>
 							<xsl:value-of select="cerif:Project/cerif:Title" />
 						</xsl:if>
 					</dim:field>
@@ -162,8 +162,7 @@
 				<xsl:if test="cerif:Funding">
 					<dim:field mdschema="dc" element="relation" qualifier="funding" >
 						<xsl:if test="cerif:Funding/@id">
-							<xsl:variable name="authorityToSet" select="concat($idPrefix,cerif:Funding/@id)" />
-							<xsl:attribute name="authority"><xsl:value-of select="$authorityToSet"/></xsl:attribute>
+							<xsl:attribute name="authority"><xsl:value-of select="concat($idPrefix,cerif:Funding/@id)"/></xsl:attribute>
 							<xsl:value-of select="cerif:Funding/cerif:Name" />
 						</xsl:if>
 					</dim:field>
@@ -236,31 +235,36 @@
 			</xsl:for-each>
 			
 			<xsl:for-each select="cerif:Affiliation">
-				<dim:field mdschema="oairecerif" element="affiliation" qualifier="startDate" >
-					<xsl:call-template name="nestedMetadataValue">
-				    	<xsl:with-param name="value" select="@startDate" />
-			    	</xsl:call-template>
-				</dim:field>
-				<dim:field mdschema="oairecerif" element="affiliation" qualifier="endDate" >
-					<xsl:call-template name="nestedMetadataValue">
-				    	<xsl:with-param name="value" select="@endDate" />
-			    	</xsl:call-template>
-				</dim:field>
-				<dim:field mdschema="oairecerif" element="affiliation" qualifier="role" >
-					<xsl:call-template name="nestedMetadataValue">
-				    	<xsl:with-param name="value" select="@role" />
-			    	</xsl:call-template>
-				</dim:field>
-				<dim:field mdschema="oairecerif" element="person" qualifier="affiliation" >
-					<xsl:call-template name="nestedMetadataValue">
-				    	<xsl:with-param name="value" select="cerif:OrgUnit/cerif:Name" />
-			    	</xsl:call-template>
-				</dim:field>
+				<xsl:choose>
+					<xsl:when test="cerif:OrgUnit/cerif:Acronym">
+						<dim:field mdschema="person" element="affiliation" qualifier="name">
+							<xsl:value-of select="cerif:OrgUnit/cerif:Acronym"/>
+						</dim:field>
+					</xsl:when>
+					<xsl:otherwise>
+						<dim:field mdschema="oairecerif" element="affiliation" qualifier="startDate" >
+							<xsl:call-template name="nestedMetadataValue">
+						    	<xsl:with-param name="value" select="@startDate" />
+					    	</xsl:call-template>
+						</dim:field>
+						<dim:field mdschema="oairecerif" element="affiliation" qualifier="endDate" >
+							<xsl:call-template name="nestedMetadataValue">
+						    	<xsl:with-param name="value" select="@endDate" />
+					    	</xsl:call-template>
+						</dim:field>
+						<dim:field mdschema="oairecerif" element="affiliation" qualifier="role" >
+							<xsl:call-template name="nestedMetadataValue">
+						    	<xsl:with-param name="value" select="@role" />
+					    	</xsl:call-template>
+						</dim:field>
+						<dim:field mdschema="oairecerif" element="person" qualifier="affiliation" >
+							<xsl:call-template name="nestedMetadataValue">
+						    	<xsl:with-param name="value" select="cerif:OrgUnit/cerif:Name" />
+					    	</xsl:call-template>
+						</dim:field>
+					</xsl:otherwise>
+				</xsl:choose>
 			</xsl:for-each>
-			
-			<dim:field mdschema="person" element="affiliation" qualifier="name">
-				<xsl:value-of select="cerif:Affiliation/cerif:OrgUnit/cerif:Acronym"/>
-			</dim:field>
 		
 		</dim:dim>
 	</xsl:template>
@@ -276,13 +280,20 @@
 				<xsl:value-of select="cerif:Acronym" />
 			</dim:field>
 			
-			<dim:field mdschema="crispj" element="openaireid" >
-				<xsl:value-of select="cerif:Identifier[@type = 'http://namespace.openaire.eu/oaf']" />
-			</dim:field>
-			
-			<dim:field mdschema="oairecerif" element="identifier" qualifier="url" >
-				<xsl:value-of select="cerif:Identifier[@type = 'URL']" />
-			</dim:field>
+			<xsl:for-each select="cerif:Identifier">
+				<xsl:choose>
+					<xsl:when test="@type = 'http://namespace.openaire.eu/oaf'">
+						<dim:field mdschema="crispj" element="openaireid" >
+							<xsl:value-of select="current()" />
+						</dim:field>
+					</xsl:when>
+					<xsl:when test="@type = 'URL'">
+						<dim:field mdschema="oairecerif" element="identifier" qualifier="url" >
+							<xsl:value-of select="current()" />
+						</dim:field>
+					</xsl:when>
+				</xsl:choose>
+			</xsl:for-each>
 			
 			<dim:field mdschema="oairecerif" element="project" qualifier="startDate" >
 				<xsl:value-of select="cerif:StartDate" />
@@ -295,7 +306,226 @@
 			<dim:field mdschema="oairecerif" element="project" qualifier="status" >
 				<xsl:value-of select="cerif:Status" />
 			</dim:field>
+			
+			<xsl:for-each select="cerif:Consortium/cerif:Coordinator">
+				<dim:field mdschema="crispj" element="coordinator">
+					<xsl:if test="cerif:OrgUnit/@id">
+						<xsl:attribute name="authority"><xsl:value-of select="concat($idPrefix,cerif:OrgUnit/@id)"/></xsl:attribute>
+					</xsl:if>
+					<xsl:value-of select="cerif:OrgUnit/cerif:Name"/>
+				</dim:field>
+			</xsl:for-each>
+			
+			<xsl:for-each select="cerif:Consortium/cerif:Partner">
+				<dim:field mdschema="crispj" element="partnerou">
+					<xsl:if test="cerif:OrgUnit/@id">
+						<xsl:attribute name="authority"><xsl:value-of select="concat($idPrefix,cerif:OrgUnit/@id)"/></xsl:attribute>
+					</xsl:if>
+					<xsl:value-of select="cerif:OrgUnit/cerif:Name"/>
+				</dim:field>
+			</xsl:for-each>
+			
+			<xsl:for-each select="cerif:Consortium/cerif:Member">
+				<dim:field mdschema="crispj" element="organization">
+					<xsl:if test="cerif:OrgUnit/@id">
+						<xsl:attribute name="authority"><xsl:value-of select="concat($idPrefix,cerif:OrgUnit/@id)"/></xsl:attribute>
+					</xsl:if>
+					<xsl:value-of select="cerif:OrgUnit/cerif:Name"/>
+				</dim:field>
+			</xsl:for-each>
+			
+			<dim:field mdschema="crispj" element="investigator" >
+				<xsl:value-of select="cerif:Team/cerif:PrincipalInvestigator/cerif:Person/@displayName" />
+			</dim:field>
+			
+			<xsl:for-each select="cerif:Team/cerif:Member/cerif:Person">
+				<dim:field mdschema="crispj" element="coinvestigators" >
+					<xsl:value-of select="@displayName" />
+				</dim:field>
+			</xsl:for-each>
+			
+			<xsl:for-each select="cerif:Uses/cerif:Equipment">
+				<dim:field mdschema="dc" element="relation" qualifier="equipment" >
+					<xsl:value-of select="cerif:Name" />
+				</dim:field>
+			</xsl:for-each>
+			
+			<dim:field mdschema="dc" element="description" qualifier="abstract" >
+				<xsl:value-of select="cerif:Abstract" />
+			</dim:field>
+			
+			<xsl:for-each select="cerif:Keyword">
+				<dim:field mdschema="dc" element="subject" >
+					<xsl:value-of select="current()" />
+				</dim:field>
+			</xsl:for-each>
+			
+			<dim:field mdschema="oairecerif" element="oamandate" >
+				<xsl:value-of select="cerif:OAMandate/@mandated" />
+			</dim:field>
+			
+			<dim:field mdschema="oairecerif" element="oamandate" qualifier="url" >
+				<xsl:value-of select="cerif:OAMandate/@URL" />
+			</dim:field>
 
+		</dim:dim>
+	</xsl:template>
+	
+	<xsl:template match="cerif:OrgUnit">
+		<dim:dim>
+			
+			<xsl:for-each select="cerif:Name">
+				<xsl:choose>
+					<xsl:when test="position() = 1">
+						<dim:field mdschema="dc" element="title" >
+							<xsl:value-of select="current()" />
+						</dim:field>
+					</xsl:when>
+					<xsl:otherwise>
+						<dim:field mdschema="organization" element="legalName">
+							<xsl:value-of select="current()" />
+						</dim:field>
+					</xsl:otherwise>
+				</xsl:choose>
+				<dim:field mdschema="dc" element="title" >
+					<xsl:value-of select="cerif:Name" />
+				</dim:field>
+			</xsl:for-each>
+			
+			<xsl:for-each select="cerif:Acronym">
+				<dim:field mdschema="oairecerif" element="acronym">
+					<xsl:value-of select="current()" />
+				</dim:field>
+			</xsl:for-each>
+	
+			<xsl:if test="cerif:Type">
+				<dim:field mdschema="dc" element="type" >
+					<xsl:value-of select="concat('cerifToOrgUnitTypes',$converterSeparator,cerif:Type)" />
+				</dim:field>
+			</xsl:if>
+			
+			<dim:field mdschema="organization" element="parentOrganization">
+				<xsl:if test="cerif:PartOf/cerif:OrgUnit/@id">
+					<xsl:attribute name="authority"><xsl:value-of select="concat($idPrefix,cerif:PartOf/cerif:OrgUnit/@id)"/></xsl:attribute>
+				</xsl:if>
+				<xsl:value-of select="cerif:PartOf/cerif:OrgUnit/cerif:Name"/>
+			</dim:field>
+			
+			<xsl:for-each select="cerif:Identifier">
+				<xsl:choose>
+					<xsl:when test="not(@type)">
+						<dim:field mdschema="organization" element="identifier" >
+							<xsl:value-of select="current()" />
+						</dim:field>
+					</xsl:when>
+					<xsl:when test="@type = 'URL'">
+						<dim:field mdschema="oairecerif" element="identifier" qualifier="url" >
+							<xsl:value-of select="current()" />
+						</dim:field>
+					</xsl:when>
+				</xsl:choose>
+			</xsl:for-each>
+			
+		</dim:dim>
+	</xsl:template>
+	
+	<xsl:template match="cerif:Equipment">
+		<dim:dim>
+			
+			<dim:field mdschema="dc" element="title" >
+				<xsl:value-of select="cerif:Name" />
+			</dim:field>
+			
+			<dim:field mdschema="oairecerif" element="acronym">
+				<xsl:value-of select="cerif:Acronym" />
+			</dim:field>
+			
+			<dim:field mdschema="oairecerif" element="internalid">
+				<xsl:value-of select="cerif:Identifier[@type = 'Institution assigned unique equipment identifier']" />
+			</dim:field>
+			
+			<dim:field mdschema="dc" element="description">
+				<xsl:value-of select="cerif:Description" />
+			</dim:field>
+			
+			<dim:field mdschema="crisequipment" element="ownerou">
+				<xsl:value-of select="cerif:Owner/cerif:OrgUnit/cerif:Name" />
+			</dim:field>
+			
+			<dim:field mdschema="crisequipment" element="ownerrp">
+				<xsl:value-of select="cerif:Owner/cerif:Person/@displayName" />
+			</dim:field>
+			
+		</dim:dim>
+	</xsl:template>
+	
+	<xsl:template match="cerif:Funding">
+		<dim:dim>
+		
+			<dim:field mdschema="dc" element="title" >
+				<xsl:value-of select="cerif:Name" />
+			</dim:field>
+			
+			<dim:field mdschema="oairecerif" element="acronym">
+				<xsl:value-of select="cerif:Acronym" />
+			</dim:field>
+			
+			<xsl:if test="ft:Type">
+				<dim:field mdschema="dc" element="type" >
+					<xsl:value-of select="concat('cerifToFundingTypes',$converterSeparator,ft:Type)" />
+				</dim:field>
+			</xsl:if>
+			
+			<xsl:for-each select="cerif:Identifier">
+				<xsl:choose>
+					<xsl:when test="@type = 'https://w3id.org/cerif/vocab/IdentifierTypes#FinanceID'">
+						<dim:field mdschema="oairecerif" element="internalid" >
+							<xsl:value-of select="current()" />
+						</dim:field>
+					</xsl:when>
+					<xsl:when test="@type = 'https://w3id.org/cerif/vocab/IdentifierTypes#AwardNumber'">
+						<dim:field mdschema="oairecerif" element="funding" qualifier="identifier" >
+							<xsl:value-of select="current()" />
+						</dim:field>
+					</xsl:when>
+				</xsl:choose>
+			</xsl:for-each>
+			
+			<dim:field mdschema="oairecerif" element="amount" >
+				<xsl:value-of select="cerif:Amount" />
+			</dim:field>
+			
+			<dim:field mdschema="oairecerif" element="amount" qualifier="currency">
+				<xsl:value-of select="cerif:Amount/@currency" />
+			</dim:field>
+			
+			<dim:field mdschema="dc" element="description">
+				<xsl:value-of select="cerif:Description" />
+			</dim:field>
+			
+			<dim:field mdschema="oairecerif" element="funder">
+				<xsl:if test="cerif:Funder/cerif:OrgUnit/@id">
+					<xsl:attribute name="authority"><xsl:value-of select="concat($idPrefix,cerif:Funder/cerif:OrgUnit/@id)"/></xsl:attribute>
+				</xsl:if>
+				<xsl:value-of select="cerif:Funder/cerif:OrgUnit/cerif:Name"/>
+			</dim:field>
+			
+			<dim:field mdschema="oairecerif" element="funding" qualifier="startDate">
+				<xsl:value-of select="cerif:Duration/@startDate" />
+			</dim:field>
+			
+			<dim:field mdschema="oairecerif" element="funding" qualifier="endDate">
+				<xsl:value-of select="cerif:Duration/@endDate" />
+			</dim:field>
+			
+			<dim:field mdschema="oairecerif" element="oamandate" >
+				<xsl:value-of select="cerif:OAMandate/@mandated" />
+			</dim:field>
+			
+			<dim:field mdschema="oairecerif" element="oamandate" qualifier="url" >
+				<xsl:value-of select="cerif:OAMandate/@URL" />
+			</dim:field>
+						
 		</dim:dim>
 	</xsl:template>
 	

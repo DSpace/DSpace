@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -511,7 +512,7 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void testRunHarvestWithCrisConsumer() throws Exception {
+    public void testRunHarvestWithPublicationAndThenPerson() throws Exception {
 
         String[] consumers = activateCrisConsumer();
         try {
@@ -571,10 +572,10 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
             assertThat(values, hasItems(with("relationship.type", "Publication")));
 
             MetadataValue author = itemService.getMetadata(publication, "dc", "contributor", "author", Item.ANY).get(0);
-            String authorAuthority = author.getAuthority();
+            UUID authorAuthority = UUIDUtils.fromString(author.getAuthority());
             assertThat(authorAuthority, notNullValue());
 
-            Item authorPerson = itemService.find(context, UUIDUtils.fromString(authorAuthority));
+            Item authorPerson = itemService.find(context, authorAuthority);
             assertThat(authorPerson, notNullValue());
             assertThat(authorPerson.getOwningCollection(), equalTo(personCollection));
 
@@ -599,6 +600,84 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
             assertThat(values, hasItems(with("person.identifier.orcid", "0000-0002-9079-5932")));
             assertThat(values, hasItems(with("person.givenName", "Paolo")));
             assertThat(values, hasItems(with("person.familyName", "Manghi")));
+
+        } finally {
+            resetConsumers(consumers);
+        }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testRunHarvestWithPersonAndThenPublication() throws Exception {
+
+        String[] consumers = activateCrisConsumer();
+        try {
+
+            when(mockClient.listRecords(eq(BASE_URL), isNull(), any(), eq("publications"), eq("oai_cerif_openaire")))
+                .thenReturn(buildResponse("single-publication.xml"));
+
+            when(mockClient.listRecords(eq(BASE_URL), isNull(), any(), eq("persons"), eq("oai_cerif_openaire")))
+                .thenReturn(buildResponse("single-person.xml"));
+
+            context.turnOffAuthorisationSystem();
+
+            Collection personCollection = createCollection(context, community)
+                .withRelationshipType("Person")
+                .withAdminGroup(eperson)
+                .build();
+
+            HarvestedCollection publicationHarvest = HarvestedCollectionBuilder.create(context, collection)
+                .withOaiSource(BASE_URL)
+                .withOaiSetId("publications")
+                .withMetadataConfigId("cerif")
+                .withHarvestType(HarvestedCollection.TYPE_DMD)
+                .withHarvestStatus(HarvestedCollection.STATUS_READY)
+                .build();
+
+            HarvestedCollection personHarvest = HarvestedCollectionBuilder.create(context, personCollection)
+                .withOaiSource(BASE_URL)
+                .withOaiSetId("persons")
+                .withMetadataConfigId("cerif")
+                .withHarvestType(HarvestedCollection.TYPE_DMD)
+                .withHarvestStatus(HarvestedCollection.STATUS_READY)
+                .build();
+
+            context.restoreAuthSystemState();
+
+            harvester.runHarvest(context, personHarvest);
+
+            Item person = findItemByOaiID("oai:test-harvest:Persons/123", personCollection);
+
+            List<MetadataValue> values = person.getMetadata();
+            assertThat(values, hasSize(12));
+            assertThat(values, hasItems(with("dc.title", "Manghi, Paolo")));
+            assertThat(values, hasItems(with("cris.sourceId", "test-harvest::123")));
+            assertThat(values, hasItems(with("relationship.type", "Person")));
+            assertThat(values, hasItems(with("oairecerif.person.gender", "M")));
+            assertThat(values, hasItems(with("person.identifier.orcid", "0000-0002-9079-5932")));
+            assertThat(values, hasItems(with("person.givenName", "Paolo")));
+            assertThat(values, hasItems(with("person.familyName", "Manghi")));
+
+            harvester.runHarvest(context, publicationHarvest);
+
+            Item publication = findItemByOaiID("oai:test-harvest:Publications/3", collection);
+            values = publication.getMetadata();
+            assertThat(values, hasSize(17));
+
+            assertThat(values, hasItems(with("dc.title", "Test Publication")));
+            assertThat(values, hasItems(with("dc.type", "Controlled Vocabulary for Resource Type Genres::text")));
+            assertThat(values, hasItems(with("dc.date.issued", "2012-11-30")));
+            assertThat(values, hasItems(with("oaire.citation.volume", "343")));
+            assertThat(values, hasItems(with("oaire.citation.issue", "168")));
+            assertThat(values, hasItems(with("oaire.citation.startPage", "168")));
+            assertThat(values, hasItems(with("oaire.citation.endPage", "180")));
+            assertThat(values, hasItems(with("dc.identifier.doi", "10.1007/978-3-642-35233-1_18")));
+            assertThat(values, hasItems(with("oairecerif.author.affiliation", PLACEHOLDER_PARENT_METADATA_VALUE)));
+            assertThat(values, hasItems(with("cris.sourceId", "test-harvest::3")));
+            assertThat(values, hasItems(with("relationship.type", "Publication")));
+
+            MetadataValue author = itemService.getMetadata(publication, "dc", "contributor", "author", Item.ANY).get(0);
+            assertThat(UUID.fromString(author.getAuthority()), equalTo(person.getID()));
 
         } finally {
             resetConsumers(consumers);

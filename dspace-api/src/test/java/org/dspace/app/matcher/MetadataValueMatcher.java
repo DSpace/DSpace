@@ -72,4 +72,8 @@ public class MetadataValueMatcher extends TypeSafeMatcher<MetadataValue> {
         return with(field, value, null, null, 0, -1);
     }
 
+    public static MetadataValueMatcher with(String field, String value, int place) {
+        return with(field, value, null, null, place, -1);
+    }
+
 }

@@ -440,9 +440,9 @@ public class OAIHarvester {
 
         List<Element> metadataElements = getMetadataElements(record);
         if (metadataElements.size() == 1) {
-            metadataElementCrosswalk.ingest(context, item, metadataElements.get(0), true);
+            metadataElementCrosswalk.ingest(context, item, metadataElements.get(0), false);
         } else {
-            metadataElementCrosswalk.ingest(context, item, metadataElements, true);
+            metadataElementCrosswalk.ingest(context, item, metadataElements, false);
         }
 
         if (CollectionUtils.isEmpty(itemService.getMetadata(item, CRIS.getName(), "sourceId", null, null))) {
@@ -492,7 +492,7 @@ public class OAIHarvester {
             itemService.removeBundle(context, item, bundle);
         }
 
-        oreCrosswalk.ingest(context, item, oreREM, true);
+        oreCrosswalk.ingest(context, item, oreREM, false);
     }
 
     private void createOREBundle(Context context, Item item, Element oreREM) throws Exception {

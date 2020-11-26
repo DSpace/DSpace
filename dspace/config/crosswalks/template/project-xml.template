@@ -1,4 +1,4 @@
-<Project id="@virtual.id@">
+<Project xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="@virtual.id@">
 	<Acronym>@oairecerif.acronym@</Acronym>
 	<Title>@dc.title@</Title>
 	<Identifier type="http://namespace.openaire.eu/oaf">@crispj.openaireid@</Identifier>

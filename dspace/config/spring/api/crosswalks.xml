@@ -424,6 +424,8 @@
 				<entry key="fundingTypes" value-ref="mapConverterFundingTypes" />
 				<entry key="orgUnitTypes" value-ref="mapConverterOrgUnitTypes" />
 				<entry key="coarToPublicationTypes" value-ref="mapConverterCoarToPublicationTypes" />
+				<entry key="cerifToOrgUnitTypes" value-ref="mapConverterCerifToOrgUnitTypes" />
+				<entry key="cerifToFundingTypes" value-ref="mapConverterCerifToFundingTypes" />
 			</map>
 		</constructor-arg>
 	</bean>
@@ -450,12 +452,26 @@
 	</bean>
 	
 	<bean name="mapConverterCoarToPublicationTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
-		<constructor-arg value="mapConverterCoarTypes" />
+		<constructor-arg value="mapConverterCoarToPublicationTypes" />
 		<property name="converterNameFile" value="mapConverter-coarToPublicationTypes.properties" />
 		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
 		<property name="defaultValue" value="Controlled Vocabulary for Resource Type Genres::other"/>
 	</bean>
-
+	
+	<bean name="mapConverterCerifToOrgUnitTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
+		<constructor-arg value="mapConverterCerifToOrgUnitTypes" />
+		<property name="converterNameFile" value="mapConverter-cerifToOrgUnitTypes.properties" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+		<property name="defaultValue" value="Unspecified"/>
+	</bean>
+	
+	<bean name="mapConverterCerifToFundingTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
+		<constructor-arg value="mapConverterCerifToFundingTypes" />
+		<property name="converterNameFile" value="mapConverter-cerifToFundingTypes.properties" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+		<property name="defaultValue" value="Unspecified"/>
+	</bean>
+	
 	<!-- CONDITION EVALUATORS CONFIGURATION -->
 	
 	<bean class="org.dspace.content.integration.crosswalks.evaluators.ConditionEvaluatorMapper" id="conditionEvaluatorMapper">
