@@ -18,6 +18,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.dspace.content.Item;
+import org.dspace.core.ReloadableEntity;
 
 /**
  * 
@@ -25,7 +26,7 @@ import org.dspace.content.Item;
  */
 @Entity
 @Table(name = "cris_metrics")
-public class CrisMetrics {
+public class CrisMetrics  implements ReloadableEntity<Integer> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cris_metrics_seq")
@@ -121,6 +122,11 @@ public class CrisMetrics {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    @Override
+    public Integer getID() {
+        return getId();
     }
 
 }

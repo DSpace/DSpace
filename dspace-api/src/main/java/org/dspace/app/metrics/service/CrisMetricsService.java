@@ -37,4 +37,5 @@ public interface CrisMetricsService {
     public CrisMetrics uniqueLastMetricByResourceIdAndResourceTypeIdAndMetricsType(Context context, String metricType,
            UUID resourceUuid, boolean last) throws SQLException;
 
+    public void update(Context context, CrisMetrics crisMetrics) throws SQLException, AuthorizeException;
 }

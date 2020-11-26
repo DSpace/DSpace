@@ -8,12 +8,14 @@
 package org.dspace.app.metrics.service;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.metrics.CrisMetrics;
 import org.dspace.app.metrics.DAO.CrisMetricsDAO;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -29,6 +31,9 @@ public class CrisMetricsServiceImpl implements CrisMetricsService {
 
     @Autowired(required = true)
     protected CrisMetricsDAO crisMetricsDAO;
+
+    @Autowired(required = true)
+    protected AuthorizeService authorizeService;
 
     @Override
     public List<CrisMetrics> findAll(Context context) throws SQLException {
@@ -68,6 +73,17 @@ public class CrisMetricsServiceImpl implements CrisMetricsService {
             UUID resource, boolean last) throws SQLException {
         return crisMetricsDAO.uniqueLastMetricByResourceIdAndResourceTypeIdAndMetricsType(
                               context, metricType, resource, last);
+    }
+
+    @Override
+    public void update(Context context, CrisMetrics crisMetrics) throws SQLException, AuthorizeException {
+        if (!authorizeService.isAdmin(context)) {
+            throw new AuthorizeException(
+                    "You must be an admin to update a CrisMetrics");
+        }
+        if (!Objects.isNull(crisMetrics)) {
+            crisMetricsDAO.save(context, crisMetrics);
+        }
     }
 
 }
