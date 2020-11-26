@@ -6,7 +6,6 @@ name: Build
 # Run this Build only for pushes / PRs to main branch
 on:
   push:
-    branches: main
   pull_request:
     branches: main
 
