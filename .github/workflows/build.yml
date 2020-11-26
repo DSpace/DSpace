@@ -4,9 +4,7 @@
 name: Build
 
 # Run this Build for all pushes / PRs
-on:
-  push
-  pull_request
+on: [push, pull_request]
 
 jobs:
   tests:
