@@ -12,9 +12,11 @@
       </submission-map>
       <step-definitions>
         <xsl:call-template name="transformSteps"/>
+        <xsl:call-template name="addFormPageSteps"/>
+        <xsl:call-template name="addStaticSteps"/>
       </step-definitions>
       <submission-definitions>
-        <xsl:call-template name="transformSubmissions"/>
+        <xsl:call-template name="transformInputFormsToSubmissions"/>
       </submission-definitions>
     </item-submission>
   </xsl:template>
@@ -53,7 +55,37 @@
     </xsl:for-each>
   </xsl:template>
 
-  <xsl:template name="transformSubmissions">
+  <xsl:template name="addFormPageSteps">
+    <xsl:for-each select="$inputForms/input-forms/form-definitions/form/page">
+      <xsl:variable name="formName" select="../@name"/>
+      <step mandatory="true">
+        <xsl:attribute name="id">
+          <xsl:value-of select="concat($formName,'page',@number)"/>
+        </xsl:attribute>
+        <heading>
+          <xsm:value-of select="concat('submit.progressbar.describe.step',@number)"/>
+        </heading>
+        <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+        <type>submission-form</type>
+      </step>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template name="addStaticSteps">
+    <step id="upload">
+      <heading>submit.progressbar.upload</heading>
+      <processing-class>org.dspace.app.rest.submit.step.UploadStep</processing-class>
+      <type>upload</type>
+    </step>
+    <step id="license">
+      <heading>submit.progressbar.license</heading>
+      <processing-class>org.dspace.app.rest.submit.step.LicenseStep</processing-class>
+      <type>license</type>
+      <scope visibilityOutside="read-only">submission</scope>
+    </step>
+  </xsl:template>
+
+  <xsl:template name="transformInputFormsToSubmissions">
     <xsl:for-each select="$inputForms/input-forms/form-definitions/form">
       <xsl:variable name="formName" select="@name"/>
       <submission-process>
