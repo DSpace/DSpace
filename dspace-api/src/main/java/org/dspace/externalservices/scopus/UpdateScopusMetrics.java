@@ -46,12 +46,16 @@ public class UpdateScopusMetrics implements MetricsExternalServices {
     public boolean updateMetric(Context context, Item item) {
         String id = buildQuery(item);
         ScopusMetricsDTO scopusMetric = scopusProvider.getScopusObject(id);
+        if (Objects.isNull(scopusMetric)) {
+            return false;
+        }
         return updateScopusMetrics(context, item, scopusMetric);
     }
 
     private String buildQuery(Item item) {
         String doi = itemService.getMetadataFirstValue(item, "dc", "identifier", "doi", Item.ANY);
         String pmid = itemService.getMetadataFirstValue(item, "dc", "identifier", "pmid", Item.ANY);
+        String scopus = itemService.getMetadataFirstValue(item, "dc", "identifier", "scopus", Item.ANY);
         StringBuilder query = new StringBuilder();
         if (StringUtils.isNotBlank(pmid)) {
             if (query.length() > 0) {
@@ -64,6 +68,12 @@ public class UpdateScopusMetrics implements MetricsExternalServices {
                 query.append(" OR ");
             }
             query.append("DOI(").append(doi).append(")");
+        }
+        if (StringUtils.isNotBlank(scopus)) {
+            if (query.length() > 0) {
+                query.append(" OR ");
+            }
+            query.append("EID(").append(scopus).append(")");
         }
         return query.toString();
     }
