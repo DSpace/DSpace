@@ -67,5 +67,9 @@
         <property name="description" value="Mocking a script for testing purposes" />
         <property name="dspaceRunnableClass" value="org.dspace.scripts.impl.MockDSpaceRunnableScript"/>
     </bean>
-    
+
+    <bean id="update-metrics" class="org.dspace.externalservices.UpdateCrisMetricsWithExternalSourceCliScriptConfiguration">
+        <property name="description" value="Perform the metrics update using external source"/>
+        <property name="dspaceRunnableClass" value="org.dspace.externalservices.UpdateCrisMetricsWithExternalSourceCli"/>
+    </bean>
 </beans>
