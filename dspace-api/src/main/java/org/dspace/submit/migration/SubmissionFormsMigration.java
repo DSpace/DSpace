@@ -89,6 +89,7 @@ public class SubmissionFormsMigration extends DSpaceRunnable<SubmissionFormsMigr
         Transformer trans;
         try {
             trans = transformerFactory.newTransformer(xsltSource);
+            trans.setParameter("inputFormsPath", inputFormsFilePath);
         } catch (TransformerConfigurationException e) {
             handler.logError("Error: the stylesheet at '" + xsltFilePath + "' couldn't be used");
             throw e;
@@ -116,9 +117,9 @@ public class SubmissionFormsMigration extends DSpaceRunnable<SubmissionFormsMigr
             itemSubmissionsFilePath = commandLine.getOptionValue('s');
             checkIfValidXMLFile(itemSubmissionsFilePath);
         }
-        if (!(commandLine.hasOption('s') || commandLine.hasOption('f'))) {
-            this.throwParseException("Please fill in either -f <source-input-forms-path> or -s " +
-                                     "<source-item-submissions-path>; or both.");
+        if (!commandLine.hasOption('s') || !commandLine.hasOption('f')) {
+            this.throwParseException("Please fill in both -f <source-input-forms-path> and -s " +
+                                     "<source-item-submissions-path>");
         }
     }
 

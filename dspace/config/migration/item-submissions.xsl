@@ -2,6 +2,8 @@
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsm="http://www.w3.org/1999/XSL/Transform">
   <xsl:output method="xml" doctype-system="item-submission.dtd" indent="yes"/>
+  <xsl:param name="inputFormsPath"/>
+  <xsl:variable name="inputForms" select="document($inputFormsPath)"/>
 
   <xsl:template match="/">
     <item-submission>
@@ -11,7 +13,9 @@
       <step-definitions>
         <xsl:call-template name="transformSteps"/>
       </step-definitions>
-      <submission-definitions></submission-definitions>
+      <submission-definitions>
+        <xsl:call-template name="transformSubmissions"/>
+      </submission-definitions>
     </item-submission>
   </xsl:template>
 
@@ -46,6 +50,31 @@
           </xsl:when>
         </xsl:choose>
       </step>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template name="transformSubmissions">
+    <xsl:for-each select="$inputForms/input-forms/form-definitions/form">
+      <xsl:variable name="formName" select="@name"/>
+      <submission-process>
+        <xsl:attribute name="name">
+          <xsl:value-of select="$formName"/>
+        </xsl:attribute>
+
+        <step id="collection"/>
+
+        <!-- The describe step pages -->
+        <xsl:for-each select="page">
+          <step>
+            <xsl:attribute name="id">
+              <xsl:value-of select="concat($formName,'page',@number)"/>
+            </xsl:attribute>
+          </step>
+        </xsl:for-each>
+
+        <step id="license"/>
+        <step id="upload"/>
+      </submission-process>
     </xsl:for-each>
   </xsl:template>
 </xsl:stylesheet>
