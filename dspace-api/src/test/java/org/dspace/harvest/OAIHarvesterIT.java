@@ -40,7 +40,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.collections4.IteratorUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.authority.CrisConsumer;
 import org.dspace.builder.HarvestedCollectionBuilder;
@@ -335,9 +334,42 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
         assertThat(harvestRow.getHarvestStatus(), equalTo(HarvestedCollection.STATUS_UNKNOWN_ERROR));
         assertThat(harvestRow.getHarvestStartTime(), notNullValue());
         assertThat(harvestRow.getLastHarvestDate(), nullValue());
-        assertThat(harvestRow.getHarvestMessage(),
-            equalTo("OAI server response contains the following error codes: [errorCode1, errorCode2]"));
+        assertThat(harvestRow.getHarvestMessage(), equalTo("Not recoverable error occurs: "
+            + "OAI server response contains the following error codes: [errorCode1, errorCode2]"));
 
+    }
+
+    @Test
+    public void testRunHarvestWithUnexpectedError() throws Exception {
+
+        when(mockClient.listRecords(eq(BASE_URL), isNull(), any(), eq("publications"), eq("oai_cerif_openaire")))
+            .thenThrow(new RuntimeException("GENERIC ERROR"));
+
+        context.turnOffAuthorisationSystem();
+        HarvestedCollection harvestRow = HarvestedCollectionBuilder.create(context, collection)
+            .withOaiSource(BASE_URL)
+            .withOaiSetId("publications")
+            .withMetadataConfigId("cerif")
+            .withHarvestType(HarvestedCollection.TYPE_DMD)
+            .withHarvestStatus(HarvestedCollection.STATUS_READY)
+            .build();
+        context.restoreAuthSystemState();
+
+        harvester.runHarvest(context, harvestRow);
+
+        verify(mockClient).resolveNamespaceToPrefix(BASE_URL, NamespaceUtils.getDMDNamespace("cerif").getURI());
+        verify(mockClient).identify(BASE_URL);
+        verify(mockClient).listRecords(eq(BASE_URL), isNull(), any(), eq("publications"), eq("oai_cerif_openaire"));
+        verifyNoMoreInteractions(mockClient);
+
+        List<Item> items = IteratorUtils.toList(itemService.findAllByCollection(context, collection));
+        assertThat(items, emptyCollectionOf(Item.class));
+
+        harvestRow = harvestedCollectionService.find(context, collection);
+        assertThat(harvestRow.getHarvestStatus(), equalTo(HarvestedCollection.STATUS_UNKNOWN_ERROR));
+        assertThat(harvestRow.getHarvestStartTime(), notNullValue());
+        assertThat(harvestRow.getLastHarvestDate(), nullValue());
+        assertThat(harvestRow.getHarvestMessage(), equalTo("Not recoverable error occurs: GENERIC ERROR"));
     }
 
     @Test
@@ -677,7 +709,7 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
             assertThat(values, hasItems(with("relationship.type", "Publication")));
 
             MetadataValue author = itemService.getMetadata(publication, "dc", "contributor", "author", Item.ANY).get(0);
-            assertThat(UUID.fromString(author.getAuthority()), equalTo(person.getID()));
+            assertThat(UUIDUtils.fromString(author.getAuthority()), equalTo(person.getID()));
 
         } finally {
             resetConsumers(consumers);
@@ -720,13 +752,10 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
     private String[] activateCrisConsumer() {
         ConfigurationService configService = DSpaceServicesFactory.getInstance().getConfigurationService();
         String[] consumers = configService.getArrayProperty("event.dispatcher.default.consumers");
-        if (!ArrayUtils.contains(consumers, CRIS_CONSUMER)) {
-            String newConsumers = consumers.length > 0 ? join(",", consumers) + "," + CRIS_CONSUMER : CRIS_CONSUMER;
-            configService.setProperty("event.dispatcher.default.consumers", newConsumers);
-            EventService eventService = EventServiceFactory.getInstance().getEventService();
-            eventService.reloadConfiguration();
-        }
-
+        String newConsumers = consumers.length > 0 ? join(",", consumers) + "," + CRIS_CONSUMER : CRIS_CONSUMER;
+        configService.setProperty("event.dispatcher.default.consumers", newConsumers);
+        EventService eventService = EventServiceFactory.getInstance().getEventService();
+        eventService.reloadConfiguration();
         return consumers;
     }
 

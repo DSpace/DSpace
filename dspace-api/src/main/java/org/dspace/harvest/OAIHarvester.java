@@ -47,7 +47,6 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authority.service.ItemSearchService;
 import org.dspace.authorize.AuthorizeException;
@@ -84,6 +83,7 @@ import org.dspace.harvest.service.OAIHarvesterClient;
 import org.dspace.harvest.util.NamespaceUtils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.util.ExceptionMessageUtils;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -186,10 +186,12 @@ public class OAIHarvester {
             setReadyStatus(context, harvestRow, nrme.getMessage(), toDate);
             log.info(nrme.getMessage());
         } catch (Exception ex) {
-            String message = getRootExceptionMessage(ex);
+            String message = formatErrorMessage(ex);
             log.error(message, ex);
-            setUnknownErrorStatus(context, harvestRow, message);
-            alertAdmin(harvestRow.getCollection(), STATUS_UNKNOWN_ERROR, ex);
+            if (harvestRow != null) {
+                setUnknownErrorStatus(context, harvestRow, message);
+                alertAdmin(harvestRow.getCollection(), STATUS_UNKNOWN_ERROR, ex);
+            }
         } finally {
             context.setMode(originalMode);
         }
@@ -215,6 +217,8 @@ public class OAIHarvester {
             toDateAsString, harvestRow.getOaiSetId(), descriptiveMetadataFormat);
 
         int totalRecordSize = getTotalRecordSize(responseDTO.getDocument());
+        log.info("Found " + totalRecordSize + " records to harvest");
+
         OAIHarvesterReport report = new OAIHarvesterReport(totalRecordSize);
 
         processOAIHarvesterResponse(context, harvestRow, responseDTO, toDate, repositoryId, report);
@@ -229,18 +233,11 @@ public class OAIHarvester {
         while (responseDTO != null) {
 
             if (responseDTO.hasErrors()) {
-                Set<String> errors = responseDTO.getErrors();
-                if (errors.size() == 1 && errors.contains("noRecordsMatch")) {
-                    throw new NoRecordsMatchException("noRecordsMatch: OAI server did not contain any updates");
-                } else {
-                    throw new HarvestingException("OAI server response contains the following error codes: " + errors);
-                }
+                handleResponseErrors(responseDTO.getErrors());
+                return;
             }
 
-            Document oaiResponse = responseDTO.getDocument();
-
-            List<Element> records = getAllRecords(oaiResponse);
-
+            List<Element> records = getAllRecords(responseDTO.getDocument());
             if (CollectionUtils.isEmpty(records)) {
                 log.info("No records to process found");
                 return;
@@ -567,9 +564,22 @@ public class OAIHarvester {
         return descriptiveMetadataFormat;
     }
 
-    private String getRootExceptionMessage(Exception ex) {
-        String message = ExceptionUtils.getRootCauseMessage(ex);
-        return isNotEmpty(message) ? message.substring(message.indexOf(":") + 1).trim() : "Unknown error";
+    private void handleResponseErrors(Set<String> errors) {
+        if (errors.size() == 1 && errors.contains("noRecordsMatch")) {
+            throw new NoRecordsMatchException("noRecordsMatch: OAI server did not contain any updates");
+        } else {
+            throw new HarvestingException("OAI server response contains the following error codes: " + errors);
+        }
+    }
+
+    private String formatErrorMessage(Exception ex) {
+        String message = "Not recoverable error occurs: ";
+        if (ex instanceof HarvestingException && StringUtils.isNotBlank(ex.getMessage())) {
+            message = message + ex.getMessage();
+        } else {
+            message = message + ExceptionMessageUtils.getRootMessage(ex);
+        }
+        return message;
     }
 
     private HarvestedCollection setBusyStatus(Context context, HarvestedCollection harvestRow, Date startDate) {
