@@ -20,6 +20,7 @@ import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.CrisLayoutBoxBuilder;
 import org.dspace.builder.CrisLayoutTabBuilder;
+import org.dspace.builder.CrisMetricsBuilder;
 import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.GroupBuilder;
@@ -57,6 +58,7 @@ public class AbstractBuilderCleanupUtil {
     private void initMap() {
         //map.put(CrisLayoutBitstreamBuilder.class.getName(), new LinkedList<>());
         //map.put(CrisLayoutFieldBuilder.class.getName(), new LinkedList<>());
+        map.put(CrisMetricsBuilder.class.getName(), new LinkedList<>());
         map.put(OrcidHistoryBuilder.class.getName(), new LinkedList<>());
         map.put(OrcidQueueBuilder.class.getName(), new LinkedList<>());
         map.put(CrisLayoutBoxBuilder.class.getName(), new LinkedList<>());
