@@ -39,10 +39,9 @@ public class ScopusProvider {
         InputStream is = getRecords(id);
         if (is != null) {
             return convertToScopusDTO(is);
-        } else {
-            log.error("The query : " + id + " is wrong!");
-            return null;
         }
+        log.error("The query : " + id + " is wrong!");
+        return null;
     }
 
     private InputStream getRecords(String id) {
@@ -55,7 +54,6 @@ public class ScopusProvider {
     private ScopusMetricsDTO convertToScopusDTO(InputStream inputStream) {
         Document doc = null;
         DocumentBuilder docBuilder = null;
-        ScopusMetricsDTO scopusMetricsDTO = new ScopusMetricsDTO();
         try {
             DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
             docBuilder = docBuilderFactory.newDocumentBuilder();
@@ -63,17 +61,17 @@ public class ScopusProvider {
         } catch (ParserConfigurationException | SAXException | IOException e) {
             log.error(e.getMessage(), e);
         }
-
-        Element xmlRoot = doc.getDocumentElement();
-        Element dataRoot = XMLUtils.getSingleElement(xmlRoot, "entry");
-        loadScopusMetrics(dataRoot,scopusMetricsDTO);
-        return scopusMetricsDTO;
+        return loadScopusMetrics(doc);
     }
 
-    private void loadScopusMetrics(Element dataRoot, ScopusMetricsDTO scopusCitation) {
+    private ScopusMetricsDTO loadScopusMetrics(Document doc) {
+        ScopusMetricsDTO scopusCitation = null;
         try {
+            Element xmlRoot = doc.getDocumentElement();
+            Element dataRoot = XMLUtils.getSingleElement(xmlRoot, "entry");
             Element errorScopusResp = XMLUtils.getSingleElement(dataRoot, "error");
             if (dataRoot != null && errorScopusResp == null) {
+                scopusCitation = new ScopusMetricsDTO();
                 String eid = XMLUtils.getElementValue(dataRoot, "eid");
                 String doi = XMLUtils.getElementValue(dataRoot, "prism:doi");
                 String pmid = XMLUtils.getElementValue(dataRoot, "pubmed-id");
@@ -103,6 +101,7 @@ public class ScopusProvider {
                     throw new Exception(ex);
                 }
                 scopusCitation.setRemark(scopusCitation.buildMetricsRemark());
+                return scopusCitation;
             } else {
                 if (dataRoot == null) {
                     log.debug("No citation entry found in Scopus");
@@ -113,5 +112,6 @@ public class ScopusProvider {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
+        return scopusCitation;
     }
 }
