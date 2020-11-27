@@ -8,7 +8,16 @@
   <xsl:template match="/">
     <item-submission>
       <submission-map>
-        <xsl:copy-of select="/item-submission/submission-map/name-map"/>
+        <xsl:for-each select="$inputForms/input-forms/form-map/name-map">
+          <name-map>
+            <xsl:attribute name="collection-handle">
+              <xsl:value-of select="@collection-handle"/>
+            </xsl:attribute>
+            <xsl:attribute name="submission-name">
+              <xsl:value-of select="@form-name"/>
+            </xsl:attribute>
+          </name-map>
+        </xsl:for-each>
       </submission-map>
       <step-definitions>
         <xsl:call-template name="transformSteps"/>
