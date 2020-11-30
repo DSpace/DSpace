@@ -298,32 +298,12 @@ public class MetadataField
      */
     public static MetadataField[] findAll(Context context) throws SQLException
     {
-        List<MetadataField> fields = new ArrayList<MetadataField>();
-
-        // Get all the metadatafieldregistry rows
-        TableRowIterator tri = DatabaseManager.queryTable(context, "MetadataFieldRegistry",
-                               "SELECT mfr.* FROM MetadataFieldRegistry mfr, MetadataSchemaRegistry msr where mfr.metadata_schema_id= msr.metadata_schema_id ORDER BY msr.short_id,  mfr.element, mfr.qualifier");
-
-        try
-        {
-            // Make into DC Type objects
-            while (tri.hasNext())
-            {
-                fields.add(new MetadataField(tri.next()));
-            }
-        }
-        finally
-        {
-            // close the TableRowIterator to free up resources
-            if (tri != null)
-            {
-                tri.close();
-            }
+        if (!isCacheInitialized()){
+            initCache(context);
         }
 
-        // Convert list into an array
-        MetadataField[] typeArray = new MetadataField[fields.size()];
-        return (MetadataField[]) fields.toArray(typeArray);
+        return metadatafieldcache.values().toArray(new MetadataField[metadatafieldcache.values().size()]);
+
     }
 
     /**

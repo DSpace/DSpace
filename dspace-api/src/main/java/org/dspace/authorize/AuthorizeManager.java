@@ -842,20 +842,7 @@ public class AuthorizeManager
         // now add them to the destination object
         for (ResourcePolicy srp : policies)
         {
-            ResourcePolicy drp = ResourcePolicy.create(c);
-
-            // copy over values
-            drp.setResource(dest);
-            drp.setAction(srp.getAction());
-            drp.setEPerson(srp.getEPerson());
-            drp.setGroup(srp.getGroup());
-            drp.setStartDate(srp.getStartDate());
-            drp.setEndDate(srp.getEndDate());
-            drp.setRpName(srp.getRpName());
-            drp.setRpDescription(srp.getRpDescription());
-            drp.setRpType(srp.getRpType());
-            // and write out new policy
-            drp.update();
+            srp.copyToDSpaceObject(dest);
         }
 
         c.turnOffAuthorisationSystem();
