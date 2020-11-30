@@ -37,6 +37,7 @@ public class OrcidRestConnector {
     }
 
     public InputStream get(String path, String accessToken) {
+        HttpResponse getResponse = null;
         InputStream result = null;
         path = trimSlashes(path);
 
@@ -48,7 +49,7 @@ public class OrcidRestConnector {
         }
         try {
             HttpClient httpClient = HttpClientBuilder.create().build();
-            HttpResponse getResponse = httpClient.execute(httpGet);
+            getResponse = httpClient.execute(httpGet);
             //do not close this httpClient
             result = getResponse.getEntity().getContent();
         } catch (Exception e) {
@@ -76,6 +77,4 @@ public class OrcidRestConnector {
         Scanner s = new Scanner(is).useDelimiter("\\A");
         return s.hasNext() ? s.next() : "";
     }
-
-
 }
