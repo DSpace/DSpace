@@ -5,7 +5,6 @@
     <xsl:output method="xml" doctype-system="submission-forms.dtd"/>
 
     <xsl:template match="/">
-<!--        <!DOCTYPE input-forms SYSTEM "submission-forms.dtd">-->
         <input-forms>
 
             <form-definitions>
@@ -14,7 +13,6 @@
             </form-definitions>
 
             <xsl:apply-templates select="input-forms/form-value-pairs"/>
-
 
         </input-forms>
     </xsl:template>
@@ -31,9 +29,31 @@
     </xsl:template>
 
     <xsl:template match="field">
-        <row>
-            <xsl:copy-of select="."/>
-        </row>
+        <xsl:choose>
+            <!-- transform input-type twobox into onebox -->
+            <xsl:when test="input-type/text() = 'twobox'">
+                <row>
+                    <field>
+                        <!-- copy each child tag of field where input-type is twobox, except input-type (order children enforced by submission-forms.dtd) -->
+                        <xsl:for-each select="*">
+                            <xsl:choose>
+                                <xsl:when test="(self::input-type)">
+                                    <input-type>onebox</input-type>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:copy-of select="."/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:for-each>
+                    </field>
+                </row>
+            </xsl:when>
+            <xsl:otherwise>
+                <row>
+                    <xsl:copy-of select="."/>
+                </row>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <xsl:template match="form-value-pairs">
@@ -67,7 +87,5 @@
             </row>
         </form>
     </xsl:template>
-
-
 
 </xsl:stylesheet>
