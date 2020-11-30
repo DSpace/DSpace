@@ -227,6 +227,9 @@ public class InitialQuestionsStep extends AbstractProcessingStep
                 subInfo.getSubmissionItem().getItem().addDC("date", "issued", null, "today");
             }
         }
+        else {
+            subInfo.getSubmissionItem().getItem().clearMetadata("dc", "date", "issued", Item.ANY);
+        }
 
         // commit all changes to DB
         subInfo.getSubmissionItem().update();
