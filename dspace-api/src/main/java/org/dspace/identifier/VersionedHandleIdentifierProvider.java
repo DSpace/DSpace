@@ -17,11 +17,14 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
-import org.dspace.content.service.ItemService;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -65,7 +68,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
     private HandleService handleService;
 
     @Autowired(required = true)
-    private ItemService itemService;
+    protected ContentServiceFactory contentServiceFactory;
 
     @Override
     public boolean supports(Class<? extends Identifier> identifier) {
@@ -107,8 +110,8 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
     public String register(Context context, DSpaceObject dso) {
         String id = mint(context, dso);
         try {
-            if (dso instanceof Item) {
-                populateHandleMetadata(context, (Item) dso, id);
+            if (dso instanceof Item || dso instanceof Collection || dso instanceof Community) {
+                populateHandleMetadata(context, dso, id);
             }
         } catch (Exception e) {
             log.error(LogManager.getHeader(context, "Error while attempting to create handle",
@@ -410,16 +413,17 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
         return identifier;
     }
 
-    protected void populateHandleMetadata(Context context, Item item, String handle)
+    protected void populateHandleMetadata(Context context, DSpaceObject dso, String handle)
         throws SQLException, IOException, AuthorizeException {
         String handleref = handleService.getCanonicalForm(handle);
         // we want to remove the old handle and insert the new. To do so, we
         // load all identifiers, clear the metadata field, re add all
         // identifiers which are not from type handle and add the new handle.
-        List<MetadataValue> identifiers = itemService.getMetadata(item,
+        DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
+        List<MetadataValue> identifiers = dsoService.getMetadata(dso,
                                                                   MetadataSchemaEnum.DC.getName(), "identifier", "uri",
                                                                   Item.ANY);
-        itemService.clearMetadata(context, item, MetadataSchemaEnum.DC.getName(),
+        dsoService.clearMetadata(context, dso, MetadataSchemaEnum.DC.getName(),
                                   "identifier", "uri", Item.ANY);
         for (MetadataValue identifier : identifiers) {
             if (this.supports(identifier.getValue())) {
@@ -428,8 +432,8 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
                 continue;
             }
             log.debug("Preserving identifier " + identifier.getValue());
-            itemService.addMetadata(context,
-                                    item,
+            dsoService.addMetadata(context,
+                                    dso,
                                     identifier.getMetadataField(),
                                     identifier.getLanguage(),
                                     identifier.getValue(),
@@ -439,9 +443,9 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
 
         // Add handle as identifier.uri DC value.
         if (StringUtils.isNotBlank(handleref)) {
-            itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
+            dsoService.addMetadata(context, dso, MetadataSchemaEnum.DC.getName(),
                                     "identifier", "uri", null, handleref);
         }
-        itemService.update(context, item);
+        dsoService.update(context, dso);
     }
 }
