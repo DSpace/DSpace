@@ -11,7 +11,7 @@ import org.apache.xpath.XPathAPI;
 import org.dspace.core.ConfigurationManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.traversal.NodeIterator;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -93,11 +93,12 @@ public class ControlledVocabulary {
         }else{
             value = label;
         }
-        NodeList subNodes = XPathAPI.selectNodeList(node, "isComposedBy/node");
+        NodeIterator subNodes = XPathAPI.selectNodeIterator(node, "isComposedBy/node");
 
-        List<ControlledVocabulary> subVocabularies = new ArrayList<ControlledVocabulary>(subNodes.getLength());
-        for(int i = 0; i < subNodes.getLength(); i++){
-            subVocabularies.add(loadVocabularyNode(subNodes.item(i), value));
+        List<ControlledVocabulary> subVocabularies = new ArrayList<ControlledVocabulary>();
+        Node i;
+        while (null != (i = subNodes.nextNode())) {
+            subVocabularies.add(loadVocabularyNode(i, value));
         }
         
         return new ControlledVocabulary(id, label, value, subVocabularies);
