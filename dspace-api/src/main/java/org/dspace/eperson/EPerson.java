@@ -487,7 +487,12 @@ public class EPerson extends DSpaceObject
             throws SQLException
     {
         String s, t = "", theQuery = "";
-
+        String sDotText_value;
+        if(DatabaseManager.isOracle()) {
+            sDotText_value= "cast(substr(m.text_value,1,200) as varchar2(200))";
+        } else {
+            sDotText_value = "m.text_value";
+        }
         switch (sortField)
         {
         case ID:
