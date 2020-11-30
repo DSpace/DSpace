@@ -88,6 +88,10 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
     
     /** cached validity object */
     private SourceValidity validity;
+
+    /** Whether to display collection and community strengths (i.e. item counts) */
+    private boolean showCount;
+    private ItemCounter itemCounter = null;
     
     /**
      * Set the component up, pulling any configuration values from the sitemap
@@ -102,6 +106,14 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         depth = parameters.getParameterAsInteger("depth", DEFAULT_DEPTH);
         excludeCollections = parameters.getParameterAsBoolean(
                 "exclude-collections", false);
+        showCount = ConfigurationManager.getBooleanProperty("webui.strengths.show");
+        if (showCount) {
+            try {
+                itemCounter = new ItemCounter(context);
+            } catch (ItemCountException e) {
+                log.error(e);
+            }
+        }
     }
 
     /**
@@ -139,13 +151,12 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
 	                validity.add(node.getDSO());
 	                
 	                // If we are configured to use collection strengths (i.e. item counts) then include that number in the validity.
-	                boolean showCount = ConfigurationManager.getBooleanProperty("webui.strengths.show");
 	                if (showCount)
 	        		{
 	                    try
 	                    {	//try to determine Collection size (i.e. # of items)
 	                    	
-	                    	int size = new ItemCounter(context).getCount(node.getDSO());
+	                    	int size = itemCounter.getCount(node.getDSO());
 	                    	validity.add("size:"+size);
 	                    }
 	                    catch(ItemCountException e) { /* ignore */ }
