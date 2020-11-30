@@ -451,6 +451,10 @@
             <!--Treats the entire field as a single token, regardless of its content-->
             <tokenizer class="solr.KeywordTokenizerFactory"/>
 
+            <!-- Underlying lucene index has a 32kb hard limit, so truncate long fields, so item will not be left unindexed -->
+            <!-- issue: https://issues.apache.org/jira/browse/LUCENE-5472 -->
+            <filter class="solr.LengthFilterFactory" min="0" max="7000"/>
+
             <!--<filter class="solr.LowerCaseFilterFactory" />-->
             <filter class="solr.TrimFilterFactory" />
         </analyzer>
