@@ -23,7 +23,9 @@ import java.util.*;
 public class DiscoveryUIUtils {
 
     private static SearchService searchService = null;
-
+    public static final String filtertypeParam = "filtertype";
+    public static final String relationalOperatorParam = "filter_relational_operator";
+    public static final String filterParam = "filter";
     static {
         DSpace dspace = new DSpace();
         searchService = dspace.getServiceManager().getServiceByName(SearchService.class.getName(),SearchService.class);
@@ -38,18 +40,18 @@ public class DiscoveryUIUtils {
     public static Map<String, String[]> getParameterFilterQueries(Request request) {
         Map<String, String[]> fqs = new HashMap<String, String[]>();
 
-        List<String> filterTypes = getRepeatableParameters(request, "filtertype");
-        List<String> filterOperators = getRepeatableParameters(request, "filter_relational_operator");
-        List<String> filterValues = getRepeatableParameters(request, "filter");
+        List<String> filterTypes = getRepeatableParameters(request, filtertypeParam);
+        List<String> filterOperators = getRepeatableParameters(request, relationalOperatorParam);
+        List<String> filterValues = getRepeatableParameters(request, filterParam);
 
         for (int i = 0; i < filterTypes.size(); i++) {
             String filterType = filterTypes.get(i);
             String filterValue = filterValues.get(i);
             String filterOperator = filterOperators.get(i);
 
-            fqs.put("filtertype_" + i, new String[]{filterType});
-            fqs.put("filter_relational_operator_" + i, new String[]{filterOperator});
-            fqs.put("filter_" + i, new String[]{filterValue});
+            fqs.put(filtertypeParam+"_" + i, new String[]{filterType});
+            fqs.put(relationalOperatorParam+"_" + i, new String[]{filterOperator});
+            fqs.put(filterParam+"_" + i, new String[]{filterValue});
         }
         return fqs;
     }
@@ -61,9 +63,9 @@ public class DiscoveryUIUtils {
     public static String[] getFilterQueries(Request request, Context context) {
         try {
             List<String> allFilterQueries = new ArrayList<String>();
-            List<String> filterTypes = getRepeatableParameters(request, "filtertype");
-            List<String> filterOperators = getRepeatableParameters(request, "filter_relational_operator");
-            List<String> filterValues = getRepeatableParameters(request, "filter");
+            List<String> filterTypes = getRepeatableParameters(request, filtertypeParam);
+            List<String> filterOperators = getRepeatableParameters(request, relationalOperatorParam);
+            List<String> filterValues = getRepeatableParameters(request, filterParam);
 
             for (int i = 0; i < filterTypes.size(); i++) {
                 String filterType = filterTypes.get(i);
@@ -85,16 +87,31 @@ public class DiscoveryUIUtils {
     }
 
     public static List<String> getRepeatableParameters(Request request, String prefix){
-        TreeMap<String, String> result = new TreeMap<String, String>();
+        return getRepeatableParameters(request,prefix,null);
+            }
 
+
+    /**
+     * Returns the repeatable parameters based on a given prefix, excluding (if any) the provided prefixes to ignore
+     * @param prefix The prefix to match against
+     * @param prefixesToIgnore The prefixes to ignore from the end results
+     * @return an array containing the repeatable parameters
+     */
+    public static java.util.List<String> getRepeatableParameters(Request request, String prefix, String[] prefixesToIgnore){
+        TreeMap<String, String> result = new TreeMap<>();
+
+        java.util.List<String> ignoredList = new ArrayList<>();
+        if(prefixesToIgnore != null){
+            ignoredList = Arrays.asList(prefixesToIgnore);
+        }
         Enumeration parameterNames = request.getParameterNames();
         while (parameterNames.hasMoreElements()) {
             String parameter = (String) parameterNames.nextElement();
-            if(parameter.startsWith(prefix)){
+            if(parameter.startsWith(prefix) && !ignoredList.contains(StringUtils.substringBeforeLast(parameter,"_"))){
                 result.put(parameter, request.getParameter(parameter));
             }
         }
-        return new ArrayList<String>(result.values());
+        return new ArrayList<>(result.values());
     }
 
     /**
