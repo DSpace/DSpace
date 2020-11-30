@@ -142,12 +142,10 @@ public class QDCCrosswalk extends SelfNamedPlugin
 
     static {
         List<String> aliasList = new ArrayList<>();
-        List<String> configKeys = configurationService.getPropertyKeys();
         String propname = CONFIG_PREFIX + ".properties.";
+        List<String> configKeys = configurationService.getPropertyKeys(propname);
         for (String key : configKeys) {
-            if (key.startsWith(propname)) {
-                aliasList.add(key.substring(propname.length()));
-            }
+            aliasList.add(key.substring(propname.length()));
         }
         aliases = (String[]) aliasList.toArray(new String[aliasList.size()]);
     }

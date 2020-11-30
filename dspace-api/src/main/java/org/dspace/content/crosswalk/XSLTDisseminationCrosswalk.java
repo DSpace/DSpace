@@ -149,13 +149,11 @@ public class XSLTDisseminationCrosswalk
         // grovel for namespaces of the form:
         //  crosswalk.diss.{PLUGIN_NAME}.namespace.{PREFIX} = {URI}
         String nsPrefix = prefix + "namespace.";
-        List<String> configKeys = configurationService.getPropertyKeys();
+        List<String> configKeys = configurationService.getPropertyKeys(nsPrefix);
         List<Namespace> nsList = new ArrayList<>();
         for (String key : configKeys) {
-            if (key.startsWith(nsPrefix)) {
-                nsList.add(Namespace.getNamespace(key.substring(nsPrefix.length()),
-                                                  configurationService.getProperty(key)));
-            }
+            nsList.add(Namespace.getNamespace(key.substring(nsPrefix.length()),
+                                              configurationService.getProperty(key)));
         }
         namespaces = nsList.toArray(new Namespace[nsList.size()]);
 

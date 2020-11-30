@@ -118,11 +118,11 @@ public abstract class XSLTCrosswalk extends SelfNamedPlugin {
         List<String> aliasList = new ArrayList<>();
         ConfigurationService configurationService
                 = DSpaceServicesFactory.getInstance().getConfigurationService();
-        List<String> configKeys = configurationService.getPropertyKeys();
+        List<String> configKeys = configurationService.getPropertyKeys(prefix);
 
         LOG.debug("XSLTCrosswalk: Looking for config prefix = {}", prefix);
         for (String key : configKeys) {
-            if (key.startsWith(prefix) && key.endsWith(suffix)) {
+            if (key.endsWith(suffix)) {
                 LOG.debug("Getting XSLT plugin name from config line: {}", key);
                 aliasList.add(key.substring(prefix.length(), key.length() - suffix.length()));
             }
