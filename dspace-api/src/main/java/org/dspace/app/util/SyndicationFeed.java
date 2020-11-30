@@ -8,6 +8,7 @@
 package org.dspace.app.util;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,6 +18,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.core.Context;
 import org.w3c.dom.Document;
 
 import org.dspace.content.Bitstream;
@@ -234,6 +238,27 @@ public class SyndicationFeed
                     continue;
                 }
                 Item item = (Item)itemDSO;
+                boolean authorization = true;
+                Context context = null;
+                try {
+                    context = new Context();
+                    AuthorizeManager.authorizeAction(context, item, Constants.READ);
+                } catch (AuthorizeException e) {
+                    authorization = false;
+                } catch (SQLException e) {
+                    log.error(e.getMessage(), e);
+                } finally {
+                    try {
+                        context.complete();
+                    } catch (SQLException e) {
+                        log.error(e.getMessage(), e);
+                        context.abort();
+                    }
+                }
+                if (!authorization) {
+                    continue;
+                }
+
                 boolean hasDate = false;
                 SyndEntry entry = new SyndEntryImpl();
                 entries.add(entry);
