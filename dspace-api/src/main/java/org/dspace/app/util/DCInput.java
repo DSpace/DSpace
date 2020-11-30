@@ -401,5 +401,13 @@ public class DCInput
 		
 		return typeBind.contains(typeName);
 	}
-	
+
+    /**
+     * Get the type bind for this form row.
+     *
+     * @return the type binds
+     */
+    public List<String> getTypeBind() {
+        return typeBind;
+    }
 }

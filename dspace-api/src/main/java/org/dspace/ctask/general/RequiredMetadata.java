@@ -41,6 +41,8 @@ public class RequiredMetadata extends AbstractCurationTask
     private DCInputsReader reader = null;
     // map of required fields
     private Map<String, List<String>> reqMap = new HashMap<String, List<String>>();
+
+    private Map<String, List<String>> typeBindsList = new HashMap<String, List<String>>();
     
     @Override 
     public void init(Curator curator, String taskId) throws IOException
@@ -73,6 +75,8 @@ public class RequiredMetadata extends AbstractCurationTask
             {
                 StringBuilder sb = new StringBuilder();
                 String handle = item.getHandle();
+                //Builds type binds map
+                getTypeBinds(handle);
                 if (handle == null)
                 {
                     // we are still in workflow - no handle assigned
@@ -81,8 +85,42 @@ public class RequiredMetadata extends AbstractCurationTask
                 sb.append("Item: ").append(handle);
                 for (String req : getReqList(item.getOwningCollection().getHandle()))
                 {
+                    boolean isReqTypeBound = false;
                     Metadatum[] vals = item.getMetadataByMetadataString(req);
-                    if (vals.length == 0)
+                    //If required field is type bound
+                    //ONLY require if item is of bounded type
+                    if(typeBindsList.get(req) != null)
+                    {
+                        isReqTypeBound = true;
+                    }
+                    if(isReqTypeBound)
+                    {
+                        Metadatum[] itemType = item.getMetadataByMetadataString("dc.type");
+                        if(itemType.length > 0)
+                        {
+                            boolean typeMatch = false;
+                            //Iterate over all possible dc.types
+                            for(int i = 0; i < itemType.length; i++)
+                            {
+                                String itemTypeBind = itemType[i].value;
+                                List<String> typeBinds = typeBindsList.get(req);
+                                for (String typeBind : typeBinds)
+                                {
+                                    if (itemTypeBind.equalsIgnoreCase(typeBind))
+                                    {
+                                        typeMatch = true;
+                                    }
+                                }
+                            }
+                            //If true then failure
+                            if (typeMatch)
+                            {
+                                sb.append(" missing type bound required field: ").append(req);
+                                count++;
+                            }
+                        }
+                    }
+                    else if (vals.length == 0)
                     {
                         sb.append(" missing required field: ").append(req);
                         count++;
@@ -145,5 +183,32 @@ public class RequiredMetadata extends AbstractCurationTask
             reqMap.put(inputs.getFormName(), reqList);
         }
         return reqList;
+    }
+
+    /** Populate Type Bind Map
+    *
+    * @param handle the DSpace object item handle
+    * @throws DCInputsReaderException
+    */
+    private void getTypeBinds(String handle) throws DCInputsReaderException
+    {
+        int pageNum = reader.getInputs(handle).getNumberPages();
+        for(int i =0; i < pageNum; i++)
+        {
+            DCInput[] inputs = reader.getInputs(handle).getPageRows(i, false, false);
+            for(DCInput input : inputs)
+            {
+                if(input.getTypeBind().size() > 0 )
+                {
+                    List<String>  typeBinds = input.getTypeBind();
+                    String field = input.getSchema() + "." + input.getElement();
+                    if(input.getQualifier() != null)
+                    {
+                        field = field + "." + input.getQualifier();
+                    }
+                    typeBindsList.put(field, typeBinds);
+                }
+            }
+        }
     }
 }
