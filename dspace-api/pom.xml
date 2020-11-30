@@ -842,12 +842,26 @@
             <version>1.10.50</version>
         </dependency>
 
-        <!-- For ORCID v2 integration -->
         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>orcid-jaxb-api</artifactId>
-            <version>2.1.0</version>
+            <groupId>org.orcid</groupId>
+            <artifactId>orcid-model</artifactId>
+            <version>3.0.2</version>
+            <exclusions>
+                <exclusion>
+		          <groupId>javax.validation</groupId>
+		          <artifactId>validation-api</artifactId>
+		        </exclusion>
+		        <exclusion>
+		          <groupId>com.fasterxml.jackson.jaxrs</groupId>
+		          <artifactId>jackson-jaxrs-json-provider</artifactId>
+		        </exclusion>
+		        <exclusion>
+		          <groupId>org.yaml</groupId>
+		          <artifactId>snakeyaml</artifactId>
+		        </exclusion>
+            </exclusions>
         </dependency>
+
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
