@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 
+
 /**
  * When an item is submitted and is somewhere in a workflow, it has a row in the
  * WorkflowItem table pointing to it.
@@ -75,6 +76,7 @@ public class XmlWorkflowManager {
             //Get our next step, if none is found, archive our item
             firstStep = wf.getNextStep(context, wfi, firstStep, ActionResult.OUTCOME_COMPLETE);
             if(firstStep == null){
+                recordStart(wfi.getItem(), null);
                 archive(context, wfi);
             }else{
                 activateFirstStep(context, wf, firstStep, wfi);
@@ -825,35 +827,52 @@ public class XmlWorkflowManager {
         return submitter;
     }
 
-    // Create workflow start provenance message
+    // Create workflow start provenance message and add it to the item's metadata
     private static void recordStart(Item myitem, Action action)
             throws SQLException, IOException, AuthorizeException
     {
+        // Build start provenance message
+        String provmessage = buildStartProvenanceMessage(myitem, action);
+
+        // Add provenance message to the DC
+        myitem.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provmessage);
+        myitem.update();
+    }
+
+    // Build workflow start provenance message
+    private static String buildStartProvenanceMessage(Item myitem, Action action) throws SQLException {
         // get date
         DCDate now = DCDate.getCurrent();
 
         // Create provenance description
-        String provmessage = "";
+        StringBuilder provMessage = new StringBuilder();
 
+        // Submitted by
+        provMessage.append("Submitted by ");
         if (myitem.getSubmitter() != null)
         {
-            provmessage = "Submitted by " + myitem.getSubmitter().getFullName()
-                    + " (" + myitem.getSubmitter().getEmail() + ") on "
-                    + now.toString() + " workflow start=" + action.getProvenanceStartId() + "\n";
+            provMessage.append(myitem.getSubmitter().getFullName()).append(" (")
+                    .append(myitem.getSubmitter().getEmail()).append(")");
         }
         else
         // null submitter
         {
-            provmessage = "Submitted by unknown (probably automated) on"
-                    + now.toString() + " workflow start=" + action.getProvenanceStartId() + "\n";
+            provMessage.append("unknown (probably automated)");
         }
 
-        // add sizes and checksums of bitstreams
-        provmessage += InstallItem.getBitstreamProvenanceMessage(myitem);
+        // Submission date
+        provMessage.append(" on ").append(now.toString());
 
-        // Add message to the DC
-        myitem.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provmessage);
-        myitem.update();
+        // Workflow start (when present)
+        if (action != null) {
+            provMessage.append(" workflow start=").append(action.getProvenanceStartId());
+        }
+        provMessage.append("\n");
+
+        // add sizes and checksums of bitstreams
+        provMessage.append(InstallItem.getBitstreamProvenanceMessage(myitem));
+
+        return provMessage.toString();
     }
 
     private static void notifyOfReject(Context c, XmlWorkflowItem wi, EPerson e,
