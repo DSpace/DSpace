@@ -101,26 +101,34 @@
           <%-- XXX get this from dspace config if available..?? --%>
             <% String help1 = LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.lookup.field."+mdfield+".help.last"); %>
             <% String help2 = LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.lookup.field."+mdfield+".help.first"); %>
+            <div class="div-ds-composite-component">
             <label class="ds-composite-component">
               <input class="ds-text-field choices-lookup" name="text1" type="text" value=""
                   title="<%= help1 %>" />
               <br/><%= help1 %>
             </label>
+            </div>
+			<div class="div-ds-composite-component las">
             <label class="ds-composite-component last">
               <input class="ds-text-field choices-lookup" name="text2" type="text" value=""
                   title="<%= help2 %>" />
               <br/><%= help2 %>
             </label>
+            </div>
           <% } else { %>
           <%-- XXX get this from dspace config if available..?? --%>
             <% String help = LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.lookup.field."+mdfield+".help"); %>
+            <div class="div-ds-composite-component">
             <label class="ds-composite-component">
               <input class="ds-text-field choices-lookup" name="text1" type="text" value=""
                   title="<%= help %>" />
               <br/><%= help %>
             </label>
+            </div>
           <% } %>
-          <div class="spacer"> </div>
+          <fieldset id="aspect_general_ChoiceLookup_detailed_info" style="display: none"> 
+              <legend><fmt:message key="jsp.tools.lookup.results.extradetails"/></legend>
+          </fieldset>
         </div>
       </li>
       <li class="ds-form-item last choices-lookup"> 
