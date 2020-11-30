@@ -205,7 +205,7 @@ public class Item extends DSpaceObject
      */
     public static ItemIterator findAll(Context context) throws SQLException
     {
-        String myQuery = "SELECT * FROM item WHERE in_archive='1'";
+        String myQuery = "SELECT * FROM item WHERE in_archive='1' order by item_id";
 
         TableRowIterator rows = DatabaseManager.queryTable(context, "item", myQuery);
 
@@ -223,7 +223,7 @@ public class Item extends DSpaceObject
      */
 	public static ItemIterator findAllUnfiltered(Context context) throws SQLException
     {
-        String myQuery = "SELECT * FROM item WHERE in_archive='1' or withdrawn='1'";
+        String myQuery = "SELECT * FROM item WHERE in_archive='1' or withdrawn='1' order by item_id";
 
         TableRowIterator rows = DatabaseManager.queryTable(context, "item", myQuery);
 
@@ -245,7 +245,7 @@ public class Item extends DSpaceObject
             throws SQLException
     {
         String myQuery = "SELECT * FROM item WHERE in_archive='1' AND submitter_id="
-                + eperson.getID();
+                + eperson.getID() + " order by item_id";
 
         TableRowIterator rows = DatabaseManager.queryTable(context, "item", myQuery);
 
@@ -269,9 +269,10 @@ public class Item extends DSpaceObject
                 "AND item.item_id = metadatavalue.resource_id AND metadatavalue.resource_type_id=2 AND metadata_field_id = ?";
         TableRowIterator rows = null;
         if (Item.ANY.equals(authority)) {
+            query += " order by item.item_id";
             rows = DatabaseManager.queryTable(context, "item", query, mdf.getFieldID());
         } else {
-            query += " AND metadatavalue.authority = ?";
+            query += " AND metadatavalue.authority = ? order by item.item_id";
             rows = DatabaseManager.queryTable(context, "item", query, mdf.getFieldID(), authority);
         }
         return new ItemIterator(context, rows);
@@ -1840,11 +1841,12 @@ public class Item extends DSpaceObject
         TableRowIterator rows = null;
         if (Item.ANY.equals(value))
         {
+                query += " order by item.item_id";
                 rows = DatabaseManager.queryTable(context, "item", query, mdf.getFieldID(), Constants.ITEM);
         }
         else
         {
-                query += " AND metadatavalue.text_value = ?";
+                query += " AND metadatavalue.text_value = ?  order by item.item_id";
                 rows = DatabaseManager.queryTable(context, "item", query, mdf.getFieldID(),  Constants.ITEM, value);
         }
         return new ItemIterator(context, rows);
@@ -2014,7 +2016,8 @@ public class Item extends DSpaceObject
 
         TableRowIterator rows = DatabaseManager.queryTable(context, "item",
             "SELECT item.* FROM metadatavalue,item WHERE item.in_archive='1' "+
-            "AND item.item_id = metadatavalue.resource_id AND metadata_field_id = ? AND authority = ? AND resource_type_id = ?",
+            "AND item.item_id = metadatavalue.resource_id AND metadata_field_id = ? AND authority = ? AND " +
+                "resource_type_id = ? order by item.item_id",
             mdf.getFieldID(), value, Constants.ITEM);
         return new ItemIterator(context, rows);
     }

@@ -475,7 +475,7 @@ public class Collection extends DSpaceObject
         String myQuery = "SELECT item.* FROM item, collection2item WHERE "
                 + "item.item_id=collection2item.item_id AND "
                 + "collection2item.collection_id= ? "
-                + "AND item.in_archive='1'";
+                + "AND item.in_archive='1' order by item.item_id";
 
         TableRowIterator rows = DatabaseManager.queryTable(ourContext, "item",
                 myQuery,getID());
@@ -499,7 +499,7 @@ public class Collection extends DSpaceObject
             "FROM item, collection2item " + 
             "WHERE item.item_id = collection2item.item_id " +
               "AND collection2item.collection_id = ? " +
-              "AND item.in_archive = '1'"
+              "AND item.in_archive = '1' order by item.item_id"
         );
 
         params.add(getID());
@@ -521,7 +521,7 @@ public class Collection extends DSpaceObject
     {
         String myQuery = "SELECT item.* FROM item, collection2item WHERE "
                 + "item.item_id=collection2item.item_id AND "
-                + "collection2item.collection_id= ? ";
+                + "collection2item.collection_id= ? order by item.item_id";
 
         TableRowIterator rows = DatabaseManager.queryTable(ourContext, "item",
                 myQuery,getID());
