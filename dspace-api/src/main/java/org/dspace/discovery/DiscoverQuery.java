@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +22,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 
 /**
- * This class represents a query which the discovery backend can use
+ * This class represents a query which the discovery back-end can use.
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
@@ -273,7 +272,7 @@ public class DiscoverQuery {
     /**
      * Sets the fields which you want Discovery to return in the search results.
      * It is HIGHLY recommended to limit the fields returned, as by default
-     * some backends (like Solr) will return everything.
+     * some back-ends (like Solr) will return everything.
      *
      * @param field field to add to the list of fields returned
      */

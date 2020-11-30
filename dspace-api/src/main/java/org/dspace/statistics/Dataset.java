@@ -10,6 +10,7 @@ package org.dspace.statistics;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -18,13 +19,12 @@ import java.util.List;
 import java.util.Map;
 
 import au.com.bytecode.opencsv.CSVWriter;
-import java.nio.charset.StandardCharsets;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author kevinvandevelde at atmire.com
- * Date: 21-jan-2009
+ * Date: 21-Jan-2009
  * Time: 13:44:48
  */
 public class Dataset {
