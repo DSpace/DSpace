@@ -7,38 +7,21 @@
  */
 package org.dspace.core;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
+import org.apache.log4j.Logger;
+import org.dspace.services.EmailService;
+import org.dspace.utils.DSpace;
+
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
-import javax.mail.Address;
-import javax.mail.BodyPart;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Session;
-import javax.mail.Transport;
+import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import org.apache.log4j.Logger;
-import org.dspace.services.EmailService;
-import org.dspace.utils.DSpace;
+import java.io.*;
+import java.text.MessageFormat;
+import java.util.*;
 
 /**
  * Class representing an e-mail message, also used to send e-mails.
@@ -109,6 +92,9 @@ public class Email
     /** The subject of the message */
     private String subject;
 
+    /** The subtype of the message, "plain" for regular text, "html" to enable html tags. */
+    private String subtype;
+
     /** The arguments to fill out */
     private List<Object> arguments;
 
@@ -139,6 +125,7 @@ public class Email
         content = "";
         replyTo = null;
         charset = null;
+        subtype = "plain";
     }
 
     /**
@@ -175,6 +162,17 @@ public class Email
     public void setSubject(String s)
     {
         subject = s;
+    }
+
+    /**
+     * Set the subtype of the message
+     *
+     * @param s
+     *            the subtype of the message
+     */
+    public void setSubtype(String s)
+    {
+        subtype = s;
     }
 
     /**
@@ -287,11 +285,11 @@ public class Email
             // If a character set has been specified, or a default exists
             if (charset != null)
             {
-                message.setText(fullMessage, charset);
+                message.setText(fullMessage, charset, subtype);
             }
             else
             {
-                message.setText(fullMessage);
+                message.setText(fullMessage, null, subtype);
             }
         }
         else{
@@ -378,6 +376,7 @@ public class Email
     {
         String charset = null;
         String subject = "";
+        String subtype = "plain";
         StringBuilder contentBuffer = new StringBuilder();
         InputStream is = null;
         InputStreamReader ir = null;
@@ -402,6 +401,10 @@ public class Email
                 else if (line.toLowerCase().startsWith("charset:"))
                 {
                     charset = line.substring(8).trim();
+                }
+                else if (line.toLowerCase().startsWith("subtype:"))
+                {
+                    subtype = line.substring(8).trim();
                 }
                 else if (!line.startsWith("#"))
                 {
@@ -438,6 +441,7 @@ public class Email
         }
         Email email = new Email();
         email.setSubject(subject);
+        email.setSubtype(subtype);
         email.setContent(contentBuffer.toString());
         if (charset != null)
         {
