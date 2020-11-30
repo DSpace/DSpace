@@ -16,6 +16,8 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.graphics.xobject.PDPixelMap;
+import org.apache.pdfbox.pdmodel.graphics.xobject.PDXObjectImage;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
@@ -25,10 +27,13 @@ import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 /**
  * The Citation Document produces a dissemination package (DIP) that is different that the archival package (AIP).
@@ -88,6 +93,7 @@ public class CitationDocument {
     private static String[] fields;
     private static String footer;
 
+    private static BufferedImage logo;
 
     static {
         // Add valid format MIME types to set. This could be put in the Schema
@@ -189,6 +195,18 @@ public class CitationDocument {
                 log.info("Created temp directory at: " + tempDirString);
             } else {
                 log.info("Unable to create temp directory at: " + tempDirString);
+            }
+        }
+
+        // Try to load logo, if specified
+        String logoString = ConfigurationManager.getProperty("disseminate-citation", "logo");
+        if (StringUtils.isNotBlank(logoString))
+        {
+            try 
+            {
+                logo = ImageIO.read(new File(logoString));
+            } catch (IOException e) {
+                log.info("Unable to load logo image: " + logoString);
             }
         }
     }
@@ -355,6 +373,28 @@ public class CitationDocument {
             contentStream.fillRect(xpos, ypos, xwidth, 1);
             contentStream.closeAndStroke();
             ypos -=(ygap*2);
+
+            // insert logo, if any
+            if (logo != null)
+            {
+                try {
+                    PDXObjectImage img = new PDPixelMap(document, logo);
+                    float scale = 1f;
+                    if (img.getWidth() > 60)
+                    {
+                        scale = 60.0f / img.getWidth();
+                    }
+                    if ((img.getHeight() * scale) > 60)
+                    {
+                        scale = scale * (60.0f / (img.getHeight() * scale));
+                    }
+                    // logo position if in the upper right corner, on the level of header2
+                    contentStream.drawXObject(img, 521, 723, img.getWidth() * scale, 
+                                            img.getHeight() * scale);
+                } catch (IOException e) {
+                    log.info("Cannot add logo to document: " + e);
+                }
+            }
 
             for(String field : fields) {
                 field = field.trim();
