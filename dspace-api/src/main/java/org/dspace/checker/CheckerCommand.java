@@ -43,7 +43,7 @@ public final class CheckerCommand
     private static final String DEFAULT_DIGEST_ALGORITHM = "MD5";
 
     /** 4 Meg byte array for reading file. */
-    private int BYTE_ARRAY_SIZE = 4 * 1024;
+    private static final int BYTE_ARRAY_SIZE = 4 * 1024;
 
     /** BitstreamInfoDAO dependency. */
     private BitstreamInfoDAO bitstreamInfoDAO = null;
@@ -190,7 +190,7 @@ public final class CheckerCommand
      * @throws java.io.IOException
      *             If an exception arises whilst reading the stream
      */
-    private String digestStream(InputStream stream, String algorithm)
+    public static String digestStream(InputStream stream, String algorithm)
             throws java.security.NoSuchAlgorithmException, java.io.IOException
     {
         // create the digest stream
@@ -218,7 +218,7 @@ public final class CheckerCommand
      * 
      * @return a result code (constants defined in Util)
      */
-    private String compareChecksums(String checksumA, String checksumB)
+    public static String compareChecksums(String checksumA, String checksumB)
     {
         String result = ChecksumCheckResults.CHECKSUM_NO_MATCH;
 
