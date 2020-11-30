@@ -52,7 +52,7 @@ public class HarvestThread extends Thread {
             dso = collectionService.find(context, collectionId);
             hc = harvestedCollectionService.find(context, dso);
             try {
-                harvester.runHarvest(context, hc);
+                harvester.runHarvest(context, hc, false, UUID.randomUUID());
             } catch (RuntimeException e) {
                 log.error("Runtime exception in thread: " + this.toString());
                 log.error(e.getMessage() + " " + e.getCause());

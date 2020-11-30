@@ -197,7 +197,7 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
         }
 
         // Next, make sure the metadata we need is supported by the target server
-        Namespace DMD_NS = NamespaceUtils.getDMDNamespace(metaPrefix);
+        Namespace DMD_NS = NamespaceUtils.getMetadataFormatNamespace(metaPrefix);
         if (null == DMD_NS) {
             errorSet.add(OAI_DMD_ERROR + ":  " + metaPrefix);
             return errorSet;

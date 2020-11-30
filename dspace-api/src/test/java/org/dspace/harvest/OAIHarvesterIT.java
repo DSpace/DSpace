@@ -13,6 +13,7 @@ import static org.dspace.app.matcher.MetadataValueMatcher.with;
 import static org.dspace.builder.CollectionBuilder.createCollection;
 import static org.dspace.builder.CommunityBuilder.createCommunity;
 import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
+import static org.dspace.harvest.util.NamespaceUtils.getMetadataFormatNamespace;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.emptyCollectionOf;
 import static org.hamcrest.Matchers.equalTo;
@@ -33,6 +34,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -118,7 +120,7 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
         mockClient = mock(OAIHarvesterClient.class);
         harvester.setOaiHarvesterClient(mockClient);
 
-        String metadataURI = NamespaceUtils.getDMDNamespace("cerif").getURI();
+        String metadataURI = NamespaceUtils.getMetadataFormatNamespace("cerif").getURI();
 
         when(mockClient.resolveNamespaceToPrefix(BASE_URL, metadataURI)).thenReturn("oai_cerif_openaire");
         when(mockClient.identify(BASE_URL)).thenReturn(buildResponse("test-identify.xml"));
@@ -145,9 +147,9 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
             .build();
         context.restoreAuthSystemState();
 
-        harvester.runHarvest(context, harvestRow);
+        harvester.runHarvest(context, harvestRow, false, UUID.randomUUID());
 
-        verify(mockClient).resolveNamespaceToPrefix(BASE_URL, NamespaceUtils.getDMDNamespace("cerif").getURI());
+        verify(mockClient).resolveNamespaceToPrefix(BASE_URL, getMetadataFormatNamespace("cerif").getURI());
         verify(mockClient).identify(BASE_URL);
         verify(mockClient).listRecords(eq(BASE_URL), isNull(), any(), eq("publications"), eq("oai_cerif_openaire"));
         verifyNoMoreInteractions(mockClient);
@@ -192,9 +194,9 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
             .build();
         context.restoreAuthSystemState();
 
-        harvester.runHarvest(context, harvestRow);
+        harvester.runHarvest(context, harvestRow, false, UUID.randomUUID());
 
-        verify(mockClient).resolveNamespaceToPrefix(BASE_URL, NamespaceUtils.getDMDNamespace("cerif").getURI());
+        verify(mockClient).resolveNamespaceToPrefix(BASE_URL, getMetadataFormatNamespace("cerif").getURI());
         verify(mockClient).identify(BASE_URL);
         verify(mockClient).listRecords(eq(BASE_URL), isNull(), any(), eq("publications"), eq("oai_cerif_openaire"));
         verifyNoMoreInteractions(mockClient);
@@ -242,9 +244,9 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
             .build();
         context.restoreAuthSystemState();
 
-        harvester.runHarvest(context, harvestRow);
+        harvester.runHarvest(context, harvestRow, false, UUID.randomUUID());
 
-        verify(mockClient).resolveNamespaceToPrefix(BASE_URL, NamespaceUtils.getDMDNamespace("cerif").getURI());
+        verify(mockClient).resolveNamespaceToPrefix(BASE_URL, getMetadataFormatNamespace("cerif").getURI());
         verify(mockClient).identify(BASE_URL);
         verify(mockClient).listRecords(eq(BASE_URL), isNull(), any(), eq("publications"), eq("oai_cerif_openaire"));
         verify(mockClient).listRecords(BASE_URL, "token");
@@ -287,9 +289,9 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
             .build();
         context.restoreAuthSystemState();
 
-        harvester.runHarvest(context, harvestRow);
+        harvester.runHarvest(context, harvestRow, false, UUID.randomUUID());
 
-        verify(mockClient).resolveNamespaceToPrefix(BASE_URL, NamespaceUtils.getDMDNamespace("cerif").getURI());
+        verify(mockClient).resolveNamespaceToPrefix(BASE_URL, getMetadataFormatNamespace("cerif").getURI());
         verify(mockClient).identify(BASE_URL);
         verify(mockClient).listRecords(eq(BASE_URL), isNull(), any(), eq("publications"), eq("oai_cerif_openaire"));
         verifyNoMoreInteractions(mockClient);
@@ -320,9 +322,9 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
             .build();
         context.restoreAuthSystemState();
 
-        harvester.runHarvest(context, harvestRow);
+        harvester.runHarvest(context, harvestRow, false, UUID.randomUUID());
 
-        verify(mockClient).resolveNamespaceToPrefix(BASE_URL, NamespaceUtils.getDMDNamespace("cerif").getURI());
+        verify(mockClient).resolveNamespaceToPrefix(BASE_URL, getMetadataFormatNamespace("cerif").getURI());
         verify(mockClient).identify(BASE_URL);
         verify(mockClient).listRecords(eq(BASE_URL), isNull(), any(), eq("publications"), eq("oai_cerif_openaire"));
         verifyNoMoreInteractions(mockClient);
@@ -331,7 +333,7 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
         assertThat(items, emptyCollectionOf(Item.class));
 
         harvestRow = harvestedCollectionService.find(context, collection);
-        assertThat(harvestRow.getHarvestStatus(), equalTo(HarvestedCollection.STATUS_UNKNOWN_ERROR));
+        assertThat(harvestRow.getHarvestStatus(), equalTo(HarvestedCollection.STATUS_RETRY));
         assertThat(harvestRow.getHarvestStartTime(), notNullValue());
         assertThat(harvestRow.getLastHarvestDate(), nullValue());
         assertThat(harvestRow.getHarvestMessage(), equalTo("Not recoverable error occurs: "
@@ -355,9 +357,9 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
             .build();
         context.restoreAuthSystemState();
 
-        harvester.runHarvest(context, harvestRow);
+        harvester.runHarvest(context, harvestRow, false, UUID.randomUUID());
 
-        verify(mockClient).resolveNamespaceToPrefix(BASE_URL, NamespaceUtils.getDMDNamespace("cerif").getURI());
+        verify(mockClient).resolveNamespaceToPrefix(BASE_URL, getMetadataFormatNamespace("cerif").getURI());
         verify(mockClient).identify(BASE_URL);
         verify(mockClient).listRecords(eq(BASE_URL), isNull(), any(), eq("publications"), eq("oai_cerif_openaire"));
         verifyNoMoreInteractions(mockClient);
@@ -366,7 +368,7 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
         assertThat(items, emptyCollectionOf(Item.class));
 
         harvestRow = harvestedCollectionService.find(context, collection);
-        assertThat(harvestRow.getHarvestStatus(), equalTo(HarvestedCollection.STATUS_UNKNOWN_ERROR));
+        assertThat(harvestRow.getHarvestStatus(), equalTo(HarvestedCollection.STATUS_RETRY));
         assertThat(harvestRow.getHarvestStartTime(), notNullValue());
         assertThat(harvestRow.getLastHarvestDate(), nullValue());
         assertThat(harvestRow.getHarvestMessage(), equalTo("Not recoverable error occurs: GENERIC ERROR"));
@@ -390,12 +392,21 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
             .withLastHarvested(new Date())
             .build();
 
-        Item item = ItemBuilder.createItem(context, collection).build();
-        HarvestedItemBuilder.create(context, item, "oai:test-harvest:Publications/3");
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("Old title")
+            .withIssueDate("2020-11-29")
+            .build();
+
+        HarvestedItemBuilder.create(context, item, "oai:test-harvest:Publications/3").build();
 
         context.restoreAuthSystemState();
 
-        harvester.runHarvest(context, harvestRow);
+        harvester.runHarvest(context, harvestRow, false, UUID.randomUUID());
+
+        verify(mockClient).resolveNamespaceToPrefix(BASE_URL, getMetadataFormatNamespace("cerif").getURI());
+        verify(mockClient).identify(BASE_URL);
+        verify(mockClient).listRecords(eq(BASE_URL), isNotNull(), any(), eq("publications"), eq("oai_cerif_openaire"));
+        verifyNoMoreInteractions(mockClient);
 
         List<Item> items = IteratorUtils.toList(itemService.findAllByCollection(context, collection));
         assertThat(items, hasSize(1));
@@ -422,6 +433,106 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
 
     @Test
     @SuppressWarnings("unchecked")
+    public void testRunHarvestDoesNotUpdateWithoutForcingSynchronization() throws Exception {
+
+        when(mockClient.listRecords(eq(BASE_URL), isNotNull(), any(), eq("publications"), eq("oai_cerif_openaire")))
+            .thenReturn(buildResponse("update-publication.xml"));
+
+        context.turnOffAuthorisationSystem();
+
+        HarvestedCollection harvestRow = HarvestedCollectionBuilder.create(context, collection)
+            .withOaiSource(BASE_URL)
+            .withOaiSetId("publications")
+            .withMetadataConfigId("cerif")
+            .withHarvestType(HarvestedCollection.TYPE_DMD)
+            .withHarvestStatus(HarvestedCollection.STATUS_READY)
+            .withLastHarvested(new Date())
+            .build();
+
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("Publication title")
+            .withIssueDate("2020-11-29")
+            .build();
+
+        HarvestedItemBuilder.create(context, item, "oai:test-harvest:Publications/3")
+            .withHarvestDate(new SimpleDateFormat("yyyy-MM-dd").parse("2101-01-01"))
+            .build();
+
+        context.restoreAuthSystemState();
+
+        harvester.runHarvest(context, harvestRow, false, UUID.randomUUID());
+
+        verify(mockClient).resolveNamespaceToPrefix(BASE_URL, getMetadataFormatNamespace("cerif").getURI());
+        verify(mockClient).identify(BASE_URL);
+        verify(mockClient).listRecords(eq(BASE_URL), isNotNull(), any(), eq("publications"), eq("oai_cerif_openaire"));
+        verifyNoMoreInteractions(mockClient);
+
+        List<Item> items = IteratorUtils.toList(itemService.findAllByCollection(context, collection));
+        assertThat(items, hasSize(1));
+
+        Item updatedItem = findItemByOaiID("oai:test-harvest:Publications/3", collection);
+        assertThat(updatedItem.getID(), equalTo(item.getID()));
+
+        List<MetadataValue> values = updatedItem.getMetadata();
+        assertThat(values, hasSize(7));
+
+        assertThat(values, hasItems(with("dc.title", "Publication title")));
+        assertThat(values, hasItems(with("dc.date.issued", "2020-11-29")));
+
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testRunHarvestUpdateWithForcingSynchronization() throws Exception {
+
+        when(mockClient.listRecords(eq(BASE_URL), isNull(), any(), eq("publications"), eq("oai_cerif_openaire")))
+            .thenReturn(buildResponse("update-publication.xml"));
+
+        context.turnOffAuthorisationSystem();
+
+        HarvestedCollection harvestRow = HarvestedCollectionBuilder.create(context, collection)
+            .withOaiSource(BASE_URL)
+            .withOaiSetId("publications")
+            .withMetadataConfigId("cerif")
+            .withHarvestType(HarvestedCollection.TYPE_DMD)
+            .withHarvestStatus(HarvestedCollection.STATUS_READY)
+            .withLastHarvested(new Date())
+            .build();
+
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("Publication title")
+            .withIssueDate("2020-11-29")
+            .build();
+
+        HarvestedItemBuilder.create(context, item, "oai:test-harvest:Publications/3")
+            .withHarvestDate(new SimpleDateFormat("yyyy-MM-dd").parse("2101-01-01"))
+            .build();
+
+        context.restoreAuthSystemState();
+
+        harvester.runHarvest(context, harvestRow, true, UUID.randomUUID());
+
+        verify(mockClient).resolveNamespaceToPrefix(BASE_URL, getMetadataFormatNamespace("cerif").getURI());
+        verify(mockClient).identify(BASE_URL);
+        verify(mockClient).listRecords(eq(BASE_URL), isNull(), any(), eq("publications"), eq("oai_cerif_openaire"));
+        verifyNoMoreInteractions(mockClient);
+
+        List<Item> items = IteratorUtils.toList(itemService.findAllByCollection(context, collection));
+        assertThat(items, hasSize(1));
+
+        Item updatedItem = findItemByOaiID("oai:test-harvest:Publications/3", collection);
+        assertThat(updatedItem.getID(), equalTo(item.getID()));
+
+        List<MetadataValue> values = updatedItem.getMetadata();
+        assertThat(values, hasSize(16));
+
+        assertThat(values, hasItems(with("dc.title", "Test Publication Updated")));
+        assertThat(values, hasItems(with("dc.date.issued", "2012-11-30")));
+
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
     public void testRunHarvestWithUpdateSearchingByCrisSourceId() throws Exception {
         when(mockClient.listRecords(eq(BASE_URL), isNotNull(), any(), eq("publications"), eq("oai_cerif_openaire")))
             .thenReturn(buildResponse("update-publication.xml"));
@@ -441,7 +552,7 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        harvester.runHarvest(context, harvestRow);
+        harvester.runHarvest(context, harvestRow, false, UUID.randomUUID());
 
         List<Item> items = IteratorUtils.toList(itemService.findAllByCollection(context, collection));
         assertThat(items, hasSize(1));
@@ -487,7 +598,7 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
 
         // create the item
-        harvester.runHarvest(context, harvestRow);
+        harvester.runHarvest(context, harvestRow, false, UUID.randomUUID());
 
         List<Item> items = IteratorUtils.toList(itemService.findAllByCollection(context, collection));
         assertThat(items, hasSize(1));
@@ -517,7 +628,7 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
         assertThat(harvestRow.getHarvestMessage(), equalTo("Imported 1 records with success"));
 
         // update the item
-        harvester.runHarvest(context, harvestRow);
+        harvester.runHarvest(context, harvestRow, false, UUID.randomUUID());
 
         items = IteratorUtils.toList(itemService.findAllByCollection(context, collection));
         assertThat(items, hasSize(1));
@@ -581,7 +692,7 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
             context.restoreAuthSystemState();
 
             // import the publication and create the person with the CrisConsumer
-            harvester.runHarvest(context, publicationHarvest);
+            harvester.runHarvest(context, publicationHarvest, false, UUID.randomUUID());
 
             List<Item> publications = IteratorUtils.toList(itemService.findAllByCollection(context, collection));
             assertThat(publications, hasSize(1));
@@ -618,7 +729,7 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
             assertThat(values, hasItems(with("relationship.type", "Person")));
 
             // import the author person
-            harvester.runHarvest(context, personHarvest);
+            harvester.runHarvest(context, personHarvest, false, UUID.randomUUID());
 
             Item updatedAuthor = findItemByOaiID("oai:test-harvest:Persons/123", personCollection);
             assertThat(updatedAuthor.getID(), equalTo(authorPerson.getID()));
@@ -676,7 +787,7 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
 
             context.restoreAuthSystemState();
 
-            harvester.runHarvest(context, personHarvest);
+            harvester.runHarvest(context, personHarvest, false, UUID.randomUUID());
 
             Item person = findItemByOaiID("oai:test-harvest:Persons/123", personCollection);
 
@@ -690,7 +801,7 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
             assertThat(values, hasItems(with("person.givenName", "Paolo")));
             assertThat(values, hasItems(with("person.familyName", "Manghi")));
 
-            harvester.runHarvest(context, publicationHarvest);
+            harvester.runHarvest(context, publicationHarvest, false, UUID.randomUUID());
 
             Item publication = findItemByOaiID("oai:test-harvest:Publications/3", collection);
             values = publication.getMetadata();

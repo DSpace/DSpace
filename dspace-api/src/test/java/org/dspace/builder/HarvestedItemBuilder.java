@@ -8,6 +8,7 @@
 package org.dspace.builder;
 
 import java.sql.SQLException;
+import java.util.Date;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
@@ -42,6 +43,11 @@ public class HarvestedItemBuilder extends AbstractBuilder<HarvestedItem, Harvest
         } catch (SQLException e) {
             throw new SQLRuntimeException(e);
         }
+        return this;
+    }
+
+    public HarvestedItemBuilder withHarvestDate(Date harvestDate) {
+        this.harvestedItem.setHarvestDate(harvestDate);
         return this;
     }
 

@@ -30,7 +30,7 @@ public final class NamespaceUtils {
      * @return             Namespace of the designated metadata format. Returns null
      *                     of not found.
      */
-    public static Namespace getDMDNamespace(String metadataKey) {
+    public static Namespace getMetadataFormatNamespace(String metadataKey) {
         String key = METADATA_FORMATS_KEY + "." + metadataKey;
         String value = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(key);
         if (StringUtils.isEmpty(value)) {
