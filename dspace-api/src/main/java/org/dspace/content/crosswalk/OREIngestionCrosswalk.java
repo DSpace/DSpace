@@ -168,7 +168,7 @@ public class OREIngestionCrosswalk
         	if (href != null) {
         		try {
 		        	// Make sure the url string escapes all the oddball characters
-        			String processedURL = encodeForURL(href);
+        			String processedURL = encodeForURL(href).replace("%20", "+");
         			// Generate a requeset for the aggregated resource
         			ARurl = new URL(processedURL);
 		        	in = ARurl.openStream();
