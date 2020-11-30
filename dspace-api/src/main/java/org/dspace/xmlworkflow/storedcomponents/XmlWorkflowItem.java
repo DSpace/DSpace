@@ -10,6 +10,7 @@ package org.dspace.xmlworkflow.storedcomponents;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.InProgressSubmission;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.TableRow;
@@ -479,7 +480,12 @@ public class XmlWorkflowItem implements InProgressSubmission {
         for(WorkflowItemRole role: roles){
             role.delete();
         }
-        XmlWorkflowManager.deleteAllTasks(ourContext, this);
+        XmlWorkflowItem workflowItem = XmlWorkflowItem.find(ourContext, this.getID());
+        if (workflowItem != null) {
+            WorkspaceItem workspaceItem = XmlWorkflowManager.sendWorkflowItemBackSubmission(ourContext, workflowItem, ourContext.getCurrentUser(), "Item sent back to the submisson process by admin", null);
+            //Delete the workspaceItem
+            workspaceItem.deleteAll();
+        }
 
         // FIXME - auth?
         DatabaseManager.delete(ourContext, wfRow);
