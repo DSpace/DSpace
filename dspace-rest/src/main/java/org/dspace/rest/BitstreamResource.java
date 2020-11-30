@@ -37,6 +37,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
+import org.dspace.content.FormatIdentifier;
 import org.dspace.eperson.Group;
 import org.dspace.rest.common.Bitstream;
 import org.dspace.rest.common.ResourcePolicy;
@@ -445,13 +446,14 @@ public class BitstreamResource extends Resource
 
             log.trace("Updating bitstream metadata.");
             dspaceBitstream.setDescription(bitstream.getDescription());
-            if (getMimeType(bitstream.getName()) == null)
+            BitstreamFormat format = FormatIdentifier.guessFormat(context, bitstream.getName());
+            if (format == null)
             {
                 dspaceBitstream.setFormat(BitstreamFormat.findUnknown(context));
             }
             else
             {
-                dspaceBitstream.setFormat(BitstreamFormat.findByMIMEType(context, getMimeType(bitstream.getName())));
+                dspaceBitstream.setFormat(format);
             }
             dspaceBitstream.setName(bitstream.getName());
             Integer sequenceId = bitstream.getSequenceId();
@@ -732,18 +734,6 @@ public class BitstreamResource extends Resource
         }
 
         return Response.status(Status.OK).build();
-    }
-
-    /**
-     * Return the MIME type of the file, by file extension.
-     *
-     * @param name
-     *            Name of file.
-     * @return String filled with type of file in MIME style.
-     */
-    static String getMimeType(String name)
-    {
-        return URLConnection.guessContentTypeFromName(name);
     }
 
     /**

@@ -38,6 +38,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
+import org.dspace.content.FormatIdentifier;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.Metadatum;
 import org.dspace.content.service.ItemService;
@@ -479,13 +480,14 @@ public class ItemsResource extends Resource
             // Set bitstream name and description
             if (name != null)
             {
-                if (BitstreamResource.getMimeType(name) == null)
+            	BitstreamFormat format = FormatIdentifier.guessFormat(context, name);
+                if (format == null)
                 {
                     dspaceBitstream.setFormat(BitstreamFormat.findUnknown(context));
                 }
                 else
                 {
-                    dspaceBitstream.setFormat(BitstreamFormat.findByMIMEType(context, BitstreamResource.getMimeType(name)));
+                    dspaceBitstream.setFormat(format);
                 }
                 dspaceBitstream.setName(name);
             }
