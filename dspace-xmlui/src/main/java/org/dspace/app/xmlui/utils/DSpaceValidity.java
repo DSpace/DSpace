@@ -367,6 +367,55 @@ public class DSpaceValidity implements SourceValidity
     }
     
     /**
+     * Like add, but only adds ORIGINAL bundles when dso is an item.
+     * 
+     * Defers to add for all other DSpaceObject types.
+     * 
+     * Used for Discovery's AbstractSearch, where not all bundles are
+     * necessarily relevant.
+     * 
+     * @param dso
+     *          The object to add to the validity.
+     */
+    public void addIfItemOnlyAddOriginalBundles(DSpaceObject dso) throws SQLException
+    {
+        if (this.completed)
+        {
+            throw new IllegalStateException("Cannot add DSpaceObject to a completed validity object");
+        }
+        
+        if (dso instanceof Item)
+        {
+            Item item = (Item) dso;
+            
+            validityKey.append("Item:");
+            validityKey.append(item.getHandle());            
+            validityKey.append(item.getOwningCollection());
+            validityKey.append(item.getLastModified());
+            // Include all metadata values in the validity key.
+            Metadatum[] dcvs = item.getMetadata(Item.ANY, Item.ANY,Item.ANY,Item.ANY);
+            for (Metadatum dcv : dcvs)
+            {
+                validityKey.append(dcv.schema).append(".");
+                validityKey.append(dcv.element).append(".");
+                validityKey.append(dcv.qualifier).append(".");
+                validityKey.append(dcv.language).append("=");
+                validityKey.append(dcv.value);
+            }
+            
+            for(Bundle bundle : item.getBundles("ORIGINAL"))
+            {
+                // Add each of the items bundles & bitstreams.
+                this.add(bundle);
+            }
+        }        
+        else
+        {
+            this.add(dso);
+        }    
+    }
+    
+    /**
      * Add a non-DSpaceObject to the validity, the object should be 
      * serialized into a string form. The order in which objects 
      * are added to the validity object is important, ensure that 
