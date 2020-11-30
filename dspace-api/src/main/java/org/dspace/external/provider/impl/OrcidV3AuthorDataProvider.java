@@ -31,29 +31,32 @@ import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
 import org.dspace.external.provider.orcid.xml.XMLtoBio;
 import org.json.JSONObject;
-import org.orcid.jaxb.model.common_v2.OrcidId;
-import org.orcid.jaxb.model.record_v2.Person;
-import org.orcid.jaxb.model.search_v2.Result;
+import org.orcid.jaxb.model.v3.release.common.OrcidIdentifier;
+import org.orcid.jaxb.model.v3.release.record.Person;
+import org.orcid.jaxb.model.v3.release.search.Result;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
- * This class is the implementation of the ExternalDataProvider interface that will deal with the OrcidV2 External
+ * This class is the implementation of the ExternalDataProvider interface that will deal with the OrcidV3 External
  * Data lookup
  */
-public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
+public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
 
-    private static Logger log = LogManager.getLogger(OrcidV2AuthorDataProvider.class);
+    private static Logger log = LogManager.getLogger(OrcidV3AuthorDataProvider.class);
 
     private OrcidRestConnector orcidRestConnector;
     private String OAUTHUrl;
-    private String clientId;
 
+    private String clientId;
     private String clientSecret;
 
     private String accessToken;
 
     private String sourceIdentifier;
+
     private String orcidUrl;
+
+    private XMLtoBio converter;
 
     public static final String ORCID_ID_SYNTAX = "\\d{4}-\\d{4}-\\d{4}-(\\d{3}X|\\d{4})";
 
@@ -62,13 +65,18 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
         return sourceIdentifier;
     }
 
+    public OrcidV3AuthorDataProvider() {
+        converter = new XMLtoBio();
+    }
+
     /**
      * Initialize the accessToken that is required for all subsequent calls to ORCID.
      *
      * @throws java.io.IOException passed through from HTTPclient.
      */
     public void init() throws IOException {
-        if (StringUtils.isNotBlank(accessToken) && StringUtils.isNotBlank(clientSecret)) {
+        if (StringUtils.isNotBlank(clientSecret) && StringUtils.isNotBlank(clientId)
+            && StringUtils.isNotBlank(OAUTHUrl)) {
             String authenticationParameters = "?client_id=" + clientId +
                 "&client_secret=" + clientSecret +
                 "&scope=/read-public&grant_type=client_credentials";
@@ -100,14 +108,6 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
         }
     }
 
-    /**
-     * Makes an instance of the Orcidv2 class based on the provided parameters.
-     * This constructor is called through the spring bean initialization
-     */
-    private OrcidV2AuthorDataProvider(String url) {
-        this.orcidRestConnector = new OrcidRestConnector(url);
-    }
-
     @Override
     public Optional<ExternalDataObject> getExternalDataObject(String id) {
         Person person = getBio(id);
@@ -120,12 +120,12 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
         String lastName = "";
         String firstName = "";
         if (person.getName().getFamilyName() != null) {
-            lastName = person.getName().getFamilyName().getValue();
+            lastName = person.getName().getFamilyName().getContent();
             externalDataObject.addMetadata(new MetadataValueDTO("person", "familyName", null, null,
                                                                 lastName));
         }
         if (person.getName().getGivenNames() != null) {
-            firstName = person.getName().getGivenNames().getValue();
+            firstName = person.getName().getGivenNames().getContent();
             externalDataObject.addMetadata(new MetadataValueDTO("person", "givenName", null, null,
                                                                 firstName));
 
@@ -159,7 +159,6 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
             return null;
         }
         InputStream bioDocument = orcidRestConnector.get(id + ((id.endsWith("/person")) ? "" : "/person"), accessToken);
-        XMLtoBio converter = new XMLtoBio();
         Person person = converter.convertSinglePerson(bioDocument);
         try {
             bioDocument.close();
@@ -187,14 +186,13 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
         String searchPath = "search?q=" + URLEncoder.encode(query) + "&start=" + start + "&rows=" + limit;
         log.debug("queryBio searchPath=" + searchPath + " accessToken=" + accessToken);
         InputStream bioDocument = orcidRestConnector.get(searchPath, accessToken);
-        XMLtoBio converter = new XMLtoBio();
         List<Result> results = converter.convert(bioDocument);
         List<Person> bios = new LinkedList<>();
         for (Result result : results) {
-            OrcidId orcidIdentifier = result.getOrcidIdentifier();
+            OrcidIdentifier orcidIdentifier = result.getOrcidIdentifier();
             if (orcidIdentifier != null) {
                 log.debug("Found OrcidId=" + orcidIdentifier.toString());
-                String orcid = orcidIdentifier.getUriPath();
+                String orcid = orcidIdentifier.getPath();
                 Person bio = getBio(orcid);
                 if (bio != null) {
                     bios.add(bio);
@@ -223,14 +221,13 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
         String searchPath = "search?q=" + URLEncoder.encode(query) + "&start=" + 0 + "&rows=" + 0;
         log.debug("queryBio searchPath=" + searchPath + " accessToken=" + accessToken);
         InputStream bioDocument = orcidRestConnector.get(searchPath, accessToken);
-        XMLtoBio converter = new XMLtoBio();
         return converter.getNumberOfResultsFromXml(bioDocument);
     }
 
 
     /**
      * Generic setter for the sourceIdentifier
-     * @param sourceIdentifier   The sourceIdentifier to be set on this OrcidV2AuthorDataProvider
+     * @param sourceIdentifier   The sourceIdentifier to be set on this OrcidV3AuthorDataProvider
      */
     @Required
     public void setSourceIdentifier(String sourceIdentifier) {
@@ -239,7 +236,7 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
 
     /**
      * Generic getter for the orcidUrl
-     * @return the orcidUrl value of this OrcidV2AuthorDataProvider
+     * @return the orcidUrl value of this OrcidV3AuthorDataProvider
      */
     public String getOrcidUrl() {
         return orcidUrl;
@@ -247,7 +244,7 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
 
     /**
      * Generic setter for the orcidUrl
-     * @param orcidUrl   The orcidUrl to be set on this OrcidV2AuthorDataProvider
+     * @param orcidUrl   The orcidUrl to be set on this OrcidV3AuthorDataProvider
      */
     @Required
     public void setOrcidUrl(String orcidUrl) {
@@ -256,7 +253,7 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
 
     /**
      * Generic setter for the OAUTHUrl
-     * @param OAUTHUrl   The OAUTHUrl to be set on this OrcidV2AuthorDataProvider
+     * @param OAUTHUrl   The OAUTHUrl to be set on this OrcidV3AuthorDataProvider
      */
     public void setOAUTHUrl(String OAUTHUrl) {
         this.OAUTHUrl = OAUTHUrl;
@@ -264,7 +261,7 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
 
     /**
      * Generic setter for the clientId
-     * @param clientId   The clientId to be set on this OrcidV2AuthorDataProvider
+     * @param clientId   The clientId to be set on this OrcidV3AuthorDataProvider
      */
     public void setClientId(String clientId) {
         this.clientId = clientId;
@@ -272,9 +269,18 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
 
     /**
      * Generic setter for the clientSecret
-     * @param clientSecret   The clientSecret to be set on this OrcidV2AuthorDataProvider
+     * @param clientSecret   The clientSecret to be set on this OrcidV3AuthorDataProvider
      */
     public void setClientSecret(String clientSecret) {
         this.clientSecret = clientSecret;
     }
+
+    public OrcidRestConnector getOrcidRestConnector() {
+        return orcidRestConnector;
+    }
+
+    public void setOrcidRestConnector(OrcidRestConnector orcidRestConnector) {
+        this.orcidRestConnector = orcidRestConnector;
+    }
+
 }
