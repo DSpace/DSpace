@@ -63,7 +63,7 @@ import org.jdom.xpath.XPath;
  * <UL>
  * <LI>Local XML schema (XSD) declarations, in the general format:
  * <br><code>mets.xsd.<em>identifier</em> = <em>namespace</em> <em>xsd-URL</em></code>
- * <br> eg. <code>mets.xsd.dc =  http://purl.org/dc/elements/1.1/ dc.xsd</code>
+ * <br> e.g. <code>mets.xsd.dc =  http://purl.org/dc/elements/1.1/ dc.xsd</code>
  * <br>Add a separate configuration entry for each schema.
  * </LI>
  * <LI>Crosswalk plugin mappings:
@@ -197,7 +197,7 @@ public class METSManifest {
         File xsdPath1 = new File(dspace_dir + "/config/schemas/");
         File xsdPath2 = new File(dspace_dir + "/config/");
 
-        List<String> configKeys = configurationService.getPropertyKeys();
+        List<String> configKeys = configurationService.getPropertyKeys(CONFIG_XSD_PREFIX);
         StringBuilder result = new StringBuilder();
         for (String key : configKeys) {
             // config lines have the format:
@@ -205,30 +205,28 @@ public class METSManifest {
             // e.g.
             //  mets.xsd.dc =  http://purl.org/dc/elements/1.1/ dc.xsd
             // (filename is relative to {dspace_dir}/config/schemas/)
-            if (key.startsWith(CONFIG_XSD_PREFIX)) {
-                String spec = configurationService.getProperty(key);
-                String val[] = spec.trim().split("\\s+");
-                if (val.length == 2) {
-                    File xsd = new File(xsdPath1, val[1]);
-                    if (!xsd.exists()) {
-                        xsd = new File(xsdPath2, val[1]);
-                    }
-                    if (!xsd.exists()) {
-                        log.warn("Schema file not found for config entry=\"" + spec + "\"");
-                    } else {
-                        try {
-                            String u = xsd.toURI().toURL().toString();
-                            if (result.length() > 0) {
-                                result.append(" ");
-                            }
-                            result.append(val[0]).append(" ").append(u);
-                        } catch (java.net.MalformedURLException e) {
-                            log.warn("Skipping badly formed XSD URL: " + e.toString());
-                        }
-                    }
-                } else {
-                    log.warn("Schema config entry has wrong format, entry=\"" + spec + "\"");
+            String spec = configurationService.getProperty(key);
+            String val[] = spec.trim().split("\\s+");
+            if (val.length == 2) {
+                File xsd = new File(xsdPath1, val[1]);
+                if (!xsd.exists()) {
+                    xsd = new File(xsdPath2, val[1]);
                 }
+                if (!xsd.exists()) {
+                    log.warn("Schema file not found for config entry=\"{}\"", spec);
+                } else {
+                    try {
+                        String u = xsd.toURI().toURL().toString();
+                        if (result.length() > 0) {
+                            result.append(" ");
+                        }
+                        result.append(val[0]).append(" ").append(u);
+                    } catch (java.net.MalformedURLException e) {
+                        log.warn("Skipping badly formed XSD URL: {}", () -> e.toString());
+                    }
+                }
+            } else {
+                log.warn("Schema config entry has wrong format, entry=\"{}\"", spec);
             }
         }
         log.debug("Got local schemas = \"{}\"", () -> result.toString());

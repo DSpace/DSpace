@@ -54,6 +54,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
     private static final Logger log = LogManager.getLogger(MetadataAuthorityServiceImpl.class);
 
+    private static final String AUTH_PREFIX = "authority.controlled";
+
     @Autowired(required = true)
     protected MetadataFieldService metadataFieldService;
 
@@ -85,52 +87,49 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
 
         if (isAuthorityRequired == null) {
             isAuthorityRequired = new HashMap<>();
-            List<String> pn = configurationService.getPropertyKeys();
-            final String authPrefix = "authority.controlled.";
+            List<String> keys = configurationService.getPropertyKeys(AUTH_PREFIX);
             Context context = new Context();
             try {
-                for (String key : pn) {
-                    if (key.startsWith(authPrefix)) {
-                        // field is expected to be "schema.element.qualifier"
-                        String field = key.substring(authPrefix.length());
-                        int dot = field.indexOf('.');
-                        if (dot < 0) {
-                            log.warn(
-                                "Skipping invalid MetadataAuthority configuration property: " + key + ": does not " +
-                                    "have schema.element.qualifier");
-                            continue;
-                        }
-                        String schema = field.substring(0, dot);
-                        String element = field.substring(dot + 1);
-                        String qualifier = null;
-                        dot = element.indexOf('.');
-                        if (dot >= 0) {
-                            qualifier = element.substring(dot + 1);
-                            element = element.substring(0, dot);
-                        }
-
-
-                        MetadataField metadataField = metadataFieldService
-                            .findByElement(context, schema, element, qualifier);
-                        if (metadataField == null) {
-                            throw new IllegalStateException(
-                                "Error while configuring authority control, metadata field: " + field + " could not " +
-                                    "be found");
-                        }
-                        boolean ctl = configurationService.getBooleanProperty(key, true);
-                        boolean req = configurationService.getBooleanProperty("authority.required." + field, false);
-                        controlled.put(metadataField.toString(), ctl);
-                        isAuthorityRequired.put(metadataField.toString(), req);
-
-                        // get minConfidence level for this field if any
-                        int mci = readConfidence("authority.minconfidence." + field);
-                        if (mci >= Choices.CF_UNSET) {
-                            minConfidence.put(metadataField.toString(), mci);
-                        }
-                        log.debug(
-                            "Authority Control: For schema=" + schema + ", elt=" + element + ", qual=" + qualifier +
-                                ", controlled=" + ctl + ", required=" + req);
+                for (String key : keys) {
+                    // field is expected to be "schema.element.qualifier"
+                    String field = key.substring(AUTH_PREFIX.length() + 1);
+                    int dot = field.indexOf('.');
+                    if (dot < 0) {
+                        log.warn(
+                            "Skipping invalid MetadataAuthority configuration property: {}:"
+                                + " does not have schema.element.qualifier", key);
+                        continue;
                     }
+                    String schema = field.substring(0, dot);
+                    String element = field.substring(dot + 1);
+                    String qualifier = null;
+                    dot = element.indexOf('.');
+                    if (dot >= 0) {
+                        qualifier = element.substring(dot + 1);
+                        element = element.substring(0, dot);
+                    }
+
+
+                    MetadataField metadataField = metadataFieldService
+                        .findByElement(context, schema, element, qualifier);
+                    if (metadataField == null) {
+                        throw new IllegalStateException(
+                            "Error while configuring authority control, metadata field: " + field + " could not " +
+                                "be found");
+                    }
+                    boolean ctl = configurationService.getBooleanProperty(key, true);
+                    boolean req = configurationService.getBooleanProperty("authority.required." + field, false);
+                    controlled.put(metadataField.toString(), ctl);
+                    isAuthorityRequired.put(metadataField.toString(), req);
+
+                    // get minConfidence level for this field if any
+                    int mci = readConfidence("authority.minconfidence." + field);
+                    if (mci >= Choices.CF_UNSET) {
+                        minConfidence.put(metadataField.toString(), mci);
+                    }
+                    log.debug(
+                        "Authority Control: For schema=" + schema + ", elt=" + element + ", qual=" + qualifier +
+                            ", controlled=" + ctl + ", required=" + req);
                 }
             } catch (SQLException e) {
                 log.error("Error reading authority config", e);
