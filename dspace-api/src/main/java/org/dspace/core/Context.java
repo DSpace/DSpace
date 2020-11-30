@@ -10,10 +10,10 @@ package org.dspace.core;
 import java.sql.SQLException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.EmptyStackException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -157,8 +157,6 @@ public class Context implements AutoCloseable {
 
     /**
      * Initializes a new context object.
-     *
-     * @throws SQLException if there was an error obtaining a database connection
      */
     protected void init() {
         updateDatabase();
@@ -310,7 +308,7 @@ public class Context implements AutoCloseable {
         Boolean previousState;
         try {
             previousState = authStateChangeHistory.pop();
-        } catch (EmptyStackException ex) {
+        } catch (NoSuchElementException ex) {
             log.warn(LogManager.getHeader(this, "restore_auth_sys_state",
                                           "not previous state info available "
                                               + ex.getLocalizedMessage()));
@@ -325,8 +323,7 @@ public class Context implements AutoCloseable {
 
             // if previousCaller is not the current caller *only* log a warning
             if (!previousCaller.equals(caller)) {
-                log
-                    .warn(LogManager
+                log.warn(LogManager
                               .getHeader(
                                   this,
                                   "restore_auth_sys_state",
@@ -741,7 +738,7 @@ public class Context implements AutoCloseable {
                     dbConnection.setConnectionMode(false, false);
                     break;
                 default:
-                    log.warn("New context mode detected that has nog been configured.");
+                    log.warn("New context mode detected that has not been configured.");
                     break;
             }
         } catch (SQLException ex) {
@@ -803,7 +800,7 @@ public class Context implements AutoCloseable {
      * entity. This means changes to the entity will be tracked and persisted to the database.
      *
      * @param entity The entity to reload
-     * @param <E>    The class of the enity. The entity must implement the {@link ReloadableEntity} interface.
+     * @param <E>    The class of the entity. The entity must implement the {@link ReloadableEntity} interface.
      * @return A (possibly) <b>NEW</b> reference to the entity that should be used for further processing.
      * @throws SQLException When reloading the entity from the database fails.
      */
@@ -816,7 +813,7 @@ public class Context implements AutoCloseable {
      * Remove an entity from the cache. This is necessary when batch processing a large number of items.
      *
      * @param entity The entity to reload
-     * @param <E>    The class of the enity. The entity must implement the {@link ReloadableEntity} interface.
+     * @param <E>    The class of the entity. The entity must implement the {@link ReloadableEntity} interface.
      * @throws SQLException When reloading the entity from the database fails.
      */
     @SuppressWarnings("unchecked")
