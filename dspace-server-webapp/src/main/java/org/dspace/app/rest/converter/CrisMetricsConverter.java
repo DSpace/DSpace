@@ -34,6 +34,9 @@ public class CrisMetricsConverter implements DSpaceConverter<CrisMetrics, CrisMe
         rest.setEndDate(model.getEndDate());
         rest.setRemark(model.getRemark());
         rest.setLast(model.getLast());
+        rest.setDeltaPeriod1(model.getDeltaPeriod1());
+        rest.setDeltaPeriod2(model.getDeltaPeriod2());
+        rest.setRank(model.getRank());
         return rest;
     }
 
