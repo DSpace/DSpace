@@ -33,11 +33,6 @@
         <constructor-arg value="${orcid.api.url}"/>
     </bean>
 
-    <bean class="org.dspace.external.provider.impl.LCNameDataProvider">
-        <property name="url" value="${lcname.url}"/>
-        <property name="sourceIdentifier" value="lcname"/>
-    </bean>
-
     <bean id="pubmedLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="pubmedImportService"/>
         <property name="sourceIdentifier" value="pubmed"/>
