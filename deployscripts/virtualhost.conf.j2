@@ -1,5 +1,8 @@
 <VirtualHost *:80>
 ServerName {{ kundedata[kunde]["virtualhost"] | default((fase == 'produksjon') | ternary(kunde ~ '.brage.unit.no', 'brage-' ~ fase ~ '.bibsys.no')) }}
+{% if kundedata[kunde]["virtualhost"] is defined %}
+ServerAlias {{ kunde }}.brage.unit.no
+{% endif %}
 ServerAdmin webmaster@unit.no
 DocumentRoot /home/httpd/domains/brage.unit.no
 ErrorLog logs/{{ appserver.split(".")[0] }}_error_log
