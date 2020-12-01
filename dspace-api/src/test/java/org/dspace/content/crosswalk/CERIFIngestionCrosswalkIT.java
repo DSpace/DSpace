@@ -77,14 +77,14 @@ public class CERIFIngestionCrosswalkIT extends AbstractIntegrationTestWithDataba
     @SuppressWarnings("unchecked")
     public void testPublicationIngest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Item item = ItemBuilder.createItem(context, collection).build();
+        Item item = ItemBuilder.createItem(context, collection).withRelationshipType("Publication").build();
         context.restoreAuthSystemState();
 
         Document document = readDocument(OAI_PMH_DIR_PATH, "sample-publication.xml");
         crosswalk.ingest(context, item, document.getRootElement(), false);
 
         List<MetadataValue> values = item.getMetadata();
-        assertThat(values, hasSize(21));
+        assertThat(values, hasSize(22));
 
         assertThat(values, hasItems(with("dc.type",
             "Controlled Vocabulary for Resource Type Genres::text::conference object::conference proceedings"
@@ -121,14 +121,14 @@ public class CERIFIngestionCrosswalkIT extends AbstractIntegrationTestWithDataba
     @SuppressWarnings("unchecked")
     public void testExportPublicationIngest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Item item = ItemBuilder.createItem(context, collection).build();
+        Item item = ItemBuilder.createItem(context, collection).withRelationshipType("Publication").build();
         context.restoreAuthSystemState();
 
         Document document = readDocument(CROSSWALK_DIR_PATH, "publication.xml");
         crosswalk.ingest(context, item, document.getRootElement(), false);
 
         List<MetadataValue> values = item.getMetadata();
-        assertThat(values, hasSize(31));
+        assertThat(values, hasSize(32));
 
         assertThat(values, hasItems(
             with("dc.type", "Controlled Vocabulary for Resource Type Genres::text::review")));
@@ -177,7 +177,7 @@ public class CERIFIngestionCrosswalkIT extends AbstractIntegrationTestWithDataba
     @SuppressWarnings("unchecked")
     public void testExportPersonIngest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Item item = ItemBuilder.createItem(context, collection).build();
+        Item item = ItemBuilder.createItem(context, collection).withRelationshipType("Person").build();
         context.restoreAuthSystemState();
 
         Document document = readDocument(CROSSWALK_DIR_PATH, "person-cerif.xml");
@@ -185,7 +185,7 @@ public class CERIFIngestionCrosswalkIT extends AbstractIntegrationTestWithDataba
 
         List<MetadataValue> values = item.getMetadata();
 
-        assertThat(values, hasSize(24));
+        assertThat(values, hasSize(25));
         assertThat(values, hasItems(with("dc.title", "Smith, John")));
         assertThat(values, hasItems(with("person.givenName", "John")));
         assertThat(values, hasItems(with("person.familyName", "Smith")));
@@ -212,7 +212,7 @@ public class CERIFIngestionCrosswalkIT extends AbstractIntegrationTestWithDataba
     @SuppressWarnings("unchecked")
     public void testPersonIngest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Item item = ItemBuilder.createItem(context, collection).build();
+        Item item = ItemBuilder.createItem(context, collection).withRelationshipType("Person").build();
         context.restoreAuthSystemState();
 
         Document document = readDocument(OAI_PMH_DIR_PATH, "sample-person.xml");
@@ -220,7 +220,7 @@ public class CERIFIngestionCrosswalkIT extends AbstractIntegrationTestWithDataba
 
         List<MetadataValue> values = item.getMetadata();
 
-        assertThat(values, hasSize(7));
+        assertThat(values, hasSize(8));
         assertThat(values, hasItems(with("dc.title", "Li-Shiuan, Peh")));
         assertThat(values, hasItems(with("person.givenName", "Peh")));
         assertThat(values, hasItems(with("person.familyName", "Li-Shiuan")));
@@ -230,14 +230,14 @@ public class CERIFIngestionCrosswalkIT extends AbstractIntegrationTestWithDataba
     @SuppressWarnings("unchecked")
     public void testProjectIngest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Item item = ItemBuilder.createItem(context, collection).build();
+        Item item = ItemBuilder.createItem(context, collection).withRelationshipType("Project").build();
         context.restoreAuthSystemState();
 
         Document document = readDocument(OAI_PMH_DIR_PATH, "sample-project.xml");
         crosswalk.ingest(context, item, document.getRootElement(), false);
 
         List<MetadataValue> values = item.getMetadata();
-        assertThat(values, hasSize(8));
+        assertThat(values, hasSize(9));
 
         assertThat(values, hasItems(with("dc.title", "GlobalSeaRoutes")));
         assertThat(values, hasItems(with("oairecerif.project.startDate", "2013-08-01")));
@@ -251,14 +251,14 @@ public class CERIFIngestionCrosswalkIT extends AbstractIntegrationTestWithDataba
     @SuppressWarnings("unchecked")
     public void testExportProjectIngest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Item item = ItemBuilder.createItem(context, collection).build();
+        Item item = ItemBuilder.createItem(context, collection).withRelationshipType("Project").build();
         context.restoreAuthSystemState();
 
         Document document = readDocument(CROSSWALK_DIR_PATH, "project.xml");
         crosswalk.ingest(context, item, document.getRootElement(), false);
 
         List<MetadataValue> values = item.getMetadata();
-        assertThat(values, hasSize(23));
+        assertThat(values, hasSize(24));
 
         assertThat(values, hasItems(with("dc.title", "Test Project")));
         assertThat(values, hasItems(with("oairecerif.acronym", "TP")));
@@ -288,14 +288,14 @@ public class CERIFIngestionCrosswalkIT extends AbstractIntegrationTestWithDataba
     @SuppressWarnings("unchecked")
     public void testOrgUnitIngest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Item item = ItemBuilder.createItem(context, collection).build();
+        Item item = ItemBuilder.createItem(context, collection).withRelationshipType("OrgUnit").build();
         context.restoreAuthSystemState();
 
         Document document = readDocument(OAI_PMH_DIR_PATH, "sample-orgUnit.xml");
         crosswalk.ingest(context, item, document.getRootElement(), false);
 
         List<MetadataValue> values = item.getMetadata();
-        assertThat(values, hasSize(5));
+        assertThat(values, hasSize(6));
         assertThat(values, hasItems(with("dc.title", "Institute of Applied Biosciences (INAB)")));
 
     }
@@ -304,14 +304,14 @@ public class CERIFIngestionCrosswalkIT extends AbstractIntegrationTestWithDataba
     @SuppressWarnings("unchecked")
     public void testExportOrgUnitIngest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Item item = ItemBuilder.createItem(context, collection).build();
+        Item item = ItemBuilder.createItem(context, collection).withRelationshipType("OrgUnit").build();
         context.restoreAuthSystemState();
 
         Document document = readDocument(CROSSWALK_DIR_PATH, "orgUnit.xml");
         crosswalk.ingest(context, item, document.getRootElement(), false);
 
         List<MetadataValue> values = item.getMetadata();
-        assertThat(values, hasSize(13));
+        assertThat(values, hasSize(14));
         assertThat(values, hasItems(with("dc.title", "Test OrgUnit")));
         assertThat(values, hasItems(with("organization.legalName", "Test OrgUnit LegalName")));
         assertThat(values, hasItems(with("oairecerif.acronym", "TOU")));
@@ -331,14 +331,14 @@ public class CERIFIngestionCrosswalkIT extends AbstractIntegrationTestWithDataba
     @SuppressWarnings("unchecked")
     public void testExportEquipmentIngest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Item item = ItemBuilder.createItem(context, collection).build();
+        Item item = ItemBuilder.createItem(context, collection).withRelationshipType("Equipment").build();
         context.restoreAuthSystemState();
 
         Document document = readDocument(CROSSWALK_DIR_PATH, "equipment.xml");
         crosswalk.ingest(context, item, document.getRootElement(), false);
 
         List<MetadataValue> values = item.getMetadata();
-        assertThat(values, hasSize(10));
+        assertThat(values, hasSize(11));
         assertThat(values, hasItems(with("dc.title", "Test Equipment")));
         assertThat(values, hasItems(with("oairecerif.acronym", "T-EQ")));
         assertThat(values, hasItems(with("oairecerif.internalid", "ID-01")));
@@ -351,14 +351,14 @@ public class CERIFIngestionCrosswalkIT extends AbstractIntegrationTestWithDataba
     @SuppressWarnings("unchecked")
     public void testExportFundingIngest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Item item = ItemBuilder.createItem(context, collection).build();
+        Item item = ItemBuilder.createItem(context, collection).withRelationshipType("Funding").build();
         context.restoreAuthSystemState();
 
         Document document = readDocument(CROSSWALK_DIR_PATH, "funding.xml");
         crosswalk.ingest(context, item, document.getRootElement(), false);
 
         List<MetadataValue> values = item.getMetadata();
-        assertThat(values, hasSize(17));
+        assertThat(values, hasSize(18));
         assertThat(values, hasItems(with("dc.type", "Gift")));
         assertThat(values, hasItems(with("dc.title", "Test Funding")));
         assertThat(values, hasItems(with("oairecerif.acronym", "T-FU")));
