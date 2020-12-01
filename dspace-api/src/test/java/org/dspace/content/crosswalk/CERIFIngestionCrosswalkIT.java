@@ -448,6 +448,72 @@ public class CERIFIngestionCrosswalkIT extends AbstractIntegrationTestWithDataba
         assertThat(values, hasItems(with("oairecerif.oamandate.url", "www.mandate.url")));
     }
 
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testIngestWithPreTransformation() throws Exception {
+
+        crosswalk.setPreTransformXsl(OAI_PMH_DIR_PATH + "preTransformation.xsl");
+
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, collection).withRelationshipType("Equipment").build();
+        context.restoreAuthSystemState();
+
+        Document document = readDocument(OAI_PMH_DIR_PATH, "sample-equipment.xml");
+        crosswalk.ingest(context, item, document.getRootElement(), false);
+
+        List<MetadataValue> values = item.getMetadata();
+        assertThat(values, hasSize(9));
+        assertThat(values, hasItems(with("dc.title", "Microflown Scan&Paint")));
+        assertThat(values, hasItems(with("dc.description", "A unique tool for acoustic trouble shooting "
+            + "and sound source localization")));
+        assertThat(values, hasItems(with("crisequipment.ownerou", "BA2E09 Machinery noise")));
+        assertThat(values, hasItems(with("oairecerif.internalid", "test-id")));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testIngestWithPostTransformation() throws Exception {
+
+        crosswalk.setPostTransformXsl(OAI_PMH_DIR_PATH + "postTransformation.xsl");
+
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, collection).withRelationshipType("Equipment").build();
+        context.restoreAuthSystemState();
+
+        Document document = readDocument(OAI_PMH_DIR_PATH, "sample-equipment.xml");
+        crosswalk.ingest(context, item, document.getRootElement(), false);
+
+        List<MetadataValue> values = item.getMetadata();
+        assertThat(values, hasSize(8));
+        assertThat(values, hasItems(with("dc.title", "MICROFLOWN SCAN&PAINT")));
+        assertThat(values, hasItems(with("dc.description", "A UNIQUE TOOL FOR ACOUSTIC TROUBLE SHOOTING "
+            + "AND SOUND SOURCE LOCALIZATION")));
+        assertThat(values, hasItems(with("crisequipment.ownerou", "BA2E09 MACHINERY NOISE")));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testIngestWithPreAndPostTransformation() throws Exception {
+
+        crosswalk.setPreTransformXsl(OAI_PMH_DIR_PATH + "preTransformation.xsl");
+        crosswalk.setPostTransformXsl(OAI_PMH_DIR_PATH + "postTransformation.xsl");
+
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, collection).withRelationshipType("Equipment").build();
+        context.restoreAuthSystemState();
+
+        Document document = readDocument(OAI_PMH_DIR_PATH, "sample-equipment.xml");
+        crosswalk.ingest(context, item, document.getRootElement(), false);
+
+        List<MetadataValue> values = item.getMetadata();
+        assertThat(values, hasSize(9));
+        assertThat(values, hasItems(with("dc.title", "MICROFLOWN SCAN&PAINT")));
+        assertThat(values, hasItems(with("dc.description", "A UNIQUE TOOL FOR ACOUSTIC TROUBLE SHOOTING "
+            + "AND SOUND SOURCE LOCALIZATION")));
+        assertThat(values, hasItems(with("crisequipment.ownerou", "BA2E09 MACHINERY NOISE")));
+        assertThat(values, hasItems(with("oairecerif.internalid", "TEST-ID")));
+    }
+
     private Document readDocument(String dir, String name) throws Exception {
         try (InputStream inputStream = new FileInputStream(new File(dir, name))) {
             return builder.build(inputStream);

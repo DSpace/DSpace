@@ -14,16 +14,17 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.dspace.app.harvest.Harvest.LOG_DELIMITER;
 import static org.dspace.app.harvest.Harvest.LOG_PREFIX;
 import static org.dspace.authority.service.AuthorityValueService.SPLIT;
+import static org.dspace.content.Item.ANY;
 import static org.dspace.content.MetadataSchemaEnum.CRIS;
 import static org.dspace.harvest.HarvestedCollection.STATUS_BUSY;
 import static org.dspace.harvest.HarvestedCollection.STATUS_READY;
 import static org.dspace.harvest.HarvestedCollection.STATUS_RETRY;
-import static org.dspace.harvest.HarvestedCollection.STATUS_UNKNOWN_ERROR;
 import static org.dspace.harvest.model.OAIHarvesterAction.NONE;
 import static org.dspace.harvest.service.OAIHarvesterClient.OAI_IDENTIFIER_NS;
 import static org.dspace.harvest.util.NamespaceUtils.METADATA_FORMATS_KEY;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -196,7 +197,7 @@ public class OAIHarvester {
             log.error(message, ex);
             if (harvestRow != null) {
                 setRetryStatus(context, harvestRow, message);
-                alertAdmin(harvestRow.getCollection(), STATUS_UNKNOWN_ERROR, ex);
+                alertAdmin(harvestRow, STATUS_RETRY, ex);
             }
         } finally {
             context.setMode(originalMode);
@@ -376,7 +377,7 @@ public class OAIHarvester {
         Element oreREM = metadata.get(0);
 
         if (harvestRow.getHarvestType() == 3) {
-            importBitstreams(context, repositoryId, item, oreREM);
+            importBitstreams(context, harvestRow, repositoryId, item, oreREM);
         }
 
         createOREBundle(context, item, oreREM);
@@ -449,7 +450,7 @@ public class OAIHarvester {
         String repositoryId, String crisSourceId) throws Exception {
 
         String metadataConfig = harvestRow.getHarvestMetadataConfig();
-        IngestionCrosswalk metadataElementCrosswalk = getIngestionCrosswalk(metadataConfig, repositoryId);
+        IngestionCrosswalk metadataElementCrosswalk = getIngestionCrosswalk(metadataConfig, harvestRow, repositoryId);
 
         List<Element> metadataElements = getMetadataElements(record);
         if (metadataElements.size() == 1) {
@@ -495,10 +496,11 @@ public class OAIHarvester {
         return resumptionElement != null && isNotBlank(resumptionElement.getAttributeValue("completeListSize"));
     }
 
-    private void importBitstreams(Context context, String repositoryId, Item item, Element oreREM) throws Exception {
+    private void importBitstreams(Context context, HarvestedCollection harvestRow, String repositoryId, Item item,
+        Element oreREM) throws Exception {
 
         String ORESerialKey = NamespaceUtils.getORENamespace().getPrefix();
-        IngestionCrosswalk oreCrosswalk = getIngestionCrosswalk(ORESerialKey, repositoryId);
+        IngestionCrosswalk oreCrosswalk = getIngestionCrosswalk(ORESerialKey, harvestRow, repositoryId);
 
         List<Bundle> allBundles = item.getBundles();
         for (Bundle bundle : allBundles) {
@@ -691,17 +693,37 @@ public class OAIHarvester {
         return itemLastHarvest != null && OAIDatestamp.before(itemLastHarvest);
     }
 
-    private IngestionCrosswalk getIngestionCrosswalk(String name, String repositoryId) {
+    private IngestionCrosswalk getIngestionCrosswalk(String name, HarvestedCollection harvestRow, String repositoryId) {
         Object crosswalk = pluginService.getNamedPlugin(IngestionCrosswalk.class, name);
         if (crosswalk == null) {
             throw new IllegalArgumentException("No IngestionCrosswalk found by name: " + name);
         }
 
         if (crosswalk instanceof CERIFIngestionCrosswalk) {
-            ((CERIFIngestionCrosswalk) crosswalk).setIdPrefix(repositoryId + SPLIT);
+            initializeCERIFIngestionCrosswalk((CERIFIngestionCrosswalk) crosswalk, harvestRow, repositoryId);
         }
 
         return (IngestionCrosswalk) crosswalk;
+    }
+
+    private void initializeCERIFIngestionCrosswalk(CERIFIngestionCrosswalk crosswalk, HarvestedCollection harvestRow,
+        String repositoryId) {
+
+        Collection coll = harvestRow.getCollection();
+
+        String transformationDir = configurationService.getProperty("oai.harvester.tranformation-dir");
+
+        String preTrasform = collectionService.getMetadataFirstValue(coll, "cris", "harvesting", "preTransform", ANY);
+        String postTrasform = collectionService.getMetadataFirstValue(coll, "cris", "harvesting", "postTransform", ANY);
+
+        crosswalk.setIdPrefix(repositoryId + SPLIT);
+        if (StringUtils.isNotBlank(preTrasform)) {
+            crosswalk.setPreTransformXsl(new File(transformationDir, preTrasform).getAbsolutePath());
+        }
+        if (StringUtils.isNotBlank(postTrasform)) {
+            crosswalk.setPostTransformXsl(new File(transformationDir, postTrasform).getAbsolutePath());
+        }
+
     }
 
     private String getItemIdentifier(Element record) {
@@ -980,19 +1002,17 @@ public class OAIHarvester {
      * Generate and send an email to the administrator. Prompted by errors
      * encountered during harvesting.
      *
-     * @param status the current status of the collection, usually
-     *               HarvestedCollection.STATUS_OAI_ERROR or
-     *               HarvestedCollection.STATUS_UNKNOWN_ERROR
-     * @param ex     the Exception that prompted this action
+     * @param status the current status of the collection
      */
-    private void alertAdmin(Collection targetCollection, int status, Exception ex) {
+    private void alertAdmin(HarvestedCollection harvestRow, int status, Exception ex) {
         try {
-            String recipient = configurationService.getProperty("alert.recipient");
+
+            String recipient = getEmailRecipient(harvestRow);
 
             if (StringUtils.isNotBlank(recipient)) {
                 Email email = Email.getEmail(I18nUtil.getEmailFilename(Locale.getDefault(), "harvesting_error"));
                 email.addRecipient(recipient);
-                email.addArgument(targetCollection.getID());
+                email.addArgument(harvestRow.getCollection().getID());
                 email.addArgument(new Date());
                 email.addArgument(status);
 
@@ -1016,6 +1036,31 @@ public class OAIHarvester {
         } catch (Exception e) {
             log.warn("Unable to send email alert", e);
         }
+    }
+
+    private String getEmailRecipient(HarvestedCollection harvestRow) {
+
+        String defaultEmail = configurationService.getProperty("alert.recipient");
+        Collection collection = harvestRow.getCollection();
+
+        String email = collectionService.getMetadataFirstValue(collection, "cris", "harvesting", "email", ANY);
+
+        if (StringUtils.isBlank(email)) {
+            return defaultEmail;
+        }
+
+        if ("IDENTIFY".equalsIgnoreCase(email)) {
+            return findAdminEmail(harvestRow).orElse(defaultEmail);
+        }
+
+        return email;
+    }
+
+    private Optional<String> findAdminEmail(HarvestedCollection harvestRow) {
+        return Optional.ofNullable(identify(harvestRow.getOaiSource()))
+            .map(document -> document.getRootElement().getChild("Identify", OAI_NS))
+            .map(identifyElement -> identifyElement.getChild("adminEmail", OAI_NS))
+            .map(emailElement -> emailElement.getText());
     }
 
     public OAIHarvesterClient getOaiHarvesterClient() {

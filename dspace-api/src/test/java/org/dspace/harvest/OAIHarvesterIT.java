@@ -94,6 +94,8 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
 
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
+    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
     private SAXBuilder builder = new SAXBuilder();
 
 
@@ -104,6 +106,8 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
     private OAIHarvesterClient oaiHarvesterClient;
 
     private OAIHarvesterClient mockClient;
+
+    private String originalTransformationDir;
 
 
     @Before
@@ -124,11 +128,15 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
 
         when(mockClient.resolveNamespaceToPrefix(BASE_URL, metadataURI)).thenReturn("oai_cerif_openaire");
         when(mockClient.identify(BASE_URL)).thenReturn(buildResponse("test-identify.xml"));
+
+        originalTransformationDir = configurationService.getProperty("oai.harvester.tranformation-dir");
+        configurationService.setProperty("oai.harvester.tranformation-dir", OAI_PMH_DIR_PATH + "cerif");
     }
 
     @After
     public void afterTests() {
         harvester.setOaiHarvesterClient(oaiHarvesterClient);
+        configurationService.setProperty("oai.harvester.tranformation-dir", originalTransformationDir);
     }
 
     @Test
@@ -825,6 +833,123 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
         } finally {
             resetConsumers(consumers);
         }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testRunHarvestWithPreTransformation() throws Exception {
+        when(mockClient.listRecords(eq(BASE_URL), isNull(), any(), eq("equipments"), eq("oai_cerif_openaire")))
+            .thenReturn(buildResponse("single-equipment.xml"));
+
+        context.turnOffAuthorisationSystem();
+
+        Collection equipmentCollection = createCollection(context, community)
+            .withRelationshipType("Equipment")
+            .withAdminGroup(eperson)
+            .withHarvestingPreTrasform("preTransformation.xsl")
+            .build();
+
+        HarvestedCollection harvestRow = HarvestedCollectionBuilder.create(context, equipmentCollection)
+            .withOaiSource(BASE_URL)
+            .withOaiSetId("equipments")
+            .withMetadataConfigId("cerif")
+            .withHarvestType(HarvestedCollection.TYPE_DMD)
+            .withHarvestStatus(HarvestedCollection.STATUS_READY)
+            .build();
+        context.restoreAuthSystemState();
+
+        harvester.runHarvest(context, harvestRow, false, UUID.randomUUID());
+
+        verify(mockClient).resolveNamespaceToPrefix(BASE_URL, getMetadataFormatNamespace("cerif").getURI());
+        verify(mockClient).identify(BASE_URL);
+        verify(mockClient).listRecords(eq(BASE_URL), isNull(), any(), eq("equipments"), eq("oai_cerif_openaire"));
+        verifyNoMoreInteractions(mockClient);
+
+        Item item = findItemByOaiID("oai:cris:equipments/f3e39333-5c82-40c2-aa3d-103def9abd97", equipmentCollection);
+        List<MetadataValue> values = item.getMetadata();
+        assertThat(values, hasSize(11));
+        assertThat(values, hasItems(with("dc.title", "Microflown Scan&Paint")));
+        assertThat(values, hasItems(with("oairecerif.internalid", "test-id")));
+        assertThat(values, hasItems(with("cris.sourceId", "test-harvest::f3e39333-5c82-40c2-aa3d-103def9abd97")));
+
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testRunHarvestWithPostTransformation() throws Exception {
+        when(mockClient.listRecords(eq(BASE_URL), isNull(), any(), eq("equipments"), eq("oai_cerif_openaire")))
+            .thenReturn(buildResponse("single-equipment.xml"));
+
+        context.turnOffAuthorisationSystem();
+
+        Collection equipmentCollection = createCollection(context, community)
+            .withRelationshipType("Equipment")
+            .withAdminGroup(eperson)
+            .withHarvestingPostTrasform("postTransformation.xsl")
+            .build();
+
+        HarvestedCollection harvestRow = HarvestedCollectionBuilder.create(context, equipmentCollection)
+            .withOaiSource(BASE_URL)
+            .withOaiSetId("equipments")
+            .withMetadataConfigId("cerif")
+            .withHarvestType(HarvestedCollection.TYPE_DMD)
+            .withHarvestStatus(HarvestedCollection.STATUS_READY)
+            .build();
+        context.restoreAuthSystemState();
+
+        harvester.runHarvest(context, harvestRow, false, UUID.randomUUID());
+
+        verify(mockClient).resolveNamespaceToPrefix(BASE_URL, getMetadataFormatNamespace("cerif").getURI());
+        verify(mockClient).identify(BASE_URL);
+        verify(mockClient).listRecords(eq(BASE_URL), isNull(), any(), eq("equipments"), eq("oai_cerif_openaire"));
+        verifyNoMoreInteractions(mockClient);
+
+        Item item = findItemByOaiID("oai:cris:equipments/f3e39333-5c82-40c2-aa3d-103def9abd97", equipmentCollection);
+        List<MetadataValue> values = item.getMetadata();
+        assertThat(values, hasSize(10));
+        assertThat(values, hasItems(with("dc.title", "MICROFLOWN SCAN&PAINT")));
+        assertThat(values, hasItems(with("cris.sourceId", "test-harvest::f3e39333-5c82-40c2-aa3d-103def9abd97")));
+
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testRunHarvestWithPreAndPostTransformation() throws Exception {
+        when(mockClient.listRecords(eq(BASE_URL), isNull(), any(), eq("equipments"), eq("oai_cerif_openaire")))
+            .thenReturn(buildResponse("single-equipment.xml"));
+
+        context.turnOffAuthorisationSystem();
+
+        Collection equipmentCollection = createCollection(context, community)
+            .withRelationshipType("Equipment")
+            .withAdminGroup(eperson)
+            .withHarvestingPreTrasform("preTransformation.xsl")
+            .withHarvestingPostTrasform("postTransformation.xsl")
+            .build();
+
+        HarvestedCollection harvestRow = HarvestedCollectionBuilder.create(context, equipmentCollection)
+            .withOaiSource(BASE_URL)
+            .withOaiSetId("equipments")
+            .withMetadataConfigId("cerif")
+            .withHarvestType(HarvestedCollection.TYPE_DMD)
+            .withHarvestStatus(HarvestedCollection.STATUS_READY)
+            .build();
+        context.restoreAuthSystemState();
+
+        harvester.runHarvest(context, harvestRow, false, UUID.randomUUID());
+
+        verify(mockClient).resolveNamespaceToPrefix(BASE_URL, getMetadataFormatNamespace("cerif").getURI());
+        verify(mockClient).identify(BASE_URL);
+        verify(mockClient).listRecords(eq(BASE_URL), isNull(), any(), eq("equipments"), eq("oai_cerif_openaire"));
+        verifyNoMoreInteractions(mockClient);
+
+        Item item = findItemByOaiID("oai:cris:equipments/f3e39333-5c82-40c2-aa3d-103def9abd97", equipmentCollection);
+        List<MetadataValue> values = item.getMetadata();
+        assertThat(values, hasSize(11));
+        assertThat(values, hasItems(with("dc.title", "MICROFLOWN SCAN&PAINT")));
+        assertThat(values, hasItems(with("oairecerif.internalid", "TEST-ID")));
+        assertThat(values, hasItems(with("cris.sourceId", "test-harvest::f3e39333-5c82-40c2-aa3d-103def9abd97")));
+
     }
 
     private Item findItemByOaiID(String oaiId, Collection collection) throws SQLException {

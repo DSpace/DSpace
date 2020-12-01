@@ -9,6 +9,8 @@ package org.dspace.content.crosswalk;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.List;
 import javax.xml.transform.Source;
@@ -62,6 +64,10 @@ public class CERIFIngestionCrosswalk implements IngestionCrosswalk {
 
     private String idPrefix;
 
+    private String preTransformXsl;
+
+    private String postTransformXsl;
+
     @Override
     public void ingest(Context context, DSpaceObject dso, List<Element> elements, boolean createMissingMetadataFields)
         throws CrosswalkException, IOException, SQLException, AuthorizeException {
@@ -86,11 +92,53 @@ public class CERIFIngestionCrosswalk implements IngestionCrosswalk {
             throw new IllegalArgumentException("Only items can be ingested by the CERIFIngestionCrosswalk");
         }
 
-        Element dimRoot = buildDIMFromCerif((Item) dso, cerifRootElement);
+        Element preTrasformation = preTransform(cerifRootElement);
 
+        Element dimRoot = buildDIMFromCerif((Item) dso, preTrasformation);
         convertDimFields(dimRoot);
 
-        getDIMIngestionCrosswalk().ingest(context, dso, dimRoot, createMissingMetadataFields);
+        Element postTransformation = postTransform(dimRoot);
+
+        getDIMIngestionCrosswalk().ingest(context, dso, postTransformation, createMissingMetadataFields);
+
+    }
+
+    private Element preTransform(Element element) throws CrosswalkException {
+        return transform(element, preTransformXsl);
+    }
+
+    private Element postTransform(Element element) throws CrosswalkException {
+        return transform(element, postTransformXsl);
+    }
+
+    private Element transform(Element element, String xsltPath) throws CrosswalkException {
+
+        if (StringUtils.isBlank(xsltPath)) {
+            return element;
+        }
+
+        if (!Files.exists(Paths.get(xsltPath))) {
+            throw new CrosswalkException("The configured xslt does not exists: " + xsltPath);
+        }
+
+        try {
+
+            Source xslt = new StreamSource(new File(xsltPath));
+            Source xml = new JDOMSource(element);
+            JDOMResult out = new JDOMResult();
+
+            TransformerFactory.newInstance().newTransformer(xslt).transform(xml, out);
+
+            Document document = out.getDocument();
+            if (document == null || !document.hasRootElement()) {
+                throw new CrosswalkException("It was not possible to produce an xml starting from " + xsltPath);
+            }
+
+            return document.getRootElement();
+
+        } catch (TransformerException e) {
+            throw new CrosswalkException(e);
+        }
 
     }
 
@@ -102,9 +150,7 @@ public class CERIFIngestionCrosswalk implements IngestionCrosswalk {
             Source xml = new JDOMSource(cerifRootElement);
             JDOMResult out = new JDOMResult();
 
-            TransformerFactory factory = TransformerFactory.newInstance();
-
-            Transformer transformer = factory.newTransformer(xslt);
+            Transformer transformer = TransformerFactory.newInstance().newTransformer(xslt);
             transformer.setParameter("nestedMetadataPlaceholder", CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE);
             transformer.setParameter("converterSeparator", CONVERTER_SEPARATOR);
             if (idPrefix != null) {
@@ -114,7 +160,7 @@ public class CERIFIngestionCrosswalk implements IngestionCrosswalk {
             transformer.transform(xml, out);
 
             Document document = out.getDocument();
-            if (document == null) {
+            if (document == null || !document.hasRootElement()) {
                 throw new CrosswalkException("It was not possible to produce an xml in DIM format");
             }
 
@@ -164,6 +210,14 @@ public class CERIFIngestionCrosswalk implements IngestionCrosswalk {
 
     public void setIdPrefix(String idPrefix) {
         this.idPrefix = idPrefix;
+    }
+
+    public void setPreTransformXsl(String preTransformXsl) {
+        this.preTransformXsl = preTransformXsl;
+    }
+
+    public void setPostTransformXsl(String postTransformXsl) {
+        this.postTransformXsl = postTransformXsl;
     }
 
 }
