@@ -460,7 +460,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
                                                                        groupService.allMemberGroups(c, e),
                                                                        Constants.ADMIN, Constants.COLLECTION);
 
-            if (CollectionUtils.isNotEmpty(policies)) {
+            if (CollectionUtils.isNotEmpty(policies) || isCommunityAdmin(c, e)) {
                 return true;
             }
         }
