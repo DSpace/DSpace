@@ -246,10 +246,6 @@ public class OAIHarvester {
             }
 
             List<Element> records = getAllRecords(responseDTO.getDocument());
-            if (CollectionUtils.isEmpty(records)) {
-                log.info("No records to process found");
-                return;
-            }
 
             // Process the obtained records
             harvestRow = processRecords(context, harvestRow, records, repositoryId, report,
@@ -541,10 +537,17 @@ public class OAIHarvester {
 
     @SuppressWarnings("unchecked")
     private List<Element> getAllRecords(Document document) {
-        if (document == null || document.getRootElement().getChild("ListRecords", OAI_NS) == null) {
+        if (document == null) {
             return Collections.emptyList();
         }
-        return document.getRootElement().getChild("ListRecords", OAI_NS).getChildren("record", OAI_NS);
+
+        Element listRecordsElement = document.getRootElement().getChild("ListRecords", OAI_NS);
+        if (listRecordsElement == null) {
+            return Collections.emptyList();
+        }
+
+        List<Element> records = listRecordsElement.getChildren("record", OAI_NS);
+        return records != null ? records : Collections.emptyList();
     }
 
     private String getOREPrefix(HarvestedCollection harvestRow) {

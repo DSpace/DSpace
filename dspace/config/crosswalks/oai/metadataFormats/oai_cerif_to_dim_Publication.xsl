@@ -55,7 +55,14 @@
 			</dim:field>
 			
 			<dim:field mdschema="dc" element="publisher" >
-				<xsl:value-of select="cerif:Publishers/cerif:Publisher/cerif:DisplayName" />
+				<xsl:choose>
+					<xsl:when test="cerif:Publishers/cerif:Publisher/cerif:DisplayName">
+						<xsl:value-of select="cerif:Publishers/cerif:Publisher/cerif:DisplayName" />
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="cerif:Publishers/cerif:Publisher/cerif:OrgUnit/cerif:Name"/> 
+					</xsl:otherwise>
+				</xsl:choose>
 			</dim:field>
 			
 			<dim:field mdschema="dc" element="date" qualifier="issued" >
@@ -119,11 +126,12 @@
 					<xsl:if test="cerif:Person/@id">
 						<xsl:attribute name="authority"><xsl:value-of select="concat($idPrefix,cerif:Person/@id)"/></xsl:attribute>
 					</xsl:if>
-					<xsl:call-template name="nestedMetadataValue">
-				    	<xsl:with-param name="value" select="cerif:DisplayName" />
-			    	</xsl:call-template>
+			    	<xsl:call-template name="personName" />
 				</dim:field>
 				<dim:field mdschema="oairecerif" element="author" qualifier="affiliation" >
+					<xsl:if test="cerif:Affiliation/cerif:OrgUnit/@id">
+						<xsl:attribute name="authority"><xsl:value-of select="concat($idPrefix,cerif:Affiliation/cerif:OrgUnit/@id)"/></xsl:attribute>
+					</xsl:if>
 					<xsl:call-template name="nestedMetadataValue">
 				    	<xsl:with-param name="value" select="cerif:Affiliation/cerif:OrgUnit/cerif:Name" />
 			    	</xsl:call-template>
@@ -135,9 +143,7 @@
 					<xsl:if test="cerif:Person/@id">
 						<xsl:attribute name="authority"><xsl:value-of select="concat($idPrefix,cerif:Person/@id)"/></xsl:attribute>
 					</xsl:if>
-					<xsl:call-template name="nestedMetadataValue">
-				    	<xsl:with-param name="value" select="cerif:DisplayName" />
-			    	</xsl:call-template>
+			    	<xsl:call-template name="personName" />
 				</dim:field>
 				<dim:field mdschema="oairecerif" element="editor" qualifier="affiliation" >
 					<xsl:call-template name="nestedMetadataValue">
@@ -178,6 +184,27 @@
 			</dim:field>
 			
 		</dim:dim>
+	</xsl:template>
+
+	<xsl:template name="personName">
+		<xsl:choose>
+			<xsl:when test="cerif:DisplayName">
+				<xsl:value-of select="cerif:DisplayName" />
+			</xsl:when>
+			<xsl:when test="cerif:Person/cerif:PersonName/cerif:FamilyNames or cerif:Person/cerif:PersonName/cerif:FirstNames">
+				<xsl:choose>
+					<xsl:when test="cerif:Person/cerif:PersonName/cerif:FamilyNames and cerif:Person/cerif:PersonName/cerif:FirstNames">
+						<xsl:value-of select="concat(cerif:Person/cerif:PersonName/cerif:FamilyNames,', ',cerif:Person/cerif:PersonName/cerif:FirstNames)" />
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="cerif:Person/cerif:PersonName/cerif:FamilyNames"/><xsl:value-of select="cerif:Person/cerif:PersonName/cerif:FirstNames"/> 
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$nestedMetadataPlaceholder"/> 
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
 	<xsl:template name="nestedMetadataValue">

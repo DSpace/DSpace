@@ -119,6 +119,62 @@ public class CERIFIngestionCrosswalkIT extends AbstractIntegrationTestWithDataba
 
     @Test
     @SuppressWarnings("unchecked")
+    public void testAnotherPublicationIngest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, collection).withRelationshipType("Publication").build();
+        context.restoreAuthSystemState();
+
+        Document document = readDocument(OAI_PMH_DIR_PATH, "sample-publication-2.xml");
+        crosswalk.ingest(context, item, document.getRootElement(), false);
+
+        List<MetadataValue> values = item.getMetadata();
+        assertThat(values, hasSize(32));
+
+        assertThat(values, hasItems(with("dc.type",
+            "Controlled Vocabulary for Resource Type Genres::text::periodical::journal::contribution to journal"
+                + "::journal article")));
+
+        assertThat(values, hasItems(with("dc.title", "Durability of thermally modified sapwood and heartwood of "
+            + "Scots pine and Norway spruce in the modified double layer test")));
+
+        assertThat(values, hasItems(with("dc.language.iso", "English")));
+        assertThat(values, hasItems(with("dc.relation.publication", "Wood Material Science and Engineering")));
+        assertThat(values, hasItems(with("dc.date.issued", "2017-05-27")));
+        assertThat(values, hasItems(with("oaire.citation.volume", "12")));
+        assertThat(values, hasItems(with("oaire.citation.issue", "3")));
+        assertThat(values, hasItems(with("oaire.citation.startPage", "129")));
+        assertThat(values, hasItems(with("oaire.citation.endPage", "139")));
+        assertThat(values, hasItems(with("dc.identifier.doi", "10.1080/17480272.2015.1061596")));
+        assertThat(values, hasItems(with("dc.identifier.issn", "1748-0272", 0)));
+        assertThat(values, hasItems(with("dc.identifier.issn", "1748-0280", 1)));
+        assertThat(values, hasItems(with("dc.identifier.scopus", "84941368060")));
+        assertThat(values, hasItems(with("dc.subject", "biological durability")));
+        assertThat(values, hasItems(with("dc.subject", "decay resistance", 1)));
+        assertThat(values, hasItems(with("dc.subject", "ground contact", 2)));
+        assertThat(values, hasItems(with("dc.subject", "heartwood", 3)));
+        assertThat(values, hasItems(with("dc.subject", "Norway spruce", 4)));
+        assertThat(values, hasItems(with("dc.subject", "sapwood", 5)));
+        assertThat(values, hasItems(with("dc.subject", "Scots pine", 6)));
+        assertThat(values, hasItems(with("dc.subject", "thermal modification", 7)));
+        assertThat(values, hasItems(with("dc.publisher", "Taylor & Francis")));
+        assertThat(values, hasItems(with("dc.description.abstract", "In the present study, durability of untreated and "
+            + "thermally modified sapwood and heartwood of Scots pine and Norway spruce was examined.")));
+
+        assertThat(values, hasItems(with("dc.contributor.author", "Metsä-Kortelainen, Sini", null,
+            "will be generated::repository-id::0d9dfbba-44a4-480d-a3f5-7690adfd7d10", 0, 500)));
+
+        assertThat(values, hasItems(with("oairecerif.author.affiliation", "BA2405 Advanced manufacturing technologies",
+            null, "will be generated::repository-id::e8d60e26-7264-4925-92d0-a781657f9d3a", 0, 500)));
+
+        assertThat(values, hasItems(with("dc.contributor.author", "Viitanen, Hannu", null,
+            "will be generated::repository-id::ea98bc38-dcba-41f0-a08f-d6b73fd6c431", 1, 500)));
+
+        assertThat(values, hasItems(with("oairecerif.author.affiliation", "VTT (former employee or external)",
+            null, "will be generated::repository-id::6f450daa-5b6d-4d18-926d-e1bbe3314fb9", 1, 500)));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
     public void testExportPublicationIngest() throws Exception {
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context, collection).withRelationshipType("Publication").build();
@@ -325,6 +381,24 @@ public class CERIFIngestionCrosswalkIT extends AbstractIntegrationTestWithDataba
         assertThat(values, hasItems(with("oairecerif.identifier.url", "www.orgUnit.com", 0)));
         assertThat(values, hasItems(with("oairecerif.identifier.url", "www.orgUnit.it", 1)));
 
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testEquipmentIngest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, collection).withRelationshipType("Equipment").build();
+        context.restoreAuthSystemState();
+
+        Document document = readDocument(OAI_PMH_DIR_PATH, "sample-equipment.xml");
+        crosswalk.ingest(context, item, document.getRootElement(), false);
+
+        List<MetadataValue> values = item.getMetadata();
+        assertThat(values, hasSize(8));
+        assertThat(values, hasItems(with("dc.title", "Microflown Scan&Paint")));
+        assertThat(values, hasItems(with("dc.description", "A unique tool for acoustic trouble shooting "
+            + "and sound source localization")));
+        assertThat(values, hasItems(with("crisequipment.ownerou", "BA2E09 Machinery noise")));
     }
 
     @Test
