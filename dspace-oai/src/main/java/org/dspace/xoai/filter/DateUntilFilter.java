@@ -26,7 +26,7 @@ public class DateUntilFilter extends DSpaceFilter {
     public DateUntilFilter(Date date) {
         Calendar calendar =  Calendar.getInstance();
         calendar.setTime(date);
-        // As this is a 'from' filter, ensure milliseconds are set to 999 (maximum value)
+        // As this is an 'until' filter, ensure milliseconds are set to 999 (maximum value)
         calendar.set(Calendar.MILLISECOND, 999);
         this.date = calendar.getTime();
     }
