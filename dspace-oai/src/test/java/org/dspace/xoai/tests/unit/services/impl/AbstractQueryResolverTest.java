@@ -12,7 +12,6 @@ import static org.mockito.Mockito.mock;
 import java.util.Calendar;
 import java.util.Date;
 
-//import com.lyncode.builder.DateBuilder;
 import com.lyncode.xoai.dataprovider.services.impl.BaseDateProvider;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.xoai.services.api.CollectionsService;

@@ -9,7 +9,6 @@
 package org.dspace.xoai.tests.integration.xoai;
 
 import static org.dspace.xoai.tests.support.XmlMatcherBuilder.xml;
-//import static com.lyncode.test.matchers.xml.XPathMatchers.xPath;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -34,7 +33,6 @@ public class PipelineTest {
                                                   .getTransformed());
 
         assertThat(output, oai_dc().withXPath("/oai_dc:dc/dc:title", equalTo("Teste")));
-        //assertThat(output, xPath("/oai_dc:dc/dc:title", equalTo("Teste")));
 
         input.close();
         input = null;
