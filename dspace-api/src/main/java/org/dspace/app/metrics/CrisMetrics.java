@@ -52,6 +52,12 @@ public class CrisMetrics  implements ReloadableEntity<Integer> {
     @Lob
     private String remark;
 
+    private Double deltaPeriod1;
+
+    private Double deltaPeriod2;
+
+    private Double rank;
+
     public Integer getId() {
         return id;
     }
@@ -127,6 +133,30 @@ public class CrisMetrics  implements ReloadableEntity<Integer> {
     @Override
     public Integer getID() {
         return getId();
+    }
+
+    public Double getDeltaPeriod1() {
+        return deltaPeriod1;
+    }
+
+    public void setDeltaPeriod1(Double deltaPeriod1) {
+        this.deltaPeriod1 = deltaPeriod1;
+    }
+
+    public Double getDeltaPeriod2() {
+        return deltaPeriod2;
+    }
+
+    public void setDeltaPeriod2(Double deltaPeriod2) {
+        this.deltaPeriod2 = deltaPeriod2;
+    }
+
+    public Double getRank() {
+        return rank;
+    }
+
+    public void setRank(Double rank) {
+        this.rank = rank;
     }
 
 }

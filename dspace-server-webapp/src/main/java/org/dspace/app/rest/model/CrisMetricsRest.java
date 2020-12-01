@@ -28,10 +28,9 @@ public class CrisMetricsRest extends BaseObjectRest<Integer> {
     private Date endDate;
     private Boolean last;
     private String remark;
-
-    private Integer deltaPeriod1;
-    private Integer deltaPeriod2;
-    private Integer rank;
+    private Double deltaPeriod1;
+    private Double deltaPeriod2;
+    private Double rank;
 
     @Override
     public String getType() {
@@ -104,27 +103,27 @@ public class CrisMetricsRest extends BaseObjectRest<Integer> {
         this.remark = remark;
     }
 
-    public Integer getDeltaPeriod1() {
+    public Double getDeltaPeriod1() {
         return deltaPeriod1;
     }
 
-    public void setDeltaPeriod1(Integer deltaPeriod1) {
+    public void setDeltaPeriod1(Double deltaPeriod1) {
         this.deltaPeriod1 = deltaPeriod1;
     }
 
-    public Integer getDeltaPeriod2() {
+    public Double getDeltaPeriod2() {
         return deltaPeriod2;
     }
 
-    public void setDeltaPeriod2(Integer deltaPeriod2) {
+    public void setDeltaPeriod2(Double deltaPeriod2) {
         this.deltaPeriod2 = deltaPeriod2;
     }
 
-    public Integer getRank() {
+    public Double getRank() {
         return rank;
     }
 
-    public void setRank(Integer rank) {
+    public void setRank(Double rank) {
         this.rank = rank;
     }
 
