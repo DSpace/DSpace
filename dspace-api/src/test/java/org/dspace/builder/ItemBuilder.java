@@ -106,6 +106,11 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "description", "provenance", provenanceData);
     }
 
+    public ItemBuilder withMetadata(final String schema, final String element, final String qualifier,
+        final String value) {
+        return addMetadataValue(item, schema, element, qualifier, value);
+    }
+
     public ItemBuilder makeUnDiscoverable() {
         item.setDiscoverable(false);
         return this;
