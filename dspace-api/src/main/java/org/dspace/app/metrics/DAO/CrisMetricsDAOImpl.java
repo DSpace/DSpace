@@ -43,6 +43,18 @@ public class CrisMetricsDAOImpl extends AbstractHibernateDAO<CrisMetrics> implem
     }
 
     @Override
+    public List<CrisMetrics> findAllByItem(Context context, Item item) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, CrisMetrics.class);
+        Root<CrisMetrics> crisMetricsRoot = criteriaQuery.from(CrisMetrics.class);
+        Join<CrisMetrics, Item> join = crisMetricsRoot.join(CrisMetrics_.resource);
+        criteriaQuery.where(
+                criteriaBuilder.and(criteriaBuilder.equal(crisMetricsRoot.get(CrisMetrics_.last), true),
+                                    criteriaBuilder.equal(join.get(Item_.id), item.getID())));
+        return list(context, criteriaQuery, false, CrisMetrics.class, -1, -1);
+    }
+
+    @Override
     public int countRows(Context context) throws SQLException {
         return count(createQuery(context, "SELECT count(*) from CrisMetrics"));
     }

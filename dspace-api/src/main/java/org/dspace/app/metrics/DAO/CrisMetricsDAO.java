@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dspace.app.metrics.CrisMetrics;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 
@@ -21,6 +22,8 @@ import org.dspace.core.GenericDAO;
 public interface CrisMetricsDAO extends GenericDAO<CrisMetrics> {
 
     public List<CrisMetrics> findAll(Context context, Integer limit, Integer offset) throws SQLException;
+
+    public List<CrisMetrics> findAllByItem(Context context, Item item) throws SQLException;
 
     public int countRows(Context context) throws SQLException;
 

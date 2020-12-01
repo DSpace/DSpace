@@ -46,6 +46,11 @@ public class CrisMetricsServiceImpl implements CrisMetricsService {
     }
 
     @Override
+    public List<CrisMetrics> findAllByItem(Context context, Item item) throws SQLException {
+        return crisMetricsDAO.findAllByItem(context, item);
+    }
+
+    @Override
     public int count(Context context) throws SQLException {
         return crisMetricsDAO.countRows(context);
     }
