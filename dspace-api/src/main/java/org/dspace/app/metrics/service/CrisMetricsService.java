@@ -38,4 +38,6 @@ public interface CrisMetricsService {
            UUID resourceUuid, boolean last) throws SQLException;
 
     public void update(Context context, CrisMetrics crisMetrics) throws SQLException, AuthorizeException;
+
+    public CrisMetrics find(Context context, int id) throws SQLException;
 }

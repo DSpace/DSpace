@@ -86,4 +86,7 @@ public class CrisMetricsServiceImpl implements CrisMetricsService {
         }
     }
 
+    public CrisMetrics find(Context context, int id) throws SQLException {
+        return crisMetricsDAO.findByID(context, CrisMetrics.class, id);
+    }
 }
