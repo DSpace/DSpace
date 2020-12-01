@@ -10,7 +10,6 @@ package org.dspace.sword2;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Properties;
 
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
