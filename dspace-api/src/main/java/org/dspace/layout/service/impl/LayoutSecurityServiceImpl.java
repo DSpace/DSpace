@@ -70,6 +70,8 @@ public class LayoutSecurityServiceImpl implements LayoutSecurityService {
                                           Set<MetadataField> metadataSecurityFields, Item item) {
         return metadataSecurityFields.stream()
                                      .map(mf -> getMetadata(item, mf))
+                                     .filter(Objects::nonNull)
+                                     .filter(metadataValues -> !metadataValues.isEmpty())
                                      .anyMatch(values -> checkUser(context, user, values));
 
 

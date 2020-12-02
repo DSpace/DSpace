@@ -274,6 +274,35 @@ public class LayoutSecurityServiceImplTest {
         assertThat(granted, is(true));
     }
 
+    /**
+     * CUSTOM_DATA {@link LayoutSecurity} set, accessed by user with id having authority on metadata
+     * contained in the box, access is granted
+     *
+     * @throws SQLException
+     */
+    @Test
+    public void customSecurityMissingSecurityMetadata() throws SQLException {
+
+        UUID userUuid = UUID.randomUUID();
+
+        Item item = mock(Item.class);
+
+        List<MetadataValue> metadataValueList = null;
+
+        HashSet<MetadataField> securityMetadataFieldSet = new HashSet<>(singletonList(
+            securityMetadataField()));
+
+        when(itemService.getMetadata(item, securityMetadataField().getMetadataSchema().getName(),
+                                     securityMetadataField().getElement(), null, Item.ANY, true))
+            .thenReturn(metadataValueList);
+
+        boolean granted =
+            securityService.hasAccess(LayoutSecurity.CUSTOM_DATA, mock(Context.class), ePerson(userUuid),
+                                      securityMetadataFieldSet, item);
+
+        assertThat(granted, is(false));
+    }
+
 
     /**
      * CUSTOM_DATA {@link LayoutSecurity} set, accessed by user belonging to a group with id having
