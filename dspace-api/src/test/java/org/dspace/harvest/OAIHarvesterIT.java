@@ -440,6 +440,46 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    public void testRunHarvestWithDeletion() throws Exception {
+
+        when(mockClient.listRecords(eq(BASE_URL), isNotNull(), any(), eq("publications"), eq("oai_cerif_openaire")))
+            .thenReturn(buildResponse("delete-publication.xml"));
+
+        context.turnOffAuthorisationSystem();
+
+        HarvestedCollection harvestRow = HarvestedCollectionBuilder.create(context, collection)
+            .withOaiSource(BASE_URL)
+            .withOaiSetId("publications")
+            .withMetadataConfigId("cerif")
+            .withHarvestType(HarvestedCollection.TYPE_DMD)
+            .withHarvestStatus(HarvestedCollection.STATUS_READY)
+            .withLastHarvested(new Date())
+            .build();
+
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("Publication title")
+            .withIssueDate("2020-11-29")
+            .build();
+
+        HarvestedItemBuilder.create(context, item, "oai:test-harvest:Publications/3").build();
+
+        context.restoreAuthSystemState();
+
+        harvester.runHarvest(context, harvestRow, false, UUID.randomUUID());
+
+        verify(mockClient).resolveNamespaceToPrefix(BASE_URL, getMetadataFormatNamespace("cerif").getURI());
+        verify(mockClient).identify(BASE_URL);
+        verify(mockClient).listRecords(eq(BASE_URL), isNotNull(), any(), eq("publications"), eq("oai_cerif_openaire"));
+        verifyNoMoreInteractions(mockClient);
+
+        List<Item> items = IteratorUtils.toList(itemService.findAllByCollection(context, collection));
+        assertThat(items, emptyCollectionOf(Item.class));
+
+        assertThat(harvestedItemService.findByOAIId(context, "oai:test-harvest:Publications/3", collection),
+            nullValue());
+    }
+
+    @Test
     @SuppressWarnings("unchecked")
     public void testRunHarvestDoesNotUpdateWithoutForcingSynchronization() throws Exception {
 

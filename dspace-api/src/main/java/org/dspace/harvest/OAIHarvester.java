@@ -675,7 +675,8 @@ public class OAIHarvester {
 
     @SuppressWarnings("unchecked")
     private List<Element> getMetadataElements(Element record) {
-        return record.getChild("metadata", OAI_NS).getChildren();
+        Element metadata = record.getChild("metadata", OAI_NS);
+        return metadata != null ? metadata.getChildren() : Collections.emptyList();
     }
 
     /**
