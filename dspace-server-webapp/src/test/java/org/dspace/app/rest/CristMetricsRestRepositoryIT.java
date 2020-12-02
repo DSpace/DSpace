@@ -8,8 +8,11 @@
 package org.dspace.app.rest;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.UUID;
 
 import org.dspace.app.metrics.CrisMetrics;
 import org.dspace.app.rest.matcher.CrisMetricsMatcher;
@@ -205,4 +208,114 @@ public class CristMetricsRestRepositoryIT extends AbstractControllerIntegrationT
 
     }
 
+    @Test
+    public void findLinkedEntitiesMetricsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+
+        Item itemA = ItemBuilder.createItem(context, col1)
+                                .withDoiIdentifier("10.1016/19")
+                                .withTitle("Title item A").build();
+
+        Item itemB = ItemBuilder.createItem(context, col1)
+                                .withDoiIdentifier("30.1100/31")
+                                .withTitle("Title item B").build();
+
+        CrisMetrics metrics1 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
+                                                 .withMetricType("view")
+                                                 .withMetricCount(2312)
+                                                 .isLast(true).build();
+
+        CrisMetrics metrics2 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
+                                                 .withMetricType("ScopusCitation")
+                                                 .withMetricCount(43)
+                                                 .isLast(true).build();
+
+        CrisMetrics metrics3 = CrisMetricsBuilder.createCrisMetrics(context, itemB)
+                                                 .withMetricType("ScopusCitation")
+                                                 .withMetricCount(103)
+                                                 .isLast(true).build();
+        context.restoreAuthSystemState();
+
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(get("/api/core/items/" + itemA.getID() + "/metrics"))
+                               .andExpect(status().isOk())
+                               .andExpect(content().contentType(contentType))
+                               .andExpect(jsonPath("$._embedded.metrics", Matchers.containsInAnyOrder(
+                                          CrisMetricsMatcher.matchCrisMetrics(metrics1),
+                                          CrisMetricsMatcher.matchCrisMetrics(metrics2)
+                                          )))
+                               .andExpect(jsonPath("$._embedded.metrics",
+                                   Matchers.not(is(CrisMetricsMatcher.matchCrisMetrics(metrics3)))))
+                               .andExpect(jsonPath("$._links.self.href",
+                                   Matchers.containsString("api/core/items/" + itemA.getID() + "/metrics")))
+                               .andExpect(jsonPath("$.page.totalElements", is(2)));
+    }
+
+    @Test
+    public void findLinkedEntitiesMetricsWithUserNotLoggedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+
+        Item itemA = ItemBuilder.createItem(context, col1)
+                                .withDoiIdentifier("10.1016/19")
+                                .withTitle("Title item A").build();
+
+        CrisMetrics metrics1 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
+                                                 .withMetricType("view")
+                                                 .withMetricCount(2312)
+                                                 .isLast(true).build();
+
+        CrisMetrics metrics2 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
+                                                 .withMetricType("ScopusCitation")
+                                                 .withMetricCount(43)
+                                                 .isLast(true).build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/items/" + itemA.getID() + "/metrics"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.metrics").value(Matchers.hasSize(0)))
+                   .andExpect(jsonPath("$._links.self.href",
+                              Matchers.containsString("api/core/items/" + itemA.getID() + "/metrics")))
+                   .andExpect(jsonPath("$.page.totalElements", is(0)));
+    }
+
+    @Test
+    public void findLinkedEntitiesMetricNotFoundTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+
+        Item itemA = ItemBuilder.createItem(context, col1)
+                                .withDoiIdentifier("10.1016/19")
+                                .withTitle("Title item A").build();
+
+        CrisMetrics metrics1 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
+                                                 .withMetricType("view")
+                                                 .withMetricCount(2312)
+                                                 .isLast(true).build();
+
+        CrisMetrics metrics2 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
+                                                 .withMetricType("ScopusCitation")
+                                                 .withMetricCount(43)
+                                                 .isLast(true).build();
+
+        context.restoreAuthSystemState();
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/items/" + UUID.randomUUID().toString() + "/metrics"))
+                             .andExpect(status().isNotFound());
+    }
 }

@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,6 +42,7 @@ public class ItemMetricsLinkRepository extends AbstractDSpaceRestRepository
     @Autowired
     private ItemService itemService;
 
+    @PreAuthorize("hasPermission(#itemUuid, 'ITEM', 'READ')")
     public Page<CrisMetrics> getMetrics(@Nullable HttpServletRequest request, @NotNull UUID itemUuid,
                                         @Nullable Pageable optionalPageable, Projection projection) {
         try {
