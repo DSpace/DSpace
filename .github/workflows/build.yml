@@ -3,7 +3,7 @@
 # https://docs.github.com/en/free-pro-team@latest/actions/guides/building-and-testing-java-with-maven
 name: Build
 
-# Run this Build for all pushes / PRs
+# Run this Build for all pushes / PRs to current branch
 on: [push, pull_request]
 
 jobs:

@@ -841,13 +841,31 @@
             <artifactId>aws-java-sdk-s3</artifactId>
             <version>1.10.50</version>
         </dependency>
-        
+
         <dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>orcid-jaxb-api</artifactId>
-			<version>3.0.0</version>
-		</dependency>
-        
+            <groupId>org.orcid</groupId>
+            <artifactId>orcid-model</artifactId>
+            <version>3.0.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.jaxrs</groupId>
+                    <artifactId>jackson-jaxrs-json-provider</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.yaml</groupId>
+                    <artifactId>snakeyaml</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.javassist</groupId>
+                    <artifactId>javassist</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
@@ -931,25 +949,6 @@
 	      <version>1.0</version>
       </dependency>
 
-        <!-- Reminder: Keep icu4j (in Parent POM) synced with version used by lucene-analyzers-icu below,
-             otherwise ICUFoldingFilterFactory may throw errors in tests.  -->
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-icu</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-smartcn</artifactId>
-            <version>${solr.client.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-stempel</artifactId>
-            <version>${solr.client.version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
 </project>
