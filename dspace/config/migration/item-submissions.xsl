@@ -113,8 +113,8 @@
           </step>
         </xsl:for-each>
 
-        <step id="license"/>
         <step id="upload"/>
+        <step id="license"/>
       </submission-process>
     </xsl:for-each>
   </xsl:template>
