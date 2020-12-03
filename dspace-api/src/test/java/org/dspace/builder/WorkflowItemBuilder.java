@@ -162,6 +162,11 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
         return this;
     }
 
+    public WorkflowItemBuilder withSubmitter(EPerson ePerson) {
+        workspaceItem.getItem().setSubmitter(ePerson);
+        return this;
+    }
+
     public WorkflowItemBuilder withTitle(final String title) {
         return setMetadataSingleValue(MetadataSchemaEnum.DC.getName(), "title", null, title);
     }

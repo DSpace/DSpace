@@ -69,6 +69,11 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
         submitter = obj.getSubmitter();
 
         witem.setId(obj.getID());
+        witem.setCollection(collection != null ? converter.toRest(collection, projection) : null);
+        witem.setItem(converter.toRest(item, projection));
+        if (submitter != null) {
+            witem.setSubmitter(converter.toRest(submitter, projection));
+        }
 
         // 1. retrieve the submission definition
         // 2. iterate over the submission section to allow to plugin additional
@@ -116,10 +121,6 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
 
             }
         }
-
-        witem.setCollection(collection != null ? converter.toRest(collection, projection) : null);
-        witem.setItem(converter.toRest(item, projection));
-        witem.setSubmitter(converter.toRest(submitter, projection));
     }
 
     void storeSubmissionName(final String name) {
