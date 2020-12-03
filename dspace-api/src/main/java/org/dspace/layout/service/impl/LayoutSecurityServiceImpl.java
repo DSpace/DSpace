@@ -84,12 +84,13 @@ public class LayoutSecurityServiceImpl implements LayoutSecurityService {
     }
 
     private boolean checkUser(final Context context, EPerson user, List<MetadataValue> values) {
-        Predicate<MetadataValue> currentUserPredicate = v -> Objects.nonNull(user) && v.getAuthority()
-                                                                                       .equals(user.getID().toString());
+        Predicate<MetadataValue> currentUserPredicate = v -> Objects.nonNull(user) &&
+            Optional.ofNullable(v.getAuthority()).map(a -> a.equals(user.getID().toString())).orElse(false);
+
         Predicate<MetadataValue> checkGroupsPredicate = v -> checkGroup(v, groups(context, user));
 
         return values.stream()
-                     .anyMatch(currentUserPredicate.or(checkGroupsPredicate));
+            .anyMatch(currentUserPredicate.or(checkGroupsPredicate));
     }
 
     private boolean checkGroup(MetadataValue value, Set<Group> groups) {
