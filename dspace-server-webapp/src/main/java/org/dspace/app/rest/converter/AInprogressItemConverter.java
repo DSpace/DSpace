@@ -18,14 +18,17 @@ import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
+import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.Collection;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.RequestService;
+import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -68,6 +71,9 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
         EPerson submitter = null;
         submitter = obj.getSubmitter();
 
+        Request currentRequest = requestService.getCurrentRequest();
+        Context context = ContextUtil.obtainContext(currentRequest.getServletRequest());
+
         witem.setId(obj.getID());
 
         // 1. retrieve the submission definition
@@ -97,7 +103,7 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
                         // load the interface for this step
                         AbstractRestProcessingStep stepProcessing =
                             (AbstractRestProcessingStep) stepClass.newInstance();
-                        for (ErrorRest error : stepProcessing.validate(submissionService, obj, stepConfig)) {
+                        for (ErrorRest error : stepProcessing.validate(context, obj, stepConfig)) {
                             addError(witem.getErrors(), error);
                         }
                         witem.getSections()

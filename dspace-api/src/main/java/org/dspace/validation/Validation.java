@@ -5,16 +5,14 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.submit.step.validation;
+package org.dspace.validation;
 
-import java.sql.SQLException;
 import java.util.List;
 
-import org.dspace.app.rest.model.ErrorRest;
-import org.dspace.app.rest.submit.SubmissionService;
-import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.InProgressSubmission;
+import org.dspace.core.Context;
+import org.dspace.validation.model.ValidationError;
 
 /**
  * Interface to support validation on submission process
@@ -22,12 +20,13 @@ import org.dspace.content.InProgressSubmission;
  * TODO should be supported InProgressSubmission (t.b.d)
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  */
 public interface Validation {
 
+    String OPERATION_PATH_SECTIONS = "sections";
+
+    List<ValidationError> validate(Context context, InProgressSubmission<?> obj, SubmissionStepConfig config);
+
     String getName();
-
-    List<? extends ErrorRest> validate(SubmissionService submissionService, InProgressSubmission obj,
-                                       SubmissionStepConfig config) throws DCInputsReaderException, SQLException;
-
 }

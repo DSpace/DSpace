@@ -5,17 +5,13 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.submit.step.validation;
+package org.dspace.validation;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.model.ErrorRest;
-import org.dspace.app.rest.repository.WorkspaceItemRestRepository;
-import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
@@ -25,14 +21,15 @@ import org.dspace.content.InProgressSubmission;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Context;
+import org.dspace.validation.model.ValidationError;
 
 /**
- * Execute three validation check on fields validation:
- * - mandatory metadata missing
- * - regex missing match
- * - authority required metadata missing
+ * Execute three validation check on fields validation: - mandatory metadata
+ * missing - regex missing match - authority required metadata missing
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
+ * @author Luca Giamminonni (luca.giamminonni at 4sciente.it)
  */
 public class MetadataValidation extends AbstractValidation {
 
@@ -53,15 +50,13 @@ public class MetadataValidation extends AbstractValidation {
     private MetadataAuthorityService metadataAuthorityService;
 
     @Override
-    public List<ErrorRest> validate(SubmissionService submissionService, InProgressSubmission obj,
-                                    SubmissionStepConfig config) throws DCInputsReaderException, SQLException {
+    public List<ValidationError> validate(Context context, InProgressSubmission<?> obj, SubmissionStepConfig config) {
 
-        String documentTypeValue = "";
-        DCInputSet inputConfig = getInputReader().getInputsByFormName(config.getId());
+        List<ValidationError> errors = new ArrayList<>();
+
+        DCInputSet inputConfig = getDCInputSet(config);
         List<MetadataValue> documentType = itemService.getMetadataByMetadataString(obj.getItem(), DOCUMENT_TYPE_FIELD);
-        if (documentType.size() > 0) {
-            documentTypeValue = documentType.get(0).getValue();
-        }
+        String documentTypeValue = documentType.size() > 0 ? documentType.get(0).getValue() : "";
 
         for (DCInput[] row : inputConfig.getFields()) {
             for (DCInput input : row) {
@@ -87,16 +82,16 @@ public class MetadataValidation extends AbstractValidation {
                     List<MetadataValue> mdv = itemService.getMetadataByMetadataString(obj.getItem(), fieldName);
                     for (MetadataValue md : mdv) {
                         if (!(input.validate(md.getValue()))) {
-                            addError(ERROR_VALIDATION_REGEX,
-                                "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
+                            addError(errors, ERROR_VALIDATION_REGEX,
+                                "/" + OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
                                 input.getFieldName() + "/" + md.getPlace());
                         }
                         if (isAuthorityControlled) {
                             String authKey = md.getAuthority();
                             if (metadataAuthorityService.isAuthorityRequired(fieldKey) &&
                                 StringUtils.isNotBlank(authKey)) {
-                                addError(ERROR_VALIDATION_AUTHORITY_REQUIRED,
-                                    "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() +
+                                addError(errors, ERROR_VALIDATION_AUTHORITY_REQUIRED,
+                                    "/" + OPERATION_PATH_SECTIONS + "/" + config.getId() +
                                     "/" + input.getFieldName() + "/" + md.getPlace());
                             }
                         }
@@ -104,14 +99,21 @@ public class MetadataValidation extends AbstractValidation {
                     if ((input.isRequired() && mdv.size() == 0) && input.isVisible(DCInput.SUBMISSION_SCOPE)) {
                         // since this field is missing add to list of error
                         // fields
-                        addError(ERROR_VALIDATION_REQUIRED,
-                            "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
-                            input.getFieldName());
+                        addError(errors, ERROR_VALIDATION_REQUIRED,
+                            "/" + OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" + input.getFieldName());
                     }
                 }
             }
         }
-        return getErrors();
+        return errors;
+    }
+
+    private DCInputSet getDCInputSet(SubmissionStepConfig config) {
+        try {
+            return getInputReader().getInputsByFormName(config.getId());
+        } catch (DCInputsReaderException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void setItemService(ItemService itemService) {

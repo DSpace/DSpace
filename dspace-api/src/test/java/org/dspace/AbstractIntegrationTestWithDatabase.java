@@ -32,6 +32,7 @@ import org.dspace.kernel.ServiceManager;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.MockSolrLoggerServiceImpl;
 import org.dspace.storage.rdbms.DatabaseUtils;
+import org.dspace.validation.MetadataValidation;
 import org.jdom.Document;
 import org.junit.After;
 import org.junit.Before;
@@ -195,6 +196,9 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
             dedupService.reset();
             // Reload our ConfigurationService (to reset configs to defaults again)
             DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
+
+            serviceManager.getServicesByType(MetadataValidation.class)
+                .forEach(metadataValidation -> metadataValidation.setInputReader(null));
 
             AbstractBuilder.cleanupBuilderCache();
 
