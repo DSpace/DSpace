@@ -9,7 +9,6 @@ package org.dspace.validation.service;
 
 import java.util.List;
 
-import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.core.Context;
 import org.dspace.validation.model.ValidationError;
@@ -22,14 +21,14 @@ import org.dspace.validation.model.ValidationError;
  */
 public interface ValidationService {
 
+    String OPERATION_PATH_SECTIONS = "sections";
+
     /**
-     * Validate the given {@link InProgressSubmission} instance for the given
-     * {@link SubmissionStepConfig}.
+     * Validate the given {@link InProgressSubmission} instance.
      *
      * @param  context the DSpace context
      * @param  obj     the {@link InProgressSubmission} instance to validate
-     * @param  config  the submission step configuration
      * @return         the validation errors, if any
      */
-    List<ValidationError> validate(Context context, InProgressSubmission<?> obj, SubmissionStepConfig config);
+    List<ValidationError> validate(Context context, InProgressSubmission<?> obj);
 }

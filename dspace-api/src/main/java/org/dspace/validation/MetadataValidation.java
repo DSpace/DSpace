@@ -7,6 +7,8 @@
  */
 package org.dspace.validation;
 
+import static org.dspace.validation.service.ValidationService.OPERATION_PATH_SECTIONS;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +33,7 @@ import org.dspace.validation.model.ValidationError;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  * @author Luca Giamminonni (luca.giamminonni at 4sciente.it)
  */
-public class MetadataValidation extends AbstractValidation {
+public class MetadataValidation extends AbstractStepValidation {
 
     private static final String ERROR_VALIDATION_REQUIRED = "error.validation.required";
 

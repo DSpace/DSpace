@@ -15,16 +15,12 @@ import org.dspace.core.Context;
 import org.dspace.validation.model.ValidationError;
 
 /**
- * Interface to support validation on submission process
- *
- * TODO should be supported InProgressSubmission (t.b.d)
+ * Interface to support step validation on submission process.
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  */
-public interface Validation {
-
-    String OPERATION_PATH_SECTIONS = "sections";
+public interface SubmissionStepValidator {
 
     List<ValidationError> validate(Context context, InProgressSubmission<?> obj, SubmissionStepConfig config);
 

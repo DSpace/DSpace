@@ -25,6 +25,7 @@ import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.model.Request;
+import org.dspace.validation.service.ValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -44,6 +45,8 @@ public class EditItemConverter
     private SubmissionSectionConverter submissionSectionConverter;
     @Autowired
     private EditItemModeConverter modeConverter;
+    @Autowired
+    private ValidationService validationService;
 
     public EditItemConverter() throws SubmissionConfigReaderException {
         super();
@@ -76,9 +79,6 @@ public class EditItemConverter
         submitter = obj.getSubmitter();
         EditItemMode mode = obj.getMode();
 
-        Request currentRequest = requestService.getCurrentRequest();
-        Context context = ContextUtil.obtainContext(currentRequest.getServletRequest());
-
         rest.setId(obj.getID() + ":none");
 
         // 1. retrieve the submission definition
@@ -86,6 +86,9 @@ public class EditItemConverter
         // info
 
         if (mode != null) {
+
+            addValidationErrorsToItem(obj, rest);
+
             rest.setId(obj.getID() + ":" + mode.getName());
             SubmissionDefinitionRest def = converter.toRest(
                     submissionConfigReader.getSubmissionConfigByName(mode.getSubmissionDefinition()), projection);
@@ -109,9 +112,7 @@ public class EditItemConverter
                         // load the interface for this step
                         AbstractRestProcessingStep stepProcessing =
                             (AbstractRestProcessingStep) stepClass.newInstance();
-                        for (ErrorRest error : stepProcessing.validate(context, obj, stepConfig)) {
-                            addError(rest.getErrors(), error);
-                        }
+
                         rest.getSections()
                             .put(sections.getId(), stepProcessing.getData(submissionService, obj, stepConfig));
                     } else {
@@ -131,6 +132,16 @@ public class EditItemConverter
         rest.setCollection(collection != null ? converter.toRest(collection, projection) : null);
         rest.setItem(converter.toRest(item, projection));
         rest.setSubmitter(converter.toRest(submitter, projection));
+    }
+
+    @SuppressWarnings("unchecked")
+    private void addValidationErrorsToItem(EditItem obj, EditItemRest rest) {
+        Request currentRequest = requestService.getCurrentRequest();
+        Context context = ContextUtil.obtainContext(currentRequest.getServletRequest());
+
+        validationService.validate(context, obj).stream()
+            .map(ErrorRest::fromValidationError)
+            .forEach(error -> addError(rest.getErrors(), error));
     }
 
     /* (non-Javadoc)

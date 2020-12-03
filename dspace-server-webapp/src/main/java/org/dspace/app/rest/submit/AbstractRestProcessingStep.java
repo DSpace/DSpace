@@ -8,17 +8,12 @@
 package org.dspace.app.rest.submit;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.stream.Collectors;
 
-import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.core.Context;
 import org.dspace.services.model.Request;
-import org.dspace.validation.service.ValidationService;
-import org.dspace.validation.service.factory.ValidationServiceFactory;
 
 /**
  * Interface for the submission steps to populate sections in the in progress submission and react to patch requests.
@@ -55,22 +50,6 @@ public interface AbstractRestProcessingStep extends ListenerProcessingStep {
      */
     public <T extends Serializable> T getData(SubmissionService submissionService, InProgressSubmission obj,
                                               SubmissionStepConfig config) throws Exception;
-
-    /**
-     * The method will expose the list of validation errors identified by the step. The default implementation will
-     * found a {@link Validation} spring bean in the context with the same name that the step id
-     *
-     * @param context
-     * @param obj
-     * @param config
-     * @return
-     */
-    default public List<ErrorRest> validate(Context context, InProgressSubmission<?> obj, SubmissionStepConfig config) {
-        ValidationService validationService = ValidationServiceFactory.getInstance().getValidationService();
-        return validationService.validate(context, obj, config).stream()
-            .map(ErrorRest::fromValidationError)
-            .collect(Collectors.toList());
-    }
 
     /**
      * Method to react to a patch request against the step managed section data

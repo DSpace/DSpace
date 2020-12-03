@@ -17,7 +17,7 @@ import org.dspace.validation.model.ValidationError;
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
-public abstract class AbstractValidation implements Validation {
+public abstract class AbstractStepValidation implements SubmissionStepValidator {
 
     private String name;
 

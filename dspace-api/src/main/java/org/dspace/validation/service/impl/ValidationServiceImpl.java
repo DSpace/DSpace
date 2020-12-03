@@ -7,13 +7,20 @@
  */
 package org.dspace.validation.service.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
 
+import org.dspace.app.util.SubmissionConfig;
+import org.dspace.app.util.SubmissionConfigReader;
+import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
+import org.dspace.content.Collection;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.core.Context;
-import org.dspace.validation.Validation;
+import org.dspace.validation.GlobalSubmissionValidator;
+import org.dspace.validation.SubmissionStepValidator;
 import org.dspace.validation.model.ValidationError;
 import org.dspace.validation.service.ValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,15 +35,48 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class ValidationServiceImpl implements ValidationService {
 
+    private List<SubmissionStepValidator> stepValidators;
+
+    private List<GlobalSubmissionValidator> globalValidators;
+
+    private SubmissionConfigReader submissionConfigReader;
+
     @Autowired
-    private List<Validation> validations;
+    public ValidationServiceImpl(List<SubmissionStepValidator> stepValidators,
+        List<GlobalSubmissionValidator> globalValidators) {
+        this.stepValidators = stepValidators;
+        this.globalValidators = globalValidators;
+    }
+
+    @PostConstruct
+    private void setup() throws SubmissionConfigReaderException {
+        submissionConfigReader = new SubmissionConfigReader();
+    }
 
     @Override
-    public List<ValidationError> validate(Context context, InProgressSubmission<?> obj, SubmissionStepConfig config) {
-        return validations.stream()
-            .filter(validation -> validation.getName().equals(config.getType()))
-            .flatMap(validation -> validation.validate(context, obj, config).stream())
-            .collect(Collectors.toList());
+    public List<ValidationError> validate(Context context, InProgressSubmission<?> obj) {
+        Collection collection = obj.getCollection();
+        if (collection == null) {
+            return Collections.emptyList();
+        }
+
+        List<ValidationError> errors = new ArrayList<ValidationError>();
+
+        SubmissionConfig submissionConfig = submissionConfigReader.getSubmissionConfigByCollection(collection);
+
+        for (SubmissionStepConfig stepConfig : submissionConfig) {
+            stepValidators.stream()
+                .filter(validation -> validation.getName().equals(stepConfig.getType()))
+                .flatMap(validation -> validation.validate(context, obj, stepConfig).stream())
+                .forEach(errors::add);
+        }
+
+        globalValidators.stream()
+            .flatMap(validator -> validator.validate(context, obj, submissionConfig).stream())
+            .forEach(errors::add);
+
+        return errors;
+
     }
 
 }

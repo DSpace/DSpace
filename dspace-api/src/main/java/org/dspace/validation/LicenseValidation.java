@@ -9,6 +9,7 @@ package org.dspace.validation;
 
 import static org.dspace.core.Constants.LICENSE_BITSTREAM_NAME;
 import static org.dspace.core.Constants.LICENSE_BUNDLE_NAME;
+import static org.dspace.validation.service.ValidationService.OPERATION_PATH_SECTIONS;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  * @author Luca Giamminonni (luca.giamminonni at 4sciente.it)
  */
-public class LicenseValidation extends AbstractValidation {
+public class LicenseValidation extends AbstractStepValidation {
 
     private static final String ERROR_VALIDATION_LICENSEREQUIRED = "error.validation.license.notgranted";
 
