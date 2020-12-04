@@ -145,7 +145,7 @@ public class S3BitStoreService implements BitStoreService {
         String key = getFullKey(bitstream.getInternalId());
         try {
             S3Object object = s3Service.getObject(new GetObjectRequest(bucketName, key));
-            return (object != null) ? object.getObjectContent() : null;
+            return (object != null) ? new S3FilterInputStream(object) : null;
         } catch (Exception e) {
             log.error("get(" + key + ")", e);
             throw new IOException(e);
