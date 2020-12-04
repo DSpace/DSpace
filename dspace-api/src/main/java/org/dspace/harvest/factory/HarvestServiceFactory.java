@@ -7,9 +7,11 @@
  */
 package org.dspace.harvest.factory;
 
+import org.dspace.harvest.OAIHarvester;
 import org.dspace.harvest.service.HarvestSchedulingService;
 import org.dspace.harvest.service.HarvestedCollectionService;
 import org.dspace.harvest.service.HarvestedItemService;
+import org.dspace.harvest.service.OAIHarvesterClient;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -25,6 +27,10 @@ public abstract class HarvestServiceFactory {
     public abstract HarvestedItemService getHarvestedItemService();
 
     public abstract HarvestSchedulingService getHarvestSchedulingService();
+
+    public abstract OAIHarvesterClient getOAIHarvesterClient();
+
+    public abstract OAIHarvester getOAIHarvester();
 
     public static HarvestServiceFactory getInstance() {
         return DSpaceServicesFactory.getInstance().getServiceManager()

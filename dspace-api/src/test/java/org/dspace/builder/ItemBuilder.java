@@ -99,6 +99,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "contributor", "editor", editorName);
     }
 
+    public ItemBuilder withEditor(final String editorName, final String authority) {
+        return addMetadataValue(item, DC.getName(), "contributor", "editor", null, editorName, authority, 600);
+    }
+
     public ItemBuilder withEditorAffiliation(String affiliation) {
         return addMetadataValue(item, "oairecerif", "editor", "affiliation", affiliation);
     }
