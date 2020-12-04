@@ -29,7 +29,6 @@
         </property>
     </bean>
     <bean class="org.dspace.external.provider.impl.OrcidV3AuthorDataProvider" init-method="init">
-        <constructor-arg value="${orcid.api.url}"/>
         <property name="sourceIdentifier" value="orcid"/>
         <property name="orcidUrl" value="${orcid.url}" />
         <property name="clientId" value="${orcid.clientid}" />
