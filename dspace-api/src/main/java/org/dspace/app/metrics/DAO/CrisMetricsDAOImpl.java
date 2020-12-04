@@ -54,6 +54,22 @@ public class CrisMetricsDAOImpl extends AbstractHibernateDAO<CrisMetrics> implem
         return list(context, criteriaQuery, false, CrisMetrics.class, -1, -1);
     }
 
+    public List<CrisMetrics> findAllLast(Context context, Integer limit, Integer offset) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, CrisMetrics.class);
+        Root<CrisMetrics> crisMetricsRoot = criteriaQuery.from(CrisMetrics.class);
+        criteriaQuery.where(criteriaBuilder.equal(crisMetricsRoot.get(CrisMetrics_.last), true));
+        return list(context, criteriaQuery, false, CrisMetrics.class, limit, offset);
+    }
+
+    public int countAllLast(Context context) throws SQLException {
+        Query query = createQuery(context,
+                   "SELECT count(*)"
+                 + " FROM " + CrisMetrics.class.getSimpleName()
+                 + " WHERE last = true");
+        return count(query);
+    }
+
     @Override
     public int countRows(Context context) throws SQLException {
         return count(createQuery(context, "SELECT count(*) from CrisMetrics"));

@@ -27,6 +27,10 @@ public interface CrisMetricsService {
 
     public List<CrisMetrics> findAllByItem(Context context, Item item) throws SQLException;
 
+    public List<CrisMetrics> findAllLast(Context context, Integer limit, Integer offset) throws SQLException;
+
+    public int countAllLast(Context context) throws SQLException;
+
     public int count(Context context) throws SQLException;
 
     public CrisMetrics create(Context context, Item item) throws SQLException, AuthorizeException;

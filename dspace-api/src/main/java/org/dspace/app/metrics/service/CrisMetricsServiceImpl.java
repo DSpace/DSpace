@@ -51,6 +51,16 @@ public class CrisMetricsServiceImpl implements CrisMetricsService {
     }
 
     @Override
+    public List<CrisMetrics> findAllLast(Context context, Integer limit, Integer offset) throws SQLException {
+        return crisMetricsDAO.findAllLast(context, limit, offset);
+    }
+
+    @Override
+    public int countAllLast(Context context) throws SQLException {
+        return crisMetricsDAO.countAllLast(context);
+    }
+
+    @Override
     public int count(Context context) throws SQLException {
         return crisMetricsDAO.countRows(context);
     }

@@ -25,6 +25,10 @@ public interface CrisMetricsDAO extends GenericDAO<CrisMetrics> {
 
     public List<CrisMetrics> findAllByItem(Context context, Item item) throws SQLException;
 
+    public List<CrisMetrics> findAllLast(Context context, Integer limit, Integer offset) throws SQLException;
+
+    public int countAllLast(Context context) throws SQLException;
+
     public int countRows(Context context) throws SQLException;
 
     public void delete(Context context, CrisMetrics crisMetrics) throws SQLException;
