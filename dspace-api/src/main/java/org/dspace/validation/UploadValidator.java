@@ -8,6 +8,7 @@
 package org.dspace.validation;
 
 import static org.dspace.validation.service.ValidationService.OPERATION_PATH_SECTIONS;
+import static org.dspace.validation.util.ValidationUtils.addError;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -29,13 +30,15 @@ import org.dspace.validation.model.ValidationError;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  * @author Luca Giamminonni (luca.giamminonni at 4sciente.it)
  */
-public class UploadValidation extends AbstractStepValidation {
+public class UploadValidator implements SubmissionStepValidator {
 
     private static final String ERROR_VALIDATION_FILEREQUIRED = "error.validation.filerequired";
 
     private ItemService itemService;
 
     private UploadConfigurationService uploadConfigurationService;
+
+    private String name;
 
     @Override
     public List<ValidationError> validate(Context context, InProgressSubmission<?> obj, SubmissionStepConfig config) {
@@ -72,5 +75,13 @@ public class UploadValidation extends AbstractStepValidation {
         this.uploadConfigurationService = uploadConfigurationService;
     }
 
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
 }

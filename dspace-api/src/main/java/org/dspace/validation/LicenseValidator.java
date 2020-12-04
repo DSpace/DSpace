@@ -10,6 +10,7 @@ package org.dspace.validation;
 import static org.dspace.core.Constants.LICENSE_BITSTREAM_NAME;
 import static org.dspace.core.Constants.LICENSE_BUNDLE_NAME;
 import static org.dspace.validation.service.ValidationService.OPERATION_PATH_SECTIONS;
+import static org.dspace.validation.util.ValidationUtils.addError;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -33,9 +34,11 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  * @author Luca Giamminonni (luca.giamminonni at 4sciente.it)
  */
-public class LicenseValidation extends AbstractStepValidation {
+public class LicenseValidator implements SubmissionStepValidator {
 
     private static final String ERROR_VALIDATION_LICENSEREQUIRED = "error.validation.license.notgranted";
+
+    private String name;
 
     @Autowired
     private BitstreamService bitstreamService;
@@ -66,6 +69,15 @@ public class LicenseValidation extends AbstractStepValidation {
 
     public void setBitstreamService(BitstreamService bitstreamService) {
         this.bitstreamService = bitstreamService;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
 }

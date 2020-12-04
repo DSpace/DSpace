@@ -21,6 +21,13 @@ public class ValidationError {
 
     private List<String> paths;
 
+    public ValidationError() {
+    }
+
+    public ValidationError(String message) {
+        this.message = message;
+    }
+
     public String getMessage() {
         return message;
     }

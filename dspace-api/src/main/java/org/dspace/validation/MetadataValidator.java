@@ -8,6 +8,7 @@
 package org.dspace.validation;
 
 import static org.dspace.validation.service.ValidationService.OPERATION_PATH_SECTIONS;
+import static org.dspace.validation.util.ValidationUtils.addError;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,7 @@ import org.dspace.validation.model.ValidationError;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  * @author Luca Giamminonni (luca.giamminonni at 4sciente.it)
  */
-public class MetadataValidation extends AbstractStepValidation {
+public class MetadataValidator implements SubmissionStepValidator {
 
     private static final String ERROR_VALIDATION_REQUIRED = "error.validation.required";
 
@@ -43,13 +44,15 @@ public class MetadataValidation extends AbstractStepValidation {
 
     private static final String DOCUMENT_TYPE_FIELD = "dc.type";
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataValidation.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataValidator.class);
 
     private DCInputsReader inputReader;
 
     private ItemService itemService;
 
     private MetadataAuthorityService metadataAuthorityService;
+
+    private String name;
 
     @Override
     public List<ValidationError> validate(Context context, InProgressSubmission<?> obj, SubmissionStepConfig config) {
@@ -139,6 +142,15 @@ public class MetadataValidation extends AbstractStepValidation {
 
     public void setInputReader(DCInputsReader inputReader) {
         this.inputReader = inputReader;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
 }
