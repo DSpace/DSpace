@@ -143,6 +143,11 @@
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>*</artifactId>
                 </exclusion>
+                <!-- Exclude Woodstox, as later version provided by Solr dependencies -->
+                <exclusion>
+                    <groupId>org.codehaus.woodstox</groupId>
+                    <artifactId>woodstox-core-asl</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
     </dependencies>
