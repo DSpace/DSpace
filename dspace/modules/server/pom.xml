@@ -317,6 +317,13 @@ just adding new jar in the classloader</description>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <!-- Newer version is pulled in by hibernate-ehcache -->
+                <exclusion>
+                    <groupId>net.bytebuddy</groupId>
+                    <artifactId>byte-buddy</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>

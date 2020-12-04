@@ -13,11 +13,14 @@ import java.util.List;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
-import org.dspace.content.service.ItemService;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -48,7 +51,7 @@ public class HandleIdentifierProvider extends IdentifierProvider {
     @Autowired(required = true)
     protected HandleService handleService;
     @Autowired(required = true)
-    protected ItemService itemService;
+    protected ContentServiceFactory contentServiceFactory;
 
     @Override
     public boolean supports(Class<? extends Identifier> identifier) {
@@ -91,7 +94,7 @@ public class HandleIdentifierProvider extends IdentifierProvider {
             String id = mint(context, dso);
 
             // move canonical to point the latest version
-            if (dso instanceof Item) {
+            if (dso instanceof Item || dso instanceof Collection || dso instanceof Community) {
                 Item item = (Item) dso;
                 populateHandleMetadata(context, item, id);
             }
@@ -108,7 +111,7 @@ public class HandleIdentifierProvider extends IdentifierProvider {
     public void register(Context context, DSpaceObject dso, String identifier) {
         try {
             handleService.createHandle(context, dso, identifier);
-            if (dso instanceof Item) {
+            if (dso instanceof Item || dso instanceof Collection || dso instanceof Community) {
                 Item item = (Item) dso;
                 populateHandleMetadata(context, item, identifier);
             }
@@ -220,23 +223,25 @@ public class HandleIdentifierProvider extends IdentifierProvider {
         return prefix;
     }
 
-    protected void populateHandleMetadata(Context context, Item item, String handle)
-        throws SQLException, IOException, AuthorizeException {
+    protected void populateHandleMetadata(Context context, DSpaceObject dso, String handle)
+            throws SQLException, IOException, AuthorizeException {
         String handleref = handleService.getCanonicalForm(handle);
+
+        DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
 
         // Add handle as identifier.uri DC value.
         // First check that identifier doesn't already exist.
         boolean identifierExists = false;
-        List<MetadataValue> identifiers = itemService
-            .getMetadata(item, MetadataSchemaEnum.DC.getName(), "identifier", "uri", Item.ANY);
+        List<MetadataValue> identifiers = dsoService
+                .getMetadata(dso, MetadataSchemaEnum.DC.getName(), "identifier", "uri", Item.ANY);
         for (MetadataValue identifier : identifiers) {
             if (handleref.equals(identifier.getValue())) {
                 identifierExists = true;
             }
         }
         if (!identifierExists) {
-            itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
-                                    "identifier", "uri", null, handleref);
+            dsoService.addMetadata(context, dso, MetadataSchemaEnum.DC.getName(),
+                    "identifier", "uri", null, handleref);
         }
     }
 }

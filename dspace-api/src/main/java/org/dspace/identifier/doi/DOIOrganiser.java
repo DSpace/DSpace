@@ -704,8 +704,8 @@ public class DOIOrganiser {
                           + ex.codeToString(ex.getCode()), ex);
 
             if (!quiet) {
-                System.err.println("It wasn't possible to detect this identifier: "
-                                       + DOI.SCHEME + doiRow.getDoi());
+                System.err.println("It wasn't possible to detect this DOI identifier: "
+                                       + identifier);
             }
         }
 

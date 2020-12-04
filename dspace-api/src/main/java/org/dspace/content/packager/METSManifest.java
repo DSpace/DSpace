@@ -245,7 +245,7 @@ public class METSManifest {
     protected METSManifest(SAXBuilder builder, Element mets, String configName) {
         super();
         this.mets = mets;
-        parser = builder;
+        this.parser = builder;
         this.configName = configName;
     }
 
@@ -623,7 +623,7 @@ public class METSManifest {
      * @throws SQLException                if database error
      * @throws AuthorizeException          if authorization error
      */
-    public List<Element> getMdContentAsXml(Element mdSec, Mdref callback)
+    private List<Element> getMdContentAsXml(Element mdSec, Mdref callback)
         throws MetadataValidationException, PackageValidationException,
         IOException, SQLException, AuthorizeException {
         try {
@@ -677,7 +677,9 @@ public class METSManifest {
                 if (mdRef != null) {
                     String mimeType = mdRef.getAttributeValue("MIMETYPE");
                     if (mimeType != null && mimeType.equalsIgnoreCase("text/xml")) {
-                        Document mdd = parser.build(callback.getInputStream(mdRef));
+                        // This next line triggers a false-positive XXE warning from LGTM, even though we disallow DTD
+                        // parsing during initialization of parser in create()
+                        Document mdd = parser.build(callback.getInputStream(mdRef)); // lgtm [java/xxe]
                         List<Element> result = new ArrayList<Element>(1);
                         result.add(mdd.getRootElement());
                         return result;
