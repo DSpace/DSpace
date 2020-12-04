@@ -2514,37 +2514,39 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         context.restoreAuthSystemState();
-        // Here we create our first Relationship to the Publication to give it a dc.contributor.author virtual
-        // metadata field.
-        MvcResult mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
-                                                                .param("relationshipType",
-                                                                       isParentOrgUnitOf.getID().toString())
-                                                                .contentType(MediaType.parseMediaType
-                                                                    (org.springframework.data.rest.webmvc.RestMediaTypes
-                                                                         .TEXT_URI_LIST_VALUE))
-                                                                .content(
-                                                                    "https://localhost:8080/server/api/core/items/" + orgUnit1
-                                                                        .getID() + "\n" +
-                                                                        "https://localhost:8080/server/api/core/items" +
-                                                                        "/" + orgUnit2
-                                                                        .getID()))
-                                                   .andExpect(status().isCreated())
-                                                   .andReturn();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+        try {
+            // Here we create our first Relationship to the Publication to give it a dc.contributor.author virtual
+            // metadata field.
+            getClient(adminToken).perform(post("/api/core/relationships")
+                .param("relationshipType",
+                    isParentOrgUnitOf.getID().toString())
+                .contentType(MediaType.parseMediaType
+                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                        .TEXT_URI_LIST_VALUE))
+                .content(
+                    "https://localhost:8080/server/api/core/items/" + orgUnit1
+                        .getID() + "\n" +
+                    "https://localhost:8080/server/api/core/items" +
+                    "/" + orgUnit2
+                        .getID()))
+                                 .andExpect(status().isCreated())
+                                 .andDo(result -> idRef
+                                     .set(read(result.getResponse().getContentAsString(), "$.id")));
 
+            itemService.getMetadata(orgUnit1, "*", "*", "*", "*", true);
 
-        itemService.getMetadata(orgUnit1, "*", "*", "*", "*", true);
-
-        getClient(adminToken).perform(get("/api/core/items/" + orgUnit1.getID()))
-                             .andExpect(status().isOk())
-                             .andExpect(jsonPath("$.metadata['relation.isParentOrgUnitOf'][0].value",
-                                                 is(String.valueOf(orgUnit2.getID()))));
-        getClient(adminToken).perform(get("/api/core/items/" + orgUnit2.getID()))
-                             .andExpect(status().isOk())
-                             .andExpect(jsonPath("$.metadata['relation.isChildOrgUnitOf'][0].value",
-                                                 is(String.valueOf(orgUnit1.getID()))));
-
-
-
+            getClient(adminToken).perform(get("/api/core/items/" + orgUnit1.getID()))
+                                 .andExpect(status().isOk())
+                                 .andExpect(jsonPath("$.metadata['relation.isParentOrgUnitOf'][0].value",
+                                     is(String.valueOf(orgUnit2.getID()))));
+            getClient(adminToken).perform(get("/api/core/items/" + orgUnit2.getID()))
+                                 .andExpect(status().isOk())
+                                 .andExpect(jsonPath("$.metadata['relation.isChildOrgUnitOf'][0].value",
+                                     is(String.valueOf(orgUnit1.getID()))));
+        } finally {
+            RelationshipBuilder.deleteRelationship(idRef.get());
+        }
     }
 
     @Test
@@ -2561,45 +2563,54 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         context.restoreAuthSystemState();
-        // Here we create our first Relationship to the Publication to give it a dc.contributor.author virtual
-        // metadata field.
-        getClient(adminToken).perform(post("/api/core/relationships")
-                                                                .param("relationshipType",
-                                                                       isParentOrgUnitOf.getID().toString())
-                                                                .contentType(MediaType.parseMediaType
-                                                                    (org.springframework.data.rest.webmvc.RestMediaTypes
-                                                                         .TEXT_URI_LIST_VALUE))
-                                                                .content(
-                                                                    "https://localhost:8080/server/api/core/items/" + orgUnit1
-                                                                        .getID() + "\n" +
-                                                                        "https://localhost:8080/server/api/core/items" +
-                                                                        "/" + orgUnit2
-                                                                        .getID()))
-                                                   .andExpect(status().isCreated());
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+        AtomicReference<Integer> idRef2 = new AtomicReference<>();
+        try {
+            // Here we create our first Relationship to the Publication to give it a dc.contributor.author virtual
+            // metadata field.
+            getClient(adminToken).perform(post("/api/core/relationships")
+                .param("relationshipType",
+                    isParentOrgUnitOf.getID().toString())
+                .contentType(MediaType.parseMediaType
+                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                        .TEXT_URI_LIST_VALUE))
+                .content(
+                    "https://localhost:8080/server/api/core/items/" + orgUnit1
+                        .getID() + "\n" +
+                    "https://localhost:8080/server/api/core/items" +
+                    "/" + orgUnit2
+                        .getID()))
+                                 .andExpect(status().isCreated())
+                                 .andDo(result -> idRef
+                                     .set(read(result.getResponse().getContentAsString(), "$.id")));
 
-        getClient(adminToken).perform(post("/api/core/relationships")
-                                                                .param("relationshipType",
-                                                                       isParentOrgUnitOf.getID().toString())
-                                                                .contentType(MediaType.parseMediaType
-                                                                    (org.springframework.data.rest.webmvc.RestMediaTypes
-                                                                         .TEXT_URI_LIST_VALUE))
-                                                                .content(
-                                                                    "https://localhost:8080/server/api/core/items/" + orgUnit2
-                                                                        .getID() + "\n" +
-                                                                        "https://localhost:8080/server/api/core/items" +
-                                                                        "/" + orgUnit3
-                                                                        .getID()))
-                                                   .andExpect(status().isCreated());
+            getClient(adminToken).perform(post("/api/core/relationships")
+                .param("relationshipType",
+                    isParentOrgUnitOf.getID().toString())
+                .contentType(MediaType.parseMediaType
+                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                        .TEXT_URI_LIST_VALUE))
+                .content(
+                    "https://localhost:8080/server/api/core/items/" + orgUnit2
+                        .getID() + "\n" +
+                    "https://localhost:8080/server/api/core/items" +
+                    "/" + orgUnit3
+                        .getID()))
+                                 .andExpect(status().isCreated())
+                                 .andDo(result -> idRef2
+                                     .set(read(result.getResponse().getContentAsString(), "$.id")));
 
-        getClient().perform(get("/api/core/relationships/search/byLabel")
-                                .param("label", "isChildOrgUnitOf")
-                                .param("dso", String.valueOf(orgUnit2.getID()))
-                                .param("page", "0")
-                                .param("size", "1"))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.page", PageMatcher.pageEntryWithTotalPagesAndElements(0, 1, 1, 1)));
-
-
+            getClient().perform(get("/api/core/relationships/search/byLabel")
+                .param("label", "isChildOrgUnitOf")
+                .param("dso", String.valueOf(orgUnit2.getID()))
+                .param("page", "0")
+                .param("size", "1"))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$.page", PageMatcher.pageEntryWithTotalPagesAndElements(0, 1, 1, 1)));
+        } finally {
+            RelationshipBuilder.deleteRelationship(idRef.get());
+            RelationshipBuilder.deleteRelationship(idRef2.get());
+        }
     }
 
 
@@ -2617,43 +2628,49 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         context.restoreAuthSystemState();
-        // Here we create our first Relationship to the Publication to give it a dc.contributor.author virtual
-        // metadata field.
-        getClient(adminToken).perform(post("/api/core/relationships")
-                                          .param("relationshipType",
-                                                 isParentOrgUnitOf.getID().toString())
-                                          .contentType(MediaType.parseMediaType
-                                              (org.springframework.data.rest.webmvc.RestMediaTypes
-                                                   .TEXT_URI_LIST_VALUE))
-                                          .content(
-                                              "https://localhost:8080/server/api/core/items/" + orgUnit1
-                                                  .getID() + "\n" +
-                                                  "https://localhost:8080/server/api/core/items" +
-                                                  "/" + orgUnit2
-                                                  .getID()))
-                             .andExpect(status().isCreated());
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+        try {
+            // Here we create our first Relationship to the Publication to give it a dc.contributor.author virtual
+            // metadata field.
+            getClient(adminToken).perform(post("/api/core/relationships")
+                .param("relationshipType",
+                    isParentOrgUnitOf.getID().toString())
+                .contentType(MediaType.parseMediaType
+                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                        .TEXT_URI_LIST_VALUE))
+                .content(
+                    "https://localhost:8080/server/api/core/items/" + orgUnit1
+                        .getID() + "\n" +
+                    "https://localhost:8080/server/api/core/items" +
+                    "/" + orgUnit2
+                        .getID()))
+                                 .andExpect(status().isCreated())
+                                 .andDo(result -> idRef
+                                     .set(read(result.getResponse().getContentAsString(), "$.id")));
 
-        getClient(adminToken).perform(post("/api/core/relationships")
-                                          .param("relationshipType",
-                                                 isParentOrgUnitOf.getID().toString())
-                                          .contentType(MediaType.parseMediaType
-                                              (org.springframework.data.rest.webmvc.RestMediaTypes
-                                                   .TEXT_URI_LIST_VALUE))
-                                          .content(
-                                              "https://localhost:8080/server/api/core/items/" + orgUnit1
-                                                  .getID() + "\n" +
-                                                  "https://localhost:8080/server/api/core/items" +
-                                                  "/" + orgUnit3
-                                                  .getID()))
-                             .andExpect(status().isBadRequest());
+            getClient(adminToken).perform(post("/api/core/relationships")
+                .param("relationshipType",
+                    isParentOrgUnitOf.getID().toString())
+                .contentType(MediaType.parseMediaType
+                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                        .TEXT_URI_LIST_VALUE))
+                .content(
+                    "https://localhost:8080/server/api/core/items/" + orgUnit1
+                        .getID() + "\n" +
+                    "https://localhost:8080/server/api/core/items" +
+                    "/" + orgUnit3
+                        .getID()))
+                                 .andExpect(status().isBadRequest());
 
-        getClient().perform(get("/api/core/relationships/search/byLabel")
-                                .param("label", "isParentOrgUnitOf")
-                                .param("dso", String.valueOf(orgUnit1.getID()))
-                                .param("page", "0"))
-                   .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.page", PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)));
+            getClient().perform(get("/api/core/relationships/search/byLabel")
+                .param("label", "isParentOrgUnitOf")
+                .param("dso", String.valueOf(orgUnit1.getID()))
+                .param("page", "0"))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$.page", PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)));
 
-
+        } finally {
+            RelationshipBuilder.deleteRelationship(idRef.get());
+        }
     }
 }
