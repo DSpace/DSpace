@@ -157,16 +157,11 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
     }
 
     @SearchRestMethod(name = "findByItem")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public PoolTaskRest findByItem(@Parameter(value = "uuid", required = true) UUID itemUUID) {
         PoolTask poolTask = null;
         try {
             Context context = obtainContext();
-            EPerson currentUser = context.getCurrentUser();
-            if (currentUser == null) {
-                throw new RESTAuthorizationException(
-                    "This endpoint is available only to logged-in user to search for their"
-                    + " own claimed tasks or the admins");
-            }
             Item item = itemService.find(context, itemUUID);
             if (item == null) {
                 return null;
@@ -175,7 +170,7 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
             if (xmlWorkflowItem == null) {
                 return null;
             } else {
-                poolTask = poolTaskService.findByWorkflowIdAndEPerson(context, xmlWorkflowItem, currentUser);
+                poolTask = poolTaskService.findByWorkflowIdAndEPerson(context,xmlWorkflowItem,context.getCurrentUser());
             }
             if (poolTask == null) {
                 return null;
