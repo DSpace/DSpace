@@ -38,10 +38,14 @@
     <!--<bean class="org.dspace.discovery.SolrServiceIndexOutputPlugin"
           id="solrServiceIndexOutputPlugin"/>-->
 
-    <!-- Statistics services are both lazy loaded (by name), as you are likely
-          just using ONE of them and not both -->
     <bean id="solrLoggerService"
           class="org.dspace.statistics.MockSolrLoggerServiceImpl"
           lazy-init="true"/>
+
+    <bean id='EmbeddedSolrClientFactory'
+          class='org.dspace.statistics.EmbeddedSolrClientFactory'
+          autowire-candidate='true'>
+        <description>Connection to an embedded Solr instance.</description>
+    </bean>
 
 </beans>

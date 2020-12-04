@@ -110,11 +110,21 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author mdiggory at atmire.com
  */
 public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBean {
-
     private static final Logger log = LogManager.getLogger();
 
+    @Autowired(required = true)
+    protected BitstreamService bitstreamService;
+    @Autowired(required = true)
+    protected ContentServiceFactory contentServiceFactory;
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
+    @Autowired(required = true)
+    protected ClientInfoService clientInfoService;
+
+    @Autowired(required = true)
+    protected SolrClientFactory solrClientFactory;
+
     private static final String MULTIPLE_VALUES_SPLITTER = "|";
-    protected SolrClient solr;
 
     public static final String DATE_FORMAT_8601 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
@@ -127,21 +137,12 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     private static final List<String> statisticYearCores = new ArrayList<>();
     private static boolean statisticYearCoresInit = false;
 
-    @Autowired(required = true)
-    protected BitstreamService bitstreamService;
-    @Autowired(required = true)
-    protected ContentServiceFactory contentServiceFactory;
-    @Autowired(required = true)
-    private ConfigurationService configurationService;
-    @Autowired(required = true)
-    private ClientInfoService clientInfoService;
-
-    /** URL to the current-year statistics core.  Prior-year shards will have a year suffixed. */
-    private String statisticsCoreURL;
+    protected SolrClient solr;
 
     /** Name of the current-year statistics core.  Prior-year shards will have a year suffixed. */
     private String statisticsCoreBase;
 
+    /** Possible values of the {@code type} field of a usage event document. */
     public static enum StatisticsType {
         VIEW("view"),
         SEARCH("search"),
@@ -160,13 +161,11 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     }
 
     protected SolrLoggerServiceImpl() {
-
     }
-
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        statisticsCoreURL = configurationService.getProperty("solr-statistics.server");
+        String statisticsCoreURL = configurationService.getProperty("solr-statistics.server");
 
         if (null != statisticsCoreURL) {
             Path statisticsPath = Paths.get(new URI(statisticsCoreURL).getPath());
@@ -181,16 +180,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         log.info("usage-statistics.dbfile:  {}",
                 configurationService.getProperty("usage-statistics.dbfile"));
 
-        HttpSolrClient server = null;
-
-        if (statisticsCoreURL != null) {
-            try {
-                server = new HttpSolrClient.Builder(statisticsCoreURL).build();
-            } catch (Exception e) {
-                log.error("Error accessing Solr server configured in 'solr-statistics.server'", e);
-            }
-        }
-        solr = server;
+        solr = solrClientFactory.getClient(statisticsCoreURL);
 
         // Read in the file so we don't have to do it all the time
         //spiderIps = SpiderDetector.getSpiderIpAddresses();
@@ -204,15 +194,15 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 service = new DatabaseReader.Builder(dbFile).build();
             } catch (FileNotFoundException fe) {
                 log.error(
-                    "The GeoLite Database file is missing (" + dbPath + ")! Solr Statistics cannot generate location " +
+                    "The GeoLite Database file is missing ({})! Solr Statistics cannot generate location " +
                         "based reports! Please see the DSpace installation instructions for instructions to install " +
                         "this file.",
-                    fe);
+                        dbPath, fe);
             } catch (IOException e) {
                 log.error(
-                    "Unable to load GeoLite Database file (" + dbPath + ")! You may need to reinstall it. See the " +
+                    "Unable to load GeoLite Database file ({})! You may need to reinstall it. See the " +
                         "DSpace installation instructions for more details.",
-                    e);
+                        dbPath, e);
             }
         } else {
             log.error("The required 'dbfile' configuration is missing in solr-statistics.cfg!");
@@ -707,83 +697,40 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         }
     }
 
-
     @Override
-    public void markRobotsByIP() {
-        for (String ip : SpiderDetector.getSpiderIpAddresses()) {
-
-            try {
-
-                /* Result Process to alter record to be identified as a bot */
-                ResultProcessor processor = new ResultProcessor() {
-                    @Override
-                    public void process(SolrInputDocument doc) throws IOException, SolrServerException {
-                        doc.removeField("isBot");
-                        doc.addField("isBot", true);
-                        solr.add(doc);
-                        log.info("Marked " + doc.getFieldValue("ip") + " as bot");
-                    }
-                };
-
-                /* query for ip, exclude results previously set as bots. */
-                processor.execute("ip:" + ip + "* AND -isBot:true");
-
-                solr.commit();
-
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-            }
-
-
-        }
-
-    }
-
-    @Override
-    public void markRobotByUserAgent(String agent) {
-        try {
-
-            /* Result Process to alter record to be identified as a bot */
-            ResultProcessor processor = new ResultProcessor() {
-                @Override
-                public void process(SolrInputDocument doc) throws IOException, SolrServerException {
+    public void markRobots() {
+        ResultProcessor processor = new ResultProcessor() {
+            @Override
+            public void process(SolrInputDocument doc)
+                    throws IOException, SolrServerException {
+                String clientIP = (String) doc.getField("ip").getValue();
+                String hostname = (String) doc.getField("dns").getValue();
+                String agent = (String) doc.getField("userAgent").getValue();
+                if (SpiderDetector.isSpider(clientIP, null, hostname, agent)) {
                     doc.removeField("isBot");
                     doc.addField("isBot", true);
                     solr.add(doc);
+                    log.info("Marked {} / {} / {} as a robot in record {}.",
+                            clientIP, hostname, agent,
+                            doc.getField("uid").getValue());
                 }
-            };
+            }
+        };
 
-            /* query for ip, exclude results previously set as bots. */
-            processor.execute("userAgent:" + agent + " AND -isBot:true");
-
+        try {
+            processor.execute("-isBot:true");
             solr.commit();
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
+        } catch (SolrServerException | IOException ex) {
+            log.error("Failed while marking robot accesses.", ex);
         }
     }
 
     @Override
-    public void deleteRobotsByIsBotFlag() {
+    public void deleteRobots() {
         try {
             solr.deleteByQuery("isBot:true");
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public void deleteIP(String ip) {
-        try {
-            solr.deleteByQuery("ip:" + ip + "*");
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public void deleteRobotsByIP() {
-        for (String ip : SpiderDetector.getSpiderIpAddresses()) {
-            deleteIP(ip);
+        } catch (IOException | SolrServerException e) {
+            log.error("Failed while deleting robot accesses.", e);
         }
     }
 
@@ -972,7 +919,6 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 } catch (ParseException e1) {
                     e1.printStackTrace();
                 }
-                // e.printStackTrace();
             }
             String dateformatString = "dd-MM-yyyy";
             if ("DAY".equals(type)) {
@@ -1045,11 +991,6 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         // performance and ensure the search result ordering will
         // not be influenced
 
-        // Choose to filter by the Legacy spider IP list (may get too long to properly filter all IP's
-        if (configurationService.getBooleanProperty("solr-statistics.query.filter.spiderIp", false)) {
-            solrQuery.addFilterQuery(getIgnoreSpiderIPs());
-        }
-
         // Choose to filter by isBot field, may be overriden in future
         // to allow views on stats based on bots.
         if (configurationService.getBooleanProperty("solr-statistics.query.filter.isBot", true)) {
@@ -1064,7 +1005,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         if (bundles != null && bundles.length > 0) {
 
             /**
-             * The code below creates a query that will allow only records which do not have a bundlename
+             * The code below creates a query that will allow only records which do not have a bundle name
              * (items, collections, ...) or bitstreams that have a configured bundle name
              */
             StringBuffer bundleQuery = new StringBuffer();
@@ -1307,7 +1248,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
      * @throws IOException         When connection to the SOLR server fails
      */
     public Set<String> getMultivaluedFieldNames() throws SolrServerException, IOException {
-        Set<String> multivaluedFields = new HashSet<String>();
+        Set<String> multivaluedFields = new HashSet<>();
         LukeRequest lukeRequest = new LukeRequest();
         lukeRequest.setShowSchema(true);
         LukeResponse process = lukeRequest.process(solr);
