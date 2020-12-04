@@ -22,11 +22,9 @@ ENV APACHE_SERVER_NAME localhost
 
 # Ensure Apache2, mod_shib & shibboleth daemon are installed.
 # Also install ssl-cert to provide a local SSL cert for use with Apache
-# TODO: curl may not be needed here?
 RUN apt-get update \
       && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
            apache2 \
-           curl \
            ca-certificates \
            ssl-cert \
            libapache2-mod-shib2 \
@@ -34,12 +32,12 @@ RUN apt-get update \
       && rm -rf /var/lib/apt/lists/* \
       && rm -rf /tmp/*
 
-# Setup Apache configs & enable mod-shib
-RUN a2enmod ssl rewrite shib && \
-    a2ensite default-ssl.conf
-    #a2dissite 000-default.conf default-ssl.conf
-
-# TODO: NEED to copy over VirtualHost configs specific to Shibboleth!!
+# Setup Apache configs & enable mod-shib & dspace vhost
+# TODO: AJP Connector must be installed/enabled in Tomcat!!!  Need to update core DSpace image
+COPY dspace-vhost.conf /etc/apache2/sites-available/
+RUN a2enmod ssl headers proxy proxy_ajp proxy_http shib && \
+    a2dissite 000-default.conf default-ssl.conf && \
+    a2ensite dspace-vhost.conf
 
 # Setup Shibboleth configs
 COPY shibboleth2.xml /etc/shibboleth/
