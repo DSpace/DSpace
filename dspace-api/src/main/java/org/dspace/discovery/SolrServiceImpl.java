@@ -34,9 +34,11 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
@@ -48,6 +50,7 @@ import org.apache.solr.common.params.HighlightParams;
 import org.apache.solr.common.params.MoreLikeThisParams;
 import org.apache.solr.common.params.SpellingParams;
 import org.apache.solr.common.util.NamedList;
+import org.dspace.app.metrics.CrisMetrics;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.content.Collection;
@@ -1381,4 +1384,26 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     public SolrSearchCore getSolrSearchCore() {
         return solrSearchCore;
     }
+
+    @Override
+    public void updateMetrics(Context context, CrisMetrics metric) {
+        UpdateRequest req = new UpdateRequest();
+        SolrClient solrClient =  solrSearchCore.getSolr();
+        StringBuilder uniqueID = new StringBuilder("Item-");
+        uniqueID.append(metric.getResource().getID());
+        String type = "metrics." + metric.getMetricType();
+        try {
+            SolrInputDocument solrInDoc = new SolrInputDocument();
+            solrInDoc.addField("search.uniqueid", uniqueID);
+            HashMap<String, Object> map = new HashMap<String, Object>();
+            map.put("set", metric.getMetricCount());
+            solrInDoc.addField(type, map);
+            req.add(solrInDoc);
+            solrClient.request(req);
+            solrClient.commit();
+        } catch (SolrServerException | IOException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
 }
