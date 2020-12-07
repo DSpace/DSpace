@@ -42,6 +42,22 @@ docker-compose -p d7 up -d
 docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-angular.yml up -d
 ```
 
+## Run DSpace 7 REST and Shibboleth SP (in Apache) from your branch
+
+Update `local.cfg` in this directory to include:
+```
+dspace.server.url=https://localhost/server
+plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.PasswordAuthentication
+plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.ShibAuthentication
+```
+
+Start all containers:
+```
+docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-shibboleth.yml up -d
+```
+
+Access DSpace REST at: https://localhost/server/
+
 ## Run DSpace 7 REST and Angular from local branches
 
 _The system will be started in 2 steps. Each step shares the same docker network._
