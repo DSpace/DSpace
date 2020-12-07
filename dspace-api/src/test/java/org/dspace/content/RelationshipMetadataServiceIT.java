@@ -8,8 +8,8 @@
 package org.dspace.content;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.sql.SQLException;
@@ -62,7 +62,9 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
      * initialize resources required for the tests.
      *
      * Other methods can be annotated with @Before here or in subclasses
-     * but no execution order is guaranteed
+     * but no execution order is guaranteed.
+     *
+     * @throws Exception passed through.
      */
     @Before
     @Override

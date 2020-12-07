@@ -21,6 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -30,6 +31,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataFieldName;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
@@ -57,7 +59,6 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
  * Container class for code that is useful to many packagers.
  *
  * @author Larry Stone
- * @version $Revision$
  */
 
 public class PackageUtils {
@@ -65,7 +66,7 @@ public class PackageUtils {
     /**
      * log4j category
      */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(PackageUtils.class);
+    private static final Logger log = LogManager.getLogger(PackageUtils.class);
 
     // Map of metadata elements for Communities and Collections
     // Format is alternating key/value in a straight array; use this
@@ -159,7 +160,7 @@ public class PackageUtils {
     public static void checkItemMetadata(Item item)
         throws PackageValidationException {
         List<MetadataValue> t = itemService.getMetadata(item, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
-        if (t == null || t.size() == 0) {
+        if (t == null || t.isEmpty()) {
             throw new PackageValidationException("Item cannot be created without the required \"title\" DC metadata.");
         }
     }
@@ -704,7 +705,9 @@ public class PackageUtils {
             // to clear out all the Collection database fields.
             for (String dbField : ccMetadataToDC.keySet()) {
                 try {
-                    collectionService.setMetadata(context, collection, dbField, null);
+                    String[] elements = MetadataFieldName.parse(dbField);
+                    collectionService.clearMetadata(context, collection,
+                            elements[0], elements[1], elements[2], Item.ANY);
                 } catch (IllegalArgumentException ie) {
                     // ignore the error -- just means the field doesn't exist in DB
                     // Communities & Collections don't include the exact same metadata fields
@@ -718,7 +721,9 @@ public class PackageUtils {
             // to clear out all the Community database fields.
             for (String dbField : ccMetadataToDC.keySet()) {
                 try {
-                    communityService.setMetadata(context, community, dbField, null);
+                    String[] elements = MetadataFieldName.parse(dbField);
+                    communityService.clearMetadata(context, community,
+                            elements[0], elements[1], elements[2], Item.ANY);
                 } catch (IllegalArgumentException ie) {
                     // ignore the error -- just means the field doesn't exist in DB
                     // Communities & Collections don't include the exact same metadata fields

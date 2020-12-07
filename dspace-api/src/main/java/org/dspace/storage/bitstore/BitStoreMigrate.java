@@ -9,10 +9,11 @@ package org.dspace.storage.bitstore;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
@@ -28,11 +29,12 @@ public class BitStoreMigrate {
     /**
      * log4j log
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(BitStoreMigrate.class);
+    private static final Logger log = LogManager.getLogger(BitStoreMigrate.class);
 
-    private static final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
-    private static final BitstreamStorageService bitstreamStorageService =
-        StorageServiceFactory.getInstance().getBitstreamStorageService();
+    private static final BitstreamService bitstreamService
+            = ContentServiceFactory.getInstance().getBitstreamService();
+    private static final BitstreamStorageService bitstreamStorageService
+            = StorageServiceFactory.getInstance().getBitstreamStorageService();
 
     /**
      * Default constructor
@@ -49,7 +51,7 @@ public class BitStoreMigrate {
             log.info("Migrate Assetstore");
 
             // set up command line parser
-            CommandLineParser parser = new PosixParser();
+            CommandLineParser parser = new DefaultParser();
             CommandLine line = null;
 
             // create an options object and populate it

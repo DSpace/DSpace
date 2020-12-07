@@ -51,7 +51,6 @@ import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -61,6 +60,8 @@ import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.WorkflowItem;
@@ -116,7 +117,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
     protected HashMap<UUID, String> entityTypeMap = new HashMap<>();
 
     /**
-     * Map of UUIDs to their relations that are referenced within any import with their referers.
+     * Map of UUIDs to their relations that are referenced within any import with their referrers.
      *
      * @see #populateEntityRelationMap(String, String, String)
      */
@@ -129,7 +130,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
     protected ArrayList<String> relationValidationErrors = new ArrayList<>();
 
     /**
-     * Counter of rows proccssed in a CSV.
+     * Counter of rows processed in a CSV.
      */
     protected Integer rowCount = 1;
 
@@ -158,6 +159,8 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
     protected EntityService entityService = ContentServiceFactory.getInstance().getEntityService();
     protected AuthorityValueService authorityValueService = AuthorityServiceFactory.getInstance()
                                                                                    .getAuthorityValueService();
+    protected ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
      * Create an instance of the metadata importer. Requires a context and an array of CSV lines
@@ -419,7 +422,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                         // Do nothing
                     } else if ("expunge".equals(action)) {
                         // Does the configuration allow deletes?
-                        if (!ConfigurationManager.getBooleanProperty("bulkedit", "allowexpunge", false)) {
+                        if (!configurationService.getBooleanProperty("bulkedit.allowexpunge", false)) {
                             throw new MetadataImportException("'expunge' action denied by configuration");
                         }
 
@@ -1368,12 +1371,12 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
      * Set authority controlled fields
      */
     private void setAuthorizedMetadataFields() {
-        authorityControlled = new HashSet<String>();
-        Enumeration propertyNames = ConfigurationManager.getProperties().propertyNames();
+        authorityControlled = new HashSet<>();
+        Enumeration propertyNames = configurationService.getProperties().propertyNames();
         while (propertyNames.hasMoreElements()) {
             String key = ((String) propertyNames.nextElement()).trim();
             if (key.startsWith(AC_PREFIX)
-                && ConfigurationManager.getBooleanProperty(key, false)) {
+                && configurationService.getBooleanProperty(key, false)) {
                 authorityControlled.add(key.substring(AC_PREFIX.length()));
             }
         }
@@ -1750,11 +1753,11 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
     }
 
     /**
-     * Generates a list of potenital Relationship Types given a typeName and attempts to match the given
+     * Generates a list of potential Relationship Types given a typeName and attempts to match the given
      * targetType and originType to a Relationship Type in the list.
      *
      * @param targetType entity type of target.
-     * @param originType entity type of origin referer.
+     * @param originType entity type of origin referrer.
      * @param typeName left or right typeName of the respective Relationship.
      * @return the UUID of the item.
      */
