@@ -111,11 +111,9 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
 
     static {
         List<String> aliasList = new ArrayList<>();
-        List<String> pe = configurationService.getPropertyKeys();
-        for (String key : pe) {
-            if (key.startsWith(CONFIG_PREFIX)) {
-                aliasList.add(key.substring(CONFIG_PREFIX.length()));
-            }
+        List<String> keys = configurationService.getPropertyKeys(CONFIG_PREFIX);
+        for (String key : keys) {
+            aliasList.add(key.substring(CONFIG_PREFIX.length()));
         }
         aliases = (String[]) aliasList.toArray(new String[aliasList.size()]);
     }

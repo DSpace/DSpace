@@ -160,13 +160,11 @@
          of the values to the next bean in the chain -->
     <bean class="org.dspace.content.virtual.Related" id="volumeJournal_issn_related">
         <property name="relationshipTypeString" value="isJournalOfVolume"/>
-        <property name="place" value="1"/>
         <property name="virtualMetadataConfiguration" ref="volumeJournal_issn"/>
     </bean>
 
     <bean class="org.dspace.content.virtual.Related" id="volumeJournal_title_related">
         <property name="relationshipTypeString" value="isJournalOfVolume"/>
-        <property name="place" value="1"/>
         <property name="virtualMetadataConfiguration" ref="volumeJournal_title"/>
     </bean>
 
@@ -233,31 +231,26 @@
      bean to retrieve the final value -->
     <bean class="org.dspace.content.virtual.Related" id="issueVolumeJournal_issn_related">
         <property name="relationshipTypeString" value="isJournalVolumeOfIssue"/>
-        <property name="place" value="1"/>
         <property name="virtualMetadataConfiguration" ref="volumeJournal_issn_related"/>
     </bean>
 
     <bean class="org.dspace.content.virtual.Related" id="issueVolumeJournal_title_related">
         <property name="relationshipTypeString" value="isJournalVolumeOfIssue"/>
-        <property name="place" value="1"/>
         <property name="virtualMetadataConfiguration" ref="volumeJournal_title_related"/>
     </bean>
 
     <bean class="org.dspace.content.virtual.Related" id="issueVolume_title_related">
         <property name="relationshipTypeString" value="isJournalVolumeOfIssue"/>
-        <property name="place" value="1"/>
         <property name="virtualMetadataConfiguration" ref="issueVolume_title"/>
     </bean>
 
     <bean class="org.dspace.content.virtual.Related" id="issueVolumeJournal_uuid_related">
         <property name="relationshipTypeString" value="isJournalVolumeOfIssue"/>
-        <property name="place" value="1"/>
         <property name="virtualMetadataConfiguration" ref="volumeJournal_uuid_related"/>
     </bean>
 
     <bean class="org.dspace.content.virtual.Related" id="volumeJournal_uuid_related">
         <property name="relationshipTypeString" value="isJournalOfVolume"/>
-        <property name="place" value="1"/>
         <property name="virtualMetadataConfiguration" ref="volumeJournal_uuid"/>
     </bean>
     <bean class="org.dspace.content.virtual.UUIDValue" id="volumeJournal_uuid"/>

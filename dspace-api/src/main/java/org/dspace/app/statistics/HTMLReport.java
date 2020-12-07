@@ -60,18 +60,23 @@ public class HTMLReport implements Report {
     /**
      * the output file to which to write aggregation data
      */
-    ConfigurationService configurationService
-            = DSpaceServicesFactory.getInstance().getConfigurationService();
-    private String output = configurationService.getProperty("dspace.dir") +
-        File.separator + "log" + File.separator + "report";
+    private String output;
 
     /**
-     * constructor for HTML reporting
+     * Output file path is set to {@code ${dspace.dir}/log/report}.
      */
     public HTMLReport() {
-        // empty constructor
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        output = configurationService.getProperty("dspace.dir")
+                + File.separator + "log" + File.separator + "report";
     }
 
+    /**
+     * Set a non-default output file path.
+     *
+     * @param newOutput new path to the report.
+     */
     public void setOutput(String newOutput) {
         if (newOutput != null) {
             output = newOutput;
@@ -346,14 +351,14 @@ public class HTMLReport implements Report {
             frag.append("\t<tr>\n");
             frag.append("\t\t<th>\n");
             if (content.getStatName() != null) {
-                frag.append("\t\t\t" + content.getStatName() + "\n");
+                frag.append("\t\t\t").append(content.getStatName()).append("\n");
             } else {
                 frag.append("\t\t\t&nbsp;\n");
             }
             frag.append("\t\t</th>\n");
             frag.append("\t\t<th>\n");
             if (content.getResultName() != null) {
-                frag.append("\t\t\t" + content.getResultName() + "\n");
+                frag.append("\t\t\t").append(content.getResultName()).append("\n");
             } else {
                 frag.append("\t\t\t&nbsp;\n");
             }
@@ -371,10 +376,10 @@ public class HTMLReport implements Report {
                 style = "reportEvenRow";
             }
 
-            frag.append("\t<tr class=\"" + style + "\">\n\t\t<td>\n");
+            frag.append("\t<tr class=\"").append(style).append("\">\n\t\t<td>\n");
             frag.append("\t\t\t");
             if (stats[i].getReference() != null) {
-                frag.append("<a href=\"" + stats[i].getReference() + "\" ");
+                frag.append("<a href=\"").append(stats[i].getReference()).append("\" ");
                 frag.append("target=\"_blank\">");
             }
             frag.append(this.clean(stats[i].getKey()));
@@ -408,7 +413,7 @@ public class HTMLReport implements Report {
         if (floor > 0) {
             StringBuilder frag = new StringBuilder();
             frag.append("<div class=\"reportFloor\">");
-            frag.append("(more than " + ReportTools.numberFormat(floor) + " times)");
+            frag.append("(more than ").append(ReportTools.numberFormat(floor)).append(" times)");
             frag.append("</div>\n");
             return frag.toString();
         } else {
