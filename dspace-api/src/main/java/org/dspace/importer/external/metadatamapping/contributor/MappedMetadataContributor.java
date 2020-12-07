@@ -8,11 +8,11 @@
 package org.dspace.importer.external.metadatamapping.contributor;
 
 import java.util.Collection;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.importer.external.metadatamapping.MetadataFieldMapping;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
+import org.dspace.util.SimpleMapConverter;
 
 /**
  * implementation of {@link MetadataContributor} that returns values transformed according to a defined map, or
@@ -24,15 +24,12 @@ public class MappedMetadataContributor implements MetadataContributor<String> {
 
     private final MetadataContributor<String> innerContributor;
 
-    private final Map<String, String> valuesMapping;
-
-    private final String defaultValue;
+    private final SimpleMapConverter mapConverter;
 
     public MappedMetadataContributor(MetadataContributor<String> innerContributor,
-                                     final Map<String, String> valuesMapping, final String defaultValue) {
+                                     SimpleMapConverter mapConverter) {
         this.innerContributor = innerContributor;
-        this.valuesMapping = valuesMapping;
-        this.defaultValue = defaultValue;
+        this.mapConverter = mapConverter;
     }
 
     @Override
@@ -47,7 +44,7 @@ public class MappedMetadataContributor implements MetadataContributor<String> {
                 metadatum.setValue("");
                 continue;
             }
-            metadatum.setValue(valuesMapping.getOrDefault(metadatum.getValue(), defaultValue));
+            metadatum.setValue(mapConverter.getValue(metadatum.getValue()));
         }
         return metadata;
     }
