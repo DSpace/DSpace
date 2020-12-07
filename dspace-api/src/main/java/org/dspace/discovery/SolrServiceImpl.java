@@ -1391,19 +1391,41 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         SolrClient solrClient =  solrSearchCore.getSolr();
         StringBuilder uniqueID = new StringBuilder("Item-");
         uniqueID.append(metric.getResource().getID());
-        String type = "metrics." + metric.getMetricType();
+        String type = "metric." + metric.getMetricType();
+        String typeId = "metric.id." + metric.getMetricType();
+        String typeAcquisitionDate = "metric.acquisitionDate." + metric.getMetricType();
         try {
             SolrInputDocument solrInDoc = new SolrInputDocument();
-            solrInDoc.addField("search.uniqueid", uniqueID);
-            HashMap<String, Object> map = new HashMap<String, Object>();
-            map.put("set", metric.getMetricCount());
-            solrInDoc.addField(type, map);
+            solrInDoc.addField(SearchUtils.RESOURCE_UNIQUE_ID, uniqueID);
+            HashMap<String, Object> map1 = new HashMap<String, Object>();
+            HashMap<String, Object> map2 = new HashMap<String, Object>();
+            HashMap<String, Object> map3 = new HashMap<String, Object>();
+            map1.put("set", metric.getMetricCount());
+            map2.put("set", metric.getId());
+            map3.put("set", metric.getAcquisitionDate());
+            solrInDoc.addField(type, map1);
+            solrInDoc.addField(typeId, map2);
+            solrInDoc.addField(typeAcquisitionDate, map3);
             req.add(solrInDoc);
             solrClient.request(req);
             solrClient.commit();
+            retriveSolrDocByUniqueID(metric.getResource().getID().toString());
         } catch (SolrServerException | IOException e) {
             log.error(e.getMessage(), e);
         }
     }
 
+    @Override
+    public QueryResponse retriveSolrDocByUniqueID(String uniqueID) {
+        SolrClient solrClient =  solrSearchCore.getSolr();
+        SolrQuery q = new SolrQuery(SearchUtils.RESOURCE_UNIQUE_ID + ":Item-" + uniqueID);
+        QueryResponse queryResponse = null;;
+        try {
+            queryResponse = solrClient.query(q);
+        } catch (SolrServerException | IOException e) {
+            log.error(e.getMessage(), e);
+        }
+        System.out.println(queryResponse.toString());
+        return queryResponse;
+    }
 }

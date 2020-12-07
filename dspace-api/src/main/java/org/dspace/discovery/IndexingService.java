@@ -10,6 +10,7 @@ package org.dspace.discovery;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.dspace.app.metrics.CrisMetrics;
 import org.dspace.core.Context;
 
@@ -65,4 +66,5 @@ public interface IndexingService {
 
     void updateMetrics(Context context, CrisMetrics metric);
 
+    public QueryResponse retriveSolrDocByUniqueID(String uniqueID);
 }
