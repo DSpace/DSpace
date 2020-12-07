@@ -193,6 +193,10 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
         return addMetadataValue("cris", "sourceId", null, sourceId);
     }
 
+    public WorkspaceItemBuilder withDoiIdentifier(String doi) {
+        return addMetadataValue("dc", "identifier", "doi", doi);
+    }
+
     public WorkspaceItemBuilder grantLicense() {
         Item item = workspaceItem.getItem();
         String license;

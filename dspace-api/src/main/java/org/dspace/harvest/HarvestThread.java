@@ -16,6 +16,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
 import org.dspace.harvest.factory.HarvestServiceFactory;
+import org.dspace.harvest.model.OAIHarvesterOptions;
 import org.dspace.harvest.service.HarvestedCollectionService;
 
 /**
@@ -52,7 +53,7 @@ public class HarvestThread extends Thread {
             dso = collectionService.find(context, collectionId);
             hc = harvestedCollectionService.find(context, dso);
             try {
-                harvester.runHarvest(context, hc, false, UUID.randomUUID());
+                harvester.runHarvest(context, hc, new OAIHarvesterOptions(false, false, true));
             } catch (RuntimeException e) {
                 log.error("Runtime exception in thread: " + this.toString());
                 log.error(e.getMessage() + " " + e.getCause());

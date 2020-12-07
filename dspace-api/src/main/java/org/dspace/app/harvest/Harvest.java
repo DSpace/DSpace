@@ -34,6 +34,7 @@ import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.harvest.HarvestedCollection;
 import org.dspace.harvest.OAIHarvester;
 import org.dspace.harvest.factory.HarvestServiceFactory;
+import org.dspace.harvest.model.OAIHarvesterOptions;
 import org.dspace.harvest.service.HarvestedCollectionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +77,8 @@ public class Harvest {
         options.addOption("P", "purge", false, "purge all harvestable collections");
 
         options.addOption("F", "force synchronization", false, "force the synchronization");
+        options.addOption("V", "validate", false, "to enable the item validation");
+        options.addOption("W", "workflow", false, "to start the item workflow after its creation");
 
 
         options.addOption("e", "eperson", true,
@@ -103,7 +106,9 @@ public class Harvest {
         String oaiSetID = null;
         String metadataKey = null;
         int harvestType = 0;
-        boolean forceSynchronization = false;
+        boolean forceSynch = false;
+        boolean validation = false;
+        boolean submitEnabled = true;
 
         if (line.hasOption('h')) {
             HelpFormatter myhelp = new HelpFormatter();
@@ -171,7 +176,15 @@ public class Harvest {
         if (line.hasOption('m')) {
             metadataKey = line.getOptionValue('m');
         }
-        forceSynchronization = line.hasOption('F');
+        if (line.hasOption('F')) {
+            forceSynch = true;
+        }
+        if (line.hasOption('V')) {
+            validation = true;
+        }
+        if (line.hasOption('W')) {
+            submitEnabled = false;
+        }
 
 
         // Instantiate our class
@@ -193,7 +206,8 @@ public class Harvest {
                 System.exit(1);
             }
 
-            harvester.runHarvest(collection, eperson, forceSynchronization);
+            harvester.runHarvest(collection, eperson, new OAIHarvesterOptions(forceSynch, validation, submitEnabled));
+
         } else if ("start".equals(command)) {
             // start the harvest loop
             startHarvester();
@@ -388,7 +402,7 @@ public class Harvest {
     /**
      * Run a single harvest cycle on the specified collection under the authorization of the supplied EPerson
      */
-    private void runHarvest(String collectionID, String email, boolean forceSynchronization) {
+    private void runHarvest(String collectionID, String email, OAIHarvesterOptions options) {
         System.out.println("Running: a harvest cycle on " + collectionID);
 
         System.out.print("Initializing the harvester... ");
@@ -403,15 +417,14 @@ public class Harvest {
             System.out.println("Harvest started... ");
             context.setCurrentUser(eperson);
 
-            UUID processId = UUID.randomUUID();
             long startTimestamp = System.currentTimeMillis();
 
-            logProcess(processId, hc, true, startTimestamp);
+            logProcess(options.getProcessId(), hc, true, startTimestamp);
 
-            harvester.runHarvest(context, hc, forceSynchronization, processId);
+            harvester.runHarvest(context, hc, options);
             context.complete();
 
-            logProcess(processId, hc, false, startTimestamp);
+            logProcess(options.getProcessId(), hc, false, startTimestamp);
 
             System.out.println("success. ");
 
