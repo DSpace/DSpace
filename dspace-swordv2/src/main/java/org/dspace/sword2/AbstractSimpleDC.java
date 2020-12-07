@@ -10,7 +10,6 @@ package org.dspace.sword2;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Properties;
 
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
@@ -21,6 +20,10 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 public class AbstractSimpleDC {
+    private static final String DC_PREFIX = "swordv2-server.simpledc";
+
+    private static final String ATOM_PREFIX = "swordv2-server.atom";
+
     protected HashMap<String, String> dcMap = null;
 
     protected HashMap<String, String> atomMap = null;
@@ -35,27 +38,21 @@ public class AbstractSimpleDC {
         if (this.dcMap == null) {
             // we should load our DC map from configuration
             this.dcMap = new HashMap<>();
-            Properties props = configurationService.getProperties();
-            for (Object key : props.keySet()) {
-                String keyString = (String) key;
-                if (keyString.startsWith("swordv2-server.simpledc.")) {
-                    String k = keyString.substring("swordv2-server.simpledc.".length());
-                    String v = (String) props.get(key);
-                    this.dcMap.put(k, v);
-                }
+            List<String> keys = configurationService.getPropertyKeys(DC_PREFIX);
+            for (String key : keys) {
+                String k = key.substring(DC_PREFIX.length() + 1);
+                String v = configurationService.getProperty(key);
+                this.dcMap.put(k, v);
             }
         }
 
         if (this.atomMap == null) {
             this.atomMap = new HashMap<>();
-            Properties props = configurationService.getProperties();
-            for (Object key : props.keySet()) {
-                String keyString = (String) key;
-                if (keyString.startsWith("swordv2-server.atom.")) {
-                    String k = keyString.substring("swordv2-server.atom.".length());
-                    String v = (String) props.get(key);
-                    this.atomMap.put(k, v);
-                }
+            List<String> keys = configurationService.getPropertyKeys(ATOM_PREFIX);
+            for (String key : keys) {
+                String k = key.substring(ATOM_PREFIX.length() + 1);
+                String v = configurationService.getProperty(key);
+                this.atomMap.put(k, v);
             }
         }
     }
