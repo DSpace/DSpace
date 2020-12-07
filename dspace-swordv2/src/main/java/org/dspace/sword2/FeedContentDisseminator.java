@@ -25,7 +25,6 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.swordapp.server.SwordError;
@@ -33,6 +32,7 @@ import org.swordapp.server.SwordServerException;
 
 public class FeedContentDisseminator extends AbstractSimpleDC
     implements SwordContentDisseminator {
+    @Override
     public InputStream disseminate(Context context, Item item)
         throws DSpaceSwordException, SwordError, SwordServerException {
         try {
@@ -82,8 +82,8 @@ public class FeedContentDisseminator extends AbstractSimpleDC
         }
 
         // ensure that the feed has one author or more
-        if (feed.getAuthors().size() == 0) {
-            feed.addAuthor(ConfigurationManager.getProperty("dspace.name"));
+        if (feed.getAuthors().isEmpty()) {
+            feed.addAuthor(configurationService.getProperty("dspace.name"));
         }
     }
 
@@ -126,30 +126,36 @@ public class FeedContentDisseminator extends AbstractSimpleDC
         entry.setContent(new IRI(bsUrl), contentType);
     }
 
+    @Override
     public boolean disseminatesContentType(String contentType)
         throws DSpaceSwordException, SwordError, SwordServerException {
         return "application/atom+xml".equals(contentType) ||
             "application/atom+xml;type=feed".equals(contentType);
     }
 
+    @Override
     public boolean disseminatesPackage(String contentType)
         throws DSpaceSwordException, SwordError, SwordServerException {
         // we're just going to ignore packaging formats here
         return true;
     }
 
+    @Override
     public void setContentType(String contentType) {
         // we just return the one format, so ignore this
     }
 
+    @Override
     public void setPackaging(String packaging) {
         // we just return the one format, so ignore this
     }
 
+    @Override
     public String getContentType() {
         return "application/atom+xml;type=feed";
     }
 
+    @Override
     public String getPackaging() {
         // no packaging
         return null;

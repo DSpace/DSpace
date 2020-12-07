@@ -7,6 +7,7 @@
  */
 package org.dspace.health;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,18 +15,20 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
+import javax.mail.MessagingException;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Email;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.PluginService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -33,10 +36,10 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  */
 public class Report {
 
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(Report.class);
+    private static final Logger log = LogManager.getLogger(Report.class);
     public static final String EMAIL_PATH = "config/emails/healthcheck";
     // store the individual check reports
-    private StringBuilder summary_;
+    private final StringBuilder summary_;
 
     // ctor
     //
@@ -95,6 +98,7 @@ public class Report {
         return checks;
     }
 
+    @Override
     public String toString() {
         return summary_.toString();
     }
@@ -145,7 +149,7 @@ public class Report {
 
         CommandLine cmdline = null;
         try {
-            cmdline = new PosixParser().parse(options, args);
+            cmdline = new DefaultParser().parse(options, args);
         } catch (ParseException e) {
             log.fatal("Invalid command line " + e.toString(), e);
             System.exit(1);
@@ -173,10 +177,11 @@ public class Report {
         }
 
         try {
-
+            ConfigurationService configurationService
+                    = DSpaceServicesFactory.getInstance().getConfigurationService();
             // last n days
-            int for_last_n_days = ConfigurationManager.getIntProperty(
-                "healthcheck", "last_n_days");
+            int for_last_n_days = configurationService.getIntProperty(
+                "healthcheck.last_n_days");
             if (cmdline.hasOption(option_last_n)) {
                 for_last_n_days = Integer.getInteger(
                     cmdline.getOptionValue(option_last_n));
@@ -195,10 +200,10 @@ public class Report {
             if (cmdline.hasOption(option_email)) {
                 String to = cmdline.getOptionValue(option_email);
                 if (!to.contains("@")) {
-                    to = ConfigurationManager.getProperty(to);
+                    to = configurationService.getProperty(to);
                 }
                 try {
-                    String dspace_dir = ConfigurationManager.getProperty("dspace.dir");
+                    String dspace_dir = configurationService.getProperty("dspace.dir");
                     String email_path = dspace_dir.endsWith("/") ? dspace_dir
                         : dspace_dir + "/";
                     email_path += Report.EMAIL_PATH;
@@ -208,7 +213,7 @@ public class Report {
                     email.addRecipient(to);
                     email.addArgument(r.toString());
                     email.send();
-                } catch (Exception e) {
+                } catch (IOException | MessagingException e) {
                     log.fatal("Error sending email:", e);
                     System.err.println("Error sending email:\n" + e.getMessage());
                     System.exit(1);

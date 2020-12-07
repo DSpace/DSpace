@@ -22,7 +22,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.time.DateUtils;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Helper class for loading the analysis / report files from the reports directory
@@ -219,8 +220,8 @@ public class StatisticsLoader {
         }
 
         // Create new maps for the monthly analysis / reports
-        Map<String, StatsFile> newMonthlyAnalysis = new HashMap<String, StatsFile>();
-        Map<String, StatsFile> newMonthlyReports = new HashMap<String, StatsFile>();
+        Map<String, StatsFile> newMonthlyAnalysis = new HashMap<>();
+        Map<String, StatsFile> newMonthlyReports = new HashMap<>();
 
         StatsFile newGeneralAnalysis = null;
         StatsFile newGeneralReport = null;
@@ -320,7 +321,9 @@ public class StatisticsLoader {
      * @return array of files
      */
     private static File[] getAnalysisAndReportFileList() {
-        File reportDir = new File(ConfigurationManager.getProperty("log.report.dir"));
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        File reportDir = new File(configurationService.getProperty("log.report.dir"));
         if (reportDir != null) {
             return reportDir.listFiles(new AnalysisAndReportFilter());
         }

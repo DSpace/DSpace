@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,7 +35,7 @@ import org.json.JSONObject;
 import org.orcid.jaxb.model.v3.release.common.OrcidIdentifier;
 import org.orcid.jaxb.model.v3.release.record.Person;
 import org.orcid.jaxb.model.v3.release.search.Result;
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This class is the implementation of the ExternalDataProvider interface that will deal with the OrcidV3 External
@@ -42,7 +43,7 @@ import org.springframework.beans.factory.annotation.Required;
  */
 public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
 
-    private static Logger log = LogManager.getLogger(OrcidV3AuthorDataProvider.class);
+    private static final Logger log = LogManager.getLogger(OrcidV3AuthorDataProvider.class);
 
     private OrcidRestConnector orcidRestConnector;
     private String OAUTHUrl;
@@ -149,7 +150,7 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
     }
 
     /**
-     * Retrieve a Person object based on a given orcid identifier
+     * Retrieve a Person object based on a given orcid identifier.
      * @param id orcid identifier
      * @return Person
      */
@@ -183,7 +184,9 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
             throw new IllegalArgumentException("The maximum number of results to retrieve cannot exceed 100.");
         }
 
-        String searchPath = "search?q=" + URLEncoder.encode(query) + "&start=" + start + "&rows=" + limit;
+        String searchPath = "search?q=" + URLEncoder.encode(query, StandardCharsets.UTF_8)
+                + "&start=" + start
+                + "&rows=" + limit;
         log.debug("queryBio searchPath=" + searchPath + " accessToken=" + accessToken);
         InputStream bioDocument = orcidRestConnector.get(searchPath, accessToken);
         List<Result> results = converter.convert(bioDocument);
@@ -218,7 +221,9 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
 
     @Override
     public int getNumberOfResults(String query) {
-        String searchPath = "search?q=" + URLEncoder.encode(query) + "&start=" + 0 + "&rows=" + 0;
+        String searchPath = "search?q=" + URLEncoder.encode(query, StandardCharsets.UTF_8)
+                + "&start=" + 0
+                + "&rows=" + 0;
         log.debug("queryBio searchPath=" + searchPath + " accessToken=" + accessToken);
         InputStream bioDocument = orcidRestConnector.get(searchPath, accessToken);
         return converter.getNumberOfResultsFromXml(bioDocument);
@@ -229,7 +234,7 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
      * Generic setter for the sourceIdentifier
      * @param sourceIdentifier   The sourceIdentifier to be set on this OrcidV3AuthorDataProvider
      */
-    @Required
+    @Autowired(required = true)
     public void setSourceIdentifier(String sourceIdentifier) {
         this.sourceIdentifier = sourceIdentifier;
     }
@@ -246,7 +251,7 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
      * Generic setter for the orcidUrl
      * @param orcidUrl   The orcidUrl to be set on this OrcidV3AuthorDataProvider
      */
-    @Required
+    @Autowired(required = true)
     public void setOrcidUrl(String orcidUrl) {
         this.orcidUrl = orcidUrl;
     }
