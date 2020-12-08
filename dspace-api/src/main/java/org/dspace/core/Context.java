@@ -8,14 +8,15 @@
 package org.dspace.core;
 
 import java.sql.SQLException;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.logging.log4j.Logger;
@@ -79,13 +80,13 @@ public class Context implements AutoCloseable {
     /**
      * A stack with the history of authorisation system check modify
      */
-    private ArrayDeque<Boolean> authStateChangeHistory;
+    private Deque<Boolean> authStateChangeHistory;
 
     /**
      * A stack with the name of the caller class that modify authorisation
      * system check
      */
-    private ArrayDeque<String> authStateClassCallHistory;
+    private Deque<String> authStateClassCallHistory;
 
     /**
      * Group IDs of special groups user is a member of
@@ -181,8 +182,8 @@ public class Context implements AutoCloseable {
 
         specialGroups = new ArrayList<>();
 
-        authStateChangeHistory = new ArrayDeque<>();
-        authStateClassCallHistory = new ArrayDeque<>();
+        authStateChangeHistory = new ConcurrentLinkedDeque<>();
+        authStateClassCallHistory = new ConcurrentLinkedDeque<>();
         setMode(this.mode);
     }
 
