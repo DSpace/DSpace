@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.sql.SQLException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.regex.Matcher;
@@ -24,10 +25,10 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.statistics.LogAnalyser;
 import org.dspace.app.statistics.LogLine;
@@ -221,7 +222,7 @@ public class ClassicDSpaceLogConverter {
                         date + "," +
                         lline.getUser() + "," +
                         ip + "\n";
-                } catch (Exception e) {
+                } catch (IllegalStateException | SQLException e) {
                     if (verbose) {
                         System.out.println("  - IN: " + line);
                     }
@@ -289,7 +290,7 @@ public class ClassicDSpaceLogConverter {
      * @param args the command line arguments given
      */
     public static void main(String[] args) {
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
 
         Options options = new Options();
 

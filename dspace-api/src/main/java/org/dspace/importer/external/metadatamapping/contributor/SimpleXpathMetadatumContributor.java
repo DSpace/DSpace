@@ -23,7 +23,7 @@ import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.jaxen.JaxenException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Metadata contributor that takes an axiom OMElement and turns it into a metadatum
@@ -60,6 +60,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
      *
      * @param metadataFieldMapping the new mapping.
      */
+    @Override
     public void setMetadataFieldMapping(
         MetadataFieldMapping<OMElement, MetadataContributor<OMElement>> metadataFieldMapping) {
         this.metadataFieldMapping = metadataFieldMapping;
@@ -115,7 +116,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
      *
      * @param field MetadataFieldConfig used while retrieving MetadatumDTO
      */
-    @Required
+    @Autowired(required = true)
     public void setField(MetadataFieldConfig field) {
         this.field = field;
     }
@@ -129,7 +130,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
         return query;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setQuery(String query) {
         this.query = query;
     }

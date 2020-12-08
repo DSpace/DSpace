@@ -17,12 +17,11 @@ import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.checker.BitstreamDispatcher;
@@ -87,7 +86,7 @@ public final class ChecksumChecker {
      */
     public static void main(String[] args) throws SQLException {
         // set up command line parser
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
         CommandLine line = null;
 
         // create an options object and populate it
@@ -102,19 +101,21 @@ public final class ChecksumChecker {
         options.addOption("a", "handle", true, "Specify a handle to check");
         options.addOption("v", "verbose", false, "Report all processing");
 
-        OptionBuilder.withArgName("bitstream-ids").hasArgs().withDescription(
-            "Space separated list of bitstream ids");
-        Option useBitstreamIds = OptionBuilder.create('b');
+        Option option;
 
-        options.addOption(useBitstreamIds);
+        option = Option.builder("b")
+                .longOpt("bitstream-ids")
+                .hasArgs()
+                .desc("Space separated list of bitstream ids")
+                .build();
+        options.addOption(option);
 
-        options.addOption("p", "prune", false, "Prune configuration file");
-        options.addOption(OptionBuilder
-                              .withArgName("prune")
-                              .hasOptionalArgs(1)
-                              .withDescription(
-                                  "Prune old results (optionally using specified properties file for configuration)")
-                              .create('p'));
+        option = Option.builder("p")
+                .longOpt("prune")
+                .optionalArg(true)
+                .desc("Prune old results (optionally using specified properties file for configuration)")
+                .build();
+        options.addOption(option);
 
         try {
             line = parser.parse(options, args);

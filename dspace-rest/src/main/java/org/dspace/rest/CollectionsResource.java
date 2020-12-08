@@ -7,6 +7,13 @@
  */
 package org.dspace.rest;
 
+import static org.dspace.content.service.DSpaceObjectService.MD_COPYRIGHT_TEXT;
+import static org.dspace.content.service.DSpaceObjectService.MD_INTRODUCTORY_TEXT;
+import static org.dspace.content.service.DSpaceObjectService.MD_LICENSE;
+import static org.dspace.content.service.DSpaceObjectService.MD_NAME;
+import static org.dspace.content.service.DSpaceObjectService.MD_SHORT_DESCRIPTION;
+import static org.dspace.content.service.DSpaceObjectService.MD_SIDEBAR_TEXT;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -60,7 +67,7 @@ public class CollectionsResource extends Resource {
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
     protected WorkflowService workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
 
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(CollectionsResource.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CollectionsResource.class);
 
     /**
      * Return instance of collection with passed id. You can add more properties
@@ -179,7 +186,7 @@ public class CollectionsResource extends Resource {
 
         log.info("Reading all collections.(offset=" + offset + ",limit=" + limit + ")");
         org.dspace.core.Context context = null;
-        List<Collection> collections = new ArrayList<Collection>();
+        List<Collection> collections = new ArrayList<>();
 
         try {
             context = createContext();
@@ -273,7 +280,7 @@ public class CollectionsResource extends Resource {
             writeStats(dspaceCollection, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
                        headers, request, context);
 
-            items = new ArrayList<Item>();
+            items = new ArrayList<>();
             Iterator<org.dspace.content.Item> dspaceItems = itemService.findByCollection(context, dspaceCollection,
                                                                                          limit, offset);
 
@@ -442,18 +449,20 @@ public class CollectionsResource extends Resource {
             writeStats(dspaceCollection, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
                        headers, request, context);
 
-            collectionService.setMetadata(context, dspaceCollection, "name", collection.getName());
-            collectionService.setMetadata(context, dspaceCollection, "license", collection.getLicense());
+            collectionService.setMetadataSingleValue(context, dspaceCollection,
+                    MD_NAME, collection.getName(), null);
+            collectionService.setMetadataSingleValue(context, dspaceCollection,
+                    MD_LICENSE, collection.getLicense(), null);
 
             // dspaceCollection.setLogo(collection.getLogo()); // TODO Add this option.
-            collectionService.setMetadata(context, dspaceCollection, org.dspace.content.Collection.COPYRIGHT_TEXT,
-                                          collection.getCopyrightText());
-            collectionService.setMetadata(context, dspaceCollection, org.dspace.content.Collection.INTRODUCTORY_TEXT,
-                                          collection.getIntroductoryText());
-            collectionService.setMetadata(context, dspaceCollection, org.dspace.content.Collection.SHORT_DESCRIPTION,
-                                          collection.getShortDescription());
-            collectionService.setMetadata(context, dspaceCollection, org.dspace.content.Collection.SIDEBAR_TEXT,
-                                          collection.getSidebarText());
+            collectionService.setMetadataSingleValue(context, dspaceCollection,
+                    MD_COPYRIGHT_TEXT, collection.getCopyrightText(), null);
+            collectionService.setMetadataSingleValue(context, dspaceCollection,
+                    MD_INTRODUCTORY_TEXT, collection.getIntroductoryText(), null);
+            collectionService.setMetadataSingleValue(context, dspaceCollection,
+                    MD_SHORT_DESCRIPTION, collection.getShortDescription(), null);
+            collectionService.setMetadataSingleValue(context, dspaceCollection,
+                    MD_SIDEBAR_TEXT, collection.getSidebarText(), null);
             collectionService.update(context, dspaceCollection);
 
             context.complete();

@@ -9,7 +9,7 @@ package org.dspace.discovery.configuration;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Class that contains the more like this configuration on item pages
@@ -24,7 +24,7 @@ public class DiscoveryMoreLikeThisConfiguration {
     private int max;
     private int minWordLength;
 
-    @Required
+    @Autowired(required = true)
     public void setSimilarityMetadataFields(List<String> similarityMetadataFields) {
         this.similarityMetadataFields = similarityMetadataFields;
     }
@@ -33,7 +33,7 @@ public class DiscoveryMoreLikeThisConfiguration {
         return similarityMetadataFields;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setMinTermFrequency(int minTermFrequency) {
         this.minTermFrequency = minTermFrequency;
     }
@@ -42,7 +42,7 @@ public class DiscoveryMoreLikeThisConfiguration {
         return minTermFrequency;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setMax(int max) {
         this.max = max;
     }

@@ -85,7 +85,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
@@ -96,6 +95,7 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowService;
@@ -157,8 +157,11 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     protected WorkspaceItemService workspaceItemService;
     @Autowired(required = true)
     protected WorkflowService workflowService;
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
 
-    protected final String tempWorkDir = ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir");
+    protected final String tempWorkDir
+            = configurationService.getProperty("org.dspace.app.batchitemimport.work.dir");
 
     protected boolean isTest = false;
     protected boolean isResume = false;
@@ -217,7 +220,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         //Determine the folder where BTE will output the results
         String outputFolder = null;
         if (workingDir == null) { //This indicates a command line import, create a random path
-            File importDir = new File(ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir"));
+            File importDir = new File(configurationService.getProperty("org.dspace.app.batchitemimport.work.dir"));
             if (!importDir.exists()) {
                 boolean success = importDir.mkdir();
                 if (!success) {
@@ -1481,7 +1484,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
         File tempdir = new File(destinationDir);
         if (!tempdir.isDirectory()) {
-            log.error("'" + ConfigurationManager.getProperty("org.dspace.app.itemexport.work.dir") +
+            log.error("'" + configurationService.getProperty("org.dspace.app.itemexport.work.dir") +
                           "' as defined by the key 'org.dspace.app.itemexport.work.dir' in dspace.cfg " +
                           "is not a valid directory");
         }
@@ -1646,7 +1649,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                         }
                     }
 
-                    importDir = ConfigurationManager.getProperty(
+                    importDir = configurationService.getProperty(
                         "org.dspace.app.batchitemimport.work.dir") + File.separator + "batchuploads" + File.separator
                         + context
                         .getCurrentUser()
@@ -1804,7 +1807,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "bte_batch_import_error"));
             email.addRecipient(eperson.getEmail());
             email.addArgument(error);
-            email.addArgument(ConfigurationManager.getProperty("dspace.ui.url") + "/feedback");
+            email.addArgument(configurationService.getProperty("dspace.ui.url") + "/feedback");
 
             email.send();
         } catch (Exception e) {
@@ -1842,7 +1845,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     @Override
     public String getImportUploadableDirectory(EPerson ePerson)
         throws Exception {
-        String uploadDir = ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir");
+        String uploadDir = configurationService.getProperty("org.dspace.app.batchitemimport.work.dir");
         if (uploadDir == null) {
             throw new Exception(
                 "A dspace.cfg entry for 'org.dspace.app.batchitemimport.work.dir' does not exist.");

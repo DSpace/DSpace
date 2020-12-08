@@ -12,12 +12,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
@@ -70,7 +72,7 @@ public class LegacyPluginServiceImpl implements PluginService {
     /**
      * log4j category
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(LegacyPluginServiceImpl.class);
+    private static final Logger log = LogManager.getLogger(LegacyPluginServiceImpl.class);
 
     /**
      * Prefixes of names of properties to look for in DSpace Configuration
@@ -205,11 +207,13 @@ public class LegacyPluginServiceImpl implements PluginService {
         throws PluginInstantiationException {
         try {
             Class pluginClass = Class.forName(classname, true, loader);
-            return pluginClass.newInstance();
+            return pluginClass.getDeclaredConstructor().newInstance();
         } catch (ClassNotFoundException e) {
             throw new PluginInstantiationException("Cannot load plugin class: " +
                                                        e.toString(), e);
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException
+                | NoSuchMethodException | SecurityException
+                | IllegalArgumentException | InvocationTargetException e) {
             throw new PluginInstantiationException(e);
         }
     }
@@ -344,7 +348,7 @@ public class LegacyPluginServiceImpl implements PluginService {
                 log.debug("Creating instance of: " + cname +
                               " for interface=" + iname +
                               " pluginName=" + name);
-                Object result = pluginClass.newInstance();
+                Object result = pluginClass.getDeclaredConstructor().newInstance();
                 if (result instanceof NameAwarePlugin) {
                     ((NameAwarePlugin) result).setPluginInstanceName(name);
                 }
@@ -353,7 +357,9 @@ public class LegacyPluginServiceImpl implements PluginService {
         } catch (ClassNotFoundException e) {
             throw new PluginInstantiationException("Cannot load plugin class: " +
                                                        e.toString(), e);
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException
+                | NoSuchMethodException | SecurityException
+                | IllegalArgumentException | InvocationTargetException e) {
             throw new PluginInstantiationException(e);
         }
 
