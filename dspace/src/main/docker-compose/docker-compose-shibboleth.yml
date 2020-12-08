@@ -6,6 +6,10 @@
 # http://www.dspace.org/license/
 #
 
+#
+# Test environment for DSpace + Shibboleth (running via mod_shib in Apache). See README for instructions.
+# This should NEVER be used in production scenarios.
+#
 version: '3.7'
 networks:
   dspacenet:
@@ -14,7 +18,9 @@ services:
     container_name: dspace-shibboleth
     depends_on:
       - dspace
-    image: dspace/dspace-shibboleth
+    build:
+      # Must be relative to root, so that it can be built alongside [src]/docker-compose.yml
+      context: ./dspace/src/main/docker/dspace-shibboleth
     networks:
       dspacenet:
     ports:
@@ -24,3 +30,8 @@ services:
         target: 443
     stdin_open: true
     tty: true
+    environment:
+      # Default to using "localhost" for Apache & Shibboleth
+      # However, you can override this via the "DSPACE_HOSTNAME" environment variable.
+      # e.g., if using ngrok.com as a proxy, set to ngrok.io server: "DSPACHE_HOSTNAME=[random-string].ngrok.io"
+      APACHE_SERVER_NAME: '${DSPACE_HOSTNAME:-localhost}"'

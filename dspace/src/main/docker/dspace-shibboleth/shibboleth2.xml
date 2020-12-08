@@ -20,14 +20,14 @@
     -->
     <RequestMapper type="Native">
         <RequestMap applicationId="default">
-            <!-- Default to localhost. Change this if you change your ServerName -->
-            <Host name="localhost"></Host>
+            <!-- Placeholder is replaced by value of $APACHE_SERVER_NAME env var when http-shibd-foreground.sh runs -->
+            <Host name="${APACHE_SERVER_NAME}"></Host>
         </RequestMap>
     </RequestMapper>
 
     <!-- The ApplicationDefaults element is where most of Shibboleth's SAML bits are defined. -->
-    <!-- Default to localhost. Change this if you change your ServerName -->
-    <ApplicationDefaults entityID="https://localhost/shibboleth"
+    <!-- Placeholder is replaced by value of $APACHE_SERVER_NAME env var when http-shibd-foreground.sh runs -->
+    <ApplicationDefaults entityID="https://${APACHE_SERVER_NAME}/shibboleth"
                          REMOTE_USER="eppn persistent-id targeted-id">
 
         <!--
