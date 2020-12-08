@@ -358,21 +358,24 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     indexableObjectService.deleteAll();
                 }
             } else {
-                SolrQuery query = new SolrQuery();
-                // Query for all indexed Items, Collections and Communities,
-                // returning just their handle
-                query.setFields(SearchUtils.RESOURCE_UNIQUE_ID);
-                query.addSort(SearchUtils.RESOURCE_UNIQUE_ID, SolrQuery.ORDER.asc);
-                query.setQuery("*:*");
-
+                // First, we'll just get a count of the total results
+                SolrQuery countQuery = new SolrQuery("*:*");
+                countQuery.setRows(0);  // don't actually request any data
                 // Get the total amount of results
-                QueryResponse totalResponse = solrSearchCore.getSolr().query(query, SolrRequest.METHOD.POST);
+                QueryResponse totalResponse = solrSearchCore.getSolr().query(countQuery, SolrRequest.METHOD.POST);
                 long total = totalResponse.getResults().getNumFound();
 
                 int start = 0;
                 int batch = 100;
 
+                // Now get actual Solr Documents in batches
+                SolrQuery query = new SolrQuery();
+                query.setFields(SearchUtils.RESOURCE_UNIQUE_ID, SearchUtils.RESOURCE_ID_FIELD,
+                                SearchUtils.RESOURCE_TYPE_FIELD);
+                query.addSort(SearchUtils.RESOURCE_UNIQUE_ID, SolrQuery.ORDER.asc);
+                query.setQuery("*:*");
                 query.setRows(batch);
+                // Keep looping until we hit the total number of Solr docs
                 while (start < total) {
                     query.setStart(start);
                     QueryResponse rsp = solrSearchCore.getSolr().query(query, SolrRequest.METHOD.POST);
