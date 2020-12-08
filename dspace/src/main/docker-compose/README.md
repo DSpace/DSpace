@@ -18,6 +18,9 @@
   - Sets the environment used across containers run with docker-compose
 - docker-compose-angular.yml
   - Docker compose file that will start a published DSpace angular container that interacts with the branch.
+- docker-compose-shibboleth.yml
+  - Docker compose file that will start a *test/demo* Shibboleth SP container (in Apache) that proxies requests to the DSpace container
+  - ONLY useful for testing/development. NOT production ready.
 - environment.dev.ts
   - Default angular environment when testing DSpace-angular from this repo
 
@@ -44,19 +47,40 @@ docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/doc
 
 ## Run DSpace 7 REST and Shibboleth SP (in Apache) from your branch
 
-Update `local.cfg` in this directory to include:
+*Only useful for testing Shibboleth in a development environment*
+
+This Shibboleth container uses https://samltest.id/ by default (see ../docker/dspace-shibboleth/).
+Therefore, for Shibboleth login to work properly, you MUST make your DSpace site available to the external web.
+
+One option is to use a development proxy service like https://ngrok.com/ (which creates a temporary public proxy for your localhost)
+If you use ngrok, start it first (in order to obtain a random URL that looks like https://a6eb2e55ad17.ngrok.io):
 ```
-dspace.server.url=https://localhost/server
+./ngrok http 443
+```
+
+Then, update `local.cfg` in this directory to use that ngrok URL & enable Shibboleth:
+```
+# NOTE: dspace.server.url MUST be available externally to use with https://samltest.id/.
+# In this example we are assuming you are using ngrok.
+dspace.server.url=https://[random-string].ngrok.io/server
+
+# Enable both Password auth & Shibboleth
 plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.PasswordAuthentication
 plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.ShibAuthentication
 ```
 
-Start all containers:
+Finally, start all containers, passing your public hostname to DSPACE_HOSTNAME environment variable:
 ```
-docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-shibboleth.yml up -d
+DSPACE_HOSTNAME=[random-string].ngrok.io docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-shibboleth.yml up -d
 ```
 
-Access DSpace REST at: https://localhost/server/
+NOTE: For Windows you MUST either set the environment variable separately, or use the 'env' command provided with Git/Cygwin
+(you may already have this command if you are running Git for Windows). See https://superuser.com/a/1079563
+```
+env DSPACE_HOSTNAME=[random-string].ngrok.io docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-shibboleth.yml up -d
+```
+
+
 
 ## Run DSpace 7 REST and Angular from local branches
 

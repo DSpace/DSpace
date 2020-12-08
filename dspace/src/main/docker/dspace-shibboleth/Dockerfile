@@ -12,7 +12,7 @@
 # See also https://wiki.lyrasis.org/display/DSDOC7x/Authentication+Plugins#AuthenticationPlugins-ShibbolethAuthentication
 FROM ubuntu:20.04
 
-# Apache ENVs
+# Apache ENVs (default values)
 ENV APACHE_RUN_USER www-data
 ENV APACHE_RUN_GROUP www-data
 ENV APACHE_LOCK_DIR /var/lock/apache2
@@ -33,7 +33,6 @@ RUN apt-get update \
       && rm -rf /tmp/*
 
 # Setup Apache configs & enable mod-shib & dspace vhost
-# TODO: AJP Connector must be installed/enabled in Tomcat!!!  Need to update core DSpace image
 COPY dspace-vhost.conf /etc/apache2/sites-available/
 RUN a2enmod ssl headers proxy proxy_ajp proxy_http shib && \
     a2dissite 000-default.conf default-ssl.conf && \
