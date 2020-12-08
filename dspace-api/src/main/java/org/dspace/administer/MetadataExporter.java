@@ -10,6 +10,7 @@ package org.dspace.administer;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -17,25 +18,28 @@ import java.util.Map;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
-import org.apache.xml.serialize.Method;
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.XMLSerializer;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Context;
-import org.xml.sax.SAXException;
+import org.w3c.dom.DOMConfiguration;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.bootstrap.DOMImplementationRegistry;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSOutput;
+import org.w3c.dom.ls.LSSerializer;
 
 
 /**
  * @author Graham Triggs
  *
- * This class creates an xml document as passed in the arguments and
+ * This class creates an XML document as passed in the arguments and
  * from the metadata schemas for the repository.
  *
  * The form of the XML is as follows
@@ -61,17 +65,20 @@ public class MetadataExporter {
     private MetadataExporter() { }
 
     /**
-     * @param args commandline arguments
+     * @param args command line arguments
      * @throws ParseException          if parser error
-     * @throws SAXException            if XML parse error
      * @throws IOException             if IO error
      * @throws SQLException            if database error
      * @throws RegistryExportException if export error
+     * @throws ClassNotFoundException  if no suitable DOM implementation
+     * @throws InstantiationException  if no suitable DOM implementation
+     * @throws IllegalAccessException  if no suitable DOM implementation
      */
     public static void main(String[] args)
-        throws ParseException, SQLException, IOException, SAXException, RegistryExportException {
+        throws ParseException, SQLException, IOException, RegistryExportException,
+            ClassNotFoundException, InstantiationException, IllegalAccessException {
         // create an options object and populate it
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
         Options options = new Options();
         options.addOption("f", "file", true, "output xml file for registry");
         options.addOption("s", "schema", true, "the name of the schema to export");
@@ -95,32 +102,31 @@ public class MetadataExporter {
     }
 
     /**
-     * Save a registry to a filepath
+     * Save a registry to a file path
      *
-     * @param file   filepath
+     * @param file   file path
      * @param schema schema definition to save
      * @throws SQLException            if database error
      * @throws IOException             if IO error
-     * @throws SAXException            if XML error
      * @throws RegistryExportException if export error
+     * @throws ClassNotFoundException  if no suitable DOM implementation
+     * @throws InstantiationException  if no suitable DOM implementation
+     * @throws IllegalAccessException  if no suitable DOM implementation
      */
     public static void saveRegistry(String file, String schema)
-        throws SQLException, IOException, SAXException, RegistryExportException {
+        throws SQLException, IOException, RegistryExportException,
+            ClassNotFoundException, InstantiationException, IllegalAccessException {
         // create a context
         Context context = new Context();
         context.turnOffAuthorisationSystem();
 
-        OutputFormat xmlFormat = new OutputFormat(Method.XML, "UTF-8", true);
-        xmlFormat.setLineWidth(120);
-        xmlFormat.setIndent(4);
-
-        XMLSerializer xmlSerializer = new XMLSerializer(new BufferedWriter(new FileWriter(file)), xmlFormat);
-        //        XMLSerializer xmlSerializer = new XMLSerializer(System.out, xmlFormat);
-        xmlSerializer.startDocument();
-        xmlSerializer.startElement("dspace-dc-types", null);
+        // Initialize an XML document.
+        Document document = DOMImplementationRegistry.newInstance()
+                .getDOMImplementation("XML 3.0")
+                .createDocument(null, "dspace-dc-types", null);
 
         // Save the schema definition(s)
-        saveSchema(context, xmlSerializer, schema);
+        saveSchema(context, document, schema);
 
         List<MetadataField> mdFields = null;
 
@@ -139,55 +145,64 @@ public class MetadataExporter {
             mdFields = metadataFieldService.findAll(context);
         }
 
-        // Output the metadata fields
+        // Compose the metadata fields
         for (MetadataField mdField : mdFields) {
-            saveType(context, xmlSerializer, mdField);
+            saveType(context, document, mdField);
         }
 
-        xmlSerializer.endElement("dspace-dc-types");
-        xmlSerializer.endDocument();
+        // Serialize the completed document to the output file.
+        try (Writer writer = new BufferedWriter(new FileWriter(file))) {
+            DOMImplementationLS lsImplementation
+                    = (DOMImplementationLS) DOMImplementationRegistry.newInstance()
+                            .getDOMImplementation("LS");
+            LSSerializer serializer = lsImplementation.createLSSerializer();
+            DOMConfiguration configuration = serializer.getDomConfig();
+            configuration.setParameter("format-pretty-print", true);
+            LSOutput lsOutput = lsImplementation.createLSOutput();
+            lsOutput.setEncoding("UTF-8");
+            lsOutput.setCharacterStream(writer);
+            serializer.write(document, lsOutput);
+        }
 
         // abort the context, as we shouldn't have changed it!!
         context.abort();
     }
 
     /**
-     * Serialize the schema registry. If the parameter 'schema' is null or empty, save all schemas
+     * Compose the schema registry. If the parameter 'schema' is null or empty, save all schemas.
      *
      * @param context       DSpace Context
-     * @param xmlSerializer XML serializer
+     * @param document      the document being built
      * @param schema        schema (may be null to save all)
      * @throws SQLException            if database error
-     * @throws SAXException            if XML error
      * @throws RegistryExportException if export error
      */
-    public static void saveSchema(Context context, XMLSerializer xmlSerializer, String schema)
-        throws SQLException, SAXException, RegistryExportException {
+    public static void saveSchema(Context context, Document document, String schema)
+        throws SQLException, RegistryExportException {
         if (schema != null && !"".equals(schema)) {
             // Find a single named schema
             MetadataSchema mdSchema = metadataSchemaService.find(context, schema);
 
-            saveSchema(xmlSerializer, mdSchema);
+            saveSchema(document, mdSchema);
         } else {
             // Find all schemas
             List<MetadataSchema> mdSchemas = metadataSchemaService.findAll(context);
 
             for (MetadataSchema mdSchema : mdSchemas) {
-                saveSchema(xmlSerializer, mdSchema);
+                saveSchema(document, mdSchema);
             }
         }
     }
 
     /**
-     * Serialize a single schema (namespace) registry entry
+     * Compose a single schema (namespace) registry entry
      *
-     * @param xmlSerializer XML serializer
-     * @param mdSchema      DSpace metadata schema
-     * @throws SAXException            if XML error
+     * @param document the output document being built.
+     * @param mdSchema DSpace metadata schema
      * @throws RegistryExportException if export error
      */
-    private static void saveSchema(XMLSerializer xmlSerializer, MetadataSchema mdSchema)
-        throws SAXException, RegistryExportException {
+    private static void saveSchema(Document document, MetadataSchema mdSchema)
+        throws RegistryExportException {
         // If we haven't got a schema, it's an error
         if (mdSchema == null) {
             throw new RegistryExportException("no schema to export");
@@ -206,35 +221,34 @@ public class MetadataExporter {
             return;
         }
 
-        // Output the parent tag
-        xmlSerializer.startElement("dc-schema", null);
+        Element document_element = document.getDocumentElement();
 
-        // Output the schema name
-        xmlSerializer.startElement("name", null);
-        xmlSerializer.characters(name.toCharArray(), 0, name.length());
-        xmlSerializer.endElement("name");
+        // Compose the parent tag
+        Element schema_element = document.createElement("dc-schema");
+        document_element.appendChild(schema_element);
 
-        // Output the schema namespace
-        xmlSerializer.startElement("namespace", null);
-        xmlSerializer.characters(namespace.toCharArray(), 0, namespace.length());
-        xmlSerializer.endElement("namespace");
+        // Compose the schema name
+        Element name_element = document.createElement("name");
+        schema_element.appendChild(name_element);
+        name_element.setTextContent(name);
 
-        xmlSerializer.endElement("dc-schema");
+        // Compose the schema namespace
+        Element namespace_element = document.createElement("namespace");
+        schema_element.appendChild(namespace_element);
+        namespace_element.setTextContent(namespace);
     }
 
     /**
-     * Serialize a single metadata field registry entry to xml
+     * Compose a single metadata field registry entry to XML.
      *
      * @param context       DSpace context
-     * @param xmlSerializer xml serializer
+     * @param document      the output document being built.
      * @param mdField       DSpace metadata field
-     * @throws SAXException            if XML error
      * @throws RegistryExportException if export error
      * @throws SQLException            if database error
-     * @throws IOException             if IO error
      */
-    private static void saveType(Context context, XMLSerializer xmlSerializer, MetadataField mdField)
-        throws SAXException, RegistryExportException, SQLException, IOException {
+    private static void saveType(Context context, Document document, MetadataField mdField)
+        throws RegistryExportException, SQLException {
         // If we haven't been given a field, it's an error
         if (mdField == null) {
             throw new RegistryExportException("no field to export");
@@ -251,38 +265,39 @@ public class MetadataExporter {
             throw new RegistryExportException("incomplete field information");
         }
 
-        // Output the parent tag
-        xmlSerializer.startElement("dc-type", null);
+        Element document_element = document.getDocumentElement();
 
-        // Output the schema name
-        xmlSerializer.startElement("schema", null);
-        xmlSerializer.characters(schemaName.toCharArray(), 0, schemaName.length());
-        xmlSerializer.endElement("schema");
+        // Compose the parent tag
+        Element dc_type = document.createElement("dc-type");
+        document_element.appendChild(dc_type);
 
-        // Output the element
-        xmlSerializer.startElement("element", null);
-        xmlSerializer.characters(element.toCharArray(), 0, element.length());
-        xmlSerializer.endElement("element");
+        // Compose the schema name
+        Element schema_element = document.createElement("schema");
+        dc_type.appendChild(schema_element);
+        schema_element.setTextContent(schemaName);
 
-        // Output the qualifier, if present
+        // Compose the element
+        Element element_element = document.createElement("element");
+        dc_type.appendChild(element_element);
+        element_element.setTextContent(element);
+
+        // Compose the qualifier, if present
         if (qualifier != null) {
-            xmlSerializer.startElement("qualifier", null);
-            xmlSerializer.characters(qualifier.toCharArray(), 0, qualifier.length());
-            xmlSerializer.endElement("qualifier");
+            Element qualifier_element = document.createElement("qualifier");
+            dc_type.appendChild(qualifier_element);
+            qualifier_element.setTextContent(qualifier);
         } else {
-            xmlSerializer.comment("unqualified");
+            dc_type.appendChild(document.createComment("unqualified"));
         }
 
-        // Output the scope note, if present
+        // Compose the scope note, if present
         if (scopeNote != null) {
-            xmlSerializer.startElement("scope_note", null);
-            xmlSerializer.characters(scopeNote.toCharArray(), 0, scopeNote.length());
-            xmlSerializer.endElement("scope_note");
+            Element scope_element = document.createElement("scope_note");
+            dc_type.appendChild(scope_element);
+            scope_element.setTextContent(scopeNote);
         } else {
-            xmlSerializer.comment("no scope note");
+            dc_type.appendChild(document.createComment("no scope note"));
         }
-
-        xmlSerializer.endElement("dc-type");
     }
 
     static Map<Integer, String> schemaMap = new HashMap<Integer, String>();
@@ -317,7 +332,7 @@ public class MetadataExporter {
     }
 
     /**
-     * Print the usage message to stdout
+     * Print the usage message to standard output
      */
     public static void usage() {
         String usage = "Use this class with the following options:\n" +

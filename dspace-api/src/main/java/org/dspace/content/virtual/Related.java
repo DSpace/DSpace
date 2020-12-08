@@ -147,8 +147,8 @@ public class Related implements VirtualMetadataConfiguration {
      * and pass this along to the next VirtualBean that's stored in this class.
      * @param context   The relevant DSpace context
      * @param item      The item that will be used to find the related item through its relationships
-     * @return          The String value of the metadata fields concatened with a seperator as defined
-     *                  in the deepest Concatened bean in the chain
+     * @return          The String value of the metadata fields concatenated with a separator as defined
+     *                  in the deepest Concatenated bean in the chain
      *                  Will return an empty list if no relationships are found
      * @throws SQLException If something goes wrong
      */
@@ -173,12 +173,12 @@ public class Related implements VirtualMetadataConfiguration {
 
         for (Relationship relationship : relationships) {
             if (relationship.getRelationshipType().getLeftType() == entityType) {
-                if (relationship.getLeftPlace() == place) {
+                if (place == null || relationship.getLeftPlace() == place) {
                     Item otherItem = relationship.getRightItem();
                     return virtualMetadataConfiguration.getValues(context, otherItem);
                 }
             } else if (relationship.getRelationshipType().getRightType() == entityType) {
-                if (relationship.getRightPlace() == place) {
+                if (place == null || relationship.getRightPlace() == place) {
                     Item otherItem = relationship.getLeftItem();
                     return virtualMetadataConfiguration.getValues(context, otherItem);
                 }

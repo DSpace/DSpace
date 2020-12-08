@@ -10,13 +10,15 @@ package org.dspace.sword;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.purl.sword.atom.Content;
 import org.purl.sword.atom.ContentType;
 import org.purl.sword.atom.InvalidMediaTypeException;
@@ -33,7 +35,7 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry {
     /**
      * logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(BitstreamEntryGenerator.class);
+    private static final Logger log = LogManager.getLogger(BitstreamEntryGenerator.class);
 
     /**
      * Create a new ATOM Entry generator which can provide a SWORD Entry for
@@ -50,6 +52,7 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry {
      * Add all the subject classifications from the bibliographic
      * metadata.
      */
+    @Override
     protected void addCategories() {
         // do nothing
     }
@@ -57,6 +60,7 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry {
     /**
      * Set the content type that DSpace received.
      */
+    @Override
     protected void addContentElement()
         throws DSpaceSWORDException {
         try {
@@ -100,13 +104,16 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry {
      * they can be used to access the resource over http (i.e.
      * a real URL).
      */
+    @Override
     protected void addIdentifier()
         throws DSpaceSWORDException {
         // if this is a deposit which is no op we can't do anything here
         if (this.deposit != null && this.deposit.isNoOp()) {
             // just use the dspace url as the
             // property
-            String cfg = ConfigurationManager.getProperty("dspace.ui.url");
+            ConfigurationService configurationService
+                    = DSpaceServicesFactory.getInstance().getConfigurationService();
+            String cfg = configurationService.getProperty("dspace.ui.url");
             entry.setId(cfg);
 
             return;
@@ -119,7 +126,6 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry {
         String bsurl = urlManager.getBitstreamUrl(this.bitstream);
         entry.setId(bsurl);
         log.debug("Added identifier for bitstream with url=" + bsurl);
-        return;
 
         // FIXME: later on we will maybe have a workflow page supplied
         // by the sword interface?
@@ -128,6 +134,7 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry {
     /**
      * Add links associated with this item.
      */
+    @Override
     protected void addLinks()
         throws DSpaceSWORDException {
         // if this is a deposit which is no op we can't do anything here
@@ -163,14 +170,16 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry {
     /**
      * Add the date of publication from the bibliographic metadata
      */
+    @Override
     protected void addPublishDate() {
         // do nothing
     }
 
     /**
      * Add rights information.  This attaches an href to the URL
-     * of the item's licence file
+     * of the item's license file
      */
+    @Override
     protected void addRights()
         throws DSpaceSWORDException {
         try {
@@ -219,6 +228,7 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry {
     /**
      * Add the summary/abstract from the bibliographic metadata
      */
+    @Override
     protected void addSummary() {
         // do nothing
     }
@@ -226,6 +236,7 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry {
     /**
      * Add the title from the bibliographic metadata
      */
+    @Override
     protected void addTitle() {
         Title title = new Title();
         title.setContent(this.bitstream.getName());
@@ -237,6 +248,7 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry {
     /**
      * Add the date that this item was last updated
      */
+    @Override
     protected void addLastUpdatedDate() {
         // do nothing
     }

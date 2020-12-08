@@ -25,8 +25,8 @@ import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 public interface SearchService {
 
     /**
-     * Convenient method to call @see #search(Context, DSpaceObject,
-     * DiscoverQuery) with a null DSpace Object as scope (i.e. all the
+     * Convenient method to call {@link #search(Context, DSpaceObject,
+     * DiscoverQuery)} with a null DSpace Object as scope (i.e. all the
      * repository)
      *
      * @param context DSpace Context object.

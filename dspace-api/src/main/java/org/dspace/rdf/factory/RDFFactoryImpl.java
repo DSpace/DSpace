@@ -12,7 +12,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.rdf.conversion.RDFConverter;
 import org.dspace.rdf.storage.RDFStorage;
 import org.dspace.rdf.storage.URIGenerator;
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Pascal-Nicolas Becker (p dot becker at tu hyphen berlin dot de)
@@ -29,12 +29,12 @@ public class RDFFactoryImpl extends RDFFactory {
     private URIGenerator generator;
     private RDFConverter converter;
 
-    @Required
+    @Autowired(required = true)
     public void setStorage(RDFStorage storage) {
         this.storage = storage;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setGenerator(URIGenerator generator) {
         if (log.isDebugEnabled()) {
             log.debug("Using '" + generator.getClass().getCanonicalName()
@@ -43,7 +43,7 @@ public class RDFFactoryImpl extends RDFFactory {
         this.generator = generator;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setConverter(RDFConverter converter) {
         this.converter = converter;
     }

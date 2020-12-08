@@ -15,12 +15,12 @@ import org.dspace.core.Context;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 
 /**
- * Utilty class that represents the year range for a date facet
+ * Utility class that represents the year range for a date facet
  */
 public class FacetYearRange {
     private static final Pattern PATTERN = Pattern.compile("\\[(.*? TO .*?)\\]");
 
-    private DiscoverySearchFilterFacet facet;
+    private final DiscoverySearchFilterFacet facet;
     private String dateFacet;
     private int oldestYear = -1;
     private int newestYear = -1;
@@ -78,7 +78,7 @@ public class FacetYearRange {
                     }
 
                 } else {
-                    if (filterQuery.indexOf(" OR ") != -1) {
+                    if (filterQuery.contains(" OR ")) {
                         //Should always be the case
                         filterQuery = filterQuery.split(" OR ")[0];
                     }
@@ -137,7 +137,7 @@ public class FacetYearRange {
 
     private int round(double number, int multiple) {
 
-        int result = new Double(Math.ceil(number)).intValue();
+        int result = Double.valueOf(Math.ceil(number)).intValue();
 
         //If not already multiple of given number
 

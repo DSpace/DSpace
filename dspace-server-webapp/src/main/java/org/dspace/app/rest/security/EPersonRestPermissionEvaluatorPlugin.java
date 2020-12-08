@@ -17,7 +17,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.patch.operation.DSpaceObjectMetadataPatchUtils;
-import org.dspace.app.rest.repository.patch.operation.EPersonPasswordReplaceOperation;
+import org.dspace.app.rest.repository.patch.operation.EPersonPasswordAddOperation;
+import org.dspace.app.rest.repository.patch.operation.PatchOperation;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.service.AuthorizeService;
@@ -99,8 +100,10 @@ public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
         Request currentRequest = requestService.getCurrentRequest();
         if (currentRequest != null) {
             HttpServletRequest httpServletRequest = currentRequest.getHttpServletRequest();
-            if (operations.size() > 0 && StringUtils.equalsIgnoreCase(operations.get(0).getOp(), "replace")
-                && StringUtils.equalsIgnoreCase(operations.get(0).getPath(), "/password")
+            if (operations.size() > 0
+                && StringUtils.equalsIgnoreCase(operations.get(0).getOp(), PatchOperation.OPERATION_ADD)
+                && StringUtils.equalsIgnoreCase(operations.get(0).getPath(),
+                EPersonPasswordAddOperation.OPERATION_PASSWORD_CHANGE)
                 && StringUtils.isNotBlank(httpServletRequest.getParameter("token"))) {
                 return true;
             }
@@ -119,7 +122,7 @@ public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
          * update their own password and their own metadata.
          */
         for (Operation op: operations) {
-            if (!(op.getPath().contentEquals(EPersonPasswordReplaceOperation.OPERATION_PASSWORD_CHANGE)
+            if (!(op.getPath().contentEquals(EPersonPasswordAddOperation.OPERATION_PASSWORD_CHANGE)
                 || (op.getPath().startsWith(DSpaceObjectMetadataPatchUtils.OPERATION_METADATA_PATH)))) {
                 return false;
             }

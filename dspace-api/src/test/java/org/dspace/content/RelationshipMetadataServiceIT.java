@@ -8,16 +8,21 @@
 package org.dspace.content;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.logging.log4j.Logger;
-import org.dspace.AbstractUnitTest;
+import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EntityTypeBuilder;
+import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.RelationshipBuilder;
+import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
@@ -28,17 +33,13 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.WorkspaceItemService;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class RelationshipMetadataServiceTest extends AbstractUnitTest {
-
-    private static final Logger log = org.apache.logging.log4j.LogManager
-        .getLogger(RelationshipMetadataServiceTest.class);
+public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDatabase {
 
     protected RelationshipMetadataService relationshipMetadataService = ContentServiceFactory
-                                                                        .getInstance().getRelationshipMetadataService();
+        .getInstance().getRelationshipMetadataService();
     protected RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
     protected RelationshipTypeService relationshipTypeService = ContentServiceFactory.getInstance()
                                                                                      .getRelationshipTypeService();
@@ -52,6 +53,7 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
 
     Item leftItem;
     Item rightItem;
+    Collection col;
     Relationship relationship;
     RelationshipType isAuthorOfPublicationRelationshipType;
 
@@ -60,65 +62,44 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
      * initialize resources required for the tests.
      *
      * Other methods can be annotated with @Before here or in subclasses
-     * but no execution order is guaranteed
+     * but no execution order is guaranteed.
+     *
+     * @throws Exception passed through.
      */
     @Before
     @Override
-    public void init() {
-        super.init();
-        try {
-            context.turnOffAuthorisationSystem();
-            Community community = communityService.create(null, context);
+    public void setUp() throws Exception {
+        super.setUp();
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
 
-            Collection col = collectionService.create(context, community);
-            WorkspaceItem leftIs = workspaceItemService.create(context, col, false);
-            WorkspaceItem rightIs = workspaceItemService.create(context, col, false);
+        col = CollectionBuilder.createCollection(context, community).build();
 
-            leftItem = installItemService.installItem(context, leftIs);
-            rightItem = installItemService.installItem(context, rightIs);
-            context.restoreAuthSystemState();
-        } catch (AuthorizeException ex) {
-            log.error("Authorization Error in init", ex);
-            fail("Authorization Error in init: " + ex.getMessage());
-        } catch (SQLException ex) {
-            log.error("SQL Error in init", ex);
-            fail("SQL Error in init: " + ex.getMessage());
-        }
-    }
-
-    /**
-     * This method will be run after every test as per @After. It will
-     * clean resources initialized by the @Before methods.
-     *
-     * Other methods can be annotated with @After here or in subclasses
-     * but no execution order is guaranteed
-     */
-    @After
-    @Override
-    public void destroy() {
-        context.abort();
-        super.destroy();
+        leftItem = ItemBuilder.createItem(context, col).build();
+        rightItem = ItemBuilder.createItem(context, col).build();
+        context.restoreAuthSystemState();
     }
 
     /**
      * Common function to convert leftItem to a publication item, convert rightItem to an author item,
      * and relating them to each other stored in the relationship field
      */
-    private void initPublicationAuthor() throws SQLException, AuthorizeException {
+    private void initPublicationAuthor() {
         context.turnOffAuthorisationSystem();
-        itemService.addMetadata(context, leftItem, "relationship", "type", null, null, "Publication");
-        itemService.addMetadata(context, rightItem, "relationship", "type", null, null, "Author");
-        itemService.addMetadata(context, rightItem, "person", "familyName", null, null, "familyName");
-        itemService.addMetadata(context, rightItem, "person", "givenName", null, null, "firstName");
-        EntityType publicationEntityType = entityTypeService.create(context, "Publication");
-        EntityType authorEntityType = entityTypeService.create(context, "Author");
-        isAuthorOfPublicationRelationshipType = relationshipTypeService
-                .create(context, publicationEntityType, authorEntityType,
-                        "isAuthorOfPublication", "isPublicationOfAuthor",
-                        null, null, null, null);
+        EntityType publicationEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType authorEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Author").build();
+        leftItem = ItemBuilder.createItem(context, col).withRelationshipType("Publication").build();
+        rightItem = ItemBuilder.createItem(context, col).withRelationshipType("Author")
+                               .withPersonIdentifierLastName("familyName")
+                               .withPersonIdentifierFirstName("firstName").build();
+        isAuthorOfPublicationRelationshipType =
+            RelationshipTypeBuilder.createRelationshipTypeBuilder(context, publicationEntityType, authorEntityType,
+                "isAuthorOfPublication", "isPublicationOfAuthor",
+                null, null, null, null).build();
 
-        relationship = relationshipService.create(context, leftItem, rightItem,
-            isAuthorOfPublicationRelationshipType, 0, 0);
+        relationship =
+            RelationshipBuilder.createRelationshipBuilder(context, leftItem, rightItem,
+                isAuthorOfPublicationRelationshipType).build();
         context.restoreAuthSystemState();
     }
 
@@ -127,20 +108,22 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
      * and relating them to each other stored in the relationship field
      */
     private void initPublicationAuthorWithCopyParams(boolean copyToLeft, boolean copyToRight)
-        throws SQLException, AuthorizeException {
+        throws SQLException {
         context.turnOffAuthorisationSystem();
-        itemService.addMetadata(context, leftItem, "relationship", "type", null, null, "Publication");
-        itemService.addMetadata(context, rightItem, "relationship", "type", null, null, "Author");
-        itemService.addMetadata(context, rightItem, "person", "familyName", null, null, "familyName");
-        itemService.addMetadata(context, rightItem, "person", "givenName", null, null, "firstName");
-        EntityType publicationEntityType = entityTypeService.create(context, "Publication");
-        EntityType authorEntityType = entityTypeService.create(context, "Author");
-        RelationshipType isAuthorOfPublication = relationshipTypeService
-            .create(context, publicationEntityType, authorEntityType,
-                    "isAuthorOfPublication", "isPublicationOfAuthor",
-                    null, null, null, null, copyToLeft, copyToRight);
+        EntityType publicationEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType authorEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Author").build();
+        leftItem = ItemBuilder.createItem(context, col).withRelationshipType("Publication").build();
+        rightItem = ItemBuilder.createItem(context, col).withRelationshipType("Author")
+                               .withPersonIdentifierLastName("familyName")
+                               .withPersonIdentifierFirstName("firstName").build();
+        RelationshipType isAuthorOfPublication =
+            RelationshipTypeBuilder.createRelationshipTypeBuilder(context, publicationEntityType, authorEntityType,
+                "isAuthorOfPublication", "isPublicationOfAuthor",
+                null, null, null, null)
+                                   .withCopyToLeft(copyToLeft).withCopyToRight(copyToRight).build();
 
-        relationship = relationshipService.create(context, leftItem, rightItem, isAuthorOfPublication, 0, 0);
+        relationship =
+            RelationshipBuilder.createRelationshipBuilder(context, leftItem, rightItem, isAuthorOfPublication).build();
         context.restoreAuthSystemState();
     }
 
@@ -148,25 +131,28 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
      * Common function to convert leftItem to a journal issue item, convert rightItem to a journal volume item,
      * and relating them to each other stored in the relationship field
      */
-    private void initJournalVolumeIssue() throws SQLException, AuthorizeException {
+    private void initJournalVolumeIssue() {
         context.turnOffAuthorisationSystem();
-        itemService.addMetadata(context, leftItem, "relationship", "type", null, null, "JournalIssue");
-        itemService.addMetadata(context, rightItem, "relationship", "type", null, null, "JournalVolume");
-        itemService.addMetadata(context, leftItem, "publicationissue", "issueNumber", null, null, "2");
-        itemService.addMetadata(context, rightItem, "publicationvolume", "volumeNumber", null, null, "30");
-        EntityType journalIssueEntityType = entityTypeService.create(context, "JournalIssue");
-        EntityType publicationVolumeEntityType = entityTypeService.create(context, "JournalVolume");
-        RelationshipType isIssueOfVolume = relationshipTypeService
-                .create(context, journalIssueEntityType, publicationVolumeEntityType,
-                        "isJournalVolumeOfIssue", "isIssueOfJournalVolume",
-                        null, null, null, null);
+        EntityType journalIssueEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "JournalIssue").build();
+        EntityType publicationVolumeEntityType =
+            EntityTypeBuilder.createEntityTypeBuilder(context, "JournalVolume").build();
+        leftItem = ItemBuilder.createItem(context, col).withRelationshipType("JournalIssue")
+                              .withPublicationIssueNumber("2").build();
+        rightItem = ItemBuilder.createItem(context, col).withRelationshipType("JournalVolume")
+                               .withPublicationVolumeNumber("30").build();
+        RelationshipType isIssueOfVolume =
+            RelationshipTypeBuilder
+                .createRelationshipTypeBuilder(context, journalIssueEntityType, publicationVolumeEntityType,
+                    "isJournalVolumeOfIssue", "isIssueOfJournalVolume",
+                    null, null, null, null).build();
 
-        relationship = relationshipService.create(context, leftItem, rightItem, isIssueOfVolume, 0, 0);
+        relationship =
+            RelationshipBuilder.createRelationshipBuilder(context, leftItem, rightItem, isIssueOfVolume).build();
         context.restoreAuthSystemState();
     }
 
     @Test
-    public void testGetAuthorRelationshipMetadata() throws SQLException, AuthorizeException {
+    public void testGetAuthorRelationshipMetadata() {
         initPublicationAuthor();
         //leftItem is the publication
         //verify the dc.contributor.author virtual metadata
@@ -191,7 +177,7 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
 
         assertThat(list.get(1).getValue(), equalTo(String.valueOf(rightItem.getID())));
         assertThat(list.get(1).getMetadataField().getMetadataSchema().getName(),
-                equalTo(MetadataSchemaEnum.RELATION.getName()));
+            equalTo(MetadataSchemaEnum.RELATION.getName()));
         assertThat(list.get(1).getMetadataField().getElement(), equalTo("isAuthorOfPublication"));
         assertThat(list.get(1).getAuthority(), equalTo("virtual::" + relationship.getID()));
     }
@@ -216,7 +202,7 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
 
         //verify there's no relation.isAuthorOfPublication actual metadata
         List<MetadataValue> relationshipMetadataList = itemService
-                .getMetadata(leftItem, MetadataSchemaEnum.RELATION.getName(), "isAuthorOfPublication", null, Item.ANY);
+            .getMetadata(leftItem, MetadataSchemaEnum.RELATION.getName(), "isAuthorOfPublication", null, Item.ANY);
         assertThat(relationshipMetadataList.size(), equalTo(0));
 
         //request the virtual metadata of the publication only
@@ -239,7 +225,7 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
 
         //verify there's no relation.isAuthorOfPublication actual metadata on the publication
         List<MetadataValue> relationshipMetadataList = itemService
-                .getMetadata(leftItem, MetadataSchemaEnum.RELATION.getName(), "isAuthorOfPublication", null, Item.ANY);
+            .getMetadata(leftItem, MetadataSchemaEnum.RELATION.getName(), "isAuthorOfPublication", null, Item.ANY);
         assertThat(relationshipMetadataList.size(), equalTo(0));
     }
 
@@ -262,31 +248,31 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
 
         //verify there's no relation.isAuthorOfPublication actual metadata
         List<MetadataValue> relationshipMetadataList = itemService
-                .getMetadata(leftItem, MetadataSchemaEnum.RELATION.getName(), "isAuthorOfPublication", null, Item.ANY);
+            .getMetadata(leftItem, MetadataSchemaEnum.RELATION.getName(), "isAuthorOfPublication", null, Item.ANY);
         assertThat(relationshipMetadataList.size(), equalTo(0));
     }
 
     @Test
-    public void testGetJournalRelationshipMetadata() throws SQLException, AuthorizeException {
+    public void testGetJournalRelationshipMetadata() {
         initJournalVolumeIssue();
 
         //leftItem is the journal issue item
         //verify the publicationvolume.volumeNumber virtual metadata
         List<MetadataValue> volumeList =
-                itemService.getMetadata(leftItem, "publicationvolume", "volumeNumber", null, Item.ANY);
+            itemService.getMetadata(leftItem, "publicationvolume", "volumeNumber", null, Item.ANY);
         assertThat(volumeList.size(), equalTo(1));
         assertThat(volumeList.get(0).getValue(), equalTo("30"));
 
         //rightItem is the journal volume item
         //verify the publicationissue.issueNumber virtual metadata
         List<MetadataValue> issueList =
-                itemService.getMetadata(rightItem, "publicationissue", "issueNumber", null, Item.ANY);
+            itemService.getMetadata(rightItem, "publicationissue", "issueNumber", null, Item.ANY);
         assertThat(issueList.size(), equalTo(1));
         assertThat(issueList.get(0).getValue(), equalTo("2"));
 
         //request the virtual metadata of the journal issue
         List<RelationshipMetadataValue> issueRelList =
-                relationshipMetadataService.getRelationshipMetadata(leftItem, true);
+            relationshipMetadataService.getRelationshipMetadata(leftItem, true);
         assertThat(issueRelList.size(), equalTo(2));
         assertThat(issueRelList.get(0).getValue(), equalTo("30"));
         assertThat(issueRelList.get(0).getMetadataField().getMetadataSchema().getName(), equalTo("publicationvolume"));
@@ -296,13 +282,13 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
 
         assertThat(issueRelList.get(1).getValue(), equalTo(String.valueOf(rightItem.getID())));
         assertThat(issueRelList.get(1).getMetadataField().getMetadataSchema().getName(),
-                equalTo(MetadataSchemaEnum.RELATION.getName()));
+            equalTo(MetadataSchemaEnum.RELATION.getName()));
         assertThat(issueRelList.get(1).getMetadataField().getElement(), equalTo("isJournalVolumeOfIssue"));
         assertThat(issueRelList.get(1).getAuthority(), equalTo("virtual::" + relationship.getID()));
 
         //request the virtual metadata of the journal volume
         List<RelationshipMetadataValue> volumeRelList =
-                relationshipMetadataService.getRelationshipMetadata(rightItem, true);
+            relationshipMetadataService.getRelationshipMetadata(rightItem, true);
         assertThat(volumeRelList.size(), equalTo(2));
         assertThat(volumeRelList.get(0).getValue(), equalTo("2"));
         assertThat(volumeRelList.get(0).getMetadataField().getMetadataSchema().getName(), equalTo("publicationissue"));
@@ -312,7 +298,7 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
 
         assertThat(volumeRelList.get(1).getValue(), equalTo(String.valueOf(leftItem.getID())));
         assertThat(volumeRelList.get(1).getMetadataField().getMetadataSchema().getName(),
-                equalTo(MetadataSchemaEnum.RELATION.getName()));
+            equalTo(MetadataSchemaEnum.RELATION.getName()));
         assertThat(volumeRelList.get(1).getMetadataField().getElement(), equalTo("isIssueOfJournalVolume"));
         assertThat(volumeRelList.get(1).getAuthority(), equalTo("virtual::" + relationship.getID()));
     }
@@ -327,13 +313,13 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
 
         //verify the left item's publicationvolume.volumeNumber actual metadata
         List<MetadataValue> volumeList =
-                itemService.getMetadata(leftItem, "publicationvolume", "volumeNumber", null, Item.ANY);
+            itemService.getMetadata(leftItem, "publicationvolume", "volumeNumber", null, Item.ANY);
         assertThat(volumeList.size(), equalTo(1));
         assertThat(volumeList.get(0).getValue(), equalTo("30"));
 
         //verify the right item doesn't contain the actual metadata
         List<MetadataValue> issueList =
-                itemService.getMetadata(rightItem, "publicationissue", "issueNumber", null, Item.ANY);
+            itemService.getMetadata(rightItem, "publicationissue", "issueNumber", null, Item.ANY);
         assertThat(issueList.size(), equalTo(0));
     }
 
@@ -347,12 +333,12 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
 
         //verify the left item doesn't contain the publicationvolume.volumeNumber actual metadata
         List<MetadataValue> volumeList =
-                itemService.getMetadata(leftItem, "publicationvolume", "volumeNumber", null, Item.ANY);
+            itemService.getMetadata(leftItem, "publicationvolume", "volumeNumber", null, Item.ANY);
         assertThat(volumeList.size(), equalTo(0));
 
         //verify the right item's publicationissue.issueNumber actual metadata
         List<MetadataValue> issueList =
-                itemService.getMetadata(rightItem, "publicationissue", "issueNumber", null, Item.ANY);
+            itemService.getMetadata(rightItem, "publicationissue", "issueNumber", null, Item.ANY);
         assertThat(issueList.size(), equalTo(1));
         assertThat(issueList.get(0).getValue(), equalTo("2"));
     }
@@ -368,13 +354,13 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
 
         //verify the left item's publicationvolume.volumeNumber actual metadata
         List<MetadataValue> volumeList =
-                itemService.getMetadata(leftItem, "publicationvolume", "volumeNumber", null, Item.ANY);
+            itemService.getMetadata(leftItem, "publicationvolume", "volumeNumber", null, Item.ANY);
         assertThat(volumeList.size(), equalTo(1));
         assertThat(volumeList.get(0).getValue(), equalTo("30"));
 
         //verify the right item's publicationissue.issueNumber actual metadata
         List<MetadataValue> issueList =
-                itemService.getMetadata(rightItem, "publicationissue", "issueNumber", null, Item.ANY);
+            itemService.getMetadata(rightItem, "publicationissue", "issueNumber", null, Item.ANY);
         assertThat(issueList.size(), equalTo(1));
         assertThat(issueList.get(0).getValue(), equalTo("2"));
     }
@@ -457,20 +443,15 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
         assertThat(relationshipService.findNextRightPlaceByRightItem(context, rightItem), equalTo(1));
 
         context.turnOffAuthorisationSystem();
-        Community community = communityService.create(null, context);
+        Community community = CommunityBuilder.createCommunity(context).build();
 
-        Collection col = collectionService.create(context, community);
-        WorkspaceItem is = workspaceItemService.create(context, col, false);
-        Item secondItem = installItemService.installItem(context, is);
-        itemService.addMetadata(context, secondItem, "relationship", "type", null, null, "Publication");
-        relationshipService.create(context, secondItem, rightItem,
-                                   isAuthorOfPublicationRelationshipType, 0, 0);
+        Collection col = CollectionBuilder.createCollection(context, community).build();
+        Item secondItem = ItemBuilder.createItem(context, col).withRelationshipType("Publication").build();
+        RelationshipBuilder.createRelationshipBuilder(context, secondItem, rightItem,
+            isAuthorOfPublicationRelationshipType).build();
         context.restoreAuthSystemState();
 
         assertThat(relationshipService.findNextRightPlaceByRightItem(context, rightItem), equalTo(2));
-
-
-
     }
 
     @Test
@@ -481,21 +462,132 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
         assertThat(relationshipService.findNextLeftPlaceByLeftItem(context, leftItem), equalTo(1));
 
         context.turnOffAuthorisationSystem();
-        Community community = communityService.create(null, context);
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection col = CollectionBuilder.createCollection(context, community).build();
 
-        Collection col = collectionService.create(context, community);
-        WorkspaceItem is = workspaceItemService.create(context, col, false);
-        Item secondAuthor = installItemService.installItem(context, is);
-        itemService.addMetadata(context, secondAuthor, "relationship", "type", null, null, "Author");
-        itemService.addMetadata(context, secondAuthor, "person", "familyName", null, null, "familyName");
-        itemService.addMetadata(context, secondAuthor, "person", "givenName", null, null, "firstName");
-        relationshipService.create(context, leftItem, secondAuthor,
-                                   isAuthorOfPublicationRelationshipType, 0, 0);
+        Item secondAuthor = ItemBuilder.createItem(context, col).withRelationshipType("Author")
+                                       .withPersonIdentifierFirstName("firstName")
+                                       .withPersonIdentifierLastName("familyName").build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, leftItem, secondAuthor,
+            isAuthorOfPublicationRelationshipType).build();
         context.restoreAuthSystemState();
 
         assertThat(relationshipService.findNextLeftPlaceByLeftItem(context, leftItem), equalTo(2));
 
 
+    }
 
+    @Test
+    public void testGetVirtualMetadata() throws SQLException, AuthorizeException {
+        // Journal, JournalVolume, JournalIssue, Publication items, related to each other using the relationship types
+        // isJournalOfVolume, isJournalVolumeOfIssue, isJournalIssueOfPublication.
+        context.turnOffAuthorisationSystem();
+        EntityType publicationEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType journalIssueEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "JournalIssue").build();
+        EntityType journalVolumeEntityType =
+            EntityTypeBuilder.createEntityTypeBuilder(context, "JournalVolume").build();
+        EntityType journalEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Journal").build();
+        RelationshipType isJournalVolumeOfIssueRelationshipType =
+            RelationshipTypeBuilder.createRelationshipTypeBuilder(context, journalIssueEntityType,
+                journalVolumeEntityType, "isIssueOfJournalVolume", "isJournalVolumeOfIssue", null, null, null, null)
+                                   .build();
+        RelationshipType isJournalVolumeOfJournalRelationshipType =
+            RelationshipTypeBuilder.createRelationshipTypeBuilder(context, journalVolumeEntityType,
+                journalEntityType, "isJournalOfVolume", "isVolumeOfJournal", null, null, null, null)
+                                   .build();
+        RelationshipType isJournalIssueOfPublicationRelationshipType =
+            RelationshipTypeBuilder.createRelationshipTypeBuilder(context, publicationEntityType,
+                journalIssueEntityType, "isJournalIssueOfPublication", "isPublicationOfJournalIssue", null, null, null,
+                null)
+                                   .build();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+
+        Item journalIssue = ItemBuilder.createItem(context, collection).withRelationshipType("JournalIssue").build();
+        Item journalVolume = ItemBuilder.createItem(context, collection)
+                                        .withPublicationVolumeNumber("30")
+                                        .withRelationshipType("JournalVolume").build();
+        Item journal = ItemBuilder.createItem(context, collection)
+                                  .withMetadata("creativeworkseries", "issn", null, "issn journal")
+                                  .withRelationshipType("Journal").build();
+        RelationshipBuilder.createRelationshipBuilder(context, journalIssue, journalVolume,
+            isJournalVolumeOfIssueRelationshipType).build();
+        RelationshipBuilder.createRelationshipBuilder(context, journalVolume, journal,
+            isJournalVolumeOfJournalRelationshipType).build();
+
+        Item publication = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Pub 1")
+                                      .withRelationshipType("Publication").build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, publication, journalIssue,
+            isJournalIssueOfPublicationRelationshipType).build();
+        context.restoreAuthSystemState();
+
+        // Query for the publication itemService.getMetadata(publication, Item.ANY, Item.ANY, null, Item.ANY, true);
+        // and verify it contains a relation.isJournalOfPublication metadata value with the value being the journal’s
+        // UUID
+        List<MetadataValue> mdPublication =
+            itemService.getMetadata(publication, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
+        boolean foundVirtualMdIsJournalOfPublicationInAllMD = false;
+        for (MetadataValue metadataValue : mdPublication) {
+            String schema = metadataValue.getMetadataField().getMetadataSchema().getName();
+            String element = metadataValue.getMetadataField().getElement();
+            String qualifier = metadataValue.getMetadataField().getQualifier();
+            if (schema.equals("relation") && element.equals("isJournalOfPublication") && qualifier == null &&
+                metadataValue.getValue().equals(journal.getID().toString())) {
+                foundVirtualMdIsJournalOfPublicationInAllMD = true;
+            }
+        }
+        assertTrue(foundVirtualMdIsJournalOfPublicationInAllMD);
+
+        // Query for the publication itemService.getMetadata(publication, "relation", "isJournalOfPublication", null,
+        // Item.ANY, true); and verify it contains a relation.isJournalOfPublication metadata value with the value
+        // being the journal’s UUID
+        List<MetadataValue> mdPublicationRelationIsJournalOfPublication =
+            itemService.getMetadata(publication, "relation", "isJournalOfPublication", Item.ANY, Item.ANY, true);
+        boolean foundVirtualMdIsJournalOfPublicationInSpecificQuery = false;
+        for (MetadataValue metadataValue : mdPublicationRelationIsJournalOfPublication) {
+            String schema = metadataValue.getMetadataField().getMetadataSchema().getName();
+            String element = metadataValue.getMetadataField().getElement();
+            String qualifier = metadataValue.getMetadataField().getQualifier();
+            if (schema.equals("relation") && element.equals("isJournalOfPublication") && qualifier == null &&
+                metadataValue.getValue().equals(journal.getID().toString())) {
+                foundVirtualMdIsJournalOfPublicationInSpecificQuery = true;
+            }
+        }
+        assertTrue(foundVirtualMdIsJournalOfPublicationInSpecificQuery);
+
+        // Query for the publication itemService.getMetadata(publication, Item.ANY, Item.ANY, null, Item.ANY, true);
+        // and verify it contains a creativeworkseries.issn metadata value with the value being the journal’s issn
+        boolean foundVirtualMdCreativeWorksISSNInAllMD = false;
+        for (MetadataValue metadataValue : mdPublication) {
+            String schema = metadataValue.getMetadataField().getMetadataSchema().getName();
+            String element = metadataValue.getMetadataField().getElement();
+            String qualifier = metadataValue.getMetadataField().getQualifier();
+            if (schema.equals("creativeworkseries") && element.equals("issn") && qualifier == null &&
+                metadataValue.getValue().equals("issn journal")) {
+                foundVirtualMdCreativeWorksISSNInAllMD = true;
+            }
+        }
+        assertTrue(foundVirtualMdCreativeWorksISSNInAllMD);
+
+        // Query for the publication itemService.getMetadata(publication, "creativeworkseries", "issn", null, Item
+        // .ANY, true); and verify it contains a creativeworkseries.issn metadata value with the value being the
+        // journal’s issn
+        List<MetadataValue> mdPublicationVirtualMdCreativeWorksISSN = itemService.getMetadata(publication,
+            "creativeworkseries", "issn", Item.ANY, Item.ANY, true);
+        boolean foundCreativeWorksISSNInSpecificQuery = false;
+        for (MetadataValue metadataValue : mdPublicationVirtualMdCreativeWorksISSN) {
+            String schema = metadataValue.getMetadataField().getMetadataSchema().getName();
+            String element = metadataValue.getMetadataField().getElement();
+            String qualifier = metadataValue.getMetadataField().getQualifier();
+            if (schema.equals("creativeworkseries") && element.equals("issn") && qualifier == null &&
+                metadataValue.getValue().equals("issn journal")) {
+                foundCreativeWorksISSNInSpecificQuery = true;
+            }
+        }
+        assertTrue(foundCreativeWorksISSNInSpecificQuery);
     }
 }
