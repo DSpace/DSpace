@@ -6,8 +6,12 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.repository;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -16,6 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.dspace.app.metrics.CrisMetrics;
@@ -39,64 +45,89 @@ import org.springframework.stereotype.Component;
 public class ItemMetricsLinkRepository extends AbstractDSpaceRestRepository
                                        implements LinkRestRepository {
 
+    private static Logger log = LogManager.getLogger(ItemMetricsLinkRepository.class);
+
     @Autowired
     private IndexingService indexingService;
 
     @PreAuthorize("hasPermission(#itemUuid, 'ITEM', 'READ')")
     public Page<CrisMetrics> getMetrics(@Nullable HttpServletRequest request, @NotNull UUID itemUuid,
             @Nullable Pageable optionalPageable, Projection projection) {
-        List<CrisMetrics> metrics = null;
         Context context = obtainContext();
         if (Objects.isNull(itemUuid)) {
             throw new BadRequestException();
         }
-        metrics = metricsByItem(context, itemUuid);
+        List<CrisMetrics> metrics = findMetricsByItemUUID(context, itemUuid);
         if (metrics == null) {
             throw new ResourceNotFoundException("No such metrics found!");
         }
         return converter.toRestPage(metrics, optionalPageable, projection);
     }
 
-    private List<CrisMetrics> metricsByItem(Context context, UUID itemUuid) {
+    private List<CrisMetrics> findMetricsByItemUUID(Context context, UUID itemUuid) {
         indexingService.retriveSolrDocByUniqueID(itemUuid.toString());
         QueryResponse queryResponse = indexingService.retriveSolrDocByUniqueID(itemUuid.toString());
-        List<SolrDocument> sd = queryResponse.getResults();
-        SolrDocument document = sd.get(0);
-        Collection<String> keys = document.getFieldNames();
-        ArrayList<String> keysMetrics = getIdMetrics(keys);
-        return buildCrisMetric(context, keysMetrics, document);
+        List<SolrDocument> solrDocuments = queryResponse.getResults();
+        if (solrDocuments.size() == 0) {
+            return null;
+        }
+        SolrDocument solrDocument = solrDocuments.get(0);
+        Collection<String> fields = solrDocument.getFieldNames();
+        return buildCrisMetric(context, getMetricFields(fields), solrDocument);
     }
 
-    private List<CrisMetrics> buildCrisMetric(Context context, ArrayList<String> keysMetrics, SolrDocument document)  {
-        List<CrisMetrics> metrics = new ArrayList<CrisMetrics>(keysMetrics.size());
-        for (String key : keysMetrics) {
-            String[] x = key.split("\\.");
-            String type = x[2];
-            CrisMetrics metric = fillMetricsObject(context, document, key, type);
+    private List<CrisMetrics> buildCrisMetric(Context context, ArrayList<String> metricFields, SolrDocument document)  {
+        List<CrisMetrics> metrics = new ArrayList<CrisMetrics>(metricFields.size());
+        for (String field : metricFields) {
+            String[] splitedField = field.split("\\.");
+            String metricType = splitedField[2];
+            CrisMetrics metric = fillMetricsObject(context, document, field, metricType);
             metrics.add(metric);
         }
         return metrics;
     }
 
-    private CrisMetrics fillMetricsObject(Context context, SolrDocument document, String key, String type) {
+    private CrisMetrics fillMetricsObject(Context context, SolrDocument document, String field, String metricType) {
         CrisMetrics metricToFill = new CrisMetrics();
-        int metricId = (int) document.getFieldValue("metric.id.".concat(type));
-        Float metricCount = (Float) document.getFieldValue("metric.".concat(type));
-        String acquisitionDate = (String) document.getFieldValue("metric.acquisitionDate.".concat(type));
+        int metricId = (int) document.getFieldValue("metric.id.".concat(metricType));
+        Float metricCount = (Float) document.getFieldValue("metric.".concat(metricType));
+        Date acquisitionDate = parseDate((String) document.getFieldValue("metric.acquisitionDate.".concat(metricType)));
+        String remark = (String) document.getFieldValue("metric.remark.".concat(metricType));
+        Double deltaPeriod1 = (Double) document.getFieldValue("metric.deltaPeriod1.".concat(metricType));
+        Double deltaPeriod2 = (Double) document.getFieldValue("metric.deltaPeriod2.".concat(metricType));
+        Double rank = (Double) document.getFieldValue("metric.rank.".concat(metricType));
+
         metricToFill.setId(metricId);
-        metricToFill.setMetricType(type);
+        metricToFill.setMetricType(metricType);
         metricToFill.setMetricCount(metricCount);
         metricToFill.setLast(true);
+        metricToFill.setRemark(remark);
+        metricToFill.setDeltaPeriod1(deltaPeriod1);
+        metricToFill.setDeltaPeriod2(deltaPeriod2);
+        metricToFill.setRank(rank);
+        metricToFill.setAcquisitionDate(acquisitionDate);
         return metricToFill;
     }
 
-    private ArrayList<String> getIdMetrics(Collection<String> keys) {
-        ArrayList<String> keysMetrics = new ArrayList<String>();
-        for (String key :keys) {
-            if (key.startsWith("metric.id.")) {
-                keysMetrics.add(key);
+    private Date parseDate(String dateToPars) {
+        DateFormat format = new SimpleDateFormat("MMMM d, yyyy");
+        Date date = null;
+        try {
+            date = format.parse(dateToPars);
+        } catch (ParseException e) {
+            log.error(e.getMessage(), e);
+        }
+        return date;
+    }
+
+    private ArrayList<String> getMetricFields(Collection<String> fields) {
+        ArrayList<String> metricsField = new ArrayList<String>();
+        for (String field : fields) {
+            if (field.startsWith("metric.id.")) {
+                metricsField.add(field);
             }
         }
-        return keysMetrics;
+        return metricsField;
     }
+
 }

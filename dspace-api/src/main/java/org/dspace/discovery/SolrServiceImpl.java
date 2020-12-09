@@ -1394,18 +1394,38 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         String type = "metric." + metric.getMetricType();
         String typeId = "metric.id." + metric.getMetricType();
         String typeAcquisitionDate = "metric.acquisitionDate." + metric.getMetricType();
+        String typeRemark = "metric.remark." + metric.getMetricType();
+        String typeDeltaPeriod1 = "metric.deltaPeriod1." + metric.getMetricType();
+        String typeDeltaPeriod2 = "metric.deltaPeriod2." + metric.getMetricType();
+        String typeRank = "metric.rank." + metric.getMetricType();
+
+        SimpleDateFormat df = new SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH);
+        String acquisitionDate =  df.format(metric.getAcquisitionDate());
+
         try {
             SolrInputDocument solrInDoc = new SolrInputDocument();
             solrInDoc.addField(SearchUtils.RESOURCE_UNIQUE_ID, uniqueID);
             HashMap<String, Object> map1 = new HashMap<String, Object>();
             HashMap<String, Object> map2 = new HashMap<String, Object>();
             HashMap<String, Object> map3 = new HashMap<String, Object>();
+            HashMap<String, Object> map4 = new HashMap<String, Object>();
+            HashMap<String, Object> map5 = new HashMap<String, Object>();
+            HashMap<String, Object> map6 = new HashMap<String, Object>();
+            HashMap<String, Object> map7 = new HashMap<String, Object>();
             map1.put("set", metric.getMetricCount());
             map2.put("set", metric.getId());
-            map3.put("set", metric.getAcquisitionDate());
+            map3.put("set", acquisitionDate);
+            map4.put("set", metric.getRemark());
+            map5.put("set", metric.getDeltaPeriod1());
+            map6.put("set", metric.getDeltaPeriod2());
+            map7.put("set", metric.getRank());
             solrInDoc.addField(type, map1);
             solrInDoc.addField(typeId, map2);
             solrInDoc.addField(typeAcquisitionDate, map3);
+            solrInDoc.addField(typeRemark, map4);
+            solrInDoc.addField(typeDeltaPeriod1, map5);
+            solrInDoc.addField(typeDeltaPeriod2, map6);
+            solrInDoc.addField(typeRank, map7);
             req.add(solrInDoc);
             solrClient.request(req);
             solrClient.commit();
@@ -1425,7 +1445,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         } catch (SolrServerException | IOException e) {
             log.error(e.getMessage(), e);
         }
-        System.out.println(queryResponse.toString());
         return queryResponse;
     }
 }
