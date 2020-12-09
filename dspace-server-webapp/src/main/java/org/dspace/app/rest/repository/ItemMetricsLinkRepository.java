@@ -91,7 +91,7 @@ public class ItemMetricsLinkRepository extends AbstractDSpaceRestRepository
         CrisMetrics metricToFill = new CrisMetrics();
         int metricId = (int) document.getFieldValue("metric.id.".concat(metricType));
         Float metricCount = (Float) document.getFieldValue("metric.".concat(metricType));
-        Date acquisitionDate = parseDate((String) document.getFieldValue("metric.acquisitionDate.".concat(metricType)));
+        Date acquisitionDate = (Date) document.getFieldValue("metric.acquisitionDate.".concat(metricType));
         String remark = (String) document.getFieldValue("metric.remark.".concat(metricType));
         Double deltaPeriod1 = (Double) document.getFieldValue("metric.deltaPeriod1.".concat(metricType));
         Double deltaPeriod2 = (Double) document.getFieldValue("metric.deltaPeriod2.".concat(metricType));
@@ -106,6 +106,10 @@ public class ItemMetricsLinkRepository extends AbstractDSpaceRestRepository
         metricToFill.setDeltaPeriod2(deltaPeriod2);
         metricToFill.setRank(rank);
         metricToFill.setAcquisitionDate(acquisitionDate);
+        //TODO avoid to set the item as it is not currently used by the REST
+        // and we should retrieve the real object from the session
+        // (or introduce a session.load to get a lazy object by ID)
+        // metricToFill.setResource(resource);
         return metricToFill;
     }
 

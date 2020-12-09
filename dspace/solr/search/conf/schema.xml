@@ -331,8 +331,8 @@
     <!--Dynamic field used for update metrics in Solr doc-->
     <dynamicField name="metric.*" type="float" indexed="true" stored="true" multiValued="false" docValues="true"/>
 
-    <dynamicField name="metric.acquisitionDate.*" type="string" indexed="true" stored="true" multiValued="false"/>
-    <dynamicField name="metric.id.*" type="long" indexed="int" stored="true" multiValued="false"/>
+    <dynamicField name="metric.acquisitionDate.*" type="date" indexed="true" stored="true" multiValued="false"/>
+    <dynamicField name="metric.id.*" type="int" indexed="true" stored="true" multiValued="false"/>
     
      <dynamicField name="metric.remark.*" type="string" indexed="true" stored="true" multiValued="false"/>
      <dynamicField name="metric.deltaPeriod1.*" type="double" indexed="true" stored="true" multiValued="false"/>

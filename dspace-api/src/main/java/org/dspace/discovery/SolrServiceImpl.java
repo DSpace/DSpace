@@ -1399,9 +1399,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         String typeDeltaPeriod2 = "metric.deltaPeriod2." + metric.getMetricType();
         String typeRank = "metric.rank." + metric.getMetricType();
 
-        SimpleDateFormat df = new SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH);
-        String acquisitionDate =  df.format(metric.getAcquisitionDate());
-
         try {
             SolrInputDocument solrInDoc = new SolrInputDocument();
             solrInDoc.addField(SearchUtils.RESOURCE_UNIQUE_ID, uniqueID);
@@ -1414,7 +1411,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             HashMap<String, Object> map7 = new HashMap<String, Object>();
             map1.put("set", metric.getMetricCount());
             map2.put("set", metric.getId());
-            map3.put("set", acquisitionDate);
+            map3.put("set", metric.getAcquisitionDate());
             map4.put("set", metric.getRemark());
             map5.put("set", metric.getDeltaPeriod1());
             map6.put("set", metric.getDeltaPeriod2());
@@ -1445,6 +1442,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         } catch (SolrServerException | IOException e) {
             log.error(e.getMessage(), e);
         }
+        System.out.println(queryResponse.toString());
         return queryResponse;
     }
 }
