@@ -28,6 +28,10 @@ public class CrisMetricsMatcher {
                      hasJsonPath("$.metricType", is(crisMetrics.getMetricType())),
                      hasJsonPath("$.metricCount", is(crisMetrics.getMetricCount())),
                      hasJsonPath("$.last", is(crisMetrics.getLast())),
+                     hasJsonPath("$.remark", is(crisMetrics.getRemark())),
+                     hasJsonPath("$.deltaPeriod1", is(crisMetrics.getDeltaPeriod1())),
+                     hasJsonPath("$.deltaPeriod2", is(crisMetrics.getDeltaPeriod2())),
+                     hasJsonPath("$.rank", is(crisMetrics.getRank())),
                      hasJsonPath("$.type", is(CrisMetricsRest.NAME))
                      );
     }

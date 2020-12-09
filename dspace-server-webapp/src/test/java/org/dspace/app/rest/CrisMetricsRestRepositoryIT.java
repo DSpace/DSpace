@@ -6,17 +6,26 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest;
+import static org.dspace.app.launcher.ScriptLauncher.handleScript;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.UUID;
 
+import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.metrics.CrisMetrics;
 import org.dspace.app.rest.matcher.CrisMetricsMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -25,6 +34,7 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
+import org.dspace.discovery.IndexingService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +44,13 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
-public class CristMetricsRestRepositoryIT extends AbstractControllerIntegrationTest {
+public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
-    AuthorizeService authorizeService;
+    private AuthorizeService authorizeService;
+
+    @Autowired
+    private IndexingService crisIndexingService;
 
     @Test
     public void findAllTest() throws Exception {
@@ -209,7 +222,7 @@ public class CristMetricsRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     @Test
-    public void findLinkedEntitiesMetricsTest() throws Exception {
+    public void findLinkedEntitiesMetricsWithoutNotExistedInSolrDocumentTest() throws Exception {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community").build();
@@ -245,15 +258,10 @@ public class CristMetricsRestRepositoryIT extends AbstractControllerIntegrationT
         getClient(tokenEperson).perform(get("/api/core/items/" + itemA.getID() + "/metrics"))
                                .andExpect(status().isOk())
                                .andExpect(content().contentType(contentType))
-                               .andExpect(jsonPath("$._embedded.metrics", Matchers.containsInAnyOrder(
-                                          CrisMetricsMatcher.matchCrisMetrics(metrics1),
-                                          CrisMetricsMatcher.matchCrisMetrics(metrics2)
-                                          )))
-                               .andExpect(jsonPath("$._embedded.metrics",
-                                   Matchers.not(is(CrisMetricsMatcher.matchCrisMetrics(metrics3)))))
+                               .andExpect(jsonPath("$._embedded.metrics").value(Matchers.hasSize(0)))
                                .andExpect(jsonPath("$._links.self.href",
                                    Matchers.containsString("api/core/items/" + itemA.getID() + "/metrics")))
-                               .andExpect(jsonPath("$.page.totalElements", is(2)));
+                               .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
@@ -318,4 +326,98 @@ public class CristMetricsRestRepositoryIT extends AbstractControllerIntegrationT
         getClient(tokenAdmin).perform(get("/api/core/items/" + UUID.randomUUID().toString() + "/metrics"))
                              .andExpect(status().isNotFound());
     }
+
+    @Test
+    public void findLinkedEntitiesMetricsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withRelationshipType("Publication")
+                                           .withName("Collection 1").build();
+
+        Item itemA = ItemBuilder.createItem(context, col1)
+                                .withDoiIdentifier("10.1016/j.gene.2009.04.019")
+                                .withTitle("Title item A").build();
+
+        String target = "Nov 21, 2020";
+        DateFormat df = new SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH);
+        Date date =  df.parse(target);
+
+        String remark = "{identifier:2-s2.0-67349162500, link:https://www.scopus.com/inward/citedby.uri?"
+                      + "partnerIDu003dHzOxMe3bu0026scpu003d67349162500u0026originu003dinward"
+                      + "pmid:19406218,doi:10.1016/j.gene.2009.04.019}";
+
+        CrisMetrics metric = CrisMetricsBuilder.createCrisMetrics(context, itemA)
+                                               .withAcquisitionDate(date)
+                                               .withMetricType("ScopusCitation")
+                                               .withMetricCount(4)
+                                               .withRemark(remark)
+                                               .withDeltaPeriod1(3.0)
+                                               .withDeltaPeriod2(12.0)
+                                               .withRank(50.0)
+                                               .isLast(true).build();
+
+        CrisMetrics metric2 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
+                                                .withAcquisitionDate(date)
+                                                .withMetricType("view")
+                                                .withMetricCount(4501)
+                                                .isLast(true).build();
+
+        context.restoreAuthSystemState();
+
+        String[] args = new String[] {"update-metrics-in-solr"};
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+
+        int status = handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin);
+
+        assertEquals(0, status);
+
+        crisIndexingService.retriveSolrDocByUniqueID(itemA.getID().toString());
+
+        String tokenEperson = getAuthToken(admin.getEmail(), password);
+        getClient(tokenEperson).perform(get("/api/core/items/" + itemA.getID() + "/metrics"))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$._embedded.metrics", Matchers.containsInAnyOrder(
+                                          CrisMetricsMatcher.matchCrisMetrics(metric),
+                                          CrisMetricsMatcher.matchCrisMetrics(metric2)
+                                          )))
+                               .andExpect(jsonPath("$._links.self.href",
+                                   Matchers.containsString("api/core/items/" + itemA.getID() + "/metrics")))
+                               .andExpect(jsonPath("$.page.totalElements", is(2)));
+    }
+
+    @Test
+    public void tryToDeletItemTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+
+        Item itemA = ItemBuilder.createItem(context, col1)
+                                .withDoiIdentifier("10.1016/19")
+                                .withTitle("Title item A").build();
+
+        String target = "Nov 21, 2020";
+        DateFormat df = new SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH);
+        Date date =  df.parse(target);
+
+        CrisMetrics metric = CrisMetricsBuilder.createCrisMetrics(context, itemA)
+                                               .withAcquisitionDate(date)
+                                               .withMetricType("ScopusCitation")
+                                               .withMetricCount(21)
+                                               .withDeltaPeriod1(3.0)
+                                               .withDeltaPeriod2(12.0)
+                                               .withRank(10.0)
+                                               .isLast(true).build();
+
+        context.restoreAuthSystemState();
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(delete("/api/core/items/" + itemA.getID()))
+                             .andExpect(status().is(204));
+    }
+
 }

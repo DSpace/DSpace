@@ -127,4 +127,25 @@ public class CrisMetricsBuilder extends AbstractBuilder<CrisMetrics, CrisMetrics
         crisMetrics.setAcquisitionDate(acquisitionDate);
         return this;
     }
+
+    public CrisMetricsBuilder withRemark(String remark) throws SQLException {
+        crisMetrics.setRemark(remark);
+        return this;
+    }
+
+    public CrisMetricsBuilder withDeltaPeriod1(Double deltaPeriod1) throws SQLException {
+        crisMetrics.setDeltaPeriod1(deltaPeriod1);
+        return this;
+    }
+
+    public CrisMetricsBuilder withDeltaPeriod2(Double deltaPeriod2) throws SQLException {
+        crisMetrics.setDeltaPeriod2(deltaPeriod2);
+        return this;
+    }
+
+    public CrisMetricsBuilder withRank(Double rank) throws SQLException {
+        crisMetrics.setRank(rank);
+        return this;
+    }
+
 }
