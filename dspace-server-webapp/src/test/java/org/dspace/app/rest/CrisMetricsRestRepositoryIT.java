@@ -33,7 +33,6 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.discovery.IndexingService;
-import org.dspace.externalservices.wos.WOSProvider;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,9 +49,6 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
 
     @Autowired
     private IndexingService crisIndexingService;
-
-    @Autowired
-    private WOSProvider wosProvider;
 
     @Test
     public void findAllTest() throws Exception {
@@ -93,7 +89,13 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
                                 .withDoiIdentifier("10.1016/19")
                                 .withTitle("Title item A").build();
 
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, 2020);
+        calendar.set(Calendar.MONTH, 3);
+        calendar.set(Calendar.DATE, 21);
+
         CrisMetrics metric = CrisMetricsBuilder.createCrisMetrics(context, itemA)
+                                               .withAcquisitionDate(calendar.getTime())
                                                .withMetricType("view")
                                                .withMetricCount(2312)
                                                .isLast(true).build();
@@ -204,10 +206,16 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
                                 .withDoiIdentifier("10.1016/19")
                                 .withTitle("Title item A").build();
 
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, 2020);
+        calendar.set(Calendar.MONTH, 9);
+        calendar.set(Calendar.DATE, 17);
+
         CrisMetrics metric = CrisMetricsBuilder.createCrisMetrics(context, itemA)
-                                                 .withMetricType("view")
-                                                 .withMetricCount(2312)
-                                                 .isLast(true).build();
+                                               .withAcquisitionDate(calendar.getTime())
+                                               .withMetricType("view")
+                                               .withMetricCount(2312)
+                                               .isLast(true).build();
 
         authorizeService.removePoliciesActionFilter(context, itemA, Constants.READ);
         context.restoreAuthSystemState();
