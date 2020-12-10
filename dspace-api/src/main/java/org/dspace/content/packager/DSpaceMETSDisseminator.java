@@ -25,7 +25,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
@@ -45,7 +44,6 @@ import org.dspace.core.Context;
  * plugin, and a way to create packages acceptable to the METS SIP importer.
  *
  * @author Larry Stone
- * @version $Revision$
  */
 public class DSpaceMETSDisseminator
     extends AbstractMETSDisseminator {
@@ -115,8 +113,7 @@ public class DSpaceMETSDisseminator
         agent.setTYPE(Type.ORGANIZATION);
         Name name = new Name();
         name.getContent()
-            .add(new PCData(ConfigurationManager
-                                .getProperty("dspace.name")));
+            .add(new PCData(configurationService.getProperty("dspace.name")));
         agent.getContent().add(name);
         metsHdr.getContent().add(agent);
         return metsHdr;
@@ -198,7 +195,7 @@ public class DSpaceMETSDisseminator
     @Override
     public String[] getRightsMdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
 
         if (dso.getType() == Constants.ITEM) {
             Item item = (Item) dso;

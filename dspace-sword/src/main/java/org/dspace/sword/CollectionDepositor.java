@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -25,8 +26,9 @@ import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.purl.sword.base.Deposit;
 import org.purl.sword.base.ErrorCodes;
 import org.purl.sword.base.SWORDErrorException;
@@ -40,7 +42,7 @@ public class CollectionDepositor extends Depositor {
     /**
      * logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(CollectionDepositor.class);
+    private static final Logger log = LogManager.getLogger(CollectionDepositor.class);
 
     protected ItemService itemService =
         ContentServiceFactory.getInstance().getItemService();
@@ -54,6 +56,8 @@ public class CollectionDepositor extends Depositor {
     protected BitstreamFormatService bitstreamFormatService =
         ContentServiceFactory.getInstance().getBitstreamFormatService();
 
+    private final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
     /**
      * The DSpace Collection we are depositing into
      */
@@ -90,6 +94,7 @@ public class CollectionDepositor extends Depositor {
      * @throws SWORDErrorException  on generic SWORD exception
      * @throws DSpaceSWORDException can be thrown by the internals of the DSpace SWORD implementation
      */
+    @Override
     public DepositResult doDeposit(Deposit deposit)
         throws SWORDErrorException, DSpaceSWORDException {
         // get the things out of the service that we need
@@ -145,7 +150,7 @@ public class CollectionDepositor extends Depositor {
                 // for a moment
                 context.turnOffAuthorisationSystem();
 
-                String bundleName = ConfigurationManager.getProperty(
+                String bundleName = configurationService.getProperty(
                     "sword-server", "bundle.name");
                 if (bundleName == null || "".equals(bundleName)) {
                     bundleName = "SWORD";
@@ -215,13 +220,14 @@ public class CollectionDepositor extends Depositor {
     /**
      * Reverse any changes which may have resulted as the consequence of a deposit.
      *
-     * This is inteded for use during no-op deposits, and should be called at the
+     * This is intended for use during no-op deposits, and should be called at the
      * end of such a deposit process in order to remove any temporary files and
      * to abort the database connection, so no changes are written.
      *
      * @param result deposit result to undo
      * @throws DSpaceSWORDException can be thrown by the internals of the DSpace SWORD implementation
      */
+    @Override
     public void undoDeposit(DepositResult result) throws DSpaceSWORDException {
         SWORDContext sc = swordService.getSwordContext();
 
