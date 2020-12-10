@@ -11,6 +11,7 @@ import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -1908,6 +1909,111 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             WorkspaceItemBuilder.deleteWorkspaceItem(idRef.get());
         }
 
+    }
+
+    /**
+     * Test a global submission validation error
+     *
+     * @throws Exception
+     */
+    @Test
+    public void globalValidationErrorsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // ** GIVEN **
+        // 1. A community-collection structure with one parent community with
+        // sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+            .withName("Collection 1")
+            .withSubmitterGroup(eperson)
+            .build();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        WorkspaceItem workspaceItem1 = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+            .withTitle("Test publication with mandatory DOI 1")
+            .withIssueDate("2017-10-17")
+            .withDoiIdentifier("10.1000/182")
+            .build();
+
+        WorkspaceItem workspaceItem2 = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+            .withTitle("Test publication with mandatory DOI 2")
+            .withIssueDate("2017-10-17")
+            .build();
+
+        // disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+
+        context.restoreAuthSystemState();
+
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + workspaceItem1.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.errors").doesNotExist());
+
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + workspaceItem2.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.test')]", allOf(
+                contains(hasJsonPath("$.paths[0]", is("/sections/traditionalpageone/dc.title"))),
+                contains(hasJsonPath("$.paths[1]", is("/sections/traditionalpageone/dc.identifier.doi"))))));
+    }
+
+    /**
+     * Test step and global submission validation error
+     *
+     * @throws Exception
+     */
+    @Test
+    public void stepAndGlobalValidationErrorsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // ** GIVEN **
+        // 1. A community-collection structure with one parent community with
+        // sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+            .withName("Collection 1")
+            .withSubmitterGroup(eperson)
+            .build();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        WorkspaceItem workspaceItem1 = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+            .withTitle("Test publication with mandatory DOI 1")
+            .withIssueDate("2017-10-17")
+            .withDoiIdentifier("10.1000/182")
+            .build();
+
+        WorkspaceItem workspaceItem2 = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+            .withTitle("Test publication with mandatory DOI 2")
+            .build();
+
+        // disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+
+        context.restoreAuthSystemState();
+
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + workspaceItem1.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.errors").doesNotExist());
+
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + workspaceItem2.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.required')]",
+                contains(hasJsonPath("$.paths[0]", is("/sections/traditionalpageone/dc.date.issued")))))
+            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.test')]", allOf(
+                contains(hasJsonPath("$.paths[0]", is("/sections/traditionalpageone/dc.title"))),
+                contains(hasJsonPath("$.paths[1]", is("/sections/traditionalpageone/dc.identifier.doi"))))));
     }
 
     @Test

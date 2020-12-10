@@ -183,6 +183,10 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
         return addMetadataValue(MetadataSchemaEnum.DC.getName(), "subject", null, subject);
     }
 
+    public WorkflowItemBuilder withDoiIdentifier(final String doi) {
+        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "identifier", "doi", doi);
+    }
+
     public WorkflowItemBuilder grantLicense() {
         Item item = workspaceItem.getItem();
         String license;
