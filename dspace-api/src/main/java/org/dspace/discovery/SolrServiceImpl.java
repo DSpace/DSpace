@@ -1426,7 +1426,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             req.add(solrInDoc);
             solrClient.request(req);
             solrClient.commit();
-            retriveSolrDocByUniqueID(metric.getResource().getID().toString());
         } catch (SolrServerException | IOException e) {
             log.error(e.getMessage(), e);
         }
@@ -1442,7 +1441,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         } catch (SolrServerException | IOException e) {
             log.error(e.getMessage(), e);
         }
-        System.out.println(queryResponse.toString());
         return queryResponse;
     }
 }
