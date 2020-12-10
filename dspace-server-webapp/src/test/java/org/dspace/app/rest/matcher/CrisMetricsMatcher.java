@@ -10,6 +10,9 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.dspace.app.metrics.CrisMetrics;
 import org.dspace.app.rest.model.CrisMetricsRest;
 import org.hamcrest.Matcher;
@@ -27,6 +30,7 @@ public class CrisMetricsMatcher {
         return allOf(hasJsonPath("$.id", is(crisMetrics.getID())),
                      hasJsonPath("$.metricType", is(crisMetrics.getMetricType())),
                      hasJsonPath("$.metricCount", is(crisMetrics.getMetricCount())),
+                     hasJsonPath("$.acquisitionDate", is(formatDate(crisMetrics.getAcquisitionDate()))),
                      hasJsonPath("$.last", is(crisMetrics.getLast())),
                      hasJsonPath("$.remark", is(crisMetrics.getRemark())),
                      hasJsonPath("$.deltaPeriod1", is(crisMetrics.getDeltaPeriod1())),
@@ -34,6 +38,12 @@ public class CrisMetricsMatcher {
                      hasJsonPath("$.rank", is(crisMetrics.getRank())),
                      hasJsonPath("$.type", is(CrisMetricsRest.NAME))
                      );
+    }
+
+    private static String formatDate(Date date) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        String formattedDate = formatter.format(date);
+        return formattedDate;
     }
 
 }
