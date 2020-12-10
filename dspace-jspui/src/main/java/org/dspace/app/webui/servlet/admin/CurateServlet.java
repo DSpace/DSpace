@@ -263,6 +263,7 @@ public class CurateServlet extends DSpaceServlet
     {
         String task   = request.getParameter("curate_task");
         Curator curator = getCurator(task);
+        curator.setTransactionScope(Curator.TxScope.CURATION);
         boolean success = false;
         try
         {
