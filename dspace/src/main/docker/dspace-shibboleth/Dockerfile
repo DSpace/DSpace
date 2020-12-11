@@ -40,6 +40,7 @@ RUN a2enmod ssl headers proxy proxy_ajp proxy_http shib && \
 
 # Setup Shibboleth configs
 COPY shibboleth2.xml /etc/shibboleth/
+COPY attribute-map.xml /etc/shibboleth/
 RUN cd /etc/shibboleth/ \
     && shib-keygen
 
