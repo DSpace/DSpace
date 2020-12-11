@@ -9,6 +9,7 @@ package org.dspace.external.provider.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -150,11 +151,11 @@ public class SherpaJournalDataProvider implements ExternalDataProvider {
             }
         } catch (IOException e) {
             log.error("SHERPA/RoMEO query failed: ", e);
-            return null;
+            return Collections.emptyList();
         } finally {
             get.releaseConnection();
         }
-        return null;
+        return Collections.emptyList();
     }
 
     private HttpGet constructHttpGet(String query) {
