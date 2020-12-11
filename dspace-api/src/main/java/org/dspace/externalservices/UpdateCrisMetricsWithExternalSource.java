@@ -24,6 +24,7 @@ import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.externalservices.scopus.UpdateScopusMetrics;
+import org.dspace.externalservices.wos.UpdateWOSMetrics;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.utils.DSpace;
 
@@ -41,15 +42,16 @@ public class UpdateCrisMetricsWithExternalSource extends
 
     private String service;
 
-    private Map<String, MetricsExternalServices> crisMetricsExternalService;
+    private Map<String, MetricsExternalServices> crisMetricsExternalServices = new HashMap<>();
 
     @Override
     public void setup() throws ParseException {
-        crisMetricsExternalService = new HashMap<String, MetricsExternalServices>();
-        crisMetricsExternalService.put("scopus", new DSpace().getServiceManager().getServiceByName(
-                                                     UpdateScopusMetrics.class.getName(),
-                                                     UpdateScopusMetrics.class));
-
+        crisMetricsExternalServices.put("scopus", new DSpace().getServiceManager().getServiceByName(
+                                                      UpdateScopusMetrics.class.getName(),
+                                                      UpdateScopusMetrics.class));
+        crisMetricsExternalServices.put("wos", new DSpace().getServiceManager().getServiceByName(
+                                                   UpdateWOSMetrics.class.getName(),
+                                                   UpdateWOSMetrics.class));
         this.service = commandLine.getOptionValue('s');
     }
 
@@ -65,11 +67,10 @@ public class UpdateCrisMetricsWithExternalSource extends
     public void internalRun() throws Exception {
         context = new Context();
         assignCurrentUserInContext();
-
         if (service == null) {
             throw new IllegalArgumentException("The name of service must be provided");
         }
-        MetricsExternalServices externalService = crisMetricsExternalService.get(this.service.toLowerCase());
+        MetricsExternalServices externalService = crisMetricsExternalServices.get(this.service.toLowerCase());
         if (externalService == null) {
             throw new IllegalArgumentException("The name of service must be provided");
         }
@@ -137,12 +138,12 @@ public class UpdateCrisMetricsWithExternalSource extends
         }
     }
 
-    public Map<String, MetricsExternalServices> getPeruExternalService() {
-        return crisMetricsExternalService;
+    public Map<String, MetricsExternalServices> getCrisMetricsExternalServices() {
+        return crisMetricsExternalServices;
     }
 
-    public void setPeruExternalService(Map<String, MetricsExternalServices> crisMetricsExternalService) {
-        this.crisMetricsExternalService = crisMetricsExternalService;
+    public void setCrisMetricsExternalServices(Map<String, MetricsExternalServices> crisMetricsExternalServices) {
+        this.crisMetricsExternalServices = crisMetricsExternalServices;
     }
 
 }
