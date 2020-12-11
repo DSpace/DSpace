@@ -31,7 +31,7 @@ public class UpdateScopusMetrics implements MetricsExternalServices {
 
     private static Logger log = LogManager.getLogger(UpdateScopusMetrics.class);
 
-    public static final String SCOPUS_CITATION = "ScopusCitation";
+    public static final String SCOPUS_CITATION = "scopusCitation";
 
     protected ScopusProvider scopusProvider = new DSpace().getServiceManager().getServiceByName(
                                                   ScopusProvider.class.getName(), ScopusProvider.class);
@@ -87,7 +87,6 @@ public class UpdateScopusMetrics implements MetricsExternalServices {
                                         SCOPUS_CITATION, currentItem.getID());
             if (!Objects.isNull(scopusMetrics)) {
                 scopusMetrics.setLast(false);
-                context.commit();
             }
             createNewScopusMetrics(context,currentItem, scopusMetric);
         } catch (SQLException | AuthorizeException e) {

@@ -33,6 +33,7 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.externalservices.scopus.ScopusRestConnector;
+import org.dspace.externalservices.scopus.UpdateScopusMetrics;
 import org.dspace.utils.DSpace;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
@@ -84,7 +85,7 @@ public class UpdateScopusMetricsIT extends AbstractControllerIntegrationTest {
                                .withTitle("Title item A").build();
 
             CrisMetrics metrics1 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
-                                                     .withMetricType("ScopusCitation")
+                                                     .withMetricType(UpdateScopusMetrics.SCOPUS_CITATION)
                                                      .withMetricCount(4)
                                                      .isLast(true).build();
 
@@ -98,9 +99,9 @@ public class UpdateScopusMetricsIT extends AbstractControllerIntegrationTest {
             assertEquals(0, status);
 
             CrisMetrics metrics = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(
-                                  context, "ScopusCitation", itemA.getID());
+                                  context, UpdateScopusMetrics.SCOPUS_CITATION, itemA.getID());
 
-            assertEquals("ScopusCitation", metrics.getMetricType());
+            assertEquals(UpdateScopusMetrics.SCOPUS_CITATION, metrics.getMetricType());
             assertEquals(44, metrics.getMetricCount(), 0);
 
             String remark = "{\"identifier\":\"2-s2.0-67349162500\",\"link\":"
@@ -157,7 +158,7 @@ public class UpdateScopusMetricsIT extends AbstractControllerIntegrationTest {
             assertEquals(0, status);
 
             CrisMetrics metrics = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(
-                                  context, "ScopusCitation", itemA.getID());
+                                  context, UpdateScopusMetrics.SCOPUS_CITATION, itemA.getID());
             assertNull(metrics);
         } finally {
             scopusRestConnector.setHttpClient(originalHttpClient);

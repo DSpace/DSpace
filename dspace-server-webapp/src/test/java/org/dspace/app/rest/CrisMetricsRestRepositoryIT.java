@@ -33,6 +33,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.discovery.IndexingService;
+import org.dspace.externalservices.scopus.UpdateScopusMetrics;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +72,7 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
         context.restoreAuthSystemState();
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(get("/api/authz/resourcepolicies"))
+        getClient(tokenAdmin).perform(get("/api/cris/metrics"))
                              .andExpect(status().isMethodNotAllowed());
     }
 
@@ -254,12 +255,12 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
                                                  .isLast(true).build();
 
         CrisMetrics metrics2 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
-                                                 .withMetricType("ScopusCitation")
+                                                 .withMetricType(UpdateScopusMetrics.SCOPUS_CITATION)
                                                  .withMetricCount(43)
                                                  .isLast(true).build();
 
         CrisMetrics metrics3 = CrisMetricsBuilder.createCrisMetrics(context, itemB)
-                                                 .withMetricType("ScopusCitation")
+                                                 .withMetricType(UpdateScopusMetrics.SCOPUS_CITATION)
                                                  .withMetricCount(103)
                                                  .isLast(true).build();
         context.restoreAuthSystemState();
@@ -293,7 +294,7 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
                                                  .isLast(true).build();
 
         CrisMetrics metrics2 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
-                                                 .withMetricType("ScopusCitation")
+                                                 .withMetricType(UpdateScopusMetrics.SCOPUS_CITATION)
                                                  .withMetricCount(43)
                                                  .isLast(true).build();
 
@@ -327,7 +328,7 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
                                                  .isLast(true).build();
 
         CrisMetrics metrics2 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
-                                                 .withMetricType("ScopusCitation")
+                                                 .withMetricType(UpdateScopusMetrics.SCOPUS_CITATION)
                                                  .withMetricCount(43)
                                                  .isLast(true).build();
 
@@ -416,7 +417,7 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
                                 .withTitle("Title item A").build();
 
         CrisMetrics metric = CrisMetricsBuilder.createCrisMetrics(context, itemA)
-                                               .withMetricType("ScopusCitation")
+                                               .withMetricType(UpdateScopusMetrics.SCOPUS_CITATION)
                                                .withMetricCount(21)
                                                .withDeltaPeriod1(3.0)
                                                .withDeltaPeriod2(12.0)
