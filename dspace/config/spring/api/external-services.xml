@@ -43,6 +43,11 @@
         <property name="sourceIdentifier" value="arxiv"/>
         <property name="recordIdMetadata" value="dc.identifier.other"/>
     </bean>
+    
+    <bean class="org.dspace.external.provider.impl.OpenAIREFunderDataProvider" init-method="init">
+         <constructor-arg value="${openaire.api.url}"/>
+         <property name="sourceIdentifier" value="openaireAPI"/>
+     </bean>    
 
 </beans>
 
