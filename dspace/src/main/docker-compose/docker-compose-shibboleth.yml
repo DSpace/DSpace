@@ -33,5 +33,5 @@ services:
     environment:
       # Default to using "localhost" for Apache & Shibboleth
       # However, you can override this via the "DSPACE_HOSTNAME" environment variable.
-      # e.g., if using ngrok.com as a proxy, set to ngrok.io server: "DSPACHE_HOSTNAME=[random-string].ngrok.io"
-      APACHE_SERVER_NAME: '${DSPACE_HOSTNAME:-localhost}"'
+      # e.g., if using ngrok.com as a proxy, set to ngrok.io server: "DSPACE_HOSTNAME=[random-string].ngrok.io"
+      APACHE_SERVER_NAME: '${DSPACE_HOSTNAME:-localhost}'

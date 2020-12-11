@@ -1,3 +1,7 @@
+<!--
+    A custom shibboleth2.xml file for DSpace
+    This configuration uses https://samltest.id/saml/idp as an IDP
+-->
 <SPConfig xmlns="urn:mace:shibboleth:2.0:native:sp:config"
           xmlns:conf="urn:mace:shibboleth:2.0:native:sp:config"
           xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"

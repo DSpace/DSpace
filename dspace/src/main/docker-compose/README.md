@@ -52,34 +52,48 @@ docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/doc
 This Shibboleth container uses https://samltest.id/ by default (see ../docker/dspace-shibboleth/).
 Therefore, for Shibboleth login to work properly, you MUST make your DSpace site available to the external web.
 
-One option is to use a development proxy service like https://ngrok.com/ (which creates a temporary public proxy for your localhost)
-If you use ngrok, start it first (in order to obtain a random URL that looks like https://a6eb2e55ad17.ngrok.io):
-```
-./ngrok http 443
-```
+One option is to use a development proxy service like https://ngrok.com/, which creates a temporary public proxy for your localhost.
+The remainder of these instructions assume you are using ngrok (though other proxies may be used).
 
-Then, update `local.cfg` in this directory to use that ngrok URL & enable Shibboleth:
-```
-# NOTE: dspace.server.url MUST be available externally to use with https://samltest.id/.
-# In this example we are assuming you are using ngrok.
-dspace.server.url=https://[random-string].ngrok.io/server
+1. If you use ngrok, start it first (in order to obtain a random URL that looks like https://a6eb2e55ad17.ngrok.io):
+   ```
+   ./ngrok http 443
+   ```
 
-# Enable both Password auth & Shibboleth
-plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.PasswordAuthentication
-plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.ShibAuthentication
-```
+2. Then, update `local.cfg` in this directory to use that ngrok URL & configure Shibboleth:
+   ```
+   # NOTE: dspace.server.url MUST be available externally to use with https://samltest.id/.
+   # In this example we are assuming you are using ngrok.
+   dspace.server.url=https://[random-string].ngrok.io/server
 
-Finally, start all containers, passing your public hostname to DSPACE_HOSTNAME environment variable:
-```
-DSPACE_HOSTNAME=[random-string].ngrok.io docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-shibboleth.yml up -d
-```
+   # Enable both Password auth & Shibboleth
+   plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.PasswordAuthentication
+   plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.ShibAuthentication
+   
+   # Settings for https://samltest.id/
+   authentication-shibboleth.netid-header = uid
+   authentication-shibboleth.email-header = mail
+   authentication-shibboleth.firstname-header = givenName
+   authentication-shibboleth.lastname-header = sn
+   authentication-shibboleth.role-header = role
+   ```
 
-NOTE: For Windows you MUST either set the environment variable separately, or use the 'env' command provided with Git/Cygwin
-(you may already have this command if you are running Git for Windows). See https://superuser.com/a/1079563
-```
-env DSPACE_HOSTNAME=[random-string].ngrok.io docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-shibboleth.yml up -d
-```
+3. Start all containers, passing your public hostname as the `DSPACE_HOSTNAME` environment variable:
+   ```
+   DSPACE_HOSTNAME=[random-string].ngrok.io docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-shibboleth.yml up -d
+   ```
+   NOTE: For Windows you MUST either set the environment variable separately, or use the 'env' command provided with Git/Cygwin
+   (you may already have this command if you are running Git for Windows). See https://superuser.com/a/1079563
+   ```
+   env DSPACE_HOSTNAME=[random-string].ngrok.io docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-shibboleth.yml up -d
+   ```
 
+4. Finally, for https://samltest.id/, you need to upload your Metadata for the site to "trust" you.
+   Using the form at https://samltest.id/upload.php, enter in
+   `https://[random-string].ngrok.io/Shibboleth.sso/Metadata`
+
+5. At this point, if all went well, your site should work!  Try it at
+   https://[random-string].ngrok.io/server/
 
 
 ## Run DSpace 7 REST and Angular from local branches
