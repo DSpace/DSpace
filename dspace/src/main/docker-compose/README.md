@@ -49,7 +49,7 @@ docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/doc
 
 *Only useful for testing Shibboleth in a development environment*
 
-This Shibboleth container uses https://samltest.id/ by default (see ../docker/dspace-shibboleth/).
+This Shibboleth container uses https://samltest.id/ as an IdP (see `../docker/dspace-shibboleth/`).
 Therefore, for Shibboleth login to work properly, you MUST make your DSpace site available to the external web.
 
 One option is to use a development proxy service like https://ngrok.com/, which creates a temporary public proxy for your localhost.
@@ -78,7 +78,13 @@ The remainder of these instructions assume you are using ngrok (though other pro
    authentication-shibboleth.role-header = role
    ```
 
-3. Start all containers, passing your public hostname as the `DSPACE_HOSTNAME` environment variable:
+3. Build the Shibboleth container (if you haven't built or pulled it before):
+   ```
+   cd [dspace-src]
+   docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-shibboleth.yml build
+   ```
+
+4. Start all containers, passing your public hostname as the `DSPACE_HOSTNAME` environment variable:
    ```
    DSPACE_HOSTNAME=[random-string].ngrok.io docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-shibboleth.yml up -d
    ```
@@ -88,11 +94,17 @@ The remainder of these instructions assume you are using ngrok (though other pro
    env DSPACE_HOSTNAME=[random-string].ngrok.io docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-shibboleth.yml up -d
    ```
 
-4. Finally, for https://samltest.id/, you need to upload your Metadata for the site to "trust" you.
+5. Finally, for https://samltest.id/, you need to upload your Shibboleth Metadata for the site to "trust" you.
    Using the form at https://samltest.id/upload.php, enter in
-   `https://[random-string].ngrok.io/Shibboleth.sso/Metadata`
+   `https://[random-string].ngrok.io/Shibboleth.sso/Metadata` and click "Fetch!"
+      * Note: If samltest.id still says you are untrusted, restart your Shibboleth daemon! (This may be necessary to download the IdP Metadata from samltest.id)
+        ```
+        docker exec -it dspace-shibboleth /bin/bash
+        service shibd stop
+        service shibd start
+        ```
 
-5. At this point, if all went well, your site should work!  Try it at
+6. At this point, if all went well, your site should work!  Try it at
    https://[random-string].ngrok.io/server/
 
 
