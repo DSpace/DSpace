@@ -61,6 +61,7 @@ import org.dspace.importer.external.service.ImportService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.util.UUIDUtils;
+import org.dspace.validation.service.ValidationService;
 import org.dspace.versioning.ItemCorrectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -82,7 +83,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceItemRest, Integer>
     implements ReloadableEntityObjectRepository<WorkspaceItem, Integer> {
 
-    public static final String OPERATION_PATH_SECTIONS = "sections";
+    public static final String OPERATION_PATH_SECTIONS = ValidationService.OPERATION_PATH_SECTIONS;
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(WorkspaceItemRestRepository.class);
 

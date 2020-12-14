@@ -577,6 +577,14 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withPassword("qwerty02")
             .build();
 
+        EPerson eperson3 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson3@mail.com")
+                .withPassword(password).build();
+
+        EPerson eperson4 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson4@mail.com")
+                .withPassword(password).build();
+
         Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
 
 
@@ -591,6 +599,18 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .withUser(eperson2).build();
 
+        ResourcePolicy firstResourcePolicyOfEPerson3 = ResourcePolicyBuilder.createResourcePolicy(context)
+            .withDspaceObject(community)
+            .withAction(Constants.DELETE)
+            .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+            .withUser(eperson3).build();
+
+        ResourcePolicy firstResourcePolicyOfEPerson4 = ResourcePolicyBuilder.createResourcePolicy(context)
+                .withDspaceObject(community)
+                .withAction(Constants.WRITE)
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .withUser(eperson4).build();
+
         ResourcePolicy resourcePolicyAnonymous = authorizeService
             .findByTypeGroupAction(context, community, EPersonServiceFactory.getInstance()
                 .getGroupService()
@@ -599,22 +619,55 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         context.restoreAuthSystemState();
 
-        String authToken = getAuthToken(eperson1.getEmail(), "qwerty01");
+        // page 0
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/authz/resourcepolicies/search/resource")
             .param("uuid", community.getID().toString())
             .param("page", "0")
             .param("size", "2"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
-            .andExpect(jsonPath("$._embedded.resourcepolicies",
-                Matchers.containsInAnyOrder(
-                    hasJsonPath("$.type", is("resourcepolicy")),
-                    hasJsonPath("$.type", is("resourcepolicy"))
-                )))
+            .andExpect(jsonPath("$._embedded.resourcepolicies", Matchers.everyItem(
+                    hasJsonPath("$.type", is("resourcepolicy")))
+                    ))
+            .andExpect(jsonPath("$._embedded.resourcepolicies").value(Matchers.hasSize(2)))
             .andExpect(jsonPath("$._links.self.href",
                 Matchers.containsString("api/authz/resourcepolicies/search/resource")))
-            .andExpect(jsonPath("$.page.totalElements", is(3)))
+            .andExpect(jsonPath("$.page.totalElements", is(5)))
+            .andExpect(jsonPath("$.page.totalPages", is(3)))
+            .andExpect(jsonPath("$.page.number", is(0)))
             .andExpect(jsonPath("$.page.size", is(2)));
+        // page 1
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/search/resource")
+                .param("uuid", community.getID().toString())
+                .param("page", "1")
+                .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.resourcepolicies", Matchers.everyItem(
+                        hasJsonPath("$.type", is("resourcepolicy")))
+                        ))
+                .andExpect(jsonPath("$._embedded.resourcepolicies").value(Matchers.hasSize(2)))
+                .andExpect(jsonPath("$.page.totalElements", is(5)))
+                .andExpect(jsonPath("$.page.totalPages", is(3)))
+                .andExpect(jsonPath("$.page.number", is(1)))
+                .andExpect(jsonPath("$.page.size", is(2)));
+
+        // page 2
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/search/resource")
+                .param("uuid", community.getID().toString())
+                .param("page", "2")
+                .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.resourcepolicies", Matchers.everyItem(
+                        hasJsonPath("$.type", is("resourcepolicy")))
+                        ))
+                .andExpect(jsonPath("$._embedded.resourcepolicies").value(Matchers.hasSize(1)))
+                .andExpect(jsonPath("$.page.totalElements", is(5)))
+                .andExpect(jsonPath("$.page.totalPages", is(3)))
+                .andExpect(jsonPath("$.page.number", is(2)))
+                .andExpect(jsonPath("$.page.size", is(2)));
     }
 
   @Test
@@ -2419,5 +2472,106 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                                 hasJsonPath("$.resourcepolicy-search.href",
                                          is("http://localhost/api/authz/resourcepolicy/search"))
                         )));
+    }
+
+    @Test
+    public void findResourcePoliciesByGroupUuidPaginationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group group1 = GroupBuilder.createGroup(context).withName("My group").build();
+
+        Community community = CommunityBuilder.createCommunity(context)
+            .withName("My community").build();
+
+        Community community2 = CommunityBuilder.createCommunity(context)
+            .withName("My 2 community")
+            .build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+            .withName("My collection")
+            .build();
+
+        ResourcePolicy rpCommunityADD = ResourcePolicyBuilder.createResourcePolicy(context)
+            .withDspaceObject(community)
+            .withAction(Constants.ADD)
+            .withGroup(group1).build();
+
+        ResourcePolicy rpCommunityREAD = ResourcePolicyBuilder.createResourcePolicy(context)
+            .withDspaceObject(community)
+            .withAction(Constants.READ)
+            .withGroup(group1).build();
+
+        ResourcePolicy rpCommunity2READ = ResourcePolicyBuilder.createResourcePolicy(context)
+            .withDspaceObject(community2)
+            .withAction(Constants.READ)
+            .withGroup(group1).build();
+
+        ResourcePolicy rpCollectionWRITE = ResourcePolicyBuilder.createResourcePolicy(context)
+            .withDspaceObject(collection)
+            .withAction(Constants.WRITE)
+            .withGroup(group1).build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/search/group")
+            .param("uuid", group1.getID().toString())
+            .param("page", "0")
+            .param("size", "1"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.resourcepolicies", Matchers.everyItem(
+                    hasJsonPath("$.type", is("resourcepolicy")))
+                    ))
+            .andExpect(jsonPath("$._embedded.resourcepolicies").value(Matchers.hasSize(1)))
+            .andExpect(jsonPath("$.page.size", is(1)))
+            .andExpect(jsonPath("$.page.number", is(0)))
+            .andExpect(jsonPath("$.page.totalPages", is(4)))
+            .andExpect(jsonPath("$.page.totalElements", is(4)));
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/search/group")
+                .param("uuid", group1.getID().toString())
+                .param("page", "1")
+                .param("size", "1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.resourcepolicies", Matchers.everyItem(
+                        hasJsonPath("$.type", is("resourcepolicy")))
+                        ))
+                .andExpect(jsonPath("$._embedded.resourcepolicies").value(Matchers.hasSize(1)))
+                .andExpect(jsonPath("$.page.size", is(1)))
+                .andExpect(jsonPath("$.page.number", is(1)))
+                .andExpect(jsonPath("$.page.totalPages", is(4)))
+                .andExpect(jsonPath("$.page.totalElements", is(4)));
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/search/group")
+                .param("uuid", group1.getID().toString())
+                .param("page", "2")
+                .param("size", "1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.resourcepolicies", Matchers.everyItem(
+                        hasJsonPath("$.type", is("resourcepolicy")))
+                        ))
+                .andExpect(jsonPath("$._embedded.resourcepolicies").value(Matchers.hasSize(1)))
+                .andExpect(jsonPath("$.page.size", is(1)))
+                .andExpect(jsonPath("$.page.number", is(2)))
+                .andExpect(jsonPath("$.page.totalPages", is(4)))
+                .andExpect(jsonPath("$.page.totalElements", is(4)));
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/search/group")
+                .param("uuid", group1.getID().toString())
+                .param("page", "3")
+                .param("size", "1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.resourcepolicies", Matchers.everyItem(
+                        hasJsonPath("$.type", is("resourcepolicy")))
+                        ))
+                .andExpect(jsonPath("$._embedded.resourcepolicies").value(Matchers.hasSize(1)))
+                .andExpect(jsonPath("$.page.size", is(1)))
+                .andExpect(jsonPath("$.page.number", is(3)))
+                .andExpect(jsonPath("$.page.totalPages", is(4)))
+                .andExpect(jsonPath("$.page.totalElements", is(4)));
     }
 }

@@ -386,6 +386,7 @@
 		<constructor-arg>
 			<map>
 				<entry key="id" value-ref="virtualFieldId" />
+				<entry key="authority" value-ref="virtualFieldAuthority" />
 				<entry key="reftype" value-ref="virtualFieldRefererType" />
 				<entry key="authors" value-ref="virtualFieldAuthors" />
 				<entry key="fullpage" value-ref="virtualFieldPageNumber" />
@@ -397,6 +398,7 @@
 	</bean>
 	
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldId" id="virtualFieldId"/>
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldAuthority" id="virtualFieldAuthority"/>
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldRefererType" id="virtualFieldRefererType"/>
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldAuthors" id="virtualFieldAuthors"/>
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldPageNumber" id="virtualFieldPageNumber"/>	
@@ -410,11 +412,20 @@
 	</bean>
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldMapConverter" id="virtualFieldMapConverter">
 		<constructor-arg name="itemService" ref="org.dspace.content.ItemServiceImpl"/>
+		<constructor-arg name="mapConverters" ref="org.dspace.util.MapConverters"/>
+	</bean>
+	
+	<!-- MapConverter configuration -->
+
+	<bean id="org.dspace.util.MapConverters"  class="org.dspace.util.MapConverters"> 
 		<constructor-arg name="mapConverters">
 			<map>
 				<entry key="coarTypes" value-ref="mapConverterCoarTypes" />
 				<entry key="fundingTypes" value-ref="mapConverterFundingTypes" />
 				<entry key="orgUnitTypes" value-ref="mapConverterOrgUnitTypes" />
+				<entry key="coarToPublicationTypes" value-ref="mapConverterCoarToPublicationTypes" />
+				<entry key="cerifToOrgUnitTypes" value-ref="mapConverterCerifToOrgUnitTypes" />
+				<entry key="cerifToFundingTypes" value-ref="mapConverterCerifToFundingTypes" />
 			</map>
 		</constructor-arg>
 	</bean>
@@ -439,7 +450,28 @@
 		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
 		<property name="defaultValue" value="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_OrgUnit_Types"/>
 	</bean>
-
+	
+	<bean name="mapConverterCoarToPublicationTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
+		<constructor-arg value="mapConverterCoarToPublicationTypes" />
+		<property name="converterNameFile" value="mapConverter-coarToPublicationTypes.properties" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+		<property name="defaultValue" value="Controlled Vocabulary for Resource Type Genres::other"/>
+	</bean>
+	
+	<bean name="mapConverterCerifToOrgUnitTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
+		<constructor-arg value="mapConverterCerifToOrgUnitTypes" />
+		<property name="converterNameFile" value="mapConverter-cerifToOrgUnitTypes.properties" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+		<property name="defaultValue" value="Unspecified"/>
+	</bean>
+	
+	<bean name="mapConverterCerifToFundingTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
+		<constructor-arg value="mapConverterCerifToFundingTypes" />
+		<property name="converterNameFile" value="mapConverter-cerifToFundingTypes.properties" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+		<property name="defaultValue" value="Unspecified"/>
+	</bean>
+	
 	<!-- CONDITION EVALUATORS CONFIGURATION -->
 	
 	<bean class="org.dspace.content.integration.crosswalks.evaluators.ConditionEvaluatorMapper" id="conditionEvaluatorMapper">

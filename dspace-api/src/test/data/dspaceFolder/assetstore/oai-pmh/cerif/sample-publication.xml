@@ -1,0 +1,79 @@
+<oai_cerif:Publication xmlns:oai_cerif="https://www.openaire.eu/cerif-profile/1.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:doc="http://www.lyncode.com/xoai" id="123456789/6">
+   <oai_cerif:Type xmlns:oai_cerif="https://www.openaire.eu/cerif-profile/vocab/COAR_Publication_Types">http://purl.org/coar/resource_type/c_5794</oai_cerif:Type>
+   <oai_cerif:Title xml:lang="en">Metadata and Semantics Research</oai_cerif:Title>
+   <oai_cerif:Subtitle xml:lang="en">6th Research Conference, MTSR 2012, Cádiz, Spain, November 28-30, 2012. Proceedings</oai_cerif:Subtitle>
+   <oai_cerif:PartOf>
+      <oai_cerif:DisplayName>The International Journal of Digital Curation</oai_cerif:DisplayName>
+      <oai_cerif:Publication id="c3ae30ae-ddc4-4c25-b0b8-c87a3f850bca">
+         <oai_cerif:Type xmlns:oai_cerif="https://www.openaire.eu/cerif-profile/vocab/COAR_Publication_Types">http://purl.org/coar/resource_type/c_0640</oai_cerif:Type>
+         <oai_cerif:Title xml:lang="en">The International Journal of Digital Curation</oai_cerif:Title>
+         <oai_cerif:ISSN>1746-8256</oai_cerif:ISSN>
+      </oai_cerif:Publication>
+   </oai_cerif:PartOf>
+   <oai_cerif:PublicationDate>2020-03-30</oai_cerif:PublicationDate>
+   <oai_cerif:DOI>10.1007/978-3-642-35233-1</oai_cerif:DOI>
+   <oai_cerif:Handle>123456789/6</oai_cerif:Handle>
+   <oai_cerif:ISBN>9783642352324</oai_cerif:ISBN>
+   <oai_cerif:Publishers>
+      <oai_cerif:Publisher>
+         <oai_cerif:DisplayName>Springer, Berlin, Heidelberg</oai_cerif:DisplayName>
+         <oai_cerif:OrgUnit id="56df5c8e-a9da-45b4-93d8-3d384d233aee">
+            <oai_cerif:Name xml:lang="en">Springer</oai_cerif:Name>
+         </oai_cerif:OrgUnit>
+      </oai_cerif:Publisher>
+   </oai_cerif:Publishers>
+   <oai_cerif:StartPage>10</oai_cerif:StartPage>
+   <oai_cerif:EndPage>20</oai_cerif:EndPage>
+   <oai_cerif:Keyword xml:lang="en">cultural heritage</oai_cerif:Keyword>
+   <oai_cerif:Keyword xml:lang="en">digital libraries</oai_cerif:Keyword>
+   <oai_cerif:Keyword xml:lang="en">learning objects</oai_cerif:Keyword>
+   <oai_cerif:Keyword xml:lang="en">linked open data</oai_cerif:Keyword>
+   <oai_cerif:Keyword xml:lang="en">scholarly publications</oai_cerif:Keyword>
+   <oai_cerif:OriginatesFrom>
+	   <oai_cerif:Project id="e9ed438e-c7f7-4a18-95e5-3f635ea65fee">
+	      <oai_cerif:Title xml:lang="en">2nd-Generation Open Access Infrastructure</oai_cerif:Title>
+	      <oai_cerif:Team>
+	         <oai_cerif:PrincipalInvestigator>
+	            <oai_cerif:DisplayName>4Science, Team</oai_cerif:DisplayName>
+	            <oai_cerif:Person />
+	         </oai_cerif:PrincipalInvestigator>
+	      </oai_cerif:Team>
+	      <oai_cerif:Funded>
+	         <oai_cerif:By>
+	            <oai_cerif:DisplayName>EC</oai_cerif:DisplayName>
+	            <oai_cerif:OrgUnit>
+	               <oai_cerif:Name xml:lang="en" />
+	            </oai_cerif:OrgUnit>
+	         </oai_cerif:By>
+	         <oai_cerif:As xmlns:oafunding="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">
+	            <oai_cerif:Funding>
+	               <oafunding:Type>https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#Grant</oafunding:Type>
+	               <oai_cerif:Amount currency="EUR">99999</oai_cerif:Amount>
+	               <oai_cerif:Identifier type="https://w3id.org/cerif/vocab/IdentifierTypes#ProjectReference">283595</oai_cerif:Identifier>
+	               <oai_cerif:PartOf>
+	                  <oai_cerif:Funding>
+	                     <oafunding:Type>https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#FundingProgramme</oafunding:Type>
+	                     <oai_cerif:Name xml:lang="en">FP7</oai_cerif:Name>
+	                  </oai_cerif:Funding>
+	               </oai_cerif:PartOf>
+	            </oai_cerif:Funding>
+	         </oai_cerif:As>
+	      </oai_cerif:Funded>
+	      <oai_cerif:OAMandate mandated="true" />
+	   </oai_cerif:Project>
+   </oai_cerif:OriginatesFrom>
+   <oai_cerif:PresentedAt>
+      <oai_cerif:Event id="05af052c-6ba7-4a1b-86cd-50bec84323e3">
+         <oai_cerif:Type scheme="https://w3id.org/cerif/vocab/EventTypes">https://w3id.org/cerif/vocab/EventTypes#Conference</oai_cerif:Type>
+         <oai_cerif:Acronym>MTSR 2012</oai_cerif:Acronym>
+         <oai_cerif:Name xml:lang="en">6th Research Conference on Metadata and Semantics Research</oai_cerif:Name>
+         <oai_cerif:Place>Roma</oai_cerif:Place>
+         <oai_cerif:Country>IT</oai_cerif:Country>
+         <oai_cerif:StartDate>2019-10-01</oai_cerif:StartDate>
+         <oai_cerif:EndDate>2019-10-04</oai_cerif:EndDate>
+         <oai_cerif:Description xml:lang="en">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</oai_cerif:Description>
+         <oai_cerif:Keyword xml:lang="en">test</oai_cerif:Keyword>
+      </oai_cerif:Event>
+   </oai_cerif:PresentedAt>
+   <ns4:Access xmlns:ns4="http://purl.org/coar/access_right">http://purl.org/coar/access_right/c_abf2</ns4:Access>
+</oai_cerif:Publication>

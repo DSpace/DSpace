@@ -93,4 +93,25 @@
         <scope_note></scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>cris</schema>
+        <element>harvesting</element>
+        <qualifier>email</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>harvesting</element>
+        <qualifier>preTransform</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>harvesting</element>
+        <qualifier>postTransform</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
 </dspace-dc-types>

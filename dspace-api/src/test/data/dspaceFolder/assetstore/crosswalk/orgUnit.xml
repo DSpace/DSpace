@@ -1,4 +1,4 @@
-<OrgUnit id="mock-id">
+<OrgUnit xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
 	<Name>Test OrgUnit</Name>
 	<Name>Test OrgUnit LegalName</Name>
 	<Acronym>TOU</Acronym>

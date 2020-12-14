@@ -9,6 +9,8 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -844,6 +846,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
      *
      * @throws Exception
      */
+    @Test
     public void validationErrorsRequiredMetadataTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -878,12 +881,12 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
         String authToken = getAuthToken(eperson.getEmail(), password);
 
-        getClient(authToken).perform(get("/api/workflow/worfklowitems/" + witem.getID()))
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors").doesNotExist())
         ;
 
-        getClient(authToken).perform(get("/api/workflow/worfklowitems/" + witemMissingFields.getID()))
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witemMissingFields.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors[?(@.message=='error.validation.required')]",
                         Matchers.contains(
@@ -891,6 +894,113 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                         hasJsonPath("$", Matchers.is("/sections/traditionalpageone/dc.date.issued"))
                                 )))))
         ;
+    }
+
+    /**
+     * Test a global submission validation error
+     *
+     * @throws Exception
+     */
+    @Test
+    public void globalValidationErrorsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // ** GIVEN **
+        // 1. A community with one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+            .withWorkflowGroup(1, eperson).build();
+
+        // 2. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+            .withEmail("submitter@example.com")
+            .withPassword("dspace")
+            .build();
+
+        context.setCurrentUser(submitter);
+
+        // 3. a workflow item will all the required fields
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+            .withTitle("Test publication with mandatory DOI 1")
+            .withIssueDate("2017-10-17")
+            .withDoiIdentifier("10.1000/182")
+            .build();
+
+        // 4. a workflow item without the dateissued required field
+        XmlWorkflowItem witemMissingFields = WorkflowItemBuilder.createWorkflowItem(context, col1)
+            .withTitle("Test publication with mandatory DOI 2")
+            .withIssueDate("2017-10-17")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.errors").doesNotExist());
+
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witemMissingFields.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.test')]", allOf(
+                    contains(hasJsonPath("$.paths[0]", is("/sections/traditionalpageone/dc.title"))),
+                    contains(hasJsonPath("$.paths[1]", is("/sections/traditionalpageone/dc.identifier.doi"))))));
+    }
+
+    /**
+     * Test step and global submission validation error
+     *
+     * @throws Exception
+     */
+    @Test
+    public void stepAndGlobalValidationErrorsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // ** GIVEN **
+        // 1. A community with one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+            .withWorkflowGroup(1, eperson).build();
+
+        // 2. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+            .withEmail("submitter@example.com")
+            .withPassword("dspace")
+            .build();
+
+        context.setCurrentUser(submitter);
+
+        // 3. a workflow item will all the required fields
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+            .withTitle("Test publication with mandatory DOI 1")
+            .withIssueDate("2017-10-17")
+            .withDoiIdentifier("10.1000/182")
+            .build();
+
+        // 4. a workflow item without the dateissued required field
+        XmlWorkflowItem witemMissingFields = WorkflowItemBuilder.createWorkflowItem(context, col1)
+            .withTitle("Test publication with mandatory DOI 2")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.errors").doesNotExist());
+
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witemMissingFields.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.required')]",
+                contains(hasJsonPath("$.paths[0]", is("/sections/traditionalpageone/dc.date.issued")))))
+            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.test')]", allOf(
+                contains(hasJsonPath("$.paths[0]", is("/sections/traditionalpageone/dc.title"))),
+                contains(hasJsonPath("$.paths[1]", is("/sections/traditionalpageone/dc.identifier.doi"))))));
     }
 
     @Test

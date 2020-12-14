@@ -99,6 +99,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "contributor", "editor", editorName);
     }
 
+    public ItemBuilder withEditor(final String editorName, final String authority) {
+        return addMetadataValue(item, DC.getName(), "contributor", "editor", null, editorName, authority, 600);
+    }
+
     public ItemBuilder withEditorAffiliation(String affiliation) {
         return addMetadataValue(item, "oairecerif", "editor", "affiliation", affiliation);
     }
@@ -129,6 +133,11 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withProvenanceData(final String provenanceData) {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "description", "provenance", provenanceData);
+    }
+
+    public ItemBuilder withMetadata(final String schema, final String element, final String qualifier,
+        final String value) {
+        return addMetadataValue(item, schema, element, qualifier, value);
     }
 
     public ItemBuilder withCrisOwner(String value, String authority) {

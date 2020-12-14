@@ -517,7 +517,10 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                                 HierarchicalSidebarFacetConfiguration hierarchicalSidebarFacetConfiguration =
                                         (HierarchicalSidebarFacetConfiguration) searchFilter;
                                 String[] subValues = value.split(hierarchicalSidebarFacetConfiguration.getSplitter());
-                                if (hierarchicalSidebarFacetConfiguration
+                                if (hierarchicalSidebarFacetConfiguration.isOnlyLastNodeRelevant()) {
+                                    subValues = (String[]) ArrayUtils.subarray(subValues, subValues.length - 1,
+                                            subValues.length);
+                                } else if (hierarchicalSidebarFacetConfiguration
                                         .isSkipFirstNodeLevel() && 1 < subValues.length) {
                                     //Remove the first element of our array
                                     subValues = (String[]) ArrayUtils.subarray(subValues, 1, subValues.length);
