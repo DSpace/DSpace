@@ -64,7 +64,7 @@ The remainder of these instructions assume you are using ngrok (though other pro
    ```
    # NOTE: dspace.server.url MUST be available externally to use with https://samltest.id/.
    # In this example we are assuming you are using ngrok.
-   dspace.server.url=https://[random-string].ngrok.io/server
+   dspace.server.url=https://[subdomain].ngrok.io/server
 
    # Enable both Password auth & Shibboleth
    plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.PasswordAuthentication
@@ -86,17 +86,17 @@ The remainder of these instructions assume you are using ngrok (though other pro
 
 4. Start all containers, passing your public hostname as the `DSPACE_HOSTNAME` environment variable:
    ```
-   DSPACE_HOSTNAME=[random-string].ngrok.io docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-shibboleth.yml up -d
+   DSPACE_HOSTNAME=[subdomain].ngrok.io docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-shibboleth.yml up -d
    ```
    NOTE: For Windows you MUST either set the environment variable separately, or use the 'env' command provided with Git/Cygwin
    (you may already have this command if you are running Git for Windows). See https://superuser.com/a/1079563
    ```
-   env DSPACE_HOSTNAME=[random-string].ngrok.io docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-shibboleth.yml up -d
+   env DSPACE_HOSTNAME=[subdomain].ngrok.io docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-shibboleth.yml up -d
    ```
 
 5. Finally, for https://samltest.id/, you need to upload your Shibboleth Metadata for the site to "trust" you.
    Using the form at https://samltest.id/upload.php, enter in
-   `https://[random-string].ngrok.io/Shibboleth.sso/Metadata` and click "Fetch!"
+   `https://[subdomain].ngrok.io/Shibboleth.sso/Metadata` and click "Fetch!"
       * Note: If samltest.id still says you are untrusted, restart your Shibboleth daemon! (This may be necessary to download the IdP Metadata from samltest.id)
         ```
         docker exec -it dspace-shibboleth /bin/bash
@@ -105,8 +105,22 @@ The remainder of these instructions assume you are using ngrok (though other pro
         ```
 
 6. At this point, if all went well, your site should work!  Try it at
-   https://[random-string].ngrok.io/server/
-
+   https://[subdomain].ngrok.io/server/
+7. If you want to include Angular UI as well, then you'll need a few extra steps:
+      * Update `environment.dev.ts` in this directory as follows:
+        ```
+        rest: {
+          ssl: true,
+          host: '[subdomain].ngrok.io',
+          port: 443,
+          // NOTE: Space is capitalized because 'namespace' is a reserved string in TypeScript
+          nameSpace: '/server'
+        }
+        ```
+      * Spin up the `dspace-angular` container alongside the others, e.g.
+        ```
+        DSPACE_HOSTNAME=[subdomain].ngrok.io docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-angular.yml -f dspace/src/main/docker-compose/docker-compose-shibboleth.yml up -d
+        ```
 
 ## Run DSpace 7 REST and Angular from local branches
 
