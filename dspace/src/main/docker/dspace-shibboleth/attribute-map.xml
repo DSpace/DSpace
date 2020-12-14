@@ -1,4 +1,13 @@
 <!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<!--
     A custom attribute-map.xml file for DSpace
     This configuration adds additional attributes based on the attributes provided by samltest.id.
     See first set of attributes below & docs at https://samltest.id/download/
@@ -64,116 +73,4 @@
     <Attribute name="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent" id="persistent-id">
         <AttributeDecoder xsi:type="NameIDAttributeDecoder" formatter="$NameQualifier!$SPNameQualifier!$Name" defaultQualifiers="true"/>
     </Attribute>
-
-    <!-- Other eduPerson attributes (SAML 2 names followed by SAML 1 names)... -->
-    <!--
-    <Attribute name="urn:oid:1.3.6.1.4.1.5923.1.1.1.11" id="assurance"/>
-    <Attribute name="urn:oid:1.3.6.1.4.1.5923.1.5.1.1" id="member"/>
-    <Attribute name="urn:oid:1.3.6.1.4.1.5923.1.6.1.1" id="eduCourseOffering"/>
-    <Attribute name="urn:oid:1.3.6.1.4.1.5923.1.6.1.2" id="eduCourseMember"/>
-
-    <Attribute name="urn:oid:1.3.6.1.4.1.5923.1.1.1.1" id="unscoped-affiliation">
-        <AttributeDecoder xsi:type="StringAttributeDecoder" caseSensitive="false"/>
-    </Attribute>
-    <Attribute name="urn:oid:1.3.6.1.4.1.5923.1.1.1.5" id="primary-affiliation">
-        <AttributeDecoder xsi:type="StringAttributeDecoder" caseSensitive="false"/>
-    </Attribute>
-    <Attribute name="urn:oid:1.3.6.1.4.1.5923.1.1.1.2" id="nickname"/>
-    <Attribute name="urn:oid:1.3.6.1.4.1.5923.1.1.1.8" id="primary-orgunit-dn"/>
-    <Attribute name="urn:oid:1.3.6.1.4.1.5923.1.1.1.4" id="orgunit-dn"/>
-    <Attribute name="urn:oid:1.3.6.1.4.1.5923.1.1.1.3" id="org-dn"/>
-
-    <Attribute name="urn:mace:dir:attribute-def:eduPersonAffiliation" id="unscoped-affiliation">
-        <AttributeDecoder xsi:type="StringAttributeDecoder" caseSensitive="false"/>
-    </Attribute>
-    <Attribute name="urn:mace:dir:attribute-def:eduPersonPrimaryAffiliation" id="primary-affiliation">
-        <AttributeDecoder xsi:type="StringAttributeDecoder" caseSensitive="false"/>
-    </Attribute>
-    <Attribute name="urn:mace:dir:attribute-def:eduPersonNickname" id="nickname"/>
-    <Attribute name="urn:mace:dir:attribute-def:eduPersonPrimaryOrgUnitDN" id="primary-orgunit-dn"/>
-    <Attribute name="urn:mace:dir:attribute-def:eduPersonOrgUnitDN" id="orgunit-dn"/>
-    <Attribute name="urn:mace:dir:attribute-def:eduPersonOrgDN" id="org-dn"/>
-    -->
-
-    <!-- Older LDAP-defined attributes (SAML 2.0 names followed by SAML 1 names)... -->
-    <!--
-    <Attribute name="urn:oid:2.5.4.3" id="cn"/>
-    <Attribute name="urn:oid:2.5.4.4" id="sn"/>
-    <Attribute name="urn:oid:2.5.4.42" id="givenName"/>
-    <Attribute name="urn:oid:2.16.840.1.113730.3.1.241" id="displayName"/>
-    <Attribute name="urn:oid:0.9.2342.19200300.100.1.1" id="uid"/>
-    <Attribute name="urn:oid:0.9.2342.19200300.100.1.3" id="mail"/>
-    <Attribute name="urn:oid:2.5.4.20" id="telephoneNumber"/>
-    <Attribute name="urn:oid:2.5.4.12" id="title"/>
-    <Attribute name="urn:oid:2.5.4.43" id="initials"/>
-    <Attribute name="urn:oid:2.5.4.13" id="description"/>
-    <Attribute name="urn:oid:2.16.840.1.113730.3.1.1" id="carLicense"/>
-    <Attribute name="urn:oid:2.16.840.1.113730.3.1.2" id="departmentNumber"/>
-    <Attribute name="urn:oid:2.16.840.1.113730.3.1.3" id="employeeNumber"/>
-    <Attribute name="urn:oid:2.16.840.1.113730.3.1.4" id="employeeType"/>
-    <Attribute name="urn:oid:2.16.840.1.113730.3.1.39" id="preferredLanguage"/>
-    <Attribute name="urn:oid:0.9.2342.19200300.100.1.10" id="manager"/>
-    <Attribute name="urn:oid:2.5.4.34" id="seeAlso"/>
-    <Attribute name="urn:oid:2.5.4.23" id="facsimileTelephoneNumber"/>
-    <Attribute name="urn:oid:2.5.4.9" id="street"/>
-    <Attribute name="urn:oid:2.5.4.18" id="postOfficeBox"/>
-    <Attribute name="urn:oid:2.5.4.17" id="postalCode"/>
-    <Attribute name="urn:oid:2.5.4.8" id="st"/>
-    <Attribute name="urn:oid:2.5.4.7" id="l"/>
-    <Attribute name="urn:oid:2.5.4.10" id="o"/>
-    <Attribute name="urn:oid:2.5.4.11" id="ou"/>
-    <Attribute name="urn:oid:2.5.4.15" id="businessCategory"/>
-    <Attribute name="urn:oid:2.5.4.19" id="physicalDeliveryOfficeName"/>
-
-    <Attribute name="urn:mace:dir:attribute-def:cn" id="cn"/>
-    <Attribute name="urn:mace:dir:attribute-def:sn" id="sn"/>
-    <Attribute name="urn:mace:dir:attribute-def:givenName" id="givenName"/>
-    <Attribute name="urn:mace:dir:attribute-def:displayName" id="displayName"/>
-    <Attribute name="urn:mace:dir:attribute-def:uid" id="uid"/>
-    <Attribute name="urn:mace:dir:attribute-def:mail" id="mail"/>
-    <Attribute name="urn:mace:dir:attribute-def:telephoneNumber" id="telephoneNumber"/>
-    <Attribute name="urn:mace:dir:attribute-def:title" id="title"/>
-    <Attribute name="urn:mace:dir:attribute-def:initials" id="initials"/>
-    <Attribute name="urn:mace:dir:attribute-def:description" id="description"/>
-    <Attribute name="urn:mace:dir:attribute-def:carLicense" id="carLicense"/>
-    <Attribute name="urn:mace:dir:attribute-def:departmentNumber" id="departmentNumber"/>
-    <Attribute name="urn:mace:dir:attribute-def:employeeNumber" id="employeeNumber"/>
-    <Attribute name="urn:mace:dir:attribute-def:employeeType" id="employeeType"/>
-    <Attribute name="urn:mace:dir:attribute-def:preferredLanguage" id="preferredLanguage"/>
-    <Attribute name="urn:mace:dir:attribute-def:manager" id="manager"/>
-    <Attribute name="urn:mace:dir:attribute-def:seeAlso" id="seeAlso"/>
-    <Attribute name="urn:mace:dir:attribute-def:facsimileTelephoneNumber" id="facsimileTelephoneNumber"/>
-    <Attribute name="urn:mace:dir:attribute-def:street" id="street"/>
-    <Attribute name="urn:mace:dir:attribute-def:postOfficeBox" id="postOfficeBox"/>
-    <Attribute name="urn:mace:dir:attribute-def:postalCode" id="postalCode"/>
-    <Attribute name="urn:mace:dir:attribute-def:st" id="st"/>
-    <Attribute name="urn:mace:dir:attribute-def:l" id="l"/>
-    <Attribute name="urn:mace:dir:attribute-def:o" id="o"/>
-    <Attribute name="urn:mace:dir:attribute-def:ou" id="ou"/>
-    <Attribute name="urn:mace:dir:attribute-def:businessCategory" id="businessCategory"/>
-    <Attribute name="urn:mace:dir:attribute-def:physicalDeliveryOfficeName" id="physicalDeliveryOfficeName"/>
-    -->
-
-    <!-- SCHAC attributes... -->
-    <!--
-    <Attribute name="urn:oid:1.3.6.1.4.1.25178.1.2.9" id="schacHomeOrganization">
-        <AttributeDecoder xsi:type="StringAttributeDecoder" caseSensitive="false"/>
-    </Attribute>
-    <Attribute name="urn:oid:1.3.6.1.4.1.25178.1.2.10" id="schacHomeOrganizationType">
-        <AttributeDecoder xsi:type="StringAttributeDecoder" caseSensitive="false"/>
-    </Attribute>
-    <Attribute name="urn:oid:1.3.6.1.4.1.25178.1.2.14" id="schacPersonalUniqueCode">
-        <AttributeDecoder xsi:type="StringAttributeDecoder" caseSensitive="false"/>
-    </Attribute>
-    <Attribute name="urn:oid:1.3.6.1.4.1.25178.1.2.15" id="schacPersonalUniqueID"/>
-    <Attribute name="urn:oid:1.3.6.1.4.1.25178.1.2.19" id="schacUserStatus">
-        <AttributeDecoder xsi:type="StringAttributeDecoder" caseSensitive="false"/>
-    </Attribute>
-    <Attribute name="urn:oid:1.3.6.1.4.1.25178.1.2.20" id="schacProjectMembership">
-        <AttributeDecoder xsi:type="StringAttributeDecoder" caseSensitive="false"/>
-    </Attribute>
-    <Attribute name="urn:oid:1.3.6.1.4.1.25178.1.2.21" id="schacProjectSpecificRole">
-        <AttributeDecoder xsi:type="StringAttributeDecoder" caseSensitive="false"/>
-    </Attribute>
-    -->
 </Attributes>
