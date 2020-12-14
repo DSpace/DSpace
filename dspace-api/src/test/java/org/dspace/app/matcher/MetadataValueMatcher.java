@@ -13,6 +13,13 @@ import org.dspace.content.MetadataValue;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 
+/**
+ * Implementation of {@link org.hamcrest.Matcher} to match a MetadataValue by
+ * all its attributes.
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ */
 public class MetadataValueMatcher extends TypeSafeMatcher<MetadataValue> {
 
     private String field;
@@ -41,8 +48,9 @@ public class MetadataValueMatcher extends TypeSafeMatcher<MetadataValue> {
 
     @Override
     public void describeTo(Description description) {
-        description.appendText("MetadataValue with the following attributes [value=" + value + ", language="
-            + language + ", authority=" + authority + ", place=" + place + ", confidence=" + confidence + "]");
+        description.appendText("MetadataValue with the following attributes [field=" + field + ", value="
+            + value + ", language=" + language + ", authority=" + authority + ", place=" + place + ", confidence="
+            + confidence + "]");
     }
 
     @Override
@@ -58,6 +66,14 @@ public class MetadataValueMatcher extends TypeSafeMatcher<MetadataValue> {
     public static MetadataValueMatcher with(String field, String value, String language,
         String authority, Integer place, Integer confidence) {
         return new MetadataValueMatcher(field, value, language, authority, place, confidence);
+    }
+
+    public static MetadataValueMatcher with(String field, String value) {
+        return with(field, value, null, null, 0, -1);
+    }
+
+    public static MetadataValueMatcher with(String field, String value, int place) {
+        return with(field, value, null, null, place, -1);
     }
 
 }

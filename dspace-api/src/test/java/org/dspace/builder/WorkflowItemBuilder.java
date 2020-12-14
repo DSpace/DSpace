@@ -162,6 +162,11 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
         return this;
     }
 
+    public WorkflowItemBuilder withSubmitter(EPerson ePerson) {
+        workspaceItem.getItem().setSubmitter(ePerson);
+        return this;
+    }
+
     public WorkflowItemBuilder withTitle(final String title) {
         return setMetadataSingleValue(MetadataSchemaEnum.DC.getName(), "title", null, title);
     }
@@ -176,6 +181,10 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
 
     public WorkflowItemBuilder withSubject(final String subject) {
         return addMetadataValue(MetadataSchemaEnum.DC.getName(), "subject", null, subject);
+    }
+
+    public WorkflowItemBuilder withDoiIdentifier(final String doi) {
+        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "identifier", "doi", doi);
     }
 
     public WorkflowItemBuilder grantLicense() {

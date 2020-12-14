@@ -1,4 +1,4 @@
-<Funding id="mock-id">
+<Funding xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
 	<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#Gift</Type>	
 	<Name>Test Funding</Name>
 	<Acronym>T-FU</Acronym>

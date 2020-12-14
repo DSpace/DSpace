@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href='static/style.xsl' type='text/xsl'?>
+<OAI-PMH
+    xmlns="http://www.openarchives.org/OAI/2.0/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+    <responseDate>2020-11-23T15:56:46Z</responseDate>
+    <request verb="ListRecords" metadataPrefix="oai_cerif_openaire" set="openaire_cris_publications">https://test-harvest/oai/openairecris</request>
+    <ListRecords>
+        <record>
+            <header status="deleted">
+                <identifier>oai:test-harvest:Publications/3</identifier>
+                <datestamp>2100-09-05T21:52:21Z</datestamp>
+                <setSpec>com_123456789_1</setSpec>
+                <setSpec>col_123456789_2</setSpec>
+                <setSpec>openaire_cris_publications</setSpec>
+            </header>
+        </record>
+    </ListRecords>
+</OAI-PMH>

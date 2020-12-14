@@ -66,6 +66,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
+import org.dspace.core.exception.SQLRuntimeException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.scripts.DSpaceRunnable;
@@ -791,12 +792,16 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
     }
 
     private void handleException(EntityRow entityRow, BulkImportException bie) {
+
+        rollback();
+
         if (abortOnError) {
             throw bie;
-        } else {
-            String message = "Row " + entityRow.getRow() + " - " + getRootCauseMessage(bie);
-            handler.logError(message);
         }
+
+        String message = "Row " + entityRow.getRow() + " - " + getRootCauseMessage(bie);
+        handler.logError(message);
+
     }
 
     private void handleValidationErrorOnRow(Row row, String message) {
@@ -806,6 +811,14 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
             throw new BulkImportException(errorMessage);
         } else {
             handler.logError(errorMessage);
+        }
+    }
+
+    private void rollback() {
+        try {
+            context.rollback();
+        } catch (SQLException e) {
+            throw new SQLRuntimeException(e);
         }
     }
 

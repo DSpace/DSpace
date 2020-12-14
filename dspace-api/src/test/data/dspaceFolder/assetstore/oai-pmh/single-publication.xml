@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href='static/style.xsl' type='text/xsl'?>
+<OAI-PMH
+    xmlns="http://www.openarchives.org/OAI/2.0/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+    <responseDate>2020-11-23T15:56:46Z</responseDate>
+    <request verb="ListRecords" metadataPrefix="oai_cerif_openaire" set="openaire_cris_publications">https://test-harvest/oai/openairecris</request>
+    <ListRecords>
+        <record>
+            <header>
+                <identifier>oai:test-harvest:Publications/3</identifier>
+                <datestamp>2019-09-05T21:52:21Z</datestamp>
+                <setSpec>com_123456789_1</setSpec>
+                <setSpec>col_123456789_2</setSpec>
+                <setSpec>openaire_cris_publications</setSpec>
+            </header>
+            <metadata>
+                <oai_cerif:Publication
+                    xmlns:oai_cerif="https://www.openaire.eu/cerif-profile/1.1/"
+                    xmlns:doc="http://www.lyncode.com/xoai"
+                    xmlns:dc="http://purl.org/dc/elements/1.1/"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="3">
+                    <oai_cerif:Type xmlns:oai_cerif="https://www.openaire.eu/cerif-profile/vocab/COAR_Publication_Types">http://purl.org/coar/resource_type/c_18cf</oai_cerif:Type>
+                    <oai_cerif:Title xml:lang="en">Test Publication</oai_cerif:Title>
+                    <oai_cerif:PublicationDate>2012-11-30</oai_cerif:PublicationDate>
+                    <oai_cerif:Volume>343</oai_cerif:Volume>
+                    <oai_cerif:Issue>168</oai_cerif:Issue>
+                    <oai_cerif:StartPage>168</oai_cerif:StartPage>
+                    <oai_cerif:EndPage>180</oai_cerif:EndPage>
+                    <oai_cerif:DOI>10.1007/978-3-642-35233-1_18</oai_cerif:DOI>
+                    <oai_cerif:Handle>123456789/7</oai_cerif:Handle>
+                    <oai_cerif:URN>http://hdl.handle.net/123456789/7</oai_cerif:URN>
+                    <oai_cerif:Authors>
+                        <oai_cerif:Author>
+                            <oai_cerif:DisplayName>Manghi, Paolo</oai_cerif:DisplayName>
+                            <oai_cerif:Person id="123">
+                                <oai_cerif:PersonName>
+                                    <oai_cerif:FamilyNames>Manghi</oai_cerif:FamilyNames>
+                                    <oai_cerif:FirstNames>Paolo</oai_cerif:FirstNames>
+                                </oai_cerif:PersonName>
+                            </oai_cerif:Person>
+                        </oai_cerif:Author>
+                    </oai_cerif:Authors>
+                </oai_cerif:Publication>
+            </metadata>
+        </record>
+    </ListRecords>
+</OAI-PMH>

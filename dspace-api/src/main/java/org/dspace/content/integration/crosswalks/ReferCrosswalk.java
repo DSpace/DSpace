@@ -9,6 +9,8 @@ package org.dspace.content.integration.crosswalks;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.collections4.iterators.EmptyIterator.emptyIterator;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -55,7 +57,6 @@ import org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldMappe
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.CrisConstants;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResultIterator;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
@@ -351,7 +352,7 @@ public class ReferCrosswalk implements ItemExportCrosswalk {
                 }
 
                 String metadataValue = metadata.get(i);
-                if (!CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE.equals(metadataValue)) {
+                if (isNotBlank(metadataValue) && !PLACEHOLDER_PARENT_METADATA_VALUE.equals(metadataValue)) {
                     appendLine(lines, line, metadataValue);
                 }
 

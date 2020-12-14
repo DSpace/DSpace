@@ -8,6 +8,7 @@
 
 package org.dspace.authorize;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 import org.dspace.AbstractUnitTest;
@@ -130,37 +131,68 @@ public class AuthorizeServiceTest extends AbstractUnitTest {
     }
 
     @Test
-    public void testIsCollectionAdmin() throws SQLException, AuthorizeException {
+    public void testIsCollectionAdmin() throws SQLException, AuthorizeException, IOException {
 
-        context.turnOffAuthorisationSystem();
+        Community community = null;
+        EPerson eperson = null;
 
-        Community community = communityService.create(null, context);
-        Collection collection = collectionService.create(context, community);
-        EPerson eperson = ePersonService.create(context);
+        try {
 
-        Group administrators = collectionService.createAdministrators(context, collection);
-        groupService.addMember(context, administrators, eperson);
+            context.turnOffAuthorisationSystem();
 
-        context.restoreAuthSystemState();
-        context.commit();
+            community = communityService.create(null, context);
+            Collection collection = collectionService.create(context, community);
+            eperson = ePersonService.create(context);
 
-        Assert.assertTrue(authorizeService.isCollectionAdmin(context, eperson));
+            Group administrators = collectionService.createAdministrators(context, collection);
+            groupService.addMember(context, administrators, eperson);
+            context.commit();
+
+            Assert.assertTrue(authorizeService.isCollectionAdmin(context, eperson));
+
+        } finally {
+
+            if (community != null) {
+                communityService.delete(context, context.reloadEntity(community));
+            }
+            if (eperson != null) {
+                ePersonService.delete(context, context.reloadEntity(eperson));
+            }
+
+            context.restoreAuthSystemState();
+        }
     }
 
     @Test
-    public void testIsCollectionAdminReturnsTrueIfTheUserIsCommunityAdmin() throws SQLException, AuthorizeException {
+    public void testIsCollectionAdminReturnsTrueIfTheUserIsCommunityAdmin()
+        throws SQLException, AuthorizeException, IOException {
 
-        context.turnOffAuthorisationSystem();
+        Community community = null;
+        EPerson eperson = null;
 
-        Community community = communityService.create(null, context);
-        EPerson eperson = ePersonService.create(context);
+        try {
 
-        Group administrators = communityService.createAdministrators(context, community);
-        groupService.addMember(context, administrators, eperson);
+            context.turnOffAuthorisationSystem();
 
-        context.restoreAuthSystemState();
-        context.commit();
+            community = communityService.create(null, context);
+            eperson = ePersonService.create(context);
 
-        Assert.assertTrue(authorizeService.isCollectionAdmin(context, eperson));
+            Group administrators = communityService.createAdministrators(context, community);
+            groupService.addMember(context, administrators, eperson);
+            context.commit();
+
+            Assert.assertTrue(authorizeService.isCollectionAdmin(context, eperson));
+
+        } finally {
+
+            if (community != null) {
+                communityService.delete(context, context.reloadEntity(community));
+            }
+            if (eperson != null) {
+                ePersonService.delete(context, context.reloadEntity(eperson));
+            }
+
+            context.restoreAuthSystemState();
+        }
     }
 }

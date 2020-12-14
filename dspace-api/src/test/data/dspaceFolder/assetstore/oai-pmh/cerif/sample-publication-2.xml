@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cerif:Publication xmlns:cerif="https://www.openaire.eu/cerif-profile/1.1/" xmlns:ar="http://purl.org/coar/access_right" xmlns:funt="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types" xmlns:patt="https://www.openaire.eu/cerif-profile/vocab/COAR_Patent_Types" xmlns:prot="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types" xmlns:pubt="https://www.openaire.eu/cerif-profile/vocab/COAR_Publication_Types" xmlns:sc="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Service_Compatibility" id="f387fa61-8ce7-443e-a14b-5583460bfc2b">
+   <pubt:Type>http://purl.org/coar/resource_type/c_6501</pubt:Type>
+   <cerif:Language>English</cerif:Language>
+   <cerif:Title xml:lang="it">Durability of thermally modified sapwood and heartwood of Scots pine and Norway spruce in the modified double layer test</cerif:Title>
+   <cerif:Subtitle xml:lang="it" />
+   <cerif:PublishedIn>
+      <cerif:Publication id="560db477-638d-4097-abcc-3410836b9770">
+         <pubt:Type>http://purl.org/coar/resource_type/c_0640</pubt:Type>
+         <cerif:Title xml:lang="it">Wood Material Science and Engineering</cerif:Title>
+      </cerif:Publication>
+   </cerif:PublishedIn>
+   <cerif:PublicationDate>2017-05-27</cerif:PublicationDate>
+   <cerif:Volume>12</cerif:Volume>
+   <cerif:Issue>3</cerif:Issue>
+   <cerif:StartPage>129</cerif:StartPage>
+   <cerif:EndPage>139</cerif:EndPage>
+   <cerif:DOI>10.1080/17480272.2015.1061596</cerif:DOI>
+   <cerif:SCP-Number>84941368060</cerif:SCP-Number>
+   <cerif:ISSN medium="http://issn.org/vocabularies/Medium#Print">1748-0272</cerif:ISSN>
+   <cerif:ISSN medium="http://issn.org/vocabularies/Medium#Online">1748-0280</cerif:ISSN>
+   <cerif:URL>https://cris.vtt.fi/en/publications/f387fa61-8ce7-443e-a14b-5583460bfc2b</cerif:URL>
+   <cerif:Authors>
+      <cerif:Author>
+         <cerif:Person id="0d9dfbba-44a4-480d-a3f5-7690adfd7d10">
+            <cerif:PersonName>
+               <cerif:FamilyNames>Metsä-Kortelainen</cerif:FamilyNames>
+               <cerif:FirstNames>Sini</cerif:FirstNames>
+            </cerif:PersonName>
+         </cerif:Person>
+         <cerif:Affiliation>
+            <cerif:OrgUnit id="e8d60e26-7264-4925-92d0-a781657f9d3a">
+               <cerif:Name xml:lang="en">BA2405 Advanced manufacturing technologies</cerif:Name>
+            </cerif:OrgUnit>
+         </cerif:Affiliation>
+      </cerif:Author>
+      <cerif:Author>
+         <cerif:Person id="ea98bc38-dcba-41f0-a08f-d6b73fd6c431">
+            <cerif:PersonName>
+               <cerif:FamilyNames>Viitanen</cerif:FamilyNames>
+               <cerif:FirstNames>Hannu</cerif:FirstNames>
+            </cerif:PersonName>
+         </cerif:Person>
+         <cerif:Affiliation>
+            <cerif:OrgUnit id="6f450daa-5b6d-4d18-926d-e1bbe3314fb9">
+               <cerif:Acronym>VTT</cerif:Acronym>
+               <cerif:Name xml:lang="en">VTT (former employee or external)</cerif:Name>
+            </cerif:OrgUnit>
+         </cerif:Affiliation>
+      </cerif:Author>
+   </cerif:Authors>
+   <cerif:Publishers>
+      <cerif:Publisher>
+         <cerif:OrgUnit>
+            <cerif:Name xml:lang="it">Taylor &amp; Francis</cerif:Name>
+         </cerif:OrgUnit>
+      </cerif:Publisher>
+   </cerif:Publishers>
+   <cerif:Keyword xml:lang="en">biological durability</cerif:Keyword>
+   <cerif:Keyword xml:lang="en">decay resistance</cerif:Keyword>
+   <cerif:Keyword xml:lang="en">ground contact</cerif:Keyword>
+   <cerif:Keyword xml:lang="en">heartwood</cerif:Keyword>
+   <cerif:Keyword xml:lang="en">Norway spruce</cerif:Keyword>
+   <cerif:Keyword xml:lang="en">sapwood</cerif:Keyword>
+   <cerif:Keyword xml:lang="en">Scots pine</cerif:Keyword>
+   <cerif:Keyword xml:lang="en">thermal modification</cerif:Keyword>
+   <cerif:Abstract xml:lang="en">In the present study, durability of untreated and thermally modified sapwood and heartwood of Scots pine and Norway spruce was examined.</cerif:Abstract>
+   <cerif:Status scheme="/dk/atira/pure/researchoutput/status/published">Published</cerif:Status>
+</cerif:Publication>

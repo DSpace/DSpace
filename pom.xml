@@ -36,8 +36,8 @@
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <jaxb-runtime.version>2.3.1</jaxb-runtime.version>
         <!-- NOTE: Jetty needed for Handle Server & tests -->
-        <jetty.version>9.4.15.v20190215</jetty.version>
-        <log4j.version>2.11.2</log4j.version>
+        <jetty.version>9.4.17.v20190418</jetty.version>
+        <log4j.version>2.13.3</log4j.version>
         <pdfbox-version>2.0.15</pdfbox-version>
         <poi-version>3.17</poi-version>
         <slf4j.version>1.7.25</slf4j.version>
@@ -671,8 +671,8 @@
                                         <!-- XML Commons claims these licenses, but it's really Apache License: https://xerces.apache.org/xml-commons/licenses.html -->
                                         <licenseMerge>Apache Software License, Version 2.0|The SAX License|The W3C License</licenseMerge>
                                         <licenseMerge>BSD License|The BSD License|BSD licence|BSD license|BSD|BSD-style license|New BSD License|New BSD license|Revised BSD License|BSD 2-Clause license</licenseMerge>
-                                        <!-- DuraSpace uses a BSD License for DSpace -->
-                                        <licenseMerge>BSD License|DuraSpace BSD License|DuraSpace Sourcecode License</licenseMerge>
+                                        <!-- DSpace uses a BSD License -->
+                                        <licenseMerge>BSD License|DSpace BSD License|DSpace Sourcecode License</licenseMerge>
                                         <!-- Coverity uses modified BSD: https://github.com/coverity/coverity-security-library -->
                                         <licenseMerge>BSD License|BSD style modified by Coverity</licenseMerge>
                                         <!-- Jaxen claims this license, but it's really BSD: http://jaxen.codehaus.org/license.html -->
@@ -1269,17 +1269,27 @@
                 <groupId>net.cnri</groupId>
                 <artifactId>cnri-servlet-container</artifactId>
                 <version>3.0.0</version>
+                <exclusions>
+                    <!-- A later version of Jetty is pulled in below -->
+                    <exclusion>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-http</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-io</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-util</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <!-- Jetty is needed to run Handle Server (and tests in some modules) -->
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-server</artifactId>
                 <version>${jetty.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.dspace</groupId>
-                <artifactId>jargon</artifactId>
-                <version>1.4.25</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
@@ -1327,11 +1337,6 @@
                 <version>2.1.1</version>
             </dependency>
             <dependency>
-                <groupId>commons-discovery</groupId>
-                <artifactId>commons-discovery</artifactId>
-                <version>0.5</version>
-            </dependency>
-            <dependency>
                 <groupId>commons-fileupload</groupId>
                 <artifactId>commons-fileupload</artifactId>
                 <version>1.3.3</version>
@@ -1346,6 +1351,8 @@
                 <artifactId>commons-lang3</artifactId>
                 <version>3.7</version>
             </dependency>
+            <!-- NOTE: We don't use commons-logging directly, but many dependencies rely on it.
+                 So, we specify the version to use to avoid dependency convergence issues. -->
             <dependency>
                 <groupId>commons-logging</groupId>
                 <artifactId>commons-logging</artifactId>
@@ -1431,11 +1438,6 @@
             </dependency>
 
             <dependency>
-                <groupId>oro</groupId>
-                <artifactId>oro</artifactId>
-                <version>2.0.8</version>
-            </dependency>
-            <dependency>
                 <groupId>org.apache.pdfbox</groupId>
                 <artifactId>pdfbox</artifactId>
                 <version>${pdfbox-version}</version>
@@ -1466,16 +1468,6 @@
                 <version>${poi-version}</version>
             </dependency>
             <dependency>
-                <groupId>rome</groupId>
-                <artifactId>rome</artifactId>
-                <version>1.0</version>
-            </dependency>
-            <dependency>
-                <groupId>rome</groupId>
-                <artifactId>opensearch</artifactId>
-                <version>0.1</version>
-            </dependency>
-            <dependency>
                 <groupId>xalan</groupId>
                 <artifactId>xalan</artifactId>
                 <version>2.7.0</version>
@@ -1483,45 +1475,14 @@
             <dependency>
                 <groupId>xerces</groupId>
                 <artifactId>xercesImpl</artifactId>
-                <version>2.11.0</version>
+                <version>2.12.0</version>
             </dependency>
             <dependency>
                 <groupId>xml-apis</groupId>
                 <artifactId>xml-apis</artifactId>
                 <version>1.4.01</version>
             </dependency>
-            <dependency>
-                <groupId>javax.activation</groupId>
-                <artifactId>activation</artifactId>
-                <version>1.1.1</version>
-            </dependency>
 
-            <dependency>
-                <groupId>wsdl4j</groupId>
-                <artifactId>wsdl4j</artifactId>
-                <version>1.6.3</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.xml</groupId>
-                <artifactId>jaxrpc-api</artifactId>
-                <version>1.3</version>
-            </dependency>
-            <dependency>
-                <groupId>axis</groupId>
-                <artifactId>axis</artifactId>
-                <version>1.4</version>
-            </dependency>
-            <dependency>
-                <groupId>axis</groupId>
-                <artifactId>axis-ant</artifactId>
-                <version>1.4</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>axis</groupId>
-                <artifactId>axis-saaj</artifactId>
-                <version>1.4</version>
-            </dependency>
             <!-- Keep icu4j synced with version used by lucene-analyzers-icu (Solr) -->
             <dependency>
                 <groupId>com.ibm.icu</groupId>
@@ -1532,16 +1493,6 @@
                 <groupId>com.oracle</groupId>
                 <artifactId>ojdbc6</artifactId>
                 <version>11.2.0.4.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.sun.media</groupId>
-                <artifactId>jai_imageio</artifactId>
-                <version>1.1</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.media</groupId>
-                <artifactId>jai_core</artifactId>
-                <version>1.1.3</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
@@ -1706,21 +1657,6 @@
                 <version>1.0.2</version>
             </dependency>
             <dependency>
-                <groupId>org.javassist</groupId>
-                <artifactId>javassist</artifactId>
-                <version>3.20.0-GA</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.logging</groupId>
-                <artifactId>jboss-logging</artifactId>
-                <version>3.3.0.Final</version>
-            </dependency>
-            <dependency>
-                <groupId>org.codehaus.woodstox</groupId>
-                <artifactId>woodstox-core-asl</artifactId>
-                <version>4.4.1</version>
-            </dependency>
-            <dependency>
                 <groupId>xom</groupId>
                 <artifactId>xom</artifactId>
                 <version>1.2.5</version>
@@ -1747,7 +1683,7 @@
 
     <licenses>
         <license>
-            <name>DuraSpace BSD License</name>
+            <name>DSpace BSD License</name>
             <url>https://raw.github.com/DSpace/DSpace/main/LICENSE</url>
             <distribution>repo</distribution>
             <comments>
@@ -1757,8 +1693,8 @@
     </licenses>
 
     <issueManagement>
-        <system>JIRA</system>
-        <url>https://jira.duraspace.org/browse/DS</url>
+        <system>GitHub</system>
+        <url>https://github.com/DSpace/DSpace/issues</url>
     </issueManagement>
 
     <mailingLists>
@@ -1819,7 +1755,7 @@
         <developer>
            <name>DSpace Committers</name>
            <email>dspace-devel@googlegroups.com</email>
-           <url>https://wiki.duraspace.org/display/DSPACE/DSpace+Committers</url>
+           <url>https://wiki.lyrasis.org/display/DSPACE/DSpace+Committers</url>
            <roles>
              <role>committer</role>
            </roles>
@@ -1830,7 +1766,7 @@
         <contributor>
            <name>DSpace Contributors</name>
            <email>dspace-tech@googlegroups.com</email>
-           <url>https://wiki.duraspace.org/display/DSPACE/DSpaceContributors</url>
+           <url>https://wiki.lyrasis.org/display/DSPACE/DSpaceContributors</url>
            <roles>
              <role>developer</role>
            </roles>

@@ -888,6 +888,18 @@ public class DCInputsReader {
 
     }
 
+    public List<String> getSubmissionFormMetadata(SubmissionStepConfig submissionStepConfig)
+        throws DCInputsReaderException {
+
+        DCInputSet inputSet = getInputsByFormName(submissionStepConfig.getId());
+
+        return Arrays.stream(inputSet.getFields())
+            .flatMap(dcInputs -> Arrays.stream(dcInputs))
+            .flatMap(dcInput -> getMetadataFieldsFromDcInput(dcInput))
+            .collect(Collectors.toList());
+
+    }
+
 
     private DCInputSet findGroupInputSetByMetadataGroupName(Collection collection, String groupName)
         throws DCInputsReaderException {
