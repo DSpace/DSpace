@@ -45,7 +45,7 @@
         -->
         <!-- DSPACE 7 requires Shibboleth to use "SameSite=None" property for its Cookies -->
         <Sessions lifetime="28800" timeout="3600" relayState="ss:mem"
-                  checkAddress="false" handlerSSL="false" cookieProps="; path=/; SameSite=None; Secure; HttpOnly">
+                  checkAddress="false" handlerSSL="true" cookieProps="; path=/; SameSite=None; secure; HttpOnly">
 
             <!--
             Configures SSO for a default IdP. To allow for >1 IdP, remove
@@ -129,7 +129,7 @@
         -->
         <!--
         <ApplicationOverride id="admin" entityID="https://admin.example.org/shibboleth"/>
-	-->
+	    -->
 
     </ApplicationDefaults>
 

@@ -18,6 +18,7 @@ services:
     container_name: dspace-shibboleth
     depends_on:
       - dspace
+    image: dspace/dspace-shibboleth
     build:
       # Must be relative to root, so that it can be built alongside [src]/docker-compose.yml
       context: ./dspace/src/main/docker/dspace-shibboleth

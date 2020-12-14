@@ -148,6 +148,9 @@ docker build -t dspace/dspace-shibboleth .
 docker run -i -t -d -p 80:80 -p 443:443 dspace/dspace-shibboleth
 ```
 
+This image can also be rebuilt using the `../docker-compose/docker-compose-shibboleth.yml` script.
+
+
 ## local.cfg and test/ folder
 
 These resources are bundled into the `dspace/dspace` image at build time.
