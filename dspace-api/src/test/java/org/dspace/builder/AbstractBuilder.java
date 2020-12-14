@@ -49,6 +49,7 @@ import org.dspace.externalservices.scopus.factory.CrisMetricsServiceFactory;
 import org.dspace.layout.factory.CrisLayoutServiceFactory;
 import org.dspace.layout.service.CrisLayoutBoxService;
 import org.dspace.layout.service.CrisLayoutFieldService;
+import org.dspace.layout.service.CrisLayoutMetric2BoxService;
 import org.dspace.layout.service.CrisLayoutTabService;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ProcessService;
@@ -108,6 +109,7 @@ public abstract class AbstractBuilder<T, S> {
     static OrcidHistoryService orcidHistoryService;
     static AuditService auditService;
     static CrisMetricsService crisMetricsService;
+    static CrisLayoutMetric2BoxService crisLayoutMetric2BoxService;
 
     protected Context context;
 
@@ -169,6 +171,7 @@ public abstract class AbstractBuilder<T, S> {
         orcidHistoryService = OrcidHistoryServiceFactory.getInstance().getOrcidHistoryService();
         auditService = new DSpace().getSingletonService(AuditService.class);
         crisMetricsService = CrisMetricsServiceFactory.getInstance().getCrisMetricsService();
+        crisLayoutMetric2BoxService = CrisLayoutServiceFactory.getInstance().getMetric2BoxService();
     }
 
 
@@ -205,6 +208,7 @@ public abstract class AbstractBuilder<T, S> {
         orcidQueueService = null;
         orcidHistoryService = null;
         crisMetricsService = null;
+        crisLayoutMetric2BoxService = null;
 
     }
 

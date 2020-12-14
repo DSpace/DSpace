@@ -146,6 +146,11 @@ public class CrisLayoutBoxBuilder extends AbstractBuilder<CrisLayoutBox, CrisLay
         return this;
     }
 
+    public CrisLayoutBoxBuilder withMaxColumns(Integer maxColumns) {
+        this.box.setMaxColumns(maxColumns);
+        return this;
+    }
+
     public CrisLayoutBoxBuilder addMetadataSecurityField(MetadataField field) {
         if (this.box.getMetadataSecurityFields() == null) {
             this.box.setMetadataSecurityFields(new HashSet<>());
