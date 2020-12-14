@@ -266,17 +266,6 @@ public class SetupCollectionHarvestingForm extends AbstractDSpaceTransformer {
 		String ingestWorkflowString = "oai.harvester.ingest_workflow.";
 		this.getOptions(ingestWorkflowValue, ingestWorkflow, ingestWorkflowString);
 
-
-		settings.addLabel(T_label_harvester_starttime);
-		settings.addItem().addContent(harvestMessageValue);
-		Text harvestStarttime = settings.addItem().addText("harvest_starttime");
-		harvestStarttime.setSize(20);
-		if (null != harvestStartTimeValue) {
-			harvestStarttime.setValue(harvestStartTimeValue.toString());
-		} else {
-			harvestStarttime.setValue(new Date().toString());
-		}
-
 		Para buttonList = main.addPara();
 		buttonList.addButton("submit_save").setValue(T_submit_save);
 		buttonList.addButton("submit_return").setValue(T_submit_return);
