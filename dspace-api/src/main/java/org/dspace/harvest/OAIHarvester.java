@@ -617,15 +617,15 @@ public class OAIHarvester {
 						bvs.versionBundles(ourContext, item);
 					} else {
 						List<Bundle> allBundles = item.getBundles();
-						for (Bundle bundle : allBundles) {
-							try {
+						try {
+							for (Bundle bundle : allBundles) {
 								itemService.removeBundle(ourContext, item, bundle);
-							} catch (ConcurrentModificationException e) {
-								log.error("Collection: " + targetCollection.getName() + " " + targetCollection.getHandle() +
-										" - item: "+ item.getName() + " " + item.getID() +
-										" - bundle: " + bundle.getName() + " " + bundle.getID());
-								log.error("Could not remove bundle since hibernate is unbalanced. ", e);
+
 							}
+						} catch (ConcurrentModificationException e) {
+							log.error("Collection: " + targetCollection.getName() + " " + targetCollection.getHandle() +
+									" - item: "+ item.getName() + " " + item.getID());
+							log.error("Could not remove bundle since hibernate is unbalanced. ", e);
 						}
 					}
 				}
