@@ -243,6 +243,14 @@
 
         <form name="peopleStep">
             <row>
+                <relation-field>
+                    <relationship-type>isPublicationOfAuthor</relationship-type>
+                    <search-configuration>publication</search-configuration>
+                    <label>Publication</label>
+                    <hint>import a publicaton</hint>
+                </relation-field>
+            </row>
+            <row>
                 <field>
                     <dc-schema>person</dc-schema>
                     <dc-element>familyName</dc-element>
