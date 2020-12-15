@@ -144,7 +144,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
             Context context = obtainContext();
             Item item = itemService.find(context, itemUUID);
             if (item == null) {
-                return null;
+                throw new UnprocessableEntityException("There is no Item with uuid provided, uuid:" + itemUUID);
             }
             XmlWorkflowItem xmlWFI = xmlWorkflowItemService.findByItem(context, item);
             if (xmlWFI == null) {
@@ -166,7 +166,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
             Context context = obtainContext();
             Item item = itemService.find(context, itemUUID);
             if (item == null) {
-                return null;
+                throw new UnprocessableEntityException("There is no Item with uuid provided, uuid:" + itemUUID);
             }
             XmlWorkflowItem xmlWFI = xmlWorkflowItemService.findByItem(context, item);
             if (xmlWFI == null) {
@@ -263,8 +263,8 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
         try {
             PoolTask task = uriListHandlerService.handle(context, request, list, PoolTask.class);
             if (task == null) {
-                throw
-                    new ResourceNotFoundException("No PoolTask record found, the uri-list does not contait a resource");
+                throw new UnprocessableEntityException(
+                        "No PoolTask record found, the uri-list does not contait a resource");
             }
             XmlWorkflowServiceFactory factory = (XmlWorkflowServiceFactory) XmlWorkflowServiceFactory.getInstance();
             Workflow workflow = factory.getWorkflowFactory().getWorkflow(task.getWorkflowItem().getCollection());
