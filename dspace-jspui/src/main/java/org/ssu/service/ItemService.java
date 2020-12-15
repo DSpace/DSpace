@@ -99,12 +99,11 @@ public class ItemService {
                 .orElse("");
     }
 
-    public String getAlternativeTitleForItem(Item item) {
+    public Set<String> getAlternativeTitleForItem(Item item) {
         return itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "title", "alternative", Item.ANY)
                 .stream()
                 .map(MetadataValue::getValue)
-                .findFirst()
-                .orElse("");
+                .collect(Collectors.toSet());
     }
 
     public List<AuthorLocalization> extractAuthorListForItem(Item item) {

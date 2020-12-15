@@ -50,7 +50,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.function.Function;
@@ -284,7 +283,6 @@ public class HandleController {
         List<Pair<String, String>> authors = itemService.extractAuthorListForItem(item).stream()
                 .map(author -> Pair.of(author.getFormattedAuthorData("%s, %s", locale), author.getOrcid()))
                 .collect(Collectors.toList());
-
         Function<Bitstream, String> getBitstreamFormat = (bitstream) -> {
             try {
                 return bitstream.getFormatDescription(dspaceContext);
@@ -307,7 +305,7 @@ public class HandleController {
                         .build())
                 .collect(Collectors.toList());
         model.addObject("title", item.getName());
-        model.addObject("titleAlternative", itemService.getAlternativeTitleForItem(item));
+        model.addObject("titlesAlternative", itemService.getAlternativeTitleForItem(item));
         model.addObject("owningCollections", item.getCollections());
         model.addObject("type", itemService.getItemTypeLocalized(item, locale));
         model.addObject("authors", authors);

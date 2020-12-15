@@ -82,10 +82,14 @@
             <td><fmt:message key="org.dspace.app.webui.jsptag.ItemListTag.title"/></td>
             <td>${title}</td>
         </tr>
-        <c:if test="${not empty titleAlternative}">
+        <c:if test="${not empty titlesAlternative}">
             <tr>
                 <td><fmt:message key="metadata.dc.title.alternative"/></td>
-                <td>${titleAlternative}</td>
+                    <td>
+                        <c:forEach items="${titlesAlternative}" var="titleAlternative">
+                            ${titleAlternative}<br/>
+                        </c:forEach>
+                    </td>
             </tr>
         </c:if>
         <tr>
