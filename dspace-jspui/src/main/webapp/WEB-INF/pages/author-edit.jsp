@@ -7,11 +7,20 @@
 
 
 <%@ page import="java.util.Locale" %>
+<%@ page import="org.dspace.core.ConfigurationManager" %>
 
+<%
+    boolean loginAs = ConfigurationManager.getBooleanProperty("webui.user.assumelogin", false);
+%>
 
 <dspace:layout locbar="nolink" title="Authors list" feedData="NONE">
-
-
+    <script>
+        function selectionchange()
+        {
+            window.document.epersongroup.eperson_id.options[0] = new Option('${eperson_string}');
+            window.document.epersongroup.eperson_id.options[0].value = '${author.uuid}';
+        }
+    </script>
     <c:if test="${hasMessage}">
         <div class="alert alert-${messageType}" role="alert">${message}</div>
     </c:if>
@@ -29,7 +38,7 @@
             </h3>
         </div>
         <div class="panel-body">
-            <form method="post" action="" class="form-horizontal">
+            <form method="post" name="epersongroup"  class="form-horizontal">
                 <div class="form-group">
                     <label for="surnameEn" class="col-sm-2 control-label">Surname in English</label>
                     <div class="col-sm-10">
@@ -68,25 +77,33 @@
                 </div>
                 <div class="form-group">
                     <label for="orcid" class="col-sm-2 control-label">ORCID</label>
-                    <div class="col-sm-10">
+                    <div class="col-sm-4">
                         <input type="text" class="form-control" name="orcid" id="orcid" placeholder="ORCID" value="${author.orcid}">
+                    </div>
+                    <label class="col-sm-1 control-label" >Eperson</label>
+                    <div class="col-sm-5" >
+                        <dspace:selecteperson multiple="false" />
+                        <c:if test="${eperson_attached}">
+                            <script>
+                                selectionchange();
+                            </script>
+                        </c:if>
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
                         <input type="hidden" class="form-control" name="uuid" id="uuid" value="${author.uuid}">
-                        <button type="button" class="btn btn-default" onclick="location.href = '/authors/list';">Cancel</button>
+                        <button type="button" class="btn btn-default" onclick="location.href = '/authors/list';javascript:finishEPerson();">Cancel</button>
 
                         <c:if test="${not empty author}">
                             <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#delteAuthorModal">Delete author</button>
                         </c:if>
-                        <button type="submit" class="btn btn-success">Save</button>
+                        <button type="submit" class="btn btn-success" onclick="javascript:finishEPerson();">Save</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
-
     <div class="modal fade" id="delteAuthorModal" tabindex="-1" role="dialog" aria-labelledby="delteAuthorModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -108,5 +125,4 @@
             </div>
         </div>
     </div>
-
 </dspace:layout>
