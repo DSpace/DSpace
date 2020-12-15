@@ -85,7 +85,6 @@ public class ProfileController {
         e.setEmail("newuser" + e.getID());
         personService.update(dspaceContext, e);
         model = fillEditUserForm(request, model, e);
-        model.addObject("isAuthorLocalized", false);
         model.addObject("isNewUser", true);
         model.setViewName("edit-user");
         dspaceContext.complete();
@@ -149,8 +148,6 @@ public class ProfileController {
         model.addObject("epersonId", eperson.getID());
         model.addObject("lastName", lastName);
         model.addObject("firstName", firstName);
-        model.addObject("isAuthorLocalized", authorsService.isAuthorLocalizationPresent(String.format("%s, %s", lastName, firstName)));
-        model.addObject("orcid", authorsService.getAuthorLocalization(String.format("%s, %s", lastName, firstName)).getOrcid());
         model.addObject("phone", phone);
         model.addObject("language", language);
         model.addObject("position", eperson.getPosition());

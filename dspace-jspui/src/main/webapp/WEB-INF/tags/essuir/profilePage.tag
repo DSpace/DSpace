@@ -101,14 +101,7 @@
         <input class="form-control" name="position" id="tposition" size="24" value="${position}"/>
     </div>
 </div>
-<c:if test="${isAuthorLocalized}">
-    <div class="form-group">
-        <label class="col-md-offset-3 col-md-2 control-label" for="orcid">ORCID</label>
-        <div class="col-md-3">
-            <input class="form-control" name="orcid" id="orcid" size="24" value="${orcid}"/>
-        </div>
-    </div>
-</c:if>
+
 <c:if test="${not isEditUserPage}">
     <c:if test="${not isRegisterPage}">
         <p class="alert"><fmt:message key="jsp.register.edit-profile.info5"/></p>
