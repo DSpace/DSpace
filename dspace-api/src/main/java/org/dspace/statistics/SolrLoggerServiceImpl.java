@@ -18,6 +18,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,6 +33,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
@@ -95,7 +97,6 @@ import org.dspace.eperson.Group;
 import org.dspace.service.ClientInfoService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.statistics.service.SolrLoggerService;
-import org.dspace.statistics.util.DnsLookup;
 import org.dspace.statistics.util.LocationUtils;
 import org.dspace.statistics.util.SpiderDetector;
 import org.dspace.usage.UsageWorkflowEvent;
@@ -263,8 +264,9 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         } catch (RuntimeException re) {
             throw re;
         } catch (Exception e) {
+            String email = null == currentUser ? "[anonymous]" : currentUser.getEmail();
             log.error("Error saving VIEW event to Solr for DSpaceObject {} by EPerson {}",
-                      dspaceObject.getID(), currentUser.getEmail(), e);
+                      dspaceObject.getID(), email, e);
         }
     }
 
@@ -337,12 +339,13 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 doc1.addField("referrer", request.getHeader("referer"));
             }
 
+            InetAddress ipAddress = null;
             try {
-                String dns = DnsLookup.reverseDns(ip);
-                doc1.addField("dns", dns.toLowerCase());
-            } catch (Exception e) {
-                log.info("Failed DNS Lookup for IP:" + ip);
-                log.debug(e.getMessage(), e);
+                ipAddress = InetAddress.getByName(ip);
+                String dns = ipAddress.getHostName();
+                doc1.addField("dns", dns.toLowerCase(Locale.ROOT));
+            } catch (UnknownHostException e) {
+                log.info("Failed DNS resolution of address {}", ip, e);
             }
             if (request.getHeader("User-Agent") != null) {
                 doc1.addField("userAgent", request.getHeader("User-Agent"));
@@ -350,9 +353,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             doc1.addField("isBot", isSpiderBot);
             // Save the location information if valid, save the event without
             // location information if not valid
-            if (locationService != null) {
+            if (locationService != null && ipAddress != null) {
                 try {
-                    InetAddress ipAddress = InetAddress.getByName(ip);
                     CityResponse location = locationService.city(ipAddress);
                     String countryCode = location.getCountry().getIsoCode();
                     double latitude = location.getLocation().getLatitude();
@@ -366,16 +368,17 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                             doc1.addField("continent", LocationUtils
                                 .getContinentCode(countryCode));
                         } catch (Exception e) {
-                            System.out
-                                .println("COUNTRY ERROR: " + countryCode);
+                            log.warn("Failed to load country/continent table: {}", countryCode);
                         }
                         doc1.addField("countryCode", countryCode);
                         doc1.addField("city", location.getCity().getName());
                         doc1.addField("latitude", latitude);
                         doc1.addField("longitude", longitude);
                     }
-                } catch (IOException | GeoIp2Exception e) {
-                    log.error("Unable to get location of request: {}", e.getMessage());
+                } catch (IOException e) {
+                    log.warn("GeoIP lookup failed.", e);
+                } catch (GeoIp2Exception e) {
+                    log.info("Unable to get location of request: {}", e.getMessage());
                 }
             }
         }
@@ -408,12 +411,13 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         ip = clientInfoService.getClientIp(ip, xforwardedfor);
         doc1.addField("ip", ip);
 
+        InetAddress ipAddress = null;
         try {
-            String dns = DnsLookup.reverseDns(ip);
-            doc1.addField("dns", dns.toLowerCase());
-        } catch (Exception e) {
-            log.info("Failed DNS Lookup for IP:" + ip);
-            log.debug(e.getMessage(), e);
+            ipAddress = InetAddress.getByName(ip);
+            String dns = ipAddress.getHostName();
+            doc1.addField("dns", dns.toLowerCase(Locale.ROOT));
+        } catch (UnknownHostException e) {
+            log.info("Failed DNS resolution of address {}", ip, e);
         }
         if (userAgent != null) {
             doc1.addField("userAgent", userAgent);
@@ -423,7 +427,6 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         // location information if not valid
         if (locationService != null) {
             try {
-                InetAddress ipAddress = InetAddress.getByName(ip);
                 CityResponse location = locationService.city(ipAddress);
                 String countryCode = location.getCountry().getIsoCode();
                 double latitude = location.getLocation().getLatitude();
@@ -445,8 +448,10 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                     doc1.addField("latitude", latitude);
                     doc1.addField("longitude", longitude);
                 }
-            } catch (GeoIp2Exception | IOException e) {
-                log.error("Unable to get location of request:  {}", e.getMessage());
+            } catch (IOException e) {
+                log.warn("GeoIP lookup failed.", e);
+            } catch (GeoIp2Exception e) {
+                log.info("Unable to get location of request: {}", e.getMessage());
             }
         }
 
