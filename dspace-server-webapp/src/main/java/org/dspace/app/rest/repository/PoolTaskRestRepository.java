@@ -18,6 +18,7 @@ import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.PoolTaskRest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
@@ -142,7 +143,7 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
             Context context = obtainContext();
             Item item = itemService.find(context, itemUUID);
             if (item == null) {
-                return null;
+                throw new UnprocessableEntityException("There is no Item with uuid provided, uuid:" + itemUUID);
             }
             XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemService.findByItem(context, item);
             if (xmlWorkflowItem == null) {
@@ -164,7 +165,7 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
             Context context = obtainContext();
             Item item = itemService.find(context, itemUUID);
             if (item == null) {
-                return null;
+                throw new UnprocessableEntityException("There is no Item with uuid provided, uuid:" + itemUUID);
             }
             XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemService.findByItem(context, item);
             if (xmlWorkflowItem == null) {
