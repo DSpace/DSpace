@@ -18,6 +18,7 @@
     <!-- for handle "default". -->
     <submission-map>
         <name-map collection-handle="default" submission-name="traditional"/>
+        <name-map collection-handle="10673/1623" submission-name="People" />
     </submission-map>
 
 
