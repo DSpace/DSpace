@@ -173,5 +173,11 @@
         <sql>
             UPDATE chair SET chair_name = 'Кафедра нейрохірургії та неврології з курсами психіатрії, наркології, медичної психології, професійних хвороб' WHERE chair_id = 56;
         </sql>
-    </changeSet>  
+    </changeSet>
+
+    <changeSet author="Yakovlev Maksymilian" id="24">
+        <sql>
+            UPDATE chair SET chair_name = 'Кафедра комп’ютерної механіки імені Володимира Марцинковського' WHERE chair_id = 11;
+        </sql>
+    </changeSet>
 </databaseChangeLog>
