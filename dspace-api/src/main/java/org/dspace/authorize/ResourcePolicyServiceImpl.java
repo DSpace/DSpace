@@ -275,6 +275,32 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService
         c.restoreAuthSystemState();
     }
 
+    @Override
+    /**
+     * @param context Context
+     * @param resourcePolicy resource Policy
+     * @param dso DSpace Object
+     * Create and fill in the new ResourcePolicy in 1 statements instead of first creating it and then updating it later on, which would take 2 statement executions
+     */
+    public ResourcePolicy copyToDSpaceObject(Context context, ResourcePolicy resourcePolicy, DSpaceObject dso) throws SQLException {
+        ResourcePolicy policy = new ResourcePolicy();
+        policy.setdSpaceObject(dso);
+        policy.setAction(resourcePolicy.getAction());
+        if(resourcePolicy.getEPerson()!=null){
+            policy.setEPerson(resourcePolicy.getEPerson());
+        }
+        if(resourcePolicy.getGroup()!=null){
+            policy.setGroup(resourcePolicy.getGroup());
+        }
+        policy.setStartDate(resourcePolicy.getStartDate());
+        policy.setEndDate(resourcePolicy.getEndDate());
+        policy.setRpName(resourcePolicy.getRpName());
+        policy.setRpDescription(resourcePolicy.getRpDescription());
+        policy.setRpType(resourcePolicy.getRpType());
+        policy = resourcePolicyDAO.create(context, policy);
+        return policy;
+    }
+
 
     /**
      * Update the ResourcePolicy
