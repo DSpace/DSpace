@@ -39,6 +39,7 @@ import org.dspace.builder.ClaimedTaskBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.PoolTaskBuilder;
 import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.content.Collection;
@@ -731,7 +732,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         getClient(adminToken).perform(post("/api/workflow/claimedtasks")
                              .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
                              .content("/api/workflow/pooltasks/" + Integer.MAX_VALUE))
-                             .andExpect(status().isNotFound());
+                             .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
@@ -3136,11 +3137,56 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String tokenSubmitter = getAuthToken(admin.getEmail(), password);
         getClient(tokenSubmitter).perform(get("/api/workflow/pooltasks/search/findAllByItem")
                                  .param("uuid", UUID.randomUUID().toString()))
-                                 .andExpect(status().isOk())
-                                 .andExpect(jsonPath("$._embedded.pooltasks").doesNotExist())
-                                 .andExpect(jsonPath("$.page.totalElements", is(0)));
+                                 .andExpect(status().isUnprocessableEntity());
 
     }
+
+    @Test
+    public void findAllPooltasksByItemBadRequestTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+                                          .withEmail("reviewer1@example.com")
+                                          .withPassword(password).build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .withWorkflowGroup(1, reviewer1, admin).build();
+
+        // create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                                          .withEmail("submitter@example.com")
+                                          .withPassword(password).build();
+
+        context.setCurrentUser(submitter);
+
+        PoolTask poolTask = PoolTaskBuilder.createPoolTask(context, col1, reviewer1)
+                                           .withTitle("Workflow Item 1")
+                                           .withIssueDate("2017-10-17")
+                                           .withAuthor("Smith, Donald")
+                                           .withAuthor("Doe, John")
+                                           .withSubject("ExtraEntry").build();
+
+        Item item1 = poolTask.getWorkflowItem().getItem();
+
+        context.restoreAuthSystemState();
+
+        // Only Admin has access to this end point
+
+        String tokenSubmitter = getAuthToken(admin.getEmail(), password);
+        getClient(tokenSubmitter).perform(get("/api/workflow/pooltasks/search/findAllByItem")
+                                 .param("uuid", "wrongID"))
+                                 .andExpect(status().isBadRequest());
+
+        // the required param is no provided
+        getClient(tokenSubmitter).perform(get("/api/workflow/pooltasks/search/findAllByItem"))
+                                 .andExpect(status().isBadRequest());
+    }
+
     @Test
     public void findPooltaskByItemTest() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -3314,8 +3360,49 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String tokenReviewer1 = getAuthToken(reviewer1.getEmail(), password);
         getClient(tokenReviewer1).perform(get("/api/workflow/pooltasks/search/findByItem")
                                  .param("uuid", UUID.randomUUID().toString()))
-                                 .andExpect(status().isNoContent());
+                                 .andExpect(status().isUnprocessableEntity());
 
+    }
+
+    @Test
+    public void findPooltaskByItemBadRequestTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+                                          .withEmail("reviewer1@example.com")
+                                          .withPassword(password).build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .withWorkflowGroup(1, reviewer1).build();
+
+        // create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                                          .withEmail("submitter@example.com")
+                                          .withPassword(password).build();
+
+        context.setCurrentUser(submitter);
+
+        PoolTask poolTask = PoolTaskBuilder.createPoolTask(context, col1, reviewer1)
+                                           .withTitle("Workflow Item 1")
+                                           .withIssueDate("2017-10-17")
+                                           .withAuthor("Smith, Donald")
+                                           .withAuthor("Doe, John")
+                                           .withSubject("ExtraEntry").build();
+
+        context.restoreAuthSystemState();
+
+        String tokenReviewer1 = getAuthToken(reviewer1.getEmail(), password);
+        getClient(tokenReviewer1).perform(get("/api/workflow/pooltasks/search/findByItem")
+                                 .param("uuid", "wrongID"))
+                                 .andExpect(status().isBadRequest());
+
+        getClient(tokenReviewer1).perform(get("/api/workflow/pooltasks/search/findByItem"))
+                                 .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -3563,9 +3650,47 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(get("/api/workflow/claimedtasks/search/findAllByItem")
                              .param("uuid", UUID.randomUUID().toString()))
-                             .andExpect(status().isOk())
-                             .andExpect(jsonPath("$._embedded.claimedtasks").doesNotExist())
-                             .andExpect(jsonPath("$.page.totalElements", is(0)));
+                             .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void findAllClaimedTaskByItemBadRequestTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+                                          .withEmail("reviewer1@example.com")
+                                          .withPassword(password).build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .withWorkflowGroup(1, reviewer1).build();
+
+        // create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                                          .withEmail("submitter@example.com")
+                                          .withPassword(password).build();
+
+        context.setCurrentUser(submitter);
+
+        ClaimedTask claimedTask1 = ClaimedTaskBuilder.createClaimedTask(context, col1, reviewer1)
+                .withTitle("Workflow Item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry").build();
+
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/workflow/claimedtasks/search/findAllByItem")
+                             .param("uuid", "wrongID"))
+                             .andExpect(status().isBadRequest());
+
+        // the required param is no provided
+        getClient(tokenAdmin).perform(get("/api/workflow/claimedtasks/search/findAllByItem"))
+                             .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -3792,6 +3917,120 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
         getClient(reviewer1Token).perform(get("/api/workflow/claimedtask/search/findByItem")
                                  .param("uuid", UUID.randomUUID().toString()))
+                                 .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void findClaimedTaskByItemBadRequestTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+                                          .withEmail("reviewer1@example.com")
+                                          .withPassword(password).build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .withWorkflowGroup(1, reviewer1).build();
+
+        // create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                                          .withEmail("submitter@example.com")
+                                          .withPassword(password).build();
+
+        context.setCurrentUser(submitter);
+
+        ClaimedTask claimedTask = ClaimedTaskBuilder.createClaimedTask(context, col1, reviewer1)
+                                                    .withTitle("Workflow Item 1")
+                                                    .withIssueDate("2017-10-17")
+                                                    .withAuthor("Smith, Donald")
+                                                    .withAuthor("Doe, John")
+                                                    .withSubject("ExtraEntry").build();
+
+        context.restoreAuthSystemState();
+
+        String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
+        getClient(reviewer1Token).perform(get("/api/workflow/claimedtask/search/findByItem")
+                                 .param("uuid", "wrongID"))
+                                 .andExpect(status().isBadRequest());
+
+        // the required param is no provided
+        getClient(reviewer1Token).perform(get("/api/workflow/claimedtask/search/findByItem"))
+                                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findClaimedTaskByItemArchivedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+                                          .withEmail("reviewer1@example.com")
+                                          .withPassword(password).build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .withWorkflowGroup(1, reviewer1).build();
+
+        Item publicItem = ItemBuilder.createItem(context, col1)
+                                     .withTitle("Public item")
+                                     .withIssueDate("2020-06-25")
+                                     .withAuthor("Smith, Donald")
+                                     .withSubject("ExtraEntry").build();
+
+        context.restoreAuthSystemState();
+
+        String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
+
+        getClient(reviewer1Token).perform(get("/api/workflow/claimedtask/search/findByItem")
+                                 .param("uuid", publicItem.getID().toString()))
                                  .andExpect(status().isNoContent());
+
+    }
+
+    @Test
+    public void findPooltaksByItemInWorkflowWithoutPooltaskTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        EPerson reviewer = EPersonBuilder.createEPerson(context)
+                                         .withEmail("reviewer1@example.com")
+                                         .withPassword(password).build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .withWorkflowGroup(1, reviewer).build();
+
+        // create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                                          .withEmail("submitter@example.com")
+                                          .withPassword(password).build();
+
+        context.setCurrentUser(submitter);
+
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                                                   .withTitle("Workflow Item")
+                                                   .withIssueDate("2010-04-24")
+                                                   .withAuthor("Doe, John")
+                                                   .withSubject("ExtraEntry").build();
+
+        context.restoreAuthSystemState();
+
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+
+        getClient(tokenEperson).perform(get("/api/workflow/pooltasks/search/findByItem")
+                               .param("uuid", witem.getItem().getID().toString()))
+                               .andExpect(status().isNoContent());
     }
 }
