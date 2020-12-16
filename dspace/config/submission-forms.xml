@@ -61,6 +61,7 @@
                         <dc-qualifier>author</dc-qualifier>
                         <input-type>name</input-type>
                     </linked-metadata-field>
+                    <externalsources>orcid</externalsources>
                     <required>At least one author (plain text or relationship) is required</required>
                 </relation-field>
             </row>
@@ -494,6 +495,7 @@
                     <filter>creativework.publisher:somepublishername</filter>
                     <label>Journal</label>
                     <hint>Select the journal related to this volume.</hint>
+                    <externalsources>sherpaJournal</externalsources>
                 </relation-field>
             </row>
             <row>
@@ -625,6 +627,7 @@
                         <dc-qualifier>author</dc-qualifier>
                         <input-type>name</input-type>
                     </linked-metadata-field>
+                    <externalsources>orcid</externalsources>
                     <required>At least one author (plain text or relationship) is required</required>
                 </relation-field>
             </row>
@@ -893,6 +896,7 @@
                         <dc-element>relation</dc-element>
                         <input-type>onebox</input-type>
                     </linked-metadata-field>
+                    <externalsources></externalsources>
                     <required></required>
                 </relation-field>
             </row>
@@ -1043,6 +1047,7 @@
                         <dc-qualifier>name</dc-qualifier>
                         <input-type>onebox</input-type>
                     </linked-metadata-field>
+                    <externalsources></externalsources>
                     <required>One funding agency is required</required>
                 </relation-field>
             </row>
