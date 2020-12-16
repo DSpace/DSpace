@@ -421,12 +421,12 @@ public class RelationshipServiceImpl implements RelationshipService {
                 for (Relationship foundRelationship : list) {
                     if (isLeft) {
                         itemsToUpdate.add(foundRelationship.getRightItem());
-                        return getRelatedItemsForRightItem(context, foundRelationship.getRightItem(), foundRelationship,
-                                                           itemsToUpdate, max);
+                        itemsToUpdate.addAll(getRelatedItemsForRightItem(context, foundRelationship.getRightItem(),
+                                foundRelationship, itemsToUpdate, max));
                     } else {
                         itemsToUpdate.add(foundRelationship.getLeftItem());
-                        return getRelatedItemsForLeftItem(context, foundRelationship.getLeftItem(), foundRelationship,
-                                                          itemsToUpdate, max);
+                        itemsToUpdate.addAll(getRelatedItemsForLeftItem(context, foundRelationship.getLeftItem(),
+                                foundRelationship, itemsToUpdate, max));
                     }
                 }
             }
@@ -458,12 +458,12 @@ public class RelationshipServiceImpl implements RelationshipService {
                 for (Relationship foundRelationship : list) {
                     if (isLeft) {
                         itemsToUpdate.add(foundRelationship.getRightItem());
-                        return getRelatedItemsForRightItem(context, foundRelationship.getRightItem(), foundRelationship,
-                                                           itemsToUpdate, max);
+                        itemsToUpdate.addAll(getRelatedItemsForRightItem(context, foundRelationship.getRightItem(),
+                                foundRelationship, itemsToUpdate, max));
                     } else {
                         itemsToUpdate.add(foundRelationship.getLeftItem());
-                        return getRelatedItemsForLeftItem(context, foundRelationship.getLeftItem(), foundRelationship,
-                                                          itemsToUpdate, max);
+                        itemsToUpdate.addAll(getRelatedItemsForLeftItem(context, foundRelationship.getLeftItem(),
+                                foundRelationship, itemsToUpdate, max));
                     }
                 }
             }
