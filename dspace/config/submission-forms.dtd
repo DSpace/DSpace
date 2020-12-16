@@ -60,5 +60,6 @@
 <!ELEMENT relationship-type (#PCDATA) >
 <!ELEMENT search-configuration (#PCDATA) >
 <!ELEMENT filter (#PCDATA) >
-<!ELEMENT relation-field (relationship-type, search-configuration, filter?, repeatable?, name-variants?, label, type-bind?, hint, linked-metadata-field?, required?, visibility?)>
+<!ELEMENT externalsources (#PCDATA) >
+<!ELEMENT relation-field (relationship-type, search-configuration, filter?, repeatable?, name-variants?, label, type-bind?, hint, linked-metadata-field?, externalsources?, required?, visibility?)>
 <!ELEMENT linked-metadata-field (dc-schema, dc-element, dc-qualifier?, input-type)>
