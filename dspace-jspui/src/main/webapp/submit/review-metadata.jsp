@@ -194,7 +194,7 @@
                     }
                     else
                     {
-                        row.append(Utils.addEntities(values.get(i).getValue()));
+                        row.append(Utils.addEntities(values.get(i).getValue()).replace("&#x0A;", "<br/>"));
                     }
                     if (isAuthorityControlled)
                     {

@@ -672,7 +672,7 @@ public class ItemTag extends TagSupport
 	                    }
                         else
                         {
-                            out.print(Utils.addEntities(val.getValue()));
+                            out.print(Utils.addEntities(val.getValue().replace("&#x0A;", "<br/>")));
                         }
                     }
                 }
