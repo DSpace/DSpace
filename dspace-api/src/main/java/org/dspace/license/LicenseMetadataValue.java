@@ -104,17 +104,15 @@ public class LicenseMetadataValue {
     {
         if (value != null)
         {
-            List<MetadataValue> dcvalues = itemService.getMetadata(item, params[0], params[1], params[2], params[3]);
-            ArrayList<String> arrayList = new ArrayList<String>();
-            for (MetadataValue dcvalue : dcvalues)
+            List<MetadataValue> metadataValues = itemService.getMetadata(item, params[0], params[1], params[2], params[3]);
+            itemService.clearMetadata(context, item, params[0], params[1], params[2], params[3]);
+            for (MetadataValue metadataValue : metadataValues)
             {
-                if (!dcvalue.getValue().equals(value))
+                if (!metadataValue.getValue().equals(value))
                 {
-                    arrayList.add(dcvalue.getValue());
+                    itemService.addMetadata(context, item, params[0], params[1], params[2], metadataValue.getLanguage(), metadataValue.getValue());
                 }
             }
-            itemService.clearMetadata(context, item, params[0], params[1], params[2], params[3]);
-            itemService.addMetadata(context, item, params[0], params[1], params[2], params[3], arrayList);
         }
     }
 
@@ -124,8 +122,8 @@ public class LicenseMetadataValue {
      * @param item - the item to update
      * @param value - the value to add in this field
      */
-    public void addItemValue(Context context, Item item, String value) throws SQLException {
-        itemService.addMetadata(context, item, params[0], params[1], params[2], params[3], value);
+    public void addItemValue(Context context, Item item, String value, String language) throws SQLException {
+        itemService.addMetadata(context, item, params[0], params[1], params[2], language, value);
     }
 
 }
