@@ -249,7 +249,12 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
         String filename = bitstream.getName();
         // FIXME: Just setting format to first guess
         // For now just get the file name
-
+        
+        return guessFormat(context, filename);
+    }
+    
+    @Override
+    public BitstreamFormat guessFormat(Context context, String filename) throws SQLException {
         // Gracefully handle the null case
         if (filename == null) {
             return null;
