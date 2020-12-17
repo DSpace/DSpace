@@ -416,7 +416,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         for (RelationshipType relationshipType : relationshipTypes) {
             if (virtualMetadataPopulator.getMap().containsKey(relationshipType.getRightwardType())) {
                 boolean isLeft = false; //was always true
-                if (relationshipType.getRightType().equals(entityTypeStringFromMetadata)) {
+                if (relationshipType.getLeftType().equals(entityTypeStringFromMetadata)) {
                     isLeft = true;
                 }
                 List<Relationship> list = findByItemAndRelationshipType(context, item, relationshipType, isLeft);
