@@ -404,6 +404,9 @@
                 <xsl:if test="../@disabled='yes'">
                     <xsl:attribute name="disabled">disabled</xsl:attribute>
                 </xsl:if>
+                <xsl:if test="../@readonly='yes'">
+                    <xsl:attribute name="readonly">readonly</xsl:attribute>
+                </xsl:if>
             </input>
             <xsl:apply-templates />
         </label>
@@ -768,6 +771,9 @@
                     </xsl:if>
                     <xsl:if test="../@disabled='yes'">
                         <xsl:attribute name="disabled">disabled</xsl:attribute>
+                    </xsl:if>
+                   <xsl:if test="../@readonly='yes'">
+                        <xsl:attribute name="readonly">readonly</xsl:attribute>
                     </xsl:if>
                 </input>
                 <xsl:apply-templates/>
@@ -1343,6 +1349,9 @@
         </xsl:call-template>
         <xsl:if test="@disabled='yes' or ../@rend = 'disabled'">
             <xsl:attribute name="disabled">disabled</xsl:attribute>
+        </xsl:if>
+        <xsl:if test="@readonly='yes' or ../@rend = 'readonly'">
+            <xsl:attribute name="readonly">readonly</xsl:attribute>
         </xsl:if>
         <xsl:if test="@type != 'checkbox' and @type != 'radio' ">
             <xsl:attribute name="name"><xsl:value-of select="@n"/></xsl:attribute>
