@@ -696,7 +696,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     {
         if(versioningService.getVersion(context, item)!=null)
         {
-            versioningService.removeVersion(context, item);
+            versioningService.removeVersionFromItem(context, item);
         }else{
             try {
                 identifierService.delete(context, item);
