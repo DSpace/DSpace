@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest.model.query;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -94,5 +97,20 @@ public enum RestSearchOperator {
 
     public String getDspaceOperator() {
         return dspaceOperator;
+    }
+
+    /**
+     * Returns a list of dspace operators of this enum's values, plus "query" which is also allowed, but will be
+     * transformed in {@link org.dspace.app.rest.converter.query.SearchQueryConverter} to any of the others
+     *
+     * @return List of dspace operators of this enum's values, plus "query"
+     */
+    public static List<String> getListOfAllowedSearchOperatorStrings() {
+        List<String> allowedSearchOperatorStrings = new ArrayList<>();
+        for (RestSearchOperator restSearchOperator: Arrays.asList(RestSearchOperator.values())) {
+            allowedSearchOperatorStrings.add(restSearchOperator.getDspaceOperator());
+        }
+        allowedSearchOperatorStrings.add("query");
+        return allowedSearchOperatorStrings;
     }
 }
