@@ -265,6 +265,28 @@
     </xsl:template>
 
 
+    <xsl:template name="languageSelectBuilder">
+        <xsl:param name="name"/>
+        <xsl:param name="selected"/>
+        <select>
+            <xsl:call-template name="fieldAttributes"/>
+            <xsl:apply-templates/>
+            <xsl:attribute name="name"><xsl:value-of select="concat($name, '[lang]')"/></xsl:attribute>
+            <xsl:for-each select="../dri:params/dri:param[@name='langs']/dri:option | ./dri:params/dri:param[@name='langs']/dri:option">
+                <option>
+                    <xsl:attribute name="value">
+                        <xsl:value-of select="@returnValue"/>
+                    </xsl:attribute>                   
+                    <xsl:if test="$selected = @returnValue">
+                        <xsl:attribute name="selected" />
+                    </xsl:if>
+                    <xsl:value-of select="."/>
+                </option>
+            </xsl:for-each>
+        </select>
+    </xsl:template>
+
+
     <xsl:template match="dri:field[@type='select']" mode="compositeField">
         <xsl:param name="position">1</xsl:param>
         <xsl:if test="not(position()=1)">
@@ -549,7 +571,43 @@
         </div>
     </xsl:template>
 
+    <!-- Since all normalFields can have a language tag, apply it when needed.
+        There may be a better way to do this.
+    -->
     <xsl:template match="dri:field" mode="normalField">
+        <xsl:choose>
+            <xsl:when test="dri:params/dri:param[@name = 'langs']">
+                <div class="row">
+                    <div class="col-xs-9">
+                        <xsl:apply-templates select="." mode="simpleNormalField"/>
+                    </div>
+                    <div class="col-xs-3">
+                        <xsl:variable name="nro" select="count(dri:instance)+1"/>
+                            <xsl:variable name="name">
+                                <xsl:choose>
+                                    <xsl:when test="dri:params[@operations='add delete']">
+                                        <xsl:value-of select="concat(@n, '_', $nro)"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:value-of select="@n"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:variable>
+                        <xsl:call-template name="languageSelectBuilder">
+                            <xsl:with-param name="name" select="$name"/>
+                            <xsl:with-param name="selected" select="dri:value[@type='lang']"/>
+                        </xsl:call-template>
+                    </div>
+                </div>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:apply-templates select="." mode="simpleNormalField"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    
+    <!-- Old normalField, unchanged -->
+    <xsl:template match="dri:field" mode="simpleNormalField">
         <xsl:variable name="confidenceIndicatorID" select="concat(translate(@id,'.','_'),'_confidence_indicator')"/>
         <xsl:choose>
             <!-- TODO: this has changed dramatically (see form3.xml) -->
@@ -1153,6 +1211,13 @@
                 <label>
                     <input type="checkbox" value="{concat(@n,'_',$position)}" name="{concat(@n,'_selected')}"/>
                     <xsl:apply-templates select="dri:instance[position()=$position]" mode="interpreted"/>
+
+                    <xsl:if test="dri:params/dri:param[@name='langs']">
+                        <xsl:call-template name="languageSelectBuilder">
+                            <xsl:with-param name="name" select="concat(@n, '_', $position)" />
+                            <xsl:with-param name="selected" select="dri:instance[position()=$position]/dri:value[@type='lang']"/>
+                        </xsl:call-template>
+                    </xsl:if>
 
                     <!-- look for authority value in instance. -->
                     <xsl:if test="dri:instance[position()=$position]/dri:value[@type='authority']">
