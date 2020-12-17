@@ -382,10 +382,10 @@ public class RelationshipServiceImpl implements RelationshipService {
             itemsToUpdate.add(relationship.getLeftItem());
             itemsToUpdate.add(relationship.getRightItem());
 
-            findRelatedItemsForLeftItem(context, relationship.getLeftItem(),
-                                                       relationship, itemsToUpdate, max, 0, maxDepth);
-            findRelatedItemsForRightItem(context, relationship.getRightItem(),
-                                                        relationship, itemsToUpdate, max, 0, maxDepth);
+            findModifiedDiscoveryItemsForCurrentItem(context, relationship.getLeftItem(),
+                                       itemsToUpdate, max, 0, maxDepth);
+            findModifiedDiscoveryItemsForCurrentItem(context, relationship.getRightItem(),
+                                        itemsToUpdate, max, 0, maxDepth);
 
             for (Item item : itemsToUpdate) {
                 if (!item.isMetadataModified()) {
@@ -399,91 +399,67 @@ public class RelationshipServiceImpl implements RelationshipService {
         context.restoreAuthSystemState();
     }
 
-    private void findRelatedItemsForRightItem(Context context, Item item, Relationship relationship,
-                                              List<Item> itemsToUpdate, int max, int currentDepth, int maxDepth)
+    /**
+     * Search for items whose metadata should be updated in discovery and adds them to itemsToUpdate
+     * It starts from the given item, excludes items already in itemsToUpdate (they're already handled),
+     * and can be limited in amount of items or depth to update
+     *
+     * The given item was found at the right-hand-side of the given relationship
+     */
+    private void findModifiedDiscoveryItemsForCurrentItem(Context context, Item item, List<Item> itemsToUpdate,
+                                                          int max, int currentDepth, int maxDepth)
         throws SQLException {
         if (itemsToUpdate.size() >= max) {
-            log.debug("skipping findRelatedItemsForRightItem for item "
+            log.debug("skipping findModifiedDiscoveryItemsForCurrentItem for item "
                     + item.getID() + " due to " + itemsToUpdate.size() + " items to be updated");
             return;
         }
         if (currentDepth == maxDepth) {
-            log.debug("skipping findRelatedItemsForRightItem for item "
+            log.debug("skipping findModifiedDiscoveryItemsForCurrentItem for item "
                     + item.getID() + " due to " + currentDepth + " depth");
             return;
         }
-        EntityType leftType = relationship.getRelationshipType().getLeftType();
         String entityTypeStringFromMetadata = relationshipMetadataService.getEntityTypeStringFromMetadata(item);
         EntityType actualEntityType = entityTypeService.findByEntityType(context, entityTypeStringFromMetadata);
+        // Get all types of relations for the current item
         List<RelationshipType> relationshipTypes = relationshipTypeService.findByEntityType(context, actualEntityType);
         for (RelationshipType relationshipType : relationshipTypes) {
-            if (virtualMetadataPopulator.getMap().containsKey(relationshipType.getRightwardType())) {
-                boolean isLeft = relationshipType.getLeftType().equals(actualEntityType); //was always true
+            //are we searching for items where the current item is on the left
+            boolean isLeft = relationshipType.getLeftType().equals(actualEntityType);
+
+            // Verify whether there's virtual metadata configured for this type of relation
+            // If it's not present, we don't need to update the virtual metadata in discovery
+            String typeToSearchInVirtualMetadata;
+            if (isLeft) {
+                typeToSearchInVirtualMetadata = relationshipType.getRightwardType();
+            } else {
+                typeToSearchInVirtualMetadata = relationshipType.getLeftwardType();
+            }
+            if (virtualMetadataPopulator.getMap().containsKey(typeToSearchInVirtualMetadata)) {
                 List<Relationship> list = findByItemAndRelationshipType(context, item, relationshipType, isLeft);
                 for (Relationship foundRelationship : list) {
                     if (isLeft) {
                         if (!itemsToUpdate.contains(foundRelationship.getRightItem())) {
                             itemsToUpdate.add(foundRelationship.getRightItem());
-                            findRelatedItemsForRightItem(context, foundRelationship.getRightItem(),
-                                    foundRelationship, itemsToUpdate, max, currentDepth + 1, maxDepth);
+                            findModifiedDiscoveryItemsForCurrentItem(context, foundRelationship.getRightItem(),
+                                    itemsToUpdate, max, currentDepth + 1, maxDepth);
                         }
                     } else {
                         if (!itemsToUpdate.contains(foundRelationship.getLeftItem())) {
                             itemsToUpdate.add(foundRelationship.getLeftItem());
-                            findRelatedItemsForLeftItem(context, foundRelationship.getLeftItem(),
-                                    foundRelationship, itemsToUpdate, max, currentDepth + 1, maxDepth);
+                            findModifiedDiscoveryItemsForCurrentItem(context, foundRelationship.getLeftItem(),
+                                    itemsToUpdate, max, currentDepth + 1, maxDepth);
                         }
                     }
                 }
             } else {
-                log.debug("skipping " + relationshipType.getID() + " in findRelatedItemsForRightItem for item "
+                log.debug("skipping " + relationshipType.getID()
+                        + " in findModifiedDiscoveryItemsForCurrentItem for item "
                         + item.getID() + " because no relevant virtual metadata was found");
             }
         }
     }
 
-    private void findRelatedItemsForLeftItem(Context context, Item item, Relationship relationship,
-                                             List<Item> itemsToUpdate, int max, int currentDepth, int maxDepth)
-        throws SQLException {
-        if (itemsToUpdate.size() >= max) {
-            log.debug("skipping findRelatedItemsForLeftItem for item "
-                    + item.getID() + " due to " + itemsToUpdate.size() + " items to be updated");
-            return;
-        }
-        if (currentDepth == maxDepth) {
-            log.debug("skipping findRelatedItemsForLeftItem for item "
-                    + item.getID() + " due to " + currentDepth + " depth");
-            return;
-        }
-        EntityType rightType = relationship.getRelationshipType().getRightType();
-        String entityTypeStringFromMetadata = relationshipMetadataService.getEntityTypeStringFromMetadata(item);
-        EntityType actualEntityType = entityTypeService.findByEntityType(context, entityTypeStringFromMetadata);
-        List<RelationshipType> relationshipTypes = relationshipTypeService.findByEntityType(context, actualEntityType);
-        for (RelationshipType relationshipType : relationshipTypes) {
-            if (virtualMetadataPopulator.getMap().containsKey(relationshipType.getLeftwardType())) {
-                boolean isLeft = relationshipType.getRightType().equals(actualEntityType); //was always false
-                List<Relationship> list = findByItemAndRelationshipType(context, item, relationshipType, isLeft);
-                for (Relationship foundRelationship : list) {
-                    if (isLeft) {
-                        if (!itemsToUpdate.contains(foundRelationship.getRightItem())) {
-                            itemsToUpdate.add(foundRelationship.getRightItem());
-                            findRelatedItemsForRightItem(context, foundRelationship.getRightItem(),
-                                    foundRelationship, itemsToUpdate, max, currentDepth + 1, maxDepth);
-                        }
-                    } else {
-                        if (!itemsToUpdate.contains(foundRelationship.getLeftItem())) {
-                            itemsToUpdate.add(foundRelationship.getLeftItem());
-                            findRelatedItemsForLeftItem(context, foundRelationship.getLeftItem(),
-                                    foundRelationship, itemsToUpdate, max, currentDepth + 1, maxDepth);
-                        }
-                    }
-                }
-            } else {
-                log.debug("skipping " + relationshipType.getID() + " in findRelatedItemsForLeftItem for item "
-                        + item.getID() + " because no relevant virtual metadata was found");
-            }
-        }
-    }
     /**
      * Converts virtual metadata from RelationshipMetadataValue objects to actual item metadata.
      *
