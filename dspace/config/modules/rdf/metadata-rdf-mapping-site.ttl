@@ -1,0 +1,63 @@
+@prefix rdf:        <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:       <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:        <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:        <http://www.w3.org/2001/XMLSchema#> .
+@prefix dc:         <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms:    <http://purl.org/dc/terms/> .
+@prefix bibo:       <http://purl.org/ontology/bibo/> .
+
+@prefix dm:         <http://digital-repositories.org/ontologies/dspace-metadata-mapping/0.2.0#> .
+
+@prefix :           <#> .
+
+:name
+  dm:metadataName "dspace.name" ;
+  dm:creates [
+    dm:subject dm:DSpaceObjectIRI ;
+    dm:predicate dcterms:title ;
+    dm:object dm:DSpaceValue ;
+  ] ;
+  .
+
+:hostname
+  dm:metadataName "dspace.hostname" ;
+  dm:creates [
+    dm:subject dm:DSpaceObjectIRI ;
+    dm:predicate bibo:handle ;
+    dm:object dm:DSpaceValue ;
+  ];
+  .
+
+:handle
+  dm:metadataName "dspace.handle" ;
+  dm:creates [
+    dm:subject dm:DSpaceObjectIRI ;
+    dm:predicate bibo:handle ;
+    dm:object dm:DSpaceValue ;
+  ];
+  .
+
+:languageISO
+  dm:metadataName "dc.language.iso" ;
+  dm:creates [
+    dm:subject dm:DSpaceObjectIRI ;
+    dm:predicate dc:language ;
+    dm:object [
+      a dm:LiteralGenerator ;
+      dm:modifier [
+        dm:matcher "^(..)_(.*)$" ;
+        dm:replacement "$1-$2";
+      ];
+      dm:pattern "$DSpaceValue";
+    ];
+  ];
+  .
+
+:language
+  dm:metadataName "dc.language" ;
+  dm:creates [
+    dm:subject dm:DSpaceObjectIRI ;
+    dm:predicate dc:language ;
+    dm:object dm:DSpaceValue ;
+  ];
+  .

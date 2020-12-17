@@ -228,7 +228,7 @@
     dm:object dm:DSpaceValue ;
   ];
   .
-  
+
 :issn
   dm:metadataName "dc.identifier.issn" ;
   dm:creates [
@@ -284,7 +284,7 @@
     dm:object dm:DSpaceValue ;
   ];
   .
-  
+
 :publisher
   dm:metadataName "dc.publisher" ;
   dm:creates [
@@ -293,7 +293,7 @@
     dm:object dm:DSpaceValue ;
   ];
   .
-  
+
 :hasPart
   dm:metadataName "dc.relation.haspart";
   dm:creates [
