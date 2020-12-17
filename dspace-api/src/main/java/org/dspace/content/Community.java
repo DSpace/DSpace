@@ -207,6 +207,37 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     }
 
     /**
+     * Return an array of collections of this community and its subcommunities
+     *
+     * @return array of Collection objects
+     */
+    public List<Collection> getAllCollections()
+    {
+        List<Collection> collectionList = new ArrayList<>();
+        for (Community subcommunity : getSubcommunities())
+        {
+            addCollectionList(subcommunity, collectionList);
+        }
+
+        collectionList.addAll(getCollections());
+
+        return collectionList;
+    }
+
+    /**
+     * Internal method to process subcommunities recursively
+     */
+    private void addCollectionList(Community community, List<Collection> collectionList)
+    {
+        for (Community subcommunity : community.getSubcommunities())
+        {
+            addCollectionList(subcommunity, collectionList);
+        }
+
+        collectionList.addAll(community.getCollections());
+    }
+
+    /**
      * Return <code>true</code> if <code>other</code> is the same Community
      * as this object, <code>false</code> otherwise
      * 
