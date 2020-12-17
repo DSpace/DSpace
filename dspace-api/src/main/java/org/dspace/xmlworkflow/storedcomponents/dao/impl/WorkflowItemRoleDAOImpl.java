@@ -38,7 +38,7 @@ public class WorkflowItemRoleDAOImpl extends AbstractHibernateDAO<WorkflowItemRo
         Criteria criteria = createCriteria(context, WorkflowItemRole.class);
         criteria.add(Restrictions.and(
                         Restrictions.eq("workflowItem", workflowItem),
-                        Restrictions.eq("role", role)
+                        Restrictions.eq("roleId", role)
                 )
         );
 
