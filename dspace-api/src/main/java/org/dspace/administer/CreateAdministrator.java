@@ -14,10 +14,13 @@ import java.util.Locale;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.ParseException;
 
 import org.apache.commons.lang.StringUtils;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
@@ -31,7 +34,7 @@ import org.dspace.eperson.service.GroupService;
  * DSpace site. Prompts for an e-mail address, last name, first name and
  * password from standard input. An administrator group is then created and the
  * data passed in used to create an e-person in that group.
- * <P>
+ *
  * Alternatively, it can be used to take the email, first name, last name and
  * desired password as arguments thus:
  * 
@@ -42,6 +45,7 @@ import org.dspace.eperson.service.GroupService;
  * 
  * @author Robert Tansley
  * @author Richard Jones
+ * @author Hrafn Malmquist
  * 
  * @version $Revision$
  */
@@ -64,20 +68,42 @@ public final class CreateAdministrator
     public static void main(String[] argv)
     	throws Exception
     {
-    	CommandLineParser parser = new PosixParser();
+    	CommandLineParser parser = new DefaultParser();
     	Options options = new Options();
     	
     	CreateAdministrator ca = new CreateAdministrator();
     	
     	options.addOption("e", "email", true, "administrator email address");
     	options.addOption("f", "first", true, "administrator first name");
+		options.addOption("h", "help", false, "prints this help information");
     	options.addOption("l", "last", true, "administrator last name");
     	options.addOption("c", "language", true, "administrator language");
     	options.addOption("p", "password", true, "administrator password");
+
+    	CommandLine line = null;
+
+		try
+		{
+			line = parser.parse(options, argv);
+		}
+		catch (ParseException e)
+		{
+			System.out.println(e.getMessage() + "\nTry \"dspace create-administrator -h\" to print help information.");
+			System.exit(1);
+		}
     	
-    	CommandLine line = parser.parse(options, argv);
-    	
-    	if (line.hasOption("e") && line.hasOption("f") && line.hasOption("l") &&
+    	if(line.hasOption("h"))
+		{
+			String header = "\nA command-line tool for creating an initial administrator for setting up a" +
+					" DSpace site. Unless all the required parameters are passed it will prompt for an e-mail" +
+					" address, last name, first name and password from standard input. An administrator group is" +
+					" then created and the data passed in used to create an e-person in that group.\n\n";
+			String footer = "\n";
+
+			HelpFormatter formatter = new HelpFormatter();
+			formatter.printHelp("dspace create-administrator", header, options, footer, true);
+		}
+		else if (line.hasOption("e") && line.hasOption("f") && line.hasOption("l") &&
     			line.hasOption("c") && line.hasOption("p"))
     	{
     		ca.createAdministrator(line.getOptionValue("e"),
@@ -86,7 +112,14 @@ public final class CreateAdministrator
     	}
     	else
     	{
-    		ca.negotiateAdministratorDetails();
+    		try
+			{
+				ca.negotiateAdministratorDetails();
+			}
+    		catch (Exception e)
+			{
+    			System.out.println(e.getMessage());
+			}
     	}
     }
     
@@ -113,8 +146,13 @@ public final class CreateAdministrator
     	throws Exception
     {
         Console console = System.console();
-    	
-    	System.out.println("Creating an initial administrator account");
+
+		if(console == null)
+		{
+			throw new Exception("Can not configure a console in running environment.");
+		}
+
+		System.out.println("Creating an initial administrator account");
     	
     	boolean dataOK = false;
     	
@@ -160,12 +198,15 @@ public final class CreateAdministrator
             {
                 lastName = lastName.trim();
             }
-   		
-            if (ConfigurationManager.getProperty("webui.supported.locales") != null)
-            {
-                System.out.println("Select one of the following languages: " + ConfigurationManager.getProperty("webui.supported.locales"));
-                System.out.print("Language: ");
-                System.out.flush();
+
+			ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+			if (configurationService.getProperty("webui.supported.locales") != null)
+			{
+				System.out.println("Select one of the following languages: "
+						+ configurationService.getProperty("webui.supported.locales"));
+				System.out.print("Language: ");
+				System.out.flush();
             
     		    language = console.readLine();
 
