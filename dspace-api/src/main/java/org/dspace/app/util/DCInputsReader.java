@@ -413,7 +413,7 @@ public class DCInputsReader
                                         }
                                         else
                                         {
-                                                field.put(PAIR_TYPE_NAME, pairTypeName);
+                                                field.put("language-value-pairs-name", pairTypeName);
                                         }
                                 }
                         }
