@@ -375,15 +375,16 @@ public class RelationshipServiceImpl implements RelationshipService {
         // authorization system here so that this failure doesn't happen when the items need to be update
         context.turnOffAuthorisationSystem();
         try {
-            int max = configurationService.getIntProperty("relationship.update.relateditems.max", 5);
+            int max = configurationService.getIntProperty("relationship.update.relateditems.max", 10);
+            int maxDepth = configurationService.getIntProperty("relationship.update.relateditems.maxdepth", 3);
             List<Item> itemsToUpdate = new LinkedList<>();
             itemsToUpdate.add(relationship.getLeftItem());
             itemsToUpdate.add(relationship.getRightItem());
 
-            itemsToUpdate = getRelatedItemsForLeftItem(context, relationship.getLeftItem(),
-                                                       relationship, itemsToUpdate, max);
-            itemsToUpdate = getRelatedItemsForRightItem(context, relationship.getRightItem(),
-                                                        relationship, itemsToUpdate, max);
+            getRelatedItemsForLeftItem(context, relationship.getLeftItem(),
+                                                       relationship, itemsToUpdate, max, 0, maxDepth);
+            getRelatedItemsForRightItem(context, relationship.getRightItem(),
+                                                        relationship, itemsToUpdate, max, 0, maxDepth);
 
             for (Item item : itemsToUpdate) {
                 if (!item.isMetadataModified()) {
@@ -398,9 +399,12 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     private List<Item> getRelatedItemsForRightItem(Context context, Item item, Relationship relationship,
-                                                   List<Item> itemsToUpdate, int max)
+                                                   List<Item> itemsToUpdate, int max, int currentDepth, int maxDepth)
         throws SQLException {
         if (itemsToUpdate.size() >= max) {
+            return itemsToUpdate;
+        }
+        if (currentDepth == maxDepth) {
             return itemsToUpdate;
         }
         List<RelationshipType> relationshipTypes = new LinkedList<>();
@@ -420,13 +424,17 @@ public class RelationshipServiceImpl implements RelationshipService {
                 List<Relationship> list = findByItemAndRelationshipType(context, item, relationshipType, isLeft);
                 for (Relationship foundRelationship : list) {
                     if (isLeft) {
-                        itemsToUpdate.add(foundRelationship.getRightItem());
-                        itemsToUpdate.addAll(getRelatedItemsForRightItem(context, foundRelationship.getRightItem(),
-                                foundRelationship, itemsToUpdate, max));
+                        if (!itemsToUpdate.contains(foundRelationship.getRightItem())) {
+                            itemsToUpdate.add(foundRelationship.getRightItem());
+                        }
+                        getRelatedItemsForRightItem(context, foundRelationship.getRightItem(),
+                                foundRelationship, itemsToUpdate, max, currentDepth + 1, maxDepth);
                     } else {
-                        itemsToUpdate.add(foundRelationship.getLeftItem());
-                        itemsToUpdate.addAll(getRelatedItemsForLeftItem(context, foundRelationship.getLeftItem(),
-                                foundRelationship, itemsToUpdate, max));
+                        if (!itemsToUpdate.contains(foundRelationship.getLeftItem())) {
+                            itemsToUpdate.add(foundRelationship.getLeftItem());
+                        }
+                        getRelatedItemsForLeftItem(context, foundRelationship.getLeftItem(),
+                                foundRelationship, itemsToUpdate, max, currentDepth + 1, maxDepth);
                     }
                 }
             }
@@ -435,7 +443,7 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     private List<Item> getRelatedItemsForLeftItem(Context context, Item item, Relationship relationship,
-                                                  List<Item> itemsToUpdate, int max)
+                                                  List<Item> itemsToUpdate, int max, int currentDepth, int maxDepth)
         throws SQLException {
         if (itemsToUpdate.size() >= max) {
             return itemsToUpdate;
@@ -459,11 +467,11 @@ public class RelationshipServiceImpl implements RelationshipService {
                     if (isLeft) {
                         itemsToUpdate.add(foundRelationship.getRightItem());
                         itemsToUpdate.addAll(getRelatedItemsForRightItem(context, foundRelationship.getRightItem(),
-                                foundRelationship, itemsToUpdate, max));
+                                foundRelationship, itemsToUpdate, max, currentDepth + 1, maxDepth));
                     } else {
                         itemsToUpdate.add(foundRelationship.getLeftItem());
                         itemsToUpdate.addAll(getRelatedItemsForLeftItem(context, foundRelationship.getLeftItem(),
-                                foundRelationship, itemsToUpdate, max));
+                                foundRelationship, itemsToUpdate, max, currentDepth + 1, maxDepth));
                     }
                 }
             }
