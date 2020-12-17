@@ -437,6 +437,9 @@ public class RelationshipServiceImpl implements RelationshipService {
                                 foundRelationship, itemsToUpdate, max, currentDepth + 1, maxDepth);
                     }
                 }
+            } else {
+                log.debug("skipping " + relationshipType.getID() + " in getRelatedItemsForRightItem for item "
+                        + item.getID());
             }
         }
         return itemsToUpdate;
@@ -446,6 +449,9 @@ public class RelationshipServiceImpl implements RelationshipService {
                                                   List<Item> itemsToUpdate, int max, int currentDepth, int maxDepth)
         throws SQLException {
         if (itemsToUpdate.size() >= max) {
+            return itemsToUpdate;
+        }
+        if (currentDepth == maxDepth) {
             return itemsToUpdate;
         }
         List<RelationshipType> relationshipTypes = new LinkedList<>();
@@ -474,6 +480,9 @@ public class RelationshipServiceImpl implements RelationshipService {
                                 foundRelationship, itemsToUpdate, max, currentDepth + 1, maxDepth));
                     }
                 }
+            } else {
+                log.debug("skipping " + relationshipType.getID() + " in getRelatedItemsForLeftItem for item "
+                        + item.getID());
             }
         }
         return itemsToUpdate;
