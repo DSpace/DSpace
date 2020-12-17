@@ -24,20 +24,18 @@
     xmlns:mets="http://www.loc.gov/METS/"
     xmlns:dim="http://www.dspace.org/xmlns/dspace/dim"
     xmlns:xlink="http://www.w3.org/TR/xlink/"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="3.0"
     xmlns:atom="http://www.w3.org/2005/Atom"
     xmlns:ore="http://www.openarchives.org/ore/terms/"
     xmlns:oreatom="http://www.openarchives.org/ore/atom/"
     xmlns="http://www.w3.org/1999/xhtml"
     xmlns:xalan="http://xml.apache.org/xalan"
-    xmlns:encoder="xalan://java.net.URLEncoder"
-    xmlns:util="org.dspace.app.xmlui.utils.XSLUtils"
-    xmlns:confman="org.dspace.core.ConfigurationManager"
-    exclude-result-prefixes="xalan encoder i18n dri mets dim xlink xsl util confman">
+    xmlns:util="http://www.dspace.org/xmlns/dspace"
+    exclude-result-prefixes="xalan i18n dri mets dim xlink xsl util">
 
     <xsl:output indent="yes"/>
 
-    <!--these templates are modfied to support the 2 different item list views that
+    <!--these templates are modified to support the 2 different item list views that
     can be configured with the property 'xmlui.theme.mirage.item-list.emphasis' in dspace.cfg-->
 
     <xsl:template name="itemSummaryList-DIM">
@@ -54,9 +52,8 @@
             </xsl:choose>
         </xsl:variable>
 
-        <xsl:variable name="emphasis" select="confman:getProperty('xmlui.theme.mirage.item-list.emphasis')"/>
         <xsl:choose>
-            <xsl:when test="'file' = $emphasis">
+            <xsl:when test="'file' = $pagemeta/dri:metadata[@element='item-list'][@qualifier='emphasis']">
 
 
                 <div class="item-wrapper clearfix">

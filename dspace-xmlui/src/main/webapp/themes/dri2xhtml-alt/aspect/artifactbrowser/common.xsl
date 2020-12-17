@@ -25,15 +25,13 @@
     xmlns:mets="http://www.loc.gov/METS/"
     xmlns:dim="http://www.dspace.org/xmlns/dspace/dim"
     xmlns:xlink="http://www.w3.org/TR/xlink/"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="3.0"
     xmlns:atom="http://www.w3.org/2005/Atom"
     xmlns:ore="http://www.openarchives.org/ore/terms/"
     xmlns:oreatom="http://www.openarchives.org/ore/atom/"
     xmlns="http://www.w3.org/1999/xhtml"
     xmlns:xalan="http://xml.apache.org/xalan"
-    xmlns:encoder="xalan://java.net.URLEncoder"
-    xmlns:confman="org.dspace.core.ConfigurationManager"
-    exclude-result-prefixes="i18n dri mets dim xlink xsl xalan encoder confman">
+    exclude-result-prefixes="i18n dri mets dim xlink xsl xalan">
 
     <xsl:output indent="yes"/>
 
@@ -189,7 +187,7 @@
 
     <xsl:template match="dri:reference" mode="summaryView">
         <!-- simplified check to verify whether access rights are available in METS -->
-        <xsl:variable name='METSRIGHTS-enabled' select="contains(confman:getProperty('plugin.named.org.dspace.content.crosswalk.DisseminationCrosswalk'), 'METSRIGHTS')" />
+        <xsl:variable name="METSRIGHTS-enabled" select="$pagemeta/dri:metadata[@element='METSRIGHTS-enabled'][not(@qualifier)] = 'true'"/>
         <xsl:variable name="externalMetadataURL">
             <xsl:text>cocoon:/</xsl:text>
             <xsl:value-of select="@url"/>

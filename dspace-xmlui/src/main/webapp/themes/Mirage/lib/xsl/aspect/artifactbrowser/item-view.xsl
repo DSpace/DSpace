@@ -23,27 +23,24 @@
     xmlns:mets="http://www.loc.gov/METS/"
     xmlns:dim="http://www.dspace.org/xmlns/dspace/dim"
     xmlns:xlink="http://www.w3.org/TR/xlink/"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="3.0"
     xmlns:atom="http://www.w3.org/2005/Atom"
     xmlns:ore="http://www.openarchives.org/ore/terms/"
     xmlns:oreatom="http://www.openarchives.org/ore/atom/"
     xmlns="http://www.w3.org/1999/xhtml"
     xmlns:xalan="http://xml.apache.org/xalan"
-    xmlns:encoder="xalan://java.net.URLEncoder"
-    xmlns:util="org.dspace.app.xmlui.utils.XSLUtils"
-    xmlns:jstring="java.lang.String"
+    xmlns:util="http://www.dspace.org/xmlns/dspace"
     xmlns:rights="http://cosimo.stanford.edu/sdr/metsrights/"
-    xmlns:confman="org.dspace.core.ConfigurationManager"
-    exclude-result-prefixes="xalan encoder i18n dri mets dim xlink xsl util jstring rights confman">
+    exclude-result-prefixes="xalan i18n dri mets dim xlink xsl util rights">
 
     <xsl:output indent="yes"/>
 
     <xsl:template name="itemSummaryView-DIM">
         <!-- optional: Altmeric.com badge and PlumX widget -->
-        <xsl:if test='confman:getProperty("altmetric.enabled") and ($identifier_doi or $identifier_handle)'>
+        <xsl:if test='$altmetric.enabled and ($identifier_doi or $identifier_handle)'>
             <xsl:call-template name='impact-altmetric'/>
         </xsl:if>
-        <xsl:if test='confman:getProperty("plumx.enabled") and $identifier_doi'>
+        <xsl:if test='$plumx.enabled and $identifier_doi'>
             <xsl:call-template name='impact-plumx'/>
         </xsl:if>
 
@@ -95,7 +92,7 @@
     </xsl:template>
 
     <xsl:template name="itemSummaryView-DIM-fields">
-      <xsl:param name="clause" select="'1'"/>
+      <xsl:param name="clause" select="1"/>
       <xsl:param name="phase" select="'even'"/>
       <xsl:variable name="otherPhase">
             <xsl:choose>
@@ -531,7 +528,7 @@
     </xsl:template>
 
     <xsl:template name="display-rights">
-        <xsl:variable name="file_id" select="jstring:replaceAll(jstring:replaceAll(string(@ADMID), '_METSRIGHTS', ''), 'rightsMD_', '')"/>
+        <xsl:variable name="file_id" select="replace(replace(string(@ADMID), '_METSRIGHTS', ''), 'rightsMD_', '')"/>
         <xsl:variable name="rights_declaration" select="../../../mets:amdSec/mets:rightsMD[@ID = concat('rightsMD_', $file_id, '_METSRIGHTS')]/mets:mdWrap/mets:xmlData/rights:RightsDeclarationMD"/>
         <xsl:variable name="rights_context" select="$rights_declaration/rights:Context"/>
         <xsl:variable name="users">
@@ -576,33 +573,28 @@
             </script>
             <div id='altmetric'
                  class='altmetric-embed'>
-                <xsl:variable name='badge_type' select='confman:getProperty("altmetric.badgeType")'/>
-                <xsl:if test='boolean($badge_type)'>
-                    <xsl:attribute name='data-badge-type'><xsl:value-of select='$badge_type'/></xsl:attribute>
+                <xsl:if test='boolean($altmetric.badgeType)'>
+                    <xsl:attribute name='data-badge-type'><xsl:value-of select='$altmetric.badgeType'/></xsl:attribute>
                 </xsl:if>
 
-                <xsl:variable name='badge_popover' select='confman:getProperty("altmetric.popover")'/>
-                <xsl:if test='$badge_popover'>
-                    <xsl:attribute name='data-badge-popover'><xsl:value-of select='$badge_popover'/></xsl:attribute>
+                <xsl:if test='$altmetric.popover'>
+                    <xsl:attribute name='data-badge-popover'><xsl:value-of select='$altmetric.popover'/></xsl:attribute>
                 </xsl:if>
 
-                <xsl:variable name='badge_details' select='confman:getProperty("altmetric.details")'/>
-                <xsl:if test='$badge_details'>
-                    <xsl:attribute name='data-badge-details'><xsl:value-of select='$badge_details'/></xsl:attribute>
+                <xsl:if test='$altmetric.details'>
+                    <xsl:attribute name='data-badge-details'><xsl:value-of select='$altmetric.details'/></xsl:attribute>
                 </xsl:if>
 
-                <xsl:variable name='no_score' select='confman:getProperty("altmetric.noScore")'/>
-                <xsl:if test='$no_score'>
-                    <xsl:attribute name='data-no-score'><xsl:value-of select='$no_score'/></xsl:attribute>
+                <xsl:if test='$altmetric.noScore'>
+                    <xsl:attribute name='data-no-score'><xsl:value-of select='$altmetric.noScore'/></xsl:attribute>
                 </xsl:if>
 
-                <xsl:if test='confman:getProperty("altmetric.hideNoMentions")'>
+                <xsl:if test='$altmetric.hideNoMentions'>
                     <xsl:attribute name='data-hide-no-mentions'>true</xsl:attribute>
                 </xsl:if>
 
-                <xsl:variable name='link_target' select='confman:getProperty("altmetric.linkTarget")'/>
-                <xsl:if test='$link_target'>
-                    <xsl:attribute name='data-link-target'><xsl:value-of select='$link_target'/></xsl:attribute>
+                <xsl:if test='$altmetric.linkTarget'>
+                    <xsl:attribute name='data-link-target'><xsl:value-of select='$altmetric.linkTarget'/></xsl:attribute>
                 </xsl:if>
 
                 <xsl:choose>    <!-- data-doi data-handle data-arxiv-id data-pmid -->
@@ -621,11 +613,10 @@
     <xsl:template name="impact-plumx">
         <div id="impact-plumx" style="clear:right">
             <!-- PlumX <http://plu.mx> -->
-            <xsl:variable name="plumx_type" select="confman:getProperty('plumx.widget-type')"/>
             <xsl:variable name="plumx-script-url">
                 <xsl:choose>
-                    <xsl:when test="boolean($plumx_type)">
-                        <xsl:value-of select="concat($scheme, 'd39af2mgp1pqhg.cloudfront.net/widget-', $plumx_type, '.js')"/>
+                    <xsl:when test="boolean($plumx.widget-type)">
+                        <xsl:value-of select="concat($scheme, 'd39af2mgp1pqhg.cloudfront.net/widget-', $plumx.widget-type, '.js')"/>
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:value-of select="concat($scheme, 'd39af2mgp1pqhg.cloudfront.net/widget-popup.js')"/>
@@ -638,8 +629,8 @@
 
             <xsl:variable name="plumx-class">
                 <xsl:choose>
-                    <xsl:when test="boolean($plumx_type) and ($plumx_type != 'popup')">
-                        <xsl:value-of select="concat('plumx-', $plumx_type)"/>
+                    <xsl:when test="boolean($plumx.widget-type) and ($plumx.widget-type != 'popup')">
+                        <xsl:value-of select="concat('plumx-', $plumx.widget-type)"/>
                     </xsl:when>
                     <xsl:otherwise>plumx-plum-print-popup</xsl:otherwise>
                 </xsl:choose>
@@ -650,30 +641,27 @@
                 <xsl:attribute name="class"><xsl:value-of select="$plumx-class"/></xsl:attribute>
                 <xsl:attribute name="href">https://plu.mx/pitt/a/?doi=<xsl:value-of select="$identifier_doi"/></xsl:attribute>
 
-                <xsl:variable name="plumx_data-popup" select="confman:getProperty('plumx.data-popup')"/>
-                <xsl:if test="$plumx_data-popup">
-                    <xsl:attribute name="data-popup"><xsl:value-of select="$plumx_data-popup"/></xsl:attribute>
+                <xsl:if test="$plumx.data-popup">
+                    <xsl:attribute name="data-popup"><xsl:value-of select="$plumx.data-popup"/></xsl:attribute>
                 </xsl:if>
 
-                <xsl:if test="confman:getProperty('plumx.data-hide-when-empty')">
+                <xsl:if test="$plumx.data-hide-when-empty">
                     <xsl:attribute name="data-hide-when-empty">true</xsl:attribute>
                 </xsl:if>
 
-                <xsl:if test="confman:getProperty('plumx.data-hide-print')">
+                <xsl:if test="$plumx.data-hide-print">
                     <xsl:attribute name="data-hide-print">true</xsl:attribute>
                 </xsl:if>
 
-                <xsl:variable name="plumx_data-orientation" select="confman:getProperty('plumx.data-orientation')"/>
-                <xsl:if test="$plumx_data-orientation">
-                    <xsl:attribute name="data-orientation"><xsl:value-of select="$plumx_data-orientation"/></xsl:attribute>
+                <xsl:if test="$plumx.data-orientation">
+                    <xsl:attribute name="data-orientation"><xsl:value-of select="$plumx.data-orientation"/></xsl:attribute>
                 </xsl:if>
 
-                <xsl:variable name="plumx_data-width" select="confman:getProperty('plumx.data-width')"/>
-                <xsl:if test="$plumx_data-width">
-                    <xsl:attribute name="data-width"><xsl:value-of select="$plumx_data-width"/></xsl:attribute>
+                <xsl:if test="$plumx.data-width">
+                    <xsl:attribute name="data-width"><xsl:value-of select="$plumx.data-width"/></xsl:attribute>
                 </xsl:if>
 
-                <xsl:if test="confman:getProperty('plumx.data-border')">
+                <xsl:if test="$plumx.data-border">
                     <xsl:attribute name="data-border">true</xsl:attribute>
                 </xsl:if>
                 &#xFEFF;

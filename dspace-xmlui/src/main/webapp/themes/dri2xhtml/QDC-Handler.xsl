@@ -21,7 +21,7 @@
     xmlns:dc="http://purl.org/dc/elements/1.1/"
     xmlns:xlink="http://www.w3.org/TR/xlink/"
     xmlns:dcterms="http://purl.org/dc/terms/"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="3.0"
     xmlns="http://www.w3.org/1999/xhtml"
     exclude-result-prefixes="i18n dri mets dc xlink dcterms xsl">
     

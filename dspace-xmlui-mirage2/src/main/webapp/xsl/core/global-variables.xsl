@@ -22,14 +22,13 @@
 	xmlns:dri="http://di.tamu.edu/DRI/1.0/"
 	xmlns:mets="http://www.loc.gov/METS/"
 	xmlns:xlink="http://www.w3.org/TR/xlink/"
-	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="3.0"
 	xmlns:dim="http://www.dspace.org/xmlns/dspace/dim"
 	xmlns:xhtml="http://www.w3.org/1999/xhtml"
 	xmlns:mods="http://www.loc.gov/mods/v3"
 	xmlns:dc="http://purl.org/dc/elements/1.1/"
 	xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:confman="org.dspace.core.ConfigurationManager"
-	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc confman">
+	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc">
 
     <xsl:output indent="yes"/>
 
@@ -39,14 +38,23 @@
 
     <xsl:variable name="theme-path" select="concat($context-path,'/themes/',$pagemeta/dri:metadata[@element='theme'][@qualifier='path'])"/>
 
-    <xsl:variable name="isModal" select="dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='framing'][@qualifier='modal']/text()='true'"/>
+    <xsl:variable name="isModal" select="$pagemeta/dri:metadata[@element='framing'][@qualifier='modal']/text()='true'"/>
+
+    <!--<xsl:variable name="METSRIGHTS-enabled" select="$pagemeta/dri:metadata[@element='METSRIGHTS-enabled'][not(@qualifier)] = 'true'"/>
+
+    <xsl:variable name="render-scientific-formulas" select="$pagemeta/dri:metadata[@element='browse'][@qualifier='render-scientific-formulas'] = 'true'"/>
+
+    <xsl:variable name="item-list-emphasis" select="$pagemeta/dri:metadata[@element='item-list'][@qualifier='emphasis']"/>
+
+    <xsl:variable name="item-view-label-1" select="$pagemeta/dri:metadata[@element='item-view'][@qualifier='label-1']"/>
+    <xsl:variable name="item-view-label-2" select="$pagemeta/dri:metadata[@element='item-view'][@qualifier='label-2']"/>-->
 
     <!--the max thumbnail height & width from dspace.cfg, needed for item view and item list pages-->
-    <xsl:variable name="thumbnail.maxheight" select="confman:getIntProperty('thumbnail.maxheight', 80)"/>
-    <xsl:variable name="thumbnail.maxwidth" select="confman:getIntProperty('thumbnail.maxwidth', 80)"/>
+    <xsl:variable name="thumbnail.maxheight" select="$pagemeta/dri:metadata[@element='thumbnail'][@qualifier='maxheight']"/>
+    <xsl:variable name="thumbnail.maxwidth" select="$pagemeta/dri:metadata[@element='thumbnail'][@qualifier='maxwidth']"/>
     <!-- item details url -->
-    <xsl:variable name="ds_item_view_toggle_url" select="//dri:p[contains(@rend , 'item-view-toggle') and
-        (preceding-sibling::dri:referenceSet[@type = 'summaryView'] or following-sibling::dri:referenceSet[@type = 'summaryView'])]/dri:xref/@target"/>
+    <!--<xsl:variable name="ds_item_view_toggle_url" select="//dri:p[contains(@rend , 'item-view-toggle') and
+        (preceding-sibling::dri:referenceSet[@type = 'summaryView'] or following-sibling::dri:referenceSet[@type = 'summaryView'])]/dri:xref/@target"/>-->
 
     <!--
         Full URI of the current page. Composed of scheme, server name and port and request URI.

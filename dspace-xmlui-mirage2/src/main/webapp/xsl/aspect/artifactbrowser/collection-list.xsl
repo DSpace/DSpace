@@ -25,16 +25,14 @@
     xmlns:mets="http://www.loc.gov/METS/"
     xmlns:dim="http://www.dspace.org/xmlns/dspace/dim"
     xmlns:xlink="http://www.w3.org/TR/xlink/"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="3.0"
     xmlns:atom="http://www.w3.org/2005/Atom"
     xmlns:ore="http://www.openarchives.org/ore/terms/"
     xmlns:oreatom="http://www.openarchives.org/ore/atom/"
     xmlns="http://www.w3.org/1999/xhtml"
     xmlns:xalan="http://xml.apache.org/xalan"
-    xmlns:encoder="xalan://java.net.URLEncoder"
-    xmlns:util="org.dspace.app.xmlui.utils.XSLUtils"
-    xmlns:confman="org.dspace.core.ConfigurationManager"
-    exclude-result-prefixes="xalan encoder i18n dri mets dim xlink xsl util confman">
+    xmlns:util="http://www.dspace.org/xmlns/dspace"
+    exclude-result-prefixes="xalan i18n dri mets dim xlink xsl util">
 
     <xsl:output indent="yes"/>
 
@@ -66,7 +64,8 @@
             <xsl:if test="$abstract and string-length($abstract[1]) &gt; 0">
                 <div class="artifact-info">
                     <span class="short-description text-muted">
-                        <xsl:value-of select="util:shortenString($abstract, 220, 10)"/>
+                        <!--<xsl:value-of select="util:shortenString($abstract, 220, 10)"/>-->
+                        <xsl:value-of select="$abstract"/>
                     </span>
                 </div>
             </xsl:if>

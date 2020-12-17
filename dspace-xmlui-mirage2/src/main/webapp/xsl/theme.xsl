@@ -19,7 +19,7 @@
 	xmlns:dri="http://di.tamu.edu/DRI/1.0/"
 	xmlns:mets="http://www.loc.gov/METS/"
 	xmlns:xlink="http://www.w3.org/TR/xlink/"
-	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="3.0"
 	xmlns:dim="http://www.dspace.org/xmlns/dspace/dim"
 	xmlns:xhtml="http://www.w3.org/1999/xhtml"
 	xmlns:mods="http://www.loc.gov/mods/v3"
@@ -31,19 +31,19 @@
     <xsl:import href="aspect/artifactbrowser/artifactbrowser.xsl"/>
     <xsl:import href="core/global-variables.xsl"/>
     <xsl:import href="core/elements.xsl"/>
+    <xsl:import href="aspect/general/choice-authority-control.xsl"/>
     <xsl:import href="core/forms.xsl"/>
     <xsl:import href="core/page-structure.xsl"/>
     <xsl:import href="core/navigation.xsl"/>
     <xsl:import href="core/attribute-handlers.xsl"/>
     <xsl:import href="core/utils.xsl"/>
-    <xsl:import href="aspect/general/choice-authority-control.xsl"/>
     <xsl:import href="aspect/general/vocabulary-support.xsl"/>
     <!--<xsl:import href="xsl/aspect/administrative/administrative.xsl"/>-->
-    <xsl:import href="aspect/artifactbrowser/common.xsl"/>
+    <!--<xsl:import href="aspect/artifactbrowser/common.xsl"/>
     <xsl:import href="aspect/artifactbrowser/item-list.xsl"/>
     <xsl:import href="aspect/artifactbrowser/item-view.xsl"/>
     <xsl:import href="aspect/artifactbrowser/community-list.xsl"/>
-    <xsl:import href="aspect/artifactbrowser/collection-list.xsl"/>
+    <xsl:import href="aspect/artifactbrowser/collection-list.xsl"/>-->
     <xsl:import href="aspect/artifactbrowser/browse.xsl"/>
     <xsl:import href="aspect/discovery/discovery.xsl"/>
     <xsl:import href="aspect/artifactbrowser/one-offs.xsl"/>

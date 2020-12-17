@@ -21,7 +21,7 @@
 	xmlns:dri="http://di.tamu.edu/DRI/1.0/"
 	xmlns:mets="http://www.loc.gov/METS/"
 	xmlns:xlink="http://www.w3.org/TR/xlink/"
-	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="3.0"
 	xmlns:dim="http://www.dspace.org/xmlns/dspace/dim"
 	xmlns:xhtml="http://www.w3.org/1999/xhtml"
 	xmlns:mods="http://www.loc.gov/mods/v3"
@@ -98,6 +98,7 @@
 
     <xsl:template name="addLookupButtonAuthor">
         <xsl:param name="isName" select="'missing value'"/>
+        <xsl:param name="confIndicator" select="''"/>
         <input type="button" name="{concat('lookup_',@n)}" class="ds-button-field ds-add-button" >
             <xsl:attribute name="value">
                 <xsl:text>Lookup</xsl:text>

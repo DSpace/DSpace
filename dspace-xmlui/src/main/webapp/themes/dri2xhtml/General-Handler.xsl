@@ -20,11 +20,10 @@
     xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
     xmlns:mets="http://www.loc.gov/METS/"
     xmlns:xlink="http://www.w3.org/TR/xlink/"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="3.0"
     xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:jstring="java.lang.String"
     xmlns:rights="http://cosimo.stanford.edu/sdr/metsrights/"
-    exclude-result-prefixes="i18n dri mets xlink xsl jstring rights">
+    exclude-result-prefixes="i18n dri mets xlink xsl rights">
     
     <xsl:output indent="yes"/>
     
@@ -205,7 +204,7 @@
     </xsl:template>
 
     <xsl:template name="display-rights">
-        <xsl:variable name="file_id" select="jstring:replaceAll(jstring:replaceAll(string(@ADMID), '_METSRIGHTS', ''), 'rightsMD_', '')"/>
+        <xsl:variable name="file_id" select="replace(replace(string(@ADMID), '_METSRIGHTS', ''), 'rightsMD_', '')"/>
         <xsl:variable name="rights_declaration" select="../../../mets:amdSec/mets:rightsMD[@ID = concat('rightsMD_', $file_id, '_METSRIGHTS')]/mets:mdWrap/mets:xmlData/rights:RightsDeclarationMD"/>
         <xsl:variable name="rights_context" select="$rights_declaration/rights:Context"/>
         <xsl:variable name="users">

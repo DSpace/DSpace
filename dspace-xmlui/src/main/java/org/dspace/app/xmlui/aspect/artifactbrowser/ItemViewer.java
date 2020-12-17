@@ -372,28 +372,20 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             return;
         }
 
-        Para showfullPara = division.addPara(null, "item-view-toggle item-view-toggle-top");
-
+        ReferenceSet referenceSet;
+        // If show full item is selected we add a paragraph above and below with link to simple view
         if (showFullItem(objectModel))
         {
+            Para showfullPara = division.addPara(null, "item-view-toggle item-view-toggle-top");
             String link = contextPath + "/handle/" + item.getHandle();
             showfullPara.addXref(link).addContent(T_show_simple);
-        }
-        else
-        {
-            String link = contextPath + "/handle/" + item.getHandle()
-                    + "?show=full";
-            showfullPara.addXref(link).addContent(T_show_full);
-        }
 
-        ReferenceSet referenceSet;
-        if (showFullItem(objectModel))
-        {
             referenceSet = division.addReferenceSet("collection-viewer",
                     ReferenceSet.TYPE_DETAIL_VIEW);
         }
         else
         {
+            // Simple view link is added via XSL in item-view.xsl
             referenceSet = division.addReferenceSet("collection-viewer",
                     ReferenceSet.TYPE_SUMMARY_VIEW);
         }
@@ -408,19 +400,14 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             appearsInclude.addReference(collection);
         }
 
-        showfullPara = division.addPara(null,"item-view-toggle item-view-toggle-bottom");
-
+        // Add second paragraph with link to simple view
         if (showFullItem(objectModel))
         {
+            Para showfullPara = division.addPara(null, "item-view-toggle item-view-toggle-bottom");
             String link = contextPath + "/handle/" + item.getHandle();
             showfullPara.addXref(link).addContent(T_show_simple);
         }
-        else
-        {
-            String link = contextPath + "/handle/" + item.getHandle()
-                    + "?show=full";
-            showfullPara.addXref(link).addContent(T_show_full);
-        }
+
     }
 
     /**

@@ -25,6 +25,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.I18nUtil;
 import org.xml.sax.SAXException;
@@ -111,13 +112,74 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         pageMeta.addMetadata("request","serverName").addContent(request.getServerName());
         pageMeta.addMetadata("request","URI").addContent(request.getSitemapURI());
 
+        ConfigurationService cs = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+        // Metadata for Mobile theme added to accommodate Saxon-HE XSLT processor that doesn't play easily with Java classes
+        // Start
+
+        pageMeta.addMetadata("mobileUrl").addContent(cs.getProperty("dspace.mobileUrl"));
+        pageMeta.addMetadata("url").addContent(cs.getProperty("dspace.url"));
+
+        // End
+
+        // Metadata for Mirage2 added to accommodate Saxon-HE XSLT processor that doesn't play easily with Java classes
+        // Start
+
+        pageMeta.addMetadata("thumbnail", "maxheight").addContent(cs.getIntProperty("thumbnail.maxheight", 80));
+        pageMeta.addMetadata("thumbnail", "maxwidth").addContent(cs.getIntProperty("thumbnail.maxwidth", 80));
+
+        pageMeta.addMetadata("item-list", "emphasis").addContent(cs.getProperty("xmlui.theme.mirage.item-list.emphasis", "metadata"));
+
+        pageMeta.addMetadata("item-view","label-1").addContent(cs.getProperty("mirage2.item-view.bitstream.href.label.1"));
+        pageMeta.addMetadata("item-view","label-2").addContent(cs.getProperty("mirage2.item-view.bitstream.href.label.2"));
+
+        pageMeta.addMetadata("browse", "render-scientific-formulas").addContent(cs.getProperty("webui.browse.render-scientific-formulas", "false"));
+
+        pageMeta.addMetadata("METSRIGHTS-enabled").addContent((cs.getProperty("plugin.named.org.dspace.content.crosswalk.DisseminationCrosswalk").contains("METSRIGHTS")) ? "true": "false");
+
+        // End
+
+        // Metadata for Mirage
+
+        pageMeta.addMetadata("scheme").addContent(cs.getProperty("dspace.baseUrl").contains("https://") ? "https://": "http://");
+
+        String altmetricEnabled = cs.getProperty("altmetric.enabled", "false");
+        pageMeta.addMetadata("altmetric", "enabled").addContent(altmetricEnabled);
+
+        if(!altmetricEnabled.equals("false"))   {
+            pageMeta.addMetadata("altmetric", "badgeType").addContent(cs.getProperty("altmetric.badgeType"));
+            pageMeta.addMetadata("altmetric", "popover").addContent(cs.getProperty("altmetric.popover"));
+            pageMeta.addMetadata("altmetric", "details").addContent(cs.getProperty("altmetric.details"));
+            pageMeta.addMetadata("altmetric", "noScore").addContent(cs.getProperty("altmetric.noScore"));
+            pageMeta.addMetadata("altmetric", "hideNoMentions").addContent(cs.getProperty("altmetric.hideNoMentions"));
+            pageMeta.addMetadata("altmetric", "linkTarget").addContent(cs.getProperty("altmetric.linkTarget"));
+
+        }
+
+        String plumxEnabled = cs.getProperty("plumx.enabled", "false");
+        pageMeta.addMetadata("plumx", "enabled").addContent(plumxEnabled);
+
+        if(!plumxEnabled.equals("false"))   {
+            pageMeta.addMetadata("plumx", "widget-type").addContent(cs.getProperty("plumx.widget-type"));
+            pageMeta.addMetadata("plumx", "data-popup").addContent(cs.getProperty("plumx.data-popup"));
+            pageMeta.addMetadata("plumx", "data-hide-when-empty").addContent(cs.getProperty("plumx.data-hide-when-empty"));
+            pageMeta.addMetadata("plumx", "data-hide-print").addContent(cs.getProperty("plumx.data-hide-print"));
+            pageMeta.addMetadata("plumx", "data-orientation").addContent(cs.getProperty("plumx.data-orientation"));
+            pageMeta.addMetadata("plumx", "data-width").addContent(cs.getProperty("plumx.data-width"));
+            pageMeta.addMetadata("plumx", "data-border").addContent(cs.getProperty("plumx.data-border"));
+
+        }
+
+
+        // End
+
         String dspaceVersion = Util.getSourceVersion();
         if (dspaceVersion != null)
         {
             pageMeta.addMetadata("dspace","version").addContent(dspaceVersion);
         }
 
-        String analyticsKey = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("xmlui.google.analytics.key");
+        String analyticsKey = cs.getProperty("xmlui.google.analytics.key");
         if (analyticsKey != null && analyticsKey.length() > 0)
         {
                 analyticsKey = analyticsKey.trim();
@@ -125,10 +187,10 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         }
 
         // add metadata for OpenSearch auto-discovery links if enabled
-        if (DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("websvc.opensearch.autolink"))
+        if (cs.getBooleanProperty("websvc.opensearch.autolink"))
         {
-            pageMeta.addMetadata("opensearch", "shortName").addContent( DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("websvc.opensearch.shortname") );
-            pageMeta.addMetadata("opensearch", "autolink").addContent( "open-search/description.xml" );
+            pageMeta.addMetadata("opensearch", "shortName").addContent(cs.getProperty("websvc.opensearch.shortname"));
+            pageMeta.addMetadata("opensearch", "autolink").addContent( "open-search/description.xml");
         }
 
         pageMeta.addMetadata("page","contactURL").addContent(contextPath + "/contact");

@@ -180,7 +180,7 @@
                 <map:call resource="transform-to-xhtml"/>
 
                 <!-- Step 3: Serialize to the browser (sends final XHTML to user's browser) -->
-                <map:serialize type="xhtml"/>
+                <map:serialize type="html"/>
             </map:match>
         </map:pipeline>
         
