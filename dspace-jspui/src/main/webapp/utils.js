@@ -265,5 +265,19 @@ function isBrowser(b,v) {
 		  return browserOk && versionOk;
 }
 
-
+/*
+ * Add/Update GET parameter of URL
+ */
+function updateURLParam(name, value) {
+ var href = window.location.href;
+ var regex = new RegExp("[&\\?]" + name + "=");
+ if(regex.test(href)) {
+	 regex = new RegExp("([&\\?])" + name + "=[^&]*");
+	 window.location.href = href.replace(regex, "$1" + name + "=" + value);
+ } else if(href.indexOf("?") > -1) {
+	 window.location.href = href + "&" + name + "=" + value;
+ } else {
+	 window.location.href = href + "?" + name + "=" + value;
+ }
+}
 
