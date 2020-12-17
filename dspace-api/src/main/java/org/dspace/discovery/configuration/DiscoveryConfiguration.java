@@ -14,7 +14,7 @@ import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -54,11 +54,14 @@ public class DiscoveryConfiguration implements InitializingBean {
     private boolean indexAlways = false;
 
     /**
-     * The `indexAlways` property determines whether the configuration should always be included when indexing items.
-     * The default value is false which implies the configuration is only used when it matches the collection or if
-     * it's the default configuration
-     * When set to true, the configuration is also used to index an item without a specific collection mapping
-     * This can be used for displaying different facets depending on the type of item instead of the collection
+     * The `indexAlways` property determines whether the configuration should
+     * always be included when indexing items.  The default value is false,
+     * which implies the configuration is only used when it matches the
+     * collection or if it's the default configuration.
+     * When set to true, the configuration is also used to index an item without
+     * a specific collection mapping.  This can be used for displaying different
+     * facets depending on the type of item instead of the collection.
+     * @return true if items without a specific collection mapping should be indexed.
      */
     public boolean isIndexAlways() {
         return indexAlways;
@@ -80,7 +83,7 @@ public class DiscoveryConfiguration implements InitializingBean {
         return sidebarFacets;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setSidebarFacets(List<DiscoverySearchFilterFacet> sidebarFacets) {
         this.sidebarFacets = sidebarFacets;
     }
@@ -96,7 +99,7 @@ public class DiscoveryConfiguration implements InitializingBean {
     public List<String> getDefaultFilterQueries() {
         //Since default filter queries are not mandatory we will return an empty list
         if (defaultFilterQueries == null) {
-            return new ArrayList<String>();
+            return new ArrayList<>();
         } else {
             return defaultFilterQueries;
         }
@@ -128,7 +131,7 @@ public class DiscoveryConfiguration implements InitializingBean {
         return null;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setSearchFilters(List<DiscoverySearchFilter> searchFilters) {
         this.searchFilters = searchFilters;
     }
@@ -137,7 +140,7 @@ public class DiscoveryConfiguration implements InitializingBean {
         return searchSortConfiguration;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setSearchSortConfiguration(DiscoverySortConfiguration searchSortConfiguration) {
         this.searchSortConfiguration = searchSortConfiguration;
     }

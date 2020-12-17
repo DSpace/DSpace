@@ -26,6 +26,7 @@ import java.util.Properties;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.content.Bitstream;
@@ -36,10 +37,11 @@ import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom.Element;
 
 /**
@@ -51,7 +53,7 @@ import org.jdom.Element;
 @SuppressWarnings("deprecation")
 public class GoogleMetadata {
 
-    private final static Logger log = org.apache.logging.log4j.LogManager.getLogger(GoogleMetadata.class);
+    private final static Logger log = LogManager.getLogger(GoogleMetadata.class);
 
     protected static final String GOOGLE_PREFIX = "google.";
 
@@ -62,7 +64,7 @@ public class GoogleMetadata {
     protected String itemURL;
 
     // Configuration keys and fields
-    protected static Map<String, String> googleScholarSettings = new HashMap<String, String>();
+    protected static Map<String, String> googleScholarSettings = new HashMap<>();
 
     // Google field names (e.g. citation_fieldname) and formatted metadata
     // values
@@ -132,35 +134,39 @@ public class GoogleMetadata {
 
     private static GoogleBitstreamComparator googleBitstreamComparator = null;
 
-    // Load configured fields from google-metadata.properties
-    static {
+    private final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-        File loadedFile = null;
-        URL url = null;
-        InputStream is = null;
-
-        String googleConfigFile = ConfigurationManager
+    /**
+     * Load configured fields from google-metadata.properties.
+     */
+    private void loadGoogleScholarSettings()
+            throws MalformedURLException, IOException {
+        String googleConfigFile = configurationService
             .getProperty("google-metadata.config");
-        log.info("Using [" + googleConfigFile
-                     + "] for Google Metadata configuration");
+        log.info("Using [{}] for Google Metadata configuration", googleConfigFile);
 
-        loadedFile = new File(googleConfigFile);
+        File loadedFile = new File(googleConfigFile);
+        URL url;
         try {
-            url = loadedFile.toURL();
+            url = loadedFile.toURI().toURL();
 
         } catch (MalformedURLException mux) {
-            log.error("Can't find Google Metadata configuration file: "
-                          + googleConfigFile, mux);
+            log.error("Can't find Google Metadata configuration file: {}",
+                          googleConfigFile, mux);
+            throw mux;
         }
 
         Properties properties = new Properties();
+        InputStream is;
         try {
             is = url.openStream();
             properties.load(is);
 
         } catch (IOException iox) {
-            log.error("Could not read Google Metadata configuration file: "
-                          + googleConfigFile, iox);
+            log.error("Could not read Google Metadata configuration file: {}",
+                          googleConfigFile, iox);
+            throw iox;
         }
 
         Enumeration propertyNames = properties.propertyNames();
@@ -180,19 +186,21 @@ public class GoogleMetadata {
             }
         }
 
-        if (log.isDebugEnabled()) {
-            logConfiguration();
-        }
+        logConfiguration();
     }
 
     /**
      * Dump Metadata field mapping to log
      */
     public static void logConfiguration() {
+        if (!log.isDebugEnabled()) {
+            return;
+        }
+
         log.debug("Google Metadata Configuration Mapping:");
 
         for (String name : googleScholarSettings.keySet()) {
-            log.debug("  " + name + " => " + googleScholarSettings.get(name));
+            log.debug("  {} => {}", name, googleScholarSettings.get(name));
         }
     }
 
@@ -202,9 +210,14 @@ public class GoogleMetadata {
      *
      * @param context context
      * @param item    The item being viewed to extract metadata from
-     * @throws SQLException if database error
+     * @throws SQLException if database error.
+     * @throws java.io.IOException passed through.
      */
-    public GoogleMetadata(Context context, Item item) throws SQLException {
+    public GoogleMetadata(Context context, Item item)
+            throws SQLException, IOException {
+        if (googleScholarSettings.isEmpty()) {
+            loadGoogleScholarSettings();
+        }
 
         // Hold onto the item in case we need to refresh a stale parse
         this.item = item;
@@ -336,7 +349,7 @@ public class GoogleMetadata {
             int optionMatches = 0;
             String[] components;
             List<MetadataValue> values;
-            ArrayList<MetadataValue> resolvedFields = new ArrayList<MetadataValue>();
+            ArrayList<MetadataValue> resolvedFields = new ArrayList<>();
 
             for (String field : optionFields) {
 
@@ -399,8 +412,8 @@ public class GoogleMetadata {
      */
     protected ArrayList<ArrayList<String>> parseOptions(String configFilter) {
 
-        ArrayList<String> options = new ArrayList<String>();
-        ArrayList<ArrayList<String>> parsedOptions = new ArrayList<ArrayList<String>>();
+        ArrayList<String> options = new ArrayList<>();
+        ArrayList<ArrayList<String>> parsedOptions = new ArrayList<>();
 
         if (null == configFilter || configFilter.equals("")) {
             return null;
@@ -414,7 +427,7 @@ public class GoogleMetadata {
                 options.add(option.trim());
             }
         } else {
-            options = new ArrayList<String>();
+            options = new ArrayList<>();
             options.add(configFilter);
         }
 
@@ -426,12 +439,12 @@ public class GoogleMetadata {
         for (String option : options) {
 
             ArrayList<String> fields;
-            parsedFields = new ArrayList<String>();
+            parsedFields = new ArrayList<>();
 
             if (option.contains(",")) {
                 fields = parseFields(option);
             } else {
-                fields = new ArrayList<String>();
+                fields = new ArrayList<>();
                 fields.add(option);
             }
 
@@ -472,7 +485,7 @@ public class GoogleMetadata {
      */
     protected ArrayList<String> parseFields(String configString) {
 
-        ArrayList<String> fields = new ArrayList<String>();
+        ArrayList<String> fields = new ArrayList<>();
 
         for (String field : configString.split("\\,")) {
             fields.add(field.trim());
@@ -523,7 +536,7 @@ public class GoogleMetadata {
             List<MetadataValue> allMD = itemService.getMetadata(item, components[0], components[1],
                                                                 components[2], Item.ANY);
 
-            ArrayList<String> expandedDC = new ArrayList<String>();
+            ArrayList<String> expandedDC = new ArrayList<>();
             for (MetadataValue v : allMD) {
 
                 // De-dup multiple occurrences of field names in item
@@ -558,7 +571,7 @@ public class GoogleMetadata {
         MetadataSchema metadataSchema = v.getMetadataField().getMetadataSchema();
         name.append(metadataSchema.getName()).append(".").append(metadataField.getElement());
         if (null != metadataField.getQualifier()) {
-            name.append("." + metadataField.getQualifier());
+            name.append(".").append(metadataField.getQualifier());
         }
 
         return name.toString();
@@ -687,7 +700,7 @@ public class GoogleMetadata {
      * @return List of elements
      */
     public List<Element> disseminateList() {
-        List<Element> metas = new ArrayList<Element>();
+        List<Element> metas = new ArrayList<>();
 
         for (Entry<String, String> m : getMappings()) {
             Element e = new Element("meta");
@@ -889,7 +902,7 @@ public class GoogleMetadata {
             Bitstream bitstream = findLinkableFulltext(item);
             if (bitstream != null) {
                 StringBuilder path = new StringBuilder();
-                path.append(ConfigurationManager.getProperty("dspace.ui.url"));
+                path.append(configurationService.getProperty("dspace.ui.url"));
 
                 if (item.getHandle() != null) {
                     path.append("/bitstream/");
@@ -1075,7 +1088,7 @@ public class GoogleMetadata {
         // FIXME: Shouldn't have to parse identifiers for every identification.
 
         ArrayList<ArrayList<String>> options = parseOptions(dConfig);
-        HashMap<String, ArrayList<String>> mdPairs = new HashMap<String, ArrayList<String>>();
+        HashMap<String, ArrayList<String>> mdPairs = new HashMap<>();
 
         // Parse field/value pairs from field identifier string
         for (ArrayList<String> option : options) {
@@ -1092,7 +1105,7 @@ public class GoogleMetadata {
                     }
                 } else {
                     // Otherwise, add it as the first occurrence of this field
-                    ArrayList<String> newField = new ArrayList<String>();
+                    ArrayList<String> newField = new ArrayList<>();
                     newField.add(parsedPair[1].trim());
                     mdPairs.put(parsedPair[0].trim(), newField);
 
@@ -1113,7 +1126,7 @@ public class GoogleMetadata {
 
         // Check resolved/present metadata fields against configured values
         ArrayList<MetadataValue> presentMD = resolveMetadataFields(sb.toString());
-        if (null != presentMD && presentMD.size() != 0) {
+        if (null != presentMD && !presentMD.isEmpty()) {
             for (MetadataValue v : presentMD) {
                 String fieldName = buildFieldName(v);
                 if (mdPairs.containsKey(fieldName)) {

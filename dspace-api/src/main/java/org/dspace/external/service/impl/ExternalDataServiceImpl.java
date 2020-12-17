@@ -95,9 +95,6 @@ public class ExternalDataServiceImpl implements ExternalDataService {
                                                                     ExternalDataObject externalDataObject,
                                                                     Collection collection)
         throws AuthorizeException, SQLException {
-        if (!authorizeService.isAdmin(context)) {
-            throw new AuthorizeException("You have to be an admin to create an Item from an ExternalDataObject");
-        }
         WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, true);
         Item item = workspaceItem.getItem();
         for (MetadataValueDTO metadataValueDTO : externalDataObject.getMetadata()) {

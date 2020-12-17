@@ -19,10 +19,11 @@ import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.CoreConnectionPNames;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.XMLUtils;
 import org.w3c.dom.Document;
@@ -35,7 +36,7 @@ public class CiNiiService {
     /**
      * log4j category
      */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CiNiiService.class);
+    private static final Logger log = LogManager.getLogger(CiNiiService.class);
 
     protected int timeout = 1000;
 
@@ -51,7 +52,7 @@ public class CiNiiService {
     public List<Record> searchByTerm(String title, String author, int year,
                                      int maxResults, String appId)
         throws HttpException, IOException {
-        List<Record> records = new ArrayList<Record>();
+        List<Record> records = new ArrayList<>();
 
         List<String> ids = getCiNiiIDs(title, author, year, maxResults, appId);
         if (ids != null && ids.size() > 0) {
@@ -78,10 +79,13 @@ public class CiNiiService {
     protected Record search(String id, String appId)
         throws IOException, HttpException {
         HttpGet method = null;
-        try {
-            HttpClient client = new DefaultHttpClient();
-            client.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, timeout);
+        try ( CloseableHttpClient client = HttpClientBuilder.create().build(); ) {
+            RequestConfig requestConfig = RequestConfig.custom()
+                    .setConnectTimeout(timeout)
+                    .build();
             method = new HttpGet("http://ci.nii.ac.jp/naid/" + id + ".rdf?appid=" + appId);
+            method.setConfig(requestConfig);
+
             // Execute the method.
             HttpResponse response = client.execute(method);
             StatusLine statusLine = response.getStatusLine();
@@ -129,7 +133,7 @@ public class CiNiiService {
      * @param title      record title
      * @param author     record author
      * @param year       record year
-     * @param maxResults maximun number of results returned
+     * @param maxResults maximum number of results returned
      * @param appId      registered application identifier for the API
      * @return matching NAIDs
      * @throws IOException   A general class of exceptions produced by failed or interrupted I/O operations.
@@ -144,10 +148,8 @@ public class CiNiiService {
         }
 
         HttpGet method = null;
-        List<String> ids = new ArrayList<String>();
-        try {
-            HttpClient client = new DefaultHttpClient();
-            client.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, timeout);
+        List<String> ids = new ArrayList<>();
+        try ( CloseableHttpClient client = HttpClientBuilder.create().build(); ) {
             StringBuilder query = new StringBuilder();
             query.append("format=rss&appid=").append(appId)
                  .append("&count=").append(maxResults);
@@ -161,7 +163,13 @@ public class CiNiiService {
                 query.append("&year_from=").append(String.valueOf(year));
                 query.append("&year_to=").append(String.valueOf(year));
             }
+
+            RequestConfig requestConfig = RequestConfig.custom()
+                    .setConnectTimeout(timeout)
+                    .build();
             method = new HttpGet("http://ci.nii.ac.jp/opensearch/search?" + query.toString());
+            method.setConfig(requestConfig);
+
             // Execute the method.
             HttpResponse response = client.execute(method);
             StatusLine statusLine = response.getStatusLine();
