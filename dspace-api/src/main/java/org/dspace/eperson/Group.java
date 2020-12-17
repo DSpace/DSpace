@@ -23,6 +23,8 @@ import javax.persistence.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Class representing a group of e-people.
@@ -251,5 +253,25 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport
     {
         permanent = permanence;
         setModified();
+    }
+
+    /**
+     * Syntactically check if a group was not created by DSpace.
+     * Was this group created by a user directly?
+     *
+     * @param g the group to be evaluated
+     * @return true if the group was not created by the system.
+     */
+    public static boolean isCustom(Group g){
+        String pattern = "^(COMMUNITY|COLLECTION)_[A-Fa-f\\-0-9]+_[A-Z_0-9]+";
+        // Create a Pattern object
+        Pattern r = Pattern.compile(pattern);
+        Matcher m = r.matcher(g.getName());
+        if(m.find()){
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 }
