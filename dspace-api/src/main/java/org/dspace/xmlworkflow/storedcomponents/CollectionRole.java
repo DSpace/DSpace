@@ -91,6 +91,7 @@ public class CollectionRole implements ReloadableEntity<Integer> {
         return group;
     }
 
+    @Override
     public Integer getID() {
         return id;
     }

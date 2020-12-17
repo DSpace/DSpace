@@ -7,7 +7,7 @@
  */
 package org.dspace.external.model;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.dspace.content.dto.MetadataValueDTO;
@@ -32,7 +32,7 @@ public class ExternalDataObject {
     /**
      * The list of Metadata values. These our MetadataValueDTO because they won't exist in the DB
      */
-    private List<MetadataValueDTO> metadata = new LinkedList<>();
+    private List<MetadataValueDTO> metadata = new ArrayList<>();
     /**
      * The display value of the ExternalDataObject
      */
@@ -87,11 +87,11 @@ public class ExternalDataObject {
 
     /**
      * This method will add a Metadata value to the list of metadata values
-     * @param metadataValueDTO The metadatavalue to be added
+     * @param metadataValueDTO The metadata value to be added.
      */
     public void addMetadata(MetadataValueDTO metadataValueDTO) {
         if (metadata == null) {
-            metadata = new LinkedList<>();
+            metadata = new ArrayList<>();
         }
         metadata.add(metadataValueDTO);
     }

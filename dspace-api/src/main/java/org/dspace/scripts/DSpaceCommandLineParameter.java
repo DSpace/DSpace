@@ -14,7 +14,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
- * This class serves as a representation of a command line parameter by holding a String name and a String value
+ * This class serves as a representation of a command line parameter by holding
+ * a String name and a String value.
  */
 public class DSpaceCommandLineParameter {
     private String name;
@@ -23,7 +24,7 @@ public class DSpaceCommandLineParameter {
     public static String SEPARATOR = "|||";
 
     /**
-     * This constructor will take a String key and String value and store them in their appriopriate fields
+     * This constructor will take a String key and String value and store them in their appropriate fields.
      * @param key   The String value to be stored as the name of the parameter
      * @param value The String value to be stored as the value of the parameter
      */
@@ -64,9 +65,10 @@ public class DSpaceCommandLineParameter {
 
     /**
      * Converts the DSpaceCommandLineParameter into a String format by concatenating the value and the name String
-     * values by separating them with a space
+     * values by separating them with a space.
      * @return The String representation of a DSpaceCommandlineParameter object
      */
+    @Override
     public String toString() {
         String stringToReturn = "";
         stringToReturn += getName();
@@ -92,7 +94,7 @@ public class DSpaceCommandLineParameter {
     }
 
     /**
-     * Will return a boolean indicating whether the given param is equal to this object
+     * Will return a boolean indicating whether the given parameter is equal to this object.
      * @param other The other object
      * @return      A boolean indicating equality
      */
@@ -101,7 +103,7 @@ public class DSpaceCommandLineParameter {
         if (other == null) {
             return false;
         }
-        if (other.getClass() != DSpaceCommandLineParameter.class) {
+        if (!(other instanceof DSpaceCommandLineParameter)) {
             return false;
         }
         return StringUtils.equals(this.getName(), ((DSpaceCommandLineParameter) other).getName()) && StringUtils

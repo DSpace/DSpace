@@ -39,11 +39,11 @@ public class ValueConcatenationModifier extends AbstractModifier {
     public Record modify(MutableRecord rec) {
         List<Value> values = rec.getValues(field);
         if (values != null) {
-            List<String> converted_values = new ArrayList<String>();
+            List<String> converted_values = new ArrayList<>();
             for (Value val : values) {
                 converted_values.add(val.getAsString());
             }
-            List<Value> final_value = new ArrayList<Value>();
+            List<Value> final_value = new ArrayList<>();
             String v = StringUtils.join(converted_values.iterator(), separator
                 + (whitespaceAfter ? " " : ""));
             final_value.add(new StringValue(v));
@@ -89,9 +89,9 @@ public class ValueConcatenationModifier extends AbstractModifier {
     }
 
     /**
-     * @param whiteSpaceAfter the whiteSpaceAfter to set
+     * @param whitespaceAfter the whiteSpaceAfter to set
      */
-    public void setWhitespaceAfter(boolean whiteSpaceAfter) {
-        this.whitespaceAfter = whiteSpaceAfter;
+    public void setWhitespaceAfter(boolean whitespaceAfter) {
+        this.whitespaceAfter = whitespaceAfter;
     }
 }

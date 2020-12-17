@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +22,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 
 /**
- * This class represents a query which the discovery backend can use
+ * This class represents a query which the discovery back-end can use.
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
@@ -33,9 +32,9 @@ public class DiscoverQuery {
      * Main attributes for the discovery query
      **/
     private String query;
-    private List<String> filterQueries;
+    private final List<String> filterQueries;
     private List<String> dspaceObjectFilters = new ArrayList<>();
-    private List<String> fieldPresentQueries;
+    private final List<String> fieldPresentQueries;
     private boolean spellCheck;
 
     private int start = 0;
@@ -55,36 +54,35 @@ public class DiscoverQuery {
     /**
      * Attributes required for the faceting of values
      **/
-    private List<DiscoverFacetField> facetFields;
-    private List<String> facetQueries;
-    private int facetLimit = -1;
+    private final List<DiscoverFacetField> facetFields;
+    private final List<String> facetQueries;
     private int facetMinCount = -1;
     private int facetOffset = 0;
-    private Map<String, DiscoverHitHighlightingField> hitHighlighting;
+    private final Map<String, DiscoverHitHighlightingField> hitHighlighting;
 
     /**
      * Used when you want to search for a specific field value
      **/
-    private List<String> searchFields;
+    private final List<String> searchFields;
 
     /**
      * Misc attributes can be implementation dependent
      **/
-    private Map<String, List<String>> properties;
+    private final Map<String, List<String>> properties;
 
     private String discoveryConfigurationName;
 
     public DiscoverQuery() {
         //Initialize all our lists
-        this.filterQueries = new ArrayList<String>();
-        this.fieldPresentQueries = new ArrayList<String>();
+        this.filterQueries = new ArrayList<>();
+        this.fieldPresentQueries = new ArrayList<>();
 
-        this.facetFields = new ArrayList<DiscoverFacetField>();
-        this.facetQueries = new ArrayList<String>();
-        this.searchFields = new ArrayList<String>();
-        this.hitHighlighting = new HashMap<String, DiscoverHitHighlightingField>();
+        this.facetFields = new ArrayList<>();
+        this.facetQueries = new ArrayList<>();
+        this.searchFields = new ArrayList<>();
+        this.hitHighlighting = new HashMap<>();
         //Use a linked hashmap since sometimes insertion order might matter
-        this.properties = new LinkedHashMap<String, List<String>>();
+        this.properties = new LinkedHashMap<>();
     }
 
 
@@ -274,7 +272,7 @@ public class DiscoverQuery {
     /**
      * Sets the fields which you want Discovery to return in the search results.
      * It is HIGHLY recommended to limit the fields returned, as by default
-     * some backends (like Solr) will return everything.
+     * some back-ends (like Solr) will return everything.
      *
      * @param field field to add to the list of fields returned
      */
@@ -309,7 +307,7 @@ public class DiscoverQuery {
     public void addProperty(String property, String value) {
         List<String> toAddList = properties.get(property);
         if (toAddList == null) {
-            toAddList = new ArrayList<String>();
+            toAddList = new ArrayList<>();
         }
 
         toAddList.add(value);
@@ -322,7 +320,7 @@ public class DiscoverQuery {
     }
 
     public List<DiscoverHitHighlightingField> getHitHighlightingFields() {
-        return new ArrayList<DiscoverHitHighlightingField>(hitHighlighting.values());
+        return new ArrayList<>(hitHighlighting.values());
     }
 
     public void addHitHighlightingField(DiscoverHitHighlightingField hitHighlighting) {
@@ -368,7 +366,7 @@ public class DiscoverQuery {
 
     private List<String> buildFacetQueriesWithGap(int newestYear, int oldestYear, String dateFacet, int gap,
                                                   int topYear, int facetLimit) {
-        List<String> facetQueries = new LinkedList<>();
+        List<String> facetQueries = new ArrayList<>();
         for (int year = topYear; year > oldestYear && (facetQueries.size() < facetLimit); year -= gap) {
             //Add a filter to remove the last year only if we aren't the last year
             int bottomYear = year - gap;
@@ -392,7 +390,7 @@ public class DiscoverQuery {
     }
 
     private int getTopYear(int newestYear, int gap) {
-        return (int) (Math.ceil((float) (newestYear) / gap) * gap);
+        return (int) (Math.ceil((float) newestYear / gap) * gap);
     }
 
     /**

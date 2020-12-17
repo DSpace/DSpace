@@ -41,7 +41,6 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * Basic Auth username and password to the <code>AuthenticationManager</code>.
  *
  * @author Larry Stone
- * @version $Revision$
  */
 public class PasswordAuthentication
     implements AuthenticationMethod {
@@ -49,7 +48,7 @@ public class PasswordAuthentication
     /**
      * log4j category
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(PasswordAuthentication.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(PasswordAuthentication.class);
 
 
     /**
@@ -142,7 +141,7 @@ public class PasswordAuthentication
                                      .toString())) {
                 String groupName = DSpaceServicesFactory.getInstance().getConfigurationService()
                                                         .getProperty("authentication-password.login.specialgroup");
-                if ((groupName != null) && (!groupName.trim().equals(""))) {
+                if ((groupName != null) && !groupName.trim().isEmpty()) {
                     Group specialGroup = EPersonServiceFactory.getInstance().getGroupService()
                                                               .findByName(context, groupName);
                     if (specialGroup == null) {
@@ -195,9 +194,8 @@ public class PasswordAuthentication
                             HttpServletRequest request)
         throws SQLException {
         if (username != null && password != null) {
-            EPerson eperson = null;
             log.info(LogManager.getHeader(context, "authenticate", "attempting password auth of user=" + username));
-            eperson = EPersonServiceFactory.getInstance().getEPersonService()
+            EPerson eperson = EPersonServiceFactory.getInstance().getEPersonService()
                                            .findByEmail(context, username.toLowerCase());
 
             if (eperson == null) {

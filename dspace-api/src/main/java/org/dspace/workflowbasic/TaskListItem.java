@@ -73,6 +73,7 @@ public class TaskListItem implements ReloadableEntity<Integer> {
         this.workflowItem = workflowItem;
     }
 
+    @Override
     public Integer getID() {
         return taskListItemId;
     }

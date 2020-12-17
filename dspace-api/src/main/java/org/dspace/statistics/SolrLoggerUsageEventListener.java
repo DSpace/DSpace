@@ -7,9 +7,10 @@
  */
 package org.dspace.statistics;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.model.Event;
@@ -28,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class SolrLoggerUsageEventListener extends AbstractUsageEventListener {
 
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(SolrLoggerUsageEventListener.class);
+    private static final Logger log = LogManager.getLogger(SolrLoggerUsageEventListener.class);
 
     protected SolrLoggerService solrLoggerService;
 
@@ -56,7 +57,7 @@ public class SolrLoggerUsageEventListener extends AbstractUsageEventListener {
                     }
                 } else if (UsageEvent.Action.SEARCH == ue.getAction()) {
                     UsageSearchEvent usageSearchEvent = (UsageSearchEvent) ue;
-                    List<String> queries = new LinkedList<>();
+                    List<String> queries = new ArrayList<>();
                     queries.add(usageSearchEvent.getQuery());
                     solrLoggerService.postSearch(usageSearchEvent.getObject(), usageSearchEvent.getRequest(),
                                     currentUser, queries, usageSearchEvent.getPage().getSize(),

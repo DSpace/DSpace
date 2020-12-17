@@ -61,7 +61,7 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
     private List<Handle> handles = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "dSpaceObject", cascade = CascadeType.ALL)
-    private List<ResourcePolicy> resourcePolicies = new ArrayList<>();
+    private final List<ResourcePolicy> resourcePolicies = new ArrayList<>();
 
     /**
      * True if anything else was changed since last update()
@@ -122,6 +122,7 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
      *
      * @return internal ID of object
      */
+    @Override
     public UUID getID() {
         return id;
     }

@@ -169,6 +169,7 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
      *
      * @return the internal identifier
      */
+    @Override
     public Integer getID() {
         return id;
     }

@@ -9,7 +9,6 @@ package org.dspace.content;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -138,7 +137,7 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport {
      * @return the bitstreams
      */
     public List<Bitstream> getBitstreams() {
-        List<Bitstream> bitstreamList = new LinkedList<>(this.bitstreams);
+        List<Bitstream> bitstreamList = new ArrayList<>(this.bitstreams);
         return bitstreamList;
     }
 
@@ -191,7 +190,7 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
+        if (obj == null || !(obj instanceof Bundle)) {
             return false;
         }
         Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(obj);
@@ -202,10 +201,7 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport {
         if (this.getType() != other.getType()) {
             return false;
         }
-        if (!this.getID().equals(other.getID())) {
-            return false;
-        }
-        return true;
+        return this.getID().equals(other.getID());
     }
 
     @Override

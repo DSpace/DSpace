@@ -12,6 +12,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
@@ -118,7 +119,8 @@ public class AbstractIntegrationTest extends AbstractUnitTest {
      */
     protected void appendToLocalConfiguration(String textToAppend) {
         String extraConfPath = getLocalConfigurationFilePath();
-        try (Writer output = new BufferedWriter(new FileWriter(extraConfPath, true))) {
+        try (Writer output = new BufferedWriter(
+                new FileWriter(extraConfPath, StandardCharsets.UTF_8, true))) {
             output.append("\n");
             output.append(textToAppend);
             output.flush();

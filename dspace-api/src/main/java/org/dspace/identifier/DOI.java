@@ -62,6 +62,7 @@ public class DOI
     protected DOI() {
     }
 
+    @Override
     public Integer getID() {
         return id;
     }

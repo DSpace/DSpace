@@ -109,7 +109,7 @@ public class ResultsLogger implements ChecksumResultsCollector {
             "unknown"));
         LOG.info(msg("new-checksum") + ": " + info.getCurrentChecksum());
         LOG.info(msg("checksum-comparison-result") + ": "
-                     + (info.getChecksumResult().getResultCode()));
+                     + info.getChecksumResult().getResultCode());
         LOG.info("\n\n");
     }
 }

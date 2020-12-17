@@ -8,7 +8,7 @@
 package org.dspace.importer.external.metadatamapping;
 
 /**
- * A generalised configuration for metadatafields.
+ * A generalised configuration for metadata fields.
  * This is used to make the link between values and the actual MetadatumDTO object.
  *
  * @author Roeland Dillen (roeland at atmire dot com)
@@ -31,7 +31,7 @@ public class MetadataFieldConfig {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null || !(o instanceof MetadataFieldConfig)) {
             return false;
         }
 
@@ -43,11 +43,7 @@ public class MetadataFieldConfig {
         if (qualifier != null ? !qualifier.equals(that.qualifier) : that.qualifier != null) {
             return false;
         }
-        if (!schema.equals(that.schema)) {
-            return false;
-        }
-
-        return true;
+        return schema.equals(that.schema);
     }
 
     /**
