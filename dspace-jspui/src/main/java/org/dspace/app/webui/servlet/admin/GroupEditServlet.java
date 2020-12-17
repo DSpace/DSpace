@@ -111,6 +111,12 @@ public class GroupEditServlet extends DSpaceServlet
                 }
 
                 List<Group> membergroups = group.getMemberGroups();
+                // get membergroups, and add new ones and remove missing ones
+                List<UUID> membergroupsIdentifiers = new ArrayList<>();
+                // Store all the identifiers of our current members
+                for (Group membergroup : membergroups) {
+                    membergroupsIdentifiers.add(membergroup.getID());
+                }
 
                 if (eperson_ids != null)
                 {
@@ -191,11 +197,11 @@ public class GroupEditServlet extends DSpaceServlet
                     }
 
                     // process members, removing any that aren't in eperson_ids
-                    for (Group g : membergroups)
+                    for (UUID groupId : membergroupsIdentifiers)
                     {
-                        if (!groupIDSet.contains(g.getID()))
+                        if (!groupIDSet.contains(groupId))
                         {
-                            groupService.removeMember(c, group, g);
+                            groupService.removeMember(c, group, groupService.find(c, groupId));
                         }
                     }
 
@@ -203,9 +209,9 @@ public class GroupEditServlet extends DSpaceServlet
                 else
                 {
                     // no members found (ids == null), remove them all!
-                    for (Group g : membergroups)
+                    for (UUID groupId : membergroupsIdentifiers)
                     {
-                        groupService.removeMember(c, group, g);
+                        groupService.removeMember(c, group, groupService.find(c, groupId));
                     }
                 }
 
