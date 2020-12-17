@@ -22,6 +22,9 @@ import org.dspace.app.xmlui.objectmanager.ItemAdapter;
 import org.dspace.app.xmlui.objectmanager.RepositoryAdapter;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.wing.WingException;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -31,6 +34,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
@@ -87,7 +91,7 @@ public class DSpaceMETSGenerator extends AbstractGenerator
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
    	protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-
+	protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 	/**
 	 * Generate the METS Document.
      * @throws java.io.IOException passed through.
@@ -106,14 +110,23 @@ public class DSpaceMETSGenerator extends AbstractGenerator
             {
                 throw new ResourceNotFoundException("Unable to locate object.");
             }
-            
-            // Configure the adapter for this request.
-            configureAdapter(adapter);
-            
-			// Generate the METS document
-			contentHandler.startDocument();
-			adapter.renderMETS(context, contentHandler,lexicalHandler);
-			contentHandler.endDocument();
+
+			boolean authorization = true;
+			if (adapter instanceof ItemAdapter) {
+				Item item = ((ItemAdapter) adapter).getItem();
+				try {
+					authorizeService.authorizeAction(context, item, Constants.READ);
+				} catch (AuthorizeException e) {
+					authorization = false;
+				}
+			}
+
+			if (authorization) {
+				// Generate the METS document
+				contentHandler.startDocument();
+				adapter.renderMETS(context, contentHandler,lexicalHandler);
+				contentHandler.endDocument();
+			}
 			
 		} catch (WingException we) {
 			throw new ProcessingException(we);
