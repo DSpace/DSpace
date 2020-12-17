@@ -211,7 +211,7 @@ public abstract class AbstractCurationTask implements CurationTask
      */
     protected void report(String message)
     {
-        curator.report(message);
+        curator.report(message, taskId);
     }
 
     /**

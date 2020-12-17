@@ -1,0 +1,21 @@
+# Curation report
+#
+# Parameters: {0} Curation Task Executed
+#             {1} Target Resource
+#             {2} Outcome
+#             {3} Report
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: DSpace - Curation report
+
+The following curation report has been completed:
+
+Curation Task Executed: {0}
+Target Resource: {1}
+Outcome: {2}
+Report:
+
+{3}
+
+The DSpace Team

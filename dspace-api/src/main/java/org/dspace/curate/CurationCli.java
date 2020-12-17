@@ -251,7 +251,12 @@ public class CurationCli
                     {
                         curator.addTask(task);
                     }
-                    curator.curate(c, entry.getObjectId());
+                    String epersonId = entry.getEpersonId();
+                    if(epersonId != null) {
+                        curator.curate(c, entry.getObjectId(), epersonId);
+                    } else {
+                        curator.curate(c, entry.getObjectId());
+                    }
                 }
                 else
                 {
