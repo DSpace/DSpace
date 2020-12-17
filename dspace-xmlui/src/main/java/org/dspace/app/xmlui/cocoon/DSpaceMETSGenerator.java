@@ -15,6 +15,7 @@ import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.cocoon.environment.Response;
 import org.apache.cocoon.generation.AbstractGenerator;
 import org.dspace.app.xmlui.objectmanager.AbstractAdapter;
 import org.dspace.app.xmlui.objectmanager.ContainerAdapter;
@@ -107,14 +108,21 @@ public class DSpaceMETSGenerator extends AbstractGenerator
                 throw new ResourceNotFoundException("Unable to locate object.");
             }
             
-            // Configure the adapter for this request.
-            configureAdapter(adapter);
-            
-			// Generate the METS document
-			contentHandler.startDocument();
-			adapter.renderMETS(context, contentHandler,lexicalHandler);
-			contentHandler.endDocument();
-			
+			if (adapter.isAuthorized())
+			{
+				// Configure the adapter for this request.
+				configureAdapter(adapter);
+
+				// Generate the METS document
+				contentHandler.startDocument();
+				adapter.renderMETS(context, contentHandler, lexicalHandler);
+				contentHandler.endDocument();
+			}
+			else
+			{
+				Response response = ObjectModelHelper.getResponse(objectModel);
+				response.setStatus(403);
+			}
 		} catch (WingException we) {
 			throw new ProcessingException(we);
 		} catch (CrosswalkException ce) {

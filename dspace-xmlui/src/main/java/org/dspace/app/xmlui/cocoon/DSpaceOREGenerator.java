@@ -13,15 +13,20 @@ import java.util.UUID;
 
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.ResourceNotFoundException;
+import org.apache.cocoon.environment.ObjectModelHelper;
+import org.apache.cocoon.environment.Response;
 import org.apache.cocoon.generation.AbstractGenerator;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
@@ -43,6 +48,7 @@ public class DSpaceOREGenerator extends AbstractGenerator
 
 	protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 	protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+	protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
 	/**
 	 * Generate the ORE Aggregation.
@@ -59,19 +65,23 @@ public class DSpaceOREGenerator extends AbstractGenerator
                 throw new ResourceNotFoundException("Unable to locate object.");
             }
             
-            
-            // Instantiate and execute the ORE plugin
-            SAXOutputter out = new SAXOutputter(contentHandler);
-            DisseminationCrosswalk xwalk = (DisseminationCrosswalk)CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(DisseminationCrosswalk.class,"ore");
-            
-            Element ore = xwalk.disseminateElement(context, item);
-            out.output(ore);
-            
-			/* Generate the METS document
-			contentHandler.startDocument();
-			adapter.renderMETS(contentHandler,lexicalHandler);
-			contentHandler.endDocument();*/
-			
+			if (authorizeService.authorizeActionBoolean(context, item,
+					Constants.READ))
+			{
+				// Instantiate and execute the ORE plugin
+				SAXOutputter out = new SAXOutputter(contentHandler);
+				DisseminationCrosswalk xwalk = (DisseminationCrosswalk) CoreServiceFactory
+						.getInstance().getPluginService()
+						.getNamedPlugin(DisseminationCrosswalk.class, "ore");
+
+				Element ore = xwalk.disseminateElement(context, item);
+				out.output(ore);
+			}
+			else
+			{
+				Response response = ObjectModelHelper.getResponse(objectModel);
+				response.setStatus(403);
+			}
 		} catch (JDOMException je) {
 			throw new ProcessingException(je);
 		} catch (AuthorizeException ae) {
