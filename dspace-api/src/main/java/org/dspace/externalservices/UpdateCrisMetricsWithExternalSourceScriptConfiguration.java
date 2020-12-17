@@ -52,6 +52,9 @@ public class UpdateCrisMetricsWithExternalSourceScriptConfiguration<T extends Up
             options.getOption("s").setType(String.class);
             options.getOption("s").setRequired(true);
 
+            options.addOption("p", "param", true, "the param of the MetricType to performe update");
+            options.getOption("p").setType(String.class);
+            //options.getOption("i").setRequired(false);
             super.options = options;
         }
         return options;

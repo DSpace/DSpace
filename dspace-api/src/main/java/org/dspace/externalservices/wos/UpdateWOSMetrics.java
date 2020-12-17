@@ -42,7 +42,7 @@ public class UpdateWOSMetrics implements MetricsExternalServices {
     private CrisMetricsService crisMetricsService;
 
     @Override
-    public boolean updateMetric(Context context, Item item) {
+    public boolean updateMetric(Context context, Item item, String param) {
         Double metricCount = null;
         String doi = itemService.getMetadataFirstValue(item, "dc", "identifier", "doi", Item.ANY);
         if (!StringUtils.isBlank(doi)) {

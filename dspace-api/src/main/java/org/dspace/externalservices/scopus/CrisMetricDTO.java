@@ -17,9 +17,11 @@ import com.google.gson.Gson;
  * 
  * @author mykhaylo boychuk (mykhaylo.boychuk at 4science.it)
  */
-public class ScopusMetricsDTO {
+public class CrisMetricDTO {
 
     private double metricCount;
+
+    private String metricType;
 
     @Lob
     private String remark;
@@ -64,5 +66,13 @@ public class ScopusMetricsDTO {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getMetricType() {
+        return metricType;
+    }
+
+    public void setMetricType(String metricType) {
+        this.metricType = metricType;
     }
 }

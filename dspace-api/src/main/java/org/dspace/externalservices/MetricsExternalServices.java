@@ -15,5 +15,5 @@ import org.dspace.core.Context;
  */
 public interface MetricsExternalServices {
 
-    public boolean updateMetric(Context context, Item item);
+    public boolean updateMetric(Context context, Item item, String param);
 }
