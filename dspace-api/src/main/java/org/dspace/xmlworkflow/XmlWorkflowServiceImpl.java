@@ -955,8 +955,51 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         }
     }
 
+    protected void notifyOfDelete(Context c, XmlWorkflowItem wi, EPerson e)
+        {
+            try
+            {
+                // Get the item title
+                String title = wi.getItem().getName();
+
+                // Get the collection
+                Collection coll = wi.getCollection();
+
+                Locale supportedLocale = I18nUtil.getEPersonLocale(e);
+
+                Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale,"submit_delete"));
+
+                email.addRecipient(wi.getSubmitter().getEmail());
+                email.addArgument(title);
+                email.addArgument(coll.getName());
+
+                email.send();
+            }
+            catch (Exception ex)
+            {
+                // log this email error
+                log.warn(LogManager.getHeader(c, "notify_of_delete",
+                        "cannot email user" + " eperson_id" + e.getID()
+                                + " eperson_email" + e.getEmail()
+                                + " workflow_item_id" + wi.getID()));
+            }
+        }
+
     @Override
     public String getMyDSpaceLink() {
         return ConfigurationManager.getProperty("dspace.url") + "/mydspace";
     }
+
+
+	@Override
+	public void sendWorkflowItemDelete(Context c, XmlWorkflowItem wi) throws AuthorizeException, SQLException, IOException {
+
+        //Remove references from 'cwf_in_progress_user'
+        workflowRequirementsService.clearInProgressUsers(c, wi);
+        //Delete workflow item
+        xmlWorkflowItemService.delete(c, wi);
+        //Send a notification to the submitter
+        notifyOfDelete(c,wi,c.getCurrentUser());
+
+	}
 }
