@@ -21,17 +21,12 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
-import org.dspace.app.openaire.funders.model.OpenAIREHandler;
-import org.dspace.app.openaire.funders.model.Project;
-//import org.openaire.jaxb.model.OpenAIREHandler;
-//import org.openaire.jaxb.model.Project;
+import org.openaire.funders.jaxb.model.OpenAIREHandler;
+import org.openaire.funders.jaxb.model.Project;
 import org.springframework.beans.factory.annotation.Required;
-import org.dspace.app.openaire.funders.model.Response;
-import org.dspace.app.openaire.funders.model.Result;
-import org.dspace.app.openaire.funders.model.Results;
-//import org.openaire.jaxb.model.Response;
-//import org.openaire.jaxb.model.Results;
-//import org.openaire.jaxb.model.Result;
+import org.openaire.funders.jaxb.model.Response;
+import org.openaire.funders.jaxb.model.Results;
+import org.openaire.funders.jaxb.model.Result;
 
 /**
  * This class is the implementation of the ExternalDataProvider interface that
