@@ -20,10 +20,12 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -32,6 +34,7 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.harvest.HarvestedCollection;
+import org.dspace.harvest.HarvestingException;
 import org.dspace.harvest.OAIHarvester;
 import org.dspace.harvest.factory.HarvestServiceFactory;
 import org.dspace.harvest.model.OAIHarvesterOptions;
@@ -60,6 +63,7 @@ public class Harvest {
     private static final CollectionService collectionService =
         ContentServiceFactory.getInstance().getCollectionService();
     private static final OAIHarvester harvester = HarvestServiceFactory.getInstance().getOAIHarvester();
+    private static final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
 
     public static void main(String[] argv) throws Exception {
         // create an options object and populate it
@@ -411,6 +415,10 @@ public class Harvest {
             Collection collection = resolveCollection(collectionID);
             HarvestedCollection hc = harvestedCollectionService.find(context, collection);
 
+            if (hc == null) {
+                throw new HarvestingException("Provided collection is not set up for harvesting");
+            }
+
             // Harvest will not work for an anonymous user
             EPerson eperson = ePersonService.findByEmail(context, email);
 
@@ -505,14 +513,18 @@ public class Harvest {
         }
     }
 
-    private static void logProcess(UUID processId, HarvestedCollection harvestRow, boolean start, long startTimestamp) {
+    private static void logProcess(UUID processId, HarvestedCollection harvestRow, boolean start, long startTimestamp)
+        throws SQLException {
+
         Collection collection = harvestRow.getCollection();
+        Community parentCommunity = (Community) collectionService.getParentObject(context, collection);
 
         String logMessage = new StringBuilder(LOG_PREFIX)
             .append(processId).append(LOG_DELIMITER)
             .append(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(new Date())).append(LOG_DELIMITER)
             .append(harvestRow.getOaiSource()).append(LOG_DELIMITER)
             .append(harvestRow.getOaiSetId() != null ? harvestRow.getOaiSetId() : "").append(LOG_DELIMITER)
+            .append(communityService.getName(parentCommunity)).append(LOG_DELIMITER)
             .append(collection.getID()).append(LOG_DELIMITER)
             .append(collectionService.getName(collection)).append(LOG_DELIMITER)
             .append(start ? "START" : "FINISH").append(LOG_DELIMITER)
