@@ -7,6 +7,8 @@
  */
 package org.dspace.eperson;
 
+import static org.dspace.eperson.service.EPersonService.MD_PHONE;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -15,7 +17,8 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
@@ -83,7 +86,7 @@ public class EPersonCLITool {
         globalOptions.addOptionGroup(VERBS);
         globalOptions.addOption("h", "help", false, "explain options");
 
-        GnuParser parser = new GnuParser();
+        CommandLineParser parser = new DefaultParser();
         CommandLine command = parser.parse(globalOptions, argv, true);
 
         Context context = new Context();
@@ -145,7 +148,7 @@ public class EPersonCLITool {
         options.addOption("h", "help", false, "explain --add options");
 
         // Rescan the command for more details.
-        GnuParser parser = new GnuParser();
+        CommandLineParser parser = new DefaultParser();
         CommandLine command;
         try {
             command = parser.parse(options, argv);
@@ -187,7 +190,8 @@ public class EPersonCLITool {
         eperson.setLastName(context, command.getOptionValue(OPT_SURNAME.getOpt()));
         eperson.setLanguage(context, command.getOptionValue(OPT_LANGUAGE.getOpt(),
                                                             Locale.getDefault().getLanguage()));
-        ePersonService.setMetadata(context, eperson, "phone", command.getOptionValue(OPT_PHONE.getOpt()));
+        ePersonService.setMetadataSingleValue(context, eperson, MD_PHONE,
+                command.getOptionValue(OPT_PHONE.getOpt()), null);
         eperson.setNetid(command.getOptionValue(OPT_NETID.getOpt()));
         ePersonService.setPassword(eperson, command.getOptionValue('p'));
         if (command.hasOption(OPT_REQUIRE_CERTIFICATE.getOpt())) {
@@ -225,7 +229,7 @@ public class EPersonCLITool {
 
         options.addOption("h", "help", false, "explain --delete options");
 
-        GnuParser parser = new GnuParser();
+        CommandLineParser parser = new DefaultParser();
         CommandLine command;
         try {
             command = parser.parse(options, argv);
@@ -314,7 +318,7 @@ public class EPersonCLITool {
 
         options.addOption("h", "help", false, "explain --modify options");
 
-        GnuParser parser = new GnuParser();
+        CommandLineParser parser = new DefaultParser();
         CommandLine command;
         try {
             command = parser.parse(options, argv);
@@ -366,7 +370,8 @@ public class EPersonCLITool {
                 modified = true;
             }
             if (command.hasOption(OPT_PHONE.getOpt())) {
-                ePersonService.setMetadata(context, eperson, "phone", command.getOptionValue(OPT_PHONE.getOpt()));
+                ePersonService.setMetadataSingleValue(context, eperson, MD_PHONE,
+                        command.getOptionValue(OPT_PHONE.getOpt()), null);
                 modified = true;
             }
             if (command.hasOption(OPT_LANGUAGE.getOpt())) {

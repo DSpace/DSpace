@@ -31,7 +31,6 @@ import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.SiteService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -39,6 +38,8 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom.Element;
 import org.jdom.Namespace;
 
@@ -51,29 +52,34 @@ import org.jdom.Namespace;
  * a complete and accurate image of all of the attributes an object
  * has in the RDBMS.
  *
+ * <p>
  * It encodes the following common properties of all archival objects:
+ * <dl>
+ *   <dt>identifier.uri</dt> <dd>persistent identifier of object in URI form (e.g. Handle URN)</dd>
+ *   <dt>relation.isPartOf</dt> <dd>persistent identifier of object's parent in URI form (e.g. Handle URN)</dd>
+ *   <dt>relation.isReferencedBy</dt> <dd>if relevant, persistent identifier of
+ *       other objects that map this one as a child.  May repeat.</dd>
+ * </dl>
  *
- * identifier.uri -- persistent identifier of object in URI form (e.g. Handle URN)
- * relation.isPartOf -- persistent identifier of object's parent in URI form (e.g. Handle URN)
- * relation.isReferencedBy -- if relevant, persistent identifier of other objects that map this one as a child.  May
- * repeat.
- *
+ * <p>
  * There may also be other fields, depending on the type of object,
  * which encode attributes that are not part of the descriptive metadata and
  * are not adequately covered by other technical MD formats (i.e. PREMIS).
  *
+ * <p>
  * Configuration entries:
- * aip.ingest.createEperson -- boolean, create EPerson for Submitter
- * automatically, on ingest, if it doesn't exist.
+ * <dl>
+ *   <dt>aip.ingest.createEperson</dt> <dd>boolean, create EPerson for Submitter
+ * automatically, on ingest, if it doesn't exist.</dd>
+ * </dl>
  *
  * @author Larry Stone
- * @version $Revision: 1.2 $
  */
 public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCrosswalk {
     /**
      * log4j category
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(AIPTechMDCrosswalk.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(AIPTechMDCrosswalk.class);
     protected final BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance()
                                                                                          .getBitstreamFormatService();
     protected final SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
@@ -81,6 +87,8 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
     protected final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+    protected final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
      * Get XML namespaces of the elements this crosswalk may return.
@@ -391,7 +399,7 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
                                 String configName = new DSpaceAIPIngester().getConfigurationName();
 
                                 //Create the EPerson if specified and person doesn't already exit
-                                if (ConfigurationManager.getBooleanProperty(
+                                if (configurationService.getBooleanProperty(
                                     METSManifest.CONFIG_METS_PREFIX + configName + ".ingest.createSubmitter")) {
                                     sub = ePersonService.create(context);
                                     sub.setEmail(value);

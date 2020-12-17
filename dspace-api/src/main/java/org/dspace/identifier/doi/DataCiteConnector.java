@@ -20,14 +20,18 @@ import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
@@ -51,7 +55,6 @@ import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * @author Pascal-Nicolas Becker
@@ -128,7 +131,7 @@ public class DataCiteConnector
      *
      * @param DATACITE_SCHEME Probably https or http.
      */
-    @Required
+    @Autowired(required = true)
     public void setDATACITE_SCHEME(String DATACITE_SCHEME) {
         this.SCHEME = DATACITE_SCHEME;
     }
@@ -139,7 +142,7 @@ public class DataCiteConnector
      *
      * @param DATACITE_HOST Hostname to connect to register DOIs (f.e. test.datacite.org).
      */
-    @Required
+    @Autowired(required = true)
     public void setDATACITE_HOST(String DATACITE_HOST) {
         this.HOST = DATACITE_HOST;
     }
@@ -150,7 +153,7 @@ public class DataCiteConnector
      *
      * @param DATACITE_DOI_PATH Path to register DOIs, f.e. /doi.
      */
-    @Required
+    @Autowired(required = true)
     public void setDATACITE_DOI_PATH(String DATACITE_DOI_PATH) {
         if (!DATACITE_DOI_PATH.startsWith("/")) {
             DATACITE_DOI_PATH = "/" + DATACITE_DOI_PATH;
@@ -168,7 +171,7 @@ public class DataCiteConnector
      *
      * @param DATACITE_METADATA_PATH Path to register metadata, f.e. /mds.
      */
-    @Required
+    @Autowired(required = true)
     public void setDATACITE_METADATA_PATH(String DATACITE_METADATA_PATH) {
         if (!DATACITE_METADATA_PATH.startsWith("/")) {
             DATACITE_METADATA_PATH = "/" + DATACITE_METADATA_PATH;
@@ -181,8 +184,7 @@ public class DataCiteConnector
     }
 
 
-    @Autowired
-    @Required
+    @Autowired(required = true)
     public void setConfigurationService(ConfigurationService configurationService) {
         this.configurationService = configurationService;
     }
@@ -194,7 +196,7 @@ public class DataCiteConnector
      * @param CROSSWALK_NAME The name of the dissemination crosswalk to use. This
      *                       crosswalk must be configured in dspace.cfg.
      */
-    @Required
+    @Autowired(required = true)
     public void setDisseminationCrosswalkName(String CROSSWALK_NAME) {
         this.CROSSWALK_NAME = CROSSWALK_NAME;
     }
@@ -271,10 +273,7 @@ public class DataCiteConnector
             default: {
                 log.warn("While checking if the DOI {} is registered, we got a "
                              + "http status code {} and the message \"{}\".",
-                         new String[] {
-                             doi, Integer.toString(resp.statusCode),
-                             resp.getContent()
-                         });
+                        doi, Integer.toString(resp.statusCode), resp.getContent());
                 throw new DOIIdentifierException("Unable to parse an answer from "
                                                      + "DataCite API. Please have a look into DSpace logs.",
                                                  DOIIdentifierException.BAD_ANSWER);
@@ -307,7 +306,7 @@ public class DataCiteConnector
             default: {
                 log.warn("While checking if the DOI {} is registered, we got a "
                              + "http status code {} and the message \"{}\".",
-                         new String[] {doi, Integer.toString(response.statusCode), response.getContent()});
+                         doi, Integer.toString(response.statusCode), response.getContent());
                 throw new DOIIdentifierException("Unable to parse an answer from "
                                                      + "DataCite API. Please have a look into DSpace logs.",
                                                  DOIIdentifierException.BAD_ANSWER);
@@ -340,7 +339,7 @@ public class DataCiteConnector
             default: {
                 log.warn("While deleting metadata of DOI {}, we got a "
                              + "http status code {} and the message \"{}\".",
-                         new String[] {doi, Integer.toString(resp.statusCode), resp.getContent()});
+                         doi, Integer.toString(resp.statusCode), resp.getContent());
                 throw new DOIIdentifierException("Unable to parse an answer from "
                                                      + "DataCite API. Please have a look into DSpace logs.",
                                                  DOIIdentifierException.BAD_ANSWER);
@@ -454,8 +453,8 @@ public class DataCiteConnector
             // Catch all other http status code in case we forgot one.
             default: {
                 log.warn("While reserving the DOI {}, we got a http status code "
-                             + "{} and the message \"{}\".", new String[]
-                             {doi, Integer.toString(resp.statusCode), resp.getContent()});
+                             + "{} and the message \"{}\".",
+                        doi, Integer.toString(resp.statusCode), resp.getContent());
                 throw new DOIIdentifierException("Unable to parse an answer from "
                                                      + "DataCite API. Please have a look into DSpace logs.",
                                                  DOIIdentifierException.BAD_ANSWER);
@@ -513,8 +512,8 @@ public class DataCiteConnector
             // Catch all other http status code in case we forgot one.
             default: {
                 log.warn("While registration of DOI {}, we got a http status code "
-                             + "{} and the message \"{}\".", new String[]
-                             {doi, Integer.toString(resp.statusCode), resp.getContent()});
+                             + "{} and the message \"{}\".",
+                        doi, Integer.toString(resp.statusCode), resp.getContent());
                 throw new DOIIdentifierException("Unable to parse an answer from "
                                                      + "DataCite API. Please have a look into DSpace logs.",
                                                  DOIIdentifierException.BAD_ANSWER);
@@ -686,14 +685,16 @@ public class DataCiteConnector
      */
     protected DataCiteResponse sendHttpRequest(HttpUriRequest req, String doi)
         throws DOIIdentifierException {
-        DefaultHttpClient httpclient = new DefaultHttpClient();
-        httpclient.getCredentialsProvider().setCredentials(
-            new AuthScope(HOST, 443),
-            new UsernamePasswordCredentials(this.getUsername(), this.getPassword()));
+        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        credentialsProvider.setCredentials(new AuthScope(HOST, 443),
+                new UsernamePasswordCredentials(this.getUsername(), this.getPassword()));
+
+        HttpClientContext httpContext = HttpClientContext.create();
+        httpContext.setCredentialsProvider(credentialsProvider);
 
         HttpEntity entity = null;
-        try {
-            HttpResponse response = httpclient.execute(req);
+        try ( CloseableHttpClient httpclient = HttpClientBuilder.create().build(); ) {
+            HttpResponse response = httpclient.execute(req, httpContext);
 
             StatusLine status = response.getStatusLine();
             int statusCode = status.getStatusCode();

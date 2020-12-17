@@ -40,7 +40,6 @@ import org.dspace.content.service.BundleService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
@@ -51,6 +50,7 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.event.Event;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageWorkflowEvent;
 import org.dspace.workflow.WorkflowException;
@@ -88,7 +88,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     /* support for 'no notification' */
     protected Map<UUID, Boolean> noEMail = new HashMap<>();
 
-    private Logger log = org.apache.logging.log4j.LogManager.getLogger(XmlWorkflowServiceImpl.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(XmlWorkflowServiceImpl.class);
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
@@ -122,6 +122,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     protected BitstreamFormatService bitstreamFormatService;
     @Autowired(required = true)
     protected BitstreamService bitstreamService;
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
 
     protected XmlWorkflowServiceImpl() {
 
@@ -137,7 +139,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
     @Override
     public List<String> getEPersonDeleteConstraints(Context context, EPerson ePerson) throws SQLException {
-        List<String> constraints = new ArrayList<String>();
+        List<String> constraints = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(claimedTaskService.findByEperson(context, ePerson))) {
             constraints.add("cwf_claimtask");
         }
@@ -237,7 +239,9 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     /**
      * startWithoutNotify() starts the workflow normally, but disables
      * notifications (useful for large imports,) for the first workflow step -
-     * subsequent notifications happen normally
+     * subsequent notifications happen normally.
+     * @param context the current DSpace session.
+     * @param wsi the submitted Item entering workflow.
      */
     @Override
     public XmlWorkflowItem startWithoutNotify(Context context, WorkspaceItem wsi)
@@ -436,7 +440,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                         return null;
                     }
                 }
-            } catch (Exception e) {
+            } catch (IOException | SQLException | AuthorizeException
+                    | WorkflowException | WorkflowConfigurationException e) {
                 log.error("error while processing workflow outcome", e);
                 e.printStackTrace();
             } finally {
@@ -463,8 +468,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             Collection myCollection = wfi.getCollection();
             String workflowStepString = null;
 
-            List<EPerson> currentEpersonOwners = new ArrayList<EPerson>();
-            List<Group> currentGroupOwners = new ArrayList<Group>();
+            List<EPerson> currentEpersonOwners = new ArrayList<>();
+            List<Group> currentGroupOwners = new ArrayList<>();
             //These are only null if our item is sent back to the submission
             if (newStep != null && newActionConfig != null) {
                 workflowStepString = workflowId + "." + newStep.getId() + "." + newActionConfig.getId();
@@ -497,7 +502,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             usageWorkflowEvent.setGroupOwners(currentGroupOwners.toArray(new Group[currentGroupOwners.size()]));
 
             DSpaceServicesFactory.getInstance().getEventService().fireEvent(usageWorkflowEvent);
-        } catch (Exception e) {
+        } catch (SQLException e) {
             //Catch all errors we do not want our workflow to crash because the logging threw an exception
             log.error(LogManager.getHeader(c, "Error while logging workflow event", "Workflow Item: " + wfi.getID()),
                       e);
@@ -736,11 +741,12 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         grantUserAllItemPolicies(context, wi.getItem(), e, ResourcePolicy.TYPE_WORKFLOW);
     }
 
+    @Override
     public void grantUserAllItemPolicies(Context context, Item item, EPerson epa, String policyType)
         throws AuthorizeException, SQLException {
         if (epa != null) {
             //A list of policies the user has for this item
-            List<Integer> userHasPolicies = new ArrayList<Integer>();
+            List<Integer> userHasPolicies = new ArrayList<>();
             List<ResourcePolicy> itempols = authorizeService.getPolicies(context, item);
             for (ResourcePolicy resourcePolicy : itempols) {
                 if (epa.equals(resourcePolicy.getEPerson())) {
@@ -772,7 +778,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         throws AuthorizeException, SQLException {
         if (group != null) {
             //A list of policies the user has for this item
-            List<Integer> groupHasPolicies = new ArrayList<Integer>();
+            List<Integer> groupHasPolicies = new ArrayList<>();
             List<ResourcePolicy> itempols = authorizeService.getPolicies(context, item);
             for (ResourcePolicy resourcePolicy : itempols) {
                 if (group.equals(resourcePolicy.getGroup())) {
@@ -829,6 +835,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         }
     }
 
+    @Override
     public void removeUserItemPolicies(Context context, Item item, EPerson e) throws SQLException, AuthorizeException {
         if (e != null && item.getSubmitter() != null) {
             //Also remove any lingering authorizations from this user
@@ -1088,13 +1095,13 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                 email.addArgument(coll.getName());
                 email.addArgument(rejector);
                 email.addArgument(reason);
-                email.addArgument(ConfigurationManager.getProperty("dspace.ui.url") + "/mydspace");
+                email.addArgument(configurationService.getProperty("dspace.ui.url") + "/mydspace");
 
                 email.send();
             } else {
                 // DO nothing
             }
-        } catch (Exception ex) {
+        } catch (IOException | MessagingException ex) {
             // log this email error
             log.warn(LogManager.getHeader(c, "notify_of_reject",
                     "cannot email user" + " eperson_id" + e.getID()
@@ -1105,7 +1112,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
     @Override
     public String getMyDSpaceLink() {
-        return ConfigurationManager.getProperty("dspace.ui.url") + "/mydspace";
+        return configurationService.getProperty("dspace.ui.url") + "/mydspace";
     }
 
     protected void revokeReviewerPolicies(Context context, Item item) throws SQLException, AuthorizeException {

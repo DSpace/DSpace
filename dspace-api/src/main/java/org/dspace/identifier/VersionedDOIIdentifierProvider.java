@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
@@ -26,7 +27,6 @@ import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * @author Marsa Haoua
@@ -36,7 +36,7 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
     /**
      * log4j category
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(VersionedDOIIdentifierProvider.class);
+    private static final Logger log = LogManager.getLogger(VersionedDOIIdentifierProvider.class);
 
     protected DOIConnector connector;
 
@@ -290,7 +290,7 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
         // dc.identifier.uri and add the safed identifiers.
         // The list of identifiers to safe won't get larger then the number of
         // existing identifiers.
-        ArrayList<String> newIdentifiers = new ArrayList<String>(identifiers.size());
+        ArrayList<String> newIdentifiers = new ArrayList<>(identifiers.size());
         boolean changed = false;
         for (MetadataValue identifier : identifiers) {
             if (!StringUtils.startsWithIgnoreCase(identifier.getValue(), bareDoiRef)) {
@@ -311,13 +311,15 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
         }
     }
 
-    @Required
+    @Override
+    @Autowired(required = true)
     public void setDOIConnector(DOIConnector connector) {
         super.setDOIConnector(connector);
         this.connector = connector;
     }
 
-    @Required
+    @Override
+    @Autowired(required = true)
     public void setConfigurationService(ConfigurationService configurationService) {
         super.setConfigurationService(configurationService);
         this.configurationService = configurationService;

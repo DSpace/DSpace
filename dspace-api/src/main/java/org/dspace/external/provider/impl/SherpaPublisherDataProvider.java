@@ -9,6 +9,7 @@ package org.dspace.external.provider.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -16,10 +17,10 @@ import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.sherpa.SHERPAPublisher;
@@ -29,8 +30,8 @@ import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
 
 /**
- * This class is the implementation of the ExternalDataProvider interface that will deal with SherpaPublisher External
- * data lookups
+ * This class is the implementation of the ExternalDataProvider interface that
+ * will deal with SherpaPublisher External data lookups.
  */
 public class SherpaPublisherDataProvider implements ExternalDataProvider {
 
@@ -47,13 +48,12 @@ public class SherpaPublisherDataProvider implements ExternalDataProvider {
 
     @Override
     public Optional<ExternalDataObject> getExternalDataObject(String id) {
-        List<BasicNameValuePair> args = new ArrayList<BasicNameValuePair>();
+        List<BasicNameValuePair> args = new ArrayList<>();
         args.add(new BasicNameValuePair("id", id));
         args.add(new BasicNameValuePair("ak", apiKey));
-        HttpClient hc = new DefaultHttpClient();
         String srUrl = url + "?" + URLEncodedUtils.format(args, "UTF8");
         HttpGet get = new HttpGet(srUrl);
-        try {
+        try ( CloseableHttpClient hc = HttpClientBuilder.create().build(); ) {
             HttpResponse response = hc.execute(get);
             if (response.getStatusLine().getStatusCode() == 200) {
                 SHERPAResponse sherpaResponse = new SHERPAResponse(response.getEntity().getContent());
@@ -74,8 +74,7 @@ public class SherpaPublisherDataProvider implements ExternalDataProvider {
     @Override
     public List<ExternalDataObject> searchExternalDataObjects(String query, int start, int limit) {
         HttpGet get = constructHttpGet(query);
-        try {
-            HttpClient hc = new DefaultHttpClient();
+        try ( CloseableHttpClient hc = HttpClientBuilder.create().build(); ) {
             HttpResponse response = hc.execute(get);
             if (response.getStatusLine().getStatusCode() == 200) {
                 SHERPAResponse sherpaResponse = new SHERPAResponse(response.getEntity().getContent());
@@ -89,15 +88,15 @@ public class SherpaPublisherDataProvider implements ExternalDataProvider {
             }
         } catch (IOException e) {
             log.error("SHERPA/RoMEO query failed: ", e);
-            return null;
+            return Collections.emptyList();
         } finally {
             get.releaseConnection();
         }
-        return null;
+        return Collections.emptyList();
     }
 
     private HttpGet constructHttpGet(String query) {
-        List<BasicNameValuePair> args = new ArrayList<BasicNameValuePair>();
+        List<BasicNameValuePair> args = new ArrayList<>();
         args.add(new BasicNameValuePair("pub", query));
         args.add(new BasicNameValuePair("qtype", "all"));
         args.add(new BasicNameValuePair("ak", apiKey));
@@ -135,8 +134,7 @@ public class SherpaPublisherDataProvider implements ExternalDataProvider {
     @Override
     public int getNumberOfResults(String query) {
         HttpGet get = constructHttpGet(query);
-        try {
-            HttpClient hc = new DefaultHttpClient();
+        try ( CloseableHttpClient hc = HttpClientBuilder.create().build(); ) {
             HttpResponse response = hc.execute(get);
             if (response.getStatusLine().getStatusCode() == 200) {
 
