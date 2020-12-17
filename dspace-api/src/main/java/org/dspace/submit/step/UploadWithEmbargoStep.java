@@ -57,7 +57,6 @@ import org.dspace.handle.service.HandleService;
  *
  * @author Tim Donohue
  * @author Keiji Suzuki
- * @version $Revision$
  */
 public class UploadWithEmbargoStep extends UploadStep
 {
@@ -486,7 +485,7 @@ public class UploadWithEmbargoStep extends UploadStep
                 if (configurationService.getBooleanProperty("submission-curation.virus-scan"))
                 {
                     Curator curator = new Curator();
-                    curator.addTask("vscan").curate(item);
+                    curator.addTask("vscan").curate(context, item);
                     int status = curator.getStatus("vscan");
                     if (status == Curator.CURATE_ERROR)
                     {
