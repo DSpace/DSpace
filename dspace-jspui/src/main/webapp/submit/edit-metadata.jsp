@@ -178,18 +178,18 @@
                 if (inputBlock != null)
                     sb.insert(0, inputBlock);
                 sb.append("<span id=\"").append(fieldInput).append("_indicator\" style=\"display: none;\">")
-                  .append("<img src=\"").append(contextPath).append("/image/authority/load-indicator.gif\" alt=\"Loading...\"/>")
-                  .append("</span><div id=\"").append(fieldInput).append("_autocomplete\" class=\"autocomplete\" style=\"display: none;\"> </div>");
+                        .append("<img src=\"").append(contextPath).append("/image/authority/load-indicator.gif\" alt=\"Loading...\"/>")
+                        .append("</span><div id=\"").append(fieldInput).append("_autocomplete\" class=\"autocomplete\" style=\"display: none;\"> </div>");
 
                 sb.append("<script type=\"text/javascript\">")
-                  .append("var gigo = DSpaceSetupAutocomplete('edit_metadata',")
-                  .append("{ metadataField: '").append(fieldName).append("', isClosed: '").append(required?"true":"false").append("', inputName: '")
-                  .append(fieldInput).append("', authorityName: '").append(authorityName).append("', containerID: '")
-                  .append(fieldInput).append("_autocomplete', indicatorID: '").append(fieldInput).append("_indicator', ")
-                  .append("contextPath: '").append(contextPath)
-                  .append("', confidenceName: '").append(confidenceName)
-                  .append("', confidenceIndicatorID: '").append(confIndID)
-                  .append("', collection: ").append(String.valueOf(collection.getID()))
+                        .append("var gigo = DSpaceSetupAutocomplete('edit_metadata',")
+                        .append("{ metadataField: '").append(fieldName).append("', isClosed: '").append(required?"true":"false").append("', inputName: '")
+                        .append(fieldInput).append("', authorityName: '").append(authorityName).append("', containerID: '")
+                        .append(fieldInput).append("_autocomplete', indicatorID: '").append(fieldInput).append("_indicator', ")
+                        .append("contextPath: '").append(contextPath)
+                        .append("', confidenceName: '").append(confidenceName)
+                        .append("', confidenceIndicatorID: '").append(confIndID).append("")
+                        .append("', collection: '").append(String.valueOf(collection.getID())).append("'")
                         .append(" }); </script>");
             }
 
