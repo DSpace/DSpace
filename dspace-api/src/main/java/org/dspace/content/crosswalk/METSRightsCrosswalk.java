@@ -596,6 +596,7 @@ public class METSRightsCrosswalk
                     }
 
                     //set permissions on policy add to list of policies
+                    rp.setdSpaceObject(dso);
                     rp.setAction(parsePermissions(permsElement));
                     policies.add(rp);
                 } //end if "Context" element

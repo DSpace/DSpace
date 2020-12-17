@@ -615,7 +615,12 @@ public class AuthorizeServiceImpl implements AuthorizeService
             ResourcePolicy rp = resourcePolicyService.create(c);
 
             // copy over values
-            rp.setdSpaceObject(dest);
+            if(srp.getdSpaceObject() != null){
+                rp.setdSpaceObject(srp.getdSpaceObject());
+            }
+            else {
+                rp.setdSpaceObject(dest);
+            }
             rp.setAction(srp.getAction());
             rp.setEPerson(srp.getEPerson());
             rp.setGroup(srp.getGroup());
