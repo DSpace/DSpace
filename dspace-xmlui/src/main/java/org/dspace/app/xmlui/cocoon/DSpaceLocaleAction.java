@@ -12,11 +12,14 @@ import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.parameters.Parameters;
 
 import org.apache.cocoon.acting.ServiceableAction;
+import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Redirector;
+import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.i18n.I18nUtils;
 import org.apache.cocoon.i18n.I18nUtils.LocaleValidator;
 import org.dspace.app.xmlui.utils.ContextUtil;
+import org.dspace.eperson.EPerson;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
@@ -48,7 +51,9 @@ import java.util.Map;
  */
 public class DSpaceLocaleAction extends ServiceableAction implements Configurable {
 
-   
+    /** Name of the attribute for the locale in the request parameters, session or cookies. */
+    public static final String LOCALE_ATTRIBUTE = "locale-attribute";
+
 	/** A validator class which tests if a local is a supported locale */
 	private static DSpaceLocaleValidator localeValidator;
 	
@@ -71,8 +76,7 @@ public class DSpaceLocaleAction extends ServiceableAction implements Configurabl
              defaultLocale = I18nUtil.getDefaultLocale();
          }
 	 }
-	
-	
+
     /**
      * Action which obtains the current environments locale information, and
      * places it in the objectModel (and optionally in a session/cookie).
@@ -83,8 +87,18 @@ public class DSpaceLocaleAction extends ServiceableAction implements Configurabl
                    String source,
                    Parameters parameters)
     throws Exception {
-        
-        Locale locale = I18nUtils.findLocale(objectModel, "locale-attribute", parameters, defaultLocale, false, true, false, localeValidator);
+
+        boolean switchLocale = false;
+
+        Locale locale = getRequestLocale(objectModel);
+        if (locale != null)
+        {
+            switchLocale = true;
+        }
+        else
+        {
+            locale = I18nUtils.findLocale(objectModel, LOCALE_ATTRIBUTE, parameters, null, false, true, false, localeValidator);
+        }
 
         if (locale == null) {
             if (getLogger().isDebugEnabled()) {
@@ -99,7 +113,7 @@ public class DSpaceLocaleAction extends ServiceableAction implements Configurabl
         }
 
         I18nUtils.storeLocale(objectModel,
-                "locale-attribute",
+                LOCALE_ATTRIBUTE,
                 localeStr,
                 false,
                 true,
@@ -108,6 +122,15 @@ public class DSpaceLocaleAction extends ServiceableAction implements Configurabl
 
         Context context = ContextUtil.obtainContext(objectModel);
         context.setCurrentLocale(locale);
+
+        if (switchLocale) {
+            // This request selects a specific locale. If logged in, save it in the user profile.
+
+            EPerson currentUser = context.getCurrentUser();
+            if (currentUser != null) {
+                currentUser.setLanguage(context, localeStr);
+            }
+        }
 
         // Set up a map for sitemap parameters
         Map<String, String> map = new HashMap<String, String>();
@@ -118,7 +141,33 @@ public class DSpaceLocaleAction extends ServiceableAction implements Configurabl
         return map;
     }
 
-    
+    /**
+     * Get the locale specifically set by the request parameters.
+     *
+     * @param objectModel
+     *            Cocoon's object model.
+     * @return The locale from the request parameters or null if the parameters
+     *         did not contain a valid locale.
+     */
+    private Locale getRequestLocale(Map objectModel)
+    {
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        String localeStr = request.getParameter(LOCALE_ATTRIBUTE);
+        Locale locale;
+
+        if (localeStr != null)
+        {
+            locale = I18nUtils.parseLocale(localeStr);
+
+            if (localeValidator.test("request", locale))
+            {
+                return locale;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * This validator class works with cocoon's i18nutils class to test if locales are valid. 
      * For dspace we define a locale as valid if it is listed in webui.supported.locales config 
