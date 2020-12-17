@@ -196,19 +196,22 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         TransformationEngine te = dls.getTransformationEngine();
 
         if (dataLoader==null){
-            System.out.println("ERROR: The key used in -i parameter must match a valid DataLoader in the BTE Spring XML configuration file!");
+            System.out.println("ERROR: The key used in -i parameter must match a " +
+              "valid DataLoader in the BTE Spring XML configuration file!");
             return;
         }
 
         if (outputMap==null){
-            System.out.println("ERROR: The key used in -i parameter must match a valid outputMapping in the BTE Spring XML configuration file!");
+            System.out.println("ERROR: The key used in -i parameter must match a " +
+              "valid outputMapping in the BTE Spring XML configuration file!");
             return;
         }
 
         if (dataLoader instanceof FileDataLoader){
             FileDataLoader fdl = (FileDataLoader) dataLoader;
             if (!StringUtils.isBlank(sourceDir)) {
-                System.out.println("INFO: Dataloader will load data from the file specified in the command prompt (and not from the Spring XML configuration file)");
+                System.out.println("INFO: Dataloader will load data from the file specified " +
+                  "in the command prompt (and not from the Spring XML configuration file)");
                 fdl.setFilename(sourceDir);
             }
         }
@@ -216,7 +219,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             OAIPMHDataLoader fdl = (OAIPMHDataLoader) dataLoader;
             System.out.println(sourceDir);
             if (!StringUtils.isBlank(sourceDir)){
-                System.out.println("INFO: Dataloader will load data from the address specified in the command prompt (and not from the Spring XML configuration file)");
+                System.out.println("INFO: Dataloader will load data from the address specified " +
+                  "in the command prompt (and not from the Spring XML configuration file)");
                 fdl.setServerAddress(sourceDir);
             }
         }
@@ -244,7 +248,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     }
 
     @Override
-    public void addItemsAtomic(Context c, List<Collection> mycollections, String sourceDir, String mapFile, boolean template) throws Exception {
+    public void addItemsAtomic(Context c, List<Collection> mycollections, String sourceDir, String mapFile, 
+        boolean template) throws Exception {
         try {
             addItems(c, mycollections, sourceDir, mapFile, template);
         } catch (Exception addException) {
@@ -684,7 +689,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 "schema");
         if (schemaAttr == null)
         {
-            schema = MetadataSchema.DC_SCHEMA;
+            schema = null;
         }
         else
         {
@@ -708,9 +713,11 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         }
     }
 
-    protected void addDCValue(Context c, Item i, String schema, Node n) throws TransformerException, SQLException, AuthorizeException
+    protected void addDCValue(Context c, Item i, String schema, Node n)
+          throws TransformerException, SQLException, AuthorizeException
     {
         String value = getStringValue(n); //n.getNodeValue();
+        String inlineSchema = schema;
         // compensate for empty value getting read as "null", which won't display
         if (value == null)
         {
@@ -718,8 +725,16 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         }
         else
         {
-        	value = value.trim();
+        	  value = value.trim();
         }
+        // check the schema attribute within the given node
+        if (inlineSchema==null || "".equals(inlineSchema)) {
+            inlineSchema = getAttributeValue(n, "schema");
+            if (inlineSchema==null || "".equals(inlineSchema)) {
+                inlineSchema = MetadataSchema.DC_SCHEMA;
+            }
+        }
+
         // //getElementData(n, "element");
         String element = getAttributeValue(n, "element");
         String qualifier = getAttributeValue(n, "qualifier"); //NodeValue();
@@ -733,8 +748,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
         if (!isQuiet)
         {
-            System.out.println("\tSchema: " + schema + " Element: " + element + " Qualifier: " + qualifier
-                    + " Value: " + value);
+	          System.out.println("\tSchema: " + inlineSchema + " Element: " + element 
+              + " Qualifier: " + qualifier + " Value: " + value);
         }
 
         if ("none".equals(qualifier) || "".equals(qualifier))
@@ -744,25 +759,26 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         // only add metadata if it is no test and there is a real value
         if (!isTest && !value.equals(""))
         {
-            itemService.addMetadata(c, i, schema, element, qualifier, language, value);
+	          itemService.addMetadata(c, i, inlineSchema, element, qualifier, language, value);
         }
         else
         {
             // If we're just test the import, let's check that the actual metadata field exists.
-        	MetadataSchema foundSchema = metadataSchemaService.find(c,schema);
+	          MetadataSchema foundSchema = metadataSchemaService.find(c, inlineSchema);
 
-        	if (foundSchema == null)
-        	{
-        		System.out.println("ERROR: schema '"+schema+"' was not found in the registry.");
-        		return;
-        	}
+            if (foundSchema == null)
+            {
+	              System.out.println("ERROR: schema '" + inlineSchema + "' was not found in the registry.");
+                return;
+            }
 
-        	MetadataField foundField = metadataFieldService.findByElement(c, foundSchema, element, qualifier);
+            MetadataField foundField = metadataFieldService.findByElement(c, foundSchema, element, qualifier);
 
-        	if (foundField == null)
-        	{
-        		System.out.println("ERROR: Metadata field: '"+schema+"."+element+"."+qualifier+"' was not found in the registry.");
-        		return;
+            if (foundField == null)
+            {
+        	      System.out.println("ERROR: Metadata field: '" + inlineSchema + "." + element + "." 
+                  + qualifier + "' was not found in the registry.");
+        	      return;
             }
         }
     }
@@ -781,7 +797,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
      * @throws SQLException if database error
      */
 
-    protected List<Collection> processCollectionFile(Context c, String path, String filename) throws IOException, SQLException
+    protected List<Collection> processCollectionFile(Context c, String path, String filename) 
+        throws IOException, SQLException
     {
         File file = new File(path + File.separatorChar + filename);
         ArrayList<Collection> collections = new ArrayList<>();
@@ -1143,7 +1160,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             String[] dirListing = dir.list();
             for (String fileName : dirListing)
             {
-                if (!"dublin_core.xml".equals(fileName) && !fileName.equals("handle") && !metadataFileFilter.accept(dir, fileName))
+                if (!"dublin_core.xml".equals(fileName) && !fileName.equals("handle") && 
+                    !metadataFileFilter.accept(dir, fileName))
                 {
                     throw new FileNotFoundException("No contents file found");
                 }
@@ -1647,7 +1665,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             log.error("Unable to create temporary directory: " + tempdir.getAbsolutePath());
         }
         String sourcedir = destinationDir + System.getProperty("file.separator") + zipfile.getName();
-        String zipDir = destinationDir + System.getProperty("file.separator") + zipfile.getName() + System.getProperty("file.separator");
+        String zipDir = destinationDir + System.getProperty("file.separator") + zipfile.getName() + 
+                        System.getProperty("file.separator");
 
 
         // 3
@@ -1750,7 +1769,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
     /**
      * 
-     * Given a local file or public URL to a zip file that has the Simple Archive Format, this method imports the contents to DSpace
+     * Given a local file or public URL to a zip file that has the Simple Archive Format, 
+     * this method imports the contents to DSpace
      * @param filepath The filepath to local file or the public URL of the zip file
      * @param owningCollection The owning collection the items will belong to
      * @param otherCollections The collections the created items will be inserted to, apart from the owning one
@@ -1761,7 +1781,9 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
      * @throws Exception if error
      */
     @Override
-    public void processUIImport(String filepath, Collection owningCollection, String[] otherCollections, String resumeDir, String inputType, Context context, final boolean template) throws Exception
+    public void processUIImport(String filepath, Collection owningCollection, String[] otherCollections, 
+                                String resumeDir, String inputType, Context context, final boolean template) 
+          throws Exception
 	{
 		final EPerson oldEPerson = context.getCurrentUser();
 		final String[] theOtherCollections = otherCollections;
@@ -1804,7 +1826,9 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                         }
                     }
 
-					importDir = ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir") + File.separator + "batchuploads" + File.separator + context.getCurrentUser().getID() + File.separator + (isResume?theResumeDir:(new GregorianCalendar()).getTimeInMillis());
+					importDir = ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir") + File.separator + 
+              "batchuploads" + File.separator + context.getCurrentUser().getID() + File.separator + 
+              (isResume?theResumeDir:(new GregorianCalendar()).getTimeInMillis());
 					File importDirFile = new File(importDir);
 					if (!importDirFile.exists()){
 						boolean success = importDirFile.mkdirs();
@@ -1838,7 +1862,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 						}
 						(new File(importDirFile + File.separator + "error.txt")).delete();
 						FileDeleteStrategy.FORCE.delete(new File(dataDir));
-						FileDeleteStrategy.FORCE.delete(new File(importDirFile + File.separator + "data_unzipped" + File.separator));
+						FileDeleteStrategy.FORCE.delete(new File(importDirFile + File.separator + "data_unzipped" + 
+                File.separator));
 					}
 
 					//In case of Simple Archive Format import we need an extra effort to download the zip file and unzip it
@@ -1860,14 +1885,16 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 						sourcePath = unzip(new File(dataPath), dataDir);
 						
 						//Move files to the required folder
-						FileUtils.moveDirectory(new File(sourcePath), new File(importDirFile + File.separator + "data_unzipped" + File.separator));
+						FileUtils.moveDirectory(new File(sourcePath), new File(importDirFile + File.separator + 
+              "data_unzipped" + File.separator));
 						FileDeleteStrategy.FORCE.delete(new File(dataDir));
 						dataDir = importDirFile + File.separator + "data_unzipped" + File.separator;
 					}
 					else if (theInputType.equals("safupload")){ 
 						sourcePath = unzip(new File(dataPath), dataDir);
 						//Move files to the required folder
-						FileUtils.moveDirectory(new File(sourcePath), new File(importDirFile + File.separator + "data_unzipped" + File.separator));
+						FileUtils.moveDirectory(new File(sourcePath), new File(importDirFile + File.separator + 
+              "data_unzipped" + File.separator));
 						FileDeleteStrategy.FORCE.delete(new File(dataDir));
 						dataDir = importDirFile + File.separator + "data_unzipped" + File.separator;
 					}
