@@ -12,12 +12,15 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+
 
 /**
  * Database Access Object interface class for the Item object.
@@ -29,6 +32,8 @@ import java.util.UUID;
 public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item>
 {
     public Iterator<Item> findAll(Context context, boolean archived) throws SQLException;
+
+    public Iterator<Item> findAll(Context context, boolean archived, int limit, int offset) throws SQLException;
 
     public Iterator<Item> findAll(Context context, boolean archived, boolean withdrawn) throws SQLException;
 
@@ -116,5 +121,9 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item>
      * @throws SQLException if database error
      */
     int countItems(Context context, boolean includeArchived, boolean includeWithdrawn) throws SQLException;
+
+    Iterator<Item> findAllAuthorized(Context context, int pageSize, int pageOffset, EPerson currentUser, int action, Set<Group> groups) throws SQLException;
+
+    int countTotalAuthorized(Context context, EPerson currentUser, int action, Set<Group> groups) throws SQLException;
     
 }

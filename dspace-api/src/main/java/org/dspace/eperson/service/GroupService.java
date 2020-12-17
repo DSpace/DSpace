@@ -16,8 +16,10 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Service interface class for the Group object.
@@ -331,4 +333,8 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
      * @throws SQLException database exception
      */
     List<Group> findByMetadataField(Context context, String searchValue, MetadataField metadataField) throws SQLException;
+
+    List<Group> getAllParentGroups(Context context, UUID groupUuid) throws SQLException;
+
+    //List<Group> getAllParentGroups(Context context, LinkedList<UUID> groupUuid) throws SQLException;
 }
