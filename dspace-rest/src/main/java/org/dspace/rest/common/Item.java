@@ -84,7 +84,9 @@ public class Item extends DSpaceObject {
 
         this.setArchived(Boolean.toString(item.isArchived()));
         this.setWithdrawn(Boolean.toString(item.isWithdrawn()));
-        this.setLastModified(item.getLastModified().toString());
+        if (item.getLastModified() != null) {
+            this.setLastModified(item.getLastModified().toString());
+        }
 
         if(expandFields.contains("parentCollection") || expandFields.contains("all")) {
         	if (item.getOwningCollection() != null) {
