@@ -20,7 +20,6 @@ import org.dspace.content.Community;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.WorkspaceItemService;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -32,47 +31,35 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
     protected SearchService searchService = SearchUtils.getSearchService();
 
 
-    Community community;
-    Collection col;
-
-    WorkspaceItem leftIs;
-    WorkspaceItem rightIs;
-
-    /**
-     * This method will be run before every test as per @Before. It will
-     * initialize resources required for the tests.
-     *
-     * Other methods can be annotated with @Before here or in subclasses
-     * but no execution order is guaranteed
-     */
-    @Before
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-        context.turnOffAuthorisationSystem();
-        community = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
-
-        col = CollectionBuilder.createCollection(context, community).build();
-
-        leftIs = WorkspaceItemBuilder.createWorkspaceItem(context, col).withAbstract("headache").build();
-        rightIs = WorkspaceItemBuilder.createWorkspaceItem(context, col).withAbstract("headache").build();
-
-        context.restoreAuthSystemState();
-    }
-
     @Test
     public void deleteWorkspaceItemSolrRecordAfterDeletionFromDbTest() throws Exception {
         context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context)
+                                              .withName("Parent Community")
+                                              .build();
+        Collection col = CollectionBuilder.createCollection(context, community)
+                                          .build();
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, col)
+                                                          .withAbstract("headache")
+                                                          .build();
+        context.restoreAuthSystemState();
+
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setQuery("*:*");
-        discoverQuery.addFilterQueries("search.resourceid:" + leftIs.getID());
+        discoverQuery.addFilterQueries("search.resourceid:" + workspaceItem.getID());
         DiscoverResult discoverResult = searchService.search(context, discoverQuery);
         List<IndexableObject> indexableObjects = discoverResult.getIndexableObjects();
         assertEquals(1, indexableObjects.size());
-        workspaceItemService.deleteAll(context, leftIs);
+        assertEquals(1, discoverResult.getTotalSearchResults());
+
+        context.turnOffAuthorisationSystem();
+        workspaceItemService.deleteAll(context, workspaceItem);
+        context.dispatchEvents();
+        context.restoreAuthSystemState();
+
         discoverResult = searchService.search(context, discoverQuery);
         indexableObjects = discoverResult.getIndexableObjects();
         assertEquals(0, indexableObjects.size());
-        context.restoreAuthSystemState();
+        assertEquals(0, discoverResult.getTotalSearchResults());
     }
 }
