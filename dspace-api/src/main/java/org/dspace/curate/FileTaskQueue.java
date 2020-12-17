@@ -7,12 +7,7 @@
  */
 package org.dspace.curate;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -117,11 +112,17 @@ public class FileTaskQueue implements TaskQueue
             // stop when no more queues or one found locked
             File qDir = ensureQueue(queueName);
             readTicket = ticket;
-            int queueIdx = 0;
-            while (true)
+            String[] queueFiles = qDir.list(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    return name.startsWith("queue");
+                }
+            });
+            for (String queueFile : queueFiles)
             {
-                File queue = new File(qDir, "queue" + Integer.toString(queueIdx));
-                File lock = new File(qDir, "lock" + Integer.toString(queueIdx));
+                int queueIdx = Integer.parseInt(queueFile.replace("queue", ""));
+                File queue = new File(qDir, queueFile);
+                File lock = new File(qDir, "lock" + queueIdx);
 
                 // If the queue file exists, atomically check for a lock file and create one if it doesn't exist
                 // If the lock file exists already, then this simply returns false
@@ -154,7 +155,6 @@ public class FileTaskQueue implements TaskQueue
                 {
                     break;
                 }
-                queueIdx++;
             }
         }
         return entrySet;
