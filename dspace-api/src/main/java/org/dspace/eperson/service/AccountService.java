@@ -36,6 +36,9 @@ public interface AccountService {
 
     public void sendForgotPasswordInfo(Context context, String email) throws SQLException, IOException, MessagingException, AuthorizeException;
 
+    public String getForgotPasswordLink(Context context, String email)
+                throws SQLException, AuthorizeException;
+
     public EPerson getEPerson(Context context, String token)
                 throws SQLException, AuthorizeException;
 
