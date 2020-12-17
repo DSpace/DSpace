@@ -9,9 +9,11 @@
 
 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util"
     xmlns:configurator="http://cocoon.apache.org/schema/configurator"
-    xmlns:avalon="http://cocoon.apache.org/schema/avalon" xmlns:servlet="http://cocoon.apache.org/schema/servlet"
+    xmlns:avalon="http://cocoon.apache.org/schema/avalon"
+    xmlns:servlet="http://cocoon.apache.org/schema/servlet"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
                            http://cocoon.apache.org/schema/configurator http://cocoon.apache.org/schema/configurator/cocoon-configurator-1.0.1.xsd
@@ -49,6 +51,22 @@
         <property name="eventService" >
             <ref bean="dspace.eventService"/>
         </property>
+    </bean>
+
+    <!-- Configure a Saxon-based transformer factory for Cocoon.
+         This will be injected Avalon-style since nothing else works. -->
+    <bean class='org.dspace.saxon.ConfigurableTransformerFactory'
+          scope='prototype'>
+        <!-- Avalon interferes with Spring DI
+        <property name='functions'>
+            <set value-type='net.sf.saxon.lib.ExtensionFunctionDefinition'>
+                <bean class='org.dspace.saxon.ConfmanGetProperty'
+                      scope='prototype'/>
+                <bean class='org.dspace.saxon.ConfmanGetIntProperty'
+                      scope='prototype'/>
+            </set>
+        </property>
+        -->
     </bean>
 
     <!-- Google Analytics recording  -->

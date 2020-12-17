@@ -22,7 +22,7 @@
 	xmlns:dri="http://di.tamu.edu/DRI/1.0/"
 	xmlns:mets="http://www.loc.gov/METS/"
 	xmlns:xlink="http://www.w3.org/TR/xlink/"
-	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="3.0"
 	xmlns:dim="http://www.dspace.org/xmlns/dspace/dim"
 	xmlns:xhtml="http://www.w3.org/1999/xhtml"
 	xmlns:mods="http://www.loc.gov/mods/v3"
@@ -65,7 +65,6 @@
                                 </input>
                                 <span class="input-group-btn">
                                     <button class="ds-button-field btn btn-primary" title="xmlui.general.go" i18n:attr="title">
-                                        <span class="glyphicon glyphicon-search" aria-hidden="true"/>
                                         <xsl:attribute name="onclick">
                                                     <xsl:text>
                                                         var radio = document.getElementById(&quot;ds-search-form-scope-container&quot;);
@@ -85,6 +84,7 @@
                                                         }
                                                     </xsl:text>
                                         </xsl:attribute>
+                                        <span class="glyphicon glyphicon-search" aria-hidden="true"/>
                                     </button>
                                 </span>
                             </div>

@@ -14,12 +14,12 @@
     xmlns:mets="http://www.loc.gov/METS/"
     xmlns:dim="http://www.dspace.org/xmlns/dspace/dim"
     xmlns:xlink="http://www.w3.org/TR/xlink/"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="3.0"
     xmlns="http://www.w3.org/1999/xhtml"
     xmlns:xalan="http://xml.apache.org/xalan"
     xmlns:encoder="xalan://java.net.URLEncoder"
     xmlns:stringescapeutils="org.apache.commons.lang3.StringEscapeUtils"
-    xmlns:util="org.dspace.app.xmlui.utils.XSLUtils"
+    xmlns:util="http://www.dspace.org/xmlns/dspace"
     exclude-result-prefixes="xalan encoder i18n dri mets dim  xlink xsl util stringescapeutils">
 
     <xsl:output indent="yes"/>
@@ -281,6 +281,7 @@
                         <xsl:when test="dri:list[@n=(concat($handle, ':dc.description.abstract'))]/dri:item">
                         <div class="abstract">
                                 <xsl:value-of select="util:shortenString(dri:list[@n=(concat($handle, ':dc.description.abstract'))]/dri:item[1], 220, 10)"/>
+                            <!--<xsl:value-of select="dri:list[@n=(concat($handle, ':dc.description.abstract'))]/dri:item[1]"/>-->
                         </div>
                     </xsl:when>
                     </xsl:choose>
@@ -387,7 +388,7 @@
 
     <xsl:template match="dri:table[@id='aspect.discovery.SimpleSearch.table.discovery-filters']/dri:row">
         <script type="text/javascript">
-            <xsl:text>
+            <!--<xsl:text>
                 if (!window.DSpace) {
                     window.DSpace = {};
                 }
@@ -402,7 +403,7 @@
                     relational_operator: '</xsl:text><xsl:value-of select="stringescapeutils:escapeEcmaScript(dri:cell/dri:field[starts-with(@n, 'filter_relational_operator')]/dri:value/@option)"/><xsl:text>',
                     query: '</xsl:text><xsl:value-of select="stringescapeutils:escapeEcmaScript(dri:cell/dri:field[@rend = 'discovery-filter-input']/dri:value)"/><xsl:text>',
                 });
-            </xsl:text>
+            </xsl:text>-->
         </script>
     </xsl:template>
 

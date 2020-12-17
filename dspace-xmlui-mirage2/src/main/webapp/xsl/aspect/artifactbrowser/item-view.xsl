@@ -24,18 +24,17 @@
     xmlns:mets="http://www.loc.gov/METS/"
     xmlns:dim="http://www.dspace.org/xmlns/dspace/dim"
     xmlns:xlink="http://www.w3.org/TR/xlink/"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="3.0"
     xmlns:atom="http://www.w3.org/2005/Atom"
     xmlns:ore="http://www.openarchives.org/ore/terms/"
     xmlns:oreatom="http://www.openarchives.org/ore/atom/"
     xmlns="http://www.w3.org/1999/xhtml"
     xmlns:xalan="http://xml.apache.org/xalan"
     xmlns:encoder="xalan://java.net.URLEncoder"
-    xmlns:util="org.dspace.app.xmlui.utils.XSLUtils"
-    xmlns:jstring="java.lang.String"
+    xmlns:util="http://www.dspace.org/xmlns/dspace"
     xmlns:rights="http://cosimo.stanford.edu/sdr/metsrights/"
     xmlns:confman="org.dspace.core.ConfigurationManager"
-    exclude-result-prefixes="xalan encoder i18n dri mets dim xlink xsl util jstring rights confman">
+    exclude-result-prefixes="xalan encoder i18n dri mets dim xlink xsl util rights confman">
 
     <xsl:output indent="yes"/>
 
@@ -338,25 +337,25 @@
                     </h5>
 
                     <xsl:variable name="label-1">
-                            <xsl:choose>
-                                <xsl:when test="confman:getProperty('mirage2.item-view.bitstream.href.label.1')">
-                                    <xsl:value-of select="confman:getProperty('mirage2.item-view.bitstream.href.label.1')"/>
-                                </xsl:when>
-                                <xsl:otherwise>
+                        <!-- <xsl:choose>
+                             <xsl:when test="confman:getProperty('mirage2.item-view.bitstream.href.label.1')">
+                                 <xsl:value-of select="confman:getProperty('mirage2.item-view.bitstream.href.label.1')"/>
+                             </xsl:when>
+                             <xsl:otherwise>-->
                                     <xsl:text>label</xsl:text>
-                                </xsl:otherwise>
-                            </xsl:choose>
+                                <!--</xsl:otherwise>
+                            </xsl:choose>-->
                     </xsl:variable>
 
                     <xsl:variable name="label-2">
-                            <xsl:choose>
+                            <!--<xsl:choose>
                                 <xsl:when test="confman:getProperty('mirage2.item-view.bitstream.href.label.2')">
                                     <xsl:value-of select="confman:getProperty('mirage2.item-view.bitstream.href.label.2')"/>
                                 </xsl:when>
-                                <xsl:otherwise>
+                                <xsl:otherwise>-->
                                     <xsl:text>title</xsl:text>
-                                </xsl:otherwise>
-                            </xsl:choose>
+                                <!--</xsl:otherwise>
+                            </xsl:choose>-->
                     </xsl:variable>
                     <!-- Primary bitstream is always first fptr child of mets:div[@TYPE='DSpace Item'] -->
                     <xsl:variable name="primaryBitstream" select="//mets:structMap[@TYPE='LOGICAL']/mets:div[@TYPE='DSpace Item']/mets:fptr/@FILEID"/>
@@ -594,7 +593,8 @@
                         <xsl:attribute name="title">
                             <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:title"/>
                         </xsl:attribute>
-                        <xsl:value-of select="util:shortenString(mets:FLocat[@LOCTYPE='URL']/@xlink:title, 30, 5)"/>
+                        <!--<xsl:value-of select="util:shortenString(mets:FLocat[@LOCTYPE='URL']/@xlink:title, 30, 5)"/>-->
+                        <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:title"/>
                     </dd>
                 <!-- File size always comes in bytes and thus needs conversion -->
                     <dt>
@@ -656,7 +656,8 @@
                             <xsl:attribute name="title">
                                 <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label"/>
                             </xsl:attribute>
-                            <xsl:value-of select="util:shortenString(mets:FLocat[@LOCTYPE='URL']/@xlink:label, 30, 5)"/>
+                            <!--<xsl:value-of select="util:shortenString(mets:FLocat[@LOCTYPE='URL']/@xlink:label, 30, 5)"/>-->
+                            <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label"/>
                         </dd>
                 </xsl:if>
                 </dl>
@@ -686,7 +687,7 @@
     </xsl:template>
 
     <xsl:template name="display-rights">
-        <xsl:variable name="file_id" select="jstring:replaceAll(jstring:replaceAll(string(@ADMID), '_METSRIGHTS', ''), 'rightsMD_', '')"/>
+        <xsl:variable name="file_id" select="replace(replace(string(@ADMID), '_METSRIGHTS', ''), 'rightsMD_', '')"/>
         <xsl:variable name="rights_declaration" select="../../../mets:amdSec/mets:rightsMD[@ID = concat('rightsMD_', $file_id, '_METSRIGHTS')]/mets:mdWrap/mets:xmlData/rights:RightsDeclarationMD"/>
         <xsl:variable name="rights_context" select="$rights_declaration/rights:Context"/>
         <xsl:variable name="users">
