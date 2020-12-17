@@ -416,7 +416,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         for (RelationshipType relationshipType : relationshipTypes) {
             if (virtualMetadataPopulator.getMap().containsKey(relationshipType.getRightwardType())) {
                 boolean isLeft = false; //was always true
-                if (relationshipType.getLeftType().equals(entityTypeStringFromMetadata)) {
+                if (relationshipType.getRightType().equals(entityTypeStringFromMetadata)) {
                     isLeft = true;
                 }
                 List<Relationship> list = findByItemAndRelationshipType(context, item, relationshipType, isLeft);
@@ -424,15 +424,15 @@ public class RelationshipServiceImpl implements RelationshipService {
                     if (isLeft) {
                         if (!itemsToUpdate.contains(foundRelationship.getRightItem())) {
                             itemsToUpdate.add(foundRelationship.getRightItem());
+                            getRelatedItemsForRightItem(context, foundRelationship.getRightItem(),
+                                    foundRelationship, itemsToUpdate, max, currentDepth + 1, maxDepth);
                         }
-                        getRelatedItemsForRightItem(context, foundRelationship.getRightItem(),
-                                foundRelationship, itemsToUpdate, max, currentDepth + 1, maxDepth);
                     } else {
                         if (!itemsToUpdate.contains(foundRelationship.getLeftItem())) {
                             itemsToUpdate.add(foundRelationship.getLeftItem());
+                            getRelatedItemsForLeftItem(context, foundRelationship.getLeftItem(),
+                                    foundRelationship, itemsToUpdate, max, currentDepth + 1, maxDepth);
                         }
-                        getRelatedItemsForLeftItem(context, foundRelationship.getLeftItem(),
-                                foundRelationship, itemsToUpdate, max, currentDepth + 1, maxDepth);
                     }
                 }
             } else {
@@ -466,13 +466,17 @@ public class RelationshipServiceImpl implements RelationshipService {
                 List<Relationship> list = findByItemAndRelationshipType(context, item, relationshipType, isLeft);
                 for (Relationship foundRelationship : list) {
                     if (isLeft) {
-                        itemsToUpdate.add(foundRelationship.getRightItem());
-                        itemsToUpdate.addAll(getRelatedItemsForRightItem(context, foundRelationship.getRightItem(),
-                                foundRelationship, itemsToUpdate, max, currentDepth + 1, maxDepth));
+                        if (!itemsToUpdate.contains(foundRelationship.getRightItem())) {
+                            itemsToUpdate.add(foundRelationship.getRightItem());
+                            itemsToUpdate.addAll(getRelatedItemsForRightItem(context, foundRelationship.getRightItem(),
+                                    foundRelationship, itemsToUpdate, max, currentDepth + 1, maxDepth));
+                        }
                     } else {
-                        itemsToUpdate.add(foundRelationship.getLeftItem());
-                        itemsToUpdate.addAll(getRelatedItemsForLeftItem(context, foundRelationship.getLeftItem(),
-                                foundRelationship, itemsToUpdate, max, currentDepth + 1, maxDepth));
+                        if (!itemsToUpdate.contains(foundRelationship.getLeftItem())) {
+                            itemsToUpdate.add(foundRelationship.getLeftItem());
+                            itemsToUpdate.addAll(getRelatedItemsForLeftItem(context, foundRelationship.getLeftItem(),
+                                    foundRelationship, itemsToUpdate, max, currentDepth + 1, maxDepth));
+                        }
                     }
                 }
             } else {
