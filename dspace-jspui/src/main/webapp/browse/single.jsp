@@ -34,6 +34,8 @@
 	BrowseInfo bi = (BrowseInfo) request.getAttribute("browse.info");
 	BrowseIndex bix = bi.getBrowseIndex();
 
+	String starts_with = (String) request.getAttribute("starts_with");
+
 	//values used by the header
 	String scope = "";
 	String type = "";
@@ -88,11 +90,19 @@
 	
 	if (bi.hasNextPage())
     {
+		if (StringUtils.isNotBlank(starts_with)) {
+			next = next + "&amp;starts_with=" + starts_with;
+		}
+
         next = next + "&amp;offset=" + bi.getNextOffset();
     }
 
 	if (bi.hasPrevPage())
     {
+		if (StringUtils.isNotBlank(starts_with)) {
+			prev = prev + "&amp;starts_with=" + starts_with;
+		}
+
         prev = prev + "&amp;offset=" + bi.getPrevOffset();
     }
 
@@ -233,6 +243,13 @@
 	}
 %>
 		</select>
+<%
+	if (StringUtils.isNotBlank(starts_with)) {
+%>
+		<input type="hidden" name="starts_with" value="<%= starts_with %>"/>
+<%
+	}
+%>
 		<input type="submit" class="btn btn-default" name="submit_browse" value="<fmt:message key="jsp.general.update"/>"/>
 	</form>
 	</div>
