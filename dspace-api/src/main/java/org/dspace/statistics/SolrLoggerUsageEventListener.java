@@ -8,6 +8,9 @@
 package org.dspace.statistics;
 
 import org.apache.log4j.Logger;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.model.Event;
 import org.dspace.statistics.factory.StatisticsServiceFactory;
@@ -47,6 +50,23 @@ public class SolrLoggerUsageEventListener extends AbstractUsageEventListener {
 			    EPerson currentUser = ue.getContext() == null ? null : ue.getContext().getCurrentUser();
 
                 if(UsageEvent.Action.VIEW == ue.getAction()){
+					// Only log bitstream views if the bitstream belongs to an archived item
+					if (ue.getObject() instanceof Bitstream) {
+						Bitstream bitstream = (Bitstream) ue.getObject();
+						Boolean isBitstreamArchived = false;
+						for (Bundle bundle : bitstream.getBundles()) {
+							for (Item item : bundle.getItems()) {
+								if (item.isArchived() == true) {
+									isBitstreamArchived = true;
+								}
+							}
+						}
+
+						if (isBitstreamArchived == false) {
+							return;
+						}
+					}
+
                 	if(ue.getRequest()!=null){
                         solrLoggerService.postView(ue.getObject(), ue.getRequest(), currentUser);
                 	} else {
