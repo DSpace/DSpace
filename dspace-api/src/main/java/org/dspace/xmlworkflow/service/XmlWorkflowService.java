@@ -32,7 +32,7 @@ import java.util.List;
  * When an item is submitted and is somewhere in a workflow, it has a row in the
  * WorkflowItem table pointing to it.
  *
- * Once the item has completed the workflow it will be archived
+ * Once the item has completed the workflow it will be archived.
  *
  * @author Bram De Schouwer (bram.deschouwer at dot com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -43,6 +43,22 @@ public interface XmlWorkflowService extends WorkflowService<XmlWorkflowItem> {
 
     public void alertUsersOnTaskActivation(Context c, XmlWorkflowItem wfi, String emailTemplate, List<EPerson> epa, String ...arguments) throws IOException, SQLException, MessagingException;
 
+    /**
+     * Execute the actions associated with a state, and return the next state.
+     *
+     * @param c session context.
+     * @param user TODO
+     * @param request the current request.
+     * @param workflowItemId the item to be advanced.
+     * @param workflow item is in this workflow.
+     * @param currentActionConfig TODO
+     * @return TODO
+     * @throws SQLException TODO
+     * @throws AuthorizeException TODO
+     * @throws IOException TODO
+     * @throws MessagingException TODO
+     * @throws WorkflowException TODO
+     */
     public WorkflowActionConfig doState(Context c, EPerson user, HttpServletRequest request, int workflowItemId, Workflow workflow, WorkflowActionConfig currentActionConfig) throws SQLException, AuthorizeException, IOException, MessagingException, WorkflowException;
 
     public WorkflowActionConfig processOutcome(Context c, EPerson user, Workflow workflow, Step currentStep, WorkflowActionConfig currentActionConfig, ActionResult currentOutcome, XmlWorkflowItem wfi, boolean enteredNewStep) throws IOException, AuthorizeException, SQLException, WorkflowException;
@@ -63,6 +79,22 @@ public interface XmlWorkflowService extends WorkflowService<XmlWorkflowItem> {
     public void grantUserAllItemPolicies(Context context, Item item, EPerson epa) throws AuthorizeException, SQLException;
 
     public void removeUserItemPolicies(Context context, Item item, EPerson e) throws SQLException, AuthorizeException;
+
+    /**
+     * Send email to interested parties when curation tasks run.
+     *
+     * @param c session context.
+     * @param wi the item being curated.
+     * @param ePeople the interested parties.
+     * @param taskName the task that has been run.
+     * @param action the action indicated by the task (reject, approve, etc.)
+     * @param message anything the code wants to say about the task.
+     * @throws SQLException passed through.
+     * @throws IOException passed through.
+     */
+    public void notifyOfCuration(Context c, XmlWorkflowItem wi,
+            List<EPerson> ePeople, String taskName, String action, String message)
+            throws SQLException, IOException;
 
     public String getEPersonName(EPerson ePerson);
 }
