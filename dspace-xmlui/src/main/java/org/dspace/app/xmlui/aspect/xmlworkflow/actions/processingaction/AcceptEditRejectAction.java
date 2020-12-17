@@ -14,8 +14,11 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.core.Constants;
 import org.dspace.xmlworkflow.state.actions.Action;
 import org.dspace.xmlworkflow.state.actions.processingaction.ReviewAction;
 import org.xml.sax.SAXException;
@@ -39,6 +42,9 @@ public class AcceptEditRejectAction extends AbstractXMLUIAction {
 
     protected static final Message T_info2=
         message("xmlui.Submission.workflow.RejectTaskStep.info1");
+    
+    protected static final Message T_info3=
+        message("xmlui.XMLWorkflow.workflow.DeleteItemAction.info3");
     
 
     private static final Message T_HEAD = message("xmlui.XMLWorkflow.workflow.EditMetadataAction.head");
@@ -76,7 +82,10 @@ public class AcceptEditRejectAction extends AbstractXMLUIAction {
     protected static final Message T_cancel_submit =
         message("xmlui.general.cancel");
 
-
+    protected static final Message T_delete_help =
+            message("xmlui.XMLWorkflow.workflow.EditMetadataAction.delete_help");
+    protected static final Message T_delete_submit =
+    		 message("xmlui.general.delete");;
     @Override
     public void addBody(Body body) throws SAXException, WingException, SQLException, IOException, AuthorizeException {
         Item item = workflowItem.getItem();
@@ -105,12 +114,16 @@ public class AcceptEditRejectAction extends AbstractXMLUIAction {
             case ReviewAction.REJECT_PAGE:
                 renderRejectPage(div);
                 break;
+            case org.dspace.xmlworkflow.state.actions.processingaction.AcceptEditRejectAction.DELETE_PAGE:
+            	renderDeletePage(div);
+
         }
 
         div.addHidden("submission-continue").setValue(knot.getId());
     }
 
-    private void renderMainPage(Division div) throws WingException {
+    private void renderMainPage(Division div) throws WingException, SQLException {
+        AuthorizeService authorizeService= AuthorizeServiceFactory.getInstance().getAuthorizeService();
         Table table = div.addTable("workflow-actions", 1, 1);
         table.setHead(T_info1);
 
@@ -123,8 +136,13 @@ public class AcceptEditRejectAction extends AbstractXMLUIAction {
         row = table.addRow();
         row.addCellContent(T_reject_help);
         row.addCell().addButton("submit_reject").setValue(T_reject_submit);
-
-
+        
+        //Delete item
+        if (authorizeService.authorizeActionBoolean(context, workflowItem.getItem(), Constants.DELETE)) {
+	        row = table.addRow();
+	        row.addCellContent(T_delete_help);
+	        row.addCell().addButton("submit_delete").setValue(T_delete_submit);
+        }
         // Edit metadata
         row = table.addRow();
         row.addCellContent(T_edit_help);
@@ -140,7 +158,6 @@ public class AcceptEditRejectAction extends AbstractXMLUIAction {
 
     private void renderRejectPage(Division div) throws WingException {
         Request request = ObjectModelHelper.getRequest(objectModel);
-
         List form = div.addList("reject-workflow",List.TYPE_FORM);
 
         form.addItem(T_info2);
@@ -160,5 +177,18 @@ public class AcceptEditRejectAction extends AbstractXMLUIAction {
         actions.addButton("submit_reject").setValue(T_submit_reject);
         actions.addButton("submit_cancel").setValue(T_submit_cancel);
 
+    }
+
+    private void renderDeletePage(Division div) throws WingException {
+    	Division divNotice = div.addDivision("general-message","notice failure");
+        divNotice.addPara(T_info3);
+
+        List form = div.addList("delete-workflow",List.TYPE_FORM);
+
+        div.addHidden("page").setValue(org.dspace.xmlworkflow.state.actions.processingaction.AcceptEditRejectAction.DELETE_PAGE);
+
+        org.dspace.app.xmlui.wing.element.Item actions = form.addItem();
+        actions.addButton("submit_delete").setValue(T_delete_submit);
+        actions.addButton("submit_cancel").setValue(T_submit_cancel);
     }
 }
