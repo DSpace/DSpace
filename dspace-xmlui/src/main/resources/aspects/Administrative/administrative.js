@@ -2483,12 +2483,12 @@ function doEditCollection(collectionID,newCollectionP)
 
 	do {
 
-		if (cocoon.request.get("submit_return") || cocoon.request.get("submit_save"))
+		if (cocoon.request.get("submit_return"))
 		{
 			// go back to wherever we came from.
 			return null;
 		}
-		else if (cocoon.request.get("submit_metadata"))
+		else if (cocoon.request.get("submit_metadata") || cocoon.request.get("submit_save"))
 		{
 			// go edit collection metadata
 			doEditCollectionMetadata(collectionID)
@@ -2544,8 +2544,8 @@ function doEditCollectionMetadata(collectionID)
 		{
 			// Save updates
 			result = FlowContainerUtils.processEditCollection(getDSContext(), collectionID, false, cocoon.request);
-      if (result.getContinue())
-         return null;
+            if (result.getContinue())
+               return null;
 		}
 		else if (cocoon.request.get("submit_delete"))
 		{

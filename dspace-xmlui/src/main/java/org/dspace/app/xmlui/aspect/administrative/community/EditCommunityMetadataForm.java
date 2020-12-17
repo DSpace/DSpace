@@ -62,7 +62,7 @@ public class EditCommunityMetadataForm extends AbstractDSpaceTransformer
 
     private static final Message T_submit_delete_logo = message("xmlui.administrative.community.EditCommunityMetadataForm.submit_delete_logo");
     private static final Message T_submit_delete = message("xmlui.administrative.community.EditCommunityMetadataForm.submit_delete");
-    private static final Message T_submit_update = message("xmlui.general.update");
+    private static final Message T_submit_update = message("xmlui.administrative.community.EditCommunityMetadataForm.submit_save");
     private static final Message T_submit_return = message("xmlui.general.return");
 
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();

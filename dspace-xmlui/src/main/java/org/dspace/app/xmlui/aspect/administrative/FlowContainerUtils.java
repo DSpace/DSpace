@@ -67,7 +67,10 @@ import java.util.UUID;
  */
 public class FlowContainerUtils 
 {
-
+	/** Language Strings */
+	private static final Message T_edit_entity_metadata_success_notice =
+			new Message("default","xmlui.administrative.FlowContainerUtils.entity.update_metadate_succuess");
+	
 	/** Possible Collection roles */
 	public static final String ROLE_ADMIN 	 	 = "ADMIN";
 	public static final String ROLE_WF_STEP1 	 = "WF_STEP1";
@@ -183,12 +186,11 @@ public class FlowContainerUtils
     		}
         }
         
-        // Save everything
-        collectionService.update(context, collection);
-
-        
-        // No notice...
-        result.setContinue(true);
+       	// Save everything
+		collectionService.update(context, collection);
+			
+        result.setOutcome(true);
+        result.setMessage(T_edit_entity_metadata_success_notice);
 		
 		return result;
 	}
@@ -1002,11 +1004,12 @@ public class FlowContainerUtils
         }
         
         // Save everything
-        communityService.update(context, community);
-
-        // No notice...
-        result.setContinue(true);
-		return result;
+		communityService.update(context, community);
+			
+        result.setOutcome(true);
+        result.setMessage(T_edit_entity_metadata_success_notice);
+		
+        return result;
 	}
 
 	/**
