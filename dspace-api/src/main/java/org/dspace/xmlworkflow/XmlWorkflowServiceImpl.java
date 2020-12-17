@@ -173,6 +173,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                 //Get our next step, if none is found, archive our item
                 firstStep = wf.getNextStep(context, wfi, firstStep, ActionResult.OUTCOME_COMPLETE);
                 if(firstStep == null){
+                    recordStart(context, wfi.getItem(), null);
                     archive(context, wfi);
                 }else{
                     activateFirstStep(context, wf, firstStep, wfi);
@@ -889,36 +890,53 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         return submitter;
     }
 
-    // Create workflow start provenance message
+    // Create workflow start provenance message and add it to the item's metadata
     protected void recordStart(Context context, Item myitem, Action action)
             throws SQLException, IOException, AuthorizeException
     {
-        // get date
-        DCDate now = DCDate.getCurrent();
-
-        // Create provenance description
-        String provmessage = "";
-
-        if (myitem.getSubmitter() != null)
-        {
-            provmessage = "Submitted by " + myitem.getSubmitter().getFullName()
-                    + " (" + myitem.getSubmitter().getEmail() + ") on "
-                    + now.toString() + " workflow start=" + action.getProvenanceStartId() + "\n";
-        }
-        else
-        // null submitter
-        {
-            provmessage = "Submitted by unknown (probably automated) on"
-                    + now.toString() + " workflow start=" + action.getProvenanceStartId() + "\n";
-        }
-
-        // add sizes and checksums of bitstreams
-        provmessage += installItemService.getBitstreamProvenanceMessage(context, myitem);
+        // Build start provenance message
+        String provmessage = buildStartProvenanceMessage(context, myitem, action);
 
         // Add message to the DC
         itemService.addMetadata(context, myitem, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provmessage);
         itemService.update(context, myitem);
     }
+
+    private String buildStartProvenanceMessage(Context context, Item myitem, Action action) throws SQLException {
+        // get date
+        DCDate now = DCDate.getCurrent();
+
+        // Create provenance description
+        StringBuilder provMessage = new StringBuilder();
+
+        // Submitted by
+        provMessage.append("Submitted by ");
+        if (myitem.getSubmitter() != null)
+        {
+            provMessage.append(myitem.getSubmitter().getFullName()).append(" (")
+                       .append(myitem.getSubmitter().getEmail()).append(")");
+        }
+        else
+        // null submitter
+        {
+            provMessage.append("unknown (probably automated)");
+        }
+
+        // Submission date
+        provMessage.append(" on ").append(now.toString());
+
+        // Workflow start (when present)
+        if (action != null) {
+            provMessage.append(" workflow start=").append(action.getProvenanceStartId());
+        }
+        provMessage.append("\n");
+
+        // add sizes and checksums of bitstreams
+        provMessage.append(installItemService.getBitstreamProvenanceMessage(context, myitem));
+
+        return provMessage.toString();
+    }
+
 
     protected void notifyOfReject(Context c, XmlWorkflowItem wi, EPerson e,
         String reason)
