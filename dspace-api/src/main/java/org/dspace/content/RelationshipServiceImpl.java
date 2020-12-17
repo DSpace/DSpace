@@ -412,16 +412,13 @@ public class RelationshipServiceImpl implements RelationshipService {
         EntityType leftType = relationship.getRelationshipType().getLeftType();
         String entityTypeStringFromMetadata = relationshipMetadataService.getEntityTypeStringFromMetadata(item);
         EntityType actualEntityType = entityTypeService.findByEntityType(context, entityTypeStringFromMetadata);
-        boolean isLeft = false;
-        if (StringUtils.equalsIgnoreCase(leftType.getLabel(),
-                                         entityTypeStringFromMetadata)) {
-            relationshipTypes = relationshipTypeService.findByEntityType(context, actualEntityType, false);
-        } else {
-            isLeft = true;
-            relationshipTypes = relationshipTypeService.findByEntityType(context, actualEntityType, true);
-        }
+        relationshipTypes = relationshipTypeService.findByEntityType(context, actualEntityType);
         for (RelationshipType relationshipType : relationshipTypes) {
             if (virtualMetadataPopulator.getMap().containsKey(relationshipType.getRightwardType())) {
+                boolean isLeft = false; //was always true
+                if (relationshipType.getRightType().equals(entityTypeStringFromMetadata)) {
+                    isLeft = true;
+                }
                 List<Relationship> list = findByItemAndRelationshipType(context, item, relationshipType, isLeft);
                 for (Relationship foundRelationship : list) {
                     if (isLeft) {
@@ -459,16 +456,13 @@ public class RelationshipServiceImpl implements RelationshipService {
         EntityType rightType = relationship.getRelationshipType().getRightType();
         String entityTypeStringFromMetadata = relationshipMetadataService.getEntityTypeStringFromMetadata(item);
         EntityType actualEntityType = entityTypeService.findByEntityType(context, entityTypeStringFromMetadata);
-        boolean isLeft = false;
-        if (StringUtils.equalsIgnoreCase(rightType.getLabel(),
-                                         relationshipMetadataService.getEntityTypeStringFromMetadata(item))) {
-            isLeft = true;
-            relationshipTypes = relationshipTypeService.findByEntityType(context, actualEntityType, true);
-        } else {
-            relationshipTypes = relationshipTypeService.findByEntityType(context, actualEntityType, false);
-        }
+        relationshipTypes = relationshipTypeService.findByEntityType(context, actualEntityType);
         for (RelationshipType relationshipType : relationshipTypes) {
             if (virtualMetadataPopulator.getMap().containsKey(relationshipType.getLeftwardType())) {
+                boolean isLeft = false; //was always false
+                if (relationshipType.getRightType().equals(entityTypeStringFromMetadata)) {
+                    isLeft = true;
+                }
                 List<Relationship> list = findByItemAndRelationshipType(context, item, relationshipType, isLeft);
                 for (Relationship foundRelationship : list) {
                     if (isLeft) {
