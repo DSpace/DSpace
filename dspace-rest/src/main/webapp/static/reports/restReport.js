@@ -503,8 +503,12 @@ var MetadataFields = function(report) {
 
 var BitstreamFields = function(report) {
   var self = this;
+  this.report = report;
   this.isOriginal = function(bit){
     return bit.bundleName === "ORIGINAL";
+  }
+  this.isThumb = function(bit){
+    return bit.bundleName === "THUMBNAIL";
   }
   this.map = [
     {
@@ -540,6 +544,14 @@ var BitstreamFields = function(report) {
       }
     },
     {
+      key: "thumb-description", 
+      name: "Thumb Description",
+      ftest: self.isThumb,
+      fval: function(bit) {
+        return bit.description;
+      }
+    },
+    {
       key: "bitstream-size", 
       name: "Bitstream Size",
       ftest: self.isOriginal,
@@ -556,6 +568,22 @@ var BitstreamFields = function(report) {
           return bit.checkSum.value;          
         }
         return "";
+      }
+    },
+    {
+      key: "original-link", 
+      name: "Original Link",
+      ftest: self.isOriginal,
+      fval: function(bit) {
+        return self.report.ROOTURL + "/bitstream/handle/" + bit.item.handle + "/" + bit.name + "?sequence=" + bit.sequenceId;
+      }
+    },
+    {
+      key: "thumbnail-link", 
+      name: "Thumbnail Link",
+      ftest: self.isThumb,
+      fval: function(bit) {
+        return self.report.ROOTURL + "/bitstream/handle/" + bit.item.handle + "/" + bit.name + "?sequence=" + bit.sequenceId;
       }
     },
   ];
@@ -610,6 +638,7 @@ var BitstreamFields = function(report) {
     }
     
     $.each(item.bitstreams, function(colindex, bitstream) {
+      bitstream.item = item;
       if (mapval.ftest(bitstream)) {
         var val = mapval.fval(bitstream);
         if (val != null) {
