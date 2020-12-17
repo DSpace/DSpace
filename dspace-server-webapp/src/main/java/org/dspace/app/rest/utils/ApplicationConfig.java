@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -48,6 +49,15 @@ public class ApplicationConfig {
     public String[] getCorsAllowedOrigins() {
         // Use "rest.cors.allowed-origins" if configured. Otherwise, default to the "dspace.ui.url" setting.
         if (corsAllowedOrigins != null) {
+            // Ensure no allowed origins end in a trailing slash
+            // Browsers send 'Origin' header without a trailing slash & Spring Security considers
+            // http://example.org and http://example.org/ to be different Origins.
+            for (int i = 0; i < corsAllowedOrigins.length; i++) {
+                if (corsAllowedOrigins[i].endsWith("/")) {
+                    corsAllowedOrigins[i] = StringUtils.removeEnd(corsAllowedOrigins[i], "/");
+                }
+            }
+
             return corsAllowedOrigins;
         } else if (uiURL != null) {
             return new String[] {uiURL};
