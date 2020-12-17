@@ -334,10 +334,10 @@ public class UploadWithEmbargoStep extends UploadStep
         if (request.getParameter("primary_bitstream_id") != null)
         {
             List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
-            if (bundles.size() > 0)
+            Bitstream primaryBitstream = bitstreamService.find(context, Util.getUUIDParameter(request, "primary_bitstream_id"));
+            if (bundles.size() > 0 && !primaryBitstream.isDeleted())
             {
-                bundles.get(0).setPrimaryBitstreamID(bitstreamService.find(context, Util.getUUIDParameter(request
-                        , "primary_bitstream_id")));
+                bundles.get(0).setPrimaryBitstreamID(primaryBitstream);
                 bundleService.update(context, bundles.get(0));
             }
         }
