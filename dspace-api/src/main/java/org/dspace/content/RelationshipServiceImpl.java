@@ -376,16 +376,20 @@ public class RelationshipServiceImpl implements RelationshipService {
         // authorization system here so that this failure doesn't happen when the items need to be update
         context.turnOffAuthorisationSystem();
         try {
-            int max = configurationService.getIntProperty("relationship.update.relateditems.max", 10);
-            int maxDepth = configurationService.getIntProperty("relationship.update.relateditems.maxdepth", 3);
+            int max = configurationService.getIntProperty("relationship.update.relateditems.max", 20);
+            int maxDepth = configurationService.getIntProperty("relationship.update.relateditems.maxdepth", 5);
             List<Item> itemsToUpdate = new LinkedList<>();
             itemsToUpdate.add(relationship.getLeftItem());
             itemsToUpdate.add(relationship.getRightItem());
 
-            findModifiedDiscoveryItemsForCurrentItem(context, relationship.getLeftItem(),
-                                       itemsToUpdate, max, 0, maxDepth);
-            findModifiedDiscoveryItemsForCurrentItem(context, relationship.getRightItem(),
-                                        itemsToUpdate, max, 0, maxDepth);
+            if (containsVirtualMetadata(relationship.getRelationshipType().getLeftwardType())) {
+                findModifiedDiscoveryItemsForCurrentItem(context, relationship.getLeftItem(),
+                                           itemsToUpdate, max, 0, maxDepth);
+            }
+            if (containsVirtualMetadata(relationship.getRelationshipType().getRightwardType())) {
+                findModifiedDiscoveryItemsForCurrentItem(context, relationship.getRightItem(),
+                                            itemsToUpdate, max, 0, maxDepth);
+            }
 
             for (Item item : itemsToUpdate) {
                 if (!item.isMetadataModified()) {
@@ -435,8 +439,7 @@ public class RelationshipServiceImpl implements RelationshipService {
             } else {
                 typeToSearchInVirtualMetadata = relationshipType.getLeftwardType();
             }
-            if (virtualMetadataPopulator.getMap().containsKey(typeToSearchInVirtualMetadata)
-            && virtualMetadataPopulator.getMap().get(typeToSearchInVirtualMetadata).size() > 0) {
+            if (containsVirtualMetadata(typeToSearchInVirtualMetadata)) {
                 List<Relationship> list = findByItemAndRelationshipType(context, item, relationshipType, isLeft);
                 for (Relationship foundRelationship : list) {
                     if (isLeft) {
@@ -459,6 +462,11 @@ public class RelationshipServiceImpl implements RelationshipService {
                         + item.getID() + " because no relevant virtual metadata was found");
             }
         }
+    }
+
+    private boolean containsVirtualMetadata(String typeToSearchInVirtualMetadata) {
+        return virtualMetadataPopulator.getMap().containsKey(typeToSearchInVirtualMetadata)
+                && virtualMetadataPopulator.getMap().get(typeToSearchInVirtualMetadata).size() > 0;
     }
 
     /**
