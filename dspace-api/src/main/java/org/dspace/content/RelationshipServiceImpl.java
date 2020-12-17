@@ -435,7 +435,8 @@ public class RelationshipServiceImpl implements RelationshipService {
             } else {
                 typeToSearchInVirtualMetadata = relationshipType.getLeftwardType();
             }
-            if (virtualMetadataPopulator.getMap().containsKey(typeToSearchInVirtualMetadata)) {
+            if (virtualMetadataPopulator.getMap().containsKey(typeToSearchInVirtualMetadata)
+            && virtualMetadataPopulator.getMap().get(typeToSearchInVirtualMetadata).size() > 0) {
                 List<Relationship> list = findByItemAndRelationshipType(context, item, relationshipType, isLeft);
                 for (Relationship foundRelationship : list) {
                     if (isLeft) {
