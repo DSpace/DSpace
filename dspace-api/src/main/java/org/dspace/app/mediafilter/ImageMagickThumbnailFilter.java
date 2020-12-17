@@ -46,6 +46,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
 
         static String cmyk_profile;
         static String srgb_profile;
+        static String[] addConvertRawArgs;
 
         static {
                 String pre = ImageMagickThumbnailFilter.class.getName();
@@ -57,6 +58,10 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
                 String description = ConfigurationManager.getProperty(pre + ".bitstreamDescription");
                 cmyk_profile = ConfigurationManager.getProperty(pre + ".cmyk_profile");
                 srgb_profile = ConfigurationManager.getProperty(pre + ".srgb_profile");
+                String value = ConfigurationManager.getProperty(pre + ".AddConvertRawArgs");
+                if (value != null) {
+                        addConvertRawArgs = value.trim().split(" ");
+                }
                 if (description != null) {
                         bitstreamDescription = description;
                 }
@@ -122,6 +127,9 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
                 f2.deleteOnExit();
                 ConvertCmd cmd = new ConvertCmd();
                 IMOperation op = new IMOperation();
+                if (addConvertRawArgs != null) {
+                        op.addRawArgs(addConvertRawArgs);
+                }
                 op.autoOrient();
                 op.addImage(f.getAbsolutePath());
                 op.thumbnail(width, height);
@@ -139,6 +147,9 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
                 f2.deleteOnExit();
                 ConvertCmd cmd = new ConvertCmd();
                 IMOperation op = new IMOperation();
+                if (addConvertRawArgs != null) {
+                        op.addRawArgs(addConvertRawArgs);
+                }
                 String s = "[" + page + "]";
                 op.addImage(f.getAbsolutePath() + s);
                 if (flatten) {
