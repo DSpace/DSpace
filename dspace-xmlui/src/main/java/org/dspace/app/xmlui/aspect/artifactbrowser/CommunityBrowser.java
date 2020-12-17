@@ -33,14 +33,19 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Reference;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.browse.ItemCountException;
 import org.dspace.browse.ItemCounter;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.LogManager;
@@ -96,7 +101,14 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
     /** cached validity object */
     private SourceValidity validity;
 
+    /** Whether to display collection and community strengths (i.e. item counts) */
+    private boolean showCount;
+    private ItemCounter itemCounter = null;
+
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
     /**
      * Set the component up, pulling any configuration values from the sitemap
@@ -120,6 +132,14 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         depth = parameters.getParameterAsInteger("depth", DEFAULT_DEPTH);
         excludeCollections = parameters.getParameterAsBoolean(
                 "exclude-collections", false);
+        showCount = configurationService.getBooleanProperty("webui.strengths.show");
+        if (showCount) {
+            try {
+                itemCounter = new ItemCounter(context);
+            } catch (ItemCountException e) {
+                log.error(e);
+            }
+        }
     }
 
     /**
@@ -164,13 +184,12 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
 	                theValidity.add(context, node.getDSO());
 	                
 	                // If we are configured to use collection strengths (i.e. item counts) then include that number in the validity.
-	                boolean showCount = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.strengths.show");
 	                if (showCount)
 	        		{
 	                    try
 	                    {	//try to determine Collection size (i.e. # of items)
 	                    	
-	                    	int size = new ItemCounter(context).getCount(node.getDSO());
+	                    	int size = itemCounter.getCount(node.getDSO());
 	                    	theValidity.add("size:"+size);
 	                    }
 	                    catch(ItemCountException e) { /* ignore */ }
@@ -327,33 +346,43 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
     public void buildList(List list, TreeNode node) throws WingException
     {
         DSpaceObject dso = node.getDSO();
-        
-        String name = null;
-        if (dso instanceof Community)
-        {
-            name = ((Community) dso).getName();
+        String commName = dso.getName();
+        String commURL = contextPath + "/handle/"+dso.getHandle();
+
+        List communityList = list.addList(commURL);
+        String commCount = null;
+        if (showCount) {
+            try {	// try to determine Community size (i.e. # of items)
+                int size = itemCounter.getCount(dso);
+                commCount = String.valueOf(size);
+            } catch (ItemCountException e) {
+                log.error(e.getMessage(), e);
+            }
         }
-        else if (dso instanceof Collection)
-        {
-            name = ((Collection) dso).getName();
-        }
-        
-        String aURL = contextPath + "/handle/"+dso.getHandle();
-        list.addItem().addHighlight("bold").addXref(aURL, name);
-        
-        List subList = null;
+        String commDesc = communityService.getMetadataFirstValue((Community) dso, "dc", "description", "abstract", Item.ANY);
+        communityList.addItem().addHighlight("bold").addXref(commURL, commName, commCount, commDesc);
         
         // Add all the sub-collections;
         java.util.List<TreeNode> collectionNodes = node.getChildrenOfType(Constants.COLLECTION);
         if (collectionNodes != null && collectionNodes.size() > 0)
         {
-        	subList = list.addList("sub-list-"+dso.getID());
+        	List subList = communityList.addList("sub-list-"+dso.getID());
         
             for (TreeNode collectionNode : collectionNodes)
             {
-                String collectionName = ((Collection) collectionNode.getDSO()).getName();
-                String collectionUrl = contextPath + "/handle/"+collectionNode.getDSO().getHandle();
-                subList.addItemXref(collectionUrl, collectionName);
+                String collCount = null;
+                if (showCount) {
+                    try {	// try to determine Collection size (i.e. # of items)
+                        int size = itemCounter.getCount(collectionNode.getDSO());
+                        collCount = String.valueOf(size);
+                    } catch (ItemCountException e) {
+                        log.error(e.getMessage(), e);
+                    }
+                }
+                String collName = collectionNode.getDSO().getName();
+                String collUrl = contextPath + "/handle/"+collectionNode.getDSO().getHandle();
+                String collDesc = collectionService.getMetadataFirstValue((Collection) collectionNode.getDSO(), "dc", "description", "abstract", Item.ANY);
+                subList.addItem().addXref(collUrl, collName, collCount, collDesc);
             }
         }
 
@@ -361,14 +390,9 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         java.util.List<TreeNode> communityNodes = node.getChildrenOfType(Constants.COMMUNITY);
         if (communityNodes != null && communityNodes.size() > 0)
         {
-        	if (subList == null)
-            {
-                subList = list.addList("sub-list-" + dso.getID());
-            }
-            
             for (TreeNode communityNode : communityNodes)
             {
-                buildList(subList,communityNode);
+                buildList(communityList,communityNode);
             }
         }
     }
