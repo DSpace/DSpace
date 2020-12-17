@@ -54,7 +54,6 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
 	private static final Message T_column4 = message("xmlui.administrative.item.EditItemBitstreamsForm.column4");
 	private static final Message T_column5 = message("xmlui.administrative.item.EditItemBitstreamsForm.column5");
 	private static final Message T_column6 = message("xmlui.administrative.item.EditItemBitstreamsForm.column6");
-	private static final Message T_column7 = message("xmlui.administrative.item.EditItemBitstreamsForm.column7");
 	private static final Message T_bundle_label = message("xmlui.administrative.item.EditItemBitstreamsForm.bundle_label");
 	private static final Message T_primary_label = message("xmlui.administrative.item.EditItemBitstreamsForm.primary_label");
 	private static final Message T_view_link = message("xmlui.administrative.item.EditItemBitstreamsForm.view_link");
@@ -116,7 +115,6 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
 		header.addCellContent(T_column4);
 		header.addCellContent(T_column5);
 		header.addCellContent(T_column6);
-		header.addCellContent(T_column7);
 
 		java.util.List<Bundle> bundles = item.getBundles();
 
@@ -124,7 +122,7 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
 		for (Bundle bundle : bundles)
 		{
 
-			Cell bundleCell = files.addRow("bundle_head_" + bundle.getID(), Row.ROLE_DATA, "").addCell(1, 5);
+			Cell bundleCell = files.addRow("bundle_head_" + bundle.getID(), Row.ROLE_DATA, "").addCell(1, 6);
 			bundleCell.addContent(T_bundle_label.parameterize(bundle.getName()));
 
 			java.util.List<Bitstream> bitstreams = bundle.getBitstreams();
@@ -221,12 +219,12 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
 
 		if (authorizeService.authorizeActionBoolean(context, item, Constants.ADD))
 		{
-			Cell cell = files.addRow().addCell(1, 5);
+			Cell cell = files.addRow().addCell(1, 6);
 			cell.addXref(contextPath+"/admin/item?administrative-continue="+knot.getId()+"&submit_add",T_submit_add);
 		}
 		else
 		{
-			Cell cell = files.addRow().addCell(1, 5);
+			Cell cell = files.addRow().addCell(1, 6);
 			cell.addHighlight("fade").addContent(T_no_upload);
 		}
 
