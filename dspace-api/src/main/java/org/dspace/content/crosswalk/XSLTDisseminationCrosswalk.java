@@ -29,6 +29,7 @@ import org.dspace.content.authority.Choices;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
@@ -354,73 +355,36 @@ public class XSLTDisseminationCrosswalk
      */
     public static Element createDIM(DSpaceObject dso)
     {
-        if (dso.getType() == Constants.ITEM)
-        {
-            Item item = (Item) dso;
-            return createDIM(dso, item2Metadata(item));
+        Element dim = new Element("dim", DIM_NS);
+        String type = Constants.typeText[dso.getType()];
+        dim.setAttribute("dspaceType",type);
+        if (dso.getHandle() != null) {
+            String identifier_uri = "hdl:" + dso.getHandle();
+            dim.addContent(createField("dc", "identifier", "uri", null, identifier_uri));
         }
-        else
-        {
-            Element dim = new Element("dim", DIM_NS);
-            String type = Constants.typeText[dso.getType()];
-            dim.setAttribute("dspaceType",type);
-
-            if (dso.getType() == Constants.COLLECTION)
-            {
-                Collection collection = (Collection) dso;
-
-                String description = collectionService.getMetadata(collection, "introductory_text");
-                String description_abstract = collectionService.getMetadata(collection, "short_description");
-                String description_table = collectionService.getMetadata(collection, "side_bar_text");
-                String identifier_uri = "hdl:" + collection.getHandle();
-                String provenance = collectionService.getMetadata(collection, "provenance_description");
-                String rights = collectionService.getMetadata(collection, "copyright_text");
-                String rights_license = collectionService.getMetadata(collection, "license");
-                String title = collectionService.getMetadata(collection, "name");
-
-                dim.addContent(createField("dc","description",null,null,description));
-                dim.addContent(createField("dc","description","abstract",null,description_abstract));
-                dim.addContent(createField("dc","description","tableofcontents",null,description_table));
-                dim.addContent(createField("dc","identifier","uri",null,identifier_uri));
-                dim.addContent(createField("dc","provenance",null,null,provenance));
-                dim.addContent(createField("dc","rights",null,null,rights));
-                dim.addContent(createField("dc","rights","license",null,rights_license));
-                dim.addContent(createField("dc","title",null,null,title));
-            }
-            else if (dso.getType() == Constants.COMMUNITY)
-            {
-                Community community = (Community) dso;
-
-                String description = communityService.getMetadata(community, "introductory_text");
-                String description_abstract = communityService.getMetadata(community, "short_description");
-                String description_table = communityService.getMetadata(community, "side_bar_text");
-                String identifier_uri = "hdl:" + community.getHandle();
-                String rights = communityService.getMetadata(community, "copyright_text");
-                String title = communityService.getMetadata(community, "name");
-
-                dim.addContent(createField("dc","description",null,null,description));
-                dim.addContent(createField("dc","description","abstract",null,description_abstract));
-                dim.addContent(createField("dc","description","tableofcontents",null,description_table));
-                dim.addContent(createField("dc","identifier","uri",null,identifier_uri));
-                dim.addContent(createField("dc","rights",null,null,rights));
-                dim.addContent(createField("dc","title",null,null,title));
-            }
-            else if (dso.getType() == Constants.SITE)
-            {
+        switch (dso.getType()) {
+            case Constants.SITE:
                 Site site = (Site) dso;
 
-                String identifier_uri = "hdl:" + site.getHandle();
                 String title = site.getName();
                 String url = site.getURL();
 
                 //FIXME: adding two URIs for now (site handle and URL), in case site isn't using handles
-                dim.addContent(createField("dc","identifier","uri",null,identifier_uri));
                 dim.addContent(createField("dc","identifier","uri",null,url));
                 dim.addContent(createField("dc","title",null,null,title));
-            }
-            // XXX FIXME: Nothing to crosswalk for bitstream?
-            return dim;
+                break;
+            case Constants.COMMUNITY:
+            case Constants.COLLECTION:
+            case Constants.ITEM:
+                DSpaceObjectService dsoService = ContentServiceFactory.getInstance().getDSpaceObjectService(dso);
+                for (MetadataValue metadata : (List<MetadataValue>) dsoService.getMetadata(dso, Item.ANY, Item.ANY, Item.ANY, Item.ANY)) {
+                    dim.addContent(createField(metadata.getMetadataField().getMetadataSchema().getName(),
+                            metadata.getMetadataField().getElement(), metadata.getMetadataField().getQualifier(),
+                            metadata.getLanguage(), metadata.getValue(), metadata.getAuthority(), metadata.getConfidence()));
+                }
+                break;
         }
+        return dim;
     }
 
     protected static List<MockMetadataValue> item2Metadata(Item item)

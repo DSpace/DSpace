@@ -14,18 +14,12 @@ import java.util.List;
 import java.sql.SQLException;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.dspace.content.*;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.*;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.content.Item;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Site;
 import org.dspace.content.packager.PackageUtils;
 import org.dspace.eperson.EPerson;
 import org.dspace.authorize.AuthorizeException;
@@ -76,6 +70,7 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
     protected final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     protected final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
 
     /**
@@ -233,21 +228,6 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
         else if (dso.getType() == Constants.BITSTREAM)
         {
             Bitstream bitstream = (Bitstream)dso;
-            String bsName = bitstream.getName();
-            if (bsName != null)
-            {
-                dc.add(makeDC("title", null, bsName));
-            }
-            String bsSource = bitstream.getSource();
-            if (bsSource != null)
-            {
-                dc.add(makeDC("title", "alternative", bsSource));
-            }
-            String bsDesc = bitstream.getDescription();
-            if (bsDesc != null)
-            {
-                dc.add(makeDC("description", null, bsDesc));
-            }
             String bsUfmt = bitstream.getUserFormatDescription();
             if (bsUfmt != null)
             {
@@ -258,6 +238,13 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
             dc.add(makeDC("format", "mimetype", bsf.getMIMEType()));
             dc.add(makeDC("format", "supportlevel", bitstreamFormatService.getSupportLevelText(bsf)));
             dc.add(makeDC("format", "internal", Boolean.toString(bsf.isInternal())));
+            for (MetadataValue metadata : bitstreamService.getMetadata(bitstream, Item.ANY, Item.ANY, Item.ANY, Item.ANY))
+            {
+                dc.add(makeMockMetadata(metadata.getMetadataField().getMetadataSchema().getName(),
+                        metadata.getMetadataField().getElement(), metadata.getMetadataField().getQualifier(),
+                        metadata.getLanguage(), metadata.getValue(), metadata.getAuthority(), metadata.getConfidence()));
+            }
+
         }
         else if (dso.getType() == Constants.COLLECTION)
         {
@@ -312,14 +299,22 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
 
     private static MockMetadataValue makeDC(String element, String qualifier, String value)
     {
+        return makeMockMetadata("dc", element, qualifier, null, value, null, -1);
+    }
+
+    private static MockMetadataValue makeMockMetadata(String schema, String element, String qualifier, String language, String value, String authority, int confidence)
+    {
         MockMetadataValue dcv = new MockMetadataValue();
-        dcv.setSchema("dc");
-        dcv.setLanguage(null);
+        dcv.setSchema(schema);
         dcv.setElement(element);
         dcv.setQualifier(qualifier);
+        dcv.setLanguage(language);
         dcv.setValue(value);
+        dcv.setAuthority(authority);
+        dcv.setConfidence(confidence);
         return dcv;
     }
+
 
     /**
      * Ingest a whole document.  Build Document object around root element,
@@ -362,6 +357,7 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
         String bsfMIMEType = null;
         int bsfSupport = BitstreamFormat.KNOWN;
         boolean bsfInternal = false;
+        List<MockMetadataValue> metadata = new ArrayList<>();
 
         for (Element field : dimList)
         {
@@ -374,9 +370,10 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
             else if (field.getName().equals("field") && field.getNamespace().equals(XSLTCrosswalk.DIM_NS))
             {
                 String schema = field.getAttributeValue("mdschema");
-                if (schema.equals("dc"))
+                if (schema.equals("dc") || type == Constants.BITSTREAM)
                 {
                     String dcField = field.getAttributeValue("element");
+                    String element = field.getAttributeValue("element");
                     String qualifier = field.getAttributeValue("qualifier");
                     if (qualifier != null)
                     {
@@ -387,19 +384,7 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
                     if (type == Constants.BITSTREAM)
                     {
                         Bitstream bitstream = (Bitstream)dso;
-                        if (dcField.equals("title"))
-                        {
-                            bitstream.setName(context, value);
-                        }
-                        else if (dcField.equals("title.alternative"))
-                        {
-                            bitstream.setSource(context, value);
-                        }
-                        else if (dcField.equals("description"))
-                        {
-                            bitstream.setDescription(context, value);
-                        }
-                        else if (dcField.equals("format"))
+                        if (dcField.equals("format"))
                         {
                             bitstream.setUserFormatDescription(context, value);
                         }
@@ -429,7 +414,11 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
                         }
                         else
                         {
-                            log.warn("Got unrecognized DC field for Bitstream: " + dcField);
+                            String language = field.getAttributeValue("lang");
+                            String authority  = field.getAttributeValue("authority");
+                            String confidenceString  = field.getAttributeValue("confidence");
+                            int confidence = confidenceString == null ? -1 : Integer.valueOf(confidenceString);
+                            metadata.add(makeMockMetadata(schema, element, qualifier, language, value, authority, confidence));
                         }
                     }
                     else if (type == Constants.ITEM)
@@ -579,6 +568,12 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
             {
                 log.warn("Failed to find or create bitstream format named \"" + bsfShortName + "\"");
             }
+            for (MockMetadataValue metadataValue : metadata) {
+                bitstreamService.addMetadata(context, (Bitstream) dso, metadataValue.getSchema(),
+                        metadataValue.getElement(), metadataValue.getQualifier(), metadataValue.getLanguage(),
+                        metadataValue.getValue(), metadataValue.getAuthority(), metadataValue.getConfidence());
+            }
+
         }
     }
 }
