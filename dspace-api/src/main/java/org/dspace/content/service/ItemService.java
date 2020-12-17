@@ -494,7 +494,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
                                               String schema, String element, String qualifier, String value)
             throws SQLException, AuthorizeException, IOException;
 
-    public Iterator<Item> findByMetadataQuery(Context context, List<List<MetadataField>> listFieldList, List<String> query_op, List<String> query_val, List<UUID> collectionUuids, String regexClause, int offset, int limit)
+    public Iterator<Item> findByMetadataQuery(Context context, List<List<MetadataField>> listFieldList, List<String> query_op, List<String> query_val, List<UUID> collectionUuids, String regexClause, boolean inArchive, int offset, int limit)
        throws SQLException, AuthorizeException, IOException;
 
     /**
