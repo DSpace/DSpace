@@ -62,7 +62,14 @@ public class ControlledVocabulary {
         if(controlledVocFile.exists()){
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document document = builder.parse(controlledVocFile);
-            return loadVocabularyNode(XPathAPI.selectSingleNode(document, "node"), "");
+
+            boolean storeHierarchy = ConfigurationManager.getBooleanProperty("vocabulary.plugin." + fileName + ".hierarchy.store", true);
+            String delimiter = ConfigurationManager.getProperty("vocabulary.plugin." + fileName + ".delimiter");
+            if (storeHierarchy && (delimiter == null || "".equals(delimiter.trim())))
+            {
+                delimiter = "::"; // use default value
+            }
+            return loadVocabularyNode(XPathAPI.selectSingleNode(document, "node"), "", storeHierarchy, delimiter);
         }else{
             return null;
         }
@@ -73,10 +80,11 @@ public class ControlledVocabulary {
      * Loads a single node & all its child nodes recursively
      * @param node The current node that we need to parse
      * @param initialValue the value of parent node
+     * @param storeHierarchy whether to store the full hierarchy as the value or only the node's own label
      * @return a vocabulary node with all its children
      * @throws TransformerException should something go wrong with loading the xml
      */
-    private static ControlledVocabulary loadVocabularyNode(Node node, String initialValue) throws TransformerException {
+    private static ControlledVocabulary loadVocabularyNode(Node node, String initialValue, boolean storeHierarchy, String delimiter) throws TransformerException {
         Node idNode = node.getAttributes().getNamedItem("id");
         String id = null;
         if(idNode != null){
@@ -88,8 +96,8 @@ public class ControlledVocabulary {
             label = labelNode.getNodeValue();
         }
         String value;
-        if(0 < initialValue.length()){
-            value = initialValue + "::" + label;
+        if(storeHierarchy && 0 < initialValue.length()){
+            value = initialValue + delimiter + label;
         }else{
             value = label;
         }
@@ -97,7 +105,7 @@ public class ControlledVocabulary {
 
         List<ControlledVocabulary> subVocabularies = new ArrayList<ControlledVocabulary>(subNodes.getLength());
         for(int i = 0; i < subNodes.getLength(); i++){
-            subVocabularies.add(loadVocabularyNode(subNodes.item(i), value));
+            subVocabularies.add(loadVocabularyNode(subNodes.item(i), value, storeHierarchy, delimiter));
         }
         
         return new ControlledVocabulary(id, label, value, subVocabularies);
