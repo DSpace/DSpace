@@ -248,6 +248,10 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         TreeNode treeRoot = buildTree(communityService.findAllTop(context));
 
         boolean full = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.community-list.render.full", true);
+        boolean allowExpandAll = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.community-list.expand.all", false);
+        if (allowExpandAll) {
+            division.addHidden("allowExpandAll");
+        }
 
         if (full)
         {
