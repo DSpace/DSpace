@@ -125,6 +125,9 @@
                                                     <i18n:text>xmlui.dri2xhtml.structural.pagination-info.nototal
                                                     </i18n:text>
                                                 </xsl:when>
+                                                <xsl:when test="parent::node()/@startsWith">
+                                                    <i18n:text>xmlui.dri2xhtml.structural.pagination-info.starts-with</i18n:text>
+                                                </xsl:when>
                                                 <xsl:otherwise>
                                                     <i18n:text>xmlui.dri2xhtml.structural.pagination-info</i18n:text>
                                                 </xsl:otherwise>
@@ -137,6 +140,9 @@
                                             </i18n:param>
                                             <i18n:param>
                                                 <xsl:value-of select="parent::node()/@itemsTotal"/>
+                                            </i18n:param>
+                                            <i18n:param>
+                                                <xsl:value-of select="parent::node()/@startsWith"/>
                                             </i18n:param>
                                         </i18n:translate>
                                     </p>
@@ -153,6 +159,9 @@
                                         <xsl:when test="parent::node()/@itemsTotal = -1">
                                             <i18n:text>xmlui.dri2xhtml.structural.pagination-info.nototal</i18n:text>
                                         </xsl:when>
+                                        <xsl:when test="parent::node()/@startsWith">
+                                            <i18n:text>xmlui.dri2xhtml.structural.pagination-info.starts-with</i18n:text>
+                                        </xsl:when>
                                         <xsl:otherwise>
                                             <i18n:text>xmlui.dri2xhtml.structural.pagination-info</i18n:text>
                                         </xsl:otherwise>
@@ -165,6 +174,9 @@
                                     </i18n:param>
                                     <i18n:param>
                                         <xsl:value-of select="parent::node()/@itemsTotal"/>
+                                    </i18n:param>
+                                    <i18n:param>
+                                        <xsl:value-of select="parent::node()/@startsWith"/>
                                     </i18n:param>
                                 </i18n:translate>
                             </p>
@@ -226,6 +238,9 @@
                                                     <i18n:text>xmlui.dri2xhtml.structural.pagination-info.nototal
                                                     </i18n:text>
                                                 </xsl:when>
+                                                <xsl:when test="parent::node()/@startsWith">
+                                                    <i18n:text>xmlui.dri2xhtml.structural.pagination-info.starts-with</i18n:text>
+                                                </xsl:when>
                                                 <xsl:otherwise>
                                                     <i18n:text>xmlui.dri2xhtml.structural.pagination-info</i18n:text>
                                                 </xsl:otherwise>
@@ -238,6 +253,9 @@
                                             </i18n:param>
                                             <i18n:param>
                                                 <xsl:value-of select="parent::node()/@itemsTotal"/>
+                                            </i18n:param>
+                                            <i18n:param>
+                                                <xsl:value-of select="parent::node()/@startsWith"/>
                                             </i18n:param>
                                         </i18n:translate>
                                     </p>
@@ -254,6 +272,9 @@
                                         <xsl:when test="parent::node()/@itemsTotal = -1">
                                             <i18n:text>xmlui.dri2xhtml.structural.pagination-info.nototal</i18n:text>
                                         </xsl:when>
+                                        <xsl:when test="parent::node()/@startsWith">
+                                            <i18n:text>xmlui.dri2xhtml.structural.pagination-info.starts-with</i18n:text>
+                                        </xsl:when>
                                         <xsl:otherwise>
                                             <i18n:text>xmlui.dri2xhtml.structural.pagination-info</i18n:text>
                                         </xsl:otherwise>
@@ -266,6 +287,9 @@
                                     </i18n:param>
                                     <i18n:param>
                                         <xsl:value-of select="parent::node()/@itemsTotal"/>
+                                    </i18n:param>
+                                    <i18n:param>
+                                        <xsl:value-of select="parent::node()/@startsWith"/>
                                     </i18n:param>
                                 </i18n:translate>
                             </p>

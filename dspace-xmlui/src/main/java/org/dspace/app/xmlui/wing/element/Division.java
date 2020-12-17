@@ -75,8 +75,13 @@ public class Division extends AbstractWingElement implements StructuralElement, 
     /** The name of the pages total attribute */
     public static final String A_PAGES_TOTAL = "pagesTotal";
 
+    /** The name of the starts with attribute */
+    public static final String A_STARTS_WITH = "startsWith";
+
     /** The name of the page url mask attribute */
     public static final String A_PAGE_URL_MASK = "pageURLMask";
+
+
 
     /** Determines whether this division is being merged */
     private boolean merged = false;
@@ -149,6 +154,12 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      * pagination type)
      */
     private int pagesTotal;
+
+    /**
+     * The starts with attribute, either used to jump to an arbitrary point in
+     * an item index or act as a metadata filter.
+     */
+    private String startsWith;
 
     /** The pagination URL mask. (used by masked pagination type) */
     private String pageURLMask;
@@ -295,9 +306,11 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      * @param nextPage
      *            (May be null) The URL of the previous page of the div, if it
      *            exists.
+     * @param startsWith
+     *            (May be null) The value of the starts_with jump to parameter.
      */
     public void setSimplePagination(int itemsTotal, int firstItemIndex,
-            int lastItemIndex, String previousPage, String nextPage)
+                                    int lastItemIndex, String previousPage, String nextPage)
     {
         this.paginationType = PAGINATION_SIMPLE;
         this.previousPage = previousPage;
@@ -305,6 +318,18 @@ public class Division extends AbstractWingElement implements StructuralElement, 
         this.itemsTotal = itemsTotal;
         this.firstItemIndex = firstItemIndex;
         this.lastItemIndex = lastItemIndex;
+    }
+
+    public void setSimplePagination(int itemsTotal, int firstItemIndex,
+            int lastItemIndex, String previousPage, String nextPage, String starts_with)
+    {
+        this.paginationType = PAGINATION_SIMPLE;
+        this.previousPage = previousPage;
+        this.nextPage = nextPage;
+        this.itemsTotal = itemsTotal;
+        this.firstItemIndex = firstItemIndex;
+        this.lastItemIndex = lastItemIndex;
+        this.startsWith = starts_with;
     }
 
     /**
@@ -925,6 +950,10 @@ public class Division extends AbstractWingElement implements StructuralElement, 
                 divAttributes.put(A_ITEMS_TOTAL, itemsTotal);
                 divAttributes.put(A_FIRST_ITEM_INDEX, firstItemIndex);
                 divAttributes.put(A_LAST_ITEM_INDEX, lastItemIndex);
+                if (startsWith != null)
+                {
+                    divAttributes.put(A_STARTS_WITH, startsWith);
+                }
             }
             else if (PAGINATION_MASKED.equals(paginationType))
             {
