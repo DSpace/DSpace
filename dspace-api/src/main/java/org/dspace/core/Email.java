@@ -109,6 +109,9 @@ public class Email
     /** The subject of the message */
     private String subject;
 
+    /** The subtype of the message, "plain" for regular text, "html" to enable html tags. */
+    private String subtype;
+
     /** The arguments to fill out */
     private List<Object> arguments;
 
@@ -139,6 +142,7 @@ public class Email
         content = "";
         replyTo = null;
         charset = null;
+        subtype = "plain";
     }
 
     /**
@@ -175,6 +179,17 @@ public class Email
     public void setSubject(String s)
     {
         subject = s;
+    }
+
+    /**
+     * Set the subtype of the message
+     *
+     * @param s
+     *            the subtype of the message
+     */
+    public void setSubtype(String s)
+    {
+        subtype = s;
     }
 
     /**
@@ -288,11 +303,11 @@ public class Email
             // If a character set has been specified, or a default exists
             if (charset != null)
             {
-                message.setText(fullMessage, charset);
+                message.setText(fullMessage, charset, subtype);
             }
             else
             {
-                message.setText(fullMessage);
+                message.setText(fullMessage, null, subtype);
             }
         }
         else{
@@ -379,6 +394,7 @@ public class Email
     {
         String charset = null;
         String subject = "";
+        String subtype = "plain";
         StringBuilder contentBuffer = new StringBuilder();
         InputStream is = null;
         InputStreamReader ir = null;
@@ -403,6 +419,10 @@ public class Email
                 else if (line.toLowerCase().startsWith("charset:"))
                 {
                     charset = line.substring(8).trim();
+                }
+                else if (line.toLowerCase().startsWith("subtype:"))
+                {
+                    subtype = line.substring(8).trim();
                 }
                 else if (!line.startsWith("#"))
                 {
@@ -439,6 +459,7 @@ public class Email
         }
         Email email = new Email();
         email.setSubject(subject);
+        email.setSubtype(subtype);
         email.setContent(contentBuffer.toString());
         if (charset != null)
         {
