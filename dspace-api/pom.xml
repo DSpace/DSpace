@@ -52,7 +52,7 @@
                     <showDeprecation>true</showDeprecation>
                     <annotationProcessorPaths>
                         <!-- Enable Hibernate's Metamodel Generator to generate metadata model classes
-                             (ending in _ suffix) for more type-safe Criteria queries -->
+                        (ending in _ suffix) for more type-safe Criteria queries -->
                         <path>
                             <groupId>org.hibernate</groupId>
                             <artifactId>hibernate-jpamodelgen</artifactId>
@@ -203,9 +203,9 @@
             <build>
                 <plugins>
                     <!-- Unit Testing setup: This plugin unzips the
-                         'testEnvironment.zip' file (created by dspace-parent POM), into
-                         the 'target/testing/' folder, to essentially create a test
-                         install of DSpace, against which Tests can be run. -->
+                    'testEnvironment.zip' file (created by dspace-parent POM), into
+                    the 'target/testing/' folder, to essentially create a test
+                    install of DSpace, against which Tests can be run. -->
                     <plugin>
                         <artifactId>maven-dependency-plugin</artifactId>
                         <configuration>
@@ -263,9 +263,9 @@
             <build>
                 <plugins>
                     <!-- Integration Testing setup: This plugin unzips the
-                         'testEnvironment.zip' file (created by dspace-parent POM), into
-                         the 'target/testing/' folder, to essentially create a test
-                         install of DSpace, against which Tests can be run. -->
+                    'testEnvironment.zip' file (created by dspace-parent POM), into
+                    the 'target/testing/' folder, to essentially create a test
+                    install of DSpace, against which Tests can be run. -->
                     <plugin>
                         <artifactId>maven-dependency-plugin</artifactId>
                         <configuration>
@@ -650,7 +650,7 @@
             <artifactId>lucene-core</artifactId>
         </dependency>
         <!-- Reminder: Keep icu4j (in Parent POM) synced with version used by lucene-analyzers-icu below,
-             otherwise ICUFoldingFilterFactory may throw errors in tests.  -->
+        otherwise ICUFoldingFilterFactory may throw errors in tests.  -->
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-icu</artifactId>
@@ -790,7 +790,7 @@
             <version>${axiom.version}</version>
             <exclusions>
                 <!-- Exclude Geronimo as it is NOT necessary when using javax.activation (which we use)
-                     See: https://ws.apache.org/axiom/userguide/ch04.html#d0e732 -->
+                See: https://ws.apache.org/axiom/userguide/ch04.html#d0e732 -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>*</artifactId>
@@ -808,7 +808,7 @@
             <version>${axiom.version}</version>
             <exclusions>
                 <!-- Exclude Geronimo as it is NOT necessary when using javax.activation (which we use)
-                     See: https://ws.apache.org/axiom/userguide/ch04.html#d0e732 -->
+                See: https://ws.apache.org/axiom/userguide/ch04.html#d0e732 -->
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>*</artifactId>
@@ -828,7 +828,7 @@
             <version>${jersey.version}</version>
         </dependency>
         <!-- Required because Jersey no longer includes a dependency injection provider by default.
-             Needed to support PubMed API call in "PubmedImportMetadataSourceServiceImpl.GetRecord" -->
+        Needed to support PubMed API call in "PubmedImportMetadataSourceServiceImpl.GetRecord" -->
         <dependency>
             <groupId>org.glassfish.jersey.inject</groupId>
             <artifactId>jersey-hk2</artifactId>
@@ -894,15 +894,16 @@
             <scope>test</scope>
         </dependency>
 
-       <dependency>
+        <dependency>
             <groupId>org.apache.bcel</groupId>
             <artifactId>bcel</artifactId>
             <version>6.4.0</version>
         </dependency>
-<dependency>
-  <groupId>eu.openaire</groupId>
-  <artifactId>funders-model</artifactId>
-  <version>1.0.0</version>
-</dependency>    </dependencies>
+        <dependency>
+            <groupId>eu.openaire</groupId>
+            <artifactId>funders-model</artifactId>
+            <version>1.0.0</version>
+        </dependency>    
+    </dependencies>
 
 </project>
