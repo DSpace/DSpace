@@ -7,20 +7,23 @@
  */
 package org.dspace.versioning;
 
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
+import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
@@ -28,22 +31,16 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
-import org.dspace.services.model.Request;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * Service to handle submission of item correction.
  *
  * @author Giuseppe Digilio (giuseppe.digilio at 4science.it)
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  */
-@Component
 public class ItemCorrectionService {
-
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemCorrectionService.class);
-
-    private String correctionRelationshipName;
 
     @Autowired
     protected ConfigurationService configurationService;
@@ -66,6 +63,15 @@ public class ItemCorrectionService {
     @Autowired
     protected ItemCorrectionProvider correctionItemProvider;
 
+    @Autowired
+    protected EntityTypeService entityTypeService;
+
+    private final String correctionRelationshipName;
+
+    public ItemCorrectionService(String correctionRelationshipName) {
+        this.correctionRelationshipName = correctionRelationshipName;
+    }
+
     /**
      * Create a workspaceitem by an existing Item
      * 
@@ -78,17 +84,11 @@ public class ItemCorrectionService {
      * @return    the created workspaceitem
      * @throws Exception
      */
-    public WorkspaceItem createWorkspaceItemByItem(Context context, Request request, UUID itemUUID)
-            throws Exception {
+    public WorkspaceItem createWorkspaceItemByItem(Context context, UUID itemUUID) throws Exception {
         WorkspaceItem wsi = null;
         Collection collection = null;
-        Item item = null;
 
-        try {
-            item = itemService.find(context, itemUUID);
-        } catch (SQLException e) {
-            throw new SQLException("Item " + itemUUID + " is not found");
-        }
+        Item item = itemService.find(context, itemUUID);
 
         if (item != null) {
             try {
@@ -128,69 +128,48 @@ public class ItemCorrectionService {
      * @return    the created workspaceitem
      * @throws Exception
      */
-    public WorkspaceItem createWorkspaceItemAndRelationshipByItem(Context context, Request request, UUID itemUUID,
-            String relationship) throws Exception {
+    public WorkspaceItem createWorkspaceItemAndRelationshipByItem(Context context, UUID itemUUID, String relationship)
+        throws Exception {
 
-        Item item;
-        RelationshipType relationshipType;
-        WorkspaceItem wsi = null;
-
-        try {
-            item = itemService.find(context, itemUUID);
-        } catch (SQLException e) {
-            throw new Exception("Cannot create a relationship without a given item");
+        if (StringUtils.isBlank(relationship)) {
+            throw new IllegalArgumentException("Relationship cannot be undefined");
         }
 
-        if (item != null) {
-            if (StringUtils.isNotBlank(relationship)) {
-                List<RelationshipType> types;
-
-                types = relationshipTypeService
-                        .findByLeftwardOrRightwardTypeName(context, relationship);
-
-                if (types != null && !types.isEmpty() && types.get(0) != null) {
-                    relationshipType = types.get(0);
-                    if (isRelationshipExisting(context, item, relationshipType)) {
-                        throw new AuthorizeException("Relationship " + relationship +
-                                " already exists for item " + itemUUID);
-                    }
-                    wsi = createWorkspaceItemByItem(context, request, itemUUID);
-                    createRelationship(context, relationshipType, wsi.getItem(), item);
-                } else {
-                    throw new Exception("Relationship of type "
-                            + relationship + " does not exist");
-                }
-            } else {
-                throw new Exception("Relationship cannot be undefined");
-            }
-
-        } else {
-            throw new Exception("Cannot create a relationship without a given item");
+        Item item = itemService.find(context, itemUUID);
+        if (item == null) {
+            throw new IllegalArgumentException("Cannot create a relationship without a given item");
         }
 
-        return wsi;
+        RelationshipType relationshipType = findRelationshipType(context, item, relationship);
+        if (relationshipType == null) {
+            throw new IllegalArgumentException("No relationship type found for " + relationship);
+        }
+
+        WorkspaceItem workspaceItem = createWorkspaceItemByItem(context, itemUUID);
+        relationshipService.create(context, workspaceItem.getItem(), item, relationshipType, false);
+
+        return workspaceItem;
     }
 
     public boolean checkIfIsCorrectionItem(Context context, Item item) throws SQLException {
-        List<RelationshipType> types = relationshipTypeService
-                .findByLeftwardOrRightwardTypeName(context, getCorrectionRelationshipName());
-        List<Relationship> itemRelationshiplist = relationshipService
-                .findByItemAndRelationshipType(context, item, types.get(0), true);
+        return checkIfIsCorrectionItem(context, item, getCorrectionRelationshipName());
+    }
 
-        return itemRelationshiplist != null && itemRelationshiplist.size() > 0;
+    public boolean checkIfIsCorrectionItem(Context context, Item item, String relationshipName) throws SQLException {
+        RelationshipType relationshipType = findRelationshipType(context, item, relationshipName);
+        if (relationshipType == null) {
+            return false;
+        }
+        return isNotEmpty(relationshipService.findByItemAndRelationshipType(context, item, relationshipType, true));
     }
 
     public Relationship getCorrectionItemRelationship(Context context, Item item) throws SQLException {
-        List<RelationshipType> types = relationshipTypeService
-                .findByLeftwardOrRightwardTypeName(context, getCorrectionRelationshipName());
-        List<Relationship> itemRelationshiplist = relationshipService
-                .findByItemAndRelationshipType(context, item, types.get(0), true);
-
-        if (itemRelationshiplist != null && itemRelationshiplist.size() > 0) {
-            return itemRelationshiplist.get(0);
-        } else {
+        RelationshipType type = findRelationshipType(context, item, getCorrectionRelationshipName());
+        if (type == null) {
             return null;
         }
+        List<Relationship> relationships = relationshipService.findByItemAndRelationshipType(context, item, type, true);
+        return isNotEmpty(relationships) ? relationships.get(0) : null;
     }
 
     public void replaceCorrectionItemWithNative(Context context, XmlWorkflowItem wfi) {
@@ -201,49 +180,25 @@ public class ItemCorrectionService {
             relationshipService.delete(context, relationship);
             correctionItemProvider.updateNativeItemWithCorrection(context, wfi, wfi.getItem(), nativeItem);
         } catch (SQLException | AuthorizeException | IOException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
 
     }
 
-    private boolean isRelationshipExisting(Context context, Item item, RelationshipType relationshipType) {
+    private RelationshipType findRelationshipType(Context context, Item item, String relationship) throws SQLException {
 
-        if (relationshipType != null && item != null) {
-            List<Relationship> relationshipList;
-            try {
-                relationshipList = relationshipService
-                        .findByItemAndRelationshipType(context, item, relationshipType);
-            } catch (SQLException e) {
-                relationshipList = null;
-            }
-            return (relationshipList != null && !relationshipList.isEmpty());
-        } else {
-            throw new RuntimeException("Invalid null argument");
+        EntityType type = entityTypeService.findByItem(context, item);
+        if (type == null) {
+            return null;
         }
 
-    }
-
-    private void createRelationship(Context context, RelationshipType relationshipType, Item leftItem, Item rightItem)
-            throws AuthorizeException {
-        if (relationshipType != null && leftItem != null && rightItem != null) {
-            try {
-                relationshipService.create(context, leftItem, rightItem, relationshipType, true);
-
-            } catch (AuthorizeException e) {
-                throw new AuthorizeException(e.getMessage());
-            } catch (SQLException e) {
-                throw new RuntimeException(e.getMessage());
-            }
-        } else {
-            throw new RuntimeException("Invalid null argument");
-        }
+        return relationshipTypeService.findByLeftwardOrRightwardTypeName(context, relationship).stream()
+            .filter(relationshipType -> type.equals(relationshipType.getLeftType())).findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Relationship type " + relationship + " does not exist"));
     }
 
     public String getCorrectionRelationshipName() {
         return correctionRelationshipName;
     }
 
-    public void setCorrectionRelationshipName(String correctionRelationshipName) {
-        this.correctionRelationshipName = correctionRelationshipName;
-    }
 }

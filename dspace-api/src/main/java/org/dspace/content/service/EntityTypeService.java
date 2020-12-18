@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.EntityType;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.service.DSpaceCRUDService;
 
@@ -56,4 +57,13 @@ public interface EntityTypeService extends DSpaceCRUDService<EntityType> {
      * @throws AuthorizeException   If something geos wrong with authorizations
      */
     public EntityType create(Context context, String entityTypeString) throws SQLException, AuthorizeException;
+
+    /**
+     * Retrieves the EntityType related to the given item.
+     *
+     * @param  context The relevant DSpace context
+     * @param  item    the Item instance
+     * @return         the entity type
+     */
+    public EntityType findByItem(Context context, Item item) throws SQLException;
 }

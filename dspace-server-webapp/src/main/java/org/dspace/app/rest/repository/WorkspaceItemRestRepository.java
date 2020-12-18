@@ -187,7 +187,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                 || StringUtils.isNotBlank(relationship)) {
             try {
                 source = itemCorrectionService.createWorkspaceItemAndRelationshipByItem(context,
-                        getRequestService().getCurrentRequest(), UUIDUtils.fromString(itemUUID), relationship);
+                    UUIDUtils.fromString(itemUUID), relationship);
             } catch (AuthorizeException e) {
                 throw new RESTAuthorizationException(e);
             } catch (Exception e) {
@@ -195,8 +195,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             }
         } else if (StringUtils.isNotBlank(itemUUID)) {
             try {
-                source = itemCorrectionService.createWorkspaceItemByItem(context,
-                        getRequestService().getCurrentRequest(), UUIDUtils.fromString(itemUUID));
+                source = itemCorrectionService.createWorkspaceItemByItem(context, UUIDUtils.fromString(itemUUID));
             } catch (Exception e) {
                 throw new UnprocessableEntityException(e.getMessage());
             }

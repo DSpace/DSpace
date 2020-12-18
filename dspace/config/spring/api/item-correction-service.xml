@@ -9,7 +9,7 @@
     <bean id="org.dspace.versioning.ItemCorrectionService"
           class="org.dspace.versioning.ItemCorrectionService"
           scope="singleton">
-       <property name="correctionRelationshipName" value="isCorrectionOfItem" />
+       <constructor-arg name="correctionRelationshipName" value="isCorrectionOfItem" />
     </bean>
 
     <!-- Correction Item Provider, defines behavior for replicating
