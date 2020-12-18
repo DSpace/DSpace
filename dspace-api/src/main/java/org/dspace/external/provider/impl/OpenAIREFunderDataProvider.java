@@ -23,10 +23,10 @@ import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
 import org.openaire.funders.jaxb.model.OpenAIREHandler;
 import org.openaire.funders.jaxb.model.Project;
-import org.springframework.beans.factory.annotation.Required;
 import org.openaire.funders.jaxb.model.Response;
 import org.openaire.funders.jaxb.model.Results;
 import org.openaire.funders.jaxb.model.Result;
+import org.springframework.beans.factory.annotation.Required;
 
 /**
  * This class is the implementation of the ExternalDataProvider interface that
@@ -38,7 +38,7 @@ public class OpenAIREFunderDataProvider implements ExternalDataProvider {
 
     /**
      * @param sourceIdentifier The source where the ExternalDataObject came from
-     * @param openaireAPIUrl OpenAIRE API baseURL 
+     * @param openaireAPIUrl OpenAIRE API baseURL
      * @param projectGrandID Project GrantID
      * @param projectFunder Project Funder
      */
@@ -99,62 +99,86 @@ public class OpenAIREFunderDataProvider implements ExternalDataProvider {
         ExternalDataObject externalDataObject = convertToExternalDataObject(response);
         return Optional.of(externalDataObject);
     }
-    /**
-     * OpenAIRE GrantID is unique among funders
-     * A GrantID might be related to more than one projects
-     */
 
+    /**
+     * OpenAIRE GrantID is unique among funders A GrantID might be related to
+     * more than one projects
+     */
     protected ExternalDataObject convertToExternalDataObject(Response response) {
         ExternalDataObject externalDataObject = new ExternalDataObject(sourceIdentifier);
         Results results = response.getResults();
 
         Result result = results.getResult();
-        Project project = response.getResults().getResult().getMetadata().getEntity().getProject();
-            if (project == null) {
-                throw new IllegalStateException("No project found");
-            }
+        Project project = response
+                .getResults()
+                .getResult()
+                .getMetadata()
+                .getEntity()
+                .getProject();
+        if (project == null) {
+           throw new IllegalStateException("No project found");
+        }
 
-            String funderName = "";
-            if (project.getFundingTreeType().getFunder().getName() != null) {
-                funderName = project.getFundingTreeType().getFunder().getName();
-                externalDataObject.addMetadata(new MetadataValueDTO("oaire", "funderName", null, null, funderName));
-            }
+        String funderName = "";
+        if (project.getFundingTreeType().getFunder().getName() != null) {
+           funderName = project
+                   .getFundingTreeType()
+                   .getFunder()
+                   .getName();
+           externalDataObject.addMetadata(new MetadataValueDTO("oaire", "funderName", null, null, funderName));
+        }
 
-            String funderID = "";
-            if (project.getFundingTreeType().getFunder().getId() != null) {
-                funderID = project.getFundingTreeType().getFunder().getId();
-                externalDataObject.addMetadata(new MetadataValueDTO("oaire", "funderIdentifier", null, null, funderID));
-            }
+        String funderID = "";
+        if (project.getFundingTreeType().getFunder().getId() != null) {
+           funderID = project
+                   .getFundingTreeType()
+                   .getFunder()
+                   .getId();
+           externalDataObject.addMetadata(new MetadataValueDTO("oaire", "funderIdentifier", null, null, funderID));
+        }
 
-            String fundingStream = "";
-            if (project.getFundingTreeType().getFunding_level1().getParent().getFundingLevel0().getDescription() != null) {
-                fundingStream = project.getFundingTreeType().getFunding_level1().getParent().getFundingLevel0().getDescription();
-                externalDataObject.addMetadata(new MetadataValueDTO("oaire", "fundingStream", null, null, fundingStream));
-            }
+        String fundingStream = "";
+        if (project.getFundingTreeType()
+                .getFunding_level1()
+                .getParent()
+                .getFundingLevel0()
+                .getDescription() != null) {
+           fundingStream = project
+                   .getFundingTreeType()
+                   .getFunding_level1()
+                   .getParent().getFundingLevel0().
+                   getDescription();
+           externalDataObject.addMetadata(new MetadataValueDTO("oaire", "fundingStream", null, null, fundingStream));
+        }
 
-            String awardTitle = "";
-            if (project.getTitle() != null) {
-                awardTitle = project.getTitle();
-                externalDataObject.addMetadata(new MetadataValueDTO("oaire", "awardTitle", null, null, awardTitle));
-            }
+        String awardTitle = "";
+        if (project.getTitle() != null) {
+           awardTitle = project.getTitle();
+           externalDataObject.addMetadata(new MetadataValueDTO("oaire", "awardTitle", null, null, awardTitle));
+        }
 
-            String awardNumber = "";
-            if (project.getCode() != null) {
-                awardNumber = project.getCode();
-                externalDataObject.addMetadata(new MetadataValueDTO("oaire", "awardNumber", null, null, awardNumber));
-            }
+        String awardNumber = "";
+        if (project.getCode() != null) {
+           awardNumber = project.getCode();
+           externalDataObject.addMetadata(new MetadataValueDTO("oaire", "awardNumber", null, null, awardNumber));
+        }
 
-            String fundingItemAcronym = "";
-            if (project.getAcronym() != null) {
-                fundingItemAcronym = project.getAcronym();
-                externalDataObject.addMetadata(new MetadataValueDTO("oaire", "fundingItemAcronym", null, null, fundingItemAcronym));
-            }
+        String fundingItemAcronym = "";
+        if (project.getAcronym() != null) {
+           fundingItemAcronym = project.getAcronym();
+           externalDataObject.addMetadata(new MetadataValueDTO("oaire", "fundingItemAcronym", null, null, fundingItemAcronym));
+        }
 
-            String funderJuristiction = "";
-            if (project.getFundingTreeType().getFunder().getJurisdiction() != null) {
-                funderJuristiction = project.getFundingTreeType().getFunder().getJurisdiction();
-                externalDataObject.addMetadata(new MetadataValueDTO("oaire", "funderJuristiction", null, null, funderJuristiction));
-            }
+        String funderJuristiction = "";
+        if (project.getFundingTreeType()
+                .getFunder()
+                .getJurisdiction() != null) {
+           funderJuristiction = project
+                   .getFundingTreeType()
+                   .getFunder()
+                   .getJurisdiction();
+           externalDataObject.addMetadata(new MetadataValueDTO("oaire", "funderJuristiction", null, null, funderJuristiction));
+        }
 
         return externalDataObject;
     }
@@ -167,7 +191,7 @@ public class OpenAIREFunderDataProvider implements ExternalDataProvider {
      * @return Response
      */
     public Response getResponse(String projectID, String projectFunder) throws MalformedURLException, JAXBException {
-        URL url = new URL(this.getOpenAIREAPIUrl() + "search/projects?grantID=" + projectID+"&funder="+projectFunder);
+        URL url = new URL(this.getOpenAIREAPIUrl()+"search/projects?grantID="+projectID+"&funder="+projectFunder);
         Response response = OpenAIREHandler.unmarshal(url);
         return response;
     }
