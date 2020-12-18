@@ -4,7 +4,9 @@
 	xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-	<util:constant id="CrisConsumer-SOURCE_INTERNAL" static-field="org.dspace.authority.CrisConsumer.SOURCE_INTERNAL" />
+	<util:constant id="CrisConsumer-SOURCE_INTERNAL" static-field="org.dspace.authority.filler.AuthorityImportFillerService.SOURCE_INTERNAL" />
+
+	<bean class="org.dspace.authority.filler.AuthorityImportFillerServiceImpl"/>
 
 	<bean id="org.dspace.authority.filler.AuthorityImportFillerHolder" class="org.dspace.authority.filler.AuthorityImportFillerHolder">
 		<property name="fillers">
