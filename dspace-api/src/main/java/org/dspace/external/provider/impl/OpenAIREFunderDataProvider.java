@@ -24,8 +24,8 @@ import org.dspace.external.provider.ExternalDataProvider;
 import org.openaire.funders.jaxb.model.OpenAIREHandler;
 import org.openaire.funders.jaxb.model.Project;
 import org.openaire.funders.jaxb.model.Response;
-import org.openaire.funders.jaxb.model.Results;
 import org.openaire.funders.jaxb.model.Result;
+import org.openaire.funders.jaxb.model.Results;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -121,20 +121,20 @@ public class OpenAIREFunderDataProvider implements ExternalDataProvider {
 
         String funderName = "";
         if (project.getFundingTreeType().getFunder().getName() != null) {
-           funderName = project
+            funderName = project
                    .getFundingTreeType()
                    .getFunder()
                    .getName();
-           externalDataObject.addMetadata(new MetadataValueDTO("oaire", "funderName", null, null, funderName));
+            externalDataObject.addMetadata(new MetadataValueDTO("oaire", "funderName", null, null, funderName));
         }
 
         String funderID = "";
         if (project.getFundingTreeType().getFunder().getId() != null) {
-           funderID = project
+            funderID = project
                    .getFundingTreeType()
                    .getFunder()
                    .getId();
-           externalDataObject.addMetadata(new MetadataValueDTO("oaire", "funderIdentifier", null, null, funderID));
+            externalDataObject.addMetadata(new MetadataValueDTO("oaire", "funderIdentifier", null, null, funderID));
         }
 
         String fundingStream = "";
@@ -143,41 +143,43 @@ public class OpenAIREFunderDataProvider implements ExternalDataProvider {
                 .getParent()
                 .getFundingLevel0()
                 .getDescription() != null) {
-           fundingStream = project
+            fundingStream = project
                    .getFundingTreeType()
                    .getFunding_level1()
                    .getParent().getFundingLevel0().
                    getDescription();
-           externalDataObject.addMetadata(new MetadataValueDTO("oaire", "fundingStream", null, null, fundingStream));
+            externalDataObject.addMetadata(new MetadataValueDTO("oaire", "fundingStream", null, null, fundingStream));
         }
 
         String awardTitle = "";
         if (project.getTitle() != null) {
-           awardTitle = project.getTitle();
-           externalDataObject.addMetadata(new MetadataValueDTO("oaire", "awardTitle", null, null, awardTitle));
+            awardTitle = project.getTitle();
+            externalDataObject.addMetadata(new MetadataValueDTO("oaire", "awardTitle", null, null, awardTitle));
         }
 
         String awardNumber = "";
         if (project.getCode() != null) {
-           awardNumber = project.getCode();
-           externalDataObject.addMetadata(new MetadataValueDTO("oaire", "awardNumber", null, null, awardNumber));
+            awardNumber = project.getCode();
+            externalDataObject.addMetadata(new MetadataValueDTO("oaire", "awardNumber", null, null, awardNumber));
         }
 
         String fundingItemAcronym = "";
         if (project.getAcronym() != null) {
-           fundingItemAcronym = project.getAcronym();
-           externalDataObject.addMetadata(new MetadataValueDTO("oaire", "fundingItemAcronym", null, null, fundingItemAcronym));
+            fundingItemAcronym = project.getAcronym();
+            externalDataObject.addMetadata(new MetadataValueDTO("oaire", 
+                    "fundingItemAcronym", null, null, fundingItemAcronym));
         }
 
         String funderJuristiction = "";
         if (project.getFundingTreeType()
                 .getFunder()
                 .getJurisdiction() != null) {
-           funderJuristiction = project
+            funderJuristiction = project
                    .getFundingTreeType()
                    .getFunder()
                    .getJurisdiction();
-           externalDataObject.addMetadata(new MetadataValueDTO("oaire", "funderJuristiction", null, null, funderJuristiction));
+            externalDataObject.addMetadata(new MetadataValueDTO("oaire", 
+                    "funderJuristiction", null, null, funderJuristiction));
         }
 
         return externalDataObject;
@@ -191,7 +193,7 @@ public class OpenAIREFunderDataProvider implements ExternalDataProvider {
      * @return Response
      */
     public Response getResponse(String projectID, String projectFunder) throws MalformedURLException, JAXBException {
-        URL url = new URL(this.getOpenAIREAPIUrl()+"search/projects?grantID="+projectID+"&funder="+projectFunder);
+        URL url = new URL(this.getOpenAIREAPIUrl() + "search/projects?grantID=" + projectID + "&funder=" + projectFunder);
         Response response = OpenAIREHandler.unmarshal(url);
         return response;
     }
