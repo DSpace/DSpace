@@ -61,6 +61,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DCDate;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -72,6 +73,7 @@ import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
@@ -170,6 +172,9 @@ public class OAIHarvester {
 
     @Autowired
     private WorkflowService<XmlWorkflowItem> workflowService;
+
+    @Autowired
+    private CommunityService communityService;
 
     /**
      * Performs a harvest cycle on this collection. This will query the remote
@@ -311,7 +316,8 @@ public class OAIHarvester {
                 log.error("An error occurs while process the record " + getItemIdentifier(record), ex);
                 report.incrementFailureCount();
                 harvestRow = rollbackAndReloadEntity(context, harvestRow);
-                logRecord(options.getProcessId(), harvestRow, false, startTimestamp, getItemIdentifier(record), NONE);
+                logRecord(context, options.getProcessId(), harvestRow, false, startTimestamp, getItemIdentifier(record),
+                    NONE);
             }
 
         }
@@ -341,7 +347,7 @@ public class OAIHarvester {
                 collectionService.removeItem(context, targetCollection, item);
             }
 
-            logRecord(options.getProcessId(), harvestRow, true, startTime, itemOaiID, DELETION);
+            logRecord(context, options.getProcessId(), harvestRow, true, startTime, itemOaiID, DELETION);
             return;
         }
 
@@ -406,7 +412,7 @@ public class OAIHarvester {
             handleORE(context, harvestRow, repositoryId, itemOaiID, item);
         }
 
-        logRecord(options.getProcessId(), harvestRow, true, startTimestamp, itemOaiID, UPDATE);
+        logRecord(context, options.getProcessId(), harvestRow, true, startTimestamp, itemOaiID, UPDATE);
 
         return harvestedItem;
     }
@@ -451,7 +457,8 @@ public class OAIHarvester {
 
         context.uncacheEntity(workspaceItem);
 
-        logRecord(options.getProcessId(), harvestRow, isItemValid, startTimestamp, getItemIdentifier(record), ADDITION);
+        logRecord(context, options.getProcessId(), harvestRow, isItemValid, startTimestamp, getItemIdentifier(record),
+            ADDITION);
 
         return harvestedItem;
     }
@@ -969,7 +976,8 @@ public class OAIHarvester {
         return message + " - Record import failures: " + report.getFailureCount();
     }
 
-    private void logRecord(UUID processId, HarvestedCollection harvestRow, boolean isValid, Long startTimestamp,
+    private void logRecord(Context context, UUID processId, HarvestedCollection harvestRow, boolean isValid,
+        Long startTimestamp,
         String itemIdentifier, OAIHarvesterAction action) {
 
         Collection collection = harvestRow.getCollection();
@@ -981,6 +989,7 @@ public class OAIHarvester {
             .append(itemIdentifier).append(LOG_DELIMITER)
             .append(harvestRow.getOaiSource()).append(LOG_DELIMITER)
             .append(harvestRow.getOaiSetId() != null ? harvestRow.getOaiSetId() : "").append(LOG_DELIMITER)
+            .append(getParentCommunityName(context, collection)).append(LOG_DELIMITER)
             .append(collection.getID()).append(LOG_DELIMITER)
             .append(collectionService.getName(collection)).append(LOG_DELIMITER)
             .append(isValid).append(LOG_DELIMITER)
@@ -989,6 +998,16 @@ public class OAIHarvester {
             .toString();
 
         log.trace(logMessage);
+
+    }
+
+    private String getParentCommunityName(Context context, Collection collection) {
+        try {
+            Community parentCommunity = (Community) collectionService.getParentObject(context, collection);
+            return parentCommunity != null ? communityService.getName(parentCommunity) : "";
+        } catch (SQLException e) {
+            throw new SQLRuntimeException(e);
+        }
 
     }
 
