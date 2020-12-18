@@ -132,6 +132,25 @@ Admins to our DockerHub repo can publish with the following command.
 docker push dspace/dspace-solr
 ```
 
+## dspace/src/main/docker/dspace-shibboleth/Dockerfile
+
+This is a test / demo image which provides an Apache HTTPD proxy (in front of Tomcat)
+with mod_shib & Shibboleth installed.  It is primarily for usage for
+testing DSpace's Shibboleth integration. It uses https://samltest.id/ as the Shibboleth IDP
+
+**This image is built manually.**   It should be rebuilt as needed.
+
+```
+cd dspace/src/main/docker/dspace-shibboleth
+docker build -t dspace/dspace-shibboleth .
+
+# Test running it manually
+docker run -i -t -d -p 80:80 -p 443:443 dspace/dspace-shibboleth
+```
+
+This image can also be rebuilt using the `../docker-compose/docker-compose-shibboleth.yml` script.
+
+
 ## local.cfg and test/ folder
 
 These resources are bundled into the `dspace/dspace` image at build time.
