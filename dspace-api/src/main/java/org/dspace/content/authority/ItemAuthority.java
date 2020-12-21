@@ -105,7 +105,6 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
             Context context = Optional.ofNullable(servletRequest.getAttribute("dspace.context")).map(c -> (Context) c)
                 .orElse(new Context());
             resultSearch = searchService.search(context, discoverQuery);
-            resultSearch = searchService.search(context, discoverQuery);
             List<Choice> choiceList = new ArrayList<Choice>();
 
             // Process results of query
