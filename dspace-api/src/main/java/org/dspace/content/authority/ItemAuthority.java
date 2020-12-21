@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import javax.servlet.ServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -29,6 +31,7 @@ import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.services.ConfigurationService;
+import org.dspace.services.RequestService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.ItemAuthorityUtils;
 import org.dspace.util.UUIDUtils;
@@ -52,6 +55,9 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
 
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
+    private RequestService requestService = dspace.getServiceManager().getServiceByName(RequestService.class.getName(),
+        RequestService.class);
+
     private SearchService searchService = dspace.getServiceManager().getServiceByName(
         "org.dspace.discovery.SearchService", SearchService.class);
 
@@ -72,7 +78,6 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
      */
     @Override
     public Choices getMatches(String text, int start, int limit, String locale) {
-        Context context = null;
         if (limit <= 0) {
             limit = 20;
         }
@@ -96,7 +101,10 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
 
         DiscoverResult resultSearch;
         try {
-            context = new Context();
+            ServletRequest servletRequest = requestService.getCurrentRequest().getServletRequest();
+            Context context = Optional.ofNullable(servletRequest.getAttribute("dspace.context")).map(c -> (Context) c)
+                .orElse(new Context());
+            resultSearch = searchService.search(context, discoverQuery);
             resultSearch = searchService.search(context, discoverQuery);
             List<Choice> choiceList = new ArrayList<Choice>();
 
