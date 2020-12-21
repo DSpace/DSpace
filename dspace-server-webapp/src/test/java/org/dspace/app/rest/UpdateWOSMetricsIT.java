@@ -9,6 +9,9 @@ package org.dspace.app.rest;
 import static org.dspace.app.launcher.ScriptLauncher.handleScript;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -37,6 +40,7 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.externalservices.wos.UpdateWOSMetrics;
+import org.dspace.externalservices.wos.WOSPersonRestConnector;
 import org.dspace.externalservices.wos.WOSRestConnector;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -55,6 +59,9 @@ public class UpdateWOSMetricsIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private WOSRestConnector wosRestConnector;
+
+    @Autowired
+    private WOSPersonRestConnector wosPersonRestConnector;
 
     @Test
     public void updateCrisMetricsFromWosMockitoTest() throws Exception {
@@ -91,8 +98,8 @@ public class UpdateWOSMetricsIT extends AbstractControllerIntegrationTest {
 
             CrisMetrics metric1 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
                                                     .withMetricType(UpdateWOSMetrics.WOS_METRIC_TYPE)
-                                                    .withMetricCount(2312)
-                                                    .isLast(false).build();
+                                                    .withMetricCount(23)
+                                                    .isLast(true).build();
 
             context.restoreAuthSystemState();
 
@@ -104,12 +111,10 @@ public class UpdateWOSMetricsIT extends AbstractControllerIntegrationTest {
             CrisMetrics metric = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(context,
                                      UpdateWOSMetrics.WOS_METRIC_TYPE, itemA.getID());
 
-            String tokenAdmin = getAuthToken(admin.getEmail(), password);
-            getClient(tokenAdmin).perform(get("/api/cris/metrics/" + metric.getID()))
-                                 .andExpect(status().isOk())
-                                 .andExpect(jsonPath("$", is(CrisMetricsMatcher.matchCrisMetrics(metric))))
-                                 .andExpect(jsonPath("$._links.self.href", Matchers.containsString(
-                                                     "/api/cris/metrics/" + metric.getID())));
+            assertNotEquals(metric1.getID(), metric.getID());
+            assertFalse(metric1.getLast());
+            assertTrue(metric.getLast());
+            assertEquals(87, metric.getMetricCount(), 0);
         } finally {
             CrisMetricsBuilder.deleteCrisMetrics(itemA);
             wosRestConnector.setHttpClient(originalHttpClient);
@@ -232,6 +237,178 @@ public class UpdateWOSMetricsIT extends AbstractControllerIntegrationTest {
         } finally {
             CrisMetricsBuilder.deleteCrisMetrics(itemA);
             wosRestConnector.setHttpClient(originalHttpClient);
+        }
+    }
+
+    @Test
+    public void updateCrisMetricsWithPersonEntityTypeMockitoTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        HttpClient originalHttpClient = wosPersonRestConnector.getHttpClient();
+        HttpClient httpClient = Mockito.mock(HttpClient.class);
+        Item itemA = null;
+        try (FileInputStream file = new FileInputStream(testProps.get("test.wosResponceMultiRecords").toString())) {
+
+            String wosMetricsExample = IOUtils.toString(file, Charset.defaultCharset());
+            wosPersonRestConnector.setHttpClient(httpClient);
+
+            BasicHttpResponse basicHttpResponse = new BasicHttpResponse(new ProtocolVersion("http", 1, 1), 200, "OK");
+            basicHttpResponse.setEntity(new BasicHttpEntity());
+            InputStream inputStream = new StringInputStream(wosMetricsExample);
+            BasicHttpEntity basicHttpEntity = new BasicHttpEntity();
+            basicHttpResponse.setEntity(basicHttpEntity);
+            basicHttpEntity.setChunked(true);
+            basicHttpEntity.setContent(inputStream);
+
+            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(basicHttpResponse);
+
+            parentCommunity = CommunityBuilder.createCommunity(context)
+                                              .withName("Parent Community").build();
+
+            Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                               .withRelationshipType("Person")
+                                               .withName("Collection 1").build();
+
+            itemA = ItemBuilder.createItem(context, col1)
+                               .withTitle("Title item A")
+                               .withOrcidIdentifier("0000-0001-8190-0000").build();
+
+            CrisMetrics metric = CrisMetricsBuilder.createCrisMetrics(context, itemA)
+                                                    .withMetricType(UpdateWOSMetrics.WOS_PERSON_METRIC_TYPE)
+                                                    .withMetricCount(22)
+                                                    .isLast(true).build();
+
+            context.restoreAuthSystemState();
+
+            String[] args = new String[] { "update-metrics", "-s", "wos", "-p", "person" };
+            TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+
+            assertEquals(0, handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin));
+
+            CrisMetrics wosMetric = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(context,
+                                                       UpdateWOSMetrics.WOS_PERSON_METRIC_TYPE, itemA.getID());
+
+            assertNotEquals(metric.getId(), wosMetric.getId());
+            assertEquals(wosMetric.getMetricCount(), 280, 0);
+            assertEquals(wosMetric.getMetricType(), UpdateWOSMetrics.WOS_PERSON_METRIC_TYPE);
+        } finally {
+            CrisMetricsBuilder.deleteCrisMetrics(itemA);
+            wosPersonRestConnector.setHttpClient(originalHttpClient);
+        }
+    }
+
+    @Test
+    public void updateCrisMetricsWithPersonEntityTypeBadRequestMockitoTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        HttpClient originalHttpClient = wosPersonRestConnector.getHttpClient();
+        HttpClient httpClient = Mockito.mock(HttpClient.class);
+        Item itemA = null;
+        try (FileInputStream file = new FileInputStream(testProps.get("test.wosBadRequest").toString())) {
+
+            String wosMetricsExample = IOUtils.toString(file, Charset.defaultCharset());
+            wosPersonRestConnector.setHttpClient(httpClient);
+
+            BasicHttpResponse basicHttpResponse = new BasicHttpResponse(new ProtocolVersion("http", 1, 1), 200, "OK");
+            basicHttpResponse.setEntity(new BasicHttpEntity());
+            InputStream inputStream = new StringInputStream(wosMetricsExample);
+            BasicHttpEntity basicHttpEntity = new BasicHttpEntity();
+            basicHttpResponse.setEntity(basicHttpEntity);
+            basicHttpEntity.setChunked(true);
+            basicHttpEntity.setContent(inputStream);
+
+            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(basicHttpResponse);
+
+            parentCommunity = CommunityBuilder.createCommunity(context)
+                                              .withName("Parent Community").build();
+
+            Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                               .withRelationshipType("Person")
+                                               .withName("Collection 1").build();
+
+            itemA = ItemBuilder.createItem(context, col1)
+                               .withTitle("Title item A")
+                               .withOrcidIdentifier("0000").build();
+
+            CrisMetrics metric = CrisMetricsBuilder.createCrisMetrics(context, itemA)
+                                                    .withMetricType(UpdateWOSMetrics.WOS_PERSON_METRIC_TYPE)
+                                                    .withMetricCount(22)
+                                                    .isLast(true).build();
+
+            context.restoreAuthSystemState();
+
+            String[] args = new String[] { "update-metrics", "-s", "wos", "-p", "person" };
+            TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+
+            assertEquals(0, handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin));
+
+            CrisMetrics wosMetric = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(context,
+                                                       UpdateWOSMetrics.WOS_PERSON_METRIC_TYPE, itemA.getID());
+
+            assertEquals(metric.getId(), wosMetric.getId());
+            assertEquals(wosMetric.getMetricCount(), 22, 0);
+            assertEquals(wosMetric.getMetricType(), UpdateWOSMetrics.WOS_PERSON_METRIC_TYPE);
+        } finally {
+            CrisMetricsBuilder.deleteCrisMetrics(itemA);
+            wosPersonRestConnector.setHttpClient(originalHttpClient);
+        }
+    }
+
+    @Test
+    public void updateCrisMetricsWithPersonEntityTypeUnauthorizedMockitoTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        HttpClient originalHttpClient = wosPersonRestConnector.getHttpClient();
+        HttpClient httpClient = Mockito.mock(HttpClient.class);
+        Item itemA = null;
+        try (FileInputStream file = new FileInputStream(testProps.get("test.wosUnauthorized").toString())) {
+
+            String wosMetricsExample = IOUtils.toString(file, Charset.defaultCharset());
+            wosPersonRestConnector.setHttpClient(httpClient);
+
+            BasicHttpResponse basicHttpResponse = new BasicHttpResponse(
+                                                  new ProtocolVersion("http", 1, 1), 401, "Unauthorized");
+            basicHttpResponse.setEntity(new BasicHttpEntity());
+            InputStream inputStream = new StringInputStream(wosMetricsExample);
+            BasicHttpEntity basicHttpEntity = new BasicHttpEntity();
+            basicHttpResponse.setEntity(basicHttpEntity);
+            basicHttpEntity.setChunked(true);
+            basicHttpEntity.setContent(inputStream);
+
+            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(basicHttpResponse);
+
+            parentCommunity = CommunityBuilder.createCommunity(context)
+                                              .withName("Parent Community").build();
+
+            Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                               .withRelationshipType("Person")
+                                               .withName("Collection 1").build();
+
+            itemA = ItemBuilder.createItem(context, col1)
+                               .withTitle("Title item A")
+                               .withOrcidIdentifier("0000-0001-8190-0000").build();
+
+            CrisMetrics metric = CrisMetricsBuilder.createCrisMetrics(context, itemA)
+                                                    .withMetricType(UpdateWOSMetrics.WOS_PERSON_METRIC_TYPE)
+                                                    .withMetricCount(22)
+                                                    .isLast(true).build();
+
+            context.restoreAuthSystemState();
+
+            String[] args = new String[] { "update-metrics", "-s", "wos", "-p", "person" };
+            TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+
+            assertEquals(0, handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin));
+
+            CrisMetrics wosMetric = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(context,
+                                                       UpdateWOSMetrics.WOS_PERSON_METRIC_TYPE, itemA.getID());
+
+            assertEquals(metric.getId(), wosMetric.getId());
+            assertEquals(wosMetric.getMetricCount(), 22, 0);
+            assertEquals(wosMetric.getMetricType(), UpdateWOSMetrics.WOS_PERSON_METRIC_TYPE);
+        } finally {
+            CrisMetricsBuilder.deleteCrisMetrics(itemA);
+            wosPersonRestConnector.setHttpClient(originalHttpClient);
         }
     }
 }
