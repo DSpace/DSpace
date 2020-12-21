@@ -15,7 +15,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>7.0-beta4-SNAPSHOT</version>
+        <version>7.0-beta5-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -307,6 +307,15 @@
             <groupId>org.webjars.bowergithub.codeseven</groupId>
             <artifactId>toastr</artifactId>
             <version>2.1.4</version>
+        </dependency>
+        <!-- Also pull in current version of Bootstrap via WebJars. This is currently ONLY used by our OAI-PMH
+             interface. But, it is include here so that it's accessible to all interfaces enabled in server webapp.
+             Made available at: webjars/bootstrap/dist/js/bootstrap.min.js and
+             webjars/bootstrap/dist/css/bootstrap.min.css -->
+        <dependency>
+            <groupId>org.webjars.bowergithub.twbs</groupId>
+            <artifactId>bootstrap</artifactId>
+            <version>4.5.2</version>
         </dependency>
 
 

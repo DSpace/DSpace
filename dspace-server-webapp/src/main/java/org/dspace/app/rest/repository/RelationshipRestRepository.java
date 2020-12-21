@@ -356,7 +356,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
                 if (relationshipType.getLeftwardType().equalsIgnoreCase(label)) {
                     isLeft = true;
                 }
-                total += relationshipService.countByItemAndRelationshipType(context, item, relationshipType);
+                total += relationshipService.countByItemAndRelationshipType(context, item, relationshipType, isLeft);
                 relationships.addAll(relationshipService.findByItemAndRelationshipType(context, item, relationshipType,
                         isLeft, pageable.getPageSize(), Math.toIntExact(pageable.getOffset())));
             }

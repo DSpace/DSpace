@@ -202,14 +202,14 @@ public class RelationshipServiceImpl implements RelationshipService {
             return false;
         }
         if (!verifyMaxCardinality(context, relationship.getLeftItem(),
-                                  relationshipType.getLeftMaxCardinality(), relationshipType)) {
+                                  relationshipType.getLeftMaxCardinality(), relationshipType, true)) {
             log.warn("The relationship has been deemed invalid since the left item has more" +
                          " relationships than the left max cardinality allows after we'd store this relationship");
             logRelationshipTypeDetailsForError(relationshipType);
             return false;
         }
         if (!verifyMaxCardinality(context, relationship.getRightItem(),
-                                  relationshipType.getRightMaxCardinality(), relationshipType)) {
+                                  relationshipType.getRightMaxCardinality(), relationshipType, false)) {
             log.warn("The relationship has been deemed invalid since the right item has more" +
                          " relationships than the right max cardinality allows after we'd store this relationship");
             logRelationshipTypeDetailsForError(relationshipType);
@@ -232,9 +232,10 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     private boolean verifyMaxCardinality(Context context, Item itemToProcess,
                                          Integer maxCardinality,
-                                         RelationshipType relationshipType) throws SQLException {
+                                         RelationshipType relationshipType,
+                                         boolean isLeft) throws SQLException {
         List<Relationship> rightRelationships = findByItemAndRelationshipType(context, itemToProcess, relationshipType,
-                                                                              false);
+                                                                              isLeft);
         if (maxCardinality != null && rightRelationships.size() >= maxCardinality) {
             return false;
         }
@@ -537,9 +538,9 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     @Override
-    public int countByItemAndRelationshipType(Context context, Item item, RelationshipType relationshipType)
-            throws SQLException {
-        return relationshipDAO.countByItemAndRelationshipType(context, item, relationshipType);
+    public int countByItemAndRelationshipType(Context context, Item item, RelationshipType relationshipType,
+                                              boolean isLeft) throws SQLException {
+        return relationshipDAO.countByItemAndRelationshipType(context, item, relationshipType, isLeft);
     }
 
     @Override

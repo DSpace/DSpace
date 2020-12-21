@@ -192,6 +192,8 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
             // Reload our ConfigurationService (to reset configs to defaults again)
             DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
 
+            AbstractBuilder.cleanupBuilderCache();
+
             // NOTE: we explicitly do NOT destroy our default eperson & admin as they
             // are cached and reused for all tests. This speeds up all tests.
         } catch (Exception e) {
