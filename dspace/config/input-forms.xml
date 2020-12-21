@@ -582,6 +582,7 @@
 					<dc-schema>sedici</dc-schema>
 					<dc-element>identifier</dc-element>
 					<dc-qualifier>issn</dc-qualifier>
+					<repeatable>true</repeatable>
 					<label>ISSN</label>
 					<input-type>onebox</input-type>
 					<hint>ISSN de la revista en la que el artículo fué publicado</hint>
