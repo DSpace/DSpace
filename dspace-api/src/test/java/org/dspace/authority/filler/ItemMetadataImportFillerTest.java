@@ -206,8 +206,8 @@ public class ItemMetadataImportFillerTest {
                 .thenReturn(emptyList());
 
         cut.fillItem(context, metadataValue, itemToFill);
-        
-        verify(itemService).getMetadataByMetadataString(sourceItem, "oairecerif.author.affiliation");        
+
+        verify(itemService).getMetadataByMetadataString(sourceItem, "oairecerif.author.affiliation");
         verify(itemService).addMetadata(context, itemToFill, "dc", "title", null, null, "Mario Rossi", null, -1);
         verify(itemService).clearMetadata(context, itemToFill, "oairecerif", "author", "affiliation", ANY);
 

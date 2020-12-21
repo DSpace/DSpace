@@ -59,15 +59,15 @@ public class ItemMetadataImportFiller implements AuthorityImportFiller {
 
         return config.getUpdateEnabled() != null ? config.getUpdateEnabled() : allowsUpdateByDefault;
     }
-    
+
     @Override
     public void fillItem(Context context, MetadataValue metadata, Item itemToFill) throws SQLException {
-    
+
         Item sourceItem = (Item) metadata.getDSpaceObject();
-    
+
         List<MetadataValueDTO> metadataDTOList = getMetadataListByRelatedItemAndMetadata(context, sourceItem,
                   metadata);
-    
+
         MetadataConfiguration metadataConfiguration = configurations.get(metadata.getMetadataField().toString('.'));
         addAllMetadata(context, itemToFill, metadataConfiguration, metadataDTOList);
 
@@ -111,7 +111,7 @@ public class ItemMetadataImportFiller implements AuthorityImportFiller {
             List<MetadataValueDTO> metadataValuesToAdd) throws SQLException {
 
         Map<String, MappingDetails> configurationMapping = new HashMap<String, MetadataConfiguration.MappingDetails>();
-        
+
         if (metadataConfiguration != null) {
             configurationMapping = metadataConfiguration.getMapping();
         }
@@ -122,7 +122,7 @@ public class ItemMetadataImportFiller implements AuthorityImportFiller {
             if (metadataFieldPrevious == null || !metadataFieldPrevious.equals(metadataField)) {
                 metadataFieldPrevious = metadataField;
                 MappingDetails mappingDetails = configurationMapping.get(metadataField);
-    
+
                 if (mappingDetails != null && !mappingDetails.isAppendMode()) {
                     itemService.clearMetadata(context, relatedItem, mappingDetails.getTargetMetadataSchema(),
                             mappingDetails.getTargetMetadataElement(), mappingDetails.getTargetMetadataQualifier(),
@@ -161,8 +161,8 @@ public class ItemMetadataImportFiller implements AuthorityImportFiller {
 
         int place = sourceMetadata.getPlace();
         if (metadataValuesToAdd.size() < (place + 1)) {
-          log.error(MISSING_METADATA_FOR_POSITION_MSG, mappingDetails.getTargetMetadata(), place, sourceItem.getID());
-          return null;
+            log.error(MISSING_METADATA_FOR_POSITION_MSG, mappingDetails.getTargetMetadata(), place, sourceItem.getID());
+            return null;
         }
 
         MetadataValue metadataValueToAdd = metadataValuesToAdd.get(place);
