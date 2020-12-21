@@ -248,6 +248,7 @@
                     <search-configuration>publication</search-configuration>
                     <label>Publication</label>
                     <hint>import a publicaton</hint>
+                    <externalsources>pubmed</externalsources>
                 </relation-field>
             </row>
             <row>
