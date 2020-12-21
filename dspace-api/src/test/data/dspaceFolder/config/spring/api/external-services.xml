@@ -50,5 +50,16 @@
     <bean id="orcidRestConnector" class="org.dspace.external.OrcidRestConnector">
         <constructor-arg value="${orcid.api.url}"/>
     </bean>
+    
+    <bean id="authorityProjectDataProvider" class="org.dspace.external.provider.impl.AuthorityImportDataProvider">
+        <property name="supportedAuthority" value="AuthorAuthority"/>
+        <property name="authorityMetadata" value="dc.contributor.author"/>
+        <property name="sourceIdentifier" value="authorAuthority"/>
+		<property name="supportedEntityTypes">
+            <list>
+                <value></value>
+            </list>
+        </property>
+    </bean>
 </beans>
 
