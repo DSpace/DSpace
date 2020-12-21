@@ -21,10 +21,10 @@ import java.util.TimeZone;
 import javax.mail.MessagingException;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
@@ -34,7 +34,6 @@ import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
@@ -45,6 +44,8 @@ import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.search.Harvest;
 import org.dspace.search.HarvestedItemInfo;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * CLI tool used for sending new item e-mail alerts to users
@@ -56,9 +57,14 @@ public class SubscribeCLITool {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SubscribeCLITool.class);
 
-    private static HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
-    private static ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-    private static SubscribeService subscribeService = EPersonServiceFactory.getInstance().getSubscribeService();
+    private static final HandleService handleService
+            = HandleServiceFactory.getInstance().getHandleService();
+    private static final ItemService itemService
+            = ContentServiceFactory.getInstance().getItemService();
+    private static final SubscribeService subscribeService
+            = EPersonServiceFactory.getInstance().getSubscribeService();
+    private static final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
      * Default constructor
@@ -168,14 +174,14 @@ public class SubscribeCLITool {
 
         // FIXME: text of email should be more configurable from an
         // i18n viewpoint
-        StringBuffer emailText = new StringBuffer();
+        StringBuilder emailText = new StringBuilder();
         boolean isFirst = true;
 
         for (int i = 0; i < collections.size(); i++) {
             Collection c = collections.get(i);
 
             try {
-                boolean includeAll = ConfigurationManager
+                boolean includeAll = configurationService
                     .getBooleanProperty("harvest.includerestricted.subscription", true);
 
                 // we harvest all the changed item from yesterday until now
@@ -191,7 +197,7 @@ public class SubscribeCLITool {
                              false, // Or withdrawals
                              includeAll);
 
-                if (ConfigurationManager.getBooleanProperty("eperson.subscription.onlynew", false)) {
+                if (configurationService.getBooleanProperty("eperson.subscription.onlynew", false)) {
                     // get only the items archived yesterday
                     itemInfos = filterOutModified(itemInfos);
                 } else {
@@ -299,8 +305,8 @@ public class SubscribeCLITool {
         }
 
         try {
-            line = new PosixParser().parse(options, argv);
-        } catch (Exception e) {
+            line = new DefaultParser().parse(options, argv);
+        } catch (org.apache.commons.cli.ParseException e) {
             // automatically generate the help statement
             formatter.printHelp(usage, e.getMessage(), options, "");
             System.exit(1);
@@ -320,7 +326,7 @@ public class SubscribeCLITool {
             context = new Context(Context.Mode.READ_ONLY);
             processDaily(context, test);
             context.complete();
-        } catch (Exception e) {
+        } catch (IOException | SQLException e) {
             log.fatal(e);
         } finally {
             if (context != null && context.isValid()) {
@@ -333,7 +339,7 @@ public class SubscribeCLITool {
     private static List<HarvestedItemInfo> filterOutToday(List<HarvestedItemInfo> completeList) {
         log.debug("Filtering out all today item to leave new items list size="
                       + completeList.size());
-        List<HarvestedItemInfo> filteredList = new ArrayList<HarvestedItemInfo>();
+        List<HarvestedItemInfo> filteredList = new ArrayList<>();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String today = sdf.format(new Date());
@@ -384,7 +390,7 @@ public class SubscribeCLITool {
 
     private static List<HarvestedItemInfo> filterOutModified(List<HarvestedItemInfo> completeList) {
         log.debug("Filtering out all modified to leave new items list size=" + completeList.size());
-        List<HarvestedItemInfo> filteredList = new ArrayList<HarvestedItemInfo>();
+        List<HarvestedItemInfo> filteredList = new ArrayList<>();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         // Get the start and end dates for yesterday

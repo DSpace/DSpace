@@ -19,8 +19,9 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
@@ -33,36 +34,18 @@ import org.im4java.process.ProcessStarter;
  * no bigger than. Creates only JPEGs.
  */
 public abstract class ImageMagickThumbnailFilter extends MediaFilter {
-    protected static int width = 180;
-    protected static int height = 120;
-    private static boolean flatten = true;
-    static String bitstreamDescription = "IM Thumbnail";
-    static final String defaultPattern = "Generated Thumbnail";
-    static Pattern replaceRegex = Pattern.compile(defaultPattern);
+    private static final int DEFAULT_WIDTH = 180;
+    private static final int DEFAULT_HEIGHT = 120;
+    static final String DEFAULT_PATTERN = "Generated Thumbnail";
     protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected static final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-    static String cmyk_profile;
-    static String srgb_profile;
+    protected static final String PRE = ImageMagickThumbnailFilter.class.getName();
 
     static {
-        String pre = ImageMagickThumbnailFilter.class.getName();
-        String s = ConfigurationManager.getProperty(pre + ".ProcessStarter");
+        String s = configurationService.getProperty(PRE + ".ProcessStarter");
         ProcessStarter.setGlobalSearchPath(s);
-        width = ConfigurationManager.getIntProperty("thumbnail.maxwidth", width);
-        height = ConfigurationManager.getIntProperty("thumbnail.maxheight", height);
-        flatten = ConfigurationManager.getBooleanProperty(pre + ".flatten", flatten);
-        String description = ConfigurationManager.getProperty(pre + ".bitstreamDescription");
-        cmyk_profile = ConfigurationManager.getProperty(pre + ".cmyk_profile");
-        srgb_profile = ConfigurationManager.getProperty(pre + ".srgb_profile");
-        if (description != null) {
-            bitstreamDescription = description;
-        }
-        try {
-            String patt = ConfigurationManager.getProperty(pre + ".replaceRegex");
-            replaceRegex = Pattern.compile(patt == null ? defaultPattern : patt);
-        } catch (PatternSyntaxException e) {
-            System.err.println("Invalid thumbnail replacement pattern: " + e.getMessage());
-        }
     }
 
     public ImageMagickThumbnailFilter() {
@@ -94,7 +77,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
      */
     @Override
     public String getDescription() {
-        return bitstreamDescription;
+        return configurationService.getProperty(PRE + ".bitstreamDescription", "IM Thumbnail");
     }
 
     public File inputStreamToTempFile(InputStream source, String prefix, String suffix) throws IOException {
@@ -120,7 +103,8 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
         IMOperation op = new IMOperation();
         op.autoOrient();
         op.addImage(f.getAbsolutePath());
-        op.thumbnail(width, height);
+        op.thumbnail(configurationService.getIntProperty("thumbnail.maxwidth", DEFAULT_WIDTH),
+                        configurationService.getIntProperty("thumbnail.maxheight", DEFAULT_HEIGHT));
         op.addImage(f2.getAbsolutePath());
         if (verbose) {
             System.out.println("IM Thumbnail Param: " + op);
@@ -137,11 +121,14 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
         IMOperation op = new IMOperation();
         String s = "[" + page + "]";
         op.addImage(f.getAbsolutePath() + s);
-        if (flatten) {
+        if (configurationService.getBooleanProperty(PRE + ".flatten", true)) {
             op.flatten();
         }
+
         // PDFs using the CMYK color system can be handled specially if
         // profiles are defined
+        String cmyk_profile = configurationService.getProperty(PRE + ".cmyk_profile");
+        String srgb_profile = configurationService.getProperty(PRE + ".srgb_profile");
         if (cmyk_profile != null && srgb_profile != null) {
             Info imageInfo = new Info(f.getAbsolutePath() + s, true);
             String imageClass = imageInfo.getImageClass();
@@ -174,24 +161,32 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
                 String description = bit.getDescription();
                 // If anything other than a generated thumbnail
                 // is found, halt processing
+                Pattern replaceRegex;
+                try {
+                    String patt = configurationService.getProperty(PRE + ".replaceRegex", DEFAULT_PATTERN);
+                    replaceRegex = Pattern.compile(patt == null ? DEFAULT_PATTERN : patt);
+                } catch (PatternSyntaxException e) {
+                    System.err.println("Invalid thumbnail replacement pattern: " + e.getMessage());
+                    throw e;
+                }
                 if (description != null) {
                     if (replaceRegex.matcher(description).matches()) {
                         if (verbose) {
-                            System.out.println(description + " " + nsrc
-                                                   + " matches pattern and is replacable.");
+                            System.out.format("%s %s matches pattern and is replacable.%n",
+                                    description, nsrc);
                         }
                         continue;
                     }
-                    if (description.equals(bitstreamDescription)) {
+                    if (description.equals(getDescription())) {
                         if (verbose) {
-                            System.out.println(bitstreamDescription + " " + nsrc
-                                                   + " is replacable.");
+                            System.out.format("%s %s is replaceable.%n",
+                                    getDescription(), nsrc);
                         }
                         continue;
                     }
                 }
-                System.out.println("Custom Thumbnail exists for " + nsrc + " for item "
-                                       + item.getHandle() + ".  Thumbnail will not be generated. ");
+                System.out.format("Custom Thumbnail exists for %s for item %s.  Thumbnail will not be generated.%n",
+                        nsrc, item.getHandle());
                 return false;
             }
         }

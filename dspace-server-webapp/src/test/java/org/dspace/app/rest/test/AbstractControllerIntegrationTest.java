@@ -103,10 +103,24 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
                              this.mappingJackson2HttpMessageConverter);
     }
 
+    /**
+     * Create a test web client without an authorization token (an anonymous
+     * session).
+     *
+     * @return the test client.
+     * @throws SQLException passed through.
+     */
     public MockMvc getClient() throws SQLException {
         return getClient(null);
     }
 
+    /**
+     * Create a test web client which uses a given authorization token.
+     *
+     * @param authToken a suitable Bearer token.
+     * @return the test client.
+     * @throws SQLException passed through.
+     */
     public MockMvc getClient(String authToken) throws SQLException {
         if (context != null && context.isValid()) {
             context.commit();

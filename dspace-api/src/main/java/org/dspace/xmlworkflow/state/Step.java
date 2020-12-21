@@ -22,7 +22,6 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.InProgressUserService;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * A class that contains all the data of an xlworkflow step
@@ -47,7 +46,7 @@ public class Step implements BeanNameAware {
 
     /**
      * Get an WorkflowActionConfiguration object for the provided action identifier
-     * @param actionID the action id for which we want our action config
+     * @param actionID the action id for which we want our action configuration.
      * @return The corresponding WorkflowActionConfiguration
      * @throws WorkflowConfigurationException occurs if the provided action isn't part of the step
      */
@@ -142,7 +141,7 @@ public class Step implements BeanNameAware {
      * Set the user selection configuration, this is required as every step requires one
      * @param userSelectionMethod the user selection method configuration
      */
-    @Required
+    @Autowired(required = true)
     public void setUserSelectionMethod(UserSelectionActionConfig userSelectionMethod) {
         this.userSelectionMethod = userSelectionMethod;
         userSelectionMethod.setStep(this);
@@ -171,7 +170,7 @@ public class Step implements BeanNameAware {
      * operations in each step.
      * @param actions the list of actions
      */
-    @Required
+    @Autowired(required = true)
     public void setActions(List<WorkflowActionConfig> actions) {
         for (WorkflowActionConfig workflowActionConfig : actions) {
             workflowActionConfig.setStep(this);

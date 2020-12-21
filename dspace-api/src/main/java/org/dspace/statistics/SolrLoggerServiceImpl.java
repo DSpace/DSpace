@@ -18,6 +18,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
@@ -46,7 +47,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
@@ -1067,7 +1069,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
              * The code below creates a query that will allow only records which do not have a bundlename
              * (items, collections, ...) or bitstreams that have a configured bundle name
              */
-            StringBuffer bundleQuery = new StringBuffer();
+            StringBuilder bundleQuery = new StringBuilder();
             //Also add the possibility that if no bundle name is there these results will also be returned !
             bundleQuery.append("-(bundleName:[* TO *]");
             for (int i = 0; i < bundles.length; i++) {
@@ -1219,12 +1221,20 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 solrRequestUrl = generateURL(solrRequestUrl, yearQueryParams);
 
                 HttpGet get = new HttpGet(solrRequestUrl);
-                HttpResponse response = new DefaultHttpClient().execute(get);
-                InputStream csvInputstream = response.getEntity().getContent();
-                //Write the csv ouput to a file !
-                File csvFile = new File(
-                    tempDirectory.getPath() + File.separatorChar + "temp." + dcStart.getYearUTC() + "." + i + ".csv");
-                FileUtils.copyInputStreamToFile(csvInputstream, csvFile);
+                InputStream csvInputstream;
+                File csvFile = new File(tempDirectory.getPath()
+                        + File.separatorChar
+                        + "temp."
+                        + dcStart.getYearUTC()
+                        + "."
+                        + i
+                        + ".csv");
+                try ( CloseableHttpClient hc = HttpClientBuilder.create().build(); ) {
+                    HttpResponse response = hc.execute(get);
+                    csvInputstream = response.getEntity().getContent();
+                    //Write the csv ouput to a file !
+                    FileUtils.copyInputStreamToFile(csvInputstream, csvFile);
+                }
                 filesToUpload.add(csvFile);
 
                 //Add 10000 & start over again
@@ -1300,14 +1310,14 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     }
 
     /**
-     * Retrieves a list of all the multi valued fields in the solr core
+     * Retrieves a list of all the multi valued fields in the solr core.
      *
      * @return all fields tagged as multivalued
      * @throws SolrServerException When getting the schema information from the SOLR core fails
      * @throws IOException         When connection to the SOLR server fails
      */
     public Set<String> getMultivaluedFieldNames() throws SolrServerException, IOException {
-        Set<String> multivaluedFields = new HashSet<String>();
+        Set<String> multivaluedFields = new HashSet<>();
         LukeRequest lukeRequest = new LukeRequest();
         lukeRequest.setShowSchema(true);
         LukeResponse process = lukeRequest.process(solr);
@@ -1360,11 +1370,13 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 solrRequestUrl = generateURL(solrRequestUrl, params);
 
                 HttpGet get = new HttpGet(solrRequestUrl);
-                HttpResponse response = new DefaultHttpClient().execute(get);
-
-                InputStream csvOutput = response.getEntity().getContent();
-                Reader csvReader = new InputStreamReader(csvOutput);
-                List<String[]> rows = new CSVReader(csvReader).readAll();
+                List<String[]> rows;
+                try ( CloseableHttpClient hc = HttpClientBuilder.create().build(); ) {
+                    HttpResponse response = hc.execute(get);
+                    InputStream csvOutput = response.getEntity().getContent();
+                    Reader csvReader = new InputStreamReader(csvOutput);
+                    rows = new CSVReader(csvReader).readAll();
+                }
                 String[][] csvParsed = rows.toArray(new String[rows.size()][]);
                 String[] header = csvParsed[0];
                 //Attempt to find the bitstream id index !
@@ -1527,8 +1539,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             String out = time + "," + "view_" + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso)
                                                                      .toLowerCase() + "," + id + "," + outputDateFormat
                 .format(solrDate) + ",anonymous," + ip + "\n";
-            FileUtils.writeStringToFile(exportOutput, out, true);
-
+            FileUtils.writeStringToFile(exportOutput, out, StandardCharsets.UTF_8, true);
         }
     }
 
