@@ -134,7 +134,7 @@ public class DefaultWorkflowIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
 
         getClient(authToken).perform(post("/api/submission/workspaceitems")
             .param("owningCollection", collection.getID().toString())
@@ -201,7 +201,7 @@ public class DefaultWorkflowIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
 
         getClient(authToken).perform(post("/api/submission/workspaceitems")
             .param("owningCollection", collection.getID().toString())
@@ -268,7 +268,7 @@ public class DefaultWorkflowIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
 
         getClient(authToken).perform(post("/api/submission/workspaceitems")
             .param("owningCollection", collection.getID().toString())

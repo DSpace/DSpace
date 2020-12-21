@@ -5,18 +5,20 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.content.edit;
+package org.dspace.content.security;
 
 /**
- * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
+ * Enum that model all the allowed values for an item access security
+ * configuration.
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public enum EditItemModeSecurity {
+public enum CrisSecurity {
 
     NONE,
     ADMIN,
     OWNER,
     ADMIN_OWNER,
-    CUSTOM
-
+    CUSTOM;
 }

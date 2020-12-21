@@ -26,6 +26,7 @@ import org.dspace.content.edit.EditItem;
 import org.dspace.content.edit.EditItemMode;
 import org.dspace.content.edit.service.EditItemModeService;
 import org.dspace.content.edit.service.EditItemService;
+import org.dspace.content.security.service.CrisSecurityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -49,6 +50,9 @@ public class EditItemServiceImpl implements EditItemService {
 
     @Autowired(required = true)
     private EditItemModeService modeService;
+
+    @Autowired(required = true)
+    private CrisSecurityService crisSecurityService;
 
     /* (non-Javadoc)
      * @see org.dspace.content.service.InProgressSubmissionService#
@@ -158,7 +162,7 @@ public class EditItemServiceImpl implements EditItemService {
             if (editMode == null) {
                 throw new NotFoundException();
             }
-            hasAccess = modeService.hasAccess(context, item, currentUser, editMode);
+            hasAccess = crisSecurityService.hasAccess(context, item, currentUser, editMode);
             if (!hasAccess) {
                 throw new AuthorizeException();
             }

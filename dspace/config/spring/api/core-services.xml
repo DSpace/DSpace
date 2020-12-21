@@ -152,6 +152,8 @@
 
     <bean class="org.dspace.app.orcid.service.impl.OrcidQueueServiceImpl" />
     <bean class="org.dspace.app.orcid.service.impl.OrcidHistoryServiceImpl" />
+    
+    <bean class="org.dspace.content.security.CrisSecurityServiceImpl" />
 
 
 </beans>
