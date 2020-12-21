@@ -140,9 +140,17 @@ public class UpdateCrisMetricsWithExternalSource extends
             discoverQuery.addFilterQueries("relationship.type:Publication");
             discoverQuery.addFilterQueries("dc.identifier.doi:* OR dc.identifier.pmid:*");
         }
+        if ("wos".equals(service) && StringUtils.isBlank(param)) {
+            discoverQuery.addFilterQueries("relationship.type:Publication");
+            discoverQuery.addFilterQueries("dc.identifier.doi:*");
+        }
         if ("hindex".equals(service)) {
             discoverQuery.addFilterQueries("relationship.type:Person");
             discoverQuery.addFilterQueries("person.identifier.scopus-author-id:*");
+        }
+        if ("wos".equals(service) && "person".equals(param)) {
+            discoverQuery.addFilterQueries("relationship.type:Person");
+            discoverQuery.addFilterQueries("person.identifier.orcid:*");
         }
     }
 

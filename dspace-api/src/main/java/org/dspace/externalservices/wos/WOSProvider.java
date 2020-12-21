@@ -14,6 +14,7 @@ import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.externalservices.scopus.CrisMetricDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -26,7 +27,7 @@ public class WOSProvider {
     @Autowired
     private WOSRestConnector wosRestConnector;
 
-    public Double getWOSObject(String id) {
+    public CrisMetricDTO getWOSObject(String id) {
         InputStream is = wosRestConnector.get(id);
         if (is != null) {
             return exstractMetricCount(is);
@@ -35,8 +36,9 @@ public class WOSProvider {
         return null;
     }
 
-    private Double exstractMetricCount(InputStream is) {
+    private CrisMetricDTO exstractMetricCount(InputStream is) {
         Integer metricCount = null;
+        CrisMetricDTO metricDTO = new CrisMetricDTO();
         final String path = "$.Data.Records.records.REC[0].dynamic_data.citation_related.tc_list.silo_tc.local_count";
         try {
             metricCount = JsonPath.read(is, path);
@@ -48,6 +50,8 @@ public class WOSProvider {
         if (Objects.isNull(metricCount)) {
             return null;
         }
-        return metricCount.doubleValue();
+        metricDTO.setMetricCount(metricCount.doubleValue());
+        metricDTO.setMetricType(UpdateWOSMetrics.WOS_METRIC_TYPE);
+        return metricDTO;
     }
 }

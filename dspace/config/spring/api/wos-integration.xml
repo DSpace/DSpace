@@ -16,5 +16,10 @@
        <property name="wosUrl" value="${wos.url}" />
     </bean>
 
+    <bean class="org.dspace.externalservices.wos.WOSPersonRestConnector">
+       <property name="apiKey" value="${wos.apiKey}" />
+       <property name="wosUrl" value="${wos.url}" />
+    </bean>
+
     <bean class="org.dspace.externalservices.wos.UpdateWOSMetrics"/>
 </beans>
