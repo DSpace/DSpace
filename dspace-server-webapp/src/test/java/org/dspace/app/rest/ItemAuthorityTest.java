@@ -373,6 +373,46 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
                   .andExpect(status().isUnauthorized());
     }
 
+    @Test
+    public void itemAuthorityWithValidExternalSourceTest() throws Exception {
+       context.turnOffAuthorisationSystem();
+
+       configurationService.setProperty("choises.externalsource.dc.contributor.author", "authorAuthority");
+
+       // These clears have to happen so that the config is actually reloaded in those classes. This is needed for
+       // the properties that we're altering above and this is only used within the tests
+       pluginService.clearNamedPluginClasses();
+       cas.clearCache();
+
+       context.restoreAuthSystemState();
+
+       String token = getAuthToken(eperson.getEmail(), password);
+       getClient(token).perform(get("/api/submission/vocabularies/AuthorAuthority"))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$.entity", Matchers.is("Person")))
+                       .andExpect(jsonPath("$.externalSource", Matchers.is("authorAuthority")));
+    }
+
+    @Test
+    public void itemAuthorityWithNotValidExternalSourceTest() throws Exception {
+       context.turnOffAuthorisationSystem();
+
+       configurationService.setProperty("choises.externalsource.dc.contributor.author", "fakeAuthorAuthority");
+
+       // These clears have to happen so that the config is actually reloaded in those classes. This is needed for
+       // the properties that we're altering above and this is only used within the tests
+       pluginService.clearNamedPluginClasses();
+       cas.clearCache();
+
+       context.restoreAuthSystemState();
+
+       String token = getAuthToken(eperson.getEmail(), password);
+       getClient(token).perform(get("/api/submission/vocabularies/AuthorAuthority"))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$.entity", Matchers.nullValue()))
+                       .andExpect(jsonPath("$.externalSource", Matchers.nullValue()));
+    }
+
     @Override
     @After
     // We need to cleanup the authorities cache once than the configuration has been restored

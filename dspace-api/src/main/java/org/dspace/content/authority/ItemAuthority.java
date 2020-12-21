@@ -28,6 +28,9 @@ import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
+import org.dspace.external.factory.ExternalServiceFactory;
+import org.dspace.external.provider.ExternalDataProvider;
+import org.dspace.external.service.ExternalDataService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.ItemAuthorityUtils;
@@ -44,6 +47,7 @@ import org.dspace.utils.DSpace;
  */
 public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
     private static final Logger log = Logger.getLogger(ItemAuthority.class);
+    final static String CHOICES_EXTERNALSOURCE_PREFIX = "choises.externalsource.";
 
     /** the name assigned to the specific instance by the PluginService, @see {@link NameAwarePlugin} **/
     private String authorityName;
@@ -59,6 +63,8 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
             "itemAuthorityServiceFactory", ItemAuthorityServiceFactory.class);
 
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    private ExternalDataService externalDataService = ExternalServiceFactory.getInstance().getExternalDataService();
 
     // punt!  this is a poor implementation..
     @Override
@@ -151,5 +157,51 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
     @Override
     public String getPluginInstanceName() {
         return authorityName;
+    }
+
+    @Override
+    public boolean hasValidExternalSource() {
+        String configName = getExternalSourceConfigName();
+        if (StringUtils.isNotBlank(configName)) {
+            String sourceIdentifier = configurationService.getProperty(configName);
+            ExternalDataProvider externalsource = externalDataService.getExternalDataProvider(sourceIdentifier);
+            return (externalsource != null);
+        }
+        return false;
+    }
+
+    @Override
+    public String getExternalSource() {
+        String configName = getExternalSourceConfigName();
+        if (StringUtils.isNotBlank(configName)) {
+            return configurationService.getProperty(configName);
+        }
+        return null;
+    }
+
+    private String getExternalSourceConfigName() {
+        String externalSourceConfigName = null;
+        // Get all configuration keys starting with a given prefix
+        List<String> propKeys = configurationService.getPropertyKeys(CHOICES_EXTERNALSOURCE_PREFIX);
+        Iterator<String> keyIterator = propKeys.iterator();
+        while (keyIterator.hasNext()) {
+            String key = keyIterator.next();
+            String metadata = key.substring(CHOICES_EXTERNALSOURCE_PREFIX.length());
+            if (metadata == null) {
+                log.warn(
+                    "Skipping invalid ChoiceAuthority configuration property: " + key + ": does not have schema" +
+                        ".element.qualifier");
+                continue;
+            }
+
+            String tmpAuthorityName = configurationService.getProperty(ChoiceAuthorityServiceImpl.CHOICES_PLUGIN_PREFIX
+                    + metadata);
+            if (authorityName.equals(tmpAuthorityName)) {
+                externalSourceConfigName = key;
+                break;
+            }
+        }
+
+        return externalSourceConfigName;
     }
 }

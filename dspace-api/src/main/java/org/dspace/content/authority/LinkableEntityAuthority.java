@@ -22,4 +22,20 @@ public interface LinkableEntityAuthority {
      */
     public String getLinkedEntityType();
 
+    /**
+     * Authorities with a valid external source configured allows creating a new entity
+     * from the origin item source
+     * 
+     * @return <code>true</code> if has valid, default <code>false</code>
+     */
+    default boolean hasValidExternalSource() {
+        return false;
+    }
+
+    /**
+     * Get the eternal source configured for this authority
+     *
+     * @return the linked external source identifier as a String
+     */
+    public String getExternalSource();
 }

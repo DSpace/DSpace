@@ -33,6 +33,10 @@ public class VocabularyRest extends BaseObjectRest<String> {
 
     private Integer preloadLevel;
 
+    private String entity;
+
+    private String externalSource;
+
     @Override
     public String getId() {
         return name;
@@ -68,6 +72,22 @@ public class VocabularyRest extends BaseObjectRest<String> {
 
     public void setPreloadLevel(Integer preloadLevel) {
         this.preloadLevel = preloadLevel;
+    }
+
+    public String getEntity() {
+        return entity;
+    }
+
+    public void setEntity(String entity) {
+        this.entity = entity;
+    }
+
+    public String getExternalSource() {
+        return externalSource;
+    }
+
+    public void setExternalSource(String externalSource) {
+        this.externalSource = externalSource;
     }
 
     @Override
