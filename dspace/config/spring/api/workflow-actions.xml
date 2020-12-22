@@ -10,6 +10,7 @@
     <bean id="reviewactionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.ReviewAction" scope="prototype"/>
     <bean id="editactionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.AcceptEditRejectAction" scope="prototype"/>
     <bean id="finaleditactionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.FinalEditAction" scope="prototype"/>
+    <bean id="checkcorrectionactionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.CheckCorrectionAction" scope="prototype"/>
     <bean id="singleuserreviewactionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.SingleUserReviewAction" scope="prototype"/>
 
     <bean id="selectrevieweractionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.SelectReviewerAction" scope="prototype">
@@ -41,6 +42,12 @@
         <constructor-arg type="java.lang.String" value="finaleditaction"/>
         <property name="processingAction" ref="finaleditactionAPI"/>
         <property name="requiresUI" value="true"/>
+    </bean>
+
+    <bean id="checkcorrectionaction" class="org.dspace.xmlworkflow.state.actions.WorkflowActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="checkcorrectionaction"/>
+        <property name="processingAction" ref="checkcorrectionactionAPI"/>
+        <property name="requiresUI" value="false"/>
     </bean>
 
 

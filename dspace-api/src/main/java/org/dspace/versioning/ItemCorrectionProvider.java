@@ -76,6 +76,12 @@ public class ItemCorrectionProvider extends AbstractVersionProvider {
 
         workflowItem.setItem(nativeItem);
         workflowItemService.update(context, workflowItem);
+
+        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, correctionItem);
+        if (workspaceItem != null) {
+            workspaceItemService.deleteWrapper(context, workspaceItem);
+        }
+
         itemService.delete(context, correctionItem);
         log.info("Deleted correction item " + correctionItem.getID().toString());
 
