@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.security;
 
+import org.dspace.app.rest.exception.DSpaceAccessDeniedHandler;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -58,6 +60,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     private AuthenticationService authenticationService;
 
+    @Autowired
+    private DSpaceAccessDeniedHandler accessDeniedHandler;
+
     @Override
     public void configure(WebSecurity webSecurity) throws Exception {
         // Define URL patterns which Spring Security will ignore entirely.
@@ -91,12 +96,18 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             .servletApi().and()
             // Enable CORS for Spring Security (see CORS settings in Application and ApplicationConfig)
             .cors().and()
-            // Enable CSRF protection with custom CookieCsrfTokenRepository (see below) designed for Angular apps
+            // Enable CSRF protection with custom csrfTokenRepository and custom sessionAuthenticationStrategy
+            // (both are defined below as methods).
             // While we primarily use JWT in headers, CSRF protection is needed because we also support JWT via Cookies
-            .csrf().csrfTokenRepository(this.getCsrfTokenRepository()).and()
-            // Return 401 on authorization failures with a correct WWWW-Authenticate header
-            .exceptionHandling().authenticationEntryPoint(
-                    new DSpace401AuthenticationEntryPoint(restAuthenticationService))
+            .csrf()
+                .csrfTokenRepository(this.getCsrfTokenRepository())
+                .sessionAuthenticationStrategy(this.sessionAuthenticationStrategy())
+            .and()
+            .exceptionHandling()
+                // Return 401 on authorization failures with a correct WWWW-Authenticate header
+                .authenticationEntryPoint(new DSpace401AuthenticationEntryPoint(restAuthenticationService))
+                // Custom handler for AccessDeniedExceptions, including CSRF exceptions
+                .accessDeniedHandler(accessDeniedHandler)
             .and()
 
             // Logout configuration
@@ -137,27 +148,30 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     /**
-     * Override the defaults of CookieCsrfTokenRepository to always set the Cookie Path to "/"
+     * Returns a custom DSpaceCsrfTokenRepository based on Spring Security's CookieCsrfTokenRepository, which is
+     * designed for Angular Apps.
      * <P>
-     * We use the CookieCsrfTokenRepository designed for Angular apps
-     * See https://docs.spring.io/spring-security/site/docs/current/reference/html5/#servlet-csrf
+     * The DSpaceCsrfTokenRepository stores the token in server-side cookie (for later verification), but sends it to
+     * the client as a DSPACE-XSRF-TOKEN header. The client is expected to return the token in either a header named
+     * X-XSRF-TOKEN *or* a URL parameter named "_csrf", at which point it is validated against the server-side cookie.
      * <P>
-     * This CookieCsrfTokenRepository will write a cookie named XSRF-TOKEN and read it from
-     * a header named X-XSRF-TOKEN *or* a URL parameter named "_csrf". Angular apps will respond to
-     * XSRF-TOKEN automatically, see: https://angular.io/guide/http#security-xsrf-protection
-     * <P>
-     * However, currently Angular *requires* the CSR cookie path to always be "/" or it will ignore it.
-     * See: https://stackoverflow.com/a/50511663
-     * @return CookieCsrfTokenRepository with cookie path="/"
+     * This behavior is based on the defaults for Angular apps: https://angular.io/guide/http#security-xsrf-protection.
+     * However, instead of sending an XSRF-TOKEN Cookie (as is usual for Angular apps), we send the DSPACE-XSRF-TOKEN
+     * header...as this ensures the Angular app can receive the token even if it is on a different domain.
+     *
+     * @return CsrfTokenRepository as described above
      */
     private CsrfTokenRepository getCsrfTokenRepository() {
-        // We are using a *custom* CrossSiteCookieCsrfTokenRepository in which sets
-        // "SameSite=None" to allow this XSRF-TOKEN cookie to be used in cross site requests.
-        // This custom class should be REMOVED when this Spring Security ticket is resolved:
-        // https://github.com/spring-projects/spring-security/issues/7537
-        CrossSiteCookieCsrfTokenRepository tokenRepository = CrossSiteCookieCsrfTokenRepository.withHttpOnlyFalse();
-        tokenRepository.setCookiePath("/");
-        return tokenRepository;
+        // NOTE: Created cookie is set to HttpOnly=false to allow Hal Browser (or other local JS clients) to access it.
+        return DSpaceCsrfTokenRepository.withHttpOnlyFalse();
+    }
+
+    /**
+     * Returns a custom DSpaceCsrfAuthenticationStrategy, which ensures that (after authenticating) the CSRF token
+     * is only refreshed when it is used (or attempted to be used) by the client.
+     */
+    private SessionAuthenticationStrategy sessionAuthenticationStrategy() {
+        return new DSpaceCsrfAuthenticationStrategy(getCsrfTokenRepository());
     }
 
 }

@@ -26,6 +26,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.web.csrf.InvalidCsrfTokenException;
+import org.springframework.security.web.csrf.MissingCsrfTokenException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -35,13 +37,15 @@ import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 /**
- * This Controller advice will handle all exceptions thrown by the DSpace API module
+ * This Controller advice will handle default exceptions thrown by the DSpace REST API module.
+ * <P>
+ * Keep in mind some specialized handlers exist for specific message types, e.g. DSpaceAccessDeniedHandler
  *
  * @author Tom Desair (tom dot desair at atmire dot com)
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
- * 
+ * @see DSpaceAccessDeniedHandler
  */
 @ControllerAdvice
 public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionHandler {
@@ -50,6 +54,8 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     @Autowired
     private RestAuthenticationService restAuthenticationService;
 
+    // NOTE: this method is also called by DSpaceAccessDeniedHandler to handle AccessDeniedExceptions thrown by
+    // Spring Security
     @ExceptionHandler({AuthorizeException.class, RESTAuthorizationException.class, AccessDeniedException.class})
     protected void handleAuthorizeException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
@@ -58,6 +64,14 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         } else {
             sendErrorResponse(request, response, ex, "Authentication is required", HttpServletResponse.SC_UNAUTHORIZED);
         }
+    }
+
+    // NOTE: this method is also called by DSpaceAccessDeniedHandler to handle CSRF exceptions thrown by Spring Security
+    @ExceptionHandler({InvalidCsrfTokenException.class, MissingCsrfTokenException.class})
+    protected void csrfTokenException(HttpServletRequest request, HttpServletResponse response, Exception ex)
+        throws IOException {
+        sendErrorResponse(request, response, ex, "Access is denied. Invalid CSRF token.",
+                          HttpServletResponse.SC_FORBIDDEN);
     }
 
     @ExceptionHandler({IllegalArgumentException.class, MultipartException.class})
@@ -146,7 +160,15 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
 
     }
 
-
+    /**
+     * Send the error to the response. Some errors may also be logged.
+     * @param request current request
+     * @param response current response
+     * @param ex Exception thrown
+     * @param message message to log or send in response
+     * @param statusCode status code to send in response
+     * @throws IOException
+     */
     private void sendErrorResponse(final HttpServletRequest request, final HttpServletResponse response,
                                    final Exception ex, final String message, final int statusCode) throws IOException {
         //Make sure Spring picks up this exception

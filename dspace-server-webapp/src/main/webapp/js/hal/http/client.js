@@ -21,10 +21,10 @@ HAL.Http.Client = function(opts) {
 };
 
 /**
- * Get CSRF Token by parsing it out of the XSRF-TOKEN cookie sent by our DSpace server webapp
+ * Get CSRF Token by parsing it out of the DSPACE-XSRF-COOKIE (server-side) cookie set by our DSpace server webapp
  **/
 function getCSRFToken() {
-    var cookie = document.cookie.match('(^|;)\\s*' + 'XSRF-TOKEN' + '\\s*=\\s*([^;]+)');
+    var cookie = document.cookie.match('(^|;)\\s*' + 'DSPACE-XSRF-COOKIE' + '\\s*=\\s*([^;]+)');
     if(cookie != undefined) {
         return cookie.pop();
     } else {
