@@ -10,14 +10,15 @@ package org.dspace.content.authority;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import javax.servlet.ServletRequest;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.authority.factory.ItemAuthorityServiceFactory;
@@ -25,15 +26,9 @@ import org.dspace.content.authority.service.ItemAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.discovery.DiscoverQuery;
-import org.dspace.discovery.DiscoverResult;
-import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchService;
-import org.dspace.discovery.SearchServiceException;
 import org.dspace.services.ConfigurationService;
-import org.dspace.services.RequestService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.util.ItemAuthorityUtils;
 import org.dspace.util.UUIDUtils;
 import org.dspace.utils.DSpace;
 
@@ -54,9 +49,6 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
     private DSpace dspace = new DSpace();
 
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-
-    private RequestService requestService = dspace.getServiceManager().getServiceByName(RequestService.class.getName(),
-        RequestService.class);
 
     private SearchService searchService = dspace.getServiceManager().getServiceByName(
         "org.dspace.discovery.SearchService", SearchService.class);
@@ -82,46 +74,47 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
             limit = 20;
         }
 
+        SolrClient solr = searchService.getSolrSearchCore().getSolr();
+        if (Objects.isNull(solr)) {
+            log.error("unable to find solr instance");
+            return new Choices(Choices.CF_UNSET);
+        }
+
         String relationshipType = getLinkedEntityType();
         ItemAuthorityService itemAuthorityService = itemAuthorityServiceFactory.getInstance(relationshipType);
         String luceneQuery = itemAuthorityService.getSolrQuery(text);
 
-        DiscoverQuery discoverQuery = new DiscoverQuery();
-        discoverQuery.setDSpaceObjectFilter(Item.class.getSimpleName());
+
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setQuery(luceneQuery);
+        solrQuery.setFields("dc.title", "search.resourceid");
+        solrQuery.setStart(start);
+        solrQuery.setRows(limit);
+        solrQuery.addFilterQuery("search.resourcetype:" + Item.class.getSimpleName());
 
         if (StringUtils.isNotBlank(relationshipType)) {
-            String filter = "relationship.type:" + relationshipType;
-            discoverQuery.addFilterQueries(filter);
+            solrQuery.addFilterQuery("relationship.type:" + relationshipType);
         }
 
-        discoverQuery
-            .setQuery(luceneQuery);
-        discoverQuery.setStart(start);
-        discoverQuery.setMaxResults(limit);
-
-        DiscoverResult resultSearch;
         try {
-            ServletRequest servletRequest = requestService.getCurrentRequest().getServletRequest();
-            Context context = Optional.ofNullable(servletRequest.getAttribute("dspace.context")).map(c -> (Context) c)
-                .orElse(new Context());
-            resultSearch = searchService.search(context, discoverQuery);
-            List<Choice> choiceList = new ArrayList<Choice>();
+            QueryResponse queryResponse = solr.query(solrQuery);
+            List<Choice> choiceList = queryResponse.getResults()
+                .stream()
+                .map(doc ->  {
+                    String title = ((ArrayList<String>) doc.getFieldValue("dc.title")).get(0);
+                    return new Choice((String) doc.getFieldValue("search.resourceid"),
+                        title,
+                        title);
+                }).collect(Collectors.toList());
 
-            // Process results of query
-            Iterator<IndexableObject> dsoIterator = resultSearch.getIndexableObjects().iterator();
-            while (dsoIterator.hasNext()) {
-                DSpaceObject dso = (DSpaceObject) dsoIterator.next().getIndexedObject();
-                Item item = (Item) dso;
-                Map<String, String> extras = ItemAuthorityUtils.buildExtra(getPluginInstanceName(), item);
-                choiceList.add(new Choice(item.getID().toString(), item.getName(),
-                                                           dso.getName(), extras));
-            }
             Choice[] results = new Choice[choiceList.size()];
             results = choiceList.toArray(results);
-            return new Choices(results, start, (int) resultSearch.getTotalSearchResults(), Choices.CF_AMBIGUOUS,
-                               resultSearch.getTotalSearchResults() > (start + limit), 0);
+            long numFound = queryResponse.getResults().getNumFound();
 
-        } catch (SearchServiceException e) {
+            return new Choices(results, start, (int) numFound, Choices.CF_AMBIGUOUS,
+                               numFound > (start + limit), 0);
+
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
             return new Choices(Choices.CF_UNSET);
         }

@@ -99,15 +99,12 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
                         .param("filter", "author"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$._embedded.entries", Matchers.containsInAnyOrder(
-                             ItemAuthorityMatcher.matchItemAuthorityWithOtherInformations(author_1.getID().toString(),
-                    "Author 1", "Author 1", "vocabularyEntry", "oairecerif_author_affiliation", "OrgUnit_1::"
-                        + orgUnit_1.getID()),
-                             ItemAuthorityMatcher.matchItemAuthorityWithOtherInformations(author_2.getID().toString(),
-                    "Author 2", "Author 2", "vocabularyEntry", "oairecerif_author_affiliation", "OrgUnit_1::"
-                        + orgUnit_1.getID()),
-                             ItemAuthorityMatcher.matchItemAuthorityWithOtherInformations(author_3.getID().toString(),
-                    "Author 3", "Author 3", "vocabularyEntry", "oairecerif_author_affiliation", "OrgUnit_2::"
-                        + orgUnit_2.getID())
+                             ItemAuthorityMatcher.matchItemAuthorityProperties(author_1.getID().toString(),
+                    "Author 1", "Author 1", "vocabularyEntry"),
+                             ItemAuthorityMatcher.matchItemAuthorityProperties(author_2.getID().toString(),
+                    "Author 2", "Author 2", "vocabularyEntry"),
+                             ItemAuthorityMatcher.matchItemAuthorityProperties(author_3.getID().toString(),
+                    "Author 3", "Author 3", "vocabularyEntry")
                              )))
                         .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
     }
@@ -209,8 +206,8 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
                        .param("filter", "author"))
                        .andExpect(status().isOk())
                        .andExpect(jsonPath("$._embedded.entries", Matchers.contains(
-                              ItemAuthorityMatcher.matchItemAuthorityWithOtherInformations(author_1.getID().toString(),
-                    "Author 1", "Author 1", "vocabularyEntry", "oairecerif_author_affiliation", "")
+                              ItemAuthorityMatcher.matchItemAuthorityProperties(author_1.getID().toString(),
+                    "Author 1", "Author 1", "vocabularyEntry")
                               )))
                        .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
     }
