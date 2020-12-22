@@ -26,18 +26,18 @@ import org.springframework.security.web.csrf.CsrfToken;
  * https://github.com/spring-projects/spring-security/blob/5.2.x/web/src/test/java/org/springframework/security/web/csrf/CookieCsrfTokenRepositoryTests.java
  *
  * The only modifications are:
- *   - Updating these tests to use our custom CrossSiteCookieCsrfTokenRepository
+ *   - Updating these tests to use our custom DSpaceCsrfTokenRepository
  *   - Updating the saveTokenSecure() test, where we check for our custom SameSite attribute.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class CrossSiteCookieCsrfTokenRepositoryTest {
-    CrossSiteCookieCsrfTokenRepository repository;
+public class DSpaceCsrfTokenRepositoryTest {
+    DSpaceCsrfTokenRepository repository;
     MockHttpServletResponse response;
     MockHttpServletRequest request;
 
     @Before
     public void setup() {
-        this.repository = new CrossSiteCookieCsrfTokenRepository();
+        this.repository = new DSpaceCsrfTokenRepository();
         this.request = new MockHttpServletRequest();
         this.response = new MockHttpServletResponse();
         this.request.setContextPath("/context");
@@ -49,9 +49,9 @@ public class CrossSiteCookieCsrfTokenRepositoryTest {
 
         assertThat(generateToken).isNotNull();
         assertThat(generateToken.getHeaderName())
-            .isEqualTo(CrossSiteCookieCsrfTokenRepository.DEFAULT_CSRF_HEADER_NAME);
+            .isEqualTo(DSpaceCsrfTokenRepository.DEFAULT_CSRF_HEADER_NAME);
         assertThat(generateToken.getParameterName())
-            .isEqualTo(CrossSiteCookieCsrfTokenRepository.DEFAULT_CSRF_PARAMETER_NAME);
+            .isEqualTo(DSpaceCsrfTokenRepository.DEFAULT_CSRF_PARAMETER_NAME);
         assertThat(generateToken.getToken()).isNotEmpty();
     }
 
@@ -76,11 +76,11 @@ public class CrossSiteCookieCsrfTokenRepositoryTest {
         this.repository.saveToken(token, this.request, this.response);
 
         Cookie tokenCookie = this.response
-            .getCookie(CrossSiteCookieCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
+            .getCookie(DSpaceCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
 
         assertThat(tokenCookie.getMaxAge()).isEqualTo(-1);
         assertThat(tokenCookie.getName())
-            .isEqualTo(CrossSiteCookieCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
+            .isEqualTo(DSpaceCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
         assertThat(tokenCookie.getPath()).isEqualTo(this.request.getContextPath());
         assertThat(tokenCookie.getSecure()).isEqualTo(this.request.isSecure());
         assertThat(tokenCookie.getValue()).isEqualTo(token.getToken());
@@ -94,7 +94,7 @@ public class CrossSiteCookieCsrfTokenRepositoryTest {
         this.repository.saveToken(token, this.request, this.response);
 
         Cookie tokenCookie = this.response
-            .getCookie(CrossSiteCookieCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
+            .getCookie(DSpaceCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
 
         assertThat(tokenCookie.getSecure()).isTrue();
         // DSpace Custom assert to verify SameSite attribute is set
@@ -111,11 +111,11 @@ public class CrossSiteCookieCsrfTokenRepositoryTest {
         this.repository.saveToken(null, this.request, this.response);
 
         Cookie tokenCookie = this.response
-            .getCookie(CrossSiteCookieCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
+            .getCookie(DSpaceCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
 
         assertThat(tokenCookie.getMaxAge()).isZero();
         assertThat(tokenCookie.getName())
-            .isEqualTo(CrossSiteCookieCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
+            .isEqualTo(DSpaceCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
         assertThat(tokenCookie.getPath()).isEqualTo(this.request.getContextPath());
         assertThat(tokenCookie.getSecure()).isEqualTo(this.request.isSecure());
         assertThat(tokenCookie.getValue()).isEmpty();
@@ -128,7 +128,7 @@ public class CrossSiteCookieCsrfTokenRepositoryTest {
         this.repository.saveToken(token, this.request, this.response);
 
         Cookie tokenCookie = this.response
-            .getCookie(CrossSiteCookieCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
+            .getCookie(DSpaceCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
 
         assertThat(tokenCookie.isHttpOnly()).isTrue();
     }
@@ -140,19 +140,19 @@ public class CrossSiteCookieCsrfTokenRepositoryTest {
         this.repository.saveToken(token, this.request, this.response);
 
         Cookie tokenCookie = this.response
-            .getCookie(CrossSiteCookieCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
+            .getCookie(DSpaceCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
 
         assertThat(tokenCookie.isHttpOnly()).isFalse();
     }
 
     @Test
     public void saveTokenWithHttpOnlyFalse() {
-        this.repository = CrossSiteCookieCsrfTokenRepository.withHttpOnlyFalse();
+        this.repository = DSpaceCsrfTokenRepository.withHttpOnlyFalse();
         CsrfToken token = this.repository.generateToken(this.request);
         this.repository.saveToken(token, this.request, this.response);
 
         Cookie tokenCookie = this.response
-            .getCookie(CrossSiteCookieCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
+            .getCookie(DSpaceCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
 
         assertThat(tokenCookie.isHttpOnly()).isFalse();
     }
@@ -165,7 +165,7 @@ public class CrossSiteCookieCsrfTokenRepositoryTest {
         this.repository.saveToken(token, this.request, this.response);
 
         Cookie tokenCookie = this.response
-            .getCookie(CrossSiteCookieCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
+            .getCookie(DSpaceCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
 
         assertThat(tokenCookie.getPath()).isEqualTo(this.repository.getCookiePath());
     }
@@ -178,7 +178,7 @@ public class CrossSiteCookieCsrfTokenRepositoryTest {
         this.repository.saveToken(token, this.request, this.response);
 
         Cookie tokenCookie = this.response
-            .getCookie(CrossSiteCookieCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
+            .getCookie(DSpaceCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
 
         assertThat(tokenCookie.getPath()).isEqualTo(this.request.getContextPath());
     }
@@ -191,7 +191,7 @@ public class CrossSiteCookieCsrfTokenRepositoryTest {
         this.repository.saveToken(token, this.request, this.response);
 
         Cookie tokenCookie = this.response
-            .getCookie(CrossSiteCookieCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
+            .getCookie(DSpaceCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
 
         assertThat(tokenCookie.getPath()).isEqualTo(this.request.getContextPath());
     }
@@ -205,7 +205,7 @@ public class CrossSiteCookieCsrfTokenRepositoryTest {
         this.repository.saveToken(token, this.request, this.response);
 
         Cookie tokenCookie = this.response
-            .getCookie(CrossSiteCookieCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
+            .getCookie(DSpaceCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
 
         assertThat(tokenCookie.getDomain()).isEqualTo(domainName);
     }
@@ -225,7 +225,7 @@ public class CrossSiteCookieCsrfTokenRepositoryTest {
     @Test
     public void loadTokenCookieValueEmptyString() {
         this.request.setCookies(
-            new Cookie(CrossSiteCookieCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME, ""));
+            new Cookie(DSpaceCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME, ""));
 
         assertThat(this.repository.loadToken(this.request)).isNull();
     }
@@ -235,7 +235,7 @@ public class CrossSiteCookieCsrfTokenRepositoryTest {
         CsrfToken generateToken = this.repository.generateToken(this.request);
 
         this.request
-            .setCookies(new Cookie(CrossSiteCookieCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME,
+            .setCookies(new Cookie(DSpaceCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME,
                                    generateToken.getToken()));
 
         CsrfToken loadToken = this.repository.loadToken(this.request);

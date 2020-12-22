@@ -22,24 +22,38 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.util.WebUtils;
 
 /**
- * This is a Spring Security CookieCsrfTokenRepository which supports cross-site cookies (i.e. SameSite=None).
- * PLEASE NOTE: It will NOT support cross-domain CSRF, as Cookies cannot be sent across domains. Therefore, this
- * CsrfTokenRepository is similar to Spring Security's in that it requires the REST API and UI to be on the same domain.
+ * This is a custom Spring Security CsrfTokenRepository which supports *cross-domain* CSRF protection (allowing the
+ * client and backend to be on different domains). It's inspired by https://stackoverflow.com/a/33175322
  * <P>
- * This code was mostly borrowed from Spring Security's CookieCsrfTokenRepository
- * https://github.com/spring-projects/spring-security/blob/5.2.x/web/src/main/java/org/springframework/security/web/csrf/CookieCsrfTokenRepository.java
- * <P>
- * Corresponding tests were also copied to CrossSiteCookieCsrfTokenRepositoryTest.
- * <P>
- * The only modification were to the saveToken() method below. See that method's JavaDocs.
- * <P>
- * NOTE: This class is TEMPORARY and should be REMOVED as soon as the "SameSite" attribute is supported by
- * Spring Security's CookieCsrfTokenRepository. As soon as the below ticket is resolved & we upgrade Spring Security,
- * then this custom class can be removed:
- * https://github.com/spring-projects/spring-security/issues/7537
+ * This also borrows heavily from Spring Security's CookieCsrfTokenRepository:
+ *  https://github.com/spring-projects/spring-security/blob/5.2.x/web/src/main/java/org/springframework/security/web/csrf/CookieCsrfTokenRepository.java
+ *
+ * How it works:
+ *
+ *  1. Backend generates XSRF token & stores in a *server-side* cookie named DSPACE-XSRF-COOKIE. This cookie is
+ *     only readable to clients on the same domain. But, it is returned (by user's browser) on every subsequent request
+ *     to backend. See "saveToken()" method below.
+ *  2. At the same time, backend also sends the generated XSRF token in a header named DSPACE-XSRF-TOKEN to client.
+ *     See "saveToken()" method below.
+ *  3. Client MUST look for DSPACE-XSRF-TOKEN header in a response from backend. If found, the client MUST store/save
+ *     this token for later request(s).  For Angular UI, this task is performed by the XsrfInterceptor.
+ *  4. Whenever the client is making a mutating request (e.g. POST, PUT, DELETE, etc), the XSRF token is REQUIRED to be
+ *     sent back in the X-XSRF-TOKEN header.
+ *        * NOTE: non-mutating requests (e.g. GET, HEAD) do not check for an XSRF token. This is default behavior in
+ *          Spring Security
+ *  5. On backend, the X-XSRF-TOKEN header is received & compared to the current value of the *server-side* cookie
+ *     named DSPACE-XSRF-COOKIE. If tokens match, the request is accepted. If tokens don't match a 403 is returned.
+ *     This is done automatically by Spring Security.
+ *
+ *  In summary, the XSRF token is ALWAYS sent to/from the client & backend via *headers*. This is what allows the client
+ *  and backend to be on different domains. The server-side cookie named DSPACE-XSRF-COOKIE is (usually) not accessible
+ *  to the client. It only exists to allow the server-side to remember the currently active XSRF token, so that it can
+ *  validate the token sent (by the client) in the X-XSRF-TOKEN header.
  */
-public class CrossSiteCookieCsrfTokenRepository implements CsrfTokenRepository {
-    static final String DEFAULT_CSRF_COOKIE_NAME = "XSRF-TOKEN";
+public class DSpaceCsrfTokenRepository implements CsrfTokenRepository {
+    // This cookie name is changed from the default "XSRF-TOKEN" to ensure it is uniquely named and doesn't conflict
+    // with any other XSRF-TOKEN cookies (e.g. in Angular UI, the XSRF-TOKEN cookie is a *client-side* only cookie)
+    static final String DEFAULT_CSRF_COOKIE_NAME = "DSPACE-XSRF-COOKIE";
 
     static final String DEFAULT_CSRF_PARAMETER_NAME = "_csrf";
 
@@ -57,7 +71,7 @@ public class CrossSiteCookieCsrfTokenRepository implements CsrfTokenRepository {
 
     private String cookieDomain;
 
-    public CrossSiteCookieCsrfTokenRepository() {
+    public DSpaceCsrfTokenRepository() {
     }
 
     @Override
@@ -67,12 +81,14 @@ public class CrossSiteCookieCsrfTokenRepository implements CsrfTokenRepository {
     }
 
     /**
-     * This is the only method modified for DSpace.  We changed this method to use ResponseCookie to build the
-     * cookie, so that we could hardcode the "SameSite" attribute to a value of "None". This allows for cross site
-     * XSRF-TOKEN cookies.
-     * @param token
-     * @param request
-     * @param response
+     * This method has been modified for DSpace.
+     * <P>
+     * It now uses ResponseCookie to build the cookie, so that the "SameSite" attribute can be applied.
+     * <P>
+     * It also sends the token (if not empty) in both the cookie and the custom "DSPACE-XSRF-TOKEN" header
+     * @param token current token
+     * @param request current request
+     * @param response current response
      */
     @Override
     public void saveToken(CsrfToken token, HttpServletRequest request,
@@ -96,22 +112,33 @@ public class CrossSiteCookieCsrfTokenRepository implements CsrfTokenRepository {
         }
 
         // Custom: Turn the above Cookie into a ResponseCookie so that we can set "SameSite" attribute
-        // NOTE: ONLY set "SameSite=None" if cookie is also secure. Most modern browsers will block it otherwise.
-        // This means that DSpace MUST USE HTTPS if the UI is on a different domain then backend.
-        String sameSite = "";
-        if (cookie.getSecure()) {
-            sameSite = "None";
+        // If client is on a different domain than the backend, then Cookie MUST use "SameSite=None" and "Secure".
+        // Most modern browsers will block it otherwise.
+        // TODO: Make SameSite configurable? "Lax" cookies are more secure, but require client & backend on same domain.
+        String sameSite = "None";
+        if (!cookie.getSecure()) {
+            sameSite = "Lax";
         }
         ResponseCookie responseCookie = ResponseCookie.from(cookie.getName(), cookie.getValue())
                                               .path(cookie.getPath()).maxAge(cookie.getMaxAge())
                                               .domain(cookie.getDomain()).httpOnly(cookie.isHttpOnly())
                                               .secure(cookie.getSecure()).sameSite(sameSite).build();
+
         // Write the ResponseCookie to the Set-Cookie header
+        // This cookie is only used by the backend & not needed by client
         response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
+
+        // Send custom header to client with token (only if token not empty)
+        // We send our token via a custom header because client can be on a different domain.
+        // Cookies cannot be reliably sent cross-domain.
+        if (StringUtils.hasLength(tokenValue)) {
+            response.setHeader("DSPACE-XSRF-TOKEN", tokenValue);
+        }
     }
 
     @Override
     public CsrfToken loadToken(HttpServletRequest request) {
+        // First, verify the (server-side) cookie was sent back
         Cookie cookie = WebUtils.getCookie(request, this.cookieName);
         if (cookie == null) {
             return null;
@@ -120,6 +147,17 @@ public class CrossSiteCookieCsrfTokenRepository implements CsrfTokenRepository {
         if (!StringUtils.hasLength(token)) {
             return null;
         }
+
+        // Second, verify either the header or param has been sent. This is a customization for DSpace.
+        // Because the server-side cookie is ALWAYS sent back, we need to verify the client has also sent the token in
+        // some other way. This ensures that we only *change* the Token when it has been used or attempted to be used.
+        //if (!StringUtils.hasLength(request.getHeader(this.headerName)) &&
+        //    !StringUtils.hasLength(request.getParameter(this.parameterName))) {
+        //    return null;
+        // }
+
+        // If we got here, we know a token exists in the cookie and *either* the header or the parameter.
+        // So, this just sends the token info back so that it can be validated by Spring Security.
         return new DefaultCsrfToken(this.headerName, this.parameterName, token);
     }
 
@@ -179,8 +217,8 @@ public class CrossSiteCookieCsrfTokenRepository implements CsrfTokenRepository {
      * @return an instance of CookieCsrfTokenRepository with
      * {@link #setCookieHttpOnly(boolean)} set to false
      */
-    public static CrossSiteCookieCsrfTokenRepository withHttpOnlyFalse() {
-        CrossSiteCookieCsrfTokenRepository result = new CrossSiteCookieCsrfTokenRepository();
+    public static DSpaceCsrfTokenRepository withHttpOnlyFalse() {
+        DSpaceCsrfTokenRepository result = new DSpaceCsrfTokenRepository();
         result.setCookieHttpOnly(false);
         return result;
     }
