@@ -34,7 +34,7 @@ RUN apt-get update \
 
 # Setup Apache configs & enable mod-shib & dspace vhost
 COPY dspace-vhost.conf /etc/apache2/sites-available/
-RUN a2enmod ssl headers proxy proxy_ajp proxy_http shib && \
+RUN a2enmod ssl proxy proxy_ajp proxy_http shib && \
     a2dissite 000-default.conf default-ssl.conf && \
     a2ensite dspace-vhost.conf
 
