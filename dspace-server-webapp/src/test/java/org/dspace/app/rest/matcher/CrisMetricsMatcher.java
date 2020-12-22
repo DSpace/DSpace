@@ -10,7 +10,9 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
-import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 import org.dspace.app.metrics.CrisMetrics;
@@ -30,8 +32,7 @@ public class CrisMetricsMatcher {
         return allOf(hasJsonPath("$.id", is(crisMetrics.getID())),
                      hasJsonPath("$.metricType", is(crisMetrics.getMetricType())),
                      hasJsonPath("$.metricCount", is(crisMetrics.getMetricCount())),
-                  // TODO
-                 //  hasJsonPath("$.acquisitionDate", is(formatDate(crisMetrics.getAcquisitionDate()))),
+                     hasJsonPath("$.acquisitionDate", is(formatDate(crisMetrics.getAcquisitionDate()))),
                      hasJsonPath("$.last", is(crisMetrics.getLast())),
                      hasJsonPath("$.remark", is(crisMetrics.getRemark())),
                      hasJsonPath("$.deltaPeriod1", is(crisMetrics.getDeltaPeriod1())),
@@ -42,9 +43,9 @@ public class CrisMetricsMatcher {
     }
 
     private static String formatDate(Date date) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-        String formattedDate = formatter.format(date);
-        return formattedDate;
+        ZonedDateTime utc = ZonedDateTime.from(date.toInstant().atZone(ZoneId.of("UTC")));
+        String format = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ"));
+        return format;
     }
 
 }

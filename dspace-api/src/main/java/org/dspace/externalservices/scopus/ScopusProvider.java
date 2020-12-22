@@ -17,7 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.XMLUtils;
-import org.dspace.utils.DSpace;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -32,8 +32,8 @@ public class ScopusProvider {
 
     private static Logger log = LogManager.getLogger(ScopusProvider.class);
 
-    protected ScopusRestConnector scopusRestConnector = new DSpace().getServiceManager().getServiceByName(
-            ScopusRestConnector.class.getName(), ScopusRestConnector.class);
+    @Autowired
+    private ScopusRestConnector scopusRestConnector;
 
     public ScopusMetricsDTO getScopusObject(String id) {
         InputStream is = getRecords(id);
@@ -45,7 +45,7 @@ public class ScopusProvider {
     }
 
     private InputStream getRecords(String id) {
-        if (!StringUtils.isNotBlank(id)) {
+        if (StringUtils.isBlank(id)) {
             return null;
         }
         return scopusRestConnector.get(id);
@@ -97,7 +97,7 @@ public class ScopusProvider {
                 try {
                     scopusCitation.setMetricCount(Double.parseDouble(numCitations));
                 } catch (NullPointerException ex) {
-                    log.error("try to parse numCitations:" + numCitations);
+                    log.error("Error while trying to parse numCitations:" + numCitations);
                     throw new Exception(ex);
                 }
                 scopusCitation.setRemark(scopusCitation.buildMetricsRemark());

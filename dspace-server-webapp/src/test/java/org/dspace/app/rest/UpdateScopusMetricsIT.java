@@ -34,7 +34,6 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.externalservices.scopus.ScopusRestConnector;
 import org.dspace.externalservices.scopus.UpdateScopusMetrics;
-import org.dspace.utils.DSpace;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
@@ -49,8 +48,8 @@ public class UpdateScopusMetricsIT extends AbstractControllerIntegrationTest {
     @Autowired
     private CrisMetricsService crisMetriscService;
 
-    private ScopusRestConnector scopusRestConnector = new DSpace().getServiceManager().getServiceByName(
-                                         ScopusRestConnector.class.getName(), ScopusRestConnector.class);
+    @Autowired
+    private ScopusRestConnector scopusRestConnector;
 
     @Test
     public void updateCrisMetricsMockitoTest() throws Exception {

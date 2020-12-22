@@ -63,9 +63,7 @@ public class UpdateCrisMetricsWithExternalSource extends
 
     @Override
     public void internalRun() throws Exception {
-        context = new Context();
         assignCurrentUserInContext();
-
         if (service == null) {
             throw new IllegalArgumentException("The name of service must be provided");
         }
@@ -130,6 +128,7 @@ public class UpdateCrisMetricsWithExternalSource extends
     }
 
     private void assignCurrentUserInContext() throws SQLException {
+        context = new Context();
         UUID uuid = getEpersonIdentifier();
         if (uuid != null) {
             EPerson ePerson = EPersonServiceFactory.getInstance().getEPersonService().find(context, uuid);

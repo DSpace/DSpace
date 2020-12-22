@@ -56,7 +56,6 @@ public class UpdateCrisMetricsInSolrDoc extends
 
     @Override
     public void internalRun() throws Exception {
-        context = new Context();
         assignCurrentUserInContext();
         try {
             performUpdate(context);
@@ -83,6 +82,7 @@ public class UpdateCrisMetricsInSolrDoc extends
     }
 
     protected void assignCurrentUserInContext() throws SQLException {
+        context = new Context();
         UUID uuid = getEpersonIdentifier();
         if (uuid != null) {
             EPerson ePerson = EPersonServiceFactory.getInstance().getEPersonService().find(context, uuid);
