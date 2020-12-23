@@ -5,6 +5,7 @@
 --
 -- http://www.dspace.org/license/
 --
+
 -----------------------------------------------------------------------------------
 
 ALTER TABLE cris_metrics DROP CONSTRAINT cris_metrics_resource_id_fkey;
