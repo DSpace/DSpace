@@ -34,9 +34,11 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
@@ -48,6 +50,7 @@ import org.apache.solr.common.params.HighlightParams;
 import org.apache.solr.common.params.MoreLikeThisParams;
 import org.apache.solr.common.params.SpellingParams;
 import org.apache.solr.common.util.NamedList;
+import org.dspace.app.metrics.CrisMetrics;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.content.Collection;
@@ -1380,5 +1383,66 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     @Override
     public SolrSearchCore getSolrSearchCore() {
         return solrSearchCore;
+    }
+
+    @Override
+    public void updateMetrics(Context context, CrisMetrics metric) {
+        UpdateRequest req = new UpdateRequest();
+        SolrClient solrClient =  solrSearchCore.getSolr();
+        StringBuilder uniqueID = new StringBuilder("Item-");
+        uniqueID.append(metric.getResource().getID());
+        String type = "metric." + metric.getMetricType();
+        String typeId = "metric.id." + metric.getMetricType();
+        String typeAcquisitionDate = "metric.acquisitionDate." + metric.getMetricType();
+        String typeRemark = "metric.remark." + metric.getMetricType();
+        String typeDeltaPeriod1 = "metric.deltaPeriod1." + metric.getMetricType();
+        String typeDeltaPeriod2 = "metric.deltaPeriod2." + metric.getMetricType();
+        String typeRank = "metric.rank." + metric.getMetricType();
+
+        try {
+            SolrInputDocument solrInDoc = new SolrInputDocument();
+            solrInDoc.addField(SearchUtils.RESOURCE_UNIQUE_ID, uniqueID);
+            HashMap<String, Object> map1 = new HashMap<String, Object>();
+            HashMap<String, Object> map2 = new HashMap<String, Object>();
+            HashMap<String, Object> map3 = new HashMap<String, Object>();
+            HashMap<String, Object> map4 = new HashMap<String, Object>();
+            HashMap<String, Object> map5 = new HashMap<String, Object>();
+            HashMap<String, Object> map6 = new HashMap<String, Object>();
+            HashMap<String, Object> map7 = new HashMap<String, Object>();
+            map1.put("set", metric.getMetricCount());
+            map2.put("set", metric.getId());
+            map3.put("set", metric.getAcquisitionDate());
+            map4.put("set", metric.getRemark());
+            map5.put("set", metric.getDeltaPeriod1());
+            map6.put("set", metric.getDeltaPeriod2());
+            map7.put("set", metric.getRank());
+            solrInDoc.addField(type, map1);
+            solrInDoc.addField(typeId, map2);
+            solrInDoc.addField(typeAcquisitionDate, map3);
+            solrInDoc.addField(typeRemark, map4);
+            solrInDoc.addField(typeDeltaPeriod1, map5);
+            solrInDoc.addField(typeDeltaPeriod2, map6);
+            solrInDoc.addField(typeRank, map7);
+            req.add(solrInDoc);
+            solrClient.request(req);
+            solrClient.commit();
+            retriveSolrDocByUniqueID(metric.getResource().getID().toString());
+        } catch (SolrServerException | IOException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public QueryResponse retriveSolrDocByUniqueID(String uniqueID) {
+        SolrClient solrClient =  solrSearchCore.getSolr();
+        SolrQuery q = new SolrQuery(SearchUtils.RESOURCE_UNIQUE_ID + ":Item-" + uniqueID);
+        QueryResponse queryResponse = null;;
+        try {
+            queryResponse = solrClient.query(q);
+        } catch (SolrServerException | IOException e) {
+            log.error(e.getMessage(), e);
+        }
+        System.out.println(queryResponse.toString());
+        return queryResponse;
     }
 }

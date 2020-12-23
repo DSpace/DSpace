@@ -155,6 +155,7 @@
     
     <bean class="org.dspace.content.security.CrisSecurityServiceImpl" />
 
+    <bean class="org.dspace.app.metrics.service.CrisMetricsServiceImpl" />
 
 </beans>
 

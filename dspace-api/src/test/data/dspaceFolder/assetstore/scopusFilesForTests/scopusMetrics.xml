@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<search-results xmlns="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:prism="http://prismstandard.org/namespaces/basic/2.0/" xmlns:atom="http://www.w3.org/2005/Atom">
+    <opensearch:totalResults>1</opensearch:totalResults>
+    <opensearch:startIndex>0</opensearch:startIndex>
+    <opensearch:itemsPerPage>1</opensearch:itemsPerPage>
+    <opensearch:Query role="request" searchTerms="DOI(10.1016/j.gene.2009.04.019)" startPage="0"/>
+    <link ref="self" href="https://api.elsevier.com/content/search/scopus?start=0&amp;count=25&amp;query=DOI%2810.1016%2Fj.gene.2009.04.019%29" type="application/xml"/>
+    <link ref="first" href="https://api.elsevier.com/content/search/scopus?start=0&amp;count=25&amp;query=DOI%2810.1016%2Fj.gene.2009.04.019%29" type="application/xml"/>
+    <entry>
+        <link ref="self" href="https://api.elsevier.com/content/abstract/scopus_id/67349162500"/>
+        <link ref="author-affiliation" href="https://api.elsevier.com/content/abstract/scopus_id/67349162500?field=author,affiliation"/>
+        <link ref="scopus" href="https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&amp;scp=67349162500&amp;origin=inward"/>
+        <link ref="scopus-citedby" href="https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&amp;scp=67349162500&amp;origin=inward"/>
+        <link ref="full-text" href="https://api.elsevier.com/content/article/eid/1-s2.0-S0378111909001929"/>
+        <prism:url>https://api.elsevier.com/content/abstract/scopus_id/67349162500</prism:url>
+        <dc:identifier>SCOPUS_ID:67349162500</dc:identifier>
+        <eid>2-s2.0-67349162500</eid>
+        <dc:title>Transcriptomic response of Argopecten purpuratus post-larvae to copper exposure under experimental conditions</dc:title>
+        <dc:creator>Zapata M.</dc:creator>
+        <prism:publicationName>Gene</prism:publicationName>
+        <prism:issn>03781119</prism:issn>
+        <prism:volume>442</prism:volume>
+        <prism:issueIdentifier>1-2</prism:issueIdentifier>
+        <prism:pageRange>37-46</prism:pageRange>
+        <prism:coverDate>2009-08-01</prism:coverDate>
+        <prism:coverDisplayDate>1 August 2009</prism:coverDisplayDate>
+        <prism:doi>10.1016/j.gene.2009.04.019</prism:doi>
+        <pii>S0378111909001929</pii>
+        <citedby-count>44</citedby-count>
+        <affiliation>
+            <affilname>Institut Universitaire Européen de la Mer (IUEM)</affilname>
+            <affiliation-city>Plouzane</affiliation-city>
+            <affiliation-country>France</affiliation-country>
+        </affiliation>
+        <affiliation>
+            <affilname>Universidad de Antofagasta</affilname>
+            <affiliation-city>Antofagasta</affiliation-city>
+            <affiliation-country>Chile</affiliation-country>
+        </affiliation>
+        <pubmed-id>19406218</pubmed-id>
+        <prism:aggregationType>Journal</prism:aggregationType>
+        <subtype>ar</subtype>
+        <subtypeDescription>Article</subtypeDescription>
+        <source-id>15636</source-id>
+        <openaccess>0</openaccess>
+        <openaccessFlag>false</openaccessFlag>
+    </entry>
+</search-results>

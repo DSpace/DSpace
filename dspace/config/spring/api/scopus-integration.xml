@@ -152,4 +152,14 @@
         <constructor-arg value="3"/>
     </bean>
 
+    <bean class="org.dspace.externalservices.scopus.ScopusRestConnector">
+        <property name="apiKey" value="${scopus.apiKey}" />
+        <property name="insttoken" value="${scopus.insttoken}" />
+        <property name="scopusUrl" value="${scopus.url}" />
+    </bean>
+
+	<bean class="org.dspace.externalservices.scopus.ScopusProvider"/>
+
+	<bean class="org.dspace.externalservices.scopus.UpdateScopusMetrics"/>
+
 </beans>
