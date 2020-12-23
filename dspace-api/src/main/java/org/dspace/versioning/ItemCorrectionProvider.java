@@ -7,7 +7,6 @@
  */
 package org.dspace.versioning;
 
-import static org.dspace.content.Item.ANY;
 
 import java.io.IOException;
 import java.sql.SQLException;
