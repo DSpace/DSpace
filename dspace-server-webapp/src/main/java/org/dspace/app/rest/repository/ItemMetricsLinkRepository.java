@@ -6,9 +6,6 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.repository;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -20,8 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.dspace.app.metrics.CrisMetrics;
@@ -44,8 +39,6 @@ import org.springframework.stereotype.Component;
 @Component(ItemRest.CATEGORY + "." + ItemRest.NAME + "." + ItemRest.METRICS)
 public class ItemMetricsLinkRepository extends AbstractDSpaceRestRepository
                                        implements LinkRestRepository {
-
-    private static Logger log = LogManager.getLogger(ItemMetricsLinkRepository.class);
 
     @Autowired
     private IndexingService indexingService;
@@ -111,17 +104,6 @@ public class ItemMetricsLinkRepository extends AbstractDSpaceRestRepository
         // (or introduce a session.load to get a lazy object by ID)
         // metricToFill.setResource(resource);
         return metricToFill;
-    }
-
-    private Date parseDate(String dateToPars) {
-        DateFormat format = new SimpleDateFormat("MMMM d, yyyy");
-        Date date = null;
-        try {
-            date = format.parse(dateToPars);
-        } catch (ParseException e) {
-            log.error(e.getMessage(), e);
-        }
-        return date;
     }
 
     private ArrayList<String> getMetricFields(Collection<String> fields) {

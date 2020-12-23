@@ -15,10 +15,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 import java.util.UUID;
 
 import org.dspace.app.launcher.ScriptLauncher;
@@ -35,6 +33,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.discovery.IndexingService;
+import org.dspace.externalservices.scopus.UpdateScopusMetrics;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +72,7 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
         context.restoreAuthSystemState();
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(get("/api/authz/resourcepolicies"))
+        getClient(tokenAdmin).perform(get("/api/cris/metrics"))
                              .andExpect(status().isMethodNotAllowed());
     }
 
@@ -91,7 +90,13 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
                                 .withDoiIdentifier("10.1016/19")
                                 .withTitle("Title item A").build();
 
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, 2020);
+        calendar.set(Calendar.MONTH, 3);
+        calendar.set(Calendar.DATE, 21);
+
         CrisMetrics metric = CrisMetricsBuilder.createCrisMetrics(context, itemA)
+                                               .withAcquisitionDate(calendar.getTime())
                                                .withMetricType("view")
                                                .withMetricCount(2312)
                                                .isLast(true).build();
@@ -202,10 +207,16 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
                                 .withDoiIdentifier("10.1016/19")
                                 .withTitle("Title item A").build();
 
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, 2020);
+        calendar.set(Calendar.MONTH, 9);
+        calendar.set(Calendar.DATE, 17);
+
         CrisMetrics metric = CrisMetricsBuilder.createCrisMetrics(context, itemA)
-                                                 .withMetricType("view")
-                                                 .withMetricCount(2312)
-                                                 .isLast(true).build();
+                                               .withAcquisitionDate(calendar.getTime())
+                                               .withMetricType("view")
+                                               .withMetricCount(2312)
+                                               .isLast(true).build();
 
         authorizeService.removePoliciesActionFilter(context, itemA, Constants.READ);
         context.restoreAuthSystemState();
@@ -244,12 +255,12 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
                                                  .isLast(true).build();
 
         CrisMetrics metrics2 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
-                                                 .withMetricType("ScopusCitation")
+                                                 .withMetricType(UpdateScopusMetrics.SCOPUS_CITATION)
                                                  .withMetricCount(43)
                                                  .isLast(true).build();
 
         CrisMetrics metrics3 = CrisMetricsBuilder.createCrisMetrics(context, itemB)
-                                                 .withMetricType("ScopusCitation")
+                                                 .withMetricType(UpdateScopusMetrics.SCOPUS_CITATION)
                                                  .withMetricCount(103)
                                                  .isLast(true).build();
         context.restoreAuthSystemState();
@@ -283,7 +294,7 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
                                                  .isLast(true).build();
 
         CrisMetrics metrics2 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
-                                                 .withMetricType("ScopusCitation")
+                                                 .withMetricType(UpdateScopusMetrics.SCOPUS_CITATION)
                                                  .withMetricCount(43)
                                                  .isLast(true).build();
 
@@ -317,7 +328,7 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
                                                  .isLast(true).build();
 
         CrisMetrics metrics2 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
-                                                 .withMetricType("ScopusCitation")
+                                                 .withMetricType(UpdateScopusMetrics.SCOPUS_CITATION)
                                                  .withMetricCount(43)
                                                  .isLast(true).build();
 
@@ -341,9 +352,13 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
                                 .withDoiIdentifier("10.1016/j.gene.2009.04.019")
                                 .withTitle("Title item A").build();
 
-        String target = "Nov 21, 2020";
-        DateFormat df = new SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH);
-        Date date =  df.parse(target);
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.set(Calendar.YEAR, 2019);
+        calendar.set(Calendar.MONTH, 9);
+        calendar.set(Calendar.DATE, 31);
+
+        Date date = calendar.getTime();
 
         String remark = "{identifier:2-s2.0-67349162500, link:https://www.scopus.com/inward/citedby.uri?"
                       + "partnerIDu003dHzOxMe3bu0026scpu003d67349162500u0026originu003dinward"
@@ -401,13 +416,8 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
                                 .withDoiIdentifier("10.1016/19")
                                 .withTitle("Title item A").build();
 
-        String target = "Nov 21, 2020";
-        DateFormat df = new SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH);
-        Date date =  df.parse(target);
-
         CrisMetrics metric = CrisMetricsBuilder.createCrisMetrics(context, itemA)
-                                               .withAcquisitionDate(date)
-                                               .withMetricType("ScopusCitation")
+                                               .withMetricType(UpdateScopusMetrics.SCOPUS_CITATION)
                                                .withMetricCount(21)
                                                .withDeltaPeriod1(3.0)
                                                .withDeltaPeriod2(12.0)

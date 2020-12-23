@@ -72,4 +72,9 @@
         <property name="description" value="Perform the metrics update using external source"/>
         <property name="dspaceRunnableClass" value="org.dspace.externalservices.UpdateCrisMetricsWithExternalSourceCli"/>
     </bean>
+
+    <bean id="update-metrics-in-solr" class="org.dspace.metrics.updateSolrDocScript.UpdateCrisMetricsInSolrDocCliScriptConfiguration">
+        <property name="description" value="Perform the metrics update in SOLR documents"/>
+        <property name="dspaceRunnableClass" value="org.dspace.metrics.updateSolrDocScript.UpdateCrisMetricsInSolrDocCli"/>
+    </bean>
 </beans>

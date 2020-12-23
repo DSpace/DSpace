@@ -12,6 +12,7 @@ import java.io.UnsupportedEncodingException;
 import javax.annotation.PostConstruct;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -20,7 +21,7 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * This class deals with logic management to connect to the SCOPUS outdoor service
+ * This class deals with logic management to connect to the SCOPUS external service
  * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
@@ -60,6 +61,11 @@ public class ScopusRestConnector {
         httpPost.setHeader("Accept", "application/xml");
 
         HttpResponse response = httpClient.execute(httpPost);
+        int statusCode = response.getStatusLine().getStatusCode();
+        if (statusCode != HttpStatus.SC_OK) {
+            log.error("Error connecting to server! The Server responce with: " + statusCode);
+            throw new RuntimeException();
+        }
         return response.getEntity().getContent();
     }
 

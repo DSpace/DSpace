@@ -20,7 +20,6 @@ import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.externalservices.MetricsExternalServices;
-import org.dspace.utils.DSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -31,10 +30,10 @@ public class UpdateScopusMetrics implements MetricsExternalServices {
 
     private static Logger log = LogManager.getLogger(UpdateScopusMetrics.class);
 
-    public static final String SCOPUS_CITATION = "ScopusCitation";
+    public static final String SCOPUS_CITATION = "scopusCitation";
 
-    protected ScopusProvider scopusProvider = new DSpace().getServiceManager().getServiceByName(
-                                                  ScopusProvider.class.getName(), ScopusProvider.class);
+    @Autowired
+    private ScopusProvider scopusProvider;
 
     @Autowired
     private ItemService itemService;
@@ -87,7 +86,6 @@ public class UpdateScopusMetrics implements MetricsExternalServices {
                                         SCOPUS_CITATION, currentItem.getID());
             if (!Objects.isNull(scopusMetrics)) {
                 scopusMetrics.setLast(false);
-                context.commit();
             }
             createNewScopusMetrics(context,currentItem, scopusMetric);
         } catch (SQLException | AuthorizeException e) {

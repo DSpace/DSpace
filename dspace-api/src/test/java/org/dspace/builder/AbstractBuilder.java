@@ -45,9 +45,9 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.RegistrationDataService;
+import org.dspace.externalservices.scopus.factory.CrisMetricsServiceFactory;
 import org.dspace.harvest.factory.HarvestServiceFactory;
 import org.dspace.harvest.service.HarvestedCollectionService;
-import org.dspace.externalservices.scopus.factory.CrisMetricsServiceFactory;
 import org.dspace.layout.factory.CrisLayoutServiceFactory;
 import org.dspace.layout.service.CrisLayoutBoxService;
 import org.dspace.layout.service.CrisLayoutFieldService;
@@ -173,7 +173,6 @@ public abstract class AbstractBuilder<T, S> {
         auditService = new DSpace().getSingletonService(AuditService.class);
         crisMetricsService = CrisMetricsServiceFactory.getInstance().getCrisMetricsService();
         harvestedCollectionService = HarvestServiceFactory.getInstance().getHarvestedCollectionService();
-
     }
 
 
@@ -210,7 +209,6 @@ public abstract class AbstractBuilder<T, S> {
         orcidQueueService = null;
         orcidHistoryService = null;
         crisMetricsService = null;
-
         harvestedCollectionService = null;
     }
 

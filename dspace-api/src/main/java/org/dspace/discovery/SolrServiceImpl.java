@@ -1402,31 +1402,23 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         try {
             SolrInputDocument solrInDoc = new SolrInputDocument();
             solrInDoc.addField(SearchUtils.RESOURCE_UNIQUE_ID, uniqueID);
-            HashMap<String, Object> map1 = new HashMap<String, Object>();
-            HashMap<String, Object> map2 = new HashMap<String, Object>();
-            HashMap<String, Object> map3 = new HashMap<String, Object>();
-            HashMap<String, Object> map4 = new HashMap<String, Object>();
-            HashMap<String, Object> map5 = new HashMap<String, Object>();
-            HashMap<String, Object> map6 = new HashMap<String, Object>();
-            HashMap<String, Object> map7 = new HashMap<String, Object>();
-            map1.put("set", metric.getMetricCount());
-            map2.put("set", metric.getId());
-            map3.put("set", metric.getAcquisitionDate());
-            map4.put("set", metric.getRemark());
-            map5.put("set", metric.getDeltaPeriod1());
-            map6.put("set", metric.getDeltaPeriod2());
-            map7.put("set", metric.getRank());
-            solrInDoc.addField(type, map1);
-            solrInDoc.addField(typeId, map2);
-            solrInDoc.addField(typeAcquisitionDate, map3);
-            solrInDoc.addField(typeRemark, map4);
-            solrInDoc.addField(typeDeltaPeriod1, map5);
-            solrInDoc.addField(typeDeltaPeriod2, map6);
-            solrInDoc.addField(typeRank, map7);
+            Map<String, Object> metricCountMap = Collections.singletonMap("set", metric.getMetricCount());
+            Map<String, Object> acquisitionDateMap = Collections.singletonMap("set", metric.getAcquisitionDate());
+            Map<String, Object> idMap = Collections.singletonMap("set", metric.getId());
+            Map<String, Object> remarkMap = Collections.singletonMap("set", metric.getRemark());
+            Map<String, Object> deltaPeriod1Map = Collections.singletonMap("set", metric.getDeltaPeriod1());
+            Map<String, Object> deltaPeriod2Map = Collections.singletonMap("set", metric.getDeltaPeriod2());
+            Map<String, Object> rankMap = Collections.singletonMap("set", metric.getRank());
+            solrInDoc.addField(type, metricCountMap);
+            solrInDoc.addField(typeId, idMap);
+            solrInDoc.addField(typeAcquisitionDate, acquisitionDateMap);
+            solrInDoc.addField(typeRemark, remarkMap);
+            solrInDoc.addField(typeDeltaPeriod1, deltaPeriod1Map);
+            solrInDoc.addField(typeDeltaPeriod2, deltaPeriod2Map);
+            solrInDoc.addField(typeRank, rankMap);
             req.add(solrInDoc);
             solrClient.request(req);
             solrClient.commit();
-            retriveSolrDocByUniqueID(metric.getResource().getID().toString());
         } catch (SolrServerException | IOException e) {
             log.error(e.getMessage(), e);
         }
@@ -1442,7 +1434,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         } catch (SolrServerException | IOException e) {
             log.error(e.getMessage(), e);
         }
-        System.out.println(queryResponse.toString());
         return queryResponse;
     }
 }
