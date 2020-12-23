@@ -11,6 +11,7 @@ package org.dspace.content.authority;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -29,6 +30,7 @@ import org.dspace.core.Context;
 import org.dspace.discovery.SearchService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.util.ItemAuthorityUtils;
 import org.dspace.util.UUIDUtils;
 import org.dspace.utils.DSpace;
 
@@ -57,6 +59,9 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
             "itemAuthorityServiceFactory", ItemAuthorityServiceFactory.class);
 
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    private List<CustomAuthorityFilter> customAuthorityFilters = dspace.getServiceManager()
+        .getServicesByType(CustomAuthorityFilter.class);
 
     // punt!  this is a poor implementation..
     @Override
@@ -87,7 +92,6 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
 
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setQuery(luceneQuery);
-        solrQuery.setFields("dc.title", "search.resourceid");
         solrQuery.setStart(start);
         solrQuery.setRows(limit);
         solrQuery.addFilterQuery("search.resourcetype:" + Item.class.getSimpleName());
@@ -96,15 +100,20 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
             solrQuery.addFilterQuery("relationship.type:" + relationshipType);
         }
 
+        customAuthorityFilters.stream()
+            .flatMap(caf -> caf.getFilterQueries(relationshipType).stream())
+            .forEach(solrQuery::addFilterQuery);
+
         try {
             QueryResponse queryResponse = solr.query(solrQuery);
             List<Choice> choiceList = queryResponse.getResults()
                 .stream()
                 .map(doc ->  {
                     String title = ((ArrayList<String>) doc.getFieldValue("dc.title")).get(0);
+                    Map<String, String> extras = ItemAuthorityUtils.buildExtra(getPluginInstanceName(), doc);
                     return new Choice((String) doc.getFieldValue("search.resourceid"),
                         title,
-                        title);
+                        title, extras);
                 }).collect(Collectors.toList());
 
             Choice[] results = new Choice[choiceList.size()];
