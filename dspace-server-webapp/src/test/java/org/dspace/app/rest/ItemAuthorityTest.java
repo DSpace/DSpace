@@ -384,10 +384,17 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
        pluginService.clearNamedPluginClasses();
        cas.clearCache();
 
+       parentCommunity = CommunityBuilder.createCommunity(context).build();
+       Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Test collection")
+                                          .build();
+
        context.restoreAuthSystemState();
 
        String token = getAuthToken(eperson.getEmail(), password);
-       getClient(token).perform(get("/api/submission/vocabularies/AuthorAuthority"))
+       getClient(token).perform(get("/api/submission/vocabularies/search/byMetadataAndCollection")
+                       .param("metadata", "dc.contributor.author")
+                       .param("collection", col1.getID().toString()))
                        .andExpect(status().isOk())
                        .andExpect(jsonPath("$.entity", Matchers.is("Person")))
                        .andExpect(jsonPath("$.externalSource", Matchers.is("authorAuthority")));
@@ -404,10 +411,17 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
        pluginService.clearNamedPluginClasses();
        cas.clearCache();
 
+       parentCommunity = CommunityBuilder.createCommunity(context).build();
+       Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Test collection")
+                                          .build();
+
        context.restoreAuthSystemState();
 
        String token = getAuthToken(eperson.getEmail(), password);
-       getClient(token).perform(get("/api/submission/vocabularies/AuthorAuthority"))
+       getClient(token).perform(get("/api/submission/vocabularies/search/byMetadataAndCollection")
+                       .param("metadata", "dc.contributor.author")
+                       .param("collection", col1.getID().toString()))
                        .andExpect(status().isOk())
                        .andExpect(jsonPath("$.entity", Matchers.nullValue()))
                        .andExpect(jsonPath("$.externalSource", Matchers.nullValue()));

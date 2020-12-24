@@ -160,10 +160,9 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
     }
 
     @Override
-    public boolean hasValidExternalSource() {
-        String configName = getExternalSourceConfigName();
-        if (StringUtils.isNotBlank(configName)) {
-            String sourceIdentifier = configurationService.getProperty(configName);
+    public boolean hasValidExternalSource(String fieldKey) {
+        String sourceIdentifier = getExternalSourceConfig(fieldKey);
+        if (StringUtils.isNotBlank(sourceIdentifier)) {
             ExternalDataProvider externalsource = externalDataService.getExternalDataProvider(sourceIdentifier);
             return (externalsource != null);
         }
@@ -171,37 +170,15 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
     }
 
     @Override
-    public String getExternalSource() {
-        String configName = getExternalSourceConfigName();
+    public String getExternalSource(String fieldKey) {
+        return getExternalSourceConfig(fieldKey);
+    }
+
+    private String getExternalSourceConfig(String fieldKey) {
+        String configName = CHOICES_EXTERNALSOURCE_PREFIX + fieldKey;
         if (StringUtils.isNotBlank(configName)) {
             return configurationService.getProperty(configName);
         }
         return null;
-    }
-
-    private String getExternalSourceConfigName() {
-        String externalSourceConfigName = null;
-        // Get all configuration keys starting with a given prefix
-        List<String> propKeys = configurationService.getPropertyKeys(CHOICES_EXTERNALSOURCE_PREFIX);
-        Iterator<String> keyIterator = propKeys.iterator();
-        while (keyIterator.hasNext()) {
-            String key = keyIterator.next();
-            String metadata = key.substring(CHOICES_EXTERNALSOURCE_PREFIX.length());
-            if (metadata == null) {
-                log.warn(
-                    "Skipping invalid ChoiceAuthority configuration property: " + key + ": does not have schema" +
-                        ".element.qualifier");
-                continue;
-            }
-
-            String tmpAuthorityName = configurationService.getProperty(ChoiceAuthorityServiceImpl.CHOICES_PLUGIN_PREFIX
-                    + metadata);
-            if (authorityName.equals(tmpAuthorityName)) {
-                externalSourceConfigName = key;
-                break;
-            }
-        }
-
-        return externalSourceConfigName;
     }
 }

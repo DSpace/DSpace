@@ -14,7 +14,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.Logger;
 import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authority.filler.AuthorityImportFiller;
 import org.dspace.authority.filler.AuthorityImportFillerService;
@@ -24,9 +23,7 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.AbstractExternalDataProvider;
 import org.dspace.util.UUIDUtils;
@@ -39,13 +36,10 @@ import org.dspace.util.UUIDUtils;
  */
 public class AuthorityImportDataProvider extends AbstractExternalDataProvider {
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(AuthorityImportDataProvider.class);
-
     private AuthorityImportFillerService authorityImportFillerService = AuthorityServiceFactory.getInstance()
             .getAuthorityImportFillerService();
 
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-    private WorkspaceItemService wsiService = ContentServiceFactory.getInstance().getWorkspaceItemService();
 
     /**
      * An unique human readable identifier for this provider
@@ -109,7 +103,7 @@ public class AuthorityImportDataProvider extends AbstractExternalDataProvider {
 
     private ExternalDataObject constructExternalDataObject(String id) {
         Context context = new Context();
-        EPerson ep = context.getCurrentUser();
+        context.getCurrentUser();
         ExternalDataObject externalDataObject = new ExternalDataObject();
         String[] split = StringUtils.split(id, AuthorityValueService.SPLIT);
 
@@ -148,10 +142,18 @@ public class AuthorityImportDataProvider extends AbstractExternalDataProvider {
 
         externalDataObject.setSource(sourceIdentifier);
         externalDataObject.setId(id);
+        String title = null;
         for (MetadataValueDTO metadataValueDTO : metadataDTOList) {
+            if (metadataValueDTO.getSchema().equals("dc") && metadataValueDTO.getElement().equals("title") &&
+                    metadataValueDTO.getQualifier() == null) {
+                title = metadataValueDTO.getValue();
+            }
             externalDataObject.addMetadata(metadataValueDTO);
         }
+        externalDataObject.setValue(title);
+        externalDataObject.setDisplayValue(title);
         context.close();
+
         return externalDataObject;
     }
 }

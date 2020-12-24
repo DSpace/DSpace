@@ -28,14 +28,14 @@ public interface LinkableEntityAuthority {
      * 
      * @return <code>true</code> if has valid, default <code>false</code>
      */
-    default boolean hasValidExternalSource() {
+    default boolean hasValidExternalSource(String fieldKey) {
         return false;
     }
 
     /**
-     * Get the eternal source configured for this authority
+     * Get the eternal source configured for this authority by given metadata key
      *
      * @return the linked external source identifier as a String
      */
-    public String getExternalSource();
+    public String getExternalSource(String fieldKey);
 }

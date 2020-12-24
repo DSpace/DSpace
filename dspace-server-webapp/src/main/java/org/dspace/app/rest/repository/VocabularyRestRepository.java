@@ -22,6 +22,7 @@ import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.content.Collection;
 import org.dspace.content.MetadataField;
 import org.dspace.content.authority.ChoiceAuthority;
+import org.dspace.content.authority.LinkableEntityAuthority;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.MetadataFieldService;
@@ -101,7 +102,15 @@ public class VocabularyRestRepository extends DSpaceRestRepository<VocabularyRes
 
         String authorityName = cas.getChoiceAuthorityName(tokens[0], tokens[1], tokens[2], collection);
         ChoiceAuthority source = cas.getChoiceAuthorityByAuthorityName(authorityName);
-        return authorityUtils.convertAuthority(source, authorityName, utils.obtainProjection());
+        if (source instanceof LinkableEntityAuthority &&
+                ((LinkableEntityAuthority) source).hasValidExternalSource(metadataField)) {
+            return authorityUtils.convertAuthorityWithExternalSource(source, authorityName,
+                    ((LinkableEntityAuthority) source).getLinkedEntityType(),
+                    ((LinkableEntityAuthority) source).getExternalSource(metadataField), utils.obtainProjection());
+        } else {
+            return authorityUtils.convertAuthority(source, authorityName, utils.obtainProjection());
+        }
+
     }
 
     @Override
