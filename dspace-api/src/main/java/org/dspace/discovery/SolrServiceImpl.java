@@ -34,9 +34,11 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
@@ -48,6 +50,7 @@ import org.apache.solr.common.params.HighlightParams;
 import org.apache.solr.common.params.MoreLikeThisParams;
 import org.apache.solr.common.params.SpellingParams;
 import org.apache.solr.common.util.NamedList;
+import org.dspace.app.metrics.CrisMetrics;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.content.Collection;
@@ -1380,5 +1383,57 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     @Override
     public SolrSearchCore getSolrSearchCore() {
         return solrSearchCore;
+    }
+
+    @Override
+    public void updateMetrics(Context context, CrisMetrics metric) {
+        UpdateRequest req = new UpdateRequest();
+        SolrClient solrClient =  solrSearchCore.getSolr();
+        StringBuilder uniqueID = new StringBuilder("Item-");
+        uniqueID.append(metric.getResource().getID());
+        String type = "metric." + metric.getMetricType();
+        String typeId = "metric.id." + metric.getMetricType();
+        String typeAcquisitionDate = "metric.acquisitionDate." + metric.getMetricType();
+        String typeRemark = "metric.remark." + metric.getMetricType();
+        String typeDeltaPeriod1 = "metric.deltaPeriod1." + metric.getMetricType();
+        String typeDeltaPeriod2 = "metric.deltaPeriod2." + metric.getMetricType();
+        String typeRank = "metric.rank." + metric.getMetricType();
+
+        try {
+            SolrInputDocument solrInDoc = new SolrInputDocument();
+            solrInDoc.addField(SearchUtils.RESOURCE_UNIQUE_ID, uniqueID);
+            Map<String, Object> metricCountMap = Collections.singletonMap("set", metric.getMetricCount());
+            Map<String, Object> acquisitionDateMap = Collections.singletonMap("set", metric.getAcquisitionDate());
+            Map<String, Object> idMap = Collections.singletonMap("set", metric.getId());
+            Map<String, Object> remarkMap = Collections.singletonMap("set", metric.getRemark());
+            Map<String, Object> deltaPeriod1Map = Collections.singletonMap("set", metric.getDeltaPeriod1());
+            Map<String, Object> deltaPeriod2Map = Collections.singletonMap("set", metric.getDeltaPeriod2());
+            Map<String, Object> rankMap = Collections.singletonMap("set", metric.getRank());
+            solrInDoc.addField(type, metricCountMap);
+            solrInDoc.addField(typeId, idMap);
+            solrInDoc.addField(typeAcquisitionDate, acquisitionDateMap);
+            solrInDoc.addField(typeRemark, remarkMap);
+            solrInDoc.addField(typeDeltaPeriod1, deltaPeriod1Map);
+            solrInDoc.addField(typeDeltaPeriod2, deltaPeriod2Map);
+            solrInDoc.addField(typeRank, rankMap);
+            req.add(solrInDoc);
+            solrClient.request(req);
+            solrClient.commit();
+        } catch (SolrServerException | IOException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public QueryResponse retriveSolrDocByUniqueID(String uniqueID) {
+        SolrClient solrClient =  solrSearchCore.getSolr();
+        SolrQuery q = new SolrQuery(SearchUtils.RESOURCE_UNIQUE_ID + ":Item-" + uniqueID);
+        QueryResponse queryResponse = null;;
+        try {
+            queryResponse = solrClient.query(q);
+        } catch (SolrServerException | IOException e) {
+            log.error(e.getMessage(), e);
+        }
+        return queryResponse;
     }
 }

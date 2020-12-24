@@ -81,4 +81,6 @@
     <bean class="org.dspace.app.orcid.dao.impl.OrcidQueueDAOImpl" />
     <bean class="org.dspace.app.orcid.dao.impl.OrcidHistoryDAOImpl" />
 
+    <bean class="org.dspace.app.metrics.DAO.CrisMetricsDAOImpl" />
+
 </beans>

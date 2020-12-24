@@ -10,7 +10,7 @@ package org.dspace.content.authority;
 import java.util.List;
 import java.util.Map;
 
-import org.dspace.content.Item;
+import org.apache.solr.common.SolrDocument;
 
 /**
  * 
@@ -21,8 +21,8 @@ import org.dspace.content.Item;
  */
 public interface ItemAuthorityExtraMetadataGenerator {
 
-    public Map<String, String> build(String authorityName, Item item);
+    public Map<String, String> build(String authorityName, SolrDocument solrDocument);
 
-    public List<Choice> buildAggregate(String authorityName, Item item);
+    public List<Choice> buildAggregate(String authorityName, SolrDocument solrDocument);
 
 }

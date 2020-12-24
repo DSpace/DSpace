@@ -60,4 +60,6 @@
 
     <bean id="openURLTrackerLoggerServiceFactory" class="org.dspace.statistics.export.factory.OpenURLTrackerLoggerServiceFactoryImpl"/>
 
+    <bean id="crisMetricsServiceFactory" class="org.dspace.externalservices.scopus.factory.CrisMetricsServiceFactoryImpl"/>
+
 </beans>

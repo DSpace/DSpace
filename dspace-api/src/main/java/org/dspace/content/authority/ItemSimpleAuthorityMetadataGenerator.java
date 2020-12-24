@@ -7,15 +7,25 @@
  */
 package org.dspace.content.authority;
 
+import java.sql.SQLException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import javax.servlet.ServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.solr.common.SolrDocument;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Context;
+import org.dspace.services.RequestService;
+import org.dspace.services.model.Request;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -26,6 +36,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  */
 public class ItemSimpleAuthorityMetadataGenerator implements ItemAuthorityExtraMetadataGenerator {
+
+    private static final Logger log = LoggerFactory.getLogger(ItemSimpleAuthorityMetadataGenerator.class);
 
     private String relatedInputformMetadata;
 
@@ -44,9 +56,22 @@ public class ItemSimpleAuthorityMetadataGenerator implements ItemAuthorityExtraM
     @Autowired
     ItemService itemService;
 
+    @Autowired
+    RequestService requestService;
+
     @Override
-    public Map<String, String> build(String checkAuthorityName, Item item) {
+    public Map<String, String> build(String checkAuthorityName, SolrDocument document) {
+        String resourceId = (String) document.getFieldValue("search.resourceid");
+
+        //FIXME: lookup via solar instead of itemService. see https://4science.atlassian.net/browse/CSTPER-375
         Map<String, String> extras = new HashMap<String, String>();
+        Item item = null;
+        try {
+            item = itemService.find(context(), UUID.fromString(resourceId));
+        } catch (SQLException e) {
+            log.error("error while retrieving item: {}", e.getMessage(), e);
+            return extras;
+        }
         if (StringUtils.isBlank(authorityName) || StringUtils.equals(authorityName, checkAuthorityName)) {
             buildSingleExtraByRP(item, extras);
         }
@@ -54,7 +79,17 @@ public class ItemSimpleAuthorityMetadataGenerator implements ItemAuthorityExtraM
     }
 
     @Override
-    public List<Choice> buildAggregate(String checkAuthorityName, Item item) {
+    public List<Choice> buildAggregate(String checkAuthorityName, SolrDocument document) {
+
+        String resourceId = (String) document.getFieldValue("search.resourceid");
+        //FIXME: lookup via solar instead of itemService. see https://4science.atlassian.net/browse/CSTPER-375
+        Item item = null;
+        try {
+            item = itemService.find(context(), UUID.fromString(resourceId));
+        } catch (SQLException e) {
+            log.error("error while retrieving item: {}", e.getMessage(), e);
+            return Collections.emptyList();
+        }
         List<Choice> choiceList = new LinkedList<Choice>();
         if (StringUtils.isNotBlank(authorityName) && !StringUtils.equals(authorityName, checkAuthorityName)) {
             choiceList.add(
@@ -152,5 +187,12 @@ public class ItemSimpleAuthorityMetadataGenerator implements ItemAuthorityExtraM
 
     public String getAuthorityName() {
         return authorityName;
+    }
+
+    private Context context() {
+        Request currentRequest = requestService.getCurrentRequest();
+        ServletRequest servletRequest = currentRequest.getServletRequest();
+        Context context = (Context) servletRequest.getAttribute("dspace.context");
+        return context;
     }
 }

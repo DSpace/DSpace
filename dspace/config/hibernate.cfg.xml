@@ -103,5 +103,7 @@
         
         <mapping class="org.dspace.statistics.export.OpenURLTracker"/>
 
+        <mapping class="org.dspace.app.metrics.CrisMetrics"/>
+
     </session-factory>
 </hibernate-configuration>
