@@ -42,9 +42,9 @@ public class UpdateScopusMetrics implements MetricsExternalServices {
     private CrisMetricsService crisMetricsService;
 
     @Override
-    public boolean updateMetric(Context context, Item item) {
+    public boolean updateMetric(Context context, Item item, String param) {
         String id = buildQuery(item);
-        ScopusMetricsDTO scopusMetric = scopusProvider.getScopusObject(id);
+        CrisMetricDTO scopusMetric = scopusProvider.getScopusObject(id);
         if (Objects.isNull(scopusMetric)) {
             return false;
         }
@@ -77,7 +77,7 @@ public class UpdateScopusMetrics implements MetricsExternalServices {
         return query.toString();
     }
 
-    private boolean updateScopusMetrics(Context context, Item currentItem, ScopusMetricsDTO scopusMetric) {
+    private boolean updateScopusMetrics(Context context, Item currentItem, CrisMetricDTO scopusMetric) {
         try {
             if (scopusMetric == null) {
                 return false;
@@ -94,7 +94,7 @@ public class UpdateScopusMetrics implements MetricsExternalServices {
         return true;
     }
 
-    private void createNewScopusMetrics(Context context, Item item, ScopusMetricsDTO scopusMetric)
+    private void createNewScopusMetrics(Context context, Item item, CrisMetricDTO scopusMetric)
             throws SQLException, AuthorizeException {
         CrisMetrics newScopusMetrics = crisMetricsService.create(context, item);
         newScopusMetrics.setMetricType(SCOPUS_CITATION);

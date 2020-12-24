@@ -35,7 +35,7 @@ public class ScopusProvider {
     @Autowired
     private ScopusRestConnector scopusRestConnector;
 
-    public ScopusMetricsDTO getScopusObject(String id) {
+    public CrisMetricDTO getScopusObject(String id) {
         InputStream is = getRecords(id);
         if (is != null) {
             return convertToScopusDTO(is);
@@ -51,7 +51,7 @@ public class ScopusProvider {
         return scopusRestConnector.get(id);
     }
 
-    private ScopusMetricsDTO convertToScopusDTO(InputStream inputStream) {
+    private CrisMetricDTO convertToScopusDTO(InputStream inputStream) {
         Document doc = null;
         DocumentBuilder docBuilder = null;
         try {
@@ -64,14 +64,14 @@ public class ScopusProvider {
         return loadScopusMetrics(doc);
     }
 
-    private ScopusMetricsDTO loadScopusMetrics(Document doc) {
-        ScopusMetricsDTO scopusCitation = null;
+    private CrisMetricDTO loadScopusMetrics(Document doc) {
+        CrisMetricDTO scopusCitation = null;
         try {
             Element xmlRoot = doc.getDocumentElement();
             Element dataRoot = XMLUtils.getSingleElement(xmlRoot, "entry");
             Element errorScopusResp = XMLUtils.getSingleElement(dataRoot, "error");
             if (dataRoot != null && errorScopusResp == null) {
-                scopusCitation = new ScopusMetricsDTO();
+                scopusCitation = new CrisMetricDTO();
                 String eid = XMLUtils.getElementValue(dataRoot, "eid");
                 String doi = XMLUtils.getElementValue(dataRoot, "prism:doi");
                 String pmid = XMLUtils.getElementValue(dataRoot, "pubmed-id");

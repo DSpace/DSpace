@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
@@ -23,7 +24,9 @@ import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.externalservices.h_index.UpdateHindexMetrics;
 import org.dspace.externalservices.scopus.UpdateScopusMetrics;
+import org.dspace.externalservices.wos.UpdateWOSMetrics;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.utils.DSpace;
 
@@ -41,16 +44,23 @@ public class UpdateCrisMetricsWithExternalSource extends
 
     private String service;
 
-    private Map<String, MetricsExternalServices> crisMetricsExternalService;
+    private String param;
+
+    private Map<String, MetricsExternalServices> crisMetricsExternalServices = new HashMap<>();
 
     @Override
     public void setup() throws ParseException {
-        crisMetricsExternalService = new HashMap<String, MetricsExternalServices>();
-        crisMetricsExternalService.put("scopus", new DSpace().getServiceManager().getServiceByName(
-                                                     UpdateScopusMetrics.class.getName(),
-                                                     UpdateScopusMetrics.class));
-
+        crisMetricsExternalServices.put("scopus", new DSpace().getServiceManager().getServiceByName(
+                                                      UpdateScopusMetrics.class.getName(),
+                                                      UpdateScopusMetrics.class));
+        crisMetricsExternalServices.put("wos", new DSpace().getServiceManager().getServiceByName(
+                                                   UpdateWOSMetrics.class.getName(),
+                                                   UpdateWOSMetrics.class));
+        crisMetricsExternalServices.put("hindex", new DSpace().getServiceManager().getServiceByName(
+                                                      UpdateHindexMetrics.class.getName(),
+                                                      UpdateHindexMetrics.class));
         this.service = commandLine.getOptionValue('s');
+        this.param = commandLine.getOptionValue('p');
     }
 
     @Override
@@ -67,12 +77,15 @@ public class UpdateCrisMetricsWithExternalSource extends
         if (service == null) {
             throw new IllegalArgumentException("The name of service must be provided");
         }
-        MetricsExternalServices externalService = crisMetricsExternalService.get(this.service.toLowerCase());
+        if (this.service.toLowerCase().equals("hindex") && StringUtils.isBlank(this.param)) {
+            throw new IllegalArgumentException("The param is mandatory for " + this.service + " service");
+        }
+        MetricsExternalServices externalService = crisMetricsExternalServices.get(this.service.toLowerCase());
         if (externalService == null) {
             throw new IllegalArgumentException("The name of service must be provided");
         }
         try {
-            performUpdate(context, externalService, service);
+            performUpdate(context, externalService, service, param);
             context.complete();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -81,7 +94,8 @@ public class UpdateCrisMetricsWithExternalSource extends
         }
     }
 
-    private void performUpdate(Context context, MetricsExternalServices metricsExternalServices, String service) {
+    private void performUpdate(Context context, MetricsExternalServices metricsExternalServices,
+            String service, String param) {
         int count = 0;
         try {
             Iterator<Item> itemIterator = findItems(context, service);
@@ -91,7 +105,7 @@ public class UpdateCrisMetricsWithExternalSource extends
             while (itemIterator.hasNext()) {
                 Item item = itemIterator.next();
                 countFoundItems++;
-                final boolean updated = metricsExternalServices.updateMetric(context, item);
+                final boolean updated = metricsExternalServices.updateMetric(context, item, param);
                 if (updated) {
                     countUpdatedItems++;
                 }
@@ -125,6 +139,18 @@ public class UpdateCrisMetricsWithExternalSource extends
             discoverQuery.addFilterQueries("relationship.type:Publication");
             discoverQuery.addFilterQueries("dc.identifier.doi:* OR dc.identifier.pmid:*");
         }
+        if ("wos".equals(service) && StringUtils.isBlank(param)) {
+            discoverQuery.addFilterQueries("relationship.type:Publication");
+            discoverQuery.addFilterQueries("dc.identifier.doi:*");
+        }
+        if ("hindex".equals(service)) {
+            discoverQuery.addFilterQueries("relationship.type:Person");
+            discoverQuery.addFilterQueries("person.identifier.scopus-author-id:*");
+        }
+        if ("wos".equals(service) && "person".equals(param)) {
+            discoverQuery.addFilterQueries("relationship.type:Person");
+            discoverQuery.addFilterQueries("person.identifier.orcid:*");
+        }
     }
 
     private void assignCurrentUserInContext() throws SQLException {
@@ -136,12 +162,20 @@ public class UpdateCrisMetricsWithExternalSource extends
         }
     }
 
-    public Map<String, MetricsExternalServices> getPeruExternalService() {
-        return crisMetricsExternalService;
+    public Map<String, MetricsExternalServices> getCrisMetricsExternalServices() {
+        return crisMetricsExternalServices;
     }
 
-    public void setPeruExternalService(Map<String, MetricsExternalServices> crisMetricsExternalService) {
-        this.crisMetricsExternalService = crisMetricsExternalService;
+    public void setCrisMetricsExternalServices(Map<String, MetricsExternalServices> crisMetricsExternalServices) {
+        this.crisMetricsExternalServices = crisMetricsExternalServices;
+    }
+
+    public String getParam() {
+        return param;
+    }
+
+    public void setParam(String param) {
+        this.param = param;
     }
 
 }
