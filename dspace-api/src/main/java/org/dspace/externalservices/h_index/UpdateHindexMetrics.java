@@ -49,13 +49,13 @@ public class UpdateHindexMetrics implements MetricsExternalServices {
     public boolean updateMetric(Context context, Item item, String param) {
         CrisMetricDTO metricDTO = null;
         String authorId = itemService.getMetadataFirstValue(item, "person", "identifier", "scopus-author-id", Item.ANY);
-        if (!StringUtils.isBlank(authorId)) {
+        if (StringUtils.isNotBlank(authorId)) {
             metricDTO = hindexProvider.getCrisMetricDTO(authorId, param);
         }
-        return updateScopusMetrics(context, item, metricDTO);
+        return updateHindexMetric(context, item, metricDTO);
     }
 
-    private boolean updateScopusMetrics(Context context, Item currentItem, CrisMetricDTO metricDTO) {
+    private boolean updateHindexMetric(Context context, Item currentItem, CrisMetricDTO metricDTO) {
         try {
             if (Objects.isNull(metricDTO)) {
                 return false;
@@ -66,10 +66,7 @@ public class UpdateHindexMetrics implements MetricsExternalServices {
                 scopusMetrics.setLast(false);
             }
             createNewMetric(context, currentItem, metricDTO);
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
-            throw new IllegalStateException("Failed to run metric update", e);
-        } catch (AuthorizeException e) {
+        } catch (SQLException | AuthorizeException e) {
             log.error(e.getMessage(), e);
             throw new IllegalStateException("Failed to run metric update", e);
         }
