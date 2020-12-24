@@ -376,8 +376,11 @@ public class RelationshipServiceImpl implements RelationshipService {
         // authorization system here so that this failure doesn't happen when the items need to be update
         context.turnOffAuthorisationSystem();
         try {
+            // Set a limit on the total amount of items to update at once during a relationship change
             int max = configurationService.getIntProperty("relationship.update.relateditems.max", 20);
+            // Set a limit on the total depth of relationships to traverse during a relationship change
             int maxDepth = configurationService.getIntProperty("relationship.update.relateditems.maxdepth", 5);
+            // This is the list containing all items which will have changes to their virtual metadata
             List<Item> itemsToUpdate = new LinkedList<>();
             itemsToUpdate.add(relationship.getLeftItem());
             itemsToUpdate.add(relationship.getRightItem());
@@ -407,8 +410,6 @@ public class RelationshipServiceImpl implements RelationshipService {
      * Search for items whose metadata should be updated in discovery and adds them to itemsToUpdate
      * It starts from the given item, excludes items already in itemsToUpdate (they're already handled),
      * and can be limited in amount of items or depth to update
-     *
-     * The given item was found at the right-hand-side of the given relationship
      */
     private void findModifiedDiscoveryItemsForCurrentItem(Context context, Item item, List<Item> itemsToUpdate,
                                                           int max, int currentDepth, int maxDepth)
@@ -440,20 +441,25 @@ public class RelationshipServiceImpl implements RelationshipService {
                 typeToSearchInVirtualMetadata = relationshipType.getLeftwardType();
             }
             if (containsVirtualMetadata(typeToSearchInVirtualMetadata)) {
+                // we have a relationship type where the items attached to the current item will inherit
+                // virtual metadata from the current item
+                // retrieving the actual relationships so the related items can be updated
                 List<Relationship> list = findByItemAndRelationshipType(context, item, relationshipType, isLeft);
                 for (Relationship foundRelationship : list) {
+                    Item nextItem;
                     if (isLeft) {
-                        if (!itemsToUpdate.contains(foundRelationship.getRightItem())) {
-                            itemsToUpdate.add(foundRelationship.getRightItem());
-                            findModifiedDiscoveryItemsForCurrentItem(context, foundRelationship.getRightItem(),
-                                    itemsToUpdate, max, currentDepth + 1, maxDepth);
-                        }
+                        // current item on the left, next item is on the right
+                        nextItem = foundRelationship.getRightItem();
                     } else {
-                        if (!itemsToUpdate.contains(foundRelationship.getLeftItem())) {
-                            itemsToUpdate.add(foundRelationship.getLeftItem());
-                            findModifiedDiscoveryItemsForCurrentItem(context, foundRelationship.getLeftItem(),
-                                    itemsToUpdate, max, currentDepth + 1, maxDepth);
-                        }
+                        nextItem = foundRelationship.getLeftItem();
+                    }
+
+                    // verify it hasn't been processed yet
+                    if (!itemsToUpdate.contains(nextItem)) {
+                        itemsToUpdate.add(nextItem);
+                        // continue the process for the next item, it may also inherit item from the current item
+                        findModifiedDiscoveryItemsForCurrentItem(context, nextItem,
+                                itemsToUpdate, max, currentDepth + 1, maxDepth);
                     }
                 }
             } else {
@@ -464,6 +470,13 @@ public class RelationshipServiceImpl implements RelationshipService {
         }
     }
 
+    /**
+     * Verifies whether there is virtual metadata generated for the given relationship
+     * If no such virtual metadata exists, there's no need to update the items in discovery
+     * @param typeToSearchInVirtualMetadata     a leftWardType or rightWardType of a relationship type
+     *                                          This can be e.g. isAuthorOfPublication
+     * @return                                  true if there is virtual metadata for this relationship
+     */
     private boolean containsVirtualMetadata(String typeToSearchInVirtualMetadata) {
         return virtualMetadataPopulator.getMap().containsKey(typeToSearchInVirtualMetadata)
                 && virtualMetadataPopulator.getMap().get(typeToSearchInVirtualMetadata).size() > 0;
