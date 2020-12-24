@@ -27,13 +27,13 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class HindexProvider {
 
-    private static Logger log = LogManager.getLogger(HindexProvider.class);
+    private static final Logger log = LogManager.getLogger(HindexProvider.class);
 
-    public static final String CITED = UpdateHindexMetrics.CITED_METRIC_TYPE;
-    public static final String H_INDEX = UpdateHindexMetrics.H_INDEX_METRIC_TYPE;
-    public static final String CITATION = UpdateHindexMetrics.CITATION_METRIC_TYPE;
-    public static final String DOCUMENT = UpdateHindexMetrics.DOCUMENT_METRIC_TYPE;
-    public static final String COAUTHOR = UpdateHindexMetrics.COAUTHOR_METRIC_TYPE;
+    private static final String CITED = UpdateHindexMetrics.CITED_METRIC_TYPE;
+    private static final String H_INDEX = UpdateHindexMetrics.H_INDEX_METRIC_TYPE;
+    private static final String CITATION = UpdateHindexMetrics.CITATION_METRIC_TYPE;
+    private static final String DOCUMENT = UpdateHindexMetrics.DOCUMENT_METRIC_TYPE;
+    private static final String COAUTHOR = UpdateHindexMetrics.COAUTHOR_METRIC_TYPE;
 
     @Autowired
     private HindexRestConnector hindexRestConnector;

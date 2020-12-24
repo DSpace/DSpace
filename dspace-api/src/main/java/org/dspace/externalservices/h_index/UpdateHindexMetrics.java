@@ -52,10 +52,10 @@ public class UpdateHindexMetrics implements MetricsExternalServices {
         if (!StringUtils.isBlank(authorId)) {
             metricDTO = hindexProvider.getCrisMetricDTO(authorId, param);
         }
-        return updateScopusMetrics(context, item, metricDTO);
+        return updateHIndex(context, item, metricDTO);
     }
 
-    private boolean updateScopusMetrics(Context context, Item currentItem, CrisMetricDTO metricDTO) {
+    private boolean updateHIndex(Context context, Item currentItem, CrisMetricDTO metricDTO) {
         try {
             if (Objects.isNull(metricDTO)) {
                 return false;
