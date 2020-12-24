@@ -97,7 +97,8 @@
         <mapping class="org.dspace.layout.CrisLayoutFieldMetadata" />
         <mapping class="org.dspace.layout.CrisLayoutFieldBitstream" />
         <mapping class="org.dspace.layout.CrisLayoutTab2Box" />
-        
+        <mapping class="org.dspace.layout.CrisLayoutMetric2Box" />
+
         <mapping class="org.dspace.app.orcid.OrcidQueue" />
         <mapping class="org.dspace.app.orcid.OrcidHistory" />
         
