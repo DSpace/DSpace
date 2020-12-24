@@ -7,13 +7,11 @@
  */
 package org.dspace.externalservices.wos;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Objects;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.metrics.CrisMetrics;
@@ -32,7 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class UpdateWOSMetrics implements MetricsExternalServices {
 
-    private static Logger log = LogManager.getLogger(UpdateScopusMetrics.class);
+    private static final Logger log = LogManager.getLogger(UpdateScopusMetrics.class);
 
     public static final String WOS_METRIC_TYPE = "wosCitation";
     public static final String WOS_PERSON_METRIC_TYPE = "wosPersonCitation";
@@ -51,50 +49,45 @@ public class UpdateWOSMetrics implements MetricsExternalServices {
 
     @Override
     public boolean updateMetric(Context context, Item item, String param) {
-        CrisMetricDTO metcitDTO = new CrisMetricDTO();
+        CrisMetricDTO metricDTO = new CrisMetricDTO();
         if (StringUtils.isBlank(param)) {
             String doi = itemService.getMetadataFirstValue(item, "dc", "identifier", "doi", Item.ANY);
-            if (!StringUtils.isBlank(doi)) {
-                metcitDTO = wosProvider.getWOSObject(doi);
+            if (StringUtils.isNotBlank(doi)) {
+                metricDTO = wosProvider.getWOSObject(doi);
             }
         }
         if ("person".equals(param)) {
             String orcidId = itemService.getMetadataFirstValue(item, "person", "identifier", "orcid", Item.ANY);
-            if (!StringUtils.isBlank(orcidId)) {
+            if (StringUtils.isNotBlank(orcidId)) {
                 try {
-                    metcitDTO = wosPersonRestConnector.sendRequestToWOS(orcidId);
-                } catch (UnsupportedEncodingException | ClientProtocolException  e) {
-                    log.error(e.getMessage(), e);
+                    metricDTO = wosPersonRestConnector.sendRequestToWOS(orcidId);
                 } catch (IOException e) {
                     log.error(e.getMessage(), e);
                 }
             }
         }
-        return updateScopusMetrics(context, item, metcitDTO);
+        return updateWosMetric(context, item, metricDTO);
     }
 
-    private boolean updateScopusMetrics(Context context, Item currentItem, CrisMetricDTO metcitDTO) {
+    private boolean updateWosMetric(Context context, Item currentItem, CrisMetricDTO metcitDTO) {
         try {
             if (Objects.isNull(metcitDTO)) {
                 return false;
             }
-            CrisMetrics scopusMetrics = crisMetricsService.findLastMetricByResourceIdAndMetricsTypes(context,
+            CrisMetrics wosMetrics = crisMetricsService.findLastMetricByResourceIdAndMetricsTypes(context,
                         metcitDTO.getMetricType(), currentItem.getID());
-            if (!Objects.isNull(scopusMetrics)) {
-                scopusMetrics.setLast(false);
+            if (!Objects.isNull(wosMetrics)) {
+                wosMetrics.setLast(false);
             }
-            createNewScopusMetrics(context, currentItem, metcitDTO);
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
-            throw new IllegalStateException("Failed to run metric update", e);
-        } catch (AuthorizeException e) {
+            createNewWosMetric(context, currentItem, metcitDTO);
+        } catch (SQLException | AuthorizeException e) {
             log.error(e.getMessage(), e);
             throw new IllegalStateException("Failed to run metric update", e);
         }
         return true;
     }
 
-    private void createNewScopusMetrics(Context context, Item item, CrisMetricDTO metcitDTO)
+    private void createNewWosMetric(Context context, Item item, CrisMetricDTO metcitDTO)
             throws SQLException, AuthorizeException {
         CrisMetrics newWosMetric = crisMetricsService.create(context, item);
         newWosMetric.setMetricType(metcitDTO.getMetricType());
