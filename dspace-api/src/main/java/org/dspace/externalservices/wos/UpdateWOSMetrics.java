@@ -45,34 +45,31 @@ public class UpdateWOSMetrics implements MetricsExternalServices {
     public boolean updateMetric(Context context, Item item) {
         Double metricCount = null;
         String doi = itemService.getMetadataFirstValue(item, "dc", "identifier", "doi", Item.ANY);
-        if (!StringUtils.isBlank(doi)) {
+        if (StringUtils.isNotBlank(doi)) {
             metricCount = wosProvider.getWOSObject(doi);
         }
-        return updateScopusMetrics(context, item, metricCount);
+        return updateWosMetrics(context, item, metricCount);
     }
 
-    private boolean updateScopusMetrics(Context context, Item currentItem, Double metricCount) {
+    private boolean updateWosMetrics(Context context, Item currentItem, Double metricCount) {
+        if (Objects.isNull(metricCount)) {
+            return false;
+        }
         try {
-            if (Objects.isNull(metricCount)) {
-                return false;
-            }
             CrisMetrics scopusMetrics = crisMetricsService.findLastMetricByResourceIdAndMetricsTypes(context,
                     WOS_METRIC_TYPE, currentItem.getID());
-            if (!Objects.isNull(scopusMetrics)) {
+            if (Objects.nonNull(scopusMetrics)) {
                 scopusMetrics.setLast(false);
             }
-            createNewScopusMetrics(context, currentItem, metricCount);
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
-            throw new IllegalStateException("Failed to run metric update", e);
-        } catch (AuthorizeException e) {
+            wosMetric(context, currentItem, metricCount);
+        } catch (SQLException | AuthorizeException e) {
             log.error(e.getMessage(), e);
             throw new IllegalStateException("Failed to run metric update", e);
         }
         return true;
     }
 
-    private void createNewScopusMetrics(Context context, Item item, Double metricCount)
+    private void wosMetric(Context context, Item item, Double metricCount)
             throws SQLException, AuthorizeException {
         CrisMetrics newWosMetric = crisMetricsService.create(context, item);
         newWosMetric.setMetricType(WOS_METRIC_TYPE);
