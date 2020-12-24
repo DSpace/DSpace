@@ -3,33 +3,6 @@
 
 <relationships>
     <type>
-        <leftType>Publication</leftType>
-        <rightType>OrgUnit</rightType>
-        <leftwardType>isAuthorOfPublication</leftwardType>
-        <rightwardType>isPublicationOfAuthor</rightwardType>
-        <leftCardinality>
-            <min>0</min>
-        </leftCardinality>
-        <rightCardinality>
-            <min>0</min>
-        </rightCardinality>
-        <copyToLeft>true</copyToLeft>
-    </type>
-    <type>
-        <leftType>JournalIssue</leftType>
-        <rightType>Publication</rightType>
-        <leftwardType>isPublicationOfJournalIssue</leftwardType>
-        <rightwardType>isJournalIssueOfPublication</rightwardType>
-        <leftCardinality>
-            <min>0</min>
-        </leftCardinality>
-        <rightCardinality>
-            <min>0</min>
-            <max>1</max>
-        </rightCardinality>
-        <copyToRight>true</copyToRight>
-    </type>
-    <type>
         <leftType>Person</leftType>
         <rightType>Person</rightType>
         <leftwardType>isCorrectionOfItem</leftwardType>
