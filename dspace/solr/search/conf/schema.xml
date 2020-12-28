@@ -328,6 +328,18 @@
     <dynamicField name="*.year" type="sint" indexed="true" stored="true" multiValued="true" omitNorms="true" />
     <dynamicField name="*_dt" type="date" indexed="true" stored="true" multiValued="false" omitNorms="true"  docValues="true"/>
 
+    <!--Dynamic field used for update metrics in Solr doc-->
+    <dynamicField name="metric.*" type="float" indexed="true" stored="true" multiValued="false" docValues="true"/>
+
+    <dynamicField name="metric.acquisitionDate.*" type="date" indexed="true" stored="true" multiValued="false"/>
+    <dynamicField name="metric.id.*" type="int" indexed="true" stored="true" multiValued="false"/>
+    
+     <dynamicField name="metric.remark.*" type="string" indexed="true" stored="true" multiValued="false"/>
+     <dynamicField name="metric.deltaPeriod1.*" type="double" indexed="true" stored="true" multiValued="false"/>
+     <dynamicField name="metric.deltaPeriod2.*" type="double" indexed="true" stored="true" multiValued="false"/>
+     <dynamicField name="metric.rank.*" type="double" indexed="true" stored="true" multiValued="false"/>
+
+
     <!--Used for matching on all other fields -->
     <dynamicField name="*" type="text" multiValued="true"/>
 

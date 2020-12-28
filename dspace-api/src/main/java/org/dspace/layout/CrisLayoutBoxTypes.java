@@ -9,5 +9,6 @@ package org.dspace.layout;
 
 public enum CrisLayoutBoxTypes {
         METADATA,
-        RELATION
+        RELATION,
+        METRICS
 }

@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class CrisLayoutBoxConfigurationRemoveOperation<D> extends PatchOperation<D> {
+public class CrisLayoutBoxMetadataConfigurationRemoveOperation<D> extends PatchOperation<D> {
 
     /**
      * Path in json body of patch that uses this operation

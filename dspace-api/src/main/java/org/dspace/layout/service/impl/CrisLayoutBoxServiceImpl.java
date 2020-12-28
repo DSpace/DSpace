@@ -233,6 +233,8 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
         switch (boxType.toUpperCase()) {
             case "RELATION":
                 return hasRelationBoxContent(box, values);
+            case "METRICS":
+                return hasMetricsBoxContent(box, values);
             case "ORCID_SYNC_SETTINGS":
             case "ORCID_SYNC_QUEUE":
                 return hasOrcidSyncBoxContent(context, box, values);
@@ -269,6 +271,10 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
 
     private boolean hasRelationBoxContent(CrisLayoutBox box, List<MetadataValue> values) {
         // The relation box has no associated content
+        return true;
+    }
+
+    private boolean hasMetricsBoxContent(CrisLayoutBox box, List<MetadataValue> values) {
         return true;
     }
 

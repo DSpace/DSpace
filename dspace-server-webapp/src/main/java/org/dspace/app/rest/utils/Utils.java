@@ -50,6 +50,7 @@ import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.CrisLayoutBoxRest;
+import org.dspace.app.rest.model.CrisMetricsRest;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.LinksRest;
 import org.dspace.app.rest.model.OrcidHistoryRest;
@@ -306,6 +307,9 @@ public class Utils {
         }
         if (StringUtils.equals(modelPlural, "orcidhistories")) {
             return OrcidHistoryRest.NAME;
+        }
+        if (StringUtils.equals(modelPlural, "metrics")) {
+            return CrisMetricsRest.NAME;
         }
         return modelPlural.replaceAll("s$", "");
     }
