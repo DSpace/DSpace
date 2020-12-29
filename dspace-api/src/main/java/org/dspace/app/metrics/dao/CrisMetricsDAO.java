@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.metrics.DAO;
+package org.dspace.app.metrics.dao;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;

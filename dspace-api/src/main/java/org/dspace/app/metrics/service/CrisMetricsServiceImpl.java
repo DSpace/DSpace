@@ -13,7 +13,7 @@ import java.util.UUID;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.metrics.CrisMetrics;
-import org.dspace.app.metrics.DAO.CrisMetricsDAO;
+import org.dspace.app.metrics.dao.CrisMetricsDAO;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
