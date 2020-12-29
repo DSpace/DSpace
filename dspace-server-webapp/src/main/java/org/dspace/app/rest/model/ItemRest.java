@@ -58,6 +58,7 @@ public class ItemRest extends DSpaceObjectRest {
     private boolean discoverable = false;
     private boolean withdrawn = false;
     private Date lastModified = new Date();
+    private String entityType = null;
 
     @Override
     public String getCategory() {
@@ -100,5 +101,15 @@ public class ItemRest extends DSpaceObjectRest {
 
     public void setLastModified(Date lastModified) {
         this.lastModified = lastModified;
+    }
+
+    public String getEntityType() {
+        return entityType;
+    }
+
+    public void setEntityType(String entityType) {
+        if (this.entityType == null) {
+            this.entityType = entityType;
+        }
     }
 }
