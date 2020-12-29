@@ -127,12 +127,12 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
             }
         }
         if (workflowByThisNameExists(workflowName)) {
-            addCollectionsWithWorkwflowMetadata(context, workflowName, collections);
+            addCollectionsWithWorkflowMetadata(context, workflowName, collections);
         }
         return new ArrayList<>(collections);
     }
 
-    private void addCollectionsWithWorkwflowMetadata(Context context, String workflowName,
+    private void addCollectionsWithWorkflowMetadata(Context context, String workflowName,
             HashSet<Collection> collections) {
         try {
             for (Collection col : collectionService.findAll(context)) {
@@ -155,7 +155,7 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
         try {
             for (Collection collection : this.collectionService.findAll(context)) {
                 String wfwName = collectionService.getMetadataFirstValue(collection, "cris", "workflow", "name", null);
-                if (Objects.isNull(this.workflowMapping.get(collection.getHandle())) & StringUtils.isBlank(wfwName)) {
+                if (Objects.isNull(this.workflowMapping.get(collection.getHandle())) && StringUtils.isBlank(wfwName)) {
                     nonMappedCollections.add(collection);
                 }
             }
