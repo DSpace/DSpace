@@ -12,6 +12,7 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
 import static org.dspace.core.Constants.WRITE;
+import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -25,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -41,6 +43,7 @@ import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
+import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -49,6 +52,7 @@ import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.ResourcePolicyBuilder;
@@ -56,6 +60,7 @@ import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.CollectionService;
@@ -2740,5 +2745,168 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     }
 
+    @Test
+    public void testEntityTypePerson() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EntityType person = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+        Community community = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection collection = CollectionBuilder.createCollection(context, community).withName("Collection").build();
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("Author1")
+            .withIssueDate("2017-10-17")
+            .withAuthor("Smith, Donald")
+            .withPersonIdentifierLastName("Smith")
+            .withPersonIdentifierFirstName("Donald")
+            .withRelationshipType("Person")
+            .build();
+        context.restoreAuthSystemState();
 
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/items/" + item.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
+            .andExpect(jsonPath("$.entityType", is("Person")));
+    }
+
+    @Test
+    public void testEntityTypePublication() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        Community community = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection collection = CollectionBuilder.createCollection(context, community).withName("Collection").build();
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("Publication1")
+            .withAuthor("Testy, TEst")
+            .withIssueDate("2015-01-01")
+            .withRelationshipType("Publication")
+            .build();
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/items/" + item.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
+            .andExpect(jsonPath("$.entityType", is("Publication")));
+    }
+
+    @Test
+    public void testEntityTypeOrgUnit() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EntityType orgUnit = EntityTypeBuilder.createEntityTypeBuilder(context, "OrgUnit").build();
+        Community community = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection collection = CollectionBuilder.createCollection(context, community).withName("Collection").build();
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("OrgUnit1")
+            .withAuthor("Testy, TEst")
+            .withIssueDate("2015-01-01")
+            .withRelationshipType("OrgUnit")
+            .build();
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/items/" + item.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
+            .andExpect(jsonPath("$.entityType", is("OrgUnit")));
+    }
+
+    @Test
+    public void testEntityTypeProject() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EntityType project = EntityTypeBuilder.createEntityTypeBuilder(context, "Project").build();
+        Community community = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection collection = CollectionBuilder.createCollection(context, community).withName("Collection").build();
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("Project1")
+            .withAuthor("Testy, TEst")
+            .withIssueDate("2015-01-01")
+            .withRelationshipType("Project")
+            .build();
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/items/" + item.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
+            .andExpect(jsonPath("$.entityType", is("Project")));
+    }
+
+    @Test
+    public void testEntityTypeNull() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection collection = CollectionBuilder.createCollection(context, community).withName("Collection").build();
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("Unclassified item")
+            .withAuthor("Testy, TEst")
+            .withIssueDate("2015-01-01")
+            .build();
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/items/" + item.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
+            .andExpect(jsonPath("$.entityType", is(emptyOrNullString())));
+    }
+
+    @Test
+    public void testEntityTypeModification() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        Community community = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection collection = CollectionBuilder.createCollection(context, community).withName("Collection").build();
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("Publication1")
+            .withAuthor("Testy, TEst")
+            .withIssueDate("2015-01-01")
+            .build();
+        context.restoreAuthSystemState();
+
+        // Verify there is no entityType yet
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/core/items/" + item.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
+            .andExpect(jsonPath("$.entityType", is(emptyOrNullString())));
+
+        // Modify the entityType and verify the response already contains this modification
+        List<Operation> ops = new ArrayList<>();
+        List<Map<String, String>> values = new ArrayList<>();
+        Map<String, String> value = new HashMap<>();
+        value.put("value", "Publication");
+        values.add(value);
+        AddOperation addOperation = new AddOperation("/metadata/relationship.type", values);
+        ops.add(addOperation);
+        String patchBody = getPatchContent(ops);
+        getClient(token).perform(patch("/api/core/items/" + item.getID())
+                .content(patchBody)
+                .contentType(contentType))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
+            .andExpect(jsonPath("$.entityType", is("Publication")));
+
+        // Verify this modification is permanent
+        getClient(token).perform(get("/api/core/items/" + item.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
+            .andExpect(jsonPath("$.entityType", is("Publication")));
+    }
 }

@@ -10,17 +10,23 @@ package org.dspace.app.rest.converter;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.MetadataValueList;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.content.Entity;
+import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.service.EntityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
+import org.dspace.xoai.services.api.context.ContextService;
+import org.dspace.xoai.services.api.context.ContextServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -41,6 +47,12 @@ public class ItemConverter
     @Autowired
     private ItemService itemService;
 
+    @Autowired
+    private EntityService entityService;
+
+    @Autowired
+    private ContextService contextService;
+
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemConverter.class);
 
     @Override
@@ -50,6 +62,18 @@ public class ItemConverter
         item.setDiscoverable(obj.isDiscoverable());
         item.setWithdrawn(obj.isWithdrawn());
         item.setLastModified(obj.getLastModified());
+
+        try {
+            Entity entity = entityService.findByItemId(contextService.getContext(), UUID.fromString(item.getId()));
+            EntityType entityType = entityService.getType(contextService.getContext(), entity);
+            if (entityType != null) {
+                item.setEntityType(entityType.getLabel());
+            }
+        } catch (SQLException e) {
+            log.error("Error getting item's entity type", e);
+        } catch (ContextServiceException e) {
+            log.error("Error getting context", e);
+        }
 
         return item;
     }
