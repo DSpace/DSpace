@@ -113,7 +113,7 @@ public class MetricsComponentsRestControllerIT extends AbstractControllerIntegra
 
         operations = new ArrayList<Operation>();
         metrics = new ArrayList<>();
-        metrics.add("metric3");
+        metrics.add("metric2");
         operations.add(new AddOperation("/metrics/", metrics));
 
         patchBody = getPatchContent(operations);
@@ -125,7 +125,7 @@ public class MetricsComponentsRestControllerIT extends AbstractControllerIntegra
                 .andExpect(jsonPath("$", Matchers.allOf(
                         hasJsonPath("$.id", is(box.getID())), // now the configuration id is a number (box id)
                         hasJsonPath("$.type", is("boxmetricsconfiguration")),
-                        hasJsonPath("$.metrics[0]", is("metric3"))
+                        hasJsonPath("$.metrics[0]", is("metric2"))
                        )));
 
         // 3 Append metrics
