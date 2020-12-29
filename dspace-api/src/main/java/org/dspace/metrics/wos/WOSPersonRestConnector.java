@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.externalservices.wos;
+package org.dspace.metrics.wos;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -22,7 +22,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.externalservices.scopus.CrisMetricDTO;
+import org.dspace.metrics.scopus.CrisMetricDTO;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

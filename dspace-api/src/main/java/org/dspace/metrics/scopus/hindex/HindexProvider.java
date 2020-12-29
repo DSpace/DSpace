@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.externalservices.h_index;
+package org.dspace.metrics.scopus.hindex;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -16,7 +16,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.externalservices.scopus.CrisMetricDTO;
+import org.dspace.metrics.scopus.CrisMetricDTO;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;

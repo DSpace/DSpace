@@ -8,9 +8,11 @@
 package org.dspace.app.rest.repository;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +29,6 @@ import org.dspace.discovery.IndexingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -50,10 +51,8 @@ public class ItemMetricsLinkRepository extends AbstractDSpaceRestRepository
         if (Objects.isNull(itemUuid)) {
             throw new BadRequestException();
         }
-        List<CrisMetrics> metrics = findMetricsByItemUUID(context, itemUuid);
-        if (metrics == null) {
-            throw new ResourceNotFoundException("No such metrics found!");
-        }
+        List<CrisMetrics> metrics = Optional.ofNullable(findMetricsByItemUUID(context, itemUuid))
+                .orElse(Collections.emptyList());
         return converter.toRestPage(metrics, optionalPageable, projection);
     }
 

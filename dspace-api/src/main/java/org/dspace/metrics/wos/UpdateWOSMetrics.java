@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.externalservices.wos;
+package org.dspace.metrics.wos;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
@@ -20,9 +20,9 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.externalservices.MetricsExternalServices;
-import org.dspace.externalservices.scopus.CrisMetricDTO;
-import org.dspace.externalservices.scopus.UpdateScopusMetrics;
+import org.dspace.metrics.MetricsExternalServices;
+import org.dspace.metrics.scopus.CrisMetricDTO;
+import org.dspace.metrics.scopus.UpdateScopusMetrics;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -78,6 +78,7 @@ public class UpdateWOSMetrics implements MetricsExternalServices {
                         metcitDTO.getMetricType(), currentItem.getID());
             if (!Objects.isNull(wosMetrics)) {
                 wosMetrics.setLast(false);
+                crisMetricsService.update(context, wosMetrics);
             }
             createNewWosMetric(context, currentItem, metcitDTO);
         } catch (SQLException | AuthorizeException e) {

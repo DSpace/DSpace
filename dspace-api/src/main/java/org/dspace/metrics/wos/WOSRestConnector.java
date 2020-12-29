@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.externalservices.scopus;
+package org.dspace.metrics.wos;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -15,24 +15,22 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * This class deals with logic management to connect to the SCOPUS external service
- * 
- * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
+ * This class deals with logic management to connect to the WOS outdoor service
+ *
+ * @author mykhaylo boychuk (mykhaylo.boychuk at 4science.it)
  */
-public class ScopusRestConnector {
+public class WOSRestConnector {
 
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ScopusRestConnector.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(WOSRestConnector.class);
 
     private String apiKey;
-    private String insttoken;
-    private String scopusUrl;
-
+    private String wosUrl;
     private HttpClient httpClient;
 
     @PostConstruct
@@ -44,45 +42,27 @@ public class ScopusRestConnector {
 
     public InputStream get(String id) {
         try {
-            return sendRequestToSunedu(id);
+            return sendRequestToWOS(id);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }
 
-    private InputStream sendRequestToSunedu(String id)
+    private InputStream sendRequestToWOS(String id)
             throws UnsupportedEncodingException, IOException, ClientProtocolException {
-        HttpPost httpPost = new HttpPost(scopusUrl.concat(id));
+        HttpGet httpPost = new HttpGet(wosUrl.concat("DO=(").concat(id).concat(")&count=10&firstRecord=1"));
         httpPost.setHeader("Accept-Encoding", "gzip, deflate, br");
         httpPost.setHeader("Connection", "keep-alive");
-        httpPost.setHeader("X-ELS-APIKey", apiKey);
-        httpPost.setHeader("X-ELS-Insttoken", insttoken);
-        httpPost.setHeader("Accept", "application/xml");
+        httpPost.setHeader("X-ApiKey", apiKey);
+        httpPost.setHeader("Accept", "application/json");
 
         HttpResponse response = httpClient.execute(httpPost);
         int statusCode = response.getStatusLine().getStatusCode();
         if (statusCode != HttpStatus.SC_OK) {
-            log.error("Error connecting to server! The Server responce with: " + statusCode);
-            throw new RuntimeException();
+            return null;
         }
         return response.getEntity().getContent();
-    }
-
-    public HttpClient getHttpClient() {
-        return httpClient;
-    }
-
-    public void setHttpClient(HttpClient httpClient) {
-        this.httpClient = httpClient;
-    }
-
-    public String getScopusUrl() {
-        return scopusUrl;
-    }
-
-    public void setScopusUrl(String scopusUrl) {
-        this.scopusUrl = scopusUrl;
     }
 
     public String getApiKey() {
@@ -93,11 +73,20 @@ public class ScopusRestConnector {
         this.apiKey = apiKey;
     }
 
-    public String getInsttoken() {
-        return insttoken;
+    public String getWosUrl() {
+        return wosUrl;
     }
 
-    public void setInsttoken(String insttoken) {
-        this.insttoken = insttoken;
+    public void setWosUrl(String wosUrl) {
+        this.wosUrl = wosUrl;
     }
+
+    public HttpClient getHttpClient() {
+        return httpClient;
+    }
+
+    public void setHttpClient(HttpClient httpClient) {
+        this.httpClient = httpClient;
+    }
+
 }

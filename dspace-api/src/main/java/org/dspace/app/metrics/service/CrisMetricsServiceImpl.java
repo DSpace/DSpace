@@ -7,6 +7,7 @@
  */
 package org.dspace.app.metrics.service;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -68,6 +69,7 @@ public class CrisMetricsServiceImpl implements CrisMetricsService {
     public CrisMetrics create(Context context, Item item) throws SQLException, AuthorizeException {
         CrisMetrics cm =  new CrisMetrics();
         cm.setResource(item);
+        cm.setAcquisitionDate(new Date());
         CrisMetrics metric = crisMetricsDAO.create(context, cm);
         log.info(LogManager.getHeader(context, "create_cris_metrics", "cris_metrics_id=" + metric.getId()));
         return metric;

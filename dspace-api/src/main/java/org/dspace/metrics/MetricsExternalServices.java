@@ -5,13 +5,15 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.metrics.updateSolrDocScript;
+package org.dspace.metrics;
+import org.dspace.content.Item;
+import org.dspace.core.Context;
 
 /**
- * Extension of {@link UpdateCrisMetricsInSolrDoc} for CLI.
- *
+ * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
-public class UpdateCrisMetricsInSolrDocCli extends UpdateCrisMetricsInSolrDoc {
+public interface MetricsExternalServices {
 
+    public boolean updateMetric(Context context, Item item, String param);
 }

@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.externalservices;
+package org.dspace.metrics;
 
 /**
  * Extension of {@link UpdateCrisMetricsWithExternalSourceScriptConfiguration} for CLI.

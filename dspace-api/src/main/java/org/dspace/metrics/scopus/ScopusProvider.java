@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.externalservices.scopus;
+package org.dspace.metrics.scopus;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;

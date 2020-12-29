@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.externalservices;
+package org.dspace.metrics;
 import java.sql.SQLException;
 
 import org.apache.commons.cli.Options;
@@ -17,15 +17,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * {@link ScriptConfiguration} for the {@link UpdateCrisMetricsWithExternalSource}.
- *
+ * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
-public class UpdateCrisMetricsWithExternalSourceScriptConfiguration<T extends UpdateCrisMetricsWithExternalSource>
-       extends ScriptConfiguration<T> {
+public class UpdateCrisMetricsInSolrDocScriptConfiguration<T extends UpdateCrisMetricsInSolrDoc>
+                                                             extends ScriptConfiguration<T> {
 
     private static final Logger log = LoggerFactory
-                                      .getLogger(UpdateCrisMetricsWithExternalSourceScriptConfiguration.class);
+            .getLogger(UpdateCrisMetricsInSolrDocScriptConfiguration.class);
 
     private Class<T> dspaceRunnableClass;
 
@@ -46,15 +45,6 @@ public class UpdateCrisMetricsWithExternalSourceScriptConfiguration<T extends Up
     public Options getOptions() {
         if (options == null) {
             Options options = new Options();
-
-            options.addOption("s", "service", true,
-                "the name of the external service to use, i.e. SCOPUS");
-            options.getOption("s").setType(String.class);
-            options.getOption("s").setRequired(true);
-
-            options.addOption("p", "param", true, "the param of the MetricType to performe update");
-            options.getOption("p").setType(String.class);
-            //options.getOption("i").setRequired(false);
             super.options = options;
         }
         return options;

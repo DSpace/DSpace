@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.metrics.updateSolrDocScript;
+package org.dspace.metrics;
 
 /**
  * Extension of {@link UpdateCrisMetricsInSolrDocScriptConfiguration} for CLI.

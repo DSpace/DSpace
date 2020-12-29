@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.externalservices.wos;
+package org.dspace.metrics.wos;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
@@ -14,7 +14,7 @@ import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.externalservices.scopus.CrisMetricDTO;
+import org.dspace.metrics.scopus.CrisMetricDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

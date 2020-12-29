@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.externalservices;
+package org.dspace.metrics;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,9 +24,9 @@ import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.externalservices.h_index.UpdateHindexMetrics;
-import org.dspace.externalservices.scopus.UpdateScopusMetrics;
-import org.dspace.externalservices.wos.UpdateWOSMetrics;
+import org.dspace.metrics.scopus.UpdateScopusMetrics;
+import org.dspace.metrics.scopus.hindex.UpdateHindexMetrics;
+import org.dspace.metrics.wos.UpdateWOSMetrics;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.utils.DSpace;
 

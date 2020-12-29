@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.externalservices.scopus;
+package org.dspace.metrics.scopus;
 import java.util.HashMap;
 import java.util.Map;
 import javax.persistence.Lob;

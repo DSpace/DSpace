@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.externalservices.h_index;
+package org.dspace.metrics.scopus.hindex;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Objects;
@@ -19,8 +19,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.externalservices.MetricsExternalServices;
-import org.dspace.externalservices.scopus.CrisMetricDTO;
+import org.dspace.metrics.MetricsExternalServices;
+import org.dspace.metrics.scopus.CrisMetricDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -64,6 +64,7 @@ public class UpdateHindexMetrics implements MetricsExternalServices {
                                                            metricDTO.getMetricType(), currentItem.getID());
             if (!Objects.isNull(scopusMetrics)) {
                 scopusMetrics.setLast(false);
+                crisMetricsService.update(context, scopusMetrics);
             }
             createNewMetric(context, currentItem, metricDTO);
         } catch (SQLException | AuthorizeException e) {

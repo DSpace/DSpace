@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.metrics.updateSolrDocScript;
+package org.dspace.metrics;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;

@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.externalservices.scopus;
+package org.dspace.metrics.scopus;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Objects;
@@ -19,7 +19,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.externalservices.MetricsExternalServices;
+import org.dspace.metrics.MetricsExternalServices;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -86,6 +86,7 @@ public class UpdateScopusMetrics implements MetricsExternalServices {
                                         SCOPUS_CITATION, currentItem.getID());
             if (!Objects.isNull(scopusMetrics)) {
                 scopusMetrics.setLast(false);
+                crisMetricsService.update(context, scopusMetrics);
             }
             createNewScopusMetrics(context,currentItem, scopusMetric);
         } catch (SQLException | AuthorizeException e) {
