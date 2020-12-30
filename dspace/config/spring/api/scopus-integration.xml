@@ -36,6 +36,8 @@
         <entry key-ref="scopus.authkeywords" value-ref="scopusAuthkeywordsContrib"/>
         <entry key-ref="scopus.articleNumber" value-ref="scopusArticleNumberContrib"/>
         <entry key-ref="scopus.creator" value-ref="scopusCreatorContrib"/>
+        <entry key-ref="scopus.openaccessFlag" value-ref="scopusOpenaccessFlagContrib"/>
+        <entry key-ref="scopus.pageRange" value-ref="scopusPageRangeContrib"/>
     </util:map>
 
     <bean id="scopusIdentifierContrib" class="org.dspace.importer.external.metadatamapping.contributor.ReplaceCharacterXPathMetadataContributor">
@@ -47,6 +49,17 @@
     </bean>
     <bean id="scopus.identifier" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.identifier.other"/>
+    </bean>
+
+    <bean id="scopusOpenaccessFlagContrib" class="org.dspace.importer.external.metadatamapping.contributor.ReplaceFieldXPathMetadataContributor">
+        <property name="field" ref="scopus.openaccessFlag"/>
+        <property name="query" value="ns:openaccessFlag"/>
+        <property name="prefixToNamespaceMapping" ref="scopusNs"/>
+        <property name="simpleMapConverter" ref="mapConverterOpenAccessScopus"/>
+    </bean>
+
+    <bean id="scopus.openaccessFlag" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.rights"/>
     </bean>
 
     <bean id="scopusAuthorsContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
@@ -223,6 +236,25 @@
 
     <bean id="scopus.creator" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.contributor.author"/>
+    </bean>
+
+    <bean id="scopusPageRangeContrib" class="org.dspace.importer.external.metadatamapping.contributor.PageRangeXPathMetadataContributor">
+        <property name="field" ref="scopus.pageRange"/>
+        <property name="query" value="prism:pageRange"/>
+        <property name="prefixToNamespaceMapping" ref="scopusPrism"/>
+        <property name="startPageMetadata" ref="scopus.startPage"/>
+        <property name="endPageMetadata" ref="scopus.endPage"/>
+    </bean>
+    <bean id="scopus.pageRange" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="oaire.citation.pages"/>
+    </bean>
+
+    <bean id="scopus.startPage" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="oaire.citation.startPage"/>
+    </bean>
+    
+    <bean id="scopus.endPage" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="oaire.citation.endPage"/>
     </bean>
 
     <util:map id="scopusAtom" map-class="java.util.HashMap"
