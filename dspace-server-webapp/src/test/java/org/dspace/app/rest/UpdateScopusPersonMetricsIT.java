@@ -37,8 +37,8 @@ import org.dspace.builder.CrisMetricsBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.metrics.scopus.hindex.HindexRestConnector;
-import org.dspace.metrics.scopus.hindex.UpdateHindexMetrics;
+import org.dspace.metrics.scopus.ScopusPersonProvider.ScopusPersonMetric;
+import org.dspace.metrics.scopus.ScopusPersonRestConnector;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
@@ -48,13 +48,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
 * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
 */
-public class UpdateHindexMetricsIT extends AbstractControllerIntegrationTest {
+public class UpdateScopusPersonMetricsIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private CrisMetricsService crisMetriscService;
 
     @Autowired
-    private HindexRestConnector hindexConnector;
+    private ScopusPersonRestConnector hindexConnector;
 
     @Test
     public void updateHindexCrisMetricMockitoTest() throws Exception {
@@ -92,20 +92,20 @@ public class UpdateHindexMetricsIT extends AbstractControllerIntegrationTest {
                                .withScopusAuthorIdentifier("7406754790").build();
 
             CrisMetrics metric = CrisMetricsBuilder.createCrisMetrics(context, itemA)
-                                                    .withMetricType(UpdateHindexMetrics.H_INDEX_METRIC_TYPE)
+                                                    .withMetricType(ScopusPersonMetric.H_INDEX.metricType())
                                                     .withMetricCount(12)
                                                     .isLast(true).build();
 
             context.restoreAuthSystemState();
 
-            String[] args = new String[] { "update-metrics", "-s", "hindex", "-p",
-                                            UpdateHindexMetrics.H_INDEX_METRIC_TYPE };
+            String[] args = new String[] { "update-metrics", "-s", "scopus-person", "-p",
+                    ScopusPersonMetric.H_INDEX.name() };
             TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
             assertEquals(0, handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin));
 
             CrisMetrics newHIndexMetric = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(context,
-                                                      UpdateHindexMetrics.H_INDEX_METRIC_TYPE, itemA.getID());
+                                    ScopusPersonMetric.H_INDEX.metricType(), itemA.getID());
 
             assertNotEquals(newHIndexMetric.getID(), metric.getID());
 
@@ -159,20 +159,20 @@ public class UpdateHindexMetricsIT extends AbstractControllerIntegrationTest {
                                .withScopusAuthorIdentifier("7406754790").build();
 
             CrisMetrics metric1 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
-                                                    .withMetricType(UpdateHindexMetrics.CITED_METRIC_TYPE)
+                                                    .withMetricType(ScopusPersonMetric.CITED.metricType())
                                                     .withMetricCount(12000)
                                                     .isLast(true).build();
 
             context.restoreAuthSystemState();
 
-            String[] args = new String[] { "update-metrics", "-s", "hindex", "-p",
-                                            UpdateHindexMetrics.CITED_METRIC_TYPE };
+            String[] args = new String[] { "update-metrics", "-s", "scopus-person", "-p",
+                    ScopusPersonMetric.CITED.name() };
             TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
             assertEquals(0, handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin));
 
             CrisMetrics newCitedMetric = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(context,
-                                                            UpdateHindexMetrics.CITED_METRIC_TYPE, itemA.getID());
+                    ScopusPersonMetric.CITED.metricType(), itemA.getID());
 
             assertNotEquals(newCitedMetric.getID(), metric1.getID());
 
@@ -226,20 +226,20 @@ public class UpdateHindexMetricsIT extends AbstractControllerIntegrationTest {
                                .withScopusAuthorIdentifier("7406754790").build();
 
             CrisMetrics metric1 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
-                                                    .withMetricType(UpdateHindexMetrics.DOCUMENT_METRIC_TYPE)
+                                                    .withMetricType(ScopusPersonMetric.DOCUMENT.metricType())
                                                     .withMetricCount(12000)
                                                     .isLast(true).build();
 
             context.restoreAuthSystemState();
 
-            String[] args = new String[] { "update-metrics", "-s", "hindex", "-p",
-                                            UpdateHindexMetrics.DOCUMENT_METRIC_TYPE };
+            String[] args = new String[] { "update-metrics", "-s", "scopus-person", "-p",
+                    ScopusPersonMetric.DOCUMENT.name() };
             TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
             assertEquals(0, handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin));
 
             CrisMetrics newDocumentMetric = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(context,
-                                                            UpdateHindexMetrics.DOCUMENT_METRIC_TYPE, itemA.getID());
+                    ScopusPersonMetric.DOCUMENT.metricType(), itemA.getID());
 
             assertNotEquals(newDocumentMetric.getID(), metric1.getID());
 
@@ -293,20 +293,20 @@ public class UpdateHindexMetricsIT extends AbstractControllerIntegrationTest {
                                .withScopusAuthorIdentifier("7406754790").build();
 
             CrisMetrics metric1 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
-                                                    .withMetricType(UpdateHindexMetrics.CITATION_METRIC_TYPE)
+                                                    .withMetricType(ScopusPersonMetric.CITATION.metricType())
                                                     .withMetricCount(12000)
                                                     .isLast(true).build();
 
             context.restoreAuthSystemState();
 
-            String[] args = new String[] { "update-metrics", "-s", "hindex", "-p",
-                                            UpdateHindexMetrics.CITATION_METRIC_TYPE };
+            String[] args = new String[] { "update-metrics", "-s", "scopus-person", "-p",
+                                            ScopusPersonMetric.CITATION.name() };
             TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
             assertEquals(0, handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin));
 
             CrisMetrics newCitationMetric = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(context,
-                                                            UpdateHindexMetrics.CITATION_METRIC_TYPE, itemA.getID());
+                    ScopusPersonMetric.CITATION.metricType(), itemA.getID());
 
             assertNotEquals(newCitationMetric.getID(), metric1.getID());
 
@@ -360,20 +360,20 @@ public class UpdateHindexMetricsIT extends AbstractControllerIntegrationTest {
                                .withScopusAuthorIdentifier("7406754790").build();
 
             CrisMetrics metric1 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
-                                                    .withMetricType(UpdateHindexMetrics.COAUTHOR_METRIC_TYPE)
+                                                    .withMetricType(ScopusPersonMetric.COAUTHOR.metricType())
                                                     .withMetricCount(12000)
                                                     .isLast(true).build();
 
             context.restoreAuthSystemState();
 
-            String[] args = new String[] { "update-metrics", "-s", "hindex", "-p",
-                                            UpdateHindexMetrics.COAUTHOR_METRIC_TYPE };
+            String[] args = new String[] { "update-metrics", "-s", "scopus-person", "-p",
+                    ScopusPersonMetric.COAUTHOR.name() };
             TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
             assertEquals(0, handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin));
 
             CrisMetrics newCoauthorMetric = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(context,
-                                                            UpdateHindexMetrics.COAUTHOR_METRIC_TYPE, itemA.getID());
+                    ScopusPersonMetric.COAUTHOR.metricType(), itemA.getID());
 
             assertNotEquals(newCoauthorMetric.getID(), metric1.getID());
 
@@ -428,20 +428,20 @@ public class UpdateHindexMetricsIT extends AbstractControllerIntegrationTest {
                                .withScopusAuthorIdentifier("7406754790").build();
 
             CrisMetrics metric1 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
-                                                    .withMetricType(UpdateHindexMetrics.H_INDEX_METRIC_TYPE)
+                                                    .withMetricType(ScopusPersonMetric.H_INDEX.metricType())
                                                     .withMetricCount(12000)
                                                     .isLast(true).build();
 
             context.restoreAuthSystemState();
 
-            String[] args = new String[] { "update-metrics", "-s", "hindex", "-p",
-                                            UpdateHindexMetrics.H_INDEX_METRIC_TYPE };
+            String[] args = new String[] { "update-metrics", "-s", "scopus-person", "-p",
+                    ScopusPersonMetric.H_INDEX.name() };
             TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
             assertEquals(0, handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin));
 
             CrisMetrics hindexMetric = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(context,
-                                                          UpdateHindexMetrics.H_INDEX_METRIC_TYPE, itemA.getID());
+                    ScopusPersonMetric.H_INDEX.metricType(), itemA.getID());
 
             assertEquals(hindexMetric.getID(), metric1.getID());
             assertEquals(hindexMetric.getMetricCount(), metric1.getMetricCount(), 0);
@@ -491,20 +491,20 @@ public class UpdateHindexMetricsIT extends AbstractControllerIntegrationTest {
                                .withScopusAuthorIdentifier("7406754790").build();
 
             CrisMetrics metric1 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
-                                                    .withMetricType(UpdateHindexMetrics.H_INDEX_METRIC_TYPE)
+                                                    .withMetricType(ScopusPersonMetric.H_INDEX.metricType())
                                                     .withMetricCount(12000)
                                                     .isLast(true).build();
 
             context.restoreAuthSystemState();
 
-            String[] args = new String[] { "update-metrics", "-s", "hindex", "-p",
-                                            UpdateHindexMetrics.H_INDEX_METRIC_TYPE };
+            String[] args = new String[] { "update-metrics", "-s", "scopus-person", "-p",
+                    ScopusPersonMetric.H_INDEX.name() };
             TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
             assertEquals(0, handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin));
 
             CrisMetrics hindexMetric = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(context,
-                                                          UpdateHindexMetrics.H_INDEX_METRIC_TYPE, itemA.getID());
+                    ScopusPersonMetric.H_INDEX.metricType(), itemA.getID());
 
             assertEquals(hindexMetric.getID(), metric1.getID());
             assertEquals(hindexMetric.getMetricCount(), metric1.getMetricCount(), 0);
@@ -553,20 +553,20 @@ public class UpdateHindexMetricsIT extends AbstractControllerIntegrationTest {
                                .withScopusAuthorIdentifier("7406754790").build();
 
             CrisMetrics metric1 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
-                                                    .withMetricType(UpdateHindexMetrics.H_INDEX_METRIC_TYPE)
+                                                    .withMetricType(ScopusPersonMetric.H_INDEX.metricType())
                                                     .withMetricCount(12000)
                                                     .isLast(true).build();
 
             context.restoreAuthSystemState();
 
-            String[] args = new String[] { "update-metrics", "-s", "hindex", "-p",
-                                            UpdateHindexMetrics.H_INDEX_METRIC_TYPE };
+            String[] args = new String[] { "update-metrics", "-s", "scopus-person", "-p",
+                    ScopusPersonMetric.H_INDEX.name() };
             TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
             assertEquals(0, handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin));
 
             CrisMetrics hindexMetric = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(context,
-                                                          UpdateHindexMetrics.H_INDEX_METRIC_TYPE, itemA.getID());
+                    ScopusPersonMetric.H_INDEX.metricType(), itemA.getID());
 
             assertEquals(hindexMetric.getID(), metric1.getID());
             assertEquals(hindexMetric.getMetricCount(), metric1.getMetricCount(), 0);

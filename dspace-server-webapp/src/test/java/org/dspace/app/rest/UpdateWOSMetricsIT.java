@@ -40,6 +40,7 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.metrics.wos.UpdateWOSMetrics;
+import org.dspace.metrics.wos.UpdateWOSPersonMetrics;
 import org.dspace.metrics.wos.WOSPersonRestConnector;
 import org.dspace.metrics.wos.WOSRestConnector;
 import org.hamcrest.Matchers;
@@ -274,23 +275,23 @@ public class UpdateWOSMetricsIT extends AbstractControllerIntegrationTest {
                                .withOrcidIdentifier("0000-0001-8190-0000").build();
 
             CrisMetrics metric = CrisMetricsBuilder.createCrisMetrics(context, itemA)
-                                                    .withMetricType(UpdateWOSMetrics.WOS_PERSON_METRIC_TYPE)
+                                                    .withMetricType(UpdateWOSPersonMetrics.WOS_PERSON_METRIC_TYPE)
                                                     .withMetricCount(22)
                                                     .isLast(true).build();
 
             context.restoreAuthSystemState();
 
-            String[] args = new String[] { "update-metrics", "-s", "wos", "-p", "person" };
+            String[] args = new String[] { "update-metrics", "-s", "wos-person" };
             TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
             assertEquals(0, handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin));
 
             CrisMetrics wosMetric = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(context,
-                                                       UpdateWOSMetrics.WOS_PERSON_METRIC_TYPE, itemA.getID());
+                                                       UpdateWOSPersonMetrics.WOS_PERSON_METRIC_TYPE, itemA.getID());
 
             assertNotEquals(metric.getId(), wosMetric.getId());
             assertEquals(wosMetric.getMetricCount(), 280, 0);
-            assertEquals(wosMetric.getMetricType(), UpdateWOSMetrics.WOS_PERSON_METRIC_TYPE);
+            assertEquals(wosMetric.getMetricType(), UpdateWOSPersonMetrics.WOS_PERSON_METRIC_TYPE);
         } finally {
             CrisMetricsBuilder.deleteCrisMetrics(itemA);
             wosPersonRestConnector.setHttpClient(originalHttpClient);
@@ -331,23 +332,23 @@ public class UpdateWOSMetricsIT extends AbstractControllerIntegrationTest {
                                .withOrcidIdentifier("0000").build();
 
             CrisMetrics metric = CrisMetricsBuilder.createCrisMetrics(context, itemA)
-                                                    .withMetricType(UpdateWOSMetrics.WOS_PERSON_METRIC_TYPE)
+                                                    .withMetricType(UpdateWOSPersonMetrics.WOS_PERSON_METRIC_TYPE)
                                                     .withMetricCount(22)
                                                     .isLast(true).build();
 
             context.restoreAuthSystemState();
 
-            String[] args = new String[] { "update-metrics", "-s", "wos", "-p", "person" };
+            String[] args = new String[] { "update-metrics", "-s", "wos-person" };
             TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
             assertEquals(0, handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin));
 
             CrisMetrics wosMetric = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(context,
-                                                       UpdateWOSMetrics.WOS_PERSON_METRIC_TYPE, itemA.getID());
+                    UpdateWOSPersonMetrics.WOS_PERSON_METRIC_TYPE, itemA.getID());
 
             assertEquals(metric.getId(), wosMetric.getId());
             assertEquals(wosMetric.getMetricCount(), 22, 0);
-            assertEquals(wosMetric.getMetricType(), UpdateWOSMetrics.WOS_PERSON_METRIC_TYPE);
+            assertEquals(wosMetric.getMetricType(), UpdateWOSPersonMetrics.WOS_PERSON_METRIC_TYPE);
         } finally {
             CrisMetricsBuilder.deleteCrisMetrics(itemA);
             wosPersonRestConnector.setHttpClient(originalHttpClient);
@@ -389,23 +390,23 @@ public class UpdateWOSMetricsIT extends AbstractControllerIntegrationTest {
                                .withOrcidIdentifier("0000-0001-8190-0000").build();
 
             CrisMetrics metric = CrisMetricsBuilder.createCrisMetrics(context, itemA)
-                                                    .withMetricType(UpdateWOSMetrics.WOS_PERSON_METRIC_TYPE)
+                                                    .withMetricType(UpdateWOSPersonMetrics.WOS_PERSON_METRIC_TYPE)
                                                     .withMetricCount(22)
                                                     .isLast(true).build();
 
             context.restoreAuthSystemState();
 
-            String[] args = new String[] { "update-metrics", "-s", "wos", "-p", "person" };
+            String[] args = new String[] { "update-metrics", "-s", "wos-person" };
             TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
             assertEquals(0, handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin));
 
             CrisMetrics wosMetric = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(context,
-                                                       UpdateWOSMetrics.WOS_PERSON_METRIC_TYPE, itemA.getID());
+                    UpdateWOSPersonMetrics.WOS_PERSON_METRIC_TYPE, itemA.getID());
 
             assertEquals(metric.getId(), wosMetric.getId());
             assertEquals(wosMetric.getMetricCount(), 22, 0);
-            assertEquals(wosMetric.getMetricType(), UpdateWOSMetrics.WOS_PERSON_METRIC_TYPE);
+            assertEquals(wosMetric.getMetricType(), UpdateWOSPersonMetrics.WOS_PERSON_METRIC_TYPE);
         } finally {
             CrisMetricsBuilder.deleteCrisMetrics(itemA);
             wosPersonRestConnector.setHttpClient(originalHttpClient);

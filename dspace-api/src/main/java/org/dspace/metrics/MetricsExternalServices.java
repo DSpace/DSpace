@@ -6,6 +6,9 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.metrics;
+import java.util.Collections;
+import java.util.List;
+
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
@@ -16,4 +19,8 @@ import org.dspace.core.Context;
 public interface MetricsExternalServices {
 
     public boolean updateMetric(Context context, Item item, String param);
+
+    public default List<String> getFilters() {
+        return Collections.EMPTY_LIST;
+    }
 }

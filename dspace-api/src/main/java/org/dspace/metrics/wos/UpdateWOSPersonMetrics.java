@@ -6,6 +6,7 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.metrics.wos;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,28 +21,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
-public class UpdateWOSMetrics extends AbstractUpdateWOSMetrics {
+public class UpdateWOSPersonMetrics extends AbstractUpdateWOSMetrics {
 
-    private static final Logger log = LogManager.getLogger(UpdateWOSMetrics.class);
+    public static final String WOS_PERSON_METRIC_TYPE = "wosPersonCitation";
 
-    public static final String WOS_METRIC_TYPE = "wosCitation";
+    private static final Logger log = LogManager.getLogger(UpdateWOSPersonMetrics.class);
 
     @Autowired
-    private WOSProvider wosProvider;
+    private WOSPersonRestConnector wosPersonRestConnector;
 
     @Override
     public List<String> getFilters() {
-        return Arrays.asList("relationship.type:Publication", "dc.identifier.doi:*");
+        return Arrays.asList("relationship.type:Person", "person.identifier.orcid:*");
     }
 
     @Override
     public boolean updateMetric(Context context, Item item, String param) {
         CrisMetricDTO metricDTO = new CrisMetricDTO();
-        String doi = itemService.getMetadataFirstValue(item, "dc", "identifier", "doi", Item.ANY);
-        if (StringUtils.isNotBlank(doi)) {
-            metricDTO = wosProvider.getWOSObject(doi);
+        String orcidId = itemService.getMetadataFirstValue(item, "person", "identifier", "orcid", Item.ANY);
+        if (StringUtils.isNotBlank(orcidId)) {
+            try {
+                metricDTO = wosPersonRestConnector.sendRequestToWOS(orcidId);
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            }
         }
         return updateWosMetric(context, item, metricDTO);
     }
-
 }

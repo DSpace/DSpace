@@ -7,7 +7,9 @@
  */
 package org.dspace.metrics.scopus;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
@@ -40,6 +42,11 @@ public class UpdateScopusMetrics implements MetricsExternalServices {
 
     @Autowired
     private CrisMetricsService crisMetricsService;
+
+    @Override
+    public List<String> getFilters() {
+        return Arrays.asList("relationship.type:Publication", "dc.identifier.doi:* OR dc.identifier.pmid:*");
+    }
 
     @Override
     public boolean updateMetric(Context context, Item item, String param) {

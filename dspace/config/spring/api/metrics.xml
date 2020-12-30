@@ -24,6 +24,8 @@
 
     <bean class="org.dspace.metrics.wos.UpdateWOSMetrics"/>
 
+    <bean class="org.dspace.metrics.wos.UpdateWOSPersonMetrics"/>
+
     <!-- Scopus citation count -->
     <bean class="org.dspace.metrics.scopus.ScopusRestConnector">
         <property name="scopusUrl" value="${metrics.scopus.citation-count.url}" />
@@ -36,14 +38,14 @@
 	<bean class="org.dspace.metrics.scopus.UpdateScopusMetrics"/>
 	
 	<!-- Scopus h-index -->
-	<bean class="org.dspace.metrics.scopus.hindex.HindexProvider"/>
+	<bean class="org.dspace.metrics.scopus.ScopusPersonProvider"/>
 
-    <bean class="org.dspace.metrics.scopus.hindex.UpdateHindexMetrics"/>
+    <bean class="org.dspace.metrics.scopus.UpdateScopusPersonMetrics"/>
 
-    <bean class="org.dspace.metrics.scopus.hindex.HindexRestConnector">
-        <property name="url" value="${metrics.scopus.hindex.url}" />
-        <property name="apiKey" value="${metrics.scopus.hindex.apiKey}" />
-        <property name="insttoken" value="${metrics.scopus.hindex.instToken}" />
-        <property name="enhanced" value="${metrics.scopus.hindex.enhanced}" />
+    <bean class="org.dspace.metrics.scopus.ScopusPersonRestConnector">
+        <property name="url" value="${metrics.scopus.person.url}" />
+        <property name="apiKey" value="${metrics.scopus.person.apiKey}" />
+        <property name="insttoken" value="${metrics.scopus.person.instToken}" />
+        <property name="enhanced" value="${metrics.scopus.person.enhanced}" />
     </bean>
 </beans>

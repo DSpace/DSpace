@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.metrics.scopus.hindex;
+package org.dspace.metrics.scopus;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -26,9 +26,9 @@ import org.apache.logging.log4j.Logger;
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
-public class HindexRestConnector {
+public class ScopusPersonRestConnector {
 
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(HindexRestConnector.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ScopusPersonRestConnector.class);
 
     private String url;
     private String apiKey;

@@ -5,9 +5,11 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.metrics.scopus.hindex;
+package org.dspace.metrics.scopus;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import org.apache.commons.lang.StringUtils;
@@ -20,24 +22,17 @@ import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.metrics.MetricsExternalServices;
-import org.dspace.metrics.scopus.CrisMetricDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
-public class UpdateHindexMetrics implements MetricsExternalServices {
+public class UpdateScopusPersonMetrics implements MetricsExternalServices {
 
-    private static Logger log = LogManager.getLogger(UpdateHindexMetrics.class);
-
-    public static final String H_INDEX_METRIC_TYPE = "scopus-author-h-index";
-    public static final String CITED_METRIC_TYPE = "scopus-author-cited-count";
-    public static final String DOCUMENT_METRIC_TYPE = "scopus-author-document-count";
-    public static final String CITATION_METRIC_TYPE = "scopus-author-citation-count";
-    public static final String COAUTHOR_METRIC_TYPE = "scopus-author-coauthor-count";
+    private static Logger log = LogManager.getLogger(UpdateScopusPersonMetrics.class);
 
     @Autowired
-    private HindexProvider hindexProvider;
+    private ScopusPersonProvider hindexProvider;
 
     @Autowired
     private ItemService itemService;
@@ -46,30 +41,36 @@ public class UpdateHindexMetrics implements MetricsExternalServices {
     private CrisMetricsService crisMetricsService;
 
     @Override
-    public boolean updateMetric(Context context, Item item, String param) {
-        CrisMetricDTO metricDTO = null;
-        String authorId = itemService.getMetadataFirstValue(item, "person", "identifier", "scopus-author-id", Item.ANY);
-        if (StringUtils.isNotBlank(authorId)) {
-            metricDTO = hindexProvider.getCrisMetricDTO(authorId, param);
-        }
-        return updateHIndex(context, item, metricDTO);
+    public List<String> getFilters() {
+        return Arrays.asList("relationship.type:Person", "person.identifier.scopus-author-id:*");
     }
 
-    private boolean updateHIndex(Context context, Item currentItem, CrisMetricDTO metricDTO) {
-        try {
-            if (Objects.isNull(metricDTO)) {
-                return false;
+    @Override
+    public boolean updateMetric(Context context, Item item, String param) {
+        List<CrisMetricDTO> metricDTOs = null;
+        String authorId = itemService.getMetadataFirstValue(item, "person", "identifier", "scopus-author-id", Item.ANY);
+        if (StringUtils.isNotBlank(authorId)) {
+            metricDTOs = hindexProvider.getCrisMetricDTOs(authorId, param);
+        }
+        if (Objects.isNull(metricDTOs)) {
+            return false;
+        }
+        for (CrisMetricDTO metricDTO : metricDTOs) {
+            try {
+                if (Objects.isNull(metricDTO)) {
+                    return false;
+                }
+                CrisMetrics scopusMetrics = crisMetricsService.findLastMetricByResourceIdAndMetricsTypes(context,
+                                                               metricDTO.getMetricType(), item.getID());
+                if (!Objects.isNull(scopusMetrics)) {
+                    scopusMetrics.setLast(false);
+                    crisMetricsService.update(context, scopusMetrics);
+                }
+                createNewMetric(context, item, metricDTO);
+            } catch (SQLException | AuthorizeException e) {
+                log.error(e.getMessage(), e);
+                throw new IllegalStateException("Failed to run metric update", e);
             }
-            CrisMetrics scopusMetrics = crisMetricsService.findLastMetricByResourceIdAndMetricsTypes(context,
-                                                           metricDTO.getMetricType(), currentItem.getID());
-            if (!Objects.isNull(scopusMetrics)) {
-                scopusMetrics.setLast(false);
-                crisMetricsService.update(context, scopusMetrics);
-            }
-            createNewMetric(context, currentItem, metricDTO);
-        } catch (SQLException | AuthorizeException e) {
-            log.error(e.getMessage(), e);
-            throw new IllegalStateException("Failed to run metric update", e);
         }
         return true;
     }

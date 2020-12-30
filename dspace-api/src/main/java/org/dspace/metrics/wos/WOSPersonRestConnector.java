@@ -49,16 +49,17 @@ public class WOSPersonRestConnector {
     public CrisMetricDTO sendRequestToWOS(String id)
             throws UnsupportedEncodingException, IOException, ClientProtocolException {
         double total = 0;
-        int record = 1;
-        final int count = 10;
-        int recordsFound = 2;
+        int record = 0;
+        final int count = 100;
+        int recordsFound = -1;
         JSONObject json = null;
         JSONArray records = null;
+        boolean error = false;
         CrisMetricDTO metricDTO = new CrisMetricDTO();
-        while (recordsFound > record) {
-            HttpGet httpPost = new HttpGet(wosUrl.concat("AI=(").concat(id)
-                                                 .concat(")&count=").concat(String.valueOf(count))
-                                                 .concat("&firstRecord=").concat(String.valueOf(record)));
+        while (!error && (recordsFound == -1 || record < recordsFound)) {
+            recordsFound = 0;
+            HttpGet httpPost = new HttpGet(wosUrl.concat("AI=(").concat(id).concat(")&count=")
+                    .concat(String.valueOf(count)).concat("&firstRecord=").concat(String.valueOf(record + 1)));
             httpPost.setHeader("Accept-Encoding", "gzip, deflate, br");
             httpPost.setHeader("Connection", "keep-alive");
             httpPost.setHeader("X-ApiKey", apiKey);
@@ -82,12 +83,17 @@ public class WOSPersonRestConnector {
                               .getJSONArray("REC");
             } catch (JSONException | IOException e) {
                 log.error(e.getMessage(), e);
+                error = true;
             }
-            record += count;
+            record += records.length();
             total += sumMetricCounts(records);
+            if (records.length() < count) {
+                // to be safe in the case the wos api would return less records than what initially reported
+                break;
+            }
         }
         metricDTO.setMetricCount(total);
-        metricDTO.setMetricType(UpdateWOSMetrics.WOS_PERSON_METRIC_TYPE);
+        metricDTO.setMetricType(UpdateWOSPersonMetrics.WOS_PERSON_METRIC_TYPE);
         return metricDTO;
     }
 
