@@ -33,10 +33,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.Entity;
+import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.EntityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -61,6 +64,7 @@ public class GenerateSitemaps {
     private static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     private static final ConfigurationService configurationService =
         DSpaceServicesFactory.getInstance().getConfigurationService();
+    private static final EntityService entityService = ContentServiceFactory.getInstance().getEntityService();
 
     /**
      * Default constructor
@@ -237,7 +241,15 @@ public class GenerateSitemaps {
 
         while (allItems.hasNext()) {
             Item i = allItems.next();
-            String url = uiURLStem + "/items/" + i.getID();
+            Entity entity = entityService.findByItemId(c, i.getID());
+            EntityType entityType = entityService.getType(c, entity);
+
+            String url;
+            if (entityType != null) {
+                url = uiURLStem + "/entities/" + entityType.getLabel() + "/" + i.getID();
+            } else {
+                url = uiURLStem + "/items/" + i.getID();
+            }
             Date lastMod = i.getLastModified();
 
             if (makeHTMLMap) {
