@@ -10,6 +10,7 @@ package org.dspace.importer.external.scopus.service;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -63,7 +64,7 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     int itemPerPage = 25;
 
-    private static final String ENDPOINT_SEARCH_SCOPUS = "http://api.elsevier.com/content/search/scopus";
+    private static final String ENDPOINT_SEARCH_SCOPUS = "https://api.elsevier.com/content/search/scopus";
 
     /**
      * Initialize the class
@@ -151,10 +152,10 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
         @Override
         public Integer call() throws Exception {
-            List<ImportRecord> results = new ArrayList<>();
             String proxyHost = configurationService.getProperty("http.proxy.host");
             String proxyPort = configurationService.getProperty("http.proxy.port");
             String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
+            String instKey = configurationService.getProperty("submission.lookup.scopus.instkey");
             if (apiKey != null && !apiKey.equals("")) {
                 HttpGet method = null;
                 try {
@@ -172,7 +173,8 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
                     HttpClient client = hcBuilder.build();
                     // open session
                     method = new HttpGet(
-                        ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey=" + apiKey + query);
+                        ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey=" + apiKey +
+                        (instKey != null ? "&insttoken=" + instKey : "") + "&query=" + query);
                     method.setConfig(requestConfigBuilder.build());
                         // Execute the method.
                     HttpResponse httpResponse = client.execute(method);
@@ -223,6 +225,7 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
             String proxyHost = configurationService.getProperty("http.proxy.host");
             String proxyPort = configurationService.getProperty("http.proxy.port");
             String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
+            String instKey = configurationService.getProperty("submission.lookup.scopus.instkey");
             if (apiKey != null && !apiKey.equals("")) {
                 HttpGet method = null;
                 try {
@@ -241,6 +244,7 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
                     // open session
                     method = new HttpGet(
                         ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey=" + apiKey +
+                            (instKey != null ? "&insttoken=" + instKey : "") +
                             "&view=COMPLETE&query=" + URLEncoder
                             .encode(queryString));
                     method.setConfig(requestConfigBuilder.build());
@@ -322,7 +326,7 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
             String proxyHost = configurationService.getProperty("http.proxy.host");
             String proxyPort = configurationService.getProperty("http.proxy.port");
             String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
-
+            String instKey = configurationService.getProperty("submission.lookup.scopus.instkey");
             if (apiKey != null && !apiKey.equals("")) {
                 HttpGet method = null;
                 try {
@@ -341,6 +345,7 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
                     // open session
                     method = new HttpGet(
                         ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey=" + apiKey +
+                            (instKey != null ? "&insttoken=" + instKey : "") +
                             "&view=COMPLETE&start=" + start + "&count=" + count + "&query=" + URLEncoder
                             .encode(queryString));
                     method.setConfig(requestConfigBuilder.build());
@@ -399,7 +404,7 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
             String proxyHost = configurationService.getProperty("http.proxy.host");
             String proxyPort = configurationService.getProperty("http.proxy.port");
             String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
-
+            String instKey = configurationService.getProperty("submission.lookup.scopus.instkey");
             if (apiKey != null && !apiKey.equals("")) {
                 HttpGet method = null;
                 try {
@@ -416,9 +421,10 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
                     HttpClient client = hcBuilder.build();
                     // open session
-                    method = new HttpGet(
-                        ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey=" + apiKey +
-                            "&start=" + (start != null ? start : 0) + "&count=" + (count != null ? count : 20) +
+                    method = new HttpGet(ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey=" +
+                             apiKey + (instKey != null ? "&insttoken=" + instKey : "") +
+                            "&view=COMPLETE&start=" + (start != null ? start : 0) +
+                            "&count=" + (count != null ? count : 20) +
                             "&query=" + URLEncoder.encode(queryString));
                     method.setConfig(requestConfigBuilder.build());
                         // Execute the method.
@@ -429,7 +435,7 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
                                                            + statusCode);
                     }
                     InputStream is = httpResponse.getEntity().getContent();
-                    String response = IOUtils.toString(is, Charsets.UTF_8);
+                    String response = IOUtils.toString(is, Charset.defaultCharset());
                     List<OMElement> omElements = splitToRecords(response);
                     for (OMElement record : omElements) {
                         results.add(transformSourceRecords(record));
