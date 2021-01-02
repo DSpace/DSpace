@@ -66,9 +66,6 @@ public class CrisLayoutMetric2BoxServiceImpl implements CrisLayoutMetric2BoxServ
 
     @Override
     public CrisLayoutBox addMetrics(Context context, CrisLayoutBox box, List<String> metrics) throws SQLException {
-        for (CrisLayoutMetric2Box m2b : box.getMetric2box()) {
-            dao.delete(context, m2b);
-        }
         box.getMetric2box().clear();
         this.createMetrics(context, box, metrics, 0);
         return box;

@@ -144,7 +144,7 @@ public class MetricsComponentsRestControllerIT extends AbstractControllerIntegra
                 .andExpect(jsonPath("$", Matchers.allOf(
                         hasJsonPath("$.id", is(box.getID())), // now the configuration id is a number (box id)
                         hasJsonPath("$.type", is("boxmetricsconfiguration")),
-                        hasJsonPath("$.metrics[0]", is("metric3")),
+                        hasJsonPath("$.metrics[0]", is("metric2")),
                         hasJsonPath("$.metrics[1]", is("metric4"))
                        )));
 

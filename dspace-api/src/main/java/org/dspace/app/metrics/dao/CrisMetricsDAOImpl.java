@@ -76,15 +76,6 @@ public class CrisMetricsDAOImpl extends AbstractHibernateDAO<CrisMetrics> implem
     }
 
     @Override
-    public void delete(Context context, CrisMetrics csrisMetrics) throws SQLException {
-        String stringQuery = "delete from CrisMetrics "
-                           + "WHERE id =:cris_metrics";
-        Query query = createQuery(context, stringQuery);
-        query.setParameter("cris_metrics", csrisMetrics.getId());
-        query.executeUpdate();
-    }
-
-    @Override
     public CrisMetrics findLastMetricByResourceIdAndMetricsTypes(Context context, String metricType, UUID resourceUuid)
            throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);

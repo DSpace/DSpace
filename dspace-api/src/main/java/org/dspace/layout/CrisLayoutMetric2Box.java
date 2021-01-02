@@ -9,12 +9,14 @@ package org.dspace.layout;
 
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapsId;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -32,11 +34,17 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
 public class CrisLayoutMetric2Box {
 
-    @EmbeddedId
-    private CrisLayoutMetric2BoxId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cris_layout_metric2box_id_seq")
+    @SequenceGenerator(name = "cris_layout_metric2box_seq", sequenceName = "cris_layout_metric2box_seq",
+        allocationSize = 1)
+    @Column(name = "id", unique = true, nullable = false, insertable = true, updatable = false)
+    private Integer id;
+
+    @Column(name = "metric_type")
+    private String type;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("id.crisLayoutBoxId")
     @JoinColumn(name = "cris_layout_box_id")
     private CrisLayoutBox box;
 
@@ -48,14 +56,14 @@ public class CrisLayoutMetric2Box {
     public CrisLayoutMetric2Box(CrisLayoutBox box, String type, int position) {
         this.box = box;
         this.position = position;
-        this.id = new CrisLayoutMetric2BoxId(box.getID(), type);
+        this.type = type;
     }
 
-    public CrisLayoutMetric2BoxId getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(CrisLayoutMetric2BoxId id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -106,12 +114,11 @@ public class CrisLayoutMetric2Box {
     }
 
     public String getType() {
-        return id.getCrisLayoutMetricId();
+        return type;
     }
 
     public void setType(String type) {
-        this.id.setCrisLayoutMetricId(type);
+        this.type = type;
     }
-
 
 }
