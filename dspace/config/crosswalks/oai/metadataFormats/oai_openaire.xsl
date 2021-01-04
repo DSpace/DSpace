@@ -526,19 +526,30 @@
    <!-- datacite:rights -->
    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_accessrights.html -->
     <xsl:template match="doc:element[@name='dc']/doc:element[@name='rights']/doc:element" mode="datacite">
+        <xsl:variable name="rightsValue" select="doc:field[@name='value']/text()"/>
         <xsl:variable name="rightsURI">
             <xsl:call-template name="resolveRightsURI">
-                <xsl:with-param name="field" select="doc:field[@name='value']/text()"/>
+                <xsl:with-param name="field" select="$rightsValue"/>
             </xsl:call-template>
         </xsl:variable>
-        <datacite:rights>
-            <xsl:if test="$rightsURI">
-                <xsl:attribute name="rightsURI">
-                <xsl:value-of select="$rightsURI"/>
-            </xsl:attribute>
-            </xsl:if>
-            <xsl:value-of select="doc:field[@name='value']/text()"/>
-        </datacite:rights>
+		<xsl:variable name="lc_rightsValue">
+		    <xsl:call-template name="lowercase">
+                <xsl:with-param name="value" select="$rightsValue"/>
+            </xsl:call-template>
+        </xsl:variable>
+		<!-- this conditions ensures what is referred in issue: #3097 -->
+		<!-- it's a solution to ensure that only values ended with "access" -->
+		<!-- can be used as datacite:rights -->		
+        <xsl:if test="ends-with($lc_rightsValue,'access')">
+            <datacite:rights>
+                <xsl:if test="$rightsURI">
+                    <xsl:attribute name="rightsURI">
+                    <xsl:value-of select="$rightsURI"/>
+                </xsl:attribute>
+                </xsl:if>
+                <xsl:value-of select="$rightsValue"/>
+            </datacite:rights>
+        </xsl:if>
     </xsl:template>
 
 
