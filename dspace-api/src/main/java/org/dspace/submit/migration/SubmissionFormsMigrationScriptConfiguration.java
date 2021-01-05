@@ -7,60 +7,19 @@
  */
 package org.dspace.submit.migration;
 
-import java.sql.SQLException;
-
-import org.apache.commons.cli.Options;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
-import org.dspace.scripts.configuration.ScriptConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * The {@link ScriptConfiguration} for the {@link SubmissionFormsMigration} script
+ * Subclass of {@link SubmissionFormsMigrationCliScriptConfiguration} to be use in rest/scripts.xml configuration so
+ * this script is not runnable from REST
  *
- * @author Maria Verdonck (Atmire) on 13/11/2020
+ * @author Maria Verdonck (Atmire) on 05/01/2021
  */
-public class SubmissionFormsMigrationScriptConfiguration<T extends SubmissionFormsMigration>
-    extends ScriptConfiguration<T> {
-
-    @Autowired
-    private AuthorizeService authorizeService;
-
-    private Class<T> dspaceRunnableClass;
-
-    @Override
-    public Class<T> getDspaceRunnableClass() {
-        return this.dspaceRunnableClass;
-    }
-
-    @Override
-    public void setDspaceRunnableClass(Class<T> dspaceRunnableClass) {
-        this.dspaceRunnableClass = dspaceRunnableClass;
-    }
+public class SubmissionFormsMigrationScriptConfiguration extends SubmissionFormsMigrationCliScriptConfiguration {
 
     @Override
     public boolean isAllowedToExecute(Context context) {
-        try {
-            return authorizeService.isAdmin(context);
-        } catch (SQLException e) {
-            throw new RuntimeException("SQLException occurred when checking if the current user is an admin", e);
-        }
-    }
-
-    @Override
-    public Options getOptions() {
-        if (options == null) {
-            Options options = new Options();
-
-            options.addOption("f", "input-forms", true, "Path to source input-forms.xml file location");
-            options.getOption("f").setType(String.class);
-            options.addOption("s", "item-submission", true, "Path to source item-submission.xml file location");
-            options.getOption("s").setType(String.class);
-            options.addOption("h", "help", false, "help");
-            options.getOption("h").setType(boolean.class);
-
-            super.options = options;
-        }
-        return options;
+        // Script is not allowed to be executed from REST side
+        return false;
     }
 }
