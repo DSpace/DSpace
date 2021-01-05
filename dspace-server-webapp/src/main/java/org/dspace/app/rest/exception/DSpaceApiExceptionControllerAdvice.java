@@ -98,6 +98,14 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                 HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
+    @ExceptionHandler(RESTEmptyWorkflowGroupException.class)
+    protected void handleEmptyWorkflowGroupException(HttpServletRequest request, HttpServletResponse response,
+                                                     Exception ex) throws IOException {
+        sendErrorResponse(
+            request, response, null, ex.getLocalizedMessage(), HttpStatus.UNPROCESSABLE_ENTITY.value()
+        );
+    }
+
     @ExceptionHandler(QueryMethodParameterConversionException.class)
     protected void ParameterConversionException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {

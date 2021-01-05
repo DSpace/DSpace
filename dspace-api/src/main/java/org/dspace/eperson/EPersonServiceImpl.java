@@ -283,9 +283,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         for (Group group: workFlowGroups) {
             List<EPerson> ePeople = groupService.allMembers(context, group);
             if (ePeople.size() == 1 && ePeople.contains(ePerson)) {
-                throw new IllegalStateException(
-                    "Refused to delete user " + ePerson.getID() + " because it the only member of the workflow group"
-                    + group.getID() + ". Delete the tasks and group first if you want to remove this user.");
+                throw new EmptyWorkflowGroupException(ePerson.getID(), group.getID());
             }
         }
         // check for presence of eperson in tables that
