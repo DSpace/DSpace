@@ -383,6 +383,12 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
                                                 .withMetricCount(4501)
                                                 .isLast(true).build();
 
+        CrisMetrics metric3 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
+                .withAcquisitionDate(date)
+                .withMetricType("wosCitation")
+                // without a metric count "null"
+                .isLast(true).build();
+
         context.restoreAuthSystemState();
 
         String[] args = new String[] {"update-metrics-in-solr"};
@@ -399,11 +405,12 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
                                .andExpect(status().isOk())
                                .andExpect(jsonPath("$._embedded.metrics", Matchers.containsInAnyOrder(
                                           CrisMetricsMatcher.matchCrisMetrics(metric),
-                                          CrisMetricsMatcher.matchCrisMetrics(metric2)
+                                          CrisMetricsMatcher.matchCrisMetrics(metric2),
+                                          CrisMetricsMatcher.matchCrisMetrics(metric3)
                                           )))
                                .andExpect(jsonPath("$._links.self.href",
                                    Matchers.containsString("api/core/items/" + itemA.getID() + "/metrics")))
-                               .andExpect(jsonPath("$.page.totalElements", is(2)));
+                               .andExpect(jsonPath("$.page.totalElements", is(3)));
     }
 
     @Test
@@ -429,8 +436,8 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
 
         context.restoreAuthSystemState();
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(delete("/api/core/items/" + itemA.getID()))
-                             .andExpect(status().is(204));
+        getClient(tokenAdmin).perform(delete("/api/core/items/" + itemA.getID())).andExpect(status().isNoContent());
+        getClient(tokenAdmin).perform(get("/api/core/items/" + itemA.getID())).andExpect(status().isNotFound());
     }
 
 }

@@ -36,7 +36,7 @@ public class CrisLayoutMetric2Box {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cris_layout_metric2box_id_seq")
-    @SequenceGenerator(name = "cris_layout_metric2box_seq", sequenceName = "cris_layout_metric2box_seq",
+    @SequenceGenerator(name = "cris_layout_metric2box_id_seq", sequenceName = "cris_layout_metric2box_id_seq",
         allocationSize = 1)
     @Column(name = "id", unique = true, nullable = false, insertable = true, updatable = false)
     private Integer id;
