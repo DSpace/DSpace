@@ -75,7 +75,7 @@
         <tr>
             <td><strong><%= HAL.truncateIfUrl(rel) %></strong></td>
             <td><%= link.title || '' %></td>
-            <td><%= link.name ? 'name: ' + link.name : 'index: ' + i %></a></td>
+            <td><%= link.name ? 'name: ' + link.name : 'index: ' + i %></td>
             <td>
                 <% if (HAL.isUrl(rel)) { %>
                 <a class="dox" href="<%= HAL.normalizeUrl(HAL.buildUrl(rel)) %>"><i class="icon-book"></i></a>
@@ -250,6 +250,7 @@ Content-Type: application/json
     </div>
 </script>
 
+<!-- Customized (to use WebJars) for DSpace -->
 <script src="webjars/jquery/dist/jquery.min.js"></script>
 <script src="browser/vendor/js/underscore.js"></script>
 <script src="browser/vendor/js/backbone.js"></script>
@@ -260,6 +261,7 @@ Content-Type: application/json
 <script src="browser/js/hal.js"></script>
 <script src="browser/js/hal/browser.js"></script>
 
+<!-- Customized for DSpace -->
 <script src="js/hal/http/client.js"></script>
 <script src="browser/js/hal/resource.js"></script>
 

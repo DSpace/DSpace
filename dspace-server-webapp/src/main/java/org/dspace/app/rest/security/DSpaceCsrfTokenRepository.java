@@ -30,9 +30,9 @@ import org.springframework.web.util.WebUtils;
  *
  * How it works:
  *
- *  1. Backend generates XSRF token & stores in a *server-side* cookie named DSPACE-XSRF-COOKIE. This cookie is
- *     only readable to clients on the same domain. But, it is returned (by user's browser) on every subsequent request
- *     to backend. See "saveToken()" method below.
+ *  1. Backend generates XSRF token & stores in a *server-side* cookie named DSPACE-XSRF-COOKIE. By default, this cookie
+ *     is not readable to JS clients (HttpOnly=true). But, it is returned (by user's browser) on every subsequent
+ *     request to backend. See "saveToken()" method below.
  *  2. At the same time, backend also sends the generated XSRF token in a header named DSPACE-XSRF-TOKEN to client.
  *     See "saveToken()" method below.
  *  3. Client MUST look for DSPACE-XSRF-TOKEN header in a response from backend. If found, the client MUST store/save
@@ -147,14 +147,6 @@ public class DSpaceCsrfTokenRepository implements CsrfTokenRepository {
         if (!StringUtils.hasLength(token)) {
             return null;
         }
-
-        // Second, verify either the header or param has been sent. This is a customization for DSpace.
-        // Because the server-side cookie is ALWAYS sent back, we need to verify the client has also sent the token in
-        // some other way. This ensures that we only *change* the Token when it has been used or attempted to be used.
-        //if (!StringUtils.hasLength(request.getHeader(this.headerName)) &&
-        //    !StringUtils.hasLength(request.getParameter(this.parameterName))) {
-        //    return null;
-        // }
 
         // If we got here, we know a token exists in the cookie and *either* the header or the parameter.
         // So, this just sends the token info back so that it can be validated by Spring Security.
