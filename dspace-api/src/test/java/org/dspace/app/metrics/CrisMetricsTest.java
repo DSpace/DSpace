@@ -72,14 +72,14 @@ public class CrisMetricsTest extends AbstractUnitTest {
             item = wsi.getItem();
             metrics1 = crisMetricsService.create(context, item);
             metrics1.setMetricType("Citation");
-            metrics1.setMetricCount(5);
+            metrics1.setMetricCount(Double.valueOf(5));
             metrics1.setLast(true);
 
             wsi2 = workspaceItemService.create(context, collection, false);
             item2 = wsi2.getItem();
             metrics2 = crisMetricsService.create(context, item2);
             metrics2.setMetricType("SomeMeticsType");
-            metrics2.setMetricCount(2);
+            metrics2.setMetricCount(Double.valueOf(2));
             metrics2.setLast(false);
 
             metrics3 = crisMetricsService.create(context, item2);
@@ -100,14 +100,17 @@ public class CrisMetricsTest extends AbstractUnitTest {
         try {
             context.turnOffAuthorisationSystem();
             if (metrics1 != null) {
+                metrics1 = context.reloadEntity(metrics1);
                 crisMetricsService.delete(context, metrics1);
                 metrics1 = null;
             }
             if (metrics2 != null) {
+                metrics2 = context.reloadEntity(metrics2);
                 crisMetricsService.delete(context, metrics2);
                 metrics2 = null;
             }
             if (metrics3 != null) {
+                metrics3 = context.reloadEntity(metrics3);
                 crisMetricsService.delete(context, metrics3);
                 metrics3 = null;
             }
@@ -150,7 +153,7 @@ public class CrisMetricsTest extends AbstractUnitTest {
         assertNotNull(crisMetrics2);
         assertTrue(crisMetrics2.getLast());
         assertEquals(metrics3.getMetricType(), crisMetrics2.getMetricType());
-        assertEquals(metrics3.getMetricCount(), crisMetrics2.getMetricCount(), 0);
+        assertNull(crisMetrics2.getMetricCount());
         assertEquals(metrics3.getLast(), crisMetrics2.getLast());
     }
 

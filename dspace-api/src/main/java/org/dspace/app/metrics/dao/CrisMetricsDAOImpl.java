@@ -27,6 +27,9 @@ import org.dspace.core.Context;
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
 public class CrisMetricsDAOImpl extends AbstractHibernateDAO<CrisMetrics> implements CrisMetricsDAO {
+    protected CrisMetricsDAOImpl() {
+        super();
+    }
 
     @Override
     public List<CrisMetrics> findAll(Context context, Integer limit, Integer offset) throws SQLException {

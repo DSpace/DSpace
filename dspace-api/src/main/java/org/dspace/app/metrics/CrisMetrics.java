@@ -37,7 +37,7 @@ public class CrisMetrics  implements ReloadableEntity<Integer> {
 
     private String metricType;
 
-    private double metricCount;
+    private Double metricCount;
 
     private Date acquisitionDate;
 
@@ -76,11 +76,11 @@ public class CrisMetrics  implements ReloadableEntity<Integer> {
         this.metricType = metricType;
     }
 
-    public double getMetricCount() {
+    public Double getMetricCount() {
         return metricCount;
     }
 
-    public void setMetricCount(double metricCount) {
+    public void setMetricCount(Double metricCount) {
         this.metricCount = metricCount;
     }
 

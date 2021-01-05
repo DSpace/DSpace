@@ -82,7 +82,7 @@ public class ItemMetricsLinkRepository extends AbstractDSpaceRestRepository
     private CrisMetrics fillMetricsObject(Context context, SolrDocument document, String field, String metricType) {
         CrisMetrics metricToFill = new CrisMetrics();
         int metricId = (int) document.getFieldValue("metric.id.".concat(metricType));
-        Float metricCount = (Float) document.getFieldValue("metric.".concat(metricType));
+        Double metricCount = (Double) document.getFieldValue("metric.".concat(metricType));
         Date acquisitionDate = (Date) document.getFieldValue("metric.acquisitionDate.".concat(metricType));
         String remark = (String) document.getFieldValue("metric.remark.".concat(metricType));
         Double deltaPeriod1 = (Double) document.getFieldValue("metric.deltaPeriod1.".concat(metricType));
