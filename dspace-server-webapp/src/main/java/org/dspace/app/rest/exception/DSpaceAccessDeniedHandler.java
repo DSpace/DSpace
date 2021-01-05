@@ -19,7 +19,14 @@ import org.springframework.security.web.csrf.MissingCsrfTokenException;
 import org.springframework.stereotype.Component;
 
 /**
- * This Handler customizes behavior of AccessDeniedException errors thrown by Spring Security/Boot
+ * This Handler customizes behavior of AccessDeniedException errors thrown by Spring Security/Boot.
+ * <P>
+ * More specifically, we use this Handler to ensure exceptions related to CSRF Tokens are also sent to our
+ * DSpaceApiExceptionControllerAdvice class, which manages all exceptions for the DSpace backend. Without this
+ * handler, those CSRF exceptions are managed by Spring Security/Boot *before* DSpaceApiExceptionControllerAdvice
+ * is triggered.
+ *
+ * @see DSpaceApiExceptionControllerAdvice
  */
 @Component
 public class DSpaceAccessDeniedHandler implements AccessDeniedHandler {
