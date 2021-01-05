@@ -8,6 +8,10 @@
 package org.dspace.submit.migration;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -18,6 +22,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
@@ -47,6 +52,15 @@ public class SubmissionFormsMigration extends DSpaceRunnable<SubmissionFormsMigr
     private static final String PATH_OUT_INPUT_FORMS = PATH_OUT_CONFIG + File.separator + "submission-forms.xml";
     private static final String PATH_OUT_ITEM_SUBMISSION = PATH_OUT_CONFIG + File.separator + "item-submission.xml";
 
+    private static final String NAME_DTD_INPUT_FORMS = "input-forms.dtd";
+    private static final String NAME_DTD_ITEM_SUBMISSION = "item-submission.dtd";
+    private static final String CONTENT_DTD_ITEM_SUBMISSION_DUMMY =
+        "<!ELEMENT item-submission (submission-map, step-definitions, submission-definitions) >";
+    private static final String CONTENT_DTD_INPUT_FORMS_DUMMY =
+        "<!ELEMENT input-forms (form-map, form-definitions, form-value-pairs) >";
+    private File inputFormsDummyDTDTemp;
+    private File itemSubmissionDummyDTDTemp;
+
     /**
      * We need to force this, because some dependency elsewhere interferes.
      */
@@ -65,6 +79,7 @@ public class SubmissionFormsMigration extends DSpaceRunnable<SubmissionFormsMigr
         if (this.itemSubmissionsFilePath != null) {
             this.transform(itemSubmissionsFilePath, PATH_XSL_ITEM_SUBMISSION, PATH_OUT_ITEM_SUBMISSION);
         }
+        deleteDTDFileDummies();
     }
 
     /**
@@ -120,6 +135,49 @@ public class SubmissionFormsMigration extends DSpaceRunnable<SubmissionFormsMigr
         if (!commandLine.hasOption('s') || !commandLine.hasOption('f')) {
             this.throwParseException("Please fill in both -f <source-input-forms-path> and -s " +
                                      "<source-item-submissions-path>");
+        }
+        createDTDFileDummiesIfNotPresent();
+    }
+
+    private void createDTDFileDummiesIfNotPresent() {
+        // Create temporary dummy item-submission.dtd in directory of input item-submission.xml if not present
+        String itemSubmissionDir = StringUtils.substringBeforeLast(itemSubmissionsFilePath, File.separator);
+        File itemSubmissionDTD = new File (itemSubmissionDir + File.separator + NAME_DTD_ITEM_SUBMISSION);
+        if (!itemSubmissionDTD.isFile()) {
+            itemSubmissionDummyDTDTemp = itemSubmissionDTD;
+
+            Path path = Paths.get(itemSubmissionDir + File.separator + NAME_DTD_ITEM_SUBMISSION);
+            byte[] strToBytes = CONTENT_DTD_ITEM_SUBMISSION_DUMMY.getBytes();
+
+            try {
+                Files.write(path, strToBytes);
+            } catch (IOException e) {
+                handler.logError("Error trying to create dummy " + NAME_DTD_ITEM_SUBMISSION);
+            }
+        }
+        // Create temporary dummy input-forms.dtd in directory of input input-forms.xml if not present
+        String inputFormsDir = StringUtils.substringBeforeLast(inputFormsFilePath, File.separator);
+        File inputFormsDTD = new File (inputFormsDir + File.separator + NAME_DTD_INPUT_FORMS);
+        if (!inputFormsDTD.isFile()) {
+            inputFormsDummyDTDTemp = inputFormsDTD;
+
+            Path path = Paths.get(inputFormsDir + File.separator + NAME_DTD_INPUT_FORMS);
+            byte[] strToBytes = CONTENT_DTD_INPUT_FORMS_DUMMY.getBytes();
+
+            try {
+                Files.write(path, strToBytes);
+            } catch (IOException e) {
+                handler.logError("Error trying to create dummy " + NAME_DTD_INPUT_FORMS);
+            }
+        }
+    }
+
+    private void deleteDTDFileDummies() {
+        if (itemSubmissionDummyDTDTemp != null) {
+            itemSubmissionDummyDTDTemp.delete();
+        }
+        if (inputFormsDummyDTDTemp != null) {
+            inputFormsDummyDTDTemp.delete();
         }
     }
 
