@@ -58,6 +58,7 @@ public class ItemRest extends DSpaceObjectRest {
     private boolean discoverable = false;
     private boolean withdrawn = false;
     private Date lastModified = new Date();
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String entityType = null;
 
     @Override
@@ -108,8 +109,6 @@ public class ItemRest extends DSpaceObjectRest {
     }
 
     public void setEntityType(String entityType) {
-        if (this.entityType == null) {
-            this.entityType = entityType;
-        }
+        this.entityType = entityType;
     }
 }
