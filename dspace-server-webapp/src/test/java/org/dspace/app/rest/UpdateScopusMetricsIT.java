@@ -6,21 +6,23 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest;
+
 import static org.dspace.app.launcher.ScriptLauncher.handleScript;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.FileInputStream;
-import java.io.InputStream;
 import java.nio.charset.Charset;
 
 import com.amazonaws.util.StringInputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.ProtocolVersion;
-import org.apache.http.client.HttpClient;
+import org.apache.http.StatusLine;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.entity.BasicHttpEntity;
-import org.apache.http.message.BasicHttpResponse;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.metrics.CrisMetrics;
 import org.dspace.app.metrics.service.CrisMetricsService;
@@ -42,6 +44,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  *
  * @author Mykhaylo Boychuk - 4Science
+ * @author Corrado Lombardi (corrado.lombardi at 4science.it)
  */
 public class UpdateScopusMetricsIT extends AbstractControllerIntegrationTest {
 
@@ -55,23 +58,24 @@ public class UpdateScopusMetricsIT extends AbstractControllerIntegrationTest {
     public void updateCrisMetricsMockitoTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        HttpClient originalHttpClient = scopusRestConnector.getHttpClient();
-        HttpClient httpClient = Mockito.mock(HttpClient.class);
+        CloseableHttpClient originalHttpClient = scopusRestConnector.getHttpClient();
+        CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
         Item itemA = null;
         try (FileInputStream file = new FileInputStream(testProps.get("test.scopusMetricsXML").toString())) {
 
             String xmlMetricsExample = IOUtils.toString(file, Charset.defaultCharset());
             scopusRestConnector.setHttpClient(httpClient);
 
-            BasicHttpResponse basicHttpResponse = new BasicHttpResponse(new ProtocolVersion("http", 1, 1), 200, "OK");
-            basicHttpResponse.setEntity(new BasicHttpEntity());
-            InputStream inputStream = new StringInputStream(xmlMetricsExample);
             BasicHttpEntity basicHttpEntity = new BasicHttpEntity();
-            basicHttpResponse.setEntity(basicHttpEntity);
             basicHttpEntity.setChunked(true);
-            basicHttpEntity.setContent(inputStream);
+            basicHttpEntity.setContent(new StringInputStream(xmlMetricsExample));
 
-            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(basicHttpResponse);
+            CloseableHttpResponse response = mock(CloseableHttpResponse.class);
+            when(response.getStatusLine())
+                .thenReturn(statusLine(new ProtocolVersion("http", 1, 1), 200, "OK"));
+            when(response.getEntity()).thenReturn(basicHttpEntity);
+
+            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
             parentCommunity = CommunityBuilder.createCommunity(context)
                                               .withName("Parent Community").build();
 
@@ -118,23 +122,23 @@ public class UpdateScopusMetricsIT extends AbstractControllerIntegrationTest {
     public void updateCrisMetricsIdNotExistMockitoTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        HttpClient originalHttpClient = scopusRestConnector.getHttpClient();
-        HttpClient httpClient = Mockito.mock(HttpClient.class);
+        CloseableHttpClient originalHttpClient = scopusRestConnector.getHttpClient();
+        CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
         Item itemA = null;
         try (FileInputStream file = new FileInputStream(testProps.get("test.scopusMetricsNotExistXML").toString())) {
 
             String xmlMetricsExample = IOUtils.toString(file, Charset.defaultCharset());
             scopusRestConnector.setHttpClient(httpClient);
 
-            BasicHttpResponse basicHttpResponse = new BasicHttpResponse(new ProtocolVersion("http", 1, 1), 200, "OK");
-            basicHttpResponse.setEntity(new BasicHttpEntity());
-            InputStream inputStream = new StringInputStream(xmlMetricsExample);
             BasicHttpEntity basicHttpEntity = new BasicHttpEntity();
-            basicHttpResponse.setEntity(basicHttpEntity);
             basicHttpEntity.setChunked(true);
-            basicHttpEntity.setContent(inputStream);
+            basicHttpEntity.setContent(new StringInputStream(xmlMetricsExample));
 
-            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(basicHttpResponse);
+            CloseableHttpResponse response = mock(CloseableHttpResponse.class);
+            when(response.getStatusLine())
+                .thenReturn(statusLine(new ProtocolVersion("http", 1, 1), 200, "OK"));
+
+            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
 
             parentCommunity = CommunityBuilder.createCommunity(context)
                                               .withName("Parent Community").build();
@@ -162,5 +166,24 @@ public class UpdateScopusMetricsIT extends AbstractControllerIntegrationTest {
         } finally {
             scopusRestConnector.setHttpClient(originalHttpClient);
         }
+    }
+
+    private StatusLine statusLine(final ProtocolVersion protocolVersion, int statusCode, String reason) {
+        return new StatusLine() {
+            @Override
+            public ProtocolVersion getProtocolVersion() {
+                return protocolVersion;
+            }
+
+            @Override
+            public int getStatusCode() {
+                return statusCode;
+            }
+
+            @Override
+            public String getReasonPhrase() {
+                return reason;
+            }
+        };
     }
 }

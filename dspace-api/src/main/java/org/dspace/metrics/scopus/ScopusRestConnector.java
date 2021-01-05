@@ -7,73 +7,79 @@
  */
 package org.dspace.metrics.scopus;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import javax.annotation.PostConstruct;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
-import org.apache.http.HttpResponse;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.logging.log4j.Logger;
 
 /**
  * This class deals with logic management to connect to the SCOPUS external service
- * 
+ * Used {@link CloseableHttpClient} can be injected. i.e. for testing purposes.
+ * Please note that {@link CloseableHttpClient} instance connection is eventually closed after performing operation.
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
+ * @author Corrado Lombardi (corrado.lombardi at 4science.it)
  */
 public class ScopusRestConnector {
 
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ScopusRestConnector.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ScopusRestConnector.class);
 
     private String apiKey;
     private String insttoken;
     private String scopusUrl;
 
-    private HttpClient httpClient;
+    private CloseableHttpClient httpClient;
 
-    @PostConstruct
-    private void setup() {
-        this.httpClient = HttpClientBuilder.create()
-            .setConnectionManager(new PoolingHttpClientConnectionManager())
-            .build();
-    }
 
-    public InputStream get(String id) {
+    public String get(String id) {
         try {
-            return sendRequestToSunedu(id);
+            return sendRequestToScopus(id);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }
 
-    private InputStream sendRequestToSunedu(String id)
-            throws UnsupportedEncodingException, IOException, ClientProtocolException {
-        HttpPost httpPost = new HttpPost(scopusUrl.concat(id));
-        httpPost.setHeader("Accept-Encoding", "gzip, deflate, br");
-        httpPost.setHeader("Connection", "keep-alive");
-        httpPost.setHeader("X-ELS-APIKey", apiKey);
-        httpPost.setHeader("X-ELS-Insttoken", insttoken);
-        httpPost.setHeader("Accept", "application/xml");
+    private String sendRequestToScopus(String id)
+            throws IOException {
+        try (CloseableHttpClient httpClient = Optional.ofNullable(this.httpClient)
+            .orElseGet(HttpClients::createDefault)) {
 
-        HttpResponse response = httpClient.execute(httpPost);
-        int statusCode = response.getStatusLine().getStatusCode();
-        if (statusCode != HttpStatus.SC_OK) {
-            log.error("Error connecting to server! The Server responce with: " + statusCode);
-            throw new RuntimeException();
+            HttpGet httpGet = new HttpGet(scopusUrl + id);
+            httpGet.setHeader("Accept-Encoding", "gzip, deflate, br");
+            httpGet.setHeader("Connection", "keep-alive");
+            httpGet.setHeader("X-ELS-APIKey", apiKey);
+            httpGet.setHeader("X-ELS-Insttoken", insttoken);
+            httpGet.setHeader("Accept", "application/xml");
+
+            try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
+                int statusCode = response.getStatusLine().getStatusCode();
+                if (statusCode != HttpStatus.SC_OK) {
+                    log.error("Error connecting to server! The Server answered with: " + statusCode);
+                    throw new RuntimeException();
+                }
+                return IOUtils.toString(response.getEntity().getContent(),
+                    StandardCharsets.UTF_8);
+            }
         }
-        return response.getEntity().getContent();
     }
 
-    public HttpClient getHttpClient() {
+    public CloseableHttpClient getHttpClient() {
         return httpClient;
     }
 
-    public void setHttpClient(HttpClient httpClient) {
+    /**
+     * sets a custom {@link CloseableHttpClient} instance. Please make sure that
+     * this instance is not closed.
+     * @param httpClient
+     */
+    public void setHttpClient(CloseableHttpClient httpClient) {
         this.httpClient = httpClient;
     }
 

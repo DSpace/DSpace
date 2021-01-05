@@ -6,41 +6,38 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.metrics.wos;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import javax.annotation.PostConstruct;
 
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.logging.log4j.Logger;
 
 /**
- * This class deals with logic management to connect to the WOS outdoor service
+ * This class deals with logic management to connect to the WOS external service
+ * Used {@link CloseableHttpClient} can be injected. i.e. for testing purposes.
+ * Please note that {@link CloseableHttpClient} instance connection is eventually closed after performing operation.
  *
  * @author mykhaylo boychuk (mykhaylo.boychuk at 4science.it)
+ * @author Corrado Lombardi (corrado.lombardi at 4science.it)
  */
 public class WOSRestConnector {
 
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(WOSRestConnector.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(WOSRestConnector.class);
 
     private String apiKey;
     private String wosUrl;
-    private HttpClient httpClient;
+    private CloseableHttpClient httpClient;
 
-    @PostConstruct
-    private void setup() {
-        this.httpClient = HttpClientBuilder.create()
-            .setConnectionManager(new PoolingHttpClientConnectionManager())
-            .build();
-    }
 
-    public InputStream get(String id) {
+    public String get(String id) {
         try {
             return sendRequestToWOS(id);
         } catch (Exception e) {
@@ -49,20 +46,25 @@ public class WOSRestConnector {
         }
     }
 
-    private InputStream sendRequestToWOS(String id)
-            throws UnsupportedEncodingException, IOException, ClientProtocolException {
-        HttpGet httpPost = new HttpGet(wosUrl.concat("DO=(").concat(id).concat(")&count=10&firstRecord=1"));
-        httpPost.setHeader("Accept-Encoding", "gzip, deflate, br");
-        httpPost.setHeader("Connection", "keep-alive");
-        httpPost.setHeader("X-ApiKey", apiKey);
-        httpPost.setHeader("Accept", "application/json");
+    private String sendRequestToWOS(String id)
+            throws IOException {
+        try (CloseableHttpClient httpClient = Optional.ofNullable(this.httpClient)
+            .orElseGet(HttpClients::createDefault)) {
+            HttpGet httpGet = new HttpGet(wosUrl.concat("DO=(").concat(URLEncoder.encode(id, StandardCharsets.UTF_8))
+                .concat(")&count=10&firstRecord=1"));
+            httpGet.setHeader("Accept-Encoding", "gzip, deflate, br");
+            httpGet.setHeader("Connection", "keep-alive");
+            httpGet.setHeader("X-ApiKey", apiKey);
+            httpGet.setHeader("Accept", "application/json");
 
-        HttpResponse response = httpClient.execute(httpPost);
-        int statusCode = response.getStatusLine().getStatusCode();
-        if (statusCode != HttpStatus.SC_OK) {
-            return null;
+            HttpResponse response = httpClient.execute(httpGet);
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode != HttpStatus.SC_OK) {
+                return null;
+            }
+            return IOUtils.toString(response.getEntity().getContent(),
+                StandardCharsets.UTF_8);
         }
-        return response.getEntity().getContent();
     }
 
     public String getApiKey() {
@@ -81,11 +83,16 @@ public class WOSRestConnector {
         this.wosUrl = wosUrl;
     }
 
-    public HttpClient getHttpClient() {
+    public CloseableHttpClient getHttpClient() {
         return httpClient;
     }
 
-    public void setHttpClient(HttpClient httpClient) {
+    /**
+     * sets a custom {@link CloseableHttpClient} instance. Please make sure that
+     * this instance is not closed.
+     * @param httpClient
+     */
+    public void setHttpClient(CloseableHttpClient httpClient) {
         this.httpClient = httpClient;
     }
 

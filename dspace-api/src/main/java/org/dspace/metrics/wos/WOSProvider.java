@@ -6,12 +6,11 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.metrics.wos;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Objects;
 
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.metrics.scopus.CrisMetricDTO;
@@ -28,22 +27,20 @@ public class WOSProvider {
     private WOSRestConnector wosRestConnector;
 
     public CrisMetricDTO getWOSObject(String id) {
-        InputStream is = wosRestConnector.get(id);
-        if (is != null) {
-            return exstractMetricCount(is);
+        String wosResponse = wosRestConnector.get(id);
+        if (StringUtils.isNotBlank(wosResponse)) {
+            return exstractMetricCount(wosResponse);
         }
         log.error("The DOI : " + id + " is wrong!");
         return null;
     }
 
-    private CrisMetricDTO exstractMetricCount(InputStream is) {
+    private CrisMetricDTO exstractMetricCount(String wosResponse) {
         Integer metricCount = null;
         CrisMetricDTO metricDTO = new CrisMetricDTO();
         final String path = "$.Data.Records.records.REC[0].dynamic_data.citation_related.tc_list.silo_tc.local_count";
         try {
-            metricCount = JsonPath.read(is, path);
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
+            metricCount = JsonPath.read(wosResponse, path);
         } catch (PathNotFoundException e) {
             log.error("The path : " + path + " does not exist!");
         }

@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.metrics.CrisMetrics;
@@ -38,18 +39,18 @@ public abstract class AbstractUpdateWOSMetrics implements MetricsExternalService
     @Override
     public abstract boolean updateMetric(Context context, Item item, String param);
 
-    protected boolean updateWosMetric(Context context, Item currentItem, CrisMetricDTO metcitDTO) {
+    protected boolean updateWosMetric(Context context, Item currentItem, CrisMetricDTO metricDTO) {
         try {
-            if (Objects.isNull(metcitDTO)) {
+            if (Objects.isNull(metricDTO) || StringUtils.isBlank(metricDTO.getMetricType())) {
                 return false;
             }
             CrisMetrics wosMetrics = crisMetricsService.findLastMetricByResourceIdAndMetricsTypes(context,
-                        metcitDTO.getMetricType(), currentItem.getID());
+                        metricDTO.getMetricType(), currentItem.getID());
             if (!Objects.isNull(wosMetrics)) {
                 wosMetrics.setLast(false);
                 crisMetricsService.update(context, wosMetrics);
             }
-            createNewWosMetric(context, currentItem, metcitDTO);
+            createNewWosMetric(context, currentItem, metricDTO);
         } catch (SQLException | AuthorizeException e) {
             log.error(e.getMessage(), e);
             throw new IllegalStateException("Failed to run metric update", e);
