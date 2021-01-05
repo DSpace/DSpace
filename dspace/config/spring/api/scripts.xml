@@ -31,7 +31,7 @@
                   value="org.dspace.curate.CurationCli"/>
     </bean>
 
-    <bean id="submission-forms-migrate" class="org.dspace.submit.migration.SubmissionFormsMigrationScriptConfiguration">
+    <bean id="submission-forms-migrate" class="org.dspace.submit.migration.SubmissionFormsMigrationCliScriptConfiguration">
         <property name="description" value="Script for migrating submission forms to DSpace 7"/>
         <property name="dspaceRunnableClass" value="org.dspace.submit.migration.SubmissionFormsMigration"/>
     </bean>

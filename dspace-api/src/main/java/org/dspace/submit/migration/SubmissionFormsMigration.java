@@ -28,13 +28,13 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 
 /**
- * Script (config {@link SubmissionFormsMigrationScriptConfiguration}) to transform the old input-forms.xml and
+ * Script (config {@link SubmissionFormsMigrationCliScriptConfiguration}) to transform the old input-forms.xml and
  * item-submission.xml via XSLT (xsl files in dspace/config/migration) into respectively the new submission-forms.xsl
  * and item-submissions.xsl files
  *
  * @author Maria Verdonck (Atmire) on 13/11/2020
  */
-public class SubmissionFormsMigration extends DSpaceRunnable<SubmissionFormsMigrationScriptConfiguration> {
+public class SubmissionFormsMigration extends DSpaceRunnable<SubmissionFormsMigrationCliScriptConfiguration> {
 
     private boolean help = false;
     private String inputFormsFilePath = null;
@@ -200,8 +200,8 @@ public class SubmissionFormsMigration extends DSpaceRunnable<SubmissionFormsMigr
     }
 
     @Override
-    public SubmissionFormsMigrationScriptConfiguration getScriptConfiguration() {
+    public SubmissionFormsMigrationCliScriptConfiguration getScriptConfiguration() {
         return new DSpace().getServiceManager().getServiceByName("submission-forms-migrate",
-            SubmissionFormsMigrationScriptConfiguration.class);
+            SubmissionFormsMigrationCliScriptConfiguration.class);
     }
 }
