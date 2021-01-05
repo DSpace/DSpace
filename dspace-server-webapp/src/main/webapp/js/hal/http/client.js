@@ -12,23 +12,33 @@ HAL.Http.Client = function(opts) {
     this.defaultHeaders = {'Accept': 'application/hal+json, application/json, */*; q=0.01'};
     var authorizationHeader = getAuthorizationHeader();
     authorizationHeader ? this.defaultHeaders.Authorization = authorizationHeader : '';
-    // If we find a CSRF header (in a cookie), send it back in X-XSRF-Token header
-    var csrfToken = getCSRFToken();
-    csrfToken ? this.defaultHeaders['X-XSRF-Token'] = csrfToken : '';
     // Write all headers to console (for easy debugging)
-    console.log(this.defaultHeaders);
+    //console.log(this.defaultHeaders);
     this.headers = this.defaultHeaders;
 };
 
 /**
- * Get CSRF Token by parsing it out of the DSPACE-XSRF-COOKIE (server-side) cookie set by our DSpace server webapp
+ * Get CSRF Token by parsing it out of the "MyHalBrowserCsrfToken" cookie.
+ * This cookie is set in login.html after a successful login occurs.
  **/
 function getCSRFToken() {
-    var cookie = document.cookie.match('(^|;)\\s*' + 'DSPACE-XSRF-COOKIE' + '\\s*=\\s*([^;]+)');
-    if(cookie != undefined) {
+    var cookie = document.cookie.match('(^|;)\\s*' + 'MyHalBrowserCsrfToken' + '\\s*=\\s*([^;]+)');
+    if (cookie != null) {
         return cookie.pop();
     } else {
-        return undefined;
+        return null;
+    }
+}
+
+/**
+ * Check current response headers to see if the CSRF Token has changed. If a new value is found in headers,
+ * save the new value into our "MyHalBrowserCsrfToken" cookie.
+ **/
+function checkForUpdatedCSRFTokenInResponse(jqxhr) {
+    // look for DSpace-XSRF-TOKEN header & save to our MyHalBrowserCsrfToken cookie (if found)
+    var updatedCsrfToken = jqxhr.getResponseHeader('DSPACE-XSRF-TOKEN');
+    if (updatedCsrfToken != null) {
+        document.cookie = "MyHalBrowserCsrfToken=" + updatedCsrfToken;
     }
 }
 
@@ -38,12 +48,13 @@ function getCSRFToken() {
  **/
 function getAuthorizationHeader() {
     var cookie = document.cookie.match('(^|;)\\s*' + 'MyHalBrowserToken' + '\\s*=\\s*([^;]+)');
-    if(cookie != undefined) {
+    if (cookie != null) {
         return 'Bearer ' + cookie.pop();
     } else {
-        return undefined;
+        return null;
     }
 }
+
 function downloadFile(url) {
     var request = new XMLHttpRequest();
     request.open('GET', url, true);
@@ -89,6 +100,9 @@ HAL.Http.Client.prototype.get = function(url) {
         },
         headers: this.headers,
         success: function(resource, textStatus, jqXHR) {
+            // NOTE: A GET never requires sending an CSRF Token, but the response may send an updated token back.
+            // So, we need to check if a token came back in this GET response.
+            checkForUpdatedCSRFTokenInResponse(jqXHR);
             self.vent.trigger('response', {
                 resource: resource,
                 jqxhr: jqXHR,
@@ -111,6 +125,18 @@ HAL.Http.Client.prototype.request = function(opts) {
     opts.dataType = 'json';
     opts.xhrFields = opts.xhrFields || {};
     opts.xhrFields.withCredentials = opts.xhrFields.withCredentials || true;
+    opts.headers = opts.headers || {};
+    // If CSRFToken exists, append as a new X-XSRF-Token header
+    var csrfToken = getCSRFToken();
+    if (csrfToken != null) {
+      opts.headers['X-XSRF-Token'] = csrfToken;
+    }
+
+    // Also check response to see if CSRF Token has been updated
+    opts.success = function(resource, textStatus, jqXHR) {
+        checkForUpdatedCSRFTokenInResponse(jqXHR);
+    };
+
     self.vent.trigger('location-change', { url: opts.url });
     return jqxhr = $.ajax(opts);
 };
