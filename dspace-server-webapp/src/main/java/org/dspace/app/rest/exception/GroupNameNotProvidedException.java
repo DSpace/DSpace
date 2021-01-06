@@ -13,18 +13,18 @@ package org.dspace.app.rest.exception;
  * {@link DSpaceApiExceptionControllerAdvice#handleCustomUnprocessableEntityException},
  * hence it should not contain sensitive or security-compromising info.</p>
  *
- * <p>Note there is a similarly named error in the DSpace API module.</p>
- *
  * @author Bruno Roemers (bruno.roemers at atmire.com)
  */
-public class RESTEmptyWorkflowGroupException extends UnprocessableEntityException {
+public class GroupNameNotProvidedException extends UnprocessableEntityException {
 
-    public RESTEmptyWorkflowGroupException(String message, Throwable cause) {
-        super(message, cause);
+    private static final String message = "cannot create group, no group name is provided";
+
+    public GroupNameNotProvidedException() {
+        super(message);
     }
 
-    public RESTEmptyWorkflowGroupException(String message) {
-        super(message);
+    public GroupNameNotProvidedException(Throwable cause) {
+        super(message, cause);
     }
 
 }

@@ -22,6 +22,7 @@ import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.authorization.AuthorizationFeatureService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.EPersonNameNotProvidedException;
 import org.dspace.app.rest.exception.RESTEmptyWorkflowGroupException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.EPersonRest;
@@ -201,8 +202,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             List<MetadataValueRest> epersonLastName = metadataRest.getMap().get("eperson.lastname");
             if (epersonFirstName == null || epersonLastName == null ||
                 epersonFirstName.isEmpty() || epersonLastName.isEmpty()) {
-                throw new UnprocessableEntityException("The eperson.firstname and eperson.lastname values need to be " +
-                                                    "filled in");
+                throw new EPersonNameNotProvidedException();
             }
         }
         String password = epersonRest.getPassword();
