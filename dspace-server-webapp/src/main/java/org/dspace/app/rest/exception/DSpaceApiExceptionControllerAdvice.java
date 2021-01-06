@@ -98,9 +98,14 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                 HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
-    @ExceptionHandler(RESTEmptyWorkflowGroupException.class)
-    protected void handleEmptyWorkflowGroupException(HttpServletRequest request, HttpServletResponse response,
-                                                     Exception ex) throws IOException {
+    @ExceptionHandler({
+        RESTEmptyWorkflowGroupException.class,
+        EPersonNameNotProvidedException.class,
+        GroupNameNotProvidedException.class,
+    })
+    protected void handleCustomUnprocessableEntityException(HttpServletRequest request, HttpServletResponse response,
+                                                            Exception ex) throws IOException {
+        // add error message to response body for selected errors
         sendErrorResponse(
             request, response, null, ex.getLocalizedMessage(), HttpStatus.UNPROCESSABLE_ENTITY.value()
         );

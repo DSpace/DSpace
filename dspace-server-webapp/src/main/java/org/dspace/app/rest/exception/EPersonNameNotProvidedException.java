@@ -13,18 +13,18 @@ package org.dspace.app.rest.exception;
  * {@link DSpaceApiExceptionControllerAdvice#handleCustomUnprocessableEntityException},
  * hence it should not contain sensitive or security-compromising info.</p>
  *
- * <p>Note there is a similarly named error in the DSpace API module.</p>
- *
  * @author Bruno Roemers (bruno.roemers at atmire.com)
  */
-public class RESTEmptyWorkflowGroupException extends UnprocessableEntityException {
+public class EPersonNameNotProvidedException extends UnprocessableEntityException {
 
-    public RESTEmptyWorkflowGroupException(String message, Throwable cause) {
-        super(message, cause);
+    public static final String message = "The eperson.firstname and eperson.lastname values need to be filled in";
+
+    public EPersonNameNotProvidedException() {
+        super(message);
     }
 
-    public RESTEmptyWorkflowGroupException(String message) {
-        super(message);
+    public EPersonNameNotProvidedException(Throwable cause) {
+        super(message, cause);
     }
 
 }
