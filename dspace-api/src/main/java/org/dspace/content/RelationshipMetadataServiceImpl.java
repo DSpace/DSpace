@@ -85,14 +85,16 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
         Item otherItem;
         int place = 0;
         boolean isLeftwards;
-        if (StringUtils.equals(relationshipType.getLeftType().getLabel(), entityType)) {
+        if (StringUtils.equals(relationshipType.getLeftType().getLabel(), entityType) &&
+                item.getID().equals(relationship.getLeftItem().getID())) {
             hashMaps = virtualMetadataPopulator.getMap().get(relationshipType.getLeftwardType());
             otherItem = relationship.getRightItem();
             relationName = relationship.getRelationshipType().getLeftwardType();
             place = relationship.getLeftPlace();
             isLeftwards = false; //if the current item is stored on the left,
             // the name variant is retrieved from the rightwards label
-        } else if (StringUtils.equals(relationshipType.getRightType().getLabel(), entityType)) {
+        } else if (StringUtils.equals(relationshipType.getRightType().getLabel(), entityType) &&
+                item.getID().equals(relationship.getRightItem().getID())) {
             hashMaps = virtualMetadataPopulator.getMap().get(relationshipType.getRightwardType());
             otherItem = relationship.getLeftItem();
             relationName = relationship.getRelationshipType().getRightwardType();

@@ -7,30 +7,31 @@
  */
 package org.dspace.event;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * An instance of this class contains the configuration profile of a specific,
  * named Consumer, <em>in the context of a specific Dispatcher</em>. This
  * includes the name, the class to instantiate and event filters. Note that all
  * characteristics are "global" and the same for all dispatchers.
- *
- * @version $Revision$
  */
 public class ConsumerProfile {
     /**
      * log4j category
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ConsumerProfile.class);
+    private static final Logger log = LogManager.getLogger(ConsumerProfile.class);
 
     /**
      * Name matching the key in DSpace Configuration
      */
-    private String name;
+    private final String name;
 
     /**
      * Instance of configured consumer class
@@ -58,13 +59,16 @@ public class ConsumerProfile {
      * @param name configuration name of the consumer profile
      * @return a new ConsumerProfile; never null.
      * @throws IllegalArgumentException if no class or no filters configured for the specified consumer
-     * @throws ClassNotFoundException   passed through.
-     * @throws InstantiationException   passed through.
-     * @throws IllegalAccessException   passed through.
+     * @throws ClassNotFoundException    passed through.
+     * @throws InstantiationException    passed through.
+     * @throws IllegalAccessException    passed through.
+     * @throws NoSuchMethodException     passed through.
+     * @throws InvocationTargetException passed through.
      */
     public static ConsumerProfile makeConsumerProfile(String name)
         throws IllegalArgumentException, ClassNotFoundException,
-        InstantiationException, IllegalAccessException {
+            InstantiationException, IllegalAccessException, NoSuchMethodException,
+            InvocationTargetException {
         ConsumerProfile result = new ConsumerProfile(name);
         result.readConfiguration();
         return result;
@@ -74,17 +78,21 @@ public class ConsumerProfile {
      * Get class and filters from DSpace Configuration.
      *
      * @throws IllegalArgumentException if no class or no filters configured for the specified consumer
-     * @throws ClassNotFoundException   passed through.
-     * @throws InstantiationException   passed through.
-     * @throws IllegalAccessException   passed through.
+     * @throws ClassNotFoundException    passed through.
+     * @throws InstantiationException    passed through.
+     * @throws IllegalAccessException    passed through.
+     * @throws NoSuchMethodException     passed through.
+     * @throws InvocationTargetException passed through.
      */
-
     private void readConfiguration()
         throws IllegalArgumentException, ClassNotFoundException,
-        InstantiationException, IllegalAccessException {
-        String className = ConfigurationManager.getProperty(CONSUMER_PREFIX
+            InstantiationException, IllegalAccessException, NoSuchMethodException,
+            InvocationTargetException {
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        String className = configurationService.getProperty(CONSUMER_PREFIX
                                                                 + name + ".class");
-        String filterString = ConfigurationManager.getProperty(CONSUMER_PREFIX
+        String filterString = configurationService.getProperty(CONSUMER_PREFIX
                                                                    + name + ".filters");
 
         if (className == null) {
@@ -96,10 +104,10 @@ public class ConsumerProfile {
                 "No filters configured for consumer named: " + name);
         }
 
-        consumer = (Consumer) Class.forName(className.trim()).newInstance();
+        consumer = (Consumer) Class.forName(className.trim()).getDeclaredConstructor().newInstance();
 
         // Each "filter" is <objectTypes> + <eventTypes> : ...
-        filters = new ArrayList<int[]>();
+        filters = new ArrayList<>();
         String part[] = filterString.trim().split(":");
         for (int j = 0; j < part.length; ++j) {
             String fpart[] = part[j].split("\\+");

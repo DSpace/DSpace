@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -59,28 +60,28 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
     /**
      * Class Logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(CitationDocumentServiceImpl.class);
+    private static final Logger log = LogManager.getLogger(CitationDocumentServiceImpl.class);
 
     /**
      * A set of MIME types that can have a citation page added to them. That is,
      * MIME types in this set can be converted to a PDF which is then prepended
      * with a citation page.
      */
-    protected final Set<String> VALID_TYPES = new HashSet<String>(2);
+    protected final Set<String> VALID_TYPES = new HashSet<>(2);
 
     /**
      * A set of MIME types that refer to a PDF
      */
-    protected final Set<String> PDF_MIMES = new HashSet<String>(2);
+    protected final Set<String> PDF_MIMES = new HashSet<>(2);
 
     /**
      * A set of MIME types that refer to a JPEG, PNG, or GIF
      */
-    protected final Set<String> RASTER_MIMES = new HashSet<String>();
+    protected final Set<String> RASTER_MIMES = new HashSet<>();
     /**
      * A set of MIME types that refer to a SVG
      */
-    protected final Set<String> SVG_MIMES = new HashSet<String>();
+    protected final Set<String> SVG_MIMES = new HashSet<>();
 
     /**
      * List of all enabled collections, inherited/determined for those under communities.
@@ -146,7 +147,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
         String[] citationEnabledCommunities = configurationService
             .getArrayProperty("citation-page.enabled_communities");
         if (citationEnabledCollectionsList == null) {
-            citationEnabledCollectionsList = new ArrayList<String>();
+            citationEnabledCollectionsList = new ArrayList<>();
         }
 
         if (citationEnabledCommunities != null && citationEnabledCommunities.length > 0) {
@@ -239,7 +240,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
 
     protected boolean isCitationEnabledThroughCollection(Context context, Bitstream bitstream) throws SQLException {
         //Reject quickly if no-enabled collections
-        if (citationEnabledCollectionsList.size() == 0) {
+        if (citationEnabledCollectionsList.isEmpty()) {
             return false;
         }
 
@@ -312,7 +313,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
                 document.save(out);
 
                 byte[] data = out.toByteArray();
-                return Pair.of((InputStream) new ByteArrayInputStream(data), new Long(data.length));
+                return Pair.of((InputStream) new ByteArrayInputStream(data), Long.valueOf(data.length));
             }
 
         } finally {
@@ -343,14 +344,16 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
             drawTable(coverPage, contentStream, ypos, xpos, content2, fontHelveticaBold, 11, false);
             ypos -= ygap;
 
-            contentStream.fillRect(xpos, ypos, xwidth, 1);
+            contentStream.addRect(xpos, ypos, xwidth, 1);
+            contentStream.fill();
             contentStream.closeAndStroke();
 
             String[][] content3 = {{getOwningCommunity(context, item), getOwningCollection(item)}};
             drawTable(coverPage, contentStream, ypos, xpos, content3, fontHelvetica, 9, false);
             ypos -= ygap;
 
-            contentStream.fillRect(xpos, ypos, xwidth, 1);
+            contentStream.addRect(xpos, ypos, xwidth, 1);
+            contentStream.fill();
             contentStream.closeAndStroke();
             ypos -= (ygap * 2);
 
@@ -366,7 +369,8 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
                 }
 
                 if (field.equals("_line_")) {
-                    contentStream.fillRect(xpos, ypos, xwidth, 1);
+                    contentStream.addRect(xpos, ypos, xwidth, 1);
+                    contentStream.fill();
                     contentStream.closeAndStroke();
                     ypos -= (ygap);
 
@@ -382,8 +386,8 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
 
             contentStream.beginText();
             contentStream.setFont(fontHelveticaOblique, 11);
-            contentStream.moveTextPositionByAmount(xpos, ypos);
-            contentStream.drawString(footer);
+            contentStream.newLineAtOffset(xpos, ypos);
+            contentStream.showText(footer);
             contentStream.endText();
         } finally {
             contentStream.close();
@@ -444,12 +448,12 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
 
         contentStream.beginText();
         contentStream.setFont(pdfFont, fontSize);
-        contentStream.moveTextPositionByAmount(startX, startY);
+        contentStream.newLineAtOffset(startX, startY);
         int currentY = startY;
         for (String line : lines) {
-            contentStream.drawString(line);
+            contentStream.showText(line);
             currentY -= leading;
-            contentStream.moveTextPositionByAmount(0, -leading);
+            contentStream.newLineAtOffset(0, -leading);
         }
         contentStream.endText();
         return currentY;
@@ -480,7 +484,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
     public String getAllMetadataSeparated(Item item, String metadataKey) {
         List<MetadataValue> dcValues = itemService.getMetadataByMetadataString(item, metadataKey);
 
-        ArrayList<String> valueArray = new ArrayList<String>();
+        ArrayList<String> valueArray = new ArrayList<>();
 
         for (MetadataValue dcValue : dcValues) {
             if (StringUtils.isNotBlank(dcValue.getValue())) {
@@ -507,14 +511,18 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
             //draw the rows
             float nexty = y;
             for (int i = 0; i <= rows; i++) {
-                contentStream.drawLine(margin, nexty, margin + tableWidth, nexty);
+                contentStream.moveTo(margin, nexty);
+                contentStream.lineTo(margin + tableWidth, nexty);
+                contentStream.stroke();
                 nexty -= rowHeight;
             }
 
             //draw the columns
             float nextx = margin;
             for (int i = 0; i <= cols; i++) {
-                contentStream.drawLine(nextx, y, nextx, y - tableHeight);
+                contentStream.moveTo(nextx, y);
+                contentStream.lineTo(nextx, y - tableHeight);
+                contentStream.stroke();
                 nextx += colWidth;
             }
         }
@@ -528,8 +536,8 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
             for (int j = 0; j < content[i].length; j++) {
                 String text = content[i][j];
                 contentStream.beginText();
-                contentStream.moveTextPositionByAmount(textx, texty);
-                contentStream.drawString(text);
+                contentStream.newLineAtOffset(textx, texty);
+                contentStream.showText(text);
                 contentStream.endText();
                 textx += colWidth;
             }
