@@ -532,14 +532,14 @@
                 <xsl:with-param name="field" select="$rightsValue"/>
             </xsl:call-template>
         </xsl:variable>
-		<xsl:variable name="lc_rightsValue">
-		    <xsl:call-template name="lowercase">
+        <xsl:variable name="lc_rightsValue">
+            <xsl:call-template name="lowercase">
                 <xsl:with-param name="value" select="$rightsValue"/>
             </xsl:call-template>
         </xsl:variable>
-		<!-- this conditions ensures what is referred in issue: #3097 -->
-		<!-- it's a solution to ensure that only values ended with "access" -->
-		<!-- can be used as datacite:rights -->		
+        <!-- this conditions ensures what is referred in issue: #3097 -->
+        <!-- it's a solution to ensure that only values ended with "access" -->
+        <!-- can be used as datacite:rights -->
         <xsl:if test="ends-with($lc_rightsValue,'access')">
             <datacite:rights>
                 <xsl:if test="$rightsURI">
@@ -1019,7 +1019,7 @@
     <xsl:template name="getRightsURI">
         <xsl:call-template name="resolveRightsURI">
             <xsl:with-param name="field"
-                select="//doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:field[@name='value']/text()"/>
+                select="//doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:field[@name='value'and ends-with(translate(text(), $uppercase, $smallcase),'access')]/text()"/>
         </xsl:call-template>
     </xsl:template>
 
@@ -1124,7 +1124,7 @@
    <!-- Other Auxiliary templates -->
    <!--  -->
     <xsl:param name="smallcase" select="'abcdefghijklmnopqrstuvwxyzàèìòùáéíóúýâêîôûãñõäëïöüÿåæœçðø'"/>
-    <xsl:param name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZÀÈÌÒÙÁÉÍÓÚÝÂÊÎÔÛÃÑÕÄËÏÖÜŸÅÆŒÇÐØ'"/>    
+    <xsl:param name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZÀÈÌÒÙÁÉÍÓÚÝÂÊÎÔÛÃÑÕÄËÏÖÜŸÅÆŒÇÐØ'"/>
 
    <!-- to retrieve a string in uppercase -->
     <xsl:template name="uppercase">
