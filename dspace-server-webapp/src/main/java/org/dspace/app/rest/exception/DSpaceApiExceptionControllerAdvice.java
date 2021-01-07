@@ -98,6 +98,9 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                 HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
+    /**
+     * Add an error message to the response body for selected errors.
+     */
     @ExceptionHandler({
         RESTEmptyWorkflowGroupException.class,
         EPersonNameNotProvidedException.class,
@@ -105,7 +108,6 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     })
     protected void handleCustomUnprocessableEntityException(HttpServletRequest request, HttpServletResponse response,
                                                             Exception ex) throws IOException {
-        // add error message to response body for selected errors
         sendErrorResponse(
             request, response, null, ex.getLocalizedMessage(), HttpStatus.UNPROCESSABLE_ENTITY.value()
         );
