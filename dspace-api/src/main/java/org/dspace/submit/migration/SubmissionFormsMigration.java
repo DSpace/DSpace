@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -58,8 +60,7 @@ public class SubmissionFormsMigration extends DSpaceRunnable<SubmissionFormsMigr
         "<!ELEMENT item-submission (submission-map, step-definitions, submission-definitions) >";
     private static final String CONTENT_DTD_INPUT_FORMS_DUMMY =
         "<!ELEMENT input-forms (form-map, form-definitions, form-value-pairs) >";
-    private File inputFormsDummyDTDTemp;
-    private File itemSubmissionDummyDTDTemp;
+    private List<File> tempFiles = new ArrayList<>();
 
     /**
      * We need to force this, because some dependency elsewhere interferes.
@@ -79,7 +80,7 @@ public class SubmissionFormsMigration extends DSpaceRunnable<SubmissionFormsMigr
         if (this.itemSubmissionsFilePath != null) {
             this.transform(itemSubmissionsFilePath, PATH_XSL_ITEM_SUBMISSION, PATH_OUT_ITEM_SUBMISSION);
         }
-        deleteDTDFileDummies();
+        deleteTempFiles();
     }
 
     /**
@@ -141,43 +142,32 @@ public class SubmissionFormsMigration extends DSpaceRunnable<SubmissionFormsMigr
 
     private void createDTDFileDummiesIfNotPresent() {
         // Create temporary dummy item-submission.dtd in directory of input item-submission.xml if not present
-        String itemSubmissionDir = StringUtils.substringBeforeLast(itemSubmissionsFilePath, File.separator);
-        File itemSubmissionDTD = new File (itemSubmissionDir + File.separator + NAME_DTD_ITEM_SUBMISSION);
-        if (!itemSubmissionDTD.isFile()) {
-            itemSubmissionDummyDTDTemp = itemSubmissionDTD;
-
-            Path path = Paths.get(itemSubmissionDir + File.separator + NAME_DTD_ITEM_SUBMISSION);
-            byte[] strToBytes = CONTENT_DTD_ITEM_SUBMISSION_DUMMY.getBytes();
-
-            try {
-                Files.write(path, strToBytes);
-            } catch (IOException e) {
-                handler.logError("Error trying to create dummy " + NAME_DTD_ITEM_SUBMISSION);
-            }
-        }
+        this.createDummyFileIfNotPresent(itemSubmissionsFilePath, NAME_DTD_ITEM_SUBMISSION, CONTENT_DTD_ITEM_SUBMISSION_DUMMY);
         // Create temporary dummy input-forms.dtd in directory of input input-forms.xml if not present
-        String inputFormsDir = StringUtils.substringBeforeLast(inputFormsFilePath, File.separator);
-        File inputFormsDTD = new File (inputFormsDir + File.separator + NAME_DTD_INPUT_FORMS);
-        if (!inputFormsDTD.isFile()) {
-            inputFormsDummyDTDTemp = inputFormsDTD;
-
-            Path path = Paths.get(inputFormsDir + File.separator + NAME_DTD_INPUT_FORMS);
-            byte[] strToBytes = CONTENT_DTD_INPUT_FORMS_DUMMY.getBytes();
+        this.createDummyFileIfNotPresent(inputFormsFilePath, NAME_DTD_INPUT_FORMS, CONTENT_DTD_INPUT_FORMS_DUMMY);
+    }
+    
+    private void createDummyFileIfNotPresent(String fileInInputDir, String dummyFileName, String dummyContent) {
+        String dir = StringUtils.substringBeforeLast(fileInInputDir, File.separator);
+        File dummyFile = new File (dir + File.separator + dummyFileName);
+        if (!dummyFile.isFile()) {
+            Path path = Paths.get(dir + File.separator + dummyFileName);
+            byte[] strToBytes = dummyContent.getBytes();
 
             try {
                 Files.write(path, strToBytes);
             } catch (IOException e) {
-                handler.logError("Error trying to create dummy " + NAME_DTD_INPUT_FORMS);
+                handler.logError("Error trying to create dummy " + dummyFileName);
             }
+            tempFiles.add(dummyFile);
         }
     }
 
-    private void deleteDTDFileDummies() {
-        if (itemSubmissionDummyDTDTemp != null) {
-            itemSubmissionDummyDTDTemp.delete();
-        }
-        if (inputFormsDummyDTDTemp != null) {
-            inputFormsDummyDTDTemp.delete();
+    private void deleteTempFiles() {
+        for (File tempFile: tempFiles) {
+            if (tempFile != null && tempFile.isFile()) {
+                tempFile.delete();
+            }
         }
     }
 
