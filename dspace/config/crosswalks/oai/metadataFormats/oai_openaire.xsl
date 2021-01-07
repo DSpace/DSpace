@@ -581,7 +581,7 @@
         <xsl:variable name="identifierType">
             <!--  only consider the first dc.identifier.uri -->
             <xsl:call-template name="resolveFieldType">
-                <xsl:with-param name="field" select="./doc:element/doc:field[@name='value'][1]"/>
+                <xsl:with-param name="field" select="./doc:element[1]/doc:field[@name='value'][1]"/>
             </xsl:call-template>
         </xsl:variable>
         <!-- only process the first element -->
@@ -589,7 +589,7 @@
             <xsl:attribute name="identifierType">
                 <xsl:value-of select="$identifierType"/>
             </xsl:attribute>
-            <xsl:value-of select="./doc:element/doc:field[@name='value'][1]"/>
+            <xsl:value-of select="./doc:element[1]/doc:field[@name='value'][1]"/>
         </datacite:identifier>
     </xsl:template>
 
@@ -1373,7 +1373,7 @@
                 <xsl:text>software</xsl:text>
             </xsl:when>
             <xsl:otherwise>
-                other research product
+                <xsl:text>other research product</xsl:text>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
