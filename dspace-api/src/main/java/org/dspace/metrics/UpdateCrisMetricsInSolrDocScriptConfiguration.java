@@ -45,6 +45,8 @@ public class UpdateCrisMetricsInSolrDocScriptConfiguration<T extends UpdateCrisM
     public Options getOptions() {
         if (options == null) {
             Options options = new Options();
+            options.addOption("o",
+                "If set, performs solr search optimization after the metrics update. It might take a long time");
             super.options = options;
         }
         return options;

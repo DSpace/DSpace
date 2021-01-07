@@ -18,6 +18,7 @@ import org.dspace.app.metrics.service.CrisMetricsService;
 import org.dspace.app.metrics.service.CrisMetricsServiceImpl;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexingService;
+import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.scripts.DSpaceRunnable;
@@ -75,7 +76,12 @@ public class UpdateCrisMetricsInSolrDoc extends
                 crisIndexingService.updateMetrics(context, metric);
             }
             handler.logInfo("Update end");
-        } catch (SQLException e) {
+            if (commandLine.hasOption("o")) {
+                handler.logInfo("Starting solr optimization");
+                crisIndexingService.optimize();
+                handler.logInfo("Solr optimization performed");
+            }
+        } catch (SQLException | SearchServiceException e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
         }
