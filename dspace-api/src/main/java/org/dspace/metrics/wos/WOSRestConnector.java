@@ -41,8 +41,8 @@ public class WOSRestConnector {
         try {
             return sendRequestToWOS(id);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw new RuntimeException(e);
+            log.warn(e.getMessage(), e);
+            return null;
         }
     }
 
