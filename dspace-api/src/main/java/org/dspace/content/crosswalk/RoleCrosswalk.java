@@ -20,10 +20,11 @@ import org.dspace.content.packager.PackageException;
 import org.dspace.content.packager.PackageIngester;
 import org.dspace.content.packager.PackageParameters;
 import org.dspace.content.packager.RoleDisseminator;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.WorkflowException;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -179,8 +180,11 @@ public class RoleCrosswalk
             }
 
             // Create a temporary file to disseminate into
-            String tempDirectory = (ConfigurationManager.getProperty("upload.temp.dir") != null)
-                ? ConfigurationManager.getProperty("upload.temp.dir") : System.getProperty("java.io.tmpdir");
+            ConfigurationService configurationService
+                    = DSpaceServicesFactory.getInstance().getConfigurationService();
+            String tempDirectory = (configurationService.hasProperty("upload.temp.dir"))
+                    ? configurationService.getProperty("upload.temp.dir")
+                    : System.getProperty("java.io.tmpdir");
             File tempFile = File
                 .createTempFile("RoleCrosswalkDisseminate" + dso.hashCode(), null, new File(tempDirectory));
             tempFile.deleteOnExit();
@@ -292,8 +296,11 @@ public class RoleCrosswalk
         }
 
         // Create a temporary file to ingest from
-        String tempDirectory = (ConfigurationManager.getProperty("upload.temp.dir") != null)
-            ? ConfigurationManager.getProperty("upload.temp.dir") : System.getProperty("java.io.tmpdir");
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        String tempDirectory = (configurationService.hasProperty("upload.temp.dir"))
+                ? configurationService.getProperty("upload.temp.dir")
+                : System.getProperty("java.io.tmpdir");
         File tempFile = File.createTempFile("RoleCrosswalkIngest" + dso.hashCode(), null, new File(tempDirectory));
         tempFile.deleteOnExit();
         FileOutputStream fileOutStream = null;

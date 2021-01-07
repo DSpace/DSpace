@@ -9,7 +9,7 @@ package org.dspace.content;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -17,13 +17,15 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.SiteService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,14 +40,17 @@ public class SiteTest extends AbstractUnitTest {
     /**
      * log4j category
      */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SiteTest.class);
+    private static final Logger log = LogManager.getLogger(SiteTest.class);
 
     /**
      * Site instance for the tests
      */
     private Site s;
 
-    private SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
+    private final SiteService siteService
+            = ContentServiceFactory.getInstance().getSiteService();
+    private final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
      * This method will be run before every test as per @Before. It will
@@ -105,8 +110,8 @@ public class SiteTest extends AbstractUnitTest {
      */
     @Test
     public void testGetHandle() {
-        assertThat("testGetHandle 0", s.getHandle(), equalTo(ConfigurationManager.getProperty("handle.prefix")
-                                                                 + "/0"));
+        assertThat("testGetHandle 0", s.getHandle(),
+                equalTo(configurationService.getProperty("handle.prefix") + "/0"));
     }
 
     /**
@@ -114,12 +119,13 @@ public class SiteTest extends AbstractUnitTest {
      */
     @Test
     public void testGetSiteHandle() {
-        assertThat("testGetSiteHandle 0", s.getHandle(), equalTo(ConfigurationManager.getProperty("handle.prefix")
-                                                                     + "/0"));
+        assertThat("testGetSiteHandle 0", s.getHandle(),
+                equalTo(configurationService.getProperty("handle.prefix") + "/0"));
     }
 
     /**
      * Test of find method, of class Site.
+     * @throws java.lang.Exception passed through.
      */
     @Test
     public void testSiteFind() throws Exception {
@@ -133,17 +139,19 @@ public class SiteTest extends AbstractUnitTest {
      */
     @Test
     public void testGetName() {
-        assertThat("testGetName 0", s.getName(), equalTo(ConfigurationManager.getProperty("dspace.name")));
-        assertThat("testGetName 1", siteService.getName(s), equalTo(ConfigurationManager.getProperty("dspace.name")));
+        assertThat("testGetName 0", s.getName(),
+                equalTo(configurationService.getProperty("dspace.name")));
+        assertThat("testGetName 1", siteService.getName(s),
+                equalTo(configurationService.getProperty("dspace.name")));
     }
-
 
     /**
      * Test of getURL method, of class Site.
      */
     @Test
     public void testGetURL() {
-        assertThat("testGetURL 0", s.getURL(), equalTo(ConfigurationManager.getProperty("dspace.ui.url")));
+        assertThat("testGetURL 0", s.getURL(),
+                equalTo(configurationService.getProperty("dspace.ui.url")));
     }
 
     @Test

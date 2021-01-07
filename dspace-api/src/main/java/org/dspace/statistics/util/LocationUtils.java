@@ -15,6 +15,7 @@ import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.I18nUtil;
 
@@ -26,7 +27,7 @@ import org.dspace.core.I18nUtil;
  * @author ben at atmire.com
  */
 public class LocationUtils {
-    private static final Logger logger = org.apache.logging.log4j.LogManager.getLogger(LocationUtils.class);
+    private static final Logger logger = LogManager.getLogger(LocationUtils.class);
 
     private static final Properties countryToContinent = new Properties();
 
@@ -73,18 +74,6 @@ public class LocationUtils {
     }
 
     /**
-     * Map DSpace continent codes onto default continent names.
-     *
-     * @param continentCode DSpace 2-character code for a continent.
-     * @return Name of the continent in the default locale, or an error message
-     * string.
-     */
-    @Deprecated
-    static public String getContinentName(String continentCode) {
-        return getContinentName(continentCode, Locale.getDefault());
-    }
-
-    /**
      * Map DSpace continent codes onto localized continent names.
      *
      * @param continentCode DSpace 2-character code for a continent.
@@ -123,18 +112,6 @@ public class LocationUtils {
                 .getMessage("org.dspace.statistics.util.LocationUtils.unknown-continent");
         }
         return name;
-    }
-
-    /**
-     * Map ISO country codes onto default country names.
-     *
-     * @param countryCode ISO 3166-1 alpha-2 country code.
-     * @return Name of the country in the default locale, or an error message
-     * string.
-     */
-    @Deprecated
-    static public String getCountryName(String countryCode) {
-        return getCountryName(countryCode, Locale.getDefault());
     }
 
     /**
