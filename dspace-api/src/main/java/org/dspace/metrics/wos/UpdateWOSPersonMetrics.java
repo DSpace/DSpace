@@ -49,13 +49,6 @@ public class UpdateWOSPersonMetrics extends AbstractUpdateWOSMetrics {
         return updateWosMetric(context, item, metricDTO);
     }
 
-    public static void main(String[] args) {
-        System.out.println(isValidId("0000-0003-4572-9711"));
-        System.out.println(isValidId("0000-0001-9999-4364"));
-        System.out.println(isValidId("asdf-jklò"));
-        System.out.println(isValidId("1234-1234-1234-1234"));
-    }
-
     private static boolean isValidId(String orcidId) {
         if (StringUtils.isBlank(orcidId) || orcidId.length() != 19) {
             return false;
