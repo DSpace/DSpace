@@ -18,7 +18,8 @@ import com.lyncode.xoai.dataprovider.data.About;
 import com.lyncode.xoai.dataprovider.data.Item;
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
 import com.lyncode.xoai.dataprovider.xml.xoai.Element.Field;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * @author Lyncode Development Team (dspace at lyncode dot com)
@@ -29,7 +30,7 @@ public abstract class DSpaceItem implements Item {
     }
 
     private static List<Element> flat(List<Element> input) {
-        List<Element> elems = new ArrayList<Element>();
+        List<Element> elems = new ArrayList<>();
         for (Element e : input) {
             if (e.getElement() != null) {
                 elems.addAll(e.getElement());
@@ -39,7 +40,7 @@ public abstract class DSpaceItem implements Item {
     }
 
     private static List<String> values(List<Element> input) {
-        List<String> elems = new ArrayList<String>();
+        List<String> elems = new ArrayList<>();
         for (Element e : input) {
             if (e.getElement() != null && !e.getElement().isEmpty() && e.getElement().get(0).getField() != null) {
                 for (Field f : e.getElement().get(0).getField()) {
@@ -68,8 +69,9 @@ public abstract class DSpaceItem implements Item {
 
     public static String buildIdentifier(String handle) {
         if (_prefix == null) {
-            _prefix = ConfigurationManager.getProperty("oai",
-                                                       "identifier.prefix");
+            ConfigurationService configurationService
+                    = DSpaceServicesFactory.getInstance().getConfigurationService();
+            _prefix = configurationService.getProperty("oai.identifier.prefix");
         }
         return "oai:" + _prefix + ":" + handle;
     }
@@ -90,13 +92,13 @@ public abstract class DSpaceItem implements Item {
         } else if (parts.length == 3) {
             return this.getMetadata(parts[0], parts[1], parts[2]);
         } else {
-            return new ArrayList<String>();
+            return new ArrayList<>();
         }
     }
 
     @Override
     public List<About> getAbout() {
-        return new ArrayList<About>();
+        return new ArrayList<>();
     }
 
     protected abstract String getHandle();
@@ -107,7 +109,7 @@ public abstract class DSpaceItem implements Item {
     }
 
     private static class MetadataNamePredicate implements Predicate<Element> {
-        private String name;
+        private final String name;
 
         public MetadataNamePredicate(String n) {
             name = n;

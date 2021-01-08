@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.StringTokenizer;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
@@ -21,11 +22,12 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.packager.PackageIngester;
 import org.dspace.content.packager.PackageParameters;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.purl.sword.base.Deposit;
 import org.purl.sword.base.SWORDErrorException;
 
@@ -34,15 +36,18 @@ public class SWORDMETSIngester implements SWORDIngester {
 
     protected ItemService itemService = ContentServiceFactory.getInstance()
                                                              .getItemService();
+    private final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
      * Log4j logger
      */
-    public static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SWORDMETSIngester.class);
+    public static final Logger log = LogManager.getLogger(SWORDMETSIngester.class);
 
     /* (non-Javadoc)
      * @see org.dspace.sword.SWORDIngester#ingest(org.dspace.core.Context, org.purl.sword.base.Deposit)
      */
+    @Override
     public DepositResult ingest(SWORDService service, Deposit deposit,
                                 DSpaceObject dso)
         throws DSpaceSWORDException, SWORDErrorException {
@@ -64,8 +69,7 @@ public class SWORDMETSIngester implements SWORDIngester {
             File depositFile = deposit.getFile();
 
             // load the plugin manager for the required configuration
-            String cfg = ConfigurationManager.getProperty("sword-server",
-                                                          "mets-ingester.package-ingester");
+            String cfg = configurationService.getProperty("sword-server.mets-ingester.package-ingester");
             if (cfg == null || "".equals(cfg)) {
                 cfg = "METS";  // default to METS
             }
@@ -87,14 +91,14 @@ public class SWORDMETSIngester implements SWORDIngester {
             params.setWorkflowEnabled(true);
 
             // Should restore mode be enabled, i.e. keep existing handle?
-            if (ConfigurationManager
-                .getBooleanProperty("sword-server", "restore-mode.enable",
+            if (configurationService
+                .getBooleanProperty("sword-server.restore-mode.enable",
                                     false)) {
                 params.setRestoreModeEnabled(true);
             }
 
             // Whether or not to use the collection template
-            params.setUseCollectionTemplate(ConfigurationManager
+            params.setUseCollectionTemplate(configurationService
                                                 .getBooleanProperty(
                                                     "mets.default.ingest.useCollectionTemplate",
                                                     false));
@@ -181,8 +185,8 @@ public class SWORDMETSIngester implements SWORDIngester {
      */
     private void setUpdatedDate(Context context, Item item)
         throws DSpaceSWORDException {
-        String field = ConfigurationManager
-            .getProperty("sword-server", "updated.field");
+        String field = configurationService
+            .getProperty("sword-server.updated.field");
         if (field == null || "".equals(field)) {
             throw new DSpaceSWORDException(
                 "No configuration, or configuration is invalid for: sword.updated.field");
@@ -221,8 +225,8 @@ public class SWORDMETSIngester implements SWORDIngester {
             return;
         }
 
-        String field = ConfigurationManager
-            .getProperty("sword-server", "slug.field");
+        String field = configurationService
+            .getProperty("sword-server.slug.field");
         if (field == null || "".equals(field)) {
             throw new DSpaceSWORDException(
                 "No configuration, or configuration is invalid for: sword.slug.field");

@@ -118,8 +118,7 @@ public class AuthenticationRestController implements InitializingBean {
 
         //If we don't have an EPerson here, this means authentication failed and we should return an error message.
         return getLoginResponse(request,
-                                "Authentication failed for user " + user + ": The credentials you provided are not " +
-                                    "valid.");
+                                "Authentication failed. The credentials you provided are not valid.");
     }
 
     /**

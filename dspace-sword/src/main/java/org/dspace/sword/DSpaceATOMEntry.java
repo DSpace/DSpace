@@ -10,7 +10,8 @@ package org.dspace.sword;
 import org.dspace.content.Bitstream;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.purl.sword.atom.Author;
 import org.purl.sword.atom.Contributor;
 import org.purl.sword.atom.Generator;
@@ -196,8 +197,10 @@ public abstract class DSpaceATOMEntry {
      * add the generator field content
      */
     protected void addGenerator() {
-        boolean identify = ConfigurationManager.getBooleanProperty(
-            "sword-server", "identify-version");
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        boolean identify = configurationService.getBooleanProperty(
+            "sword-server.identify-version");
         SWORDUrlManager urlManager = swordService.getUrlManager();
         String softwareUri = urlManager.getGeneratorUrl();
         if (identify) {
