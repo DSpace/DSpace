@@ -63,6 +63,7 @@ import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.EmptyWorkflowGroupException;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.PasswordHash;
 import org.dspace.eperson.dao.RegistrationDataDAO;
@@ -70,6 +71,7 @@ import org.dspace.eperson.service.AccountService;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.RegistrationDataService;
 import org.dspace.services.ConfigurationService;
+import org.dspace.workflow.WorkflowService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,6 +87,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private EPersonService ePersonService;
+
+    @Autowired
+    private WorkflowService workflowService;
 
     @Autowired
     private RegistrationDataDAO registrationDataDAO;
@@ -833,11 +838,42 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         // 422 error when trying to DELETE the eperson=submitter
         getClient(token).perform(delete("/api/eperson/epersons/" + ePerson.getID()))
-                   .andExpect(status().is(422));
+                   .andExpect(status().isUnprocessableEntity());
 
         // Verify the eperson is still here
         getClient(token).perform(get("/api/eperson/epersons/" + ePerson.getID()))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void deleteLastPersonInWorkflowGroup() throws Exception {
+        // set up workflow group with ePerson as only member
+        context.turnOffAuthorisationSystem();
+        EPerson ePerson = EPersonBuilder
+            .createEPerson(context)
+            .withEmail("eperson@example.com")
+            .withNameInMetadata("Sample", "EPerson")
+            .build();
+        Community community = CommunityBuilder
+            .createCommunity(context)
+            .build();
+        Collection collection = CollectionBuilder
+            .createCollection(context, community)
+            .withWorkflowGroup(1, ePerson)
+            .build();
+        Group workflowGroup = collection.getWorkflowStep1(context);
+        context.restoreAuthSystemState();
+
+        // generate expectations
+        String expectedErrorMsg = String.format(
+            EmptyWorkflowGroupException.msgFmt, ePerson.getID(), workflowGroup.getID()
+        );
+
+        // verify 422 with correct error message
+        getClient(getAuthToken(admin.getEmail(), password))
+            .perform(delete("/api/eperson/epersons/" + ePerson.getID()))
+            .andExpect(status().isUnprocessableEntity())
+            .andExpect(status().reason(is(expectedErrorMsg)));
     }
 
     @Test
