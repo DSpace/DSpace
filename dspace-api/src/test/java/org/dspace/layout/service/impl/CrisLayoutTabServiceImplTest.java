@@ -282,7 +282,7 @@ public class CrisLayoutTabServiceImplTest {
         throws SQLException {
         CrisLayoutBox box = new CrisLayoutBox();
         box.setId(new Random().nextInt(10000));
-        when(boxService.hasContent(context, box, null, itemMetadata))
+        when(boxService.hasContent(context, box, item, itemMetadata))
             .thenReturn(hasContent);
         when(crisLayoutBoxAccessService.hasAccess(any(), any(), eq(box), any()))
             .thenReturn(grantedAccess);
