@@ -6,8 +6,9 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.metrics.scopus;
+
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.StringReader;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -20,6 +21,7 @@ import org.dspace.app.util.XMLUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
@@ -27,6 +29,7 @@ import org.xml.sax.SAXException;
  * will deal with the SCOPUS External Data lookup
  * 
  * @author mykhaylo boychuk (mykhaylo.boychuk at 4science.it)
+ * @author Corrado Lombardi (corrado.lombardi at 4science.it)
  */
 public class ScopusProvider {
 
@@ -36,28 +39,28 @@ public class ScopusProvider {
     private ScopusRestConnector scopusRestConnector;
 
     public CrisMetricDTO getScopusObject(String id) {
-        InputStream is = getRecords(id);
-        if (is != null) {
+        String is = getRecords(id);
+        if (StringUtils.isNotBlank(is)) {
             return convertToScopusDTO(is);
         }
         log.error("The query : " + id + " is wrong!");
         return null;
     }
 
-    private InputStream getRecords(String id) {
+    private String getRecords(String id) {
         if (StringUtils.isBlank(id)) {
             return null;
         }
         return scopusRestConnector.get(id);
     }
 
-    private CrisMetricDTO convertToScopusDTO(InputStream inputStream) {
+    private CrisMetricDTO convertToScopusDTO(String inputStream) {
         Document doc = null;
         DocumentBuilder docBuilder = null;
         try {
             DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
             docBuilder = docBuilderFactory.newDocumentBuilder();
-            doc = docBuilder.parse(inputStream);
+            doc = docBuilder.parse(new InputSource(new StringReader(inputStream)));
         } catch (ParserConfigurationException | SAXException | IOException e) {
             log.error(e.getMessage(), e);
         }

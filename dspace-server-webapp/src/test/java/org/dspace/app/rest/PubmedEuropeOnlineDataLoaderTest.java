@@ -117,7 +117,7 @@ public class PubmedEuropeOnlineDataLoaderTest extends AbstractControllerIntegrat
             .andExpect(jsonPath("$.sections.publication.['dc.contributor.author'][2].value",
                 is("Yan, Xiaotong")))
             .andExpect(jsonPath("$.sections.publication_indexing.['dc.description.abstract'][0].value",
-                is("Abstract Background Acute respiratory tract infections " +
+                is("<h4>Background: </h4> Acute respiratory tract infections " +
                     "(ARTI), including the common cold, pharyngitis, sinusitis, otitis media, " +
                     "tonsillitis, bronchiolitis and pneumonia are the most common diagnoses in " +
                     "pediatric patients, and account for most antibiotic prescriptions. A confirmed and " +
@@ -159,7 +159,7 @@ public class PubmedEuropeOnlineDataLoaderTest extends AbstractControllerIntegrat
             .andExpect(jsonPath("$.sections.publication.['dc.contributor.author'][2].value",
                 is("Yan, Xiaotong")))
             .andExpect(jsonPath("$.sections.publication_indexing.['dc.description.abstract'][0].value",
-                is("Abstract Background Acute respiratory tract infections " +
+                is("<h4>Background: </h4> Acute respiratory tract infections " +
                     "(ARTI), including the common cold, pharyngitis, sinusitis, otitis media, " +
                     "tonsillitis, bronchiolitis and pneumonia are the most common diagnoses in " +
                     "pediatric patients, and account for most antibiotic prescriptions. A confirmed and " +
@@ -234,7 +234,7 @@ public class PubmedEuropeOnlineDataLoaderTest extends AbstractControllerIntegrat
             .andExpect(jsonPath("$.sections.publication.['dc.contributor.author'][2].value",
                 is("Yan, Xiaotong")))
             .andExpect(jsonPath("$.sections.publication_indexing.['dc.description.abstract'][0].value",
-                is("Abstract Background Acute respiratory tract infections " +
+                is("<h4>Background: </h4> Acute respiratory tract infections " +
                     "(ARTI), including the common cold, pharyngitis, sinusitis, otitis media, " +
                     "tonsillitis, bronchiolitis and pneumonia are the most common diagnoses in " +
                     "pediatric patients, and account for most antibiotic prescriptions. A confirmed and " +
@@ -276,7 +276,7 @@ public class PubmedEuropeOnlineDataLoaderTest extends AbstractControllerIntegrat
             .andExpect(jsonPath("$.sections.publication.['dc.contributor.author'][2].value",
                 is("Yan, Xiaotong")))
             .andExpect(jsonPath("$.sections.publication_indexing.['dc.description.abstract'][0].value",
-                is("Abstract Background Acute respiratory tract infections " +
+                is("<h4>Background: </h4> Acute respiratory tract infections " +
                     "(ARTI), including the common cold, pharyngitis, sinusitis, otitis media, " +
                     "tonsillitis, bronchiolitis and pneumonia are the most common diagnoses in " +
                     "pediatric patients, and account for most antibiotic prescriptions. A confirmed and " +

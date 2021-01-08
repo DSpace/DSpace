@@ -6,21 +6,20 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.metrics.wos;
+
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Objects;
-import javax.annotation.PostConstruct;
+import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.logging.log4j.Logger;
 import org.dspace.metrics.scopus.CrisMetricDTO;
 import org.json.JSONArray;
@@ -28,8 +27,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * 
+ * Connectors towards Web Of Science external service that collects
+ * author-related metrics.
+ *
+ * Used {@link CloseableHttpClient} can be injected. i.e. for testing purposes.
+ * Please note that {@link CloseableHttpClient} instance connection is eventually closed after performing operation.
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
+ * @author Corrado Lombardi (corrado.lombardi at 4science.it)
  */
 public class WOSPersonRestConnector {
 
@@ -37,17 +42,10 @@ public class WOSPersonRestConnector {
 
     private String apiKey;
     private String wosUrl;
-    private HttpClient httpClient;
+    private CloseableHttpClient httpClient;
 
-    @PostConstruct
-    private void setup() {
-        this.httpClient = HttpClientBuilder.create()
-            .setConnectionManager(new PoolingHttpClientConnectionManager())
-            .build();
-    }
 
-    public CrisMetricDTO sendRequestToWOS(String id)
-            throws UnsupportedEncodingException, IOException, ClientProtocolException {
+    public CrisMetricDTO sendRequestToWOS(String orcidId)throws IOException {
         double total = 0;
         int record = 0;
         final int count = 100;
@@ -58,38 +56,46 @@ public class WOSPersonRestConnector {
         CrisMetricDTO metricDTO = new CrisMetricDTO();
         while (!error && (recordsFound == -1 || record < recordsFound)) {
             recordsFound = 0;
-            HttpGet httpPost = new HttpGet(wosUrl.concat("AI=(").concat(id).concat(")&count=")
+            try (CloseableHttpClient httpClient = Optional.ofNullable(this.httpClient)
+                .orElseGet(HttpClients::createDefault)) {
+                HttpGet httpGet = new HttpGet(wosUrl.concat("AI=(").concat(orcidId).concat(")&count=")
                     .concat(String.valueOf(count)).concat("&firstRecord=").concat(String.valueOf(record + 1)));
-            httpPost.setHeader("Accept-Encoding", "gzip, deflate, br");
-            httpPost.setHeader("Connection", "keep-alive");
-            httpPost.setHeader("X-ApiKey", apiKey);
-            httpPost.setHeader("Accept", "application/json");
+                httpGet.setHeader("Accept-Encoding", "gzip, deflate, br");
+                httpGet.setHeader("Connection", "keep-alive");
+                httpGet.setHeader("X-ApiKey", apiKey);
+                httpGet.setHeader("Accept", "application/json");
 
-            HttpResponse response = httpClient.execute(httpPost);
-            int statusCode = response.getStatusLine().getStatusCode();
-            if (statusCode != HttpStatus.SC_OK) {
-                return null;
-            }
-            try {
-                json = new JSONObject(IOUtils.toString(response.getEntity().getContent(), Charset.defaultCharset()));
-                if (StringUtils
-                        .isBlank(json.getJSONObject("Data").getJSONObject("Records").get("records").toString())) {
+                HttpResponse response = httpClient.execute(httpGet);
+                int statusCode = response.getStatusLine().getStatusCode();
+                if (statusCode != HttpStatus.SC_OK) {
                     return null;
                 }
-                recordsFound = json.getJSONObject("QueryResult").getInt("RecordsFound");
-                records = json.getJSONObject("Data")
-                              .getJSONObject("Records")
-                              .getJSONObject("records")
-                              .getJSONArray("REC");
-            } catch (JSONException | IOException e) {
-                log.error(e.getMessage(), e);
-                error = true;
-            }
-            record += records.length();
-            total += sumMetricCounts(records);
-            if (records.length() < count) {
-                // to be safe in the case the wos api would return less records than what initially reported
-                break;
+                InputStream inputStream = response.getEntity().getContent();
+                try {
+                    json = new JSONObject(IOUtils.toString(inputStream, Charset.defaultCharset()));
+                    if (StringUtils
+                        .isBlank(json.getJSONObject("Data").getJSONObject("Records").get("records").toString())) {
+                        return null;
+                    }
+                    recordsFound = json.getJSONObject("QueryResult").getInt("RecordsFound");
+                    records = json.getJSONObject("Data")
+                        .getJSONObject("Records")
+                        .getJSONObject("records")
+                        .getJSONArray("REC");
+                } catch (JSONException | IOException e) {
+                    log.error(e.getMessage(), e);
+                    error = true;
+                } finally {
+                    if (Objects.nonNull(inputStream)) {
+                        inputStream.close();
+                    }
+                }
+                record += records.length();
+                total += sumMetricCounts(records);
+                if (records.length() < count) {
+                    // to be safe in the case the wos api would return less records than what initially reported
+                    break;
+                }
             }
         }
         metricDTO.setMetricCount(total);
@@ -131,11 +137,16 @@ public class WOSPersonRestConnector {
         this.wosUrl = wosUrl;
     }
 
-    public HttpClient getHttpClient() {
+    public CloseableHttpClient getHttpClient() {
         return httpClient;
     }
 
-    public void setHttpClient(HttpClient httpClient) {
+    /**
+     * sets a custom {@link CloseableHttpClient} instance. Please make sure that
+     * this instance is not closed.
+     * @param httpClient
+     */
+    public void setHttpClient(CloseableHttpClient httpClient) {
         this.httpClient = httpClient;
     }
 

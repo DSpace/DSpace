@@ -6,27 +6,30 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest;
+
 import static org.dspace.app.launcher.ScriptLauncher.handleScript;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
 import com.amazonaws.util.StringInputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.ProtocolVersion;
-import org.apache.http.client.HttpClient;
+import org.apache.http.StatusLine;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.entity.BasicHttpEntity;
-import org.apache.http.message.BasicHttpResponse;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.metrics.CrisMetrics;
 import org.dspace.app.metrics.service.CrisMetricsService;
@@ -52,6 +55,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  *
  * @author mykhaylo boychuk (mykhaylo.boychuk at 4science.it)
+ * @author Corrado Lombardi (corrado.lombardi at 4science.it)
  */
 public class UpdateWOSMetricsIT extends AbstractControllerIntegrationTest {
 
@@ -68,23 +72,17 @@ public class UpdateWOSMetricsIT extends AbstractControllerIntegrationTest {
     public void updateCrisMetricsFromWosMockitoTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        HttpClient originalHttpClient = wosRestConnector.getHttpClient();
-        HttpClient httpClient = Mockito.mock(HttpClient.class);
+        CloseableHttpClient originalHttpClient = wosRestConnector.getHttpClient();
+        CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
         Item itemA = null;
         try (FileInputStream file = new FileInputStream(testProps.get("test.wosResponceJSON").toString())) {
 
             String xmlMetricsExample = IOUtils.toString(file, Charset.defaultCharset());
             wosRestConnector.setHttpClient(httpClient);
 
-            BasicHttpResponse basicHttpResponse = new BasicHttpResponse(new ProtocolVersion("http", 1, 1), 200, "OK");
-            basicHttpResponse.setEntity(new BasicHttpEntity());
-            InputStream inputStream = new StringInputStream(xmlMetricsExample);
-            BasicHttpEntity basicHttpEntity = new BasicHttpEntity();
-            basicHttpResponse.setEntity(basicHttpEntity);
-            basicHttpEntity.setChunked(true);
-            basicHttpEntity.setContent(inputStream);
+            CloseableHttpResponse response = mockResponse(xmlMetricsExample, 200, "OK");
 
-            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(basicHttpResponse);
+            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
 
             parentCommunity = CommunityBuilder.createCommunity(context)
                                               .withName("Parent Community").build();
@@ -126,8 +124,8 @@ public class UpdateWOSMetricsIT extends AbstractControllerIntegrationTest {
     public void wosResponceMetricCountAbsentMockitoTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        HttpClient originalHttpClient = wosRestConnector.getHttpClient();
-        HttpClient httpClient = Mockito.mock(HttpClient.class);
+        CloseableHttpClient originalHttpClient = wosRestConnector.getHttpClient();
+        CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
         Item itemA = null;
         try (FileInputStream file = new FileInputStream(testProps.get(
                         "test.wosResponceMetricCountAbsent").toString())) {
@@ -135,15 +133,8 @@ public class UpdateWOSMetricsIT extends AbstractControllerIntegrationTest {
             String xmlMetricsExample = IOUtils.toString(file, Charset.defaultCharset());
             wosRestConnector.setHttpClient(httpClient);
 
-            BasicHttpResponse basicHttpResponse = new BasicHttpResponse(new ProtocolVersion("http", 1, 1), 200, "OK");
-            basicHttpResponse.setEntity(new BasicHttpEntity());
-            InputStream inputStream = new StringInputStream(xmlMetricsExample);
-            BasicHttpEntity basicHttpEntity = new BasicHttpEntity();
-            basicHttpResponse.setEntity(basicHttpEntity);
-            basicHttpEntity.setChunked(true);
-            basicHttpEntity.setContent(inputStream);
-
-            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(basicHttpResponse);
+            CloseableHttpResponse response = mockResponse(xmlMetricsExample, 200, "OK");
+            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
 
             parentCommunity = CommunityBuilder.createCommunity(context)
                                               .withName("Parent Community").build();
@@ -189,23 +180,16 @@ public class UpdateWOSMetricsIT extends AbstractControllerIntegrationTest {
     public void badRequestMockitoTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        HttpClient originalHttpClient = wosRestConnector.getHttpClient();
-        HttpClient httpClient = Mockito.mock(HttpClient.class);
+        CloseableHttpClient originalHttpClient = wosRestConnector.getHttpClient();
+        CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
         Item itemA = null;
         try (FileInputStream file = new FileInputStream(testProps.get("test.wosBadRequest").toString())) {
 
             String xmlMetricsExample = IOUtils.toString(file, Charset.defaultCharset());
             wosRestConnector.setHttpClient(httpClient);
 
-            BasicHttpResponse basicHttpResponse = new BasicHttpResponse(new ProtocolVersion("http", 1, 1), 200, "OK");
-            basicHttpResponse.setEntity(new BasicHttpEntity());
-            InputStream inputStream = new StringInputStream(xmlMetricsExample);
-            BasicHttpEntity basicHttpEntity = new BasicHttpEntity();
-            basicHttpResponse.setEntity(basicHttpEntity);
-            basicHttpEntity.setChunked(true);
-            basicHttpEntity.setContent(inputStream);
-
-            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(basicHttpResponse);
+            CloseableHttpResponse response = mockResponse(xmlMetricsExample, 200, "OK");
+            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
 
             parentCommunity = CommunityBuilder.createCommunity(context)
                                               .withName("Parent Community").build();
@@ -245,23 +229,16 @@ public class UpdateWOSMetricsIT extends AbstractControllerIntegrationTest {
     public void updateCrisMetricsWithPersonEntityTypeMockitoTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        HttpClient originalHttpClient = wosPersonRestConnector.getHttpClient();
-        HttpClient httpClient = Mockito.mock(HttpClient.class);
+        CloseableHttpClient originalHttpClient = wosPersonRestConnector.getHttpClient();
+        CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
         Item itemA = null;
         try (FileInputStream file = new FileInputStream(testProps.get("test.wosResponceMultiRecords").toString())) {
 
             String wosMetricsExample = IOUtils.toString(file, Charset.defaultCharset());
             wosPersonRestConnector.setHttpClient(httpClient);
 
-            BasicHttpResponse basicHttpResponse = new BasicHttpResponse(new ProtocolVersion("http", 1, 1), 200, "OK");
-            basicHttpResponse.setEntity(new BasicHttpEntity());
-            InputStream inputStream = new StringInputStream(wosMetricsExample);
-            BasicHttpEntity basicHttpEntity = new BasicHttpEntity();
-            basicHttpResponse.setEntity(basicHttpEntity);
-            basicHttpEntity.setChunked(true);
-            basicHttpEntity.setContent(inputStream);
-
-            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(basicHttpResponse);
+            CloseableHttpResponse response = mockResponse(wosMetricsExample, 200, "OK");
+            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
 
             parentCommunity = CommunityBuilder.createCommunity(context)
                                               .withName("Parent Community").build();
@@ -302,23 +279,16 @@ public class UpdateWOSMetricsIT extends AbstractControllerIntegrationTest {
     public void updateCrisMetricsWithPersonEntityTypeBadRequestMockitoTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        HttpClient originalHttpClient = wosPersonRestConnector.getHttpClient();
-        HttpClient httpClient = Mockito.mock(HttpClient.class);
+        CloseableHttpClient originalHttpClient = wosPersonRestConnector.getHttpClient();
+        CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
         Item itemA = null;
         try (FileInputStream file = new FileInputStream(testProps.get("test.wosBadRequest").toString())) {
 
             String wosMetricsExample = IOUtils.toString(file, Charset.defaultCharset());
             wosPersonRestConnector.setHttpClient(httpClient);
 
-            BasicHttpResponse basicHttpResponse = new BasicHttpResponse(new ProtocolVersion("http", 1, 1), 200, "OK");
-            basicHttpResponse.setEntity(new BasicHttpEntity());
-            InputStream inputStream = new StringInputStream(wosMetricsExample);
-            BasicHttpEntity basicHttpEntity = new BasicHttpEntity();
-            basicHttpResponse.setEntity(basicHttpEntity);
-            basicHttpEntity.setChunked(true);
-            basicHttpEntity.setContent(inputStream);
-
-            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(basicHttpResponse);
+            CloseableHttpResponse response = mockResponse(wosMetricsExample, 200, "OK");
+            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
 
             parentCommunity = CommunityBuilder.createCommunity(context)
                                               .withName("Parent Community").build();
@@ -359,24 +329,16 @@ public class UpdateWOSMetricsIT extends AbstractControllerIntegrationTest {
     public void updateCrisMetricsWithPersonEntityTypeUnauthorizedMockitoTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        HttpClient originalHttpClient = wosPersonRestConnector.getHttpClient();
-        HttpClient httpClient = Mockito.mock(HttpClient.class);
+        CloseableHttpClient originalHttpClient = wosPersonRestConnector.getHttpClient();
+        CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
         Item itemA = null;
         try (FileInputStream file = new FileInputStream(testProps.get("test.wosUnauthorized").toString())) {
 
             String wosMetricsExample = IOUtils.toString(file, Charset.defaultCharset());
             wosPersonRestConnector.setHttpClient(httpClient);
 
-            BasicHttpResponse basicHttpResponse = new BasicHttpResponse(
-                                                  new ProtocolVersion("http", 1, 1), 401, "Unauthorized");
-            basicHttpResponse.setEntity(new BasicHttpEntity());
-            InputStream inputStream = new StringInputStream(wosMetricsExample);
-            BasicHttpEntity basicHttpEntity = new BasicHttpEntity();
-            basicHttpResponse.setEntity(basicHttpEntity);
-            basicHttpEntity.setChunked(true);
-            basicHttpEntity.setContent(inputStream);
-
-            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(basicHttpResponse);
+            CloseableHttpResponse response = mockResponse(wosMetricsExample, 401, "Unauthorized");
+            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
 
             parentCommunity = CommunityBuilder.createCommunity(context)
                                               .withName("Parent Community").build();
@@ -411,5 +373,37 @@ public class UpdateWOSMetricsIT extends AbstractControllerIntegrationTest {
             CrisMetricsBuilder.deleteCrisMetrics(itemA);
             wosPersonRestConnector.setHttpClient(originalHttpClient);
         }
+    }
+
+    private CloseableHttpResponse mockResponse(String xmlExample, int statusCode, String reason)
+        throws UnsupportedEncodingException {
+        BasicHttpEntity basicHttpEntity = new BasicHttpEntity();
+        basicHttpEntity.setChunked(true);
+        basicHttpEntity.setContent(new StringInputStream(xmlExample));
+
+        CloseableHttpResponse response = mock(CloseableHttpResponse.class);
+        when(response.getStatusLine())
+            .thenReturn(statusLine(statusCode, reason));
+        when(response.getEntity()).thenReturn(basicHttpEntity);
+        return response;
+    }
+
+    private StatusLine statusLine(int statusCode, String reason) {
+        return new StatusLine() {
+            @Override
+            public ProtocolVersion getProtocolVersion() {
+                return new ProtocolVersion("http", 1, 1);
+            }
+
+            @Override
+            public int getStatusCode() {
+                return statusCode;
+            }
+
+            @Override
+            public String getReasonPhrase() {
+                return reason;
+            }
+        };
     }
 }

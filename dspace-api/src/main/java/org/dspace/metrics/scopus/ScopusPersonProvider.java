@@ -6,15 +6,12 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.metrics.scopus;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import com.jayway.jsonpath.PathNotFoundException;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -56,29 +53,27 @@ public class ScopusPersonProvider {
     private ScopusPersonRestConnector hindexRestConnector;
 
     public List<CrisMetricDTO> getCrisMetricDTOs(String id, String param) {
-        InputStream is = getRecords(id);
-        if (is != null) {
-            return convertToCrisMetricDTOs(is, param);
+        String records = getRecords(id);
+        if (StringUtils.isNotBlank(records)) {
+            return convertToCrisMetricDTOs(records, param);
         }
         log.error("The Item with scopus-author-id : " + id + " was not updated!");
         return null;
     }
 
-    private InputStream getRecords(String id) {
+    private String getRecords(String id) {
         if (!StringUtils.isNotBlank(id)) {
             return null;
         }
         return hindexRestConnector.get(id);
     }
 
-    private List<CrisMetricDTO> convertToCrisMetricDTOs(InputStream inputStream, String param) {
+    private List<CrisMetricDTO> convertToCrisMetricDTOs(String json, String param) {
         JSONObject jsonObject = null;
         try {
-            jsonObject = new JSONObject(IOUtils.toString(inputStream, Charset.defaultCharset()))
+            jsonObject = new JSONObject(json)
                                      .getJSONArray("author-retrieval-response").getJSONObject(0);
         } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
             e.printStackTrace();
         }
         List<CrisMetricDTO> dtos = new ArrayList<CrisMetricDTO>();

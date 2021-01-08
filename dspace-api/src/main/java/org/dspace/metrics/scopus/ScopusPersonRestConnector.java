@@ -7,54 +7,51 @@
  */
 package org.dspace.metrics.scopus;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
-import javax.annotation.PostConstruct;
+import java.util.Optional;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.logging.log4j.Logger;
 
 /**
- * This class deals with logic management to connect to the H-Index outdoor service
+ * This class deals with logic management to connect to scopus external service in order to collect
+ * person metrics like h-index.
+ *
+ * Used {@link CloseableHttpClient} can be injected. i.e. for testing purposes.
+ * Please note that {@link CloseableHttpClient} instance connection is eventually closed after performing operation.
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
+ * @author Corrado Lombardi (corrado.lombardi at 4science.it)
  */
 public class ScopusPersonRestConnector {
 
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ScopusPersonRestConnector.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ScopusPersonRestConnector.class);
 
     private String url;
     private String apiKey;
     private String insttoken;
     private Boolean enhanced;
 
-    private HttpClient httpClient;
+    private CloseableHttpClient httpClient;
 
-    @PostConstruct
-    private void setup() {
-        this.httpClient = HttpClientBuilder.create()
-            .setConnectionManager(new PoolingHttpClientConnectionManager())
-            .build();
-    }
 
-    public InputStream get(String id) {
+    public String get(String id) {
         try {
             return sendRequest(id);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw new RuntimeException(e);
+            log.warn(e.getMessage(), e);
+            return null;
         }
     }
 
-    private InputStream sendRequest(String id)
-            throws UnsupportedEncodingException, IOException, ClientProtocolException {
+    private String sendRequest(String id)
+            throws IOException {
         StringBuilder requestUrl = new StringBuilder(url);
         requestUrl.append(id);
         if (!Objects.isNull(enhanced) && enhanced == true) {
@@ -63,19 +60,23 @@ public class ScopusPersonRestConnector {
             System.out.println("The ENHANCED param must be valued with true");
             return null;
         }
-        HttpGet httpGet = new HttpGet(requestUrl.toString());
-        httpGet.setHeader("Accept-Encoding", "gzip, deflate, br");
-        httpGet.setHeader("Connection", "keep-alive");
-        httpGet.setHeader("X-ELS-APIKey", apiKey);
-        httpGet.setHeader("X-ELS-Insttoken", insttoken);
-        httpGet.setHeader("Accept", "application/json");
+        try (CloseableHttpClient httpClient = Optional.ofNullable(this.httpClient)
+            .orElseGet(HttpClients::createDefault)) {
 
-        HttpResponse response = httpClient.execute(httpGet);
-        int statusCode = response.getStatusLine().getStatusCode();
-        if (statusCode != HttpStatus.SC_OK) {
-            return null;
+            HttpGet httpGet = new HttpGet(requestUrl.toString());
+            httpGet.setHeader("Accept-Encoding", "gzip, deflate, br");
+            httpGet.setHeader("Connection", "keep-alive");
+            httpGet.setHeader("X-ELS-APIKey", apiKey);
+            httpGet.setHeader("X-ELS-Insttoken", insttoken);
+            httpGet.setHeader("Accept", "application/json");
+
+            HttpResponse response = httpClient.execute(httpGet);
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode != HttpStatus.SC_OK) {
+                return null;
+            }
+            return IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
         }
-        return response.getEntity().getContent();
     }
 
     public String getUrl() {
@@ -110,11 +111,16 @@ public class ScopusPersonRestConnector {
         this.enhanced = enhanced;
     }
 
-    public HttpClient getHttpClient() {
+    public CloseableHttpClient getHttpClient() {
         return httpClient;
     }
 
-    public void setHttpClient(HttpClient httpClient) {
+    /**
+     * sets a custom {@link CloseableHttpClient} instance. Please make sure that
+     * this instance is not closed.
+     * @param httpClient
+     */
+    public void setHttpClient(CloseableHttpClient httpClient) {
         this.httpClient = httpClient;
     }
 }
