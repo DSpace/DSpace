@@ -10,6 +10,8 @@ package org.dspace.content.authority;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -69,6 +71,9 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
         .getServicesByType(CustomAuthorityFilter.class);
 
     private ExternalDataService externalDataService = ExternalServiceFactory.getInstance().getExternalDataService();
+
+    // map of field key to presentation type
+    protected Map<String, String> externalSource = new HashMap<String, String>();
 
     // punt!  this is a poor implementation..
     @Override
@@ -168,27 +173,47 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
     public String getPluginInstanceName() {
         return authorityName;
     }
-
+    
+    /**
+     * Return map of key to presentation
+     *
+     * @return
+     */
     @Override
-    public boolean hasValidExternalSource(String fieldKey) {
-        String sourceIdentifier = getExternalSourceConfig(fieldKey);
+    public Map<String, String> getExternalSource() {
+        // If empty, load from configuration
+        if (externalSource.isEmpty()) {
+            // Get all configuration keys starting with a given prefix
+            List<String> propKeys = configurationService.getPropertyKeys(CHOICES_EXTERNALSOURCE_PREFIX);
+            Iterator<String> keyIterator = propKeys.iterator();
+            while (keyIterator.hasNext()) {
+                String key = keyIterator.next();
+
+                String metadata = key.substring(CHOICES_EXTERNALSOURCE_PREFIX.length());
+                if (metadata == null) {
+                    log.warn("Skipping invalid external source authority configuration property: " + key +
+                        ": does not have schema.element.qualifier");
+                    continue;
+                }
+                String sourceIdentifier = configurationService.getProperty(key);
+                if (hasValidExternalSource(sourceIdentifier)) {
+                    externalSource.put(metadata, sourceIdentifier);
+                } else {
+                    log.warn("Skipping invalid external source authority configuration property: " + sourceIdentifier +
+                            " does not exist");
+                    continue;
+                }
+            }
+        }
+
+        return externalSource;
+    }
+
+    private boolean hasValidExternalSource(String sourceIdentifier) {
         if (StringUtils.isNotBlank(sourceIdentifier)) {
             ExternalDataProvider externalsource = externalDataService.getExternalDataProvider(sourceIdentifier);
             return (externalsource != null);
         }
         return false;
-    }
-
-    @Override
-    public String getExternalSource(String fieldKey) {
-        return getExternalSourceConfig(fieldKey);
-    }
-
-    private String getExternalSourceConfig(String fieldKey) {
-        String configName = CHOICES_EXTERNALSOURCE_PREFIX + fieldKey;
-        if (StringUtils.isNotBlank(configName)) {
-            return configurationService.getProperty(configName);
-        }
-        return null;
     }
 }

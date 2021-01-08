@@ -125,25 +125,6 @@ public class AuthorityUtils {
     }
 
     /**
-     * TODO the authorityName MUST be a part of ChoiceAuthority model
-     *
-     * @param source
-     * @param authorityName
-     * @param entityType
-     * @param externalSource
-     * @param projection the projecton to use.
-     * @return
-     */
-    public VocabularyRest convertAuthorityWithExternalSource(ChoiceAuthority source, String authorityName,
-            String entityType, String externalSource, Projection projection) {
-        VocabularyRest result = converter.toRest(source, projection);
-        result.setEntity(entityType);
-        result.setExternalSource(externalSource);
-        result.setName(authorityName);
-        return result;
-    }
-
-    /**
      * Get the configured "isHierarchical" value for this authority.
      *
      * @param authorityName single string identifying authority name

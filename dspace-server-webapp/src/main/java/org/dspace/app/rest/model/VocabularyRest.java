@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.model;
 
+import java.util.Map;
+
 import org.dspace.app.rest.RestResourceController;
 
 /**
@@ -35,7 +37,7 @@ public class VocabularyRest extends BaseObjectRest<String> {
 
     private String entity;
 
-    private String externalSource;
+    private Map<String,String> externalSource;
 
     @Override
     public String getId() {
@@ -82,11 +84,11 @@ public class VocabularyRest extends BaseObjectRest<String> {
         this.entity = entity;
     }
 
-    public String getExternalSource() {
+    public Map<String, String> getExternalSource() {
         return externalSource;
     }
 
-    public void setExternalSource(String externalSource) {
+    public void setExternalSource(Map<String, String> externalSource) {
         this.externalSource = externalSource;
     }
 

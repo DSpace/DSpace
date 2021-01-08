@@ -11,6 +11,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.dspace.app.rest.matcher.ItemAuthorityMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
@@ -378,6 +381,8 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
 
     @Test
     public void itemAuthorityWithValidExternalSourceTest() throws Exception {
+        Map<String, String> exptectedMap = new HashMap<String, String>(
+                Map.of("dc.contributor.author", "authorAuthority"));
        context.turnOffAuthorisationSystem();
 
        configurationService.setProperty("choises.externalsource.dc.contributor.author", "authorAuthority");
@@ -387,24 +392,18 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
        pluginService.clearNamedPluginClasses();
        cas.clearCache();
 
-       parentCommunity = CommunityBuilder.createCommunity(context).build();
-       Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                          .withName("Test collection")
-                                          .build();
-
        context.restoreAuthSystemState();
 
        String token = getAuthToken(eperson.getEmail(), password);
-       getClient(token).perform(get("/api/submission/vocabularies/search/byMetadataAndCollection")
-                       .param("metadata", "dc.contributor.author")
-                       .param("collection", col1.getID().toString()))
+       getClient(token).perform(get("/api/submission/vocabularies/AuthorAuthority"))
                        .andExpect(status().isOk())
                        .andExpect(jsonPath("$.entity", Matchers.is("Person")))
-                       .andExpect(jsonPath("$.externalSource", Matchers.is("authorAuthority")));
+                       .andExpect(jsonPath("$.externalSource", Matchers.is(exptectedMap)));
     }
 
     @Test
     public void itemAuthorityWithNotValidExternalSourceTest() throws Exception {
+        Map<String, String> exptectedMap = new HashMap<String, String>();
        context.turnOffAuthorisationSystem();
 
        configurationService.setProperty("choises.externalsource.dc.contributor.author", "fakeAuthorAuthority");
@@ -414,20 +413,13 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
        pluginService.clearNamedPluginClasses();
        cas.clearCache();
 
-       parentCommunity = CommunityBuilder.createCommunity(context).build();
-       Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                          .withName("Test collection")
-                                          .build();
-
        context.restoreAuthSystemState();
 
        String token = getAuthToken(eperson.getEmail(), password);
-       getClient(token).perform(get("/api/submission/vocabularies/search/byMetadataAndCollection")
-                       .param("metadata", "dc.contributor.author")
-                       .param("collection", col1.getID().toString()))
+       getClient(token).perform(get("/api/submission/vocabularies/AuthorAuthority"))
                        .andExpect(status().isOk())
-                       .andExpect(jsonPath("$.entity", Matchers.nullValue()))
-                       .andExpect(jsonPath("$.externalSource", Matchers.nullValue()));
+                       .andExpect(jsonPath("$.entity", Matchers.is("Person")))
+                       .andExpect(jsonPath("$.externalSource", Matchers.is(exptectedMap)));
     }
 
     @Override
