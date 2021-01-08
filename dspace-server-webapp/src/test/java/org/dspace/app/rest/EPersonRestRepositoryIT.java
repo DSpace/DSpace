@@ -40,6 +40,7 @@ import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.exception.EPersonNameNotProvidedException;
 import org.dspace.app.rest.jackson.IgnoreJacksonWriteOnlyAccess;
 import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.matcher.GroupMatcher;
@@ -2533,7 +2534,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                          .param("token", newRegisterToken)
                                          .content(mapper.writeValueAsBytes(ePersonRest))
                                          .contentType(MediaType.APPLICATION_JSON))
-                            .andExpect(status().isUnprocessableEntity());
+                            .andExpect(status().isUnprocessableEntity())
+                            .andExpect(status().reason(is(EPersonNameNotProvidedException.message)));
 
             EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
             assertNull(createdEPerson);
@@ -2579,7 +2581,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                          .param("token", newRegisterToken)
                                          .content(mapper.writeValueAsBytes(ePersonRest))
                                          .contentType(MediaType.APPLICATION_JSON))
-                            .andExpect(status().isUnprocessableEntity());
+                            .andExpect(status().isUnprocessableEntity())
+                            .andExpect(status().reason(is(EPersonNameNotProvidedException.message)));
 
             EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
             assertNull(createdEPerson);
