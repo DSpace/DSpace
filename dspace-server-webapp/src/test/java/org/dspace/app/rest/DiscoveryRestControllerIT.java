@@ -50,6 +50,8 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.discovery.configuration.DiscoveryConfigurationService;
+import org.dspace.discovery.configuration.GraphDiscoverSearchFilterFacet;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
@@ -57,10 +59,13 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest {
 
+    @Autowired
+    private DiscoveryConfigurationService discoveryConfigurationService;
 
     @Test
     public void rootDiscoverTest() throws Exception {
@@ -4645,7 +4650,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/discover/facets/graphpubldate")
-                   .param("size", "4"))
+                   .param("size", "3"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.type", is("discover")))
                    .andExpect(jsonPath("$.name", is("graphpubldate")))
@@ -4653,15 +4658,68 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                    .andExpect(jsonPath("$._links.self.href", containsString(
                                        "api/discover/facets/graphpubldate")))
                    .andExpect(jsonPath("$.missing", is("0")))
-                   .andExpect(jsonPath("$.more", is("0")))
+                   .andExpect(jsonPath("$.more", is("3")))
                    .andExpect(jsonPath("$.totalElements", is("4")))
-                   .andExpect(jsonPath("$.page", is(PageMatcher.pageEntry(0, 4))))
+                   .andExpect(jsonPath("$.page", is(PageMatcher.pageEntry(0, 3))))
                    .andExpect(jsonPath("$._embedded.values", contains(
-                              FacetValueMatcher.entryDateIssuedWithLabelAndCount("2016", 1),
-                              FacetValueMatcher.entryDateIssuedWithLabelAndCount("2017", 2),
-                              FacetValueMatcher.entryDateIssuedWithLabelAndCount("2019", 1),
-                              FacetValueMatcher.entryDateIssuedWithLabelAndCount("2020", 1)
+                           FacetValueMatcher.entryDateIssuedWithLabelAndCount("2020", 1),
+                           FacetValueMatcher.entryDateIssuedWithLabelAndCount("2019", 1),
+                           FacetValueMatcher.entryDateIssuedWithLabelAndCount("2018", 0)
                               )));
+
+        GraphDiscoverSearchFilterFacet graphpubldateFacet =
+                (GraphDiscoverSearchFilterFacet) discoveryConfigurationService
+                    .getDiscoveryConfiguration(null).getSidebarFacet("graphpubldate");
+        try {
+            // change the default configuration to disable the reverse direction
+            graphpubldateFacet.setInverseDirection(false);
+            graphpubldateFacet.setGraphType("bar.left-to-right");
+            getClient().perform(get("/api/discover/facets/graphpubldate")
+                    .param("size", "4"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.type", is("discover")))
+                    .andExpect(jsonPath("$.name", is("graphpubldate")))
+                    .andExpect(jsonPath("$.facetType", is("chart.bar.left-to-right")))
+                    .andExpect(jsonPath("$._links.self.href", containsString(
+                                        "api/discover/facets/graphpubldate")))
+                    .andExpect(jsonPath("$.missing", is("0")))
+                    .andExpect(jsonPath("$.more", is("1")))
+                    .andExpect(jsonPath("$.totalElements", is("4")))
+                    .andExpect(jsonPath("$.page", is(PageMatcher.pageEntry(0, 4))))
+                    .andExpect(jsonPath("$._embedded.values", contains(
+                               FacetValueMatcher.entryDateIssuedWithLabelAndCount("2016", 1),
+                               FacetValueMatcher.entryDateIssuedWithLabelAndCount("2017", 2),
+                               FacetValueMatcher.entryDateIssuedWithLabelAndCount("2018", 0),
+                               FacetValueMatcher.entryDateIssuedWithLabelAndCount("2019", 1)
+                               )));
+
+            // also disable the fillDateGap flag
+            graphpubldateFacet.setFillDateGaps(false);
+            graphpubldateFacet.setGraphType("bar.right-to-left");
+            getClient().perform(get("/api/discover/facets/graphpubldate")
+                    .param("size", "4"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.type", is("discover")))
+                    .andExpect(jsonPath("$.name", is("graphpubldate")))
+                    .andExpect(jsonPath("$.facetType", is("chart.bar.right-to-left")))
+                    .andExpect(jsonPath("$._links.self.href", containsString(
+                                        "api/discover/facets/graphpubldate")))
+                    .andExpect(jsonPath("$.missing", is("0")))
+                    .andExpect(jsonPath("$.more", is("0")))
+                    .andExpect(jsonPath("$.totalElements", is("4")))
+                    .andExpect(jsonPath("$.page", is(PageMatcher.pageEntry(0, 4))))
+                    .andExpect(jsonPath("$._embedded.values", contains(
+                               FacetValueMatcher.entryDateIssuedWithLabelAndCount("2016", 1),
+                               FacetValueMatcher.entryDateIssuedWithLabelAndCount("2017", 2),
+                               FacetValueMatcher.entryDateIssuedWithLabelAndCount("2019", 1),
+                               FacetValueMatcher.entryDateIssuedWithLabelAndCount("2020", 1)
+                               )));
+        } finally {
+            // restore default configuration
+            graphpubldateFacet.setInverseDirection(true);
+            graphpubldateFacet.setFillDateGaps(true);
+            graphpubldateFacet.setGraphType("bar");
+        }
     }
 
     @Test

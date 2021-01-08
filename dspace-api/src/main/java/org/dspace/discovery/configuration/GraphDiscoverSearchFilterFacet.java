@@ -79,4 +79,5 @@ public class GraphDiscoverSearchFilterFacet extends DiscoverySearchFilterFacet {
     public void setMaxLevels(int max) {
         this.maxLevels = max;
     }
+
 }
