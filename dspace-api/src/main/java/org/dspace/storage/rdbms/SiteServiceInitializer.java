@@ -45,8 +45,8 @@ public class SiteServiceInitializer implements Callback {
             context = new Context();
             context.turnOffAuthorisationSystem();
             // Create Site object if it doesn't exist in database
-            Site site = null;
-            if (siteService.findSite(context) == null) {
+            Site site = siteService.findSite(context);
+            if (site == null) {
                 site = siteService.createSite(context);
             }
             context.restoreAuthSystemState();
