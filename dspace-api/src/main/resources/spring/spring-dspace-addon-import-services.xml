@@ -173,5 +173,12 @@
           class="org.dspace.importer.external.scopus.service.ScopusFieldMapping">
     </bean>
 
+    <bean id="WosImportService"
+          class="org.dspace.importer.external.wos.service.WOSImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="wosMetadataFieldMapping"/>
+    </bean>
+    <bean id="wosMetadataFieldMapping"
+          class="org.dspace.importer.external.wos.service.WOSFieldMapping">
+    </bean>
 
 </beans>
