@@ -101,6 +101,7 @@ public class CommunityIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Inde
                                   "dc.description.tableofcontents", description_table);
         addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.rights", rights);
         addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.title", title);
+        doc.addField("dc.title_sort", title);
         return doc;
     }
 

@@ -35,6 +35,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
 import org.dspace.app.rest.matcher.BitstreamMatcher;
+import org.dspace.app.rest.matcher.BundleMatcher;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
@@ -46,6 +47,7 @@ import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
 import org.dspace.builder.BitstreamBuilder;
+import org.dspace.builder.BundleBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
@@ -54,6 +56,7 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.ResourcePolicyBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -2739,6 +2742,149 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(jsonPath("$.metadata", matchMetadataDoesNotExist("dc.description.provenance")));
 
     }
+
+    @Test
+    public void findOneTestWithEmbedsWithNoPageSize() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Collection")
+                                                 .build();
+
+        Item item = ItemBuilder.createItem(context, collection).withTitle("Item").build();
+
+        Bundle bundle0 = BundleBuilder.createBundle(context, item).withName("Bundle 0").build();
+        Bundle bundle1 = BundleBuilder.createBundle(context, item).withName("Bundle 1").build();
+        Bundle bundle2 = BundleBuilder.createBundle(context, item).withName("Bundle 2").build();
+        Bundle bundle3 = BundleBuilder.createBundle(context, item).withName("Bundle 3").build();
+        Bundle bundle4 = BundleBuilder.createBundle(context, item).withName("Bundle 4").build();
+        Bundle bundle5 = BundleBuilder.createBundle(context, item).withName("Bundle 5").build();
+        Bundle bundle6 = BundleBuilder.createBundle(context, item).withName("Bundle 6").build();
+        Bundle bundle7 = BundleBuilder.createBundle(context, item).withName("Bundle 7").build();
+        Bundle bundle8 = BundleBuilder.createBundle(context, item).withName("Bundle 8").build();
+        Bundle bundle9 = BundleBuilder.createBundle(context, item).withName("Bundle 9").build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/items/" + item.getID())
+                                    .param("embed", "bundles"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
+        .andExpect(jsonPath("$._embedded.bundles._embedded.bundles",Matchers.containsInAnyOrder(
+            BundleMatcher.matchProperties(bundle0.getName(), bundle0.getID(), bundle0.getHandle(), bundle0.getType()),
+            BundleMatcher.matchProperties(bundle1.getName(), bundle1.getID(), bundle1.getHandle(), bundle1.getType()),
+            BundleMatcher.matchProperties(bundle2.getName(), bundle2.getID(), bundle2.getHandle(), bundle2.getType()),
+            BundleMatcher.matchProperties(bundle3.getName(), bundle3.getID(), bundle3.getHandle(), bundle3.getType()),
+            BundleMatcher.matchProperties(bundle4.getName(), bundle4.getID(), bundle4.getHandle(), bundle4.getType()),
+            BundleMatcher.matchProperties(bundle5.getName(), bundle5.getID(), bundle5.getHandle(), bundle5.getType()),
+            BundleMatcher.matchProperties(bundle6.getName(), bundle6.getID(), bundle6.getHandle(), bundle6.getType()),
+            BundleMatcher.matchProperties(bundle7.getName(), bundle7.getID(), bundle7.getHandle(), bundle7.getType()),
+            BundleMatcher.matchProperties(bundle8.getName(), bundle8.getID(), bundle8.getHandle(), bundle8.getType()),
+            BundleMatcher.matchProperties(bundle9.getName(), bundle9.getID(), bundle9.getHandle(), bundle9.getType())
+        )))
+        .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/items/" + item.getID())))
+        .andExpect(jsonPath("$._embedded.bundles.page.size", is(20)))
+        .andExpect(jsonPath("$._embedded.bundles.page.totalElements", is(10)));
+    }
+
+    @Test
+    public void findOneTestWithEmbedsWithPageSize() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Collection")
+                                                 .build();
+
+        Item item = ItemBuilder.createItem(context, collection).withTitle("Item").build();
+
+        Bundle bundle0 = BundleBuilder.createBundle(context, item).withName("Bundle 0").build();
+        Bundle bundle1 = BundleBuilder.createBundle(context, item).withName("Bundle 1").build();
+        Bundle bundle2 = BundleBuilder.createBundle(context, item).withName("Bundle 2").build();
+        Bundle bundle3 = BundleBuilder.createBundle(context, item).withName("Bundle 3").build();
+        Bundle bundle4 = BundleBuilder.createBundle(context, item).withName("Bundle 4").build();
+        Bundle bundle5 = BundleBuilder.createBundle(context, item).withName("Bundle 5").build();
+        Bundle bundle6 = BundleBuilder.createBundle(context, item).withName("Bundle 6").build();
+        Bundle bundle7 = BundleBuilder.createBundle(context, item).withName("Bundle 7").build();
+        Bundle bundle8 = BundleBuilder.createBundle(context, item).withName("Bundle 8").build();
+        Bundle bundle9 = BundleBuilder.createBundle(context, item).withName("Bundle 9").build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/items/" + item.getID())
+                                    .param("embed", "bundles")
+                           .param("embed.size", "bundles=5"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
+        .andExpect(jsonPath("$._embedded.bundles._embedded.bundles",Matchers.containsInAnyOrder(
+            BundleMatcher.matchProperties(bundle0.getName(), bundle0.getID(), bundle0.getHandle(), bundle0.getType()),
+            BundleMatcher.matchProperties(bundle1.getName(), bundle1.getID(), bundle1.getHandle(), bundle1.getType()),
+            BundleMatcher.matchProperties(bundle2.getName(), bundle2.getID(), bundle2.getHandle(), bundle2.getType()),
+            BundleMatcher.matchProperties(bundle3.getName(), bundle3.getID(), bundle3.getHandle(), bundle3.getType()),
+            BundleMatcher.matchProperties(bundle4.getName(), bundle4.getID(), bundle4.getHandle(), bundle4.getType())
+        )))
+        .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/items/" + item.getID())))
+        .andExpect(jsonPath("$._embedded.bundles.page.size", is(5)))
+        .andExpect(jsonPath("$._embedded.bundles.page.totalElements", is(10)));
+    }
+
+
+    @Test
+    public void findOneTestWithEmbedsWithInvalidPageSize() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Collection")
+                                                 .build();
+
+        Item item = ItemBuilder.createItem(context, collection).withTitle("Item").build();
+
+        Bundle bundle0 = BundleBuilder.createBundle(context, item).withName("Bundle 0").build();
+        Bundle bundle1 = BundleBuilder.createBundle(context, item).withName("Bundle 1").build();
+        Bundle bundle2 = BundleBuilder.createBundle(context, item).withName("Bundle 2").build();
+        Bundle bundle3 = BundleBuilder.createBundle(context, item).withName("Bundle 3").build();
+        Bundle bundle4 = BundleBuilder.createBundle(context, item).withName("Bundle 4").build();
+        Bundle bundle5 = BundleBuilder.createBundle(context, item).withName("Bundle 5").build();
+        Bundle bundle6 = BundleBuilder.createBundle(context, item).withName("Bundle 6").build();
+        Bundle bundle7 = BundleBuilder.createBundle(context, item).withName("Bundle 7").build();
+        Bundle bundle8 = BundleBuilder.createBundle(context, item).withName("Bundle 8").build();
+        Bundle bundle9 = BundleBuilder.createBundle(context, item).withName("Bundle 9").build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/items/" + item.getID())
+                                    .param("embed", "bundles")
+                                    .param("embed.size", "bundles=invalidPage"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
+        .andExpect(jsonPath("$._embedded.bundles._embedded.bundles",Matchers.containsInAnyOrder(
+            BundleMatcher.matchProperties(bundle0.getName(), bundle0.getID(), bundle0.getHandle(), bundle0.getType()),
+            BundleMatcher.matchProperties(bundle1.getName(), bundle1.getID(), bundle1.getHandle(), bundle1.getType()),
+            BundleMatcher.matchProperties(bundle2.getName(), bundle2.getID(), bundle2.getHandle(), bundle2.getType()),
+            BundleMatcher.matchProperties(bundle3.getName(), bundle3.getID(), bundle3.getHandle(), bundle3.getType()),
+            BundleMatcher.matchProperties(bundle4.getName(), bundle4.getID(), bundle4.getHandle(), bundle4.getType()),
+            BundleMatcher.matchProperties(bundle5.getName(), bundle5.getID(), bundle5.getHandle(), bundle5.getType()),
+            BundleMatcher.matchProperties(bundle6.getName(), bundle6.getID(), bundle6.getHandle(), bundle6.getType()),
+            BundleMatcher.matchProperties(bundle7.getName(), bundle7.getID(), bundle7.getHandle(), bundle7.getType()),
+            BundleMatcher.matchProperties(bundle8.getName(), bundle8.getID(), bundle8.getHandle(), bundle8.getType()),
+            BundleMatcher.matchProperties(bundle9.getName(), bundle9.getID(), bundle9.getHandle(), bundle9.getType())
+        )))
+        .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/items/" + item.getID())))
+        .andExpect(jsonPath("$._embedded.bundles.page.size", is(20)))
+        .andExpect(jsonPath("$._embedded.bundles.page.totalElements", is(10)));
+}
+
 
 
 }

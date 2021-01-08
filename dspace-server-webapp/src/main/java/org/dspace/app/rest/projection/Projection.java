@@ -15,6 +15,7 @@ import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.utils.Utils;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RestController;
@@ -136,4 +137,6 @@ public interface Projection {
      * @return true if allowed, false otherwise.
      */
     boolean allowLinking(HALResource halResource, LinkRest linkRest);
+
+    PageRequest getPagingOptions(String rel);
 }

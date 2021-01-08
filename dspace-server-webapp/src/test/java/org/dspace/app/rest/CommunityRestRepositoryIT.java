@@ -368,6 +368,202 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
     }
 
     @Test
+    public void findOneTestWithEmbedsNoPageSize() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with 10 sub-communities
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child0 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 0")
+                                           .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 1")
+                                           .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 2")
+                                           .build();
+        Community child3 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 3")
+                                           .build();
+        Community child4 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 4")
+                                           .build();
+        Community child5 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 5")
+                                           .build();
+        Community child6 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 6")
+                                           .build();
+        Community child7 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 7")
+                                           .build();
+        Community child8 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 8")
+                                           .build();
+        Community child9 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 9")
+                                           .build();
+
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/communities/" + parentCommunity.getID())
+                                    .param("embed", "subcommunities"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", CommunityMatcher.matchCommunity(parentCommunity)))
+                   .andExpect(
+                           jsonPath("$._embedded.subcommunities._embedded.subcommunities", Matchers.containsInAnyOrder(
+                                   CommunityMatcher.matchCommunity(child0),
+                                   CommunityMatcher.matchCommunity(child1),
+                                   CommunityMatcher.matchCommunity(child2),
+                                   CommunityMatcher.matchCommunity(child3),
+                                   CommunityMatcher.matchCommunity(child4),
+                                   CommunityMatcher.matchCommunity(child5),
+                                   CommunityMatcher.matchCommunity(child6),
+                                   CommunityMatcher.matchCommunity(child7),
+                                   CommunityMatcher.matchCommunity(child8),
+                                   CommunityMatcher.matchCommunity(child9)
+                           )))
+                   .andExpect(jsonPath("$._links.self.href",
+                                       Matchers.containsString("/api/core/communities/" + parentCommunity.getID())))
+                   .andExpect(jsonPath("$._embedded.subcommunities.page.size", is(20)))
+                   .andExpect(jsonPath("$._embedded.subcommunities.page.totalElements", is(10)));
+    }
+
+    @Test
+    public void findOneTestWithEmbedsWithPageSize() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with 10 sub-communities
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child0 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 0")
+                                           .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 1")
+                                           .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 2")
+                                           .build();
+        Community child3 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 3")
+                                           .build();
+        Community child4 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 4")
+                                           .build();
+        Community child5 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 5")
+                                           .build();
+        Community child6 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 6")
+                                           .build();
+        Community child7 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 7")
+                                           .build();
+        Community child8 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 8")
+                                           .build();
+        Community child9 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 9")
+                                           .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/communities/" + parentCommunity.getID())
+                                    .param("embed", "subcommunities")
+                                    .param("embed.size", "subcommunities=5"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", CommunityMatcher.matchCommunity(parentCommunity)))
+                   .andExpect(
+                           jsonPath("$._embedded.subcommunities._embedded.subcommunities", Matchers.containsInAnyOrder(
+                                   CommunityMatcher.matchCommunity(child0),
+                                   CommunityMatcher.matchCommunity(child1),
+                                   CommunityMatcher.matchCommunity(child2),
+                                   CommunityMatcher.matchCommunity(child3),
+                                   CommunityMatcher.matchCommunity(child4)
+                           )))
+                   .andExpect(jsonPath("$._links.self.href",
+                                       Matchers.containsString("/api/core/communities/" + parentCommunity.getID())))
+                   .andExpect(jsonPath("$._embedded.subcommunities.page.size", is(5)))
+                   .andExpect(jsonPath("$._embedded.subcommunities.page.totalElements", is(10)));
+    }
+
+    @Test
+    public void findOneTestWithEmbedsWithInvalidPageSize() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with 10 sub-communities
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child0 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 0")
+                                           .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 1")
+                                           .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 2")
+                                           .build();
+        Community child3 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 3")
+                                           .build();
+        Community child4 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 4")
+                                           .build();
+        Community child5 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 5")
+                                           .build();
+        Community child6 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 6")
+                                           .build();
+        Community child7 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 7")
+                                           .build();
+        Community child8 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 8")
+                                           .build();
+        Community child9 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 9")
+                                           .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/communities/" + parentCommunity.getID())
+                                    .param("embed", "subcommunities")
+                                    .param("embed.size", "subcommunities=invalidPage"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", CommunityMatcher.matchCommunity(parentCommunity)))
+                   .andExpect(
+                           jsonPath("$._embedded.subcommunities._embedded.subcommunities", Matchers.containsInAnyOrder(
+                                   CommunityMatcher.matchCommunity(child0),
+                                   CommunityMatcher.matchCommunity(child1),
+                                   CommunityMatcher.matchCommunity(child2),
+                                   CommunityMatcher.matchCommunity(child3),
+                                   CommunityMatcher.matchCommunity(child4),
+                                   CommunityMatcher.matchCommunity(child5),
+                                   CommunityMatcher.matchCommunity(child6),
+                                   CommunityMatcher.matchCommunity(child7),
+                                   CommunityMatcher.matchCommunity(child8),
+                                   CommunityMatcher.matchCommunity(child9)
+                           )))
+                   .andExpect(jsonPath("$._links.self.href",
+                                       Matchers.containsString("/api/core/communities/" + parentCommunity.getID())))
+                   .andExpect(jsonPath("$._embedded.subcommunities.page.size", is(20)))
+                   .andExpect(jsonPath("$._embedded.subcommunities.page.totalElements", is(10)));
+    }
+
+    @Test
     public void findAllNoDuplicatesOnMultipleCommunityTitlesTest() throws Exception {
         context.turnOffAuthorisationSystem();
         List<String> titles = Arrays.asList("First title", "Second title", "Third title", "Fourth title");
