@@ -65,6 +65,8 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
     int itemPerPage = 25;
 
     private static final String ENDPOINT_SEARCH_SCOPUS = "https://api.elsevier.com/content/search/scopus";
+    private String apiKey;
+    private String instKey;
 
     /**
      * Initialize the class
@@ -131,7 +133,15 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
         return retry(new FindByQueryCallable(query));
     }
 
-/**
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
+    }
+
+    public void setInstKey(String instKey) {
+        this.instKey = instKey;
+    }
+
+    /**
  * 
  * This class implements a callable to get the numbers of result
  * @author pasquale
@@ -154,9 +164,9 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
         public Integer call() throws Exception {
             String proxyHost = configurationService.getProperty("http.proxy.host");
             String proxyPort = configurationService.getProperty("http.proxy.port");
-            String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
-            String instKey = configurationService.getProperty("submission.lookup.scopus.instkey");
-            if (apiKey != null && !apiKey.equals("")) {
+//            String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
+//            String instKey = configurationService.getProperty("submission.lookup.scopus.instkey");
+            if (StringUtils.isNotBlank(apiKey)) {
                 HttpGet method = null;
                 try {
                     HttpClientBuilder hcBuilder = HttpClients.custom();
@@ -224,8 +234,8 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
             String queryString = "DOI(" + doi.replace("!", "/") + ")";
             String proxyHost = configurationService.getProperty("http.proxy.host");
             String proxyPort = configurationService.getProperty("http.proxy.port");
-            String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
-            String instKey = configurationService.getProperty("submission.lookup.scopus.instkey");
+//            String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
+//            String instKey = configurationService.getProperty("submission.lookup.scopus.instkey");
             if (apiKey != null && !apiKey.equals("")) {
                 HttpGet method = null;
                 try {
@@ -325,8 +335,8 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
             String proxyHost = configurationService.getProperty("http.proxy.host");
             String proxyPort = configurationService.getProperty("http.proxy.port");
-            String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
-            String instKey = configurationService.getProperty("submission.lookup.scopus.instkey");
+//            String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
+//            String instKey = configurationService.getProperty("submission.lookup.scopus.instkey");
             if (apiKey != null && !apiKey.equals("")) {
                 HttpGet method = null;
                 try {
@@ -403,8 +413,8 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
             Integer count = query.getParameterAsClass("count", Integer.class);
             String proxyHost = configurationService.getProperty("http.proxy.host");
             String proxyPort = configurationService.getProperty("http.proxy.port");
-            String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
-            String instKey = configurationService.getProperty("submission.lookup.scopus.instkey");
+//            String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
+//            String instKey = configurationService.getProperty("submission.lookup.scopus.instkey");
             if (apiKey != null && !apiKey.equals("")) {
                 HttpGet method = null;
                 try {
