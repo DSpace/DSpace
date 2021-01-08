@@ -9,6 +9,7 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
@@ -32,6 +33,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.dspace.app.rest.exception.GroupNameNotProvidedException;
 import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.matcher.GroupMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
@@ -194,10 +196,27 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
-                .perform(post("/api/eperson/groups")
-                        .content(mapper.writeValueAsBytes(groupRest))
-                        .contentType(contentType))
-                .andExpect(status().isUnprocessableEntity());
+            .perform(
+                post("/api/eperson/groups").content("").contentType(contentType)
+            )
+            .andExpect(status().isUnprocessableEntity())
+            .andExpect(status().reason(containsString("Unprocessable")));
+    }
+
+    @Test
+    public void createWithoutNameTest() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        GroupRest groupRest = new GroupRest(); // no name set
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken)
+            .perform(
+                post("/api/eperson/groups")
+                    .content(mapper.writeValueAsBytes(groupRest))
+                    .contentType(contentType)
+            )
+            .andExpect(status().isUnprocessableEntity())
+            .andExpect(status().reason(is(GroupNameNotProvidedException.message)));
     }
 
     @Test
