@@ -22,6 +22,9 @@ public class DiscoverFacetField {
     private String prefix;
     private String type;
     private DiscoveryConfigurationParameters.SORT sortOrder;
+    private boolean exposeMore;
+    private boolean exposeMissing;
+    private boolean exposeTotalElements;
 
     public DiscoverFacetField(String field, String type, int limit, DiscoveryConfigurationParameters.SORT sortOrder) {
         this.field = field;
@@ -31,7 +34,7 @@ public class DiscoverFacetField {
     }
 
     public DiscoverFacetField(String field, String type, int limit, DiscoveryConfigurationParameters.SORT sortOrder,
-                              int offset) {
+            int offset) {
         this.field = field;
         this.type = type;
         this.limit = limit;
@@ -40,12 +43,24 @@ public class DiscoverFacetField {
     }
 
     public DiscoverFacetField(String field, String type, int limit, DiscoveryConfigurationParameters.SORT sortOrder,
-                              String prefix) {
+            String prefix) {
         this.prefix = prefix;
         this.limit = limit;
         this.type = type;
         this.sortOrder = sortOrder;
         this.field = field;
+    }
+
+    public DiscoverFacetField(String field, String type, int limit, DiscoveryConfigurationParameters.SORT sortOrder,
+                              String prefix, boolean exposeMore, boolean exposeMissing, boolean exposeTotalElements) {
+        this.prefix = prefix;
+        this.limit = limit;
+        this.type = type;
+        this.sortOrder = sortOrder;
+        this.field = field;
+        this.exposeMore = exposeMore;
+        this.exposeMissing = exposeMissing;
+        this.exposeTotalElements = exposeTotalElements;
     }
 
     public DiscoverFacetField(String field, String type, int limit, DiscoveryConfigurationParameters.SORT sortOrder,
@@ -85,4 +100,17 @@ public class DiscoverFacetField {
     public void setOffset(int offset) {
         this.offset = offset;
     }
+
+    public boolean exposeMissing() {
+        return exposeMissing;
+    }
+
+    public boolean exposeMore() {
+        return exposeMore;
+    }
+
+    public boolean exposeTotalElements() {
+        return exposeTotalElements;
+    }
+
 }

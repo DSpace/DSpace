@@ -59,7 +59,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.http.MediaType;
 
-@Ignore
 public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest {
 
 
@@ -95,8 +94,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets")))
                 //We have 4 facets in the default configuration, they need to all be present in the embedded section
                 .andExpect(jsonPath("$._embedded.facets", containsInAnyOrder(
-                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
-                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.anyFacet("graphitemtype", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("graphpubldate", "chart.bar"),
                         FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
@@ -164,7 +163,10 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$.facetType", is("text")))
                 //Because we've constructed such a structure so that we have more than 2 (size) authors, there
                 // needs to be a next link
-                .andExpect(jsonPath("$._links.next.href", containsString("api/discover/facets/author?page")))
+                .andExpect(jsonPath("$._links.next.href",
+                        Matchers.allOf(
+                                containsString("api/discover/facets/author"),
+                                containsString("page=1"))))
                 //There always needs to be a self link
                 .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets/author")))
                 //Because there are more authors than is represented (because of the size param), hasMore has to
@@ -387,7 +389,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$.facetType", is("text")))
                 //There needs to be a next link because there are more authors than the current size is allowed to
                 // show. There are more pages after this one
-                .andExpect(jsonPath("$._links.next.href", containsString("api/discover/facets/author?page")))
+                .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                        containsString("api/discover/facets/author"),
+                        containsString("page=2"))))
                 //There always needs to be a self link
                 .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets/author")))
                 //The page object has to be like this because that's what we've asked in the parameters
@@ -752,7 +756,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets/dateIssued")))
                 //Seeing as we've entered a size of two and there are more dates than just two, we'll need a next
                 // link to go to the next page to see the rest of the dates
-                .andExpect(jsonPath("$._links.next.href", containsString("api/discover/facets/dateIssued?page")))
+                .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                        containsString("api/discover/facets/dateIssued"),
+                        containsString("page=1"))))
                 //The page object needs to look like this because we've entered a size of 2 and we didn't specify
                 // a starting page so it defaults to 0
                 .andExpect(jsonPath("$.page",
@@ -945,17 +951,12 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //There needs to be a page object that shows the total pages and total elements as well as the
                 // size and the current page (number)
                 .andExpect(jsonPath("$._embedded.searchResult.page", is(
-                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 7)
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3)
                 )))
                 //These search results have to be shown in the embedded.objects section as these are the items
                 // given in the structure defined above.
                 //Seeing as everything fits onto one page, they have to all be present
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItems(
-                        SearchResultMatcher.match("core", "community", "communities"),
-                        SearchResultMatcher.match("core", "community", "communities"),
-                        //This has to be like this because collections don't have anything else
-                        SearchResultMatcher.match(),
-                        SearchResultMatcher.match(),
                         SearchResultMatcher.match("core", "item", "items"),
                         SearchResultMatcher.match("core", "item", "items"),
                         SearchResultMatcher.match("core", "item", "items")
@@ -963,8 +964,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
-                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.anyFacet("graphitemtype", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("graphpubldate", "chart.bar"),
                         FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
@@ -1029,21 +1030,15 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(status().isOk())
                 //The type has to be 'discover'
                 .andExpect(jsonPath("$.type", is("discover")))
-                //The page object has to look like this because we've only made 7 elements, the default size is 20
-                // and they all fit onto one page (20 > 7) so totalPages has to be 1. Number is 0 because
-                //page 0 is the default page we view if not specified otherwise
+                //The page object has to look like this because we've only made 7 elements (3 items),
+                //the default size is 20 and they all fit onto one page (20 > 7) so totalPages has
+                //to be 1. Number is 0 because page 0 is the default page we view if not specified otherwise
                 .andExpect(jsonPath("$._embedded.searchResult.page", is(
-                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 7)
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3)
                 )))
                 //All elements have to be present in the embedded.objects section, these are the ones we made in
                 // the structure defined above
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItems(
-                        SearchResultMatcher.match("core", "community", "communities"),
-                        SearchResultMatcher.match("core", "community", "communities"),
-                        //Match without any parameters because collections don't have anything special to check in the
-                        // json
-                        SearchResultMatcher.match(),
-                        SearchResultMatcher.match(),
                         SearchResultMatcher.match("core", "item", "items"),
                         SearchResultMatcher.match("core", "item", "items"),
                         SearchResultMatcher.match("core", "item", "items")
@@ -1053,8 +1048,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //We do however exceed the limit for the authors, so this property has to be true for the author
                 // facet
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
-                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.anyFacet("graphitemtype", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("graphpubldate", "chart.bar"),
                         FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(true),
                         FacetEntryMatcher.entityTypeFacet(false),
@@ -1125,18 +1120,13 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(status().isOk())
                 //The type has to be 'discover'
                 .andExpect(jsonPath("$.type", is("discover")))
-                //The page object has to look like this because we've only made 7 items, they all fit onto 1 page
-                // because the default size is 20 and the default starting page is 0.
+                //The page object has to look like this because we've only made 7 objects (but only 3 items),
+                //they all fit onto 1 page because the default size is 20 and the default starting page is 0.
                 .andExpect(jsonPath("$._embedded.searchResult.page", is(
-                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 7)
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3)
                 )))
                 //All the elements created in the structure above have to be present in the embedded.objects section
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItems(
-                        SearchResultMatcher.match("core", "community", "communities"),
-                        SearchResultMatcher.match("core", "community", "communities"),
-                        //Collections are specified like this because they don't have any special properties
-                        SearchResultMatcher.match(),
-                        SearchResultMatcher.match(),
                         SearchResultMatcher.match("core", "item", "items"),
                         SearchResultMatcher.match("core", "item", "items"),
                         SearchResultMatcher.match("core", "item", "items")
@@ -1146,8 +1136,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //We do however exceed the limit for the subject, so this property has to be true for the subject
                 // facet
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
-                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.anyFacet("graphitemtype", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("graphpubldate", "chart.bar"),
                         FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
@@ -1229,8 +1219,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
-                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.anyFacet("graphitemtype", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("graphpubldate", "chart.bar"),
                         FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
@@ -1299,17 +1289,12 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$.type", is("discover")))
                 //The page element has to look like this because it contains all the elements we've just created
                 .andExpect(jsonPath("$._embedded.searchResult.page", is(
-                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 7)
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3)
                 )))
                 //The scope property has to be set to the value we entered in the parameters
                 .andExpect(jsonPath("$.scope", is("test")))
                 //All the elements created in the structure above have to be present in the embedded.objects section
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItems(
-                        SearchResultMatcher.match("core", "community", "communities"),
-                        SearchResultMatcher.match("core", "community", "communities"),
-                        //Collections are specified like this because they don't have any special properties
-                        SearchResultMatcher.match(),
-                        SearchResultMatcher.match(),
                         SearchResultMatcher.match("core", "item", "items"),
                         SearchResultMatcher.match("core", "item", "items"),
                         SearchResultMatcher.match("core", "item", "items")
@@ -1317,8 +1302,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
-                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.anyFacet("graphitemtype", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("graphpubldate", "chart.bar"),
                         FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
@@ -1400,8 +1385,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
-                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.anyFacet("graphitemtype", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("graphpubldate", "chart.bar"),
                         FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
@@ -1414,6 +1399,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         // With dsoTypes 'community' and 'collection'
         getClient().perform(get("/api/discover/search/objects")
+                .param("configuration", "default")
                 .param("dsoType", "Community")
                 .param("dsoType", "Collection"))
 
@@ -1438,9 +1424,6 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
-                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
-                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
@@ -1452,6 +1435,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         // With dsoTypes 'collection' and 'item'
         getClient().perform(get("/api/discover/search/objects")
+                .param("configuration", "default")
                 .param("dsoType", "Collection")
                 .param("dsoType", "Item"))
 
@@ -1477,9 +1461,6 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
-                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
-                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
@@ -1491,6 +1472,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         // With dsoTypes 'community', 'collection' and 'item'
         getClient().perform(get("/api/discover/search/objects")
+                .param("configuration", "default")
                 .param("dsoType", "Community")
                 .param("dsoType", "Collection")
                 .param("dsoType", "Item"))
@@ -1520,9 +1502,6 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
-                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
-                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
@@ -1610,8 +1589,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
-                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.anyFacet("graphitemtype", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("graphpubldate", "chart.bar"),
                         FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
@@ -1803,7 +1782,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         //An anonymous user browses this endpoint to find the the objects in the system
         //With a size 2
         getClient().perform(get("/api/discover/search/objects")
-                .param("size", "2")
+                .param("size", "1")
                 .param("page", "1"))
                 //** THEN **
                 //The status has to be 200 OK
@@ -1811,22 +1790,23 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //The type has to be 'discover'
                 .andExpect(jsonPath("$.type", is("discover")))
                 //The page object needs to look like this
-                //Size of 2 because that's what we entered
+                //Size of 1 because that's what we entered
                 //Page number 1 because that's the param we entered
-                //TotalPages 4 because size = 2 and total elements is 7 -> 4 pages
+                //TotalPages 3 because size = 1 and total elements is 3 -> 3 pages
                 //We made 7 elements -> 7 total elements
+                //dspace-cris excludes communities and collections by default,
+                //so we have 3 indexed elements (items)
                 .andExpect(jsonPath("$._embedded.searchResult.page", is(
-                        PageMatcher.pageEntryWithTotalPagesAndElements(1, 2, 4, 7)
+                        PageMatcher.pageEntryWithTotalPagesAndElements(1, 1, 3, 3)
                 )))
-                //These are the  two elements that'll be shown (because page = 1, so the third and fourth element
-                // in the list) and they'll be the only ones because the size is 2
+                //These is the  element that'll be shown (because page = 1, so the second element
+                // in the list) and it will be the only one because the size is 1
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
-                        SearchResultMatcher.match(),
                         SearchResultMatcher.match()
                 )))
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
-                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.anyFacet("graphitemtype", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("graphpubldate", "chart.bar"),
                         FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(true),
                         FacetEntryMatcher.subjectFacet(true),
@@ -1918,8 +1898,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
-                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.anyFacet("graphitemtype", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("graphpubldate", "chart.bar"),
                         FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
@@ -1993,11 +1973,6 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 )))
                 //These are the items that aren't set to private
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItems(
-                        SearchResultMatcher.match("core", "community", "communities"),
-                        SearchResultMatcher.match("core", "community", "communities"),
-                        //Collections are specified like this because they don't have any special properties
-                        SearchResultMatcher.match(),
-                        SearchResultMatcher.match(),
                         SearchResultMatcher.matchOnItemName("item", "items", "Test"),
                         SearchResultMatcher.matchOnItemName("item", "items", "Public item 2")
                 )))
@@ -2007,8 +1982,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
-                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.anyFacet("graphitemtype", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("graphpubldate", "chart.bar"),
                         FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
@@ -2334,8 +2309,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
-                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.anyFacet("graphitemtype", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("graphpubldate", "chart.bar"),
                         FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
@@ -2481,8 +2456,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore property
                 // because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
-                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.anyFacet("graphitemtype", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("graphpubldate", "chart.bar"),
                         FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
@@ -2558,8 +2533,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore property
                 // because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
-                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.anyFacet("graphitemtype", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("graphpubldate", "chart.bar"),
                         FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
@@ -2634,20 +2609,20 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //The page object needs to look like this
                 //Size of 2 because that's what we entered
                 //Page number 1 because that's the param we entered
-                //TotalPages 4 because size = 2 and total elements is 7 -> 4 pages
-                //We made 7 elements -> 7 total elements
+                //TotalPages 2 because size = 2 and total elements is 3 -> 2 pages
+                //We made 7 elements but only items are included in the dspace-cris default configuration
+                // -> 3 total elements
                 .andExpect(jsonPath("$._embedded.searchResult.page", is(
-                        PageMatcher.pageEntryWithTotalPagesAndElements(1, 2, 4, 7)
+                        PageMatcher.pageEntryWithTotalPagesAndElements(1, 2, 2, 3)
                 )))
-                //These are the  two elements that'll be shown (because page = 1, so the third and fourth element
-                // in the list) and they'll be the only ones because the size is 2
+                //These are the  two elements that'll be shown (because page = 1, so the third element
+                // in the list) and they'll be the only one
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
-                        SearchResultMatcher.match(),
                         SearchResultMatcher.match()
                 )))
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
-                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.anyFacet("graphitemtype", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("graphpubldate", "chart.bar"),
                         FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacetWithMinMax(true, "Doe, Jane", "Testing, Works"),
                         FacetEntryMatcher.entityTypeFacet(false),
@@ -2718,8 +2693,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //The type has to be 'discover'
                 .andExpect(jsonPath("$.type", is("discover")))
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
-                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.anyFacet("graphitemtype", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("graphpubldate", "chart.bar"),
                         FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacetWithMinMax(true, "Doe, Jane", "Testing, Works"),
                         FacetEntryMatcher.entityTypeFacet(false),
@@ -2795,8 +2770,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore property
                 // because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
-                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.anyFacet("graphitemtype", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("graphpubldate", "chart.bar"),
                         FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
@@ -2873,8 +2848,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore property
                 // because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
-                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.anyFacet("graphitemtype", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("graphpubldate", "chart.bar"),
                         FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
@@ -2950,8 +2925,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These facets have to show up in the embedded.facets section as well with the given hasMore property
                 // because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
-                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.anyFacet("graphitemtype", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("graphpubldate", "chart.bar"),
                         FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.entityTypeFacet(false),
@@ -3351,30 +3326,23 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                     //The type has to be 'discover'
                     .andExpect(jsonPath("$.type", is("discover")))
                     //There needs to be a page object that shows the total pages and total elements as well as the
-                    // size and the current page (number)
+                    // size and the current page (number) - only items are included in the default dspace-cris conf
                     .andExpect(jsonPath("$._embedded.searchResult.page", is(
-                            PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 7)
+                            PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3)
                     )))
                     //These search results have to be shown in the embedded.objects section as these are the items
-                    // given in the structure defined above.
+                    // given in the structure defined above (dspace-cris only return items by default).
                     //Seeing as everything fits onto one page, they have to all be present
                     .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
-                            SearchResultMatcher.match("core", "community", "communities"),
-                            SearchResultMatcher.match("core", "community", "communities"),
                             SearchResultMatcher.match("core", "item", "items"),
                             SearchResultMatcher.match("core", "item", "items"),
-                            SearchResultMatcher.match("core", "item", "items"),
-                            //This has to be like this because collections don't have anything else
-                            // these matchers also need to be the last otherwise they will be potentially consumed for
-                            // other staff
-                            SearchResultMatcher.match(),
-                            SearchResultMatcher.match()
+                            SearchResultMatcher.match("core", "item", "items")
                     )))
                     //These facets have to show up in the embedded.facets section as well with the given hasMore
                     // property because we don't exceed their default limit for a hasMore true (the default is 10)
                     .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                            FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
-                            FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                            FacetEntryMatcher.anyFacet("graphitemtype", "chart.pie"),
+                            FacetEntryMatcher.anyFacet("graphpubldate", "chart.bar"),
                             FacetEntryMatcher.typeFacet(false),
                             FacetEntryMatcher.authorFacet(false),
                             FacetEntryMatcher.subjectFacet(false),
@@ -4644,48 +4612,51 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         Item publicItem1 = ItemBuilder.createItem(context, col1)
                                       .withTitle("Public item 1")
                                       .withIssueDate("2017-10-17")
-                                      .withAuthor("Michel, Boychuk")
+                                      .withAuthor("Boychuk, Michele")
                                       .withSubject("ExtraEntry").build();
 
         Item publicItem2 = ItemBuilder.createItem(context, col2)
                                       .withTitle("Public item 2")
                                       .withIssueDate("2016-02-13")
-                                      .withAuthor("Michel, Boychuk")
-                                      .withAuthor("Andrea, Bollini")
+                                      .withAuthor("Boychuk, Michele")
+                                      .withAuthor("Bollini, Andrea")
                                       .withSubject("ExtraEntry").build();
 
         Item publicItem3 = ItemBuilder.createItem(context, col2)
                                       .withTitle("Public item 3")
                                       .withIssueDate("2017-10-17")
-                                      .withAuthor("Michel, Boychuk")
+                                      .withAuthor("Boychuk, Michele")
                                       .withSubject("ExtraEntry").build();
 
 
         Item publicItem4 = ItemBuilder.createItem(context, col2)
                                       .withTitle("Public item 4")
                                       .withIssueDate("2020-02-13")
-                                      .withAuthor("Volodymyr, Trus")
+                                      .withAuthor("Trus, Volodymyr")
                                       .withSubject("AnotherTest")
                                       .withSubject("ExtraEntry").build();
 
         Item publicItem5 = ItemBuilder.createItem(context, col2)
                                       .withTitle("Public item 5")
                                       .withIssueDate("2019-06-17")
-                                      .withAuthor("Luca, Bruschetti")
+                                      .withAuthor("Bruschetti, Luca")
                                       .withSubject("ExtraEntry").build();
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/discover/facets/chart.bar.dateIssued.year")
+        getClient().perform(get("/api/discover/facets/graphpubldate")
                    .param("size", "4"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.type", is("discover")))
-                   .andExpect(jsonPath("$.name", is("chart.bar.dateIssued.year")))
+                   .andExpect(jsonPath("$.name", is("graphpubldate")))
                    .andExpect(jsonPath("$.facetType", is("chart.bar")))
                    .andExpect(jsonPath("$._links.self.href", containsString(
-                                       "api/discover/facets/chart.bar.dateIssued.year")))
+                                       "api/discover/facets/graphpubldate")))
+                   .andExpect(jsonPath("$.missing", is("0")))
+                   .andExpect(jsonPath("$.more", is("0")))
+                   .andExpect(jsonPath("$.totalElements", is("4")))
                    .andExpect(jsonPath("$.page", is(PageMatcher.pageEntry(0, 4))))
-                   .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                   .andExpect(jsonPath("$._embedded.values", contains(
                               FacetValueMatcher.entryDateIssuedWithLabelAndCount("2016", 1),
                               FacetValueMatcher.entryDateIssuedWithLabelAndCount("2017", 2),
                               FacetValueMatcher.entryDateIssuedWithLabelAndCount("2019", 1),
@@ -4710,43 +4681,52 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         Item publicItem1 = ItemBuilder.createItem(context, col1)
                                       .withTitle("Public item 1")
                                       .withIssueDate("2017-10-17")
-                                      .withAuthor("Michele, Boychuk")
+                                      .withAuthor("Boychuk, Michele")
                                       .withType("book").build();
 
         Item publicItem2 = ItemBuilder.createItem(context, col2)
                                       .withTitle("Public item 2")
                                       .withIssueDate("2016-02-13")
-                                      .withAuthor("Andrea, Bollini")
+                                      .withAuthor("Bollini, Andrea")
                                       .withType("manuscript").build();
 
         Item publicItem3 = ItemBuilder.createItem(context, col2)
                                       .withTitle("Public item 3")
                                       .withIssueDate("2017-10-17")
-                                      .withAuthor("Michele, Boychuk")
+                                      .withAuthor("Boychuk, Michele")
                                       .withSubject("AnotherTest")
                                       .withType("manuscript").build();
 
         Item publicItem4 = ItemBuilder.createItem(context, col2)
                                       .withTitle("Public item 4")
                                       .withIssueDate("2020-02-13")
-                                      .withAuthor("Volodymyr, Trus")
+                                      .withAuthor("Trus, Volodymyr")
                                       .withSubject("AnotherTest")
                                       .withType("Journal Article")
                                       .withSubject("ExtraEntry").build();
 
+        Item publicItem5 = ItemBuilder.createItem(context, col2)
+                .withTitle("Public item 5 without type")
+                .withIssueDate("2021-01-07")
+                .withAuthor("Volodymyr, Trus")
+                .withSubject("AnotherTest")
+                .withSubject("ExtraEntry").build();
+
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/discover/facets/chart.pie.itemtype_filter")
-                   .param("size", "4"))
+        getClient().perform(get("/api/discover/facets/graphitemtype")
+                   .param("size", "2"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.type", is("discover")))
-                   .andExpect(jsonPath("$.name", is("chart.pie.itemtype_filter")))
+                   .andExpect(jsonPath("$.name", is("graphitemtype")))
                    .andExpect(jsonPath("$.facetType", is("chart.pie")))
-                   .andExpect(jsonPath("$.page", is(PageMatcher.pageEntry(0, 4))))
-                   .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                   .andExpect(jsonPath("$.missing", is("1")))
+                   .andExpect(jsonPath("$.more", is("2")))
+                   .andExpect(jsonPath("$.totalElements", is("3")))
+                   .andExpect(jsonPath("$.page", is(PageMatcher.pageEntry(0, 2))))
+                   .andExpect(jsonPath("$._embedded.values", contains(
                               FacetValueMatcher.entryDateIssuedWithLabelAndCount("manuscript", 2),
-                              FacetValueMatcher.entryDateIssuedWithLabelAndCount("book", 1),
-                              FacetValueMatcher.entryDateIssuedWithLabelAndCount("Journal Article", 1)
+                              FacetValueMatcher.entryDateIssuedWithLabelAndCount("book", 1)
                               )));
     }
 }

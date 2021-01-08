@@ -7,11 +7,6 @@
  */
 package org.dspace.discovery.configuration;
 
-import java.util.Collections;
-import java.util.List;
-
-import org.apache.commons.codec.binary.StringUtils;
-
 /**
  * Special sidebar facet configuration used for Graph facets
  * 
@@ -23,34 +18,14 @@ public class GraphDiscoverSearchFilterFacet extends DiscoverySearchFilterFacet {
 
     private int facetLimit = -1;
     private DiscoveryConfigurationParameters.SORT sortOrderSidebar = DiscoveryConfigurationParameters.SORT.COUNT;
-    private DiscoverySearchFilterFacet dataFacet;
     private String graphType;
-
-    @Override
-    public String getIndexFieldName() {
-        if (StringUtils.equals(dataFacet.getType(), "date")) {
-            return getType() + "." + dataFacet.getIndexFieldName() + ".year";
-        } else {
-            return getType() + "." + dataFacet.getIndexFieldName() + "_filter";
-        }
-    }
-
+    private String splitter;
+    private boolean onlyLastNodeRelevant = false;
+    private boolean isDate = false;
+    private int maxLevels = Integer.MAX_VALUE;
     @Override
     public String getType() {
         return TYPE_PREFIX + graphType;
-    }
-
-    @Override
-    public List<String> getMetadataFields() {
-        return Collections.emptyList();
-    }
-
-    public DiscoverySearchFilterFacet getDataFacet() {
-        return dataFacet;
-    }
-
-    public void setDataFacet(DiscoverySearchFilterFacet dataFacet) {
-        this.dataFacet = dataFacet;
     }
 
     public String getGraphType() {
@@ -74,5 +49,34 @@ public class GraphDiscoverSearchFilterFacet extends DiscoverySearchFilterFacet {
     }
     public void setSortOrderSidebar(DiscoveryConfigurationParameters.SORT sortOrderSidebar) {
         this.sortOrderSidebar = sortOrderSidebar;
+    }
+    public void setSplitter(String splitter) {
+        this.splitter = splitter;
+    }
+    public void setOnlyLastNodeRelevant(boolean onlyLastNodeRelevant) {
+        this.onlyLastNodeRelevant = onlyLastNodeRelevant;
+    }
+    public void setIsDate(boolean isDate) {
+        this.isDate = isDate;
+    }
+
+    public String getSplitter() {
+        return splitter;
+    }
+
+    public boolean isDate() {
+        return isDate;
+    }
+
+    public boolean isOnlyLastNodeRelevant() {
+        return onlyLastNodeRelevant;
+    }
+
+    public int getMaxLevels() {
+        return maxLevels;
+    }
+
+    public void setMaxLevels(int max) {
+        this.maxLevels = max;
     }
 }

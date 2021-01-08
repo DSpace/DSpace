@@ -40,6 +40,7 @@ import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.FacetField;
+import org.apache.solr.client.solrj.response.FieldStatsInfo;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
@@ -818,6 +819,13 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 if (facetFieldConfig.getPrefix() != null) {
                     solrQuery.setFacetPrefix(field, facetFieldConfig.getPrefix());
                 }
+                if (facetFieldConfig.exposeMissing()) {
+                    solrQuery.setParam("f." + field + "." + FacetParams.FACET_MISSING, true);
+                }
+                if (facetFieldConfig.exposeMore() || facetFieldConfig.exposeTotalElements()) {
+                    solrQuery.addGetFieldStatistics("{!count=true countDistinct=true}"
+                            + transformFacetField(facetFieldConfig, facetFieldConfig.getField(), true) + "_statfilter");
+                }
             }
         }
 
@@ -930,10 +938,13 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                             Collections.reverse(facetValues);
                         }
 
+                        String field = transformFacetField(facetFieldConfig, facetField.getName(), true);
+                        long countInPage = 0;
+                        int idxFC = 0;
+                        long missing = 0;
                         for (FacetField.Count facetValue : facetValues) {
                             String displayedValue = transformDisplayedValue(context, facetField.getName(),
                                                                             facetValue.getName());
-                            String field = transformFacetField(facetFieldConfig, facetField.getName(), true);
                             String authorityValue = transformAuthorityValue(context, facetField.getName(),
                                                                             facetValue.getName());
                             String sortValue = transformSortValue(context, facetField.getName(), facetValue.getName());
@@ -941,12 +952,32 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                             if (StringUtils.isNotBlank(authorityValue)) {
                                 filterValue = authorityValue;
                             }
-                            result.addFacetResult(
-                                field,
-                                new DiscoverResult.FacetResult(filterValue,
-                                                               displayedValue, authorityValue,
-                                                               sortValue, facetValue.getCount(),
-                                                               facetFieldConfig.getType()));
+                            if (StringUtils.isNotBlank(facetValue.getName())) {
+                                // as we are 0-based and the limit is set to 1 more than needed
+                                if (idxFC < facetFieldConfig.getLimit() - 1) {
+                                    countInPage += facetValue.getCount();
+                                }
+                                result.addFacetResult(
+                                    field,
+                                    new DiscoverResult.FacetResult(filterValue,
+                                                                   displayedValue, authorityValue,
+                                                                   sortValue, facetValue.getCount(),
+                                                                   facetFieldConfig.getType()));
+                                idxFC++;
+                            } else {
+                                missing = facetValue.getCount();
+                                result.setFacetResultMissing(field, missing);
+                            }
+                        }
+                        Map<String, FieldStatsInfo> fieldStatsInfo = solrQueryResponse.getFieldStatsInfo();
+                        if (fieldStatsInfo != null) {
+                            FieldStatsInfo statsInfo = fieldStatsInfo.get(field + "_statfilter");
+                            if (statsInfo != null) {
+                                if (statsInfo.getCount() != null) {
+                                    result.setFacetResultMore(field, missing + statsInfo.getCount() - countInPage);
+                                }
+                                result.setFacetResultTotalElements(field, statsInfo.getCountDistinct());
+                            }
                         }
                     }
                 }
@@ -1190,7 +1221,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             }
         } else if (facetFieldConfig.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)) {
             if (removePostfix) {
-                return field.substring(0, field.lastIndexOf(".year"));
+                return field.lastIndexOf(".year") != -1 ? field.substring(0, field.lastIndexOf(".year")) : field;
             } else {
                 return field + ".year";
             }
@@ -1215,9 +1246,12 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             }
         } else if (facetFieldConfig.getType().equals(DiscoveryConfigurationParameters.TYPE_STANDARD)) {
             return field;
-        } else if (StringUtils.startsWith(facetFieldConfig.getType(), GraphDiscoverSearchFilterFacet.TYPE_PREFIX) &&
-                   StringUtils.startsWith(field, GraphDiscoverSearchFilterFacet.TYPE_PREFIX)) {
-            return field.split("\\.", 3)[2];
+        } else if (StringUtils.startsWith(facetFieldConfig.getType(), GraphDiscoverSearchFilterFacet.TYPE_PREFIX)) {
+            if (removePostfix) {
+                return field.lastIndexOf("_filter") != -1 ? field.substring(0, field.lastIndexOf("_filter")) : field;
+            } else {
+                return field + "_filter";
+            }
         } else {
             return field;
         }

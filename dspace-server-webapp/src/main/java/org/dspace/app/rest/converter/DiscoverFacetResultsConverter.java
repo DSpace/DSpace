@@ -33,6 +33,9 @@ public class DiscoverFacetResultsConverter {
     private DiscoverFacetValueConverter facetValueConverter;
 
     @Autowired
+    private DiscoverFacetsConverter facetsConverter;
+
+    @Autowired
     private SearchFilterToAppliedFilterConverter searchFilterToAppliedFilterConverter;
 
     public FacetResultsRest convert(Context context, String facetName, String prefix, String query,
@@ -113,7 +116,10 @@ public class DiscoverFacetResultsConverter {
 
         //We requested one extra facet value. Check if that value is present to indicate that there are more results
         facetEntryRest.setHasMore(facetResults.size() > page.getPageSize());
-
+        facetsConverter.handleExposeMissing(field, facetEntryRest, searchResult);
+        facetsConverter.handleExposeMore(field, facetEntryRest, searchResult);
+        facetsConverter.handleExposeTotalValues(field, facetEntryRest, searchResult);
         return facetEntryRest;
     }
+
 }
