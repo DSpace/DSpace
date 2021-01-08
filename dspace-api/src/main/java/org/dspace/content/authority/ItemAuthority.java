@@ -173,7 +173,7 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
     public String getPluginInstanceName() {
         return authorityName;
     }
-    
+
     /**
      * Return map of key to presentation
      *
