@@ -12,8 +12,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.dspace.app.rest.security.WebSecurityConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.InvalidCsrfTokenException;
 import org.springframework.security.web.csrf.MissingCsrfTokenException;
 import org.springframework.stereotype.Component;
@@ -25,11 +29,18 @@ import org.springframework.stereotype.Component;
  * DSpaceApiExceptionControllerAdvice class, which manages all exceptions for the DSpace backend. Without this
  * handler, those CSRF exceptions are managed by Spring Security/Boot *before* DSpaceApiExceptionControllerAdvice
  * is triggered.
+ * <P>
+ * Additionally, this Handler is customized to refresh the CSRF Token whenever an InvalidCsrfTokenException occurs.
+ * This helps ensure our DSpace server-side token (stored in a server-side cookie) remains "synced" with the token
+ * on the client side. If they ever get out of sync, the next request will throw an InvalidCsrfTokenException.
  *
  * @see DSpaceApiExceptionControllerAdvice
  */
 @Component
 public class DSpaceAccessDeniedHandler implements AccessDeniedHandler {
+
+    @Autowired
+    private WebSecurityConfiguration webSecurityConfiguration;
 
     /**
      * Override handle() to pass these exceptions over to our DSpaceApiExceptionControllerAdvice handler
@@ -46,6 +57,19 @@ public class DSpaceAccessDeniedHandler implements AccessDeniedHandler {
         // Do nothing if response is already committed
         if (response.isCommitted()) {
             return;
+        }
+
+        // If we had an InvalidCsrfTokenException, this means the client sent a CSRF token which did *not* match the
+        // token on the server. In this scenario, we trigger a refresh of the CSRF token...as it's possible the user
+        // switched clients (from HAL Browser to UI or visa versa) and has an out-of-sync token.
+        if (ex instanceof InvalidCsrfTokenException) {
+            // Get access to our enabled CSRF token repository
+            CsrfTokenRepository csrfTokenRepository = webSecurityConfiguration.getCsrfTokenRepository();
+
+            // Remove current token & generate a new one
+            csrfTokenRepository.saveToken(null, request, response);
+            CsrfToken newToken = csrfTokenRepository.generateToken(request);
+            csrfTokenRepository.saveToken(newToken, request, response);
         }
 
         // Get access to our general exception handler

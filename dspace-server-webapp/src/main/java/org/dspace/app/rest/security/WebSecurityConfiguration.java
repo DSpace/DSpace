@@ -161,7 +161,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
      *
      * @return CsrfTokenRepository as described above
      */
-    private CsrfTokenRepository getCsrfTokenRepository() {
+    public CsrfTokenRepository getCsrfTokenRepository() {
         return new DSpaceCsrfTokenRepository();
     }
 

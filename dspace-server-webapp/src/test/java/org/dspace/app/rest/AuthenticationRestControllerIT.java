@@ -19,6 +19,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -399,7 +400,12 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                                                     .secure(true)
                                                     .cookie(cookies))
                    // Should return a 403 Forbidden, for an invalid CSRF token
-                   .andExpect(status().isForbidden());
+                   .andExpect(status().isForbidden())
+                   // And, a new/updated token should be returned (as both server-side cookie and header)
+                   // This is handled by DSpaceAccessDeniedHandler
+                   .andExpect(cookie().exists("DSPACE-XSRF-COOKIE"))
+                   .andExpect(header().exists("DSPACE-XSRF-TOKEN"));
+
         //Logout
         getClient(token).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
