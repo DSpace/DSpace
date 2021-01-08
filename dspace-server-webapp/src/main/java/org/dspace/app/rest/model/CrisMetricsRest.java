@@ -15,7 +15,7 @@ import org.dspace.app.rest.RestResourceController;
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
-public class CrisMetricsRest extends BaseObjectRest<Integer> {
+public class CrisMetricsRest extends BaseObjectRest<String> {
 
     private static final long serialVersionUID = 1L;
     public static final String NAME = "metric";
