@@ -221,17 +221,17 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     private class FindByIdCallable implements Callable<List<ImportRecord>> {
 
-        private String doi;
+        private String eid;
 
         private FindByIdCallable(String doi) {
-            this.doi = doi;
+            this.eid = doi;
         }
 
 
         @Override
         public List<ImportRecord> call() throws Exception {
             List<ImportRecord> results = new ArrayList<>();
-            String queryString = "DOI(" + doi.replace("!", "/") + ")";
+            String queryString = "EID(" + eid.replace("!", "/") + ")";
             String proxyHost = configurationService.getProperty("http.proxy.host");
             String proxyPort = configurationService.getProperty("http.proxy.port");
 //            String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
