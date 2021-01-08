@@ -9,6 +9,7 @@ package org.dspace.app.rest.utils;
 
 import static java.lang.Integer.parseInt;
 import static java.util.stream.Collectors.toList;
+import static org.dspace.app.rest.utils.URLUtils.urlIsPrefixOf;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 import java.beans.IntrospectionException;
@@ -134,7 +135,7 @@ public class Utils {
     private ConfigurationService configurationService;
 
     /** Cache to support fast lookups of LinkRest method annotation information. */
-    private Map<Method, Optional<LinkRest>> linkAnnotationForMethod = new HashMap<>();
+    private final Map<Method, Optional<LinkRest>> linkAnnotationForMethod = new HashMap<>();
 
     public <T> Page<T> getPage(List<T> fullContents, @Nullable Pageable optionalPageable) {
         Pageable pageable = getPageable(optionalPageable);
@@ -149,7 +150,7 @@ public class Utils {
                 pageContent = fullContents.subList(Math.toIntExact(pageable.getOffset()),
                         Math.toIntExact(pageable.getOffset()) + pageable.getPageSize());
             }
-            return new PageImpl<T>(pageContent, pageable, total);
+            return new PageImpl<>(pageContent, pageable, total);
         }
     }
 
@@ -304,11 +305,12 @@ public class Utils {
     }
 
     /**
-     * Build the canonical representation of a metadata key in DSpace. ie
-     * <schema>.<element>[.<qualifier>]
+     * Build the canonical representation of a metadata key in DSpace.  I.e.
+     * {@code <schema>.<element>[.<qualifier>]}
      *
      * @param schema
      * @param element
+     * @param qualifier
      * @return
      */
     public String getMetadataKey(String schema, String element, String qualifier) {
@@ -320,11 +322,11 @@ public class Utils {
      *
      * @param multipartFile
      *            the multipartFile representing the uploaded file. Please note that it is a complex object including
-     *            additional information other than the binary like the orginal file name and the mimetype
+     *            additional information other than the binary like the original file name and the MIME type
      * @param prefixTempName
      *            the prefix to use to generate the filename of the temporary file
      * @param suffixTempName
-     *            the suffic to use to generate the filename of the temporary file
+     *            the suffix to use to generate the filename of the temporary file
      * @return the temporary file on the server
      * @throws IOException
      * @throws FileNotFoundException
@@ -410,6 +412,7 @@ public class Utils {
      * It will then look through all the DSpaceObjectServices to try and match this UUID to a DSpaceObject.
      * If one is found, this DSpaceObject is added to the List of DSpaceObjects that we will return.
      * @param context   The relevant DSpace context
+     * @param list      The interesting UUIDs.
      * @return          The resulting list of DSpaceObjects that we parsed out of the request
      */
     public List<DSpaceObject> constructDSpaceObjectList(Context context, List<String> list) {
@@ -696,6 +699,7 @@ public class Utils {
     /**
      * Adds embeds (if the maximum embed level has not been exceeded yet) for all properties annotated with
      * {@code @LinkRel} or whose return types are {@link RestAddressableModel} subclasses.
+     * @param resource the resource to be so augmented.
      */
     public void embedMethodLevelRels(HALResource<? extends RestAddressableModel> resource) {
         if (resource.getContent().getEmbedLevel() == EMBED_MAX_LEVELS) {
@@ -914,11 +918,12 @@ public class Utils {
     public BaseObjectRest getBaseObjectRestFromUri(Context context, String uri) throws SQLException {
         String dspaceUrl = configurationService.getProperty("dspace.server.url");
         // first check if the uri could be valid
-        if (!StringUtils.startsWith(uri, dspaceUrl)) {
+        if (!urlIsPrefixOf(dspaceUrl, uri)) {
             throw new IllegalArgumentException("the supplied uri is not valid: " + uri);
         }
-        // extract from the uri the category, model and id components
-        // they start after the dspaceUrl/api/{apiCategory}/{apiModel}/{id}
+
+        // Extract from the URI the category, model and id components.
+        // They start after the dspaceUrl/api/{apiCategory}/{apiModel}/{id}
         String[] uriParts = uri.substring(dspaceUrl.length() + (dspaceUrl.endsWith("/") ? 0 : 1) + "api/".length())
                 .split("/", 3);
         if (uriParts.length != 3) {
