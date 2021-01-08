@@ -138,7 +138,6 @@ public class DSpaceCsrfTokenRepository implements CsrfTokenRepository {
 
     @Override
     public CsrfToken loadToken(HttpServletRequest request) {
-        // First, verify the (server-side) cookie was sent back
         Cookie cookie = WebUtils.getCookie(request, this.cookieName);
         if (cookie == null) {
             return null;
@@ -148,8 +147,6 @@ public class DSpaceCsrfTokenRepository implements CsrfTokenRepository {
             return null;
         }
 
-        // If we got here, we know a token exists in the cookie and *either* the header or the parameter.
-        // So, this just sends the token info back so that it can be validated by Spring Security.
         return new DefaultCsrfToken(this.headerName, this.parameterName, token);
     }
 
