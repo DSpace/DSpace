@@ -30,7 +30,6 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchService;
-import org.dspace.discovery.SearchServiceException;
 import org.dspace.external.factory.ExternalServiceFactory;
 import org.dspace.external.provider.ExternalDataProvider;
 import org.dspace.external.service.ExternalDataService;
