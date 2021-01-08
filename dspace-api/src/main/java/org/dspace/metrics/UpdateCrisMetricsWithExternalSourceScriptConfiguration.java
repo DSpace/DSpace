@@ -48,13 +48,10 @@ public class UpdateCrisMetricsWithExternalSourceScriptConfiguration<T extends Up
             Options options = new Options();
 
             options.addOption("s", "service", true,
-                "the name of the external service to use, i.e. SCOPUS");
+                "the name of the external service to use: scopus, wos, scopus-person, wos-person");
             options.getOption("s").setType(String.class);
             options.getOption("s").setRequired(true);
 
-            options.addOption("p", "param", true, "the param of the MetricType to performe update");
-            options.getOption("p").setType(String.class);
-            //options.getOption("i").setRequired(false);
             super.options = options;
         }
         return options;

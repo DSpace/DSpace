@@ -20,13 +20,27 @@
         <entry key-ref="scopus.doi" value-ref="scopusDoiContrib"/>
         <entry key-ref="scopus.title" value-ref="scopusTitleContrib"/>
         <entry key-ref="scopus.type" value-ref="scopusTypeContrib"/>
-        <entry key-ref="scopus.source" value-ref="scopusSourceContrib"/>
+        <!--   <entry key-ref="scopus.source" value-ref="scopusSourceContrib"/>            -->
         <entry key-ref="scopus.isbn" value-ref="scopusIsbnContrib"/>
         <entry key-ref="scopus.issn" value-ref="scopusIssnContrib"/>
         <entry key-ref="scopus.date" value-ref="scopusDateContrib"/>
         <entry key-ref="scopus.abstract" value-ref="scopusAbstractContrib"/>
-        <entry key-ref="scopus.author" value-ref="scopusAuthorsContrib"/>
-        <entry key-ref="scopus.identifier" value-ref="scopusIdentifierContrib"/>
+        <!--   <entry key-ref="scopus.author" value-ref="scopusAuthorsContrib"/>           -->
+        <!--   <entry key-ref="scopus.identifier" value-ref="scopusIdentifierContrib"/>    -->
+        <entry key-ref="scopus.pubmed" value-ref="scopusPubmedContrib"/>
+        <entry key-ref="scopus.volume" value-ref="scopusVolumeContrib"/>
+        <entry key-ref="scopus.issueIdentifier" value-ref="scopusIssueIdentifierContrib"/>
+        <entry key-ref="scopus.eid" value-ref="scopusEidContrib"/>
+        <entry key-ref="scopus.fundSponsor" value-ref="scopusFundSponsorContrib"/>
+        <entry key-ref="scopus.fundNo" value-ref="scopusFundNoContrib"/>
+        <entry key-ref="scopus.authkeywords" value-ref="scopusAuthkeywordsContrib"/>
+        <entry key-ref="scopus.articleNumber" value-ref="scopusArticleNumberContrib"/>
+        <entry key-ref="scopus.creator" value-ref="scopusCreatorContrib"/>
+        <entry key-ref="scopus.openaccessFlag" value-ref="scopusOpenaccessFlagContrib"/>
+        <entry key-ref="scopus.pageRange" value-ref="scopusPageRangeContrib"/>
+        <entry key-ref="scopus.ispartof" value-ref="scopusIspartofContrib"/>
+        <entry key-ref="scopus.ispartofseries" value-ref="scopusIspartofseriesContrib"/>
+        <entry key-ref="scopus.authname" value-ref="scopusAuthorMetadataContrib"/>
     </util:map>
 
     <bean id="scopusIdentifierContrib" class="org.dspace.importer.external.metadatamapping.contributor.ReplaceCharacterXPathMetadataContributor">
@@ -38,6 +52,17 @@
     </bean>
     <bean id="scopus.identifier" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.identifier.other"/>
+    </bean>
+
+    <bean id="scopusOpenaccessFlagContrib" class="org.dspace.importer.external.metadatamapping.contributor.ReplaceFieldXPathMetadataContributor">
+        <property name="field" ref="scopus.openaccessFlag"/>
+        <property name="query" value="ns:openaccessFlag"/>
+        <property name="prefixToNamespaceMapping" ref="scopusNs"/>
+        <property name="simpleMapConverter" ref="mapConverterOpenAccessScopus"/>
+    </bean>
+
+    <bean id="scopus.openaccessFlag" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.rights"/>
     </bean>
 
     <bean id="scopusAuthorsContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
@@ -92,15 +117,17 @@
         <property name="query" value="prism:publicationName"/>
         <property name="prefixToNamespaceMapping" ref="scopusPrism"/>
     </bean>
+
     <bean id="scopus.source" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.source"/>
     </bean>
 
     <bean id="scopusTypeContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="scopus.type"/>
-        <property name="query" value="ns:subtype"/>
-        <property name="prefixToNamespaceMapping" ref="scopusNs"/>
+        <property name="query" value="prism:aggregationType"/>
+        <property name="prefixToNamespaceMapping" ref="scopusPrism"/>
     </bean>
+
     <bean id="scopus.type" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.type"/>
     </bean>
@@ -119,8 +146,163 @@
         <property name="query" value="prism:doi"/>
         <property name="prefixToNamespaceMapping" ref="scopusPrism"/>
     </bean>
+
     <bean id="scopus.doi" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier"/>
+        <constructor-arg value="dc.identifier.doi"/>
+    </bean>
+
+    <bean id="scopusPubmedContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="scopus.pubmed"/>
+        <property name="query" value="ns:pubmed-id"/>
+        <property name="prefixToNamespaceMapping" ref="scopusNs"/>
+    </bean>
+
+    <bean id="scopus.pubmed" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.pmid"/>
+    </bean>
+
+    <bean id="scopusVolumeContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="scopus.volume"/>
+        <property name="query" value="prism:volume"/>
+        <property name="prefixToNamespaceMapping" ref="scopusPrism"/>
+    </bean>
+
+    <bean id="scopus.volume" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="oaire.citation.volume"/>
+    </bean>
+
+    <bean id="scopusIssueIdentifierContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="scopus.issueIdentifier"/>
+        <property name="query" value="prism:issueIdentifier"/>
+        <property name="prefixToNamespaceMapping" ref="scopusPrism"/>
+    </bean>
+
+    <bean id="scopus.issueIdentifier" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="oaire.citation.issue"/>
+    </bean>
+
+    <bean id="scopusEidContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="scopus.eid"/>
+        <property name="query" value="ns:eid"/>
+        <property name="prefixToNamespaceMapping" ref="scopusNs"/>
+    </bean>
+
+    <bean id="scopus.eid" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.scopus"/>
+    </bean>
+
+    <bean id="scopusFundSponsorContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="scopus.fundSponsor"/>
+        <property name="query" value="ns:fund-sponsor"/>
+        <property name="prefixToNamespaceMapping" ref="scopusNs"/>
+    </bean>
+
+    <bean id="scopus.fundSponsor" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.relation.funding"/>
+    </bean>
+
+    <bean id="scopusFundNoContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="scopus.fundNo"/>
+        <property name="query" value="ns:fund-no"/>
+        <property name="prefixToNamespaceMapping" ref="scopusNs"/>
+    </bean>
+
+    <bean id="scopus.fundNo" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.relation.grantno"/>
+    </bean>
+
+    <bean id="scopusAuthkeywordsContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="scopus.authkeywords"/>
+        <property name="query" value="ns:authkeywords"/>
+        <property name="prefixToNamespaceMapping" ref="scopusNs"/>
+    </bean>
+
+    <bean id="scopus.authkeywords" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.subject"/>
+    </bean>
+
+    <bean id="scopusArticleNumberContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="scopus.articleNumber"/>
+        <property name="query" value="ns:article-number"/>
+        <property name="prefixToNamespaceMapping" ref="scopusNs"/>
+    </bean>
+
+    <bean id="scopus.articleNumber" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="oairecerif.citation.number"/>
+    </bean>
+
+    <bean id="scopusCreatorContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="scopus.creator"/>
+        <property name="query" value="dc:creator"/>
+        <property name="prefixToNamespaceMapping" ref="scopusDc"/>
+    </bean>
+
+    <bean id="scopus.creator" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.contributor.author"/>
+    </bean>
+
+    <bean id="scopusPageRangeContrib" class="org.dspace.importer.external.metadatamapping.contributor.PageRangeXPathMetadataContributor">
+        <property name="field" ref="scopus.pageRange"/>
+        <property name="query" value="prism:pageRange"/>
+        <property name="prefixToNamespaceMapping" ref="scopusPrism"/>
+        <property name="startPageMetadata" ref="scopus.startPage"/>
+        <property name="endPageMetadata" ref="scopus.endPage"/>
+    </bean>
+    <bean id="scopus.pageRange" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="oaire.citation.pages"/>
+    </bean>
+
+    <bean id="scopus.startPage" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="oaire.citation.startPage"/>
+    </bean>
+    
+    <bean id="scopus.endPage" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="oaire.citation.endPage"/>
+    </bean>
+
+    <bean id="scopusIspartofContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="scopus.ispartof"/>
+        <property name="query" value="prism:publicationName"/>
+        <property name="prefixToNamespaceMapping" ref="scopusPrism"/>
+    </bean>
+
+    <bean id="scopus.ispartof" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.relation.ispartof"/>
+    </bean>
+
+    <bean id="scopusIspartofseriesContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="scopus.ispartofseries"/>
+        <property name="query" value="prism:publicationName"/>
+        <property name="prefixToNamespaceMapping" ref="scopusPrism"/>
+    </bean>
+
+    <bean id="scopus.ispartofseries" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.relation.ispartofseries"/>
+    </bean>
+
+    <bean id="scopusAuthorMetadataContrib" class="org.dspace.importer.external.metadatamapping.contributor.AuthorMetadataContributor">
+        <property name="authname" ref="scopus.authname"/>
+        <property name="orcid" ref="scopus.orcid"/>
+        <property name="scopusId" ref="scopus.scopusId"/>
+        <property name="affiliation" ref="scopus.affiliation"/>
+        <property name="query" value=""/>
+        <property name="prefixToNamespaceMapping" ref="scopusNs"/>
+    </bean>
+
+    <bean id="scopus.authname" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.contributor.author"/>
+    </bean>
+
+    <bean id="scopus.orcid" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="person.identifier.orcid"/>
+    </bean>
+    
+    <bean id="scopus.scopusId" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="person.identifier.scopus-author-id"/>
+    </bean>
+
+    <bean id="scopus.affiliation" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="oairecerif.affiliation.orgunit"/>
     </bean>
 
     <util:map id="scopusAtom" map-class="java.util.HashMap"
