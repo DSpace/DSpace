@@ -17,7 +17,7 @@ package org.dspace.app.rest.exception;
  */
 public class EPersonNameNotProvidedException extends UnprocessableEntityException {
 
-    private static final String message = "The eperson.firstname and eperson.lastname values need to be filled in";
+    public static final String message = "The eperson.firstname and eperson.lastname values need to be filled in";
 
     public EPersonNameNotProvidedException() {
         super(message);

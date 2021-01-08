@@ -17,7 +17,7 @@ package org.dspace.app.rest.exception;
  */
 public class GroupNameNotProvidedException extends UnprocessableEntityException {
 
-    private static final String message = "cannot create group, no group name is provided";
+    public static final String message = "cannot create group, no group name is provided";
 
     public GroupNameNotProvidedException() {
         super(message);
