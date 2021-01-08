@@ -21,11 +21,11 @@ import java.util.UUID;
  */
 public class EmptyWorkflowGroupException extends IllegalStateException {
 
+    public static final String msgFmt = "Refused to delete user %s because it is the only member of the " +
+        "workflow group %s. Delete the tasks and group first if you want to remove this user.";
+
     public EmptyWorkflowGroupException(UUID ePersonId, UUID groupId) {
-        super(String.format(
-            "Refused to delete user %s because it is the only member of the workflow group %s. " +
-            "Delete the tasks and group first if you want to remove this user.", ePersonId, groupId
-        ));
+        super(String.format(msgFmt, ePersonId, groupId));
     }
 
 }
