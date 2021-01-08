@@ -7,11 +7,16 @@
  */
 package org.dspace.app.rest.projection;
 
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.Link;
 
 /**
@@ -24,9 +29,17 @@ public class EmbedRelsProjection extends AbstractProjection {
     public final static String NAME = "embedrels";
 
     private final Set<String> embedRels;
+    private Map<String, Integer> embedSizes;
 
-    public EmbedRelsProjection(Set<String> embedRels) {
+    public EmbedRelsProjection(Set<String> embedRels, Set<String> embedSizes) {
         this.embedRels = embedRels;
+        this.embedSizes = embedSizes.stream()
+                                    .filter(embedSize -> StringUtils.contains(embedSize, "="))
+                                    .map(embedSize -> embedSize.split("="))
+                                    .collect(Collectors.toMap(
+                                        split -> split[0],
+                                        split -> NumberUtils.toInt(split[1], 0)
+                                    ));
     }
 
     @Override
@@ -61,5 +74,22 @@ public class EmbedRelsProjection extends AbstractProjection {
             }
         }
         return false;
+    }
+
+    @Override
+    public PageRequest getPagingOptions(String rel) {
+        Integer size = embedSizes.get(rel);
+        if (size != null && size > 0) {
+            return PageRequest.of(0, size);
+        }
+        return null;
+    }
+
+    public Map<String, Integer> getEmbedSizes() {
+        return embedSizes;
+    }
+
+    public void setEmbedSizes(final Map<String, Integer> embedSizes) {
+        this.embedSizes = embedSizes;
     }
 }
