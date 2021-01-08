@@ -78,7 +78,6 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
 
         witem.setId(obj.getID());
         witem.setCollection(collection != null ? converter.toRest(collection, projection) : null);
-        witem.setItem(converter.toRest(item, projection));
         if (submitter != null) {
             witem.setSubmitter(converter.toRest(submitter, projection));
         }
@@ -126,6 +125,8 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
 
             }
         }
+        // need to be after to have stored the submission-name in the request attribute
+        witem.setItem(converter.toRest(item, projection));
     }
 
     @SuppressWarnings("unchecked")

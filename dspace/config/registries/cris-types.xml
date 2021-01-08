@@ -38,6 +38,13 @@
 	</dc-type>
 
     <dc-type>
+		<schema>cris</schema>
+		<element>workflow</element>
+		<qualifier>name</qualifier>
+        <scope_note>Metadata to link a collection with a workflow type</scope_note>
+	</dc-type>
+
+    <dc-type>
         <schema>cris</schema>
         <element>owner</element>
         <qualifier></qualifier>

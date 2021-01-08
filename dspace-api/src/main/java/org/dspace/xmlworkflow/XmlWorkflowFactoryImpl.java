@@ -9,12 +9,15 @@ package org.dspace.xmlworkflow;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
+import org.dspace.content.Item;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
@@ -39,6 +42,7 @@ import org.springframework.beans.factory.annotation.Required;
  * @author Ben Bosman (ben at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  * @author Maria Verdonck (Atmire) on 11/12/2019
+ * @author Mykhaylo Boychuk (4Science)
  */
 public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
 
@@ -54,9 +58,19 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
     @Autowired
     protected HandleService handleService;
 
+    /*
+     * Contains all the wolrkflows in the context
+     */
+    @Autowired
+    private List<Workflow> workflows;
+
     @Override
     public Workflow getWorkflow(Collection collection) throws WorkflowConfigurationException {
         // Attempt to retrieve our workflow object
+        String workflowName = collectionService.getMetadataFirstValue(collection, "cris", "workflow", "name", Item.ANY);
+        if (workflowByThisNameExists(workflowName)) {
+            return getWorkflowByName(workflowName);
+        }
         if (workflowMapping.get(collection.getHandle()) == null) {
             final Workflow defaultWorkflow = workflowMapping.get(LEGACY_WORKFLOW_NAME);
             if (defaultWorkflow != null) {
@@ -77,7 +91,7 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
 
     @Override
     public Workflow getWorkflowByName(String workflowName) throws WorkflowConfigurationException {
-        for (Workflow workflow : workflowMapping.values()) {
+        for (Workflow workflow : this.workflows) {
             if (workflow.getID().equals(workflowName)) {
                 return workflow;
             }
@@ -93,18 +107,18 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
 
     @Override
     public List<Workflow> getAllConfiguredWorkflows() {
-        return new ArrayList<>(this.workflowMapping.values());
+        return this.workflows;
     }
 
     @Override
     public List<Collection> getCollectionHandlesMappedToWorkflow(Context context, String workflowName) {
-        List<Collection> collectionsMapped = new ArrayList<>();
+        HashSet<Collection> collections = new HashSet<Collection>();
         for (String handle : this.workflowMapping.keySet()) {
             if (this.workflowMapping.get(handle).getID().equals(workflowName)) {
                 try {
                     Collection collection = (Collection) handleService.resolveToObject(context, handle);
                     if (collection != null) {
-                        collectionsMapped.add(collection);
+                        collections.add(collection);
                     }
                 } catch (SQLException e) {
                     log.error("SQLException in XmlWorkflowFactoryImpl.getCollectionHandlesMappedToWorkflow trying to " +
@@ -112,7 +126,27 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
                 }
             }
         }
-        return collectionsMapped;
+        if (workflowByThisNameExists(workflowName)) {
+            addCollectionsWithWorkflowMetadata(context, workflowName, collections);
+        }
+        return new ArrayList<>(collections);
+    }
+
+    private void addCollectionsWithWorkflowMetadata(Context context, String workflowName,
+            HashSet<Collection> collections) {
+        try {
+            for (Collection col : collectionService.findAll(context)) {
+                String wfwName = collectionService.getMetadataFirstValue(col, "cris", "workflow", "name", Item.ANY);
+                if (StringUtils.isNotBlank(wfwName)) {
+                    if (wfwName.equals(workflowName)) {
+                        collections.add(col);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            log.error("SQLException in XmlWorkflowFactoryImpl.getCollectionHandlesMappedToWorkflow trying to "
+                    + "retrieve collections mapped to workwflow with name: " + workflowName, e);
+        }
     }
 
     @Override
@@ -120,7 +154,8 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
         List<Collection> nonMappedCollections = new ArrayList<>();
         try {
             for (Collection collection : this.collectionService.findAll(context)) {
-                if (workflowMapping.get(collection.getHandle()) == null) {
+                String wfwName = collectionService.getMetadataFirstValue(collection, "cris", "workflow", "name", null);
+                if (Objects.isNull(this.workflowMapping.get(collection.getHandle())) && StringUtils.isBlank(wfwName)) {
                     nonMappedCollections.add(collection);
                 }
             }
@@ -133,7 +168,7 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
 
     @Override
     public boolean workflowByThisNameExists(String workflowName) {
-        for (Workflow workflow : this.workflowMapping.values()) {
+        for (Workflow workflow : this.workflows) {
             if (workflow.getID().equals(workflowName)) {
                 return true;
             }

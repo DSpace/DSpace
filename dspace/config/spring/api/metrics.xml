@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
+
+    <!-- WOS citation count -->
+    <bean class="org.dspace.metrics.wos.WOSProvider"/>
+
+    <bean class="org.dspace.metrics.wos.WOSRestConnector">
+       <property name="wosUrl" value="${metrics.wos.citation-count.url}" />
+       <property name="apiKey" value="${metrics.wos.citation-count.apiKey}" />
+    </bean>
+
+    <bean class="org.dspace.metrics.wos.WOSPersonRestConnector">
+       <property name="wosUrl" value="${metrics.wos.citation-count.url}" />
+       <property name="apiKey" value="${metrics.wos.citation-count.apiKey}" />
+    </bean>
+
+    <bean class="org.dspace.metrics.wos.UpdateWOSMetrics"/>
+
+    <bean class="org.dspace.metrics.wos.UpdateWOSPersonMetrics"/>
+
+    <!-- Scopus citation count -->
+    <bean class="org.dspace.metrics.scopus.ScopusRestConnector">
+        <property name="scopusUrl" value="${metrics.scopus.citation-count.url}" />
+        <property name="apiKey" value="${metrics.scopus.citation-count.apiKey}" />
+        <property name="insttoken" value="${metrics.scopus.citation-count.instToken}" />
+    </bean>
+
+	<bean class="org.dspace.metrics.scopus.ScopusProvider"/>
+
+	<bean class="org.dspace.metrics.scopus.UpdateScopusMetrics"/>
+	
+	<!-- Scopus h-index -->
+	<bean class="org.dspace.metrics.scopus.ScopusPersonProvider"/>
+
+    <bean class="org.dspace.metrics.scopus.UpdateScopusPersonMetrics"/>
+
+    <bean class="org.dspace.metrics.scopus.ScopusPersonRestConnector">
+        <property name="url" value="${metrics.scopus.person.url}" />
+        <property name="apiKey" value="${metrics.scopus.person.apiKey}" />
+        <property name="insttoken" value="${metrics.scopus.person.instToken}" />
+        <property name="enhanced" value="${metrics.scopus.person.enhanced}" />
+    </bean>
+</beans>

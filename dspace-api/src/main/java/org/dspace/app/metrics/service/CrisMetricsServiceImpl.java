@@ -7,13 +7,14 @@
  */
 package org.dspace.app.metrics.service;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.metrics.CrisMetrics;
-import org.dspace.app.metrics.DAO.CrisMetricsDAO;
+import org.dspace.app.metrics.dao.CrisMetricsDAO;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
@@ -68,6 +69,7 @@ public class CrisMetricsServiceImpl implements CrisMetricsService {
     public CrisMetrics create(Context context, Item item) throws SQLException, AuthorizeException {
         CrisMetrics cm =  new CrisMetrics();
         cm.setResource(item);
+        cm.setAcquisitionDate(new Date());
         CrisMetrics metric = crisMetricsDAO.create(context, cm);
         log.info(LogManager.getHeader(context, "create_cris_metrics", "cris_metrics_id=" + metric.getId()));
         return metric;

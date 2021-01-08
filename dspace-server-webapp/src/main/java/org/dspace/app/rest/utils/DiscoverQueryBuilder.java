@@ -241,7 +241,8 @@ public class DiscoverQueryBuilder implements InitializingBean {
             int facetLimit = pageSize + 1;
             //This should take care of the sorting for us
             queryArgs.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(), facet.getType(), facetLimit,
-                    facet.getSortOrderSidebar(), StringUtils.trimToNull(prefix)));
+                    facet.getSortOrderSidebar(), StringUtils.trimToNull(prefix),
+                    facet.exposeMore(), facet.exposeMissing(), facet.exposeTotalElements()));
         }
     }
 

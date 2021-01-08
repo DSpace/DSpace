@@ -243,11 +243,13 @@ public class DiscoveryRelatedBoxComponentIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
                         FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
                         FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
-                        FacetEntryMatcher.typeFacet(false),
+//                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.anyFacet("editor", "text"),
                         FacetEntryMatcher.anyFacet("organization", "text"),
                         FacetEntryMatcher.anyFacet("funding", "text"),
+                        FacetEntryMatcher.anyFacet("itemtype", "hierarchical"),
+//                        FacetEntryMatcher.anyFacet("subject", "hierarchical"),
                         FacetEntryMatcher.subjectFacet(false),
                         FacetEntryMatcher.dateIssuedFacet(false),
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -283,11 +285,12 @@ public class DiscoveryRelatedBoxComponentIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
                         FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
                         FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
-                        FacetEntryMatcher.typeFacet(false),
+//                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.anyFacet("editor", "text"),
                         FacetEntryMatcher.anyFacet("organization", "text"),
                         FacetEntryMatcher.anyFacet("funding", "text"),
+                        FacetEntryMatcher.anyFacet("itemtype", "hierarchical"),
                         FacetEntryMatcher.subjectFacet(false),
                         FacetEntryMatcher.dateIssuedFacet(false),
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
@@ -325,12 +328,13 @@ public class DiscoveryRelatedBoxComponentIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
                         FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
                         FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
-                        FacetEntryMatcher.typeFacet(false),
+//                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.anyFacet("editor", "text"),
                         FacetEntryMatcher.anyFacet("organization", "text"),
                         FacetEntryMatcher.anyFacet("funding", "text"),
                         FacetEntryMatcher.subjectFacet(false),
+                        FacetEntryMatcher.anyFacet("itemtype", "hierarchical"),
                         FacetEntryMatcher.dateIssuedFacet(false),
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
                 )))

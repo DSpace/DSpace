@@ -91,6 +91,10 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
         return addMetadataValue(collection, "cris", "submission", "definition", null, name);
     }
 
+    public CollectionBuilder withWorkflow(final String name) {
+        return addMetadataValue(collection, "cris", "workflow", "name", null, name);
+    }
+
     public CollectionBuilder withHarvestingPreTrasform(String preTransform) {
         return addMetadataValue(collection, "cris", "harvesting", "preTransform", null, preTransform);
     }

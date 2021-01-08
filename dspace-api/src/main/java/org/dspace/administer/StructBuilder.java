@@ -271,6 +271,7 @@ public class StructBuilder {
         collectionMap.put("name", "name");
         collectionMap.put("entity-type", "entity-type");
         collectionMap.put("submission-type", "submission-type");
+        collectionMap.put("workflow-name", "workflow-name");
         collectionMap.put("description", "short_description");
         collectionMap.put("intro", "introductory_text");
         collectionMap.put("copyright", "copyright_text");
@@ -388,8 +389,14 @@ public class StructBuilder {
 
         String submissionDefinition = collectionService.getMetadataFirstValue(collection,
             MetadataSchemaEnum.CRIS.getName(), "submission", "definition", Item.ANY);
-        if (StringUtils.isNotBlank(entityType)) {
+        if (StringUtils.isNotBlank(submissionDefinition)) {
             element.addContent(new Element("submission-type").setText(submissionDefinition));
+        }
+
+        String workflowName = collectionService.getMetadataFirstValue(collection, MetadataSchemaEnum.CRIS.getName(),
+                "workflow", "name", Item.ANY);
+        if (StringUtils.isNotBlank(workflowName)) {
+            element.addContent(new Element("workflow-name").setText(workflowName));
         }
 
         return element;
@@ -795,10 +802,15 @@ public class StructBuilder {
 
             String submissionDefinition = collectionService.getMetadataFirstValue(collection,
                 MetadataSchemaEnum.CRIS.getName(), "submission", "definition", Item.ANY);
-            if (StringUtils.isNotBlank(entityType)) {
+            if (StringUtils.isNotBlank(submissionDefinition)) {
                 element.addContent(new Element("submission-type").setText(submissionDefinition));
             }
 
+            String workflowName = collectionService.getMetadataFirstValue(collection, MetadataSchemaEnum.CRIS.getName(),
+                    "workflow", "name", Item.ANY);
+            if (StringUtils.isNotBlank(workflowName)) {
+                element.addContent(new Element("workflow-name").setText(workflowName));
+            }
             elements[i] = element;
         }
 
