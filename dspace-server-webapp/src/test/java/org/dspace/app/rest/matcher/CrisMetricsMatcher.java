@@ -29,7 +29,7 @@ public class CrisMetricsMatcher {
     private CrisMetricsMatcher() {}
 
     public static Matcher<? super Object> matchCrisMetrics(CrisMetrics crisMetrics) {
-        return allOf(hasJsonPath("$.id", is(crisMetrics.getID())),
+        return allOf(hasJsonPath("$.id", is(String.valueOf(crisMetrics.getID()))),
                      hasJsonPath("$.metricType", is(crisMetrics.getMetricType())),
                      hasJsonPath("$.metricCount", is(crisMetrics.getMetricCount())),
                      hasJsonPath("$.acquisitionDate", is(formatDate(crisMetrics.getAcquisitionDate()))),
