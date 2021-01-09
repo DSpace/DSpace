@@ -24,7 +24,7 @@ public class EmbeddableGoogleScholarProvider extends AbstractEmbeddableMetricPro
             + "Check"
             + "</a>";
 
-    private final String PUBBLICATION_TEMPLATE =
+    private final String PUBLICATION_TEMPLATE =
             "<a "
             + "target=\"_blank\" "
             + "title=\"\" "
@@ -72,7 +72,7 @@ public class EmbeddableGoogleScholarProvider extends AbstractEmbeddableMetricPro
     }
 
     protected String getTemplate(String relationshipType) {
-        return relationshipType.equals("Publication") ? PUBBLICATION_TEMPLATE : PERSON_TEMPLATE;
+        return relationshipType.equals("Publication") ? PUBLICATION_TEMPLATE : PERSON_TEMPLATE;
     }
 
     public String getField() {

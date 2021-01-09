@@ -10,6 +10,7 @@ package org.dspace.metrics;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -70,7 +71,7 @@ public class CrisItemMetricsServiceImpl implements CrisItemMetricsService {
             });
             return metrics;
         } catch (SQLException ex) {
-            log.debug("Item with uuid " + itemUuid + "not found");
+            log.warn("Item with uuid " + itemUuid + "not found");
         }
         return new ArrayList<>();
     }
@@ -100,7 +101,8 @@ public class CrisItemMetricsServiceImpl implements CrisItemMetricsService {
 
         // Solr metrics
         SolrDocument solrDocument = findMetricsDocumentInSolr(context, itemUuid);
-        Collection<String> fields = solrDocument.getFieldNames();
+        Collection<String> fields = Optional.ofNullable(solrDocument)
+            .map(SolrDocument::getFieldNames).orElseGet(Collections::emptyList);
         List<CrisMetrics> metrics = buildCrisMetric(context, getMetricFields(fields), solrDocument);
 
         // Embeddable metrics
