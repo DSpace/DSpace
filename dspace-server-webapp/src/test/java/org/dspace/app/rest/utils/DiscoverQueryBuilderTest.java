@@ -303,7 +303,9 @@ public class DiscoverQueryBuilderTest {
         assertThat(discoverQuery.getFacetMinCount(), is(1));
         assertThat(discoverQuery.getFacetFields(), hasSize(1));
         assertThat(discoverQuery.getFacetFields(), contains(
-                discoverFacetFieldMatcher(new DiscoverFacetField("subject", TYPE_TEXT, 10, COUNT, "prefix"))
+                // the page created in the setUp has index 1, so it is the 2nd, offset 10
+                // the facet limit is 11 as we retrieve one facet value more than requested to know if there are more
+                discoverFacetFieldMatcher(new DiscoverFacetField("subject", TYPE_TEXT, 11, COUNT, "prefix", 10))
         ));
     }
 
