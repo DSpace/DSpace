@@ -117,6 +117,7 @@ public class DiscoverFacetsConverter {
 
     public void handleExposeMissing(DiscoverySearchFilterFacet field, SearchFacetEntryRest facetEntry,
             DiscoverResult searchResult) {
+        facetEntry.setExposeMissing(field.exposeMissing());
         if (field.exposeMissing()) {
             Long facetResultMissing = searchResult.getFacetResultMissing(field.getIndexFieldName());
             if (facetResultMissing != null) {
@@ -127,6 +128,7 @@ public class DiscoverFacetsConverter {
 
     public void handleExposeMore(DiscoverySearchFilterFacet field, SearchFacetEntryRest facetEntry,
             DiscoverResult searchResult) {
+        facetEntry.setExposeMore(field.exposeMore());
         if (field.exposeMore()) {
             Long facetResultMore = searchResult.getFacetResultMore(field.getIndexFieldName());
             if (facetResultMore != null) {

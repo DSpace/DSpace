@@ -47,6 +47,8 @@ public class SearchFacetEntryRest extends RestAddressableModel {
 
     @JsonIgnore
     private List<SearchFacetValueRest> values = new LinkedList<>();
+    private boolean exposeMore;
+    private boolean exposeMissing;
 
     public SearchFacetEntryRest(final String name) {
         this.name = name;
@@ -172,5 +174,21 @@ public class SearchFacetEntryRest extends RestAddressableModel {
 
     public String getTotalElements() {
         return totalElements;
+    }
+
+    public boolean exposeMore() {
+        return exposeMore;
+    }
+
+    public void setExposeMore(boolean exposeMore) {
+        this.exposeMore = exposeMore;
+    }
+
+    public boolean exposeMissing() {
+        return exposeMissing;
+    }
+
+    public void setExposeMissing(boolean exposeMissing) {
+        this.exposeMissing = exposeMissing;
     }
 }

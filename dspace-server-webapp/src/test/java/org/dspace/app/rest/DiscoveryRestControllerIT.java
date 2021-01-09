@@ -4779,7 +4779,13 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                    .andExpect(jsonPath("$.name", is("graphitemtype")))
                    .andExpect(jsonPath("$.facetType", is("chart.pie")))
                    .andExpect(jsonPath("$.missing", is("1")))
+                   .andExpect(jsonPath("$._links.missing.href",
+                           containsString("f.graphitemtype=%5B*%20TO%20*%5D,notequals")))
                    .andExpect(jsonPath("$.more", is("2")))
+                   .andExpect(jsonPath("$._links.more.href", Matchers.allOf(
+                           containsString("f.graphitemtype=manuscript,notequals"),
+                           containsString("f.graphitemtype=book,notequals")
+                           )))
                    .andExpect(jsonPath("$.totalElements", is("3")))
                    .andExpect(jsonPath("$.page", is(PageMatcher.pageEntry(0, 2))))
                    .andExpect(jsonPath("$._embedded.values", contains(
