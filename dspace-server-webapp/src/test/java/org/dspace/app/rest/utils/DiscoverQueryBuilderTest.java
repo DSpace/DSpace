@@ -303,7 +303,7 @@ public class DiscoverQueryBuilderTest {
         assertThat(discoverQuery.getFacetMinCount(), is(1));
         assertThat(discoverQuery.getFacetFields(), hasSize(1));
         assertThat(discoverQuery.getFacetFields(), contains(
-                discoverFacetFieldMatcher(new DiscoverFacetField("subject", TYPE_TEXT, 11, COUNT, "prefix"))
+                discoverFacetFieldMatcher(new DiscoverFacetField("subject", TYPE_TEXT, 10, COUNT, "prefix"))
         ));
     }
 
