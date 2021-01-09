@@ -7,6 +7,8 @@
  */
 package org.dspace.metrics.embeddable.impl;
 
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import org.dspace.content.Item;
@@ -19,7 +21,7 @@ public class EmbeddableGoogleScholarProvider extends AbstractEmbeddableMetricPro
             "<a "
             + "target=\"_blank\" "
             + "title=\"\" "
-            + "href=\"https://scholar.google.com/citations?view_op=search_authors&mauthors=\"{{searchText}}\"\""
+                + "href=\"https://scholar.google.com/citations?view_op=search_authors&mauthors={{searchText}}\""
             + ">"
             + "Check"
             + "</a>";
@@ -28,7 +30,7 @@ public class EmbeddableGoogleScholarProvider extends AbstractEmbeddableMetricPro
             "<a "
             + "target=\"_blank\" "
             + "title=\"\" "
-            + "href=\\\"https://scholar.google.com/scholar?q=\"{{searchText}}\"\""
+            + "href=\"https://scholar.google.com/scholar?q={{searchText}}\""
             + ">"
             + "Check"
             + "</a>";
@@ -49,7 +51,8 @@ public class EmbeddableGoogleScholarProvider extends AbstractEmbeddableMetricPro
 
         String searchText = calculateSearchText(item);
 
-        String innerHtml = this.getTemplate(relationshipType).replace("{{searchText}}", searchText);
+        String innerHtml = this.getTemplate(relationshipType).replace("{{searchText}}",
+            URLEncoder.encode(searchText, Charset.defaultCharset()));
 
         return innerHtml;
     }

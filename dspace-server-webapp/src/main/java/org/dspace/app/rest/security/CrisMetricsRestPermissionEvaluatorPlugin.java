@@ -9,6 +9,7 @@ package org.dspace.app.rest.security;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Objects;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.metrics.CrisMetrics;
@@ -16,6 +17,8 @@ import org.dspace.app.metrics.service.CrisMetricsService;
 import org.dspace.app.rest.model.CrisMetricsRest;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.Item;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -50,6 +53,9 @@ public class CrisMetricsRestPermissionEvaluatorPlugin extends RestObjectPermissi
     @Autowired
     private CrisMetricsService crisMetricsService;
 
+    @Autowired
+    private ItemService itemService;
+
     @Override
     public boolean hasDSpacePermission(Authentication authentication, Serializable targetId, String targetType,
             DSpaceRestPermission permission) {
@@ -66,23 +72,44 @@ public class CrisMetricsRestPermissionEvaluatorPlugin extends RestObjectPermissi
 
         try {
             ePerson = ePersonService.findByEmail(context, (String) authentication.getPrincipal());
-            Integer crisMetricId = Integer.parseInt(targetId.toString());
 
             // anonymous user
             if (ePerson == null) {
                 return false;
             }
-            CrisMetrics metric = crisMetricsService.find(context, crisMetricId);
-            if (Objects.isNull(metric)) {
-                return true;
+
+            String target = targetId.toString();
+
+            if (isEmbedded(target)) {
+                return evaluateEmbeddedMetric(target, context);
             }
-            if (authorizeService.authorizeActionBoolean(context, metric.getResource(), Constants.READ)) {
-                return true;
-            }
+            return evaluateStoredMetric(target, context);
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
         }
         return false;
+    }
+
+    private boolean evaluateEmbeddedMetric(String target, Context context) throws SQLException {
+        Item item = itemService.find(context, UUID.fromString(target));
+
+        if (Objects.isNull(item)) {
+            return false;
+        }
+        return authorizeService.authorizeActionBoolean(context, item, Constants.READ);
+    }
+
+    private boolean isEmbedded(Serializable targetId) {
+        return targetId.toString().contains("/");
+    }
+
+    private boolean evaluateStoredMetric(String target, Context context) throws SQLException {
+        Integer crisMetricId = Integer.parseInt(target);
+        CrisMetrics metric = crisMetricsService.find(context, crisMetricId);
+        if (Objects.isNull(metric)) {
+            return true;
+        }
+        return authorizeService.authorizeActionBoolean(context, metric.getResource(), Constants.READ);
     }
 
 }

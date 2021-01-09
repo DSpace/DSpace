@@ -46,20 +46,21 @@ public class EmbeddableAltmetricsProvider extends AbstractEmbeddableMetricProvid
     public String innerHtml(Context context, Item item) {
 
         String doiAttr = this.calculateAttribute(item, doiField, doiDataAttr);
-        String pmidAtt = this.calculateAttribute(item, doiField, doiDataAttr);
+        String pmidAtt = this.calculateAttribute(item, pmidField, pmidDataAttr);
 
         return  TEMPLATE
                 .replace("{{popover}}", this.popover)
                 .replace("{{badgeType}}", this.badgeType)
                 .replace("{{doiAttr}}", doiAttr)
-                .replace("{{pmidAtt}}", pmidAtt);
+                .replace("{{pmidAttr}}", pmidAtt);
     }
 
     private String calculateAttribute(Item item, String field, String attr) {
         if (field != null && attr != null) {
             List<MetadataValue> values = this.itemService.getMetadataByMetadataString(item, field);
             if (!values.isEmpty()) {
-                return attr + "=" + Optional.of(values.get(0).getValue());
+                return attr + "=" + Optional.ofNullable(values.get(0))
+                    .map(MetadataValue::getValue).orElse("");
             }
         }
         return "";
