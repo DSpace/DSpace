@@ -32,6 +32,8 @@ import org.dspace.kernel.ServiceManager;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.MockSolrLoggerServiceImpl;
 import org.dspace.storage.rdbms.DatabaseUtils;
+import org.dspace.validation.LogicalStatementValidator;
+import org.dspace.validation.MetadataValidator;
 import org.jdom.Document;
 import org.junit.After;
 import org.junit.Before;
@@ -84,11 +86,6 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
      */
     @BeforeClass
     public static void initDatabase() {
-        // Clear our old flyway object. Because this DB is in-memory, its
-        // data is lost when the last connection is closed. So, we need
-        // to (re)start Flyway from scratch for each Unit Test class.
-        DatabaseUtils.clearFlywayDBCache();
-
         try {
             // Update/Initialize the database to latest version (via Flyway)
             DatabaseUtils.updateDatabase();
@@ -200,6 +197,14 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
             dedupService.reset();
             // Reload our ConfigurationService (to reset configs to defaults again)
             DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
+
+            serviceManager.getServicesByType(MetadataValidator.class)
+                .forEach(metadataValidation -> metadataValidation.setInputReader(null));
+
+            serviceManager.getServicesByType(LogicalStatementValidator.class)
+                .forEach(logicalStatementValidator -> logicalStatementValidator.setInputReader(null));
+
+            AbstractBuilder.cleanupBuilderCache();
 
             // NOTE: we explicitly do NOT destroy our default eperson & admin as they
             // are cached and reused for all tests. This speeds up all tests.

@@ -33,6 +33,10 @@ public class VirtualFieldMapper {
         return virtualFields.get(name);
     }
 
+    public void setVirtualField(String name, VirtualField virtualField) {
+        virtualFields.put(name, virtualField);
+    }
+
     public boolean contains(String name) {
         return virtualFields.containsKey(name);
     }

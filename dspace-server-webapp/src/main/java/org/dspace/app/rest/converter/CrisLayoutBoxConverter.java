@@ -48,6 +48,7 @@ public class CrisLayoutBoxConverter implements DSpaceConverter<CrisLayoutBox, Cr
         rest.setShortname(mo.getShortname());
         rest.setStyle(mo.getStyle());
         rest.setClear(mo.getClear());
+        rest.setMaxColumns(mo.getMaxColumns());
         return rest;
     }
 
@@ -77,6 +78,7 @@ public class CrisLayoutBoxConverter implements DSpaceConverter<CrisLayoutBox, Cr
         box.setShortname(rest.getShortname());
         box.setStyle(rest.getStyle());
         box.setClear(rest.getClear());
+        box.setMaxColumns(rest.getMaxColumns());
         return box;
     }
 }

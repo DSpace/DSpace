@@ -57,4 +57,16 @@ public interface ExternalDataProvider {
      */
     public int getNumberOfResults(String query);
 
+    /**
+     * Override this method to limit the external data provider to specific entity
+     * types (Publication, OrgUnit, etc.)
+     * 
+     * @param entityType the entity type to check
+     * @return true if the external provider can be used to search for items of the
+     *         specified type
+     */
+    public default boolean supportsEntityType(String entityType) {
+        return true;
+    }
+
 }

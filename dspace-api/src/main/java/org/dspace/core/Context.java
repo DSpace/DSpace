@@ -190,7 +190,15 @@ public class Context implements AutoCloseable {
         setMode(this.mode);
     }
 
-    public static boolean updateDatabase() {
+    /**
+     * Update the DSpace database, ensuring that any necessary migrations are run prior to initializing
+     * Hibernate.
+     * <P>
+     * This is synchronized as it only needs to be run successfully *once* (for the first Context initialized).
+     *
+     * @return true/false, based on whether database was successfully updated
+     */
+    public static synchronized boolean updateDatabase() {
         //If the database has not been updated yet, update it and remember that.
         if (databaseUpdated.compareAndSet(false, true)) {
 
@@ -200,7 +208,7 @@ public class Context implements AutoCloseable {
             try {
                 DatabaseUtils.updateDatabase();
             } catch (SQLException sqle) {
-                log.fatal("Cannot initialize database via Flyway!", sqle);
+                log.fatal("Cannot update or initialize database via Flyway!", sqle);
                 databaseUpdated.set(false);
             }
         }
@@ -520,6 +528,36 @@ public class Context implements AutoCloseable {
     }
 
     /**
+     * Rollback the current transaction with the database, without persisting any
+     * pending changes. The database connection is not closed and can be reused
+     * afterwards.
+     *
+     * <b>WARNING: After calling this method all previously fetched entities are
+     * "detached" (pending changes are not tracked anymore). You have to reload all
+     * entities you still want to work with manually after this method call (see
+     * {@link Context#reloadEntity(ReloadableEntity)}).</b>
+     *
+     * @throws SQLException When rollbacking the transaction in the database fails.
+     */
+    public void rollback() throws SQLException {
+        // If Context is no longer open/valid, just note that it has already been closed
+        if (!isValid()) {
+            log.info("abort() was called on a closed Context object. No changes to abort.");
+            return;
+        }
+
+        try {
+            // Rollback ONLY if we have a database transaction, and it is NOT Read Only
+            if (!isReadOnly() && isTransactionAlive()) {
+                dbConnection.rollback();
+                reloadContextBoundEntities();
+            }
+        } finally {
+            events = null;
+        }
+    }
+
+    /**
      * Close the context, without committing any of the changes performed using
      * this context. The database connection is freed. No exception is thrown if
      * there is an error freeing the database connection, since this method may
@@ -641,9 +679,9 @@ public class Context implements AutoCloseable {
     /**
      * Temporary change the user bound to the context, empty the special groups that
      * are retained to allow subsequent restore
-     * 
+     *
      * @param newUser the EPerson to bound to the context
-     * 
+     *
      * @throws IllegalStateException if the switch was already performed without be
      *                               restored
      */
@@ -661,7 +699,7 @@ public class Context implements AutoCloseable {
 
     /**
      * Restore the user bound to the context and his special groups
-     * 
+     *
      * @throws IllegalStateException if no switch was performed before
      */
     public void restoreContextUser() {

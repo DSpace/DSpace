@@ -64,11 +64,11 @@
     <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.PoolTaskDAOImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.WorkflowItemRoleDAOImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.XmlWorkflowItemDAOImpl"/>
+    <bean class="org.dspace.statistics.export.dao.impl.OpenURLTrackerDAOImpl"/>
 
     <bean class="org.dspace.batch.dao.impl.ImpBitstreamDAOImpl"/>
     <bean class="org.dspace.batch.dao.impl.ImpMetadatavalueDAOImpl"/>
     <bean class="org.dspace.batch.dao.impl.ImpRecordDAOImpl"/>
-    <bean class="org.dspace.batch.dao.impl.ImpRecordToItemDAOImpl"/>
 	<bean class="org.dspace.batch.dao.impl.ImpBitstreamMetadatavalueDAOImpl"/>
 	<bean class="org.dspace.batch.dao.impl.ImpWorkflowNStateDAOImpl"/>
 
@@ -76,9 +76,12 @@
     <bean class="org.dspace.layout.dao.impl.CrisLayoutTabDAOImpl" />
     <bean class="org.dspace.layout.dao.impl.CrisLayoutBoxDAOImpl" />
     <bean class="org.dspace.layout.dao.impl.CrisLayoutFieldDAOImpl" />
+    <bean class="org.dspace.layout.dao.impl.CrisLayoutMetric2BoxDAOImpl" />
     
     <!-- Orcid DAO --> 
     <bean class="org.dspace.app.orcid.dao.impl.OrcidQueueDAOImpl" />
     <bean class="org.dspace.app.orcid.dao.impl.OrcidHistoryDAOImpl" />
+
+    <bean class="org.dspace.app.metrics.dao.CrisMetricsDAOImpl" />
 
 </beans>

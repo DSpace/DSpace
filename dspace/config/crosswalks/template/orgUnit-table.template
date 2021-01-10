@@ -1,0 +1,7 @@
+Name = dc.title
+Legal name = organization.legalName
+Acronym = oairecerif.acronym
+Type = virtual.mapConverter.orgUnitTypes.dc-type
+Parent OrgUnit = organization.parentOrganization
+Identifier(s) = organization.identifier
+URL(s) = oairecerif.identifier.url

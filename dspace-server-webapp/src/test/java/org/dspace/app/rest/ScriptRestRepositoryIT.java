@@ -8,10 +8,11 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -72,7 +73,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
 
     @Test
-    public void findAllScriptsTest() throws Exception {
+    public void findAllScriptsWithAdminTest() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
 
         getClient(token).perform(get("/api/system/scripts"))
@@ -93,20 +94,36 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 ScriptMatcher.matchScript(scriptConfigurations.get(6).getName(),
                                                           scriptConfigurations.get(6).getDescription()),
                                 ScriptMatcher.matchScript(scriptConfigurations.get(7).getName(),
-                                                          scriptConfigurations.get(7).getDescription())
+                                                          scriptConfigurations.get(7).getDescription()),
+                                ScriptMatcher.matchScript(scriptConfigurations.get(8).getName(),
+                                                          scriptConfigurations.get(8).getDescription()),
+                                ScriptMatcher.matchScript(scriptConfigurations.get(9).getName(),
+                                                          scriptConfigurations.get(9).getDescription()),
+                                ScriptMatcher.matchScript(scriptConfigurations.get(10).getName(),
+                                                          scriptConfigurations.get(10).getDescription()),
+                                ScriptMatcher.matchScript(scriptConfigurations.get(11).getName(),
+                                                          scriptConfigurations.get(11).getDescription()),
+                                ScriptMatcher.matchScript(scriptConfigurations.get(12).getName(),
+                                                          scriptConfigurations.get(12).getDescription()),
+                                ScriptMatcher.matchScript(scriptConfigurations.get(13).getName(),
+                                                          scriptConfigurations.get(13).getDescription())
                         )));
 
     }
 
 
     @Test
-    public void findAllScriptsUnauthorizedTest() throws Exception {
+    public void findAllScriptsWithNoAdminTest() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
 
         getClient(token).perform(get("/api/system/scripts"))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.page",
-                                            is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 0, 0))));
+                        .andExpect(jsonPath("$._embedded.scripts", hasSize(2)))
+                        .andExpect(jsonPath("$._embedded.scripts", containsInAnyOrder(
+                            ScriptMatcher.matchScript("item-export", "Perform the item export in the given format"),
+                            ScriptMatcher.matchScript("bulk-item-export",
+                                    "Perform the multiple items export in the given format")
+                            )));
 
     }
 
@@ -118,8 +135,8 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(get("/api/system/scripts").param("size", "1"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$._embedded.scripts", Matchers.not(Matchers.hasItem(
-                                ScriptMatcher.matchScript(scriptConfigurations.get(6).getName(),
-                                                          scriptConfigurations.get(6).getDescription())
+                                ScriptMatcher.matchScript(scriptConfigurations.get(10).getName(),
+                                                          scriptConfigurations.get(10).getDescription())
                         ))))
                         .andExpect(jsonPath("$._embedded.scripts", hasItem(
                                 ScriptMatcher.matchScript(scriptConfigurations.get(7).getName(),
@@ -131,8 +148,8 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(get("/api/system/scripts").param("size", "1").param("page", "1"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$._embedded.scripts", hasItem(
-                                ScriptMatcher.matchScript(scriptConfigurations.get(6).getName(),
-                                                          scriptConfigurations.get(6).getDescription())
+                                ScriptMatcher.matchScript(scriptConfigurations.get(10).getName(),
+                                                          scriptConfigurations.get(10).getDescription())
                         )))
                         .andExpect(jsonPath("$._embedded.scripts", Matchers.not(hasItem(
                                 ScriptMatcher.matchScript(scriptConfigurations.get(7).getName(),
@@ -149,7 +166,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", ScriptMatcher
                                 .matchMockScript(
-                                        scriptConfigurations.get(scriptConfigurations.size() - 3).getOptions())));
+                                        scriptConfigurations.get(scriptConfigurations.size() - 1).getOptions())));
     }
 
     @Test

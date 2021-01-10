@@ -14,14 +14,18 @@ import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
+import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.edit.EditItem;
 import org.dspace.content.edit.EditItemMode;
+import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.EPerson;
+import org.dspace.services.model.Request;
+import org.dspace.validation.service.ValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -41,6 +45,8 @@ public class EditItemConverter
     private SubmissionSectionConverter submissionSectionConverter;
     @Autowired
     private EditItemModeConverter modeConverter;
+    @Autowired
+    private ValidationService validationService;
 
     public EditItemConverter() throws SubmissionConfigReaderException {
         super();
@@ -74,19 +80,20 @@ public class EditItemConverter
         EditItemMode mode = obj.getMode();
 
         rest.setId(obj.getID() + ":none");
-        rest.setCollection(collection != null ? converter.toRest(collection, projection) : null);
-        rest.setItem(converter.toRest(item, projection));
-        rest.setSubmitter(converter.toRest(submitter, projection));
 
         // 1. retrieve the submission definition
         // 2. iterate over the submission section to allow to plugin additional
         // info
 
         if (mode != null) {
+
+            addValidationErrorsToItem(obj, rest);
+
             rest.setId(obj.getID() + ":" + mode.getName());
             SubmissionDefinitionRest def = converter.toRest(
                     submissionConfigReader.getSubmissionConfigByName(mode.getSubmissionDefinition()), projection);
             rest.setSubmissionDefinition(def);
+            storeSubmissionName(def.getName());
             for (SubmissionSectionRest sections : def.getPanels()) {
                 SubmissionStepConfig stepConfig = submissionSectionConverter.toModel(sections);
 
@@ -105,9 +112,7 @@ public class EditItemConverter
                         // load the interface for this step
                         AbstractRestProcessingStep stepProcessing =
                             (AbstractRestProcessingStep) stepClass.newInstance();
-                        for (ErrorRest error : stepProcessing.validate(submissionService, obj, stepConfig)) {
-                            addError(rest.getErrors(), error);
-                        }
+
                         rest.getSections()
                             .put(sections.getId(), stepProcessing.getData(submissionService, obj, stepConfig));
                     } else {
@@ -124,6 +129,19 @@ public class EditItemConverter
 
             }
         }
+        rest.setCollection(collection != null ? converter.toRest(collection, projection) : null);
+        rest.setItem(converter.toRest(item, projection));
+        rest.setSubmitter(converter.toRest(submitter, projection));
+    }
+
+    @SuppressWarnings("unchecked")
+    private void addValidationErrorsToItem(EditItem obj, EditItemRest rest) {
+        Request currentRequest = requestService.getCurrentRequest();
+        Context context = ContextUtil.obtainContext(currentRequest.getServletRequest());
+
+        validationService.validate(context, obj).stream()
+            .map(ErrorRest::fromValidationError)
+            .forEach(error -> addError(rest.getErrors(), error));
     }
 
     /* (non-Javadoc)

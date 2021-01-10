@@ -189,7 +189,6 @@ public class DiscoverQueryBuilderTest {
         assertThat(discoverQuery.getMaxResults(), is(10));
         assertThat(discoverQuery.getStart(), is(10));
         assertThat(discoverQuery.getFacetMinCount(), is(1));
-        assertThat(discoverQuery.getFacetOffset(), is(0));
         assertThat(discoverQuery.getFacetFields(), hasSize(2));
         assertThat(discoverQuery.getFacetFields(), containsInAnyOrder(
                 discoverFacetFieldMatcher(new DiscoverFacetField("subject", TYPE_TEXT, 6, COUNT)),
@@ -217,7 +216,6 @@ public class DiscoverQueryBuilderTest {
         assertThat(discoverQuery.getMaxResults(), is(100));
         assertThat(discoverQuery.getStart(), is(0));
         assertThat(discoverQuery.getFacetMinCount(), is(1));
-        assertThat(discoverQuery.getFacetOffset(), is(0));
         assertThat(discoverQuery.getFacetFields(), hasSize(2));
         assertThat(discoverQuery.getFacetFields(), containsInAnyOrder(
                 discoverFacetFieldMatcher(new DiscoverFacetField("subject", TYPE_TEXT, 6, COUNT)),
@@ -247,7 +245,6 @@ public class DiscoverQueryBuilderTest {
         assertThat(discoverQuery.getMaxResults(), is(10));
         assertThat(discoverQuery.getStart(), is(20));
         assertThat(discoverQuery.getFacetMinCount(), is(1));
-        assertThat(discoverQuery.getFacetOffset(), is(0));
         assertThat(discoverQuery.getFacetFields(), hasSize(2));
         assertThat(discoverQuery.getFacetFields(), containsInAnyOrder(
                 discoverFacetFieldMatcher(new DiscoverFacetField("subject", TYPE_TEXT, 6, COUNT)),
@@ -304,10 +301,11 @@ public class DiscoverQueryBuilderTest {
         assertThat(discoverQuery.getMaxResults(), is(0));
         assertThat(discoverQuery.getStart(), is(0));
         assertThat(discoverQuery.getFacetMinCount(), is(1));
-        assertThat(discoverQuery.getFacetOffset(), is(10));
         assertThat(discoverQuery.getFacetFields(), hasSize(1));
         assertThat(discoverQuery.getFacetFields(), contains(
-                discoverFacetFieldMatcher(new DiscoverFacetField("subject", TYPE_TEXT, 11, COUNT, "prefix"))
+                // the page created in the setUp has index 1, so it is the 2nd, offset 10
+                // the facet limit is 11 as we retrieve one facet value more than requested to know if there are more
+                discoverFacetFieldMatcher(new DiscoverFacetField("subject", TYPE_TEXT, 11, COUNT, "prefix", 10))
         ));
     }
 

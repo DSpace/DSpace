@@ -29,6 +29,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.services.ConfigurationService;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,9 @@ public class WorkspaceItemPatentStepIT extends AbstractControllerIntegrationTest
     @Before
     @Override
     public void setUp() throws Exception {
-
+        Assume.assumeTrue("EPO Credentials are set",
+                configurationService.hasProperty("submission.lookup.epo.consumerKey")
+                        && configurationService.hasProperty("submission.lookup.epo.consumerSecretKey"));
         super.setUp();
 
         // disable file upload mandatory

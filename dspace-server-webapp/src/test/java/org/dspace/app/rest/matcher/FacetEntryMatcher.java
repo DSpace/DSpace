@@ -109,7 +109,7 @@ public class FacetEntryMatcher {
     public static Matcher<? super Object> typeFacet(boolean b) {
         return allOf(
                 hasJsonPath("$.name", is("itemtype")),
-                hasJsonPath("$.facetType", is("text")),
+                hasJsonPath("$.facetType", is("hierarchical")),
                 hasJsonPath("$.facetLimit", any(Integer.class)),
                 hasJsonPath("$._links.self.href", containsString("api/discover/facets/itemtype")),
                 hasJsonPath("$._links", matchNextLink(b, "api/discover/facets/itemtype"))
@@ -145,6 +145,15 @@ public class FacetEntryMatcher {
             hasJsonPath("$.facetLimit", any(Integer.class)),
             hasJsonPath("$._links.self.href", containsString("api/discover/facets/entityType")),
             hasJsonPath("$._links", matchNextLink(hasNext, "api/discover/facets/entityType"))
+        );
+    }
+
+    public static Matcher<? super Object> anyFacet(String name, String facetType) {
+        return allOf(
+            hasJsonPath("$.name", is(name)),
+            hasJsonPath("$.facetType", is(facetType)),
+            hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$._links.self.href", containsString("api/discover/facets/" + name))
         );
     }
 }

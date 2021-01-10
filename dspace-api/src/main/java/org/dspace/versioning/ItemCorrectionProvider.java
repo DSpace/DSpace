@@ -7,10 +7,12 @@
  */
 package org.dspace.versioning;
 
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
@@ -76,6 +78,12 @@ public class ItemCorrectionProvider extends AbstractVersionProvider {
 
         workflowItem.setItem(nativeItem);
         workflowItemService.update(context, workflowItem);
+
+        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, correctionItem);
+        if (workspaceItem != null) {
+            workspaceItemService.deleteWrapper(context, workspaceItem);
+        }
+
         itemService.delete(context, correctionItem);
         log.info("Deleted correction item " + correctionItem.getID().toString());
 
@@ -91,8 +99,15 @@ public class ItemCorrectionProvider extends AbstractVersionProvider {
             throws SQLException, AuthorizeException, IOException {
 
         // Update only default bundle
-        Bundle nativeDefaultBundle = nativeItem.getBundles(Constants.DEFAULT_BUNDLE_NAME).get(0);
-        Bundle correctedDefaultBundle = itemNew.getBundles(Constants.DEFAULT_BUNDLE_NAME).get(0);;
+        List<Bundle> nativeBundles = nativeItem.getBundles(Constants.DEFAULT_BUNDLE_NAME);
+        Bundle nativeDefaultBundle = CollectionUtils.isNotEmpty(nativeBundles) ? nativeBundles.get(0) : null;
+
+        List<Bundle> correctedBundles = itemNew.getBundles(Constants.DEFAULT_BUNDLE_NAME);
+        Bundle correctedDefaultBundle = CollectionUtils.isNotEmpty(correctedBundles) ? correctedBundles.get(0) : null;
+
+        if (correctedDefaultBundle == null || nativeDefaultBundle == null) {
+            return;
+        }
 
         List<Bitstream> nativeBitstreams = nativeDefaultBundle.getBitstreams();
         for (Bitstream bitstreamCorrected : correctedDefaultBundle.getBitstreams()) {

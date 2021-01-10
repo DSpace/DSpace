@@ -663,6 +663,8 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                 return new String[] {MetadataSchemaEnum.RELATIONSHIP.getName(), "type", null};
             case "submission-type":
                 return new String[] { MetadataSchemaEnum.CRIS.getName(), "submission", "definition" };
+            case "workflow-name":
+                return new String[] { MetadataSchemaEnum.CRIS.getName(), "workflow", "name" };
             default:
                 return new String[] {null, null, null};
         }

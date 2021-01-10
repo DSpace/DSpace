@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,7 @@ import org.dspace.layout.CrisLayoutField;
 import org.dspace.layout.dao.CrisLayoutBoxDAO;
 import org.dspace.layout.service.CrisLayoutBoxAccessService;
 import org.dspace.layout.service.CrisLayoutBoxService;
+import org.dspace.metrics.CrisItemMetricsService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -61,15 +63,20 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
     @Autowired
     private CrisLayoutBoxAccessService crisLayoutBoxAccessService;
 
+    @Autowired
+    private CrisItemMetricsService crisMetricService;
+
     //constructor with all fields injected, used for test purposes (mock injection)
     CrisLayoutBoxServiceImpl(CrisLayoutBoxDAO dao, ItemService itemService, AuthorizeService authorizeService,
                              EntityTypeService entityTypeService,
-                             CrisLayoutBoxAccessService crisLayoutBoxAccessService) {
+                             CrisLayoutBoxAccessService crisLayoutBoxAccessService,
+                             CrisItemMetricsService crisMetricService) {
         this.dao = dao;
         this.itemService = itemService;
         this.authorizeService = authorizeService;
         this.entityTypeService = entityTypeService;
         this.crisLayoutBoxAccessService = crisLayoutBoxAccessService;
+        this.crisMetricService = crisMetricService;
     }
 
     public CrisLayoutBoxServiceImpl() {
@@ -205,7 +212,7 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
                        .filter(im -> !im.isEmpty())
                        .map(itemMetadata -> boxes
                            .stream()
-                           .filter(b -> hasContent(context, b, itemMetadata))
+                           .filter(b -> hasContent(context, b, item, itemMetadata))
                            .filter(b -> accessGranted(context, item, b))
                            .collect(Collectors.toList()))
                        .orElse(new ArrayList<>());
@@ -224,7 +231,7 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
      * @see org.dspace.layout.service.CrisLayoutBoxService#hasContent()
      */
     @Override
-    public boolean hasContent(Context context, CrisLayoutBox box, List<MetadataValue> values) {
+    public boolean hasContent(Context context, CrisLayoutBox box, Item item, List<MetadataValue> values) {
         String boxType = box.getType();
         if (StringUtils.isEmpty(boxType)) {
             return hasMetadataBoxContent(box, values);
@@ -233,6 +240,8 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
         switch (boxType.toUpperCase()) {
             case "RELATION":
                 return hasRelationBoxContent(box, values);
+            case "METRICS":
+                return hasMetricsBoxContent(context, box, item.getID());
             case "ORCID_SYNC_SETTINGS":
             case "ORCID_SYNC_QUEUE":
                 return hasOrcidSyncBoxContent(context, box, values);
@@ -270,6 +279,22 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
     private boolean hasRelationBoxContent(CrisLayoutBox box, List<MetadataValue> values) {
         // The relation box has no associated content
         return true;
+    }
+
+    protected boolean hasMetricsBoxContent(Context context, CrisLayoutBox box, UUID itemUuid) {
+        if (box.getMetric2box().isEmpty()) {
+            return false;
+        }
+        final Set<String> boxTypes = box.getMetric2box().stream().map(mb -> mb.getType()).collect(Collectors.toSet());
+        if (this.crisMetricService.getEmbeddableMetrics(context, itemUuid).stream()
+            .filter(m -> boxTypes.contains(m.getMetricType())).count() > 0) {
+            return true;
+        }
+        if (this.crisMetricService.getStoredMetrics(context, itemUuid).stream()
+            .filter(m -> boxTypes.contains(m.getMetricType())).count() > 0) {
+            return true;
+        }
+        return false;
     }
 
     private boolean hasOrcidSyncBoxContent(Context context, CrisLayoutBox box, List<MetadataValue> values) {

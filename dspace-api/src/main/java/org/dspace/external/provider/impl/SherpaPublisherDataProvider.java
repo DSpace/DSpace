@@ -26,13 +26,13 @@ import org.dspace.app.sherpa.SHERPAPublisher;
 import org.dspace.app.sherpa.SHERPAResponse;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.model.ExternalDataObject;
-import org.dspace.external.provider.ExternalDataProvider;
+import org.dspace.external.provider.AbstractExternalDataProvider;
 
 /**
  * This class is the implementation of the ExternalDataProvider interface that will deal with SherpaPublisher External
  * data lookups
  */
-public class SherpaPublisherDataProvider implements ExternalDataProvider {
+public class SherpaPublisherDataProvider extends AbstractExternalDataProvider {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SherpaPublisherDataProvider.class);
 

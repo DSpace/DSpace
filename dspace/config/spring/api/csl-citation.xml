@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+    default-lazy-init="true">
+
+    <bean id="DSpaceListItemDataProvider" class="org.dspace.content.integration.crosswalks.csl.DSpaceListItemDataProvider" scope="prototype">
+    	<property name="typeConverter" ref="mapConverterPublicationTypes"/>
+    	<property name="type" value="dc.type"/>
+    	<property name="language" value="dc.language.iso"/>
+        <property name="abstrct" value="dc.description.abstract"/>
+        <property name="DOI" value="dc.identifier.doi"/>
+        <property name="ISBN" value="dc.identifier.isbn"/>
+        <property name="ISSN" value="dc.identifier.issn"/>
+        <property name="keyword" value="dc.subject"/>
+        <property name="publisher" value="dc.publisher"/>
+        <property name="volume" value="oaire.citation.volume"/>
+        <property name="issue" value="oaire.citation.issue"/>
+        <property name="event" value="dc.relation.conference"/>
+        <property name="title" value="dc.title"/>
+        <property name="URL" value="dc.identifier.uri"/>
+        <property name="issued" value="dc.date.issued"/>
+        <property name="author" value="dc.contributor.author"/>
+        <property name="editor" value="dc.contributor.editor"/>
+    </bean>
+    
+    <bean name="mapConverterPublicationTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
+		<constructor-arg value="mapConverterPublicationTypes" />
+		<property name="converterNameFile" value="mapConverter-publicationTypes.properties" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+		<property name="defaultValue" value=""/>
+	</bean>
+</beans>

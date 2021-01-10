@@ -46,4 +46,8 @@ public class EmbeddedPage extends EmbeddedPageHeader {
         return fullList;
     }
 
+    @JsonProperty(value = "_links")
+    public Map<String, Object> getInternalLinks() {
+        return super.getLinks();
+    }
 }

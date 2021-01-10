@@ -1,0 +1,43 @@
+{
+  "items": [
+    {
+      "id": "a02e86bc-6624-4f7a-bed8-1783df5650f3",
+      "type": "ARTICLE_JOURNAL",
+      "language": "en",
+      "author": [
+        {
+          "family": "Smith",
+          "given": "John"
+        },
+        {
+          "family": "Red",
+          "given": "Edward"
+        }
+      ],
+      "editor": [
+        {
+          "family": "Editor"
+        }
+      ],
+      "issued": {
+        "date-parts": [
+          [
+            2018,
+            5,
+            17
+          ]
+        ]
+      },
+      "DOI": "10.1000/182",
+      "event": "Conference",
+      "ISBN": "11-22-33",
+      "ISSN": "0002",
+      "issue": "03",
+      "keyword": "publication",
+      "publisher": "Publisher",
+      "title": "Publication title",
+      "URL": "http://localhost:4000/handle/123456789/0001",
+      "volume": "V01"
+    }
+  ]
+}

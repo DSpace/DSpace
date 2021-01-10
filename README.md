@@ -1,7 +1,7 @@
 
 # DSpace
 
-[![Build Status](https://travis-ci.com/DSpace/DSpace.png?branch=main)](https://travis-ci.com/DSpace/DSpace)
+[![Build Status](https://github.com/DSpace/DSpace/workflows/Build/badge.svg)](https://github.com/DSpace/DSpace/actions?query=workflow%3ABuild)
 
 [DSpace Documentation](https://wiki.lyrasis.org/display/DSDOC/) |
 [DSpace Releases](https://github.com/DSpace/DSpace/releases) |
@@ -86,7 +86,7 @@ DSpace uses GitHub to track issues:
 ### Running Tests
 
 By default, in DSpace, Unit Tests and Integration Tests are disabled. However, they are
-run automatically by [Travis CI](https://travis-ci.com/DSpace/DSpace/) for all Pull Requests and code commits.
+run automatically by [GitHub Actions](https://github.com/DSpace/DSpace/actions?query=workflow%3ABuild) for all Pull Requests and code commits.
 
 * How to run both Unit Tests (via `maven-surefire-plugin`) and Integration Tests (via `maven-failsafe-plugin`):
   ```
@@ -113,10 +113,10 @@ run automatically by [Travis CI](https://travis-ci.com/DSpace/DSpace/) for all P
   ```
   # Run all integration tests in a specific test class
   # NOTE: failIfNoTests=false is required to skip tests in other modules
-  mvn install -DskipIntegrationTests=false -Dtest=[full.package.testClassName] -DfailIfNoTests=false
+  mvn install -DskipIntegrationTests=false -Dit.test=[full.package.testClassName] -DfailIfNoTests=false
 
   # Run one test method in a specific test class
-  mvn install -DskipIntegrationTests=false -Dtest=[full.package.testClassName]#[testMethodName] -DfailIfNoTests=false
+  mvn install -DskipIntegrationTests=false -Dit.test=[full.package.testClassName]#[testMethodName] -DfailIfNoTests=false
   ```
 * How to run only tests of a specific DSpace module
   ```

@@ -10,6 +10,7 @@ package org.dspace.app.bulkedit;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.split;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.dspace.app.bulkimport.utils.WorkbookUtils.getCellValue;
 import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
@@ -45,13 +46,11 @@ import org.dspace.app.bulkimport.model.EntityRow;
 import org.dspace.app.bulkimport.model.ImportAction;
 import org.dspace.app.bulkimport.model.MetadataGroup;
 import org.dspace.app.bulkimport.model.MetadataValueVO;
-import org.dspace.app.bulkimport.service.ItemSearcherMapper;
 import org.dspace.app.bulkimport.utils.WorkbookUtils;
-import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
-import org.dspace.app.util.SubmissionConfigReader;
-import org.dspace.app.util.SubmissionConfigReaderException;
+import org.dspace.authority.service.ItemSearchService;
+import org.dspace.authority.service.ItemSearcherMapper;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -67,6 +66,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
+import org.dspace.core.exception.SQLRuntimeException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.scripts.DSpaceRunnable;
@@ -90,28 +90,28 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BulkImport.class);
 
+    public static final String AUTHORITY_SEPARATOR = "$$";
+
+    public static final String METADATA_SEPARATOR = "||";
+
+    public static final String LANGUAGE_SEPARATOR_PREFIX = "[";
+
+    public static final String LANGUAGE_SEPARATOR_SUFFIX = "]";
+
+    public static final String ID_CELL = "ID";
+
+    public static final String PARENT_ID_CELL = "PARENT-ID";
+
+    public static final String ROW_ID = "ROW-ID";
+
+    public static final String ID_SEPARATOR = "::";
+
 
     private static final int ID_CELL_INDEX = 0;
 
     private static final int ACTION_CELL_INDEX = 1;
 
-    private static final String ID_CELL = "ID";
-
     private static final String ACTION_CELL = "ACTION";
-
-    private static final String PARENT_ID_CELL = "PARENT-ID";
-
-    private static final String UUID_PREFIX = "UUID";
-
-    private static final String ID_SEPARATOR = "::";
-
-    private static final String AUTHORITY_SEPARATOR = "::";
-
-    private static final String METADATA_SEPARATOR = "\\|\\|";
-
-    private static final String LANGUAGE_SEPARATOR = "/";
-
-    private static final String ROW_ID = "ROW-ID";
 
 
     private CollectionService collectionService;
@@ -128,11 +128,11 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
     private ItemSearcherMapper itemSearcherMapper;
 
+    private ItemSearchService itemSearchService;
+
     private AuthorizeService authorizeService;
 
     private DCInputsReader reader;
-
-    private SubmissionConfigReader submissionConfigReader;
 
 
     private String collectionId;
@@ -157,13 +157,12 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         this.installItemService = ContentServiceFactory.getInstance().getInstallItemService();
         this.workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
         this.authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
-        this.itemSearcherMapper = new DSpace().getServiceManager().getServiceByName("itemSearcherMapper",
-            ItemSearcherMapper.class);
+        this.itemSearcherMapper = new DSpace().getSingletonService(ItemSearcherMapper.class);
+        this.itemSearchService = new DSpace().getSingletonService(ItemSearchService.class);
 
         try {
             this.reader = new DCInputsReader();
-            this.submissionConfigReader = new SubmissionConfigReader();
-        } catch (DCInputsReaderException | SubmissionConfigReaderException e) {
+        } catch (DCInputsReaderException e) {
             throw new RuntimeException(e);
         }
 
@@ -185,6 +184,10 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         context.setMode(Context.Mode.BATCH_EDIT);
         assignCurrentUserInContext();
 
+        //FIXME: see https://4science.atlassian.net/browse/CSTPER-236 for final solution
+
+        context.turnOffAuthorisationSystem();
+
         InputStream inputStream = handler.getFileStream(context, filename)
             .orElseThrow(() -> new IllegalArgumentException("Error reading file, the file couldn't be "
                 + "found for filename: " + filename));
@@ -201,6 +204,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         try {
             performImport(inputStream);
             context.complete();
+            context.restoreAuthSystemState();
         } catch (Exception e) {
             handler.handleException(e);
             context.abort();
@@ -227,7 +231,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
             throw new BulkImportException("The Workbook should have at least one sheet");
         }
 
-        List<String> groups = getSubmissionFormMetadata(true);
+        List<String> groups = getSubmissionFormMetadataGroups();
 
         for (Sheet sheet : workbook) {
             String name = sheet.getSheetName();
@@ -286,7 +290,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         List<String> metadataFields = headers.subList(getFirstMetadataIndex(sheet), headers.size());
         List<String> invalidMetadataMessages = new ArrayList<>();
 
-        List<String> submissionMetadata = isEntityRowSheet ? getSubmissionFormMetadata(false)
+        List<String> submissionMetadata = isEntityRowSheet ? getSubmissionFormMetadata()
             : getSubmissionFormMetadataGroup(sheetName);
 
         for (String metadataField : metadataFields) {
@@ -322,36 +326,27 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
     private List<String> getSubmissionFormMetadataGroup(String groupName) {
         try {
-            String submissionName = this.submissionConfigReader.getSubmissionConfigByCollection(getCollection())
-                .getSubmissionName();
-            String formName = submissionName + "-" + groupName.replaceAll("\\.", "-");
-            return Arrays.stream(this.reader.getInputsByFormName(formName).getFields())
-                .flatMap(dcInputs -> Arrays.stream(dcInputs))
-                .map(dcInput -> dcInput.getFieldName())
-                .collect(Collectors.toList());
+            return this.reader.getAllNestedMetadataByGroupName(getCollection(), groupName);
         } catch (DCInputsReaderException e) {
             throw new BulkImportException("An error occurs reading the input configuration "
                 + "by group name " + groupName, e);
         }
     }
 
-    private List<String> getSubmissionFormMetadata(boolean group) {
-
+    private List<String> getSubmissionFormMetadata() {
         try {
-            return this.reader.getInputsByCollection(getCollection()).stream()
-                .flatMap(dcInputSet -> Arrays.stream(dcInputSet.getFields()))
-                .flatMap(dcInputs -> Arrays.stream(dcInputs))
-                .filter(dcInput -> group ? isGroupType(dcInput) : !isGroupType(dcInput))
-                .map(dcInput -> dcInput.getFieldName())
-                .collect(Collectors.toList());
+            return this.reader.getSubmissionFormMetadata(getCollection());
         } catch (DCInputsReaderException e) {
             throw new BulkImportException("An error occurs reading the input configuration by collection", e);
         }
-
     }
 
-    private boolean isGroupType(DCInput dcInput) {
-        return "group".equals(dcInput.getInputType());
+    private List<String> getSubmissionFormMetadataGroups() {
+        try {
+            return this.reader.getSubmissionFormMetadataGroups(getCollection());
+        } catch (DCInputsReaderException e) {
+            throw new BulkImportException("An error occurs reading the input configuration by collection", e);
+        }
     }
 
     private List<EntityRow> getValidEntityRows(Workbook workbook) {
@@ -544,18 +539,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
     }
 
     private Item findItem(EntityRow entityRow) throws Exception {
-
-        String id = entityRow.getId();
-        if (id == null) {
-            return null;
-        }
-
-        if (UUIDUtils.fromString(id) != null) {
-            return itemSearcherMapper.search(context, UUID_PREFIX, id);
-        }
-
-        String[] idSections = entityRow.getId().split(ID_SEPARATOR);
-        return itemSearcherMapper.search(context, idSections[0].toUpperCase(), idSections[1]);
+        return entityRow.getId() != null ? itemSearchService.search(context, entityRow.getId()) : null;
     }
 
     private void addMetadata(Item item, EntityRow entityRow, boolean replace) throws SQLException {
@@ -584,7 +568,9 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
                 String authority = metadataValue.getAuthority();
                 int confidence = metadataValue.getConfidence();
                 String value = metadataValue.getValue();
-                itemService.addMetadata(context, item, metadataField, language, value, authority, confidence);
+                if (StringUtils.isNotEmpty(value)) {
+                    itemService.addMetadata(context, item, metadataField, language, value, authority, confidence);
+                }
             }
         }
 
@@ -620,11 +606,14 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
     }
 
     private String getMetadataField(String field) {
-        return field.split(LANGUAGE_SEPARATOR)[0];
+        return field.contains(LANGUAGE_SEPARATOR_PREFIX) ? split(field, LANGUAGE_SEPARATOR_PREFIX)[0] : field;
     }
 
     private String getMetadataLanguage(String field) {
-        return field.contains(LANGUAGE_SEPARATOR) ? field.split(LANGUAGE_SEPARATOR)[1] : null;
+        if (field.contains(LANGUAGE_SEPARATOR_PREFIX)) {
+            return split(field, LANGUAGE_SEPARATOR_PREFIX)[1].replace(LANGUAGE_SEPARATOR_SUFFIX, "");
+        }
+        return null;
     }
 
     private String getIdFromRow(Row row) {
@@ -647,7 +636,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
             if (index >= firstMetadataIndex) {
 
                 String cellValue = WorkbookUtils.getCellValue(row, index);
-                String[] values = isNotBlank(cellValue) ? cellValue.split(METADATA_SEPARATOR) : new String[] { "" };
+                String[] values = isNotBlank(cellValue) ? split(cellValue, METADATA_SEPARATOR) : new String[] { "" };
 
                 List<MetadataValueVO> metadataValues = Arrays.stream(values)
                     .map(value -> buildMetadataValueVO(row, value, isEntityRowSheet))
@@ -670,7 +659,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
             return new MetadataValueVO(metadataValue, null, -1);
         }
 
-        String[] valueSections = metadataValue.split(AUTHORITY_SEPARATOR);
+        String[] valueSections = StringUtils.split(metadataValue, AUTHORITY_SEPARATOR);
 
         String value = valueSections[0];
         String authority = valueSections[1];
@@ -750,7 +739,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         for (int index = firstMetadataIndex; index < row.getLastCellNum(); index++) {
 
             String cellValue = WorkbookUtils.getCellValue(row, index);
-            String[] values = isNotBlank(cellValue) ? cellValue.split(METADATA_SEPARATOR) : new String[] { "" };
+            String[] values = isNotBlank(cellValue) ? split(cellValue, METADATA_SEPARATOR) : new String[] { "" };
             if (values.length > 1) {
                 handleValidationErrorOnRow(row, "Multiple metadata value on the same cell not allowed "
                     + "in the metadata group sheets: " + cellValue);
@@ -760,7 +749,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
             String value = values[0];
             if (value.contains(AUTHORITY_SEPARATOR)) {
 
-                String[] valueSections = value.split(AUTHORITY_SEPARATOR);
+                String[] valueSections = StringUtils.split(value, AUTHORITY_SEPARATOR);
                 if (valueSections.length > 3) {
                     handleValidationErrorOnRow(row, "Invalid metadata value " + value + ": too many sections "
                         + "splitted by " + AUTHORITY_SEPARATOR);
@@ -803,12 +792,16 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
     }
 
     private void handleException(EntityRow entityRow, BulkImportException bie) {
+
+        rollback();
+
         if (abortOnError) {
             throw bie;
-        } else {
-            String message = "Row " + entityRow.getRow() + " - " + getRootCauseMessage(bie);
-            handler.logError(message);
         }
+
+        String message = "Row " + entityRow.getRow() + " - " + getRootCauseMessage(bie);
+        handler.logError(message);
+
     }
 
     private void handleValidationErrorOnRow(Row row, String message) {
@@ -818,6 +811,14 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
             throw new BulkImportException(errorMessage);
         } else {
             handler.logError(errorMessage);
+        }
+    }
+
+    private void rollback() {
+        try {
+            context.rollback();
+        } catch (SQLException e) {
+            throw new SQLRuntimeException(e);
         }
     }
 

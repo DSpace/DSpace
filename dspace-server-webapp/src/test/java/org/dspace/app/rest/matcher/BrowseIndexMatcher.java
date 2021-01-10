@@ -139,4 +139,15 @@ public class BrowseIndexMatcher {
             hasJsonPath("$._links.items.href", is(REST_SERVER_URL + "discover/browses/pjtitle/items"))
         );
     }
+
+    public static Matcher<? super Object> eqtitleBrowseIndex(final String order) {
+        return allOf(
+            hasJsonPath("$.metadata", contains("dc.title")),
+            hasJsonPath("$.metadataBrowse", Matchers.is(false)),
+            hasJsonPath("$.order", equalToIgnoringCase(order)),
+            hasJsonPath("$.sortOptions[*].name", containsInAnyOrder("title", "dateissued", "dateaccessioned")),
+            hasJsonPath("$._links.self.href", is(REST_SERVER_URL + "discover/browses/eqtitle")),
+            hasJsonPath("$._links.items.href", is(REST_SERVER_URL + "discover/browses/eqtitle/items"))
+                    );
+    }
 }

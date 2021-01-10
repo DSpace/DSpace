@@ -7,6 +7,8 @@
  */
 package org.dspace.app.batch;
 
+import static org.dspace.content.MetadataSchemaEnum.CRIS;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -29,6 +31,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -37,13 +40,11 @@ import org.dspace.batch.ImpBitstream;
 import org.dspace.batch.ImpBitstreamMetadatavalue;
 import org.dspace.batch.ImpMetadatavalue;
 import org.dspace.batch.ImpRecord;
-import org.dspace.batch.ImpRecordToItem;
 import org.dspace.batch.ImpWorkflowNState;
 import org.dspace.batch.service.ImpBitstreamMetadatavalueService;
 import org.dspace.batch.service.ImpBitstreamService;
 import org.dspace.batch.service.ImpMetadatavalueService;
 import org.dspace.batch.service.ImpRecordService;
-import org.dspace.batch.service.ImpRecordToItemService;
 import org.dspace.batch.service.ImpServiceFactory;
 import org.dspace.batch.service.ImpWorkflowNStateService;
 import org.dspace.content.AdditionalMetadataUpdateProcessPlugin;
@@ -65,7 +66,6 @@ import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
-import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -140,7 +140,6 @@ public class ItemImportOA {
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    private MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
     private MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance()
             .getMetadataSchemaService();
     private BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
@@ -167,7 +166,6 @@ public class ItemImportOA {
     private ImpMetadatavalueService impMetadatavalueService = ImpServiceFactory.getInstance()
             .getImpMetadatavalueService();
     private ImpRecordService impRecordService = ImpServiceFactory.getInstance().getImpRecordService();
-    private ImpRecordToItemService impRecordToItemService = ImpServiceFactory.getInstance().getImpRecordToItemService();
     private ImpWorkflowNStateService impWorkflowNStateService = ImpServiceFactory.getInstance()
             .getImpWorkflowNStateService();
     private InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
@@ -229,7 +227,7 @@ public class ItemImportOA {
         String handle = null;
         String imp_record_id = null;
         UUID item_id = null;
-        ImpRecord imp_id = null;
+        ImpRecord impRecord = null;
 
         if (line.hasOption('h')) {
             HelpFormatter myhelp = new HelpFormatter();
@@ -289,7 +287,7 @@ public class ItemImportOA {
         // item ID (replace or delete)
         if (line.hasOption('I')) {
             int temp_imp_id = Integer.parseInt(line.getOptionValue('I').trim());
-            imp_id = impRecordService.findByID(context, temp_imp_id);
+            impRecord = impRecordService.findByID(context, temp_imp_id);
         }
         if (line.hasOption('E')) {
             String batchjob = line.getOptionValue('E').trim();
@@ -399,35 +397,17 @@ public class ItemImportOA {
         try {
             context.turnOffAuthorisationSystem();
             if (command.equals("add")) {
-                item_id = myLoader.addItem(context, mycollections, imp_id, handle, clearOldBitstream);
-                ImpRecordToItem impRecordToItem = null;
-
-                if (StringUtils.isNotBlank(myLoader.getSourceRef())) {
-                    impRecordToItem = new ImpRecordToItem();
-                    impRecordToItem.setImpRecordId(imp_record_id);
-                    impRecordToItem.setImpItemId(item_id);
-                    impRecordToItem.setImpSourceref(myLoader.getSourceRef());
-                } else {
-                    impRecordToItem = new ImpRecordToItem();
-                    impRecordToItem.setImpRecordId(imp_record_id);
-                    impRecordToItem.setImpItemId(item_id);
-                }
-                impRecordToItem = impRecordToItemService.create(context, impRecordToItem);
+                item_id = myLoader.addItem(context, mycollections, impRecord, handle, clearOldBitstream);
             } else if (command.equals("replace")) {
-                myLoader.replaceItems(context, mycollections, imp_record_id, item_id, imp_id, clearOldBitstream);
+                myLoader.replaceItems(context, mycollections, imp_record_id, item_id, impRecord, clearOldBitstream);
             } else if (command.equals("delete")) {
                 Item item = itemService.find(context, item_id);
                 if (item != null) {
                     ItemUtils.removeOrWithdrawn(context, item);
                 }
-                if (command.equals("delete") && (item == null || !item.isWithdrawn())) {
-                    ImpRecordToItem impRecordToItem = impRecordToItemService.findByPK(context, imp_record_id);
-                    impRecordToItemService.delete(context, impRecordToItem);
-                    impRecordToItem = null;
-                }
             }
-            imp_id.setLastModified(new Date());
-            impRecordService.update(context, imp_id);
+            impRecord.setLastModified(new Date());
+            impRecordService.update(context, impRecord);
             context.restoreAuthSystemState();
             return item_id;
         } catch (RuntimeException e) {
@@ -437,7 +417,7 @@ public class ItemImportOA {
     }
 
     private void replaceItems(Context c, Collection[] mycollections, String imp_record_id, UUID item_id,
-            ImpRecord imp_id, boolean clearOldBitstream) throws Exception {
+            ImpRecord impRecord, boolean clearOldBitstream) throws Exception {
 
         Item oldItem = itemService.find(c, item_id);
 
@@ -446,10 +426,10 @@ public class ItemImportOA {
             throw new RuntimeException("No item found with id: " + item_id);
         }
 
-        processItemUpdate(c, imp_id, clearOldBitstream, oldItem);
+        processItemUpdate(c, impRecord, clearOldBitstream, oldItem);
     }
 
-    private void processItemUpdate(Context c, ImpRecord imp_id, boolean clearOldBitstream, Item item)
+    private void processItemUpdate(Context c, ImpRecord impRecord, boolean clearOldBitstream, Item item)
             throws SQLException, AuthorizeException, TransformerException, IOException, WorkflowException,
             WorkflowConfigurationException, MessagingException {
 
@@ -480,9 +460,9 @@ public class ItemImportOA {
         }
 
         // now fill out dublin core for item
-        loadDublinCore(c, item, imp_id);
+        loadDublinCore(c, item, impRecord);
         // and the bitstreams
-        processImportBitstream(c, item, imp_id, clearOldBitstream);
+        processImportBitstream(c, item, impRecord, clearOldBitstream);
 
         List<AdditionalMetadataUpdateProcessPlugin> plugins = dspace.getServiceManager()
                 .getServicesByType(AdditionalMetadataUpdateProcessPlugin.class);
@@ -496,7 +476,7 @@ public class ItemImportOA {
             if (item.isArchived()) {
                 ItemUtils.removeOrWithdrawn(c, item);
             } else {
-                throw new RuntimeException("Item corresponding imp_id=" + imp_id + " is not in archive");
+                throw new RuntimeException("Item corresponding imp_id=" + impRecord + " is not in archive");
             }
         } else {
             if (reinstate) {
@@ -511,7 +491,7 @@ public class ItemImportOA {
                 if (workflow) {
                     XmlWorkflowItem wfi = workflowService.startWithoutNotify(c, wsi);
 
-                    processWorkflow(c, wfi, imp_id);
+                    processWorkflow(c, wfi, impRecord);
                 }
             } else if (backToWorkspace || workflow) {
 
@@ -523,7 +503,7 @@ public class ItemImportOA {
                         workflowService.abort(c, wfi, batchJob);
                     } else {
 
-                        processWorkflow(c, wfi, imp_id);
+                        processWorkflow(c, wfi, impRecord);
                     }
                 }
             }
@@ -537,12 +517,12 @@ public class ItemImportOA {
      * non-null means we have a pre-defined handle already mapOut - mapfile we're
      * writing
      */
-    private UUID addItem(Context c, Collection[] mycollections, ImpRecord imp_id, String handle,
+    private UUID addItem(Context c, Collection[] mycollections, ImpRecord impRecord, String handle,
             boolean clearOldBitstream) throws Exception {
 
         // hanlde withdraw
         if (withdrawn) {
-            throw new RuntimeException("Item corresponding imp_id=" + imp_id + " is not in archive");
+            throw new RuntimeException("Item corresponding imp_id=" + impRecord.getImpId() + " is not in archive");
         }
 
         // create workspace item
@@ -558,9 +538,11 @@ public class ItemImportOA {
         }
 
         // now fill out dublin core for item
-        loadDublinCore(c, myitem, imp_id);
+        loadDublinCore(c, myitem, impRecord);
+        // add cris source if to item
+        addCrisSourceId(c, myitem, impRecord);
         // and the bitstreams
-        processImportBitstream(c, myitem, imp_id, clearOldBitstream);
+        processImportBitstream(c, myitem, impRecord, clearOldBitstream);
 
         List<AdditionalMetadataUpdateProcessPlugin> plugins = DSpaceServicesFactory.getInstance().getServiceManager()
                 .getServicesByType(AdditionalMetadataUpdateProcessPlugin.class);
@@ -576,7 +558,7 @@ public class ItemImportOA {
 
         if (workflow) {
             XmlWorkflowItem wfi = workflowService.startWithoutNotify(c, wsi);
-            processWorkflow(c, wfi, imp_id);
+            processWorkflow(c, wfi, impRecord);
         } else if (reinstate) {
             myitem = installItemService.installItem(c, wsi);
         }
@@ -591,9 +573,9 @@ public class ItemImportOA {
         return myitem.getID();
     }
 
-    private void processWorkflow(Context context, XmlWorkflowItem wfi, ImpRecord imp_id) throws SQLException,
+    private void processWorkflow(Context context, XmlWorkflowItem wfi, ImpRecord impRecord) throws SQLException,
             IOException, AuthorizeException, WorkflowConfigurationException, MessagingException, WorkflowException {
-        List<ImpWorkflowNState> impWorkflowNStates = impWorkflowNStateService.searchWorkflowOps(context, imp_id);
+        List<ImpWorkflowNState> impWorkflowNStates = impWorkflowNStateService.searchWorkflowOps(context, impRecord);
         for (ImpWorkflowNState iwns : impWorkflowNStates) {
             EPerson user = null;
             if (iwns.getImpWNStateEpersonUuid() != null) {
@@ -631,20 +613,25 @@ public class ItemImportOA {
                 workflowService.doState(context, user, null, claimedTask.getWorkflowItem().getID(), workflow,
                         currentActionConfig);
             } else if ("UNCLAIM".equalsIgnoreCase(iwns.getImpWNStateOp())) {
-                workflowService.sendWorkflowItemBackSubmission(context, wfi, user, imp_id.getImpSourceref(), "");
+                workflowService.sendWorkflowItemBackSubmission(context, wfi, user, impRecord.getImpSourceref(), "");
             } else if ("ABORT".equalsIgnoreCase(iwns.getImpWNStateOp())) {
                 workflowService.abort(context, wfi, user);
             }
         }
     }
 
-    private void loadDublinCore(Context c, Item myitem, ImpRecord imp_id)
+    private void loadDublinCore(Context c, Item myitem, ImpRecord impRecord)
             throws SQLException, AuthorizeException, TransformerException {
-        List<ImpMetadatavalue> impMetadatavlues = impMetadatavalueService.searchByImpRecordId(c, imp_id);
+        List<ImpMetadatavalue> impMetadatavlues = impMetadatavalueService.searchByImpRecordId(c, impRecord);
         // Add each one as a new format to the registry
         for (ImpMetadatavalue row_data : impMetadatavlues) {
             addDCValue(c, myitem, "dc", row_data);
         }
+    }
+
+    private void addCrisSourceId(Context c, Item item, ImpRecord impRecord) throws SQLException {
+        String sourceId = impRecord.getImpSourceref() + AuthorityValueService.SPLIT + impRecord.getImpRecordId();
+        itemService.addMetadata(c, item, CRIS.getName(), "sourceId", null, null, sourceId);
     }
 
     /**
@@ -726,12 +713,12 @@ public class ItemImportOA {
      * 
      * @param c
      * @param i
-     * @param imp_id
+     * @param impRecord
      * @throws AuthorizeException
      * @throws IOException
      * @throws SQLException
      */
-    private void processImportBitstream(Context c, Item i, ImpRecord imp_id, boolean clearOldBitstream)
+    private void processImportBitstream(Context c, Item i, ImpRecord impRecord, boolean clearOldBitstream)
             throws SQLException, IOException, AuthorizeException {
 
         if (clearOldBitstream) {
@@ -750,7 +737,7 @@ public class ItemImportOA {
             }
         }
         // retrieve the attached
-        List<ImpBitstream> impBitstreams = impBitstreamService.searchByImpRecord(c, imp_id);
+        List<ImpBitstream> impBitstreams = impBitstreamService.searchByImpRecord(c, impRecord);
 
         for (ImpBitstream imp_bitstream : impBitstreams) {
             String filepath = imp_bitstream.getFilepath();

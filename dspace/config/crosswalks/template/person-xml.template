@@ -72,4 +72,15 @@
 		<language>@person.knowsLanguage@</language>
 	</knows-languages>
 	<personal-picture>@virtual.bitstream.original.picture@</personal-picture>
+	<publications>
+		@relation.researchoutputs.start@
+		<publication>
+			<title>@dc.title@</title>
+			<date-issued>@dc.date.issued@</date-issued>
+			<authors>
+				<author>@dc.contributor.author@</author>
+			</authors>
+		</publication>
+		@relation.researchoutputs.end@
+	</publications>
 </person>

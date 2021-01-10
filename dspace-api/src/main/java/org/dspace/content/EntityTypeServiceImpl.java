@@ -16,6 +16,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.EntityTypeDAO;
 import org.dspace.content.service.EntityTypeService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,6 +27,9 @@ public class EntityTypeServiceImpl implements EntityTypeService {
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
+
+    @Autowired(required = true)
+    protected ItemService itemService;
 
     @Override
     public EntityType findByEntityType(Context context, String entityType) throws SQLException {
@@ -97,5 +101,11 @@ public class EntityTypeServiceImpl implements EntityTypeService {
                 "Only administrators can delete entityType");
         }
         entityTypeDAO.delete(context, entityType);
+    }
+
+    @Override
+    public EntityType findByItem(Context context, Item item) throws SQLException {
+        String relationshipType = itemService.getMetadataFirstValue(item, "relationship", "type", null, Item.ANY);
+        return relationshipType != null ? findByEntityType(context, relationshipType) : null;
     }
 }

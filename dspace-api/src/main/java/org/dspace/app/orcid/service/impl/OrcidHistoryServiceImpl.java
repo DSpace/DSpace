@@ -8,11 +8,9 @@
 package org.dspace.app.orcid.service.impl;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.orcid.jaxb.model.utils.Iso3166Country.fromValue;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -52,29 +50,34 @@ import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.util.SimpleMapConverter;
 import org.dspace.util.UUIDUtils;
-import org.orcid.jaxb.model.common_v3.CreditName;
-import org.orcid.jaxb.model.common_v3.ExternalId;
-import org.orcid.jaxb.model.common_v3.ExternalIds;
-import org.orcid.jaxb.model.common_v3.FuzzyDate;
-import org.orcid.jaxb.model.common_v3.FuzzyDate.Day;
-import org.orcid.jaxb.model.common_v3.FuzzyDate.Month;
-import org.orcid.jaxb.model.common_v3.FuzzyDate.Year;
-import org.orcid.jaxb.model.common_v3.OrcidId;
-import org.orcid.jaxb.model.common_v3.Organization;
-import org.orcid.jaxb.model.common_v3.OrganizationAddress;
-import org.orcid.jaxb.model.record_v3.Citation;
-import org.orcid.jaxb.model.record_v3.Contributor;
-import org.orcid.jaxb.model.record_v3.ContributorAttributes;
-import org.orcid.jaxb.model.record_v3.ContributorEmail;
-import org.orcid.jaxb.model.record_v3.Funding;
-import org.orcid.jaxb.model.record_v3.FundingTitle;
-import org.orcid.jaxb.model.record_v3.Work;
-import org.orcid.jaxb.model.record_v3.WorkContributors;
-import org.orcid.jaxb.model.record_v3.WorkTitle;
-import org.orcid.jaxb.model.utils.ContributorRole;
-import org.orcid.jaxb.model.utils.FundingType;
-import org.orcid.jaxb.model.utils.Iso3166Country;
-import org.orcid.jaxb.model.utils.Relationship;
+import org.orcid.jaxb.model.common.CitationType;
+import org.orcid.jaxb.model.common.ContributorRole;
+import org.orcid.jaxb.model.common.FundingType;
+import org.orcid.jaxb.model.common.Iso3166Country;
+import org.orcid.jaxb.model.common.Relationship;
+import org.orcid.jaxb.model.common.WorkType;
+import org.orcid.jaxb.model.v3.release.common.Contributor;
+import org.orcid.jaxb.model.v3.release.common.ContributorAttributes;
+import org.orcid.jaxb.model.v3.release.common.ContributorEmail;
+import org.orcid.jaxb.model.v3.release.common.ContributorOrcid;
+import org.orcid.jaxb.model.v3.release.common.CreditName;
+import org.orcid.jaxb.model.v3.release.common.Day;
+import org.orcid.jaxb.model.v3.release.common.FuzzyDate;
+import org.orcid.jaxb.model.v3.release.common.Month;
+import org.orcid.jaxb.model.v3.release.common.OrcidIdBase;
+import org.orcid.jaxb.model.v3.release.common.Organization;
+import org.orcid.jaxb.model.v3.release.common.OrganizationAddress;
+import org.orcid.jaxb.model.v3.release.common.PublicationDate;
+import org.orcid.jaxb.model.v3.release.common.Title;
+import org.orcid.jaxb.model.v3.release.common.Year;
+import org.orcid.jaxb.model.v3.release.record.Citation;
+import org.orcid.jaxb.model.v3.release.record.ExternalID;
+import org.orcid.jaxb.model.v3.release.record.ExternalIDs;
+import org.orcid.jaxb.model.v3.release.record.Funding;
+import org.orcid.jaxb.model.v3.release.record.FundingTitle;
+import org.orcid.jaxb.model.v3.release.record.Work;
+import org.orcid.jaxb.model.v3.release.record.WorkContributors;
+import org.orcid.jaxb.model.v3.release.record.WorkTitle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -189,14 +192,16 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         Item entity = orcidQueue.getEntity();
         Item owner = orcidQueue.getOwner();
         OrcidWorkMetadata itemMetadata = new OrcidWorkMetadata(entity);
-        BigInteger putCode = null;
+        Long putCode = null;
         Work work = new Work();
         addAuthors(context, work, itemMetadata);
         addPubblicationDate(work, itemMetadata);
         addExternalIdentifiers(work, itemMetadata);
         addType(work, itemMetadata);
         addCitation(work, itemMetadata);
-        work.setTitle(new WorkTitle(itemMetadata.getTitle(), null, null));
+        WorkTitle workTitle = new WorkTitle();
+        workTitle.setTitle(new Title(itemMetadata.getTitle()));
+        work.setWorkTitle(workTitle);
         if (!forceAddition) {
             putCode = findPutCode(context, entity, owner);
             work.setPutCode(putCode);
@@ -213,9 +218,9 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         Item owner = orcidQueue.getOwner();
 
         Funding funding = new Funding();
-        funding.setType(FundingType.GRANT.value());
+        funding.setType(FundingType.GRANT);
 
-        BigInteger putCode = null;
+        Long putCode = null;
 
         if (!forceAddition) {
             putCode = findPutCode(context, entity, owner);
@@ -225,17 +230,26 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         }
 
         String title = getMetadataValue(entity, "dc.title");
-        funding.setTitle(new FundingTitle(title, null));
+        FundingTitle fundTitle = new FundingTitle();
+        fundTitle.setTitle(new Title(title));
+        funding.setTitle(fundTitle);
 
-        funding.setExternalIds(getExternalIds(entity));
+        funding.setExternalIdentifiers(getExternalIds(entity));
 
         MetadataValue coordinator = getMetadata(entity, "crispj.coordinator");
         if (coordinator != null && coordinator.getAuthority() != null) {
             Item organization = itemService.findByIdOrLegacyId(context, coordinator.getAuthority());
             String name = getMetadataValue(organization, "dc.title");
             String city = getMetadataValue(organization, "organization.address.addressLocality");
-            Iso3166Country country = fromValue(getMetadataValue(organization, "organization.address.addressCountry"));
-            funding.setOrganization(new Organization(name, new OrganizationAddress(city, null, country.name()), null));
+            Iso3166Country country = Iso3166Country
+                    .fromValue(getMetadataValue(organization, "organization.address.addressCountry"));
+            Organization org = new Organization();
+            org.setName(name);
+            OrganizationAddress orgAddress = new OrganizationAddress();
+            orgAddress.setCity(city);
+            orgAddress.setCountry(country);
+            org.setAddress(orgAddress);
+            funding.setOrganization(org);
         }
         return sendObjectToOrcid(context, orcidQueue, orcid, token, putCode, funding, FUNDING_ENDPOINT);
     }
@@ -247,7 +261,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     }
 
     private OrcidHistory sendObjectToOrcid(Context context, OrcidQueue orcidQueue, String orcid, String token,
-            BigInteger putCode, Object objToSend, String endpoint) {
+            Long putCode, Object objToSend, String endpoint) {
 
         Item entity = orcidQueue.getEntity();
         Item owner = orcidQueue.getOwner();
@@ -307,31 +321,34 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         }
     }
 
-    private BigInteger findPutCode(Context context, Item entity, Item owner) throws SQLException {
+    private Long findPutCode(Context context, Item entity, Item owner) throws SQLException {
         return orcidHistoryDAO.findByOwnerAndEntity(context, owner.getID(), entity.getID()).stream()
                               .filter(history -> StringUtils.isNotBlank(history.getPutCode()))
-                              .map(history -> new BigInteger(history.getPutCode())).findFirst().orElse(null);
+                              .map(history -> Long.valueOf(history.getPutCode())).findFirst().orElse(null);
     }
 
-    private ExternalIds getExternalIds(Item entity) {
-        List<ExternalId> externalIds = new ArrayList<ExternalId>();
+    private ExternalIDs getExternalIds(Item entity) {
+        List<ExternalID> externalIds = new ArrayList<ExternalID>();
         String indentifierUri = getMetadataValue(entity, "dc.identifier.uri");
 
-        ExternalId handle = new ExternalId();
-        handle.setExternalIdValue(indentifierUri);
-        handle.setExternalIdType("handle");
-        handle.setExternalIdRelationship(Relationship.SELF.value());
+        ExternalID handle = new ExternalID();
+        handle.setValue(indentifierUri);
+        handle.setType("handle");
+        handle.setRelationship(Relationship.SELF);
         externalIds.add(handle);
 
         String indentifierDoi = getMetadataValue(entity, "dc.identifier.doi");
         if (StringUtils.isNotBlank(indentifierDoi)) {
-            ExternalId doi = new ExternalId();
-            doi.setExternalIdType("doi");
-            doi.setExternalIdValue(indentifierDoi);
-            doi.setExternalIdRelationship(Relationship.SELF.value());
+            ExternalID doi = new ExternalID();
+            doi.setType("doi");
+            doi.setValue(indentifierDoi);
+            doi.setRelationship(Relationship.SELF);
             externalIds.add(doi);
         }
-        return new ExternalIds(externalIds);
+        ExternalIDs retExIds = new ExternalIDs();
+        // this look a bit odd but it is the only way to add external ids in the orcid official jaxb serialization
+        retExIds.getExternalIdentifier().addAll(externalIds);
+        return retExIds;
     }
 
     private String getPutCodeFromResponse(HttpResponse response) {
@@ -405,24 +422,23 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
                 if (StringUtils.isNotBlank(orcidId)) {
                     String orcidDomain = configurationService.getProperty("orcid.domain-url");
                     if (StringUtils.isNotBlank(orcidId)) {
-                        OrcidId orcidID = new OrcidId();
-                        orcidID.setHost(orcidDomain);
-                        orcidID.setPath(orcidId);
-                        orcidID.setUri(orcidDomain + "/" + orcidId);
-                        contributor.setContributorOrcid(orcidID);
+                        OrcidIdBase orcidBase = new OrcidIdBase();
+                        orcidBase.setHost(orcidDomain);
+                        orcidBase.setPath(orcidId);
+                        orcidBase.setUri(orcidDomain + "/" + orcidId);
+                        contributor.setContributorOrcid(new ContributorOrcid(orcidBase));
                     }
                 }
             }
 
             contributor.setCreditName(new CreditName(name));
-
             ContributorAttributes attributes = new ContributorAttributes();
-            attributes.setContributorRole(ContributorRole.AUTHOR.value());
+            attributes.setContributorRole(ContributorRole.AUTHOR);
             contributor.setContributorAttributes(attributes);
             workContributors.getContributor().add(contributor);
         }
 
-        work.setContributors(workContributors);
+        work.setWorkContributors(workContributors);
     }
 
     private void addPubblicationDate(Work work, OrcidWorkMetadata itemMetadata) {
@@ -450,29 +466,29 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
                 day.setValue(decimalFormat.format(Long.parseLong(itemMetadata.getDay())));
                 publicationDate.setDay(day);
             }
-            work.setPublicationDate(publicationDate);
+            work.setPublicationDate(new PublicationDate(publicationDate));
         }
     }
 
     private void addExternalIdentifiers(Work work, OrcidWorkMetadata itemMetadata) {
         if (itemMetadata.getExternalIdentifier() != null) {
-            ExternalIds workExternalIdentifiers = new ExternalIds();
+            ExternalIDs workExternalIdentifiers = new ExternalIDs();
             for (String valIdentifier : itemMetadata.getExternalIdentifier()) {
-                ExternalId workExternalIdentifier = new ExternalId();
-                workExternalIdentifier.setExternalIdType(itemMetadata.getExternalIdentifierType(valIdentifier));
-                workExternalIdentifier.setExternalIdValue(valIdentifier);
-                workExternalIdentifier.setExternalIdRelationship(Relationship.SELF.value());
-                workExternalIdentifiers.getExternalId().add(workExternalIdentifier);
+                ExternalID workExternalIdentifier = new ExternalID();
+                workExternalIdentifier.setType(itemMetadata.getExternalIdentifierType(valIdentifier));
+                workExternalIdentifier.setValue(valIdentifier);
+                workExternalIdentifier.setRelationship(Relationship.SELF);
+                workExternalIdentifiers.getExternalIdentifier().add(workExternalIdentifier);
             }
-            work.setExternalIds(workExternalIdentifiers);
+            work.setWorkExternalIdentifiers(workExternalIdentifiers);
         }
     }
 
     private void addType(Work work, OrcidWorkMetadata itemMetadata) {
         if (mapConverterModifier == null) {
-            work.setType(itemMetadata.getWorkType());
+            work.setWorkType(WorkType.fromValue(itemMetadata.getWorkType()));
         } else {
-            work.setType(mapConverterModifier.getValue(itemMetadata.getWorkType()));
+            work.setWorkType(WorkType.fromValue(mapConverterModifier.getValue(itemMetadata.getWorkType())));
         }
     }
 
@@ -480,9 +496,9 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         String citationVal = itemMetadata.getCitation();
         if (StringUtils.isNotBlank(citationVal)) {
             Citation citation = new Citation();
-            citation.setCitationType(itemMetadata.getCitationType());
-            citation.setCitationValue(citationVal);
-            work.setCitation(citation);
+            citation.setWorkCitationType(CitationType.BIBTEX);
+            citation.setCitation(citationVal);
+            work.setWorkCitation(citation);
         }
     }
 }

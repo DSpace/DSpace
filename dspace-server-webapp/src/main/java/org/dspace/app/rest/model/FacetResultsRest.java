@@ -49,4 +49,5 @@ public class FacetResultsRest extends DiscoveryResultsRest {
     public String getPrefix() {
         return prefix;
     }
+
 }

@@ -8,10 +8,11 @@
 
 package org.dspace.authority;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.dspace.content.MetadataSchemaEnum.CRIS;
 
+import java.sql.SQLException;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -24,6 +25,7 @@ import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authority.filler.AuthorityImportFiller;
 import org.dspace.authority.filler.AuthorityImportFillerHolder;
 import org.dspace.authority.service.AuthorityValueService;
+import org.dspace.authority.service.ItemSearchService;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
@@ -43,6 +45,7 @@ import org.dspace.event.Consumer;
 import org.dspace.event.Event;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.utils.DSpace;
 import org.dspace.workflow.WorkflowService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
@@ -56,6 +59,8 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  */
 public class CrisConsumer implements Consumer {
 
+    public static final String CONSUMER_NAME = "crisconsumer";
+
     public static final String SOURCE_INTERNAL = "INTERNAL-SUBMISSION";
 
     private final static String NO_RELATIONSHIP_TYPE_FOUND_MSG = "No relationship.type found for field {}";
@@ -64,6 +69,8 @@ public class CrisConsumer implements Consumer {
 
     private final static String NO_COLLECTION_FOUND_MSG = "No collection found with relationship.type = {} "
             + "for item = {}. No related item will be created.";
+
+    private final static String NO_ITEM_FOUND_BY_AUTHORITY_MSG = "No related item found by authority {}";
 
     private static Logger log = LogManager.getLogger(CrisConsumer.class);
 
@@ -87,6 +94,8 @@ public class CrisConsumer implements Consumer {
 
     private AuthorityImportFillerHolder authorityImportFillerHolder;
 
+    private ItemSearchService itemSearchService;
+
     @Override
     @SuppressWarnings("unchecked")
     public void initialize() throws Exception {
@@ -98,6 +107,7 @@ public class CrisConsumer implements Consumer {
         configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
         authorityImportFillerHolder = AuthorityServiceFactory.getInstance().getAuthorityImportFillerHolder();
+        itemSearchService = new DSpace().getSingletonService(ItemSearchService.class);
         relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
     }
 
@@ -132,11 +142,13 @@ public class CrisConsumer implements Consumer {
         for (MetadataValue metadata : metadataValues) {
 
             String authority = metadata.getAuthority();
-            // ignore nested metadata with placeholder
-            if (StringUtils.equals(metadata.getValue(), CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE)) {
+
+            if (isNestedMetadataPlaceholder(metadata) || isAuthorityAlreadySet(authority)) {
                 continue;
             }
-            if (StringUtils.isNotBlank(authority) && !authority.startsWith(AuthorityValueService.GENERATE)) {
+
+            boolean skipEmptyAuthority = configurationService.getBooleanProperty("cris-consumer.skip-empty-authority");
+            if (skipEmptyAuthority && StringUtils.isBlank(authority)) {
                 continue;
             }
 
@@ -154,8 +166,14 @@ public class CrisConsumer implements Consumer {
 
             String crisSourceId = generateCrisSourceId(metadata);
 
-            Item relatedItem = findRelatedItemByCrisSourceId(context, crisSourceId, relationshipType);
+            Item relatedItem = itemSearchService.search(context, crisSourceId, relationshipType);
             boolean relatedItemAlreadyPresent = relatedItem != null;
+
+            if (!relatedItemAlreadyPresent && isNotBlank(authority) && isReferenceAuthority(authority)) {
+                log.warn(NO_ITEM_FOUND_BY_AUTHORITY_MSG, metadata.getAuthority());
+                metadata.setConfidence(Choices.CF_UNSET);
+                continue;
+            }
 
             if (!relatedItemAlreadyPresent) {
 
@@ -171,11 +189,7 @@ public class CrisConsumer implements Consumer {
 
             }
 
-            String authorityType = calculateAuthorityType(authority);
-            AuthorityImportFiller filler = authorityImportFillerHolder.getFiller(authorityType);
-            if (filler != null && (!relatedItemAlreadyPresent || filler.allowsUpdate(context, metadata, relatedItem))) {
-                filler.fillItem(context, metadata, relatedItem);
-            }
+            fillRelatedItem(context, metadata, relatedItem, relatedItemAlreadyPresent);
 
             metadata.setAuthority(relatedItem.getID().toString());
             metadata.setConfidence(Choices.CF_ACCEPTED);
@@ -183,32 +197,30 @@ public class CrisConsumer implements Consumer {
 
     }
 
+    private boolean isAuthorityAlreadySet(String authority) {
+        return isNotBlank(authority) && !isGenerateAuthority(authority) && !isReferenceAuthority(authority);
+    }
+
+    private boolean isNestedMetadataPlaceholder(MetadataValue metadata) {
+        return StringUtils.equals(metadata.getValue(), CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE);
+    }
+
+    private boolean isGenerateAuthority(String authority) {
+        return StringUtils.startsWith(authority, AuthorityValueService.GENERATE);
+    }
+
+    private boolean isReferenceAuthority(String authority) {
+        return StringUtils.startsWith(authority, AuthorityValueService.REFERENCE);
+    }
+
     @Override
     public void end(Context context) throws Exception {
         itemsAlreadyProcessed.clear();
     }
 
-    private Item findRelatedItemByCrisSourceId(Context context, String crisSourceId,
-            String relationshipType) throws Exception {
-
-        Iterator<Item> items = itemService.findByMetadataField(context, CRIS.getName(), "sourceId", null, crisSourceId);
-
-        while (items.hasNext()) {
-            Item item = items.next();
-            if (relationshipService.hasRelationshipType(item, relationshipType)) {
-                return item;
-            }
-        }
-
-        return null;
-
-    }
-
     private String getFieldKey(MetadataValue metadata) {
         return metadata.getMetadataField().toString('_');
     }
-
-
 
     private Item buildRelatedItem(Context context, Item item, Collection collection, MetadataValue metadata,
             String relationshipType, String crisSourceId) throws Exception {
@@ -232,7 +244,11 @@ public class CrisConsumer implements Consumer {
     }
 
     private String generateCrisSourceId(MetadataValue metadata) {
-        if (isUuidStrategyEnabled(metadata)) {
+        if (isGenerateAuthority(metadata.getAuthority())) {
+            return metadata.getAuthority().substring(AuthorityValueService.GENERATE.length());
+        } else if (isReferenceAuthority(metadata.getAuthority())) {
+            return metadata.getAuthority().substring(AuthorityValueService.REFERENCE.length());
+        } else if (isUuidStrategyEnabled(metadata)) {
             return UUID.randomUUID().toString();
         } else {
             return DigestUtils.md5Hex(metadata.getValue().toUpperCase());
@@ -254,7 +270,19 @@ public class CrisConsumer implements Consumer {
         }
     }
 
-    private String calculateAuthorityType(String authority ) {
+    private void fillRelatedItem(Context context, MetadataValue metadata, Item relatedItem, boolean alreadyPresent)
+        throws SQLException {
+
+        String authorityType = calculateAuthorityType(metadata);
+        AuthorityImportFiller filler = authorityImportFillerHolder.getFiller(authorityType);
+        if (filler != null && (!alreadyPresent || filler.allowsUpdate(context, metadata, relatedItem))) {
+            filler.fillItem(context, metadata, relatedItem);
+        }
+
+    }
+
+    private String calculateAuthorityType(MetadataValue metadata) {
+        String authority = metadata.getAuthority();
         if (StringUtils.isNotBlank(authority) && authority.startsWith(AuthorityValueService.GENERATE)) {
             String[] split = StringUtils.split(authority, AuthorityValueService.SPLIT);
             if (split.length > 1) {

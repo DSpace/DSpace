@@ -20,12 +20,18 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
+import org.dspace.app.rest.authorization.AuthorizationFeature;
+import org.dspace.app.rest.authorization.AuthorizationFeatureService;
+import org.dspace.app.rest.authorization.AuthorizationRestUtil;
+import org.dspace.app.rest.authorization.impl.ItemCorrectionFeature;
 import org.dspace.app.rest.converter.WorkspaceItemConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
+import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.ErrorRest;
+import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
@@ -61,6 +67,7 @@ import org.dspace.importer.external.service.ImportService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.util.UUIDUtils;
+import org.dspace.validation.service.ValidationService;
 import org.dspace.versioning.ItemCorrectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -82,7 +89,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceItemRest, Integer>
     implements ReloadableEntityObjectRepository<WorkspaceItem, Integer> {
 
-    public static final String OPERATION_PATH_SECTIONS = "sections";
+    public static final String OPERATION_PATH_SECTIONS = ValidationService.OPERATION_PATH_SECTIONS;
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(WorkspaceItemRestRepository.class);
 
@@ -121,6 +128,12 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
     @Autowired
     ImportService importService;
+
+    @Autowired
+    AuthorizationFeatureService authorizationFeatureService;
+
+    @Autowired
+    AuthorizationRestUtil authorizationRestUtil;
 
     @Autowired
     private UriListHandlerService uriListHandlerService;
@@ -177,25 +190,33 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
     @Override
     protected WorkspaceItemRest createAndReturn(Context context) throws SQLException, AuthorizeException {
-        WorkspaceItem source;
-        String itemUUID = getRequestService().getCurrentRequest().getHttpServletRequest().getParameter("item");
-        String relationship = getRequestService().getCurrentRequest().getHttpServletRequest()
-                .getParameter("relationship");
 
-        if ((StringUtils.isNotBlank(itemUUID) && StringUtils.isNotBlank(relationship))
-                || StringUtils.isNotBlank(relationship)) {
+        HttpServletRequest httpServletRequest = getRequestService().getCurrentRequest().getHttpServletRequest();
+        String itemUUID = httpServletRequest.getParameter("item");
+        String relationship = httpServletRequest.getParameter("relationship");
+
+        WorkspaceItem source;
+
+
+        if ((StringUtils.isNotBlank(itemUUID) && StringUtils.isNotBlank(relationship))) {
+
+            UUID itemId = UUIDUtils.fromString(itemUUID);
+
+            if (itemId != null && !isAuthorizedToCorrect(context, itemId)) {
+                throw new RESTAuthorizationException("The user is not allowed to correct the given item");
+            }
+
             try {
-                source = itemCorrectionService.createWorkspaceItemAndRelationshipByItem(context,
-                        getRequestService().getCurrentRequest(), UUIDUtils.fromString(itemUUID), relationship);
+                source = itemCorrectionService.createWorkspaceItemAndRelationshipByItem(context, itemId, relationship);
             } catch (AuthorizeException e) {
                 throw new RESTAuthorizationException(e);
             } catch (Exception e) {
                 throw new UnprocessableEntityException(e.getMessage());
             }
+
         } else if (StringUtils.isNotBlank(itemUUID)) {
             try {
-                source = itemCorrectionService.createWorkspaceItemByItem(context,
-                        getRequestService().getCurrentRequest(), UUIDUtils.fromString(itemUUID));
+                source = itemCorrectionService.createWorkspaceItemByItem(context, UUIDUtils.fromString(itemUUID));
             } catch (Exception e) {
                 throw new UnprocessableEntityException(e.getMessage());
             }
@@ -524,6 +545,22 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     @Override
     public Class<Integer> getPKClass() {
         return Integer.class;
+    }
+
+    private boolean isAuthorizedToCorrect(Context context, UUID itemId) throws SQLException {
+
+        AuthorizationFeature itemCorrectionFeature = authorizationFeatureService.find(ItemCorrectionFeature.NAME);
+        if (itemCorrectionFeature == null) {
+            throw new IllegalStateException(
+                "No AuthorizationFeature configured with name " + ItemCorrectionFeature.NAME);
+        }
+
+        return itemCorrectionFeature.isAuthorized(context, findItemRestById(context, itemId.toString()));
+    }
+
+    private BaseObjectRest<?> findItemRestById(Context context, String itemId) throws SQLException {
+        String objectId = ItemCorrectionFeature.NAME + "_" + ItemRest.CATEGORY + "." + ItemRest.NAME + "_" + itemId;
+        return authorizationRestUtil.getObject(context, objectId);
     }
 
     private void merge(Context context, List<ImportRecord> records, WorkspaceItem item) throws SQLException {

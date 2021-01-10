@@ -12,7 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.dspace.content.Item;
+import org.apache.solr.common.SolrDocument;
 import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ItemAuthorityExtraMetadataGenerator;
 import org.dspace.utils.DSpace;
@@ -25,7 +25,7 @@ public class ItemAuthorityUtils {
     private static DSpace dspace = new DSpace();
     private ItemAuthorityUtils() {}
 
-    public static Map<String, String> buildExtra(String authorityName, Item item) {
+    public static Map<String, String> buildExtra(String authorityName, SolrDocument item) {
         Map<String, String> extras = new HashMap<String, String>();
         List<ItemAuthorityExtraMetadataGenerator> generators = dspace.getServiceManager()
                 .getServicesByType(ItemAuthorityExtraMetadataGenerator.class);
@@ -38,7 +38,7 @@ public class ItemAuthorityUtils {
         return extras;
     }
 
-    public static List<Choice> buildAggregateByExtra(String authorityName, Item item) {
+    public static List<Choice> buildAggregateByExtra(String authorityName, SolrDocument item) {
         List<Choice> choiceList = new LinkedList<Choice>();
         List<ItemAuthorityExtraMetadataGenerator> generators = dspace.getServiceManager()
                 .getServicesByType(ItemAuthorityExtraMetadataGenerator.class);

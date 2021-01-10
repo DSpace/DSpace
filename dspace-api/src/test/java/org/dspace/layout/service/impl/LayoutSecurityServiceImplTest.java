@@ -274,6 +274,64 @@ public class LayoutSecurityServiceImplTest {
         assertThat(granted, is(true));
     }
 
+    /**
+     * CUSTOM_DATA {@link LayoutSecurity} set, accessed by user with id having authority on metadata
+     * contained in the box, access is granted
+     *
+     * @throws SQLException
+     */
+    @Test
+    public void customSecurityMissingSecurityMetadata() throws SQLException {
+
+        UUID userUuid = UUID.randomUUID();
+
+        Item item = mock(Item.class);
+
+        List<MetadataValue> metadataValueList = null;
+
+        HashSet<MetadataField> securityMetadataFieldSet = new HashSet<>(singletonList(
+            securityMetadataField()));
+
+        when(itemService.getMetadata(item, securityMetadataField().getMetadataSchema().getName(),
+                                     securityMetadataField().getElement(), null, Item.ANY, true))
+            .thenReturn(metadataValueList);
+
+        boolean granted =
+            securityService.hasAccess(LayoutSecurity.CUSTOM_DATA, mock(Context.class), ePerson(userUuid),
+                                      securityMetadataFieldSet, item);
+
+        assertThat(granted, is(false));
+    }
+
+    /**
+     * CUSTOM_DATA {@link LayoutSecurity} set, field having null metadata authority, access not granted
+     *
+     * @throws SQLException
+     */
+    @Test
+    public void customSecurityNullAuthorityInMetadata() throws SQLException {
+
+        UUID userUuid = UUID.randomUUID();
+
+        Item item = mock(Item.class);
+
+        List<MetadataValue> metadataValueList = Arrays.asList(metadataValueWithAuthority(null),
+            metadataValueWithAuthority(UUID.randomUUID().toString()));
+
+        HashSet<MetadataField> securityMetadataFieldSet = new HashSet<>(singletonList(
+            securityMetadataField()));
+
+        when(itemService.getMetadata(item, securityMetadataField().getMetadataSchema().getName(),
+            securityMetadataField().getElement(), null, Item.ANY, true))
+            .thenReturn(metadataValueList);
+
+        boolean granted =
+            securityService.hasAccess(LayoutSecurity.CUSTOM_DATA, mock(Context.class), ePerson(userUuid),
+                securityMetadataFieldSet, item);
+
+        assertThat(granted, is(false));
+    }
+
 
     /**
      * CUSTOM_DATA {@link LayoutSecurity} set, accessed by user belonging to a group with id having
@@ -359,6 +417,48 @@ public class LayoutSecurityServiceImplTest {
             securityMetadataFieldSet, item);
 
         assertThat(granted, is(false));
+    }
+
+    /**
+     * Tests layout security layers with null user object
+     *
+     * @throws SQLException
+     */
+    @Test
+    public void nullUserHasOnlyPublicAccess() throws SQLException {
+
+        final Context context = mock(Context.class);
+        final Item item = mock(Item.class);
+        final EPerson user = null;
+
+        final MetadataField metadataField = securityMetadataField();
+
+        final HashSet<MetadataField> securityMetadataFieldSet = new HashSet<>(singletonList(metadataField));
+
+        List<MetadataValue> metadataValueList =
+            singletonList(metadataValueWithAuthority(UUID.randomUUID().toString()));
+
+
+        when(itemService.getMetadata(item, metadataField.getMetadataSchema().getName(),
+                                     metadataField.getElement(), null, Item.ANY, true))
+            .thenReturn(metadataValueList);
+
+        final boolean publicAccess = securityService.hasAccess(LayoutSecurity.PUBLIC,
+                                                                   context, user, securityMetadataFieldSet, item);
+
+        final boolean customDataAccess = securityService.hasAccess(LayoutSecurity.CUSTOM_DATA,
+                                                    context, user, securityMetadataFieldSet, item);
+
+        final boolean adminAccess = securityService.hasAccess(LayoutSecurity.ADMINISTRATOR,
+                                                              context, user, securityMetadataFieldSet, item);
+
+        final boolean adminOwnerAccess = securityService.hasAccess(LayoutSecurity.OWNER_AND_ADMINISTRATOR,
+                                                                   context, user, securityMetadataFieldSet, item);
+
+        assertThat(publicAccess, is(true));
+        assertThat(customDataAccess, is(false));
+        assertThat(adminAccess, is(false));
+        assertThat(adminOwnerAccess, is(false));
     }
 
     private EPerson ePerson(UUID userUuid, UUID... groupsUuid) throws SQLException {

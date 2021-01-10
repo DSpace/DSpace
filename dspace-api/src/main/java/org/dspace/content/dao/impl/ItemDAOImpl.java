@@ -109,6 +109,17 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     }
 
     @Override
+    public Iterator<Item> findBySubmitter(Context context, EPerson eperson, boolean retrieveAllItems)
+        throws SQLException {
+        if (!retrieveAllItems) {
+            return findBySubmitter(context, eperson);
+        }
+        Query query = createQuery(context, "FROM Item WHERE submitter= :submitter");
+        query.setParameter("submitter", eperson);
+        return iterate(query);
+    }
+
+    @Override
     public Iterator<Item> findBySubmitter(Context context, EPerson eperson, MetadataField metadataField, int limit)
         throws SQLException {
         StringBuilder query = new StringBuilder();
@@ -138,6 +149,23 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         Query query = createQuery(context, hqlQueryString);
 
         query.setParameter("in_archive", inArchive);
+        query.setParameter("metadata_field", metadataField);
+        if (value != null) {
+            query.setParameter("text_value", value);
+        }
+        return iterate(query);
+    }
+
+    @Override
+    public Iterator<Item> findByMetadataField(Context context, MetadataField metadataField, String value)
+        throws SQLException {
+        String hqlQueryString = "SELECT item FROM Item as item join item.metadata metadatavalue " +
+            "WHERE metadatavalue.metadataField = :metadata_field";
+        if (value != null) {
+            hqlQueryString += " AND STR(metadatavalue.value) = :text_value";
+        }
+        Query query = createQuery(context, hqlQueryString);
+
         query.setParameter("metadata_field", metadataField);
         if (value != null) {
             query.setParameter("text_value", value);

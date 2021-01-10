@@ -18,10 +18,12 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.core.Context;
+import org.dspace.versioning.ItemCorrectionService;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Processing class of an accept/reject action
@@ -38,6 +40,10 @@ public class ReviewAction extends ProcessingAction {
 
     private static final String SUBMIT_APPROVE = "submit_approve";
     private static final String SUBMIT_REJECT = "submit_reject";
+    private static final String SUBMITTER_IS_DELETED_PAGE = "submitter_deleted";
+
+    @Autowired
+    protected ItemCorrectionService itemCorrectionService;
 
     @Override
     public void activate(Context c, XmlWorkflowItem wfItem) {
@@ -53,6 +59,8 @@ public class ReviewAction extends ProcessingAction {
                     return processAccept(c, wfi);
                 case SUBMIT_REJECT:
                     return processRejectPage(c, wfi, step, request);
+                case SUBMITTER_IS_DELETED_PAGE:
+                    return processSubmitterIsDeletedPage(c, wfi, request);
                 default:
                     return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
             }
@@ -82,8 +90,14 @@ public class ReviewAction extends ProcessingAction {
         String usersName = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
             .getEPersonName(c.getCurrentUser());
 
-        String provDescription = getProvenanceStartId() + " Approved for entry into archive by "
-            + usersName + " on " + now + " (GMT) ";
+        String provDescription;
+        if (itemCorrectionService.checkIfIsCorrectionItem(c, wfi.getItem())) {
+            provDescription = getProvenanceStartId() + " Correction approved for entry into archive by "
+                + usersName + " on " + now + " (GMT) ";
+        } else {
+            provDescription = getProvenanceStartId() + " Approved for entry into archive by "
+                + usersName + " on " + now + " (GMT) ";
+        }
 
         // Add to item as a DC field
         itemService.addMetadata(c, wfi.getItem(), MetadataSchemaEnum.DC.getName(), "description", "provenance", "en",
@@ -107,5 +121,22 @@ public class ReviewAction extends ProcessingAction {
 
 
         return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
+    }
+
+    public ActionResult processSubmitterIsDeletedPage(Context c, XmlWorkflowItem wfi, HttpServletRequest request)
+            throws SQLException, AuthorizeException, IOException {
+        if (request.getParameter("submit_delete") != null) {
+            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
+                                     .deleteWorkflowByWorkflowItem(c, wfi, c.getCurrentUser());
+            // Delete and send user back to myDspace page
+            return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
+        } else if (request.getParameter("submit_keep_it") != null) {
+            // Do nothing, just send it back to myDspace page
+            return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
+        } else {
+            //Cancel, go back to the main task page
+            request.setAttribute("page", MAIN_PAGE);
+            return new ActionResult(ActionResult.TYPE.TYPE_PAGE);
+        }
     }
 }

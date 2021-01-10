@@ -62,6 +62,7 @@ public class ProcessDAOImpl extends AbstractHibernateDAO<Process> implements Pro
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Process.class);
         Root<Process> processRoot = criteriaQuery.from(Process.class);
         criteriaQuery.select(processRoot);
+        criteriaQuery.orderBy(criteriaBuilder.desc(processRoot.get(Process_.processId)));
 
         return list(context, criteriaQuery, false, Process.class, limit, offset);
     }

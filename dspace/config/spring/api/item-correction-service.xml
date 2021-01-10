@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
-           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+       xmlns:util="http://www.springframework.org/schema/util" 
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
 
     <!-- Submission correction Service Application. Autowired at this time. -->
     <bean id="org.dspace.versioning.ItemCorrectionService"
           class="org.dspace.versioning.ItemCorrectionService"
           scope="singleton">
-       <property name="correctionRelationshipName" value="isCorrectionOfItem" />
+       <constructor-arg name="correctionRelationshipName" value="isCorrectionOfItem" />
     </bean>
 
     <!-- Correction Item Provider, defines behavior for replicating
@@ -23,5 +24,89 @@
         </property>
         
     </bean>
+    
+	<util:map id="correctItemModesMap" map-class="java.util.HashMap" key-type="java.lang.String" value-type="java.util.List"> 
+		<entry key="Publication">
+			<list>
+				<bean class="org.dspace.content.edit.CorrectItemMode">
+					<property name="security">
+						<value type="org.dspace.content.security.CrisSecurity">ADMIN</value>
+					</property>
+				</bean>
+			</list>
+		</entry> 
+		<entry key="Person">
+			<list>
+				<bean class="org.dspace.content.edit.CorrectItemMode">
+					<property name="security">
+						<value type="org.dspace.content.security.CrisSecurity">ADMIN</value>
+					</property>
+				</bean>
+			</list>
+		</entry> 
+		<entry key="Equipment">
+			<list>
+				<bean class="org.dspace.content.edit.CorrectItemMode">
+					<property name="security">
+						<value type="org.dspace.content.security.CrisSecurity">ADMIN</value>
+					</property>
+				</bean>
+			</list>
+		</entry> 
+		<entry key="Funding">
+			<list>
+				<bean class="org.dspace.content.edit.CorrectItemMode">
+					<property name="security">
+						<value type="org.dspace.content.security.CrisSecurity">ADMIN</value>
+					</property>
+				</bean>
+			</list>
+		</entry> 
+		<entry key="Orgunit">
+			<list>
+				<bean class="org.dspace.content.edit.CorrectItemMode">
+					<property name="security">
+						<value type="org.dspace.content.security.CrisSecurity">ADMIN</value>
+					</property>
+				</bean>
+			</list>
+		</entry> 
+		<entry key="Journal">
+			<list>
+				<bean class="org.dspace.content.edit.CorrectItemMode">
+					<property name="security">
+						<value type="org.dspace.content.security.CrisSecurity">ADMIN</value>
+					</property>
+				</bean>
+			</list>
+		</entry> 
+		<entry key="Patent">
+			<list>
+				<bean class="org.dspace.content.edit.CorrectItemMode">
+					<property name="security">
+						<value type="org.dspace.content.security.CrisSecurity">ADMIN</value>
+					</property>
+				</bean>
+			</list>
+		</entry>
+		<entry key="Project">
+			<list>
+				<bean class="org.dspace.content.edit.CorrectItemMode">
+					<property name="security">
+						<value type="org.dspace.content.security.CrisSecurity">ADMIN</value>
+					</property>
+				</bean>
+			</list>
+		</entry>
+		<entry key="Event">
+			<list>
+				<bean class="org.dspace.content.edit.CorrectItemMode">
+					<property name="security">
+						<value type="org.dspace.content.security.CrisSecurity">ADMIN</value>
+					</property>
+				</bean>
+			</list>
+		</entry>
+	</util:map>
            
 </beans>

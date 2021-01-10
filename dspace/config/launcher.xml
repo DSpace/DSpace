@@ -195,6 +195,13 @@
         </step>
     </command>
     <command>
+        <name>retry-tracker</name>
+        <description>Retry all failed commits to the OpenURLTracker</description>
+        <step>
+            <class>org.dspace.statistics.export.RetryFailedOpenUrlTracker</class>
+        </step>
+    </command>
+    <command>
         <name>solr-export-statistics</name>
         <description>Export usage statistics data from Solr for back-up purposes</description>
         <step passuserargs="true">

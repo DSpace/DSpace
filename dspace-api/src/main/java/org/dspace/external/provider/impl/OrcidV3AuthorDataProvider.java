@@ -28,19 +28,19 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.OrcidRestConnector;
 import org.dspace.external.model.ExternalDataObject;
-import org.dspace.external.provider.ExternalDataProvider;
+import org.dspace.external.provider.AbstractExternalDataProvider;
 import org.dspace.external.provider.orcid.xml.XMLtoBio;
 import org.json.JSONObject;
-import org.orcid.jaxb.model.common_v3.OrcidId;
-import org.orcid.jaxb.model.record_v3.Person;
-import org.orcid.jaxb.model.search_v3.Result;
+import org.orcid.jaxb.model.v3.release.common.OrcidIdentifier;
+import org.orcid.jaxb.model.v3.release.record.Person;
+import org.orcid.jaxb.model.v3.release.search.Result;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
  * This class is the implementation of the ExternalDataProvider interface that will deal with the OrcidV3 External
  * Data lookup
  */
-public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
+public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
 
     private static Logger log = LogManager.getLogger(OrcidV3AuthorDataProvider.class);
 
@@ -56,11 +56,17 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
 
     private String orcidUrl;
 
+    private XMLtoBio converter;
+
     public static final String ORCID_ID_SYNTAX = "\\d{4}-\\d{4}-\\d{4}-(\\d{3}X|\\d{4})";
 
     @Override
     public String getSourceIdentifier() {
         return sourceIdentifier;
+    }
+
+    public OrcidV3AuthorDataProvider() {
+        converter = new XMLtoBio();
     }
 
     /**
@@ -102,14 +108,6 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
         }
     }
 
-    /**
-     * Makes an instance of the Orcidv3 class based on the provided parameters.
-     * This constructor is called through the spring bean initialization
-     */
-    private OrcidV3AuthorDataProvider(String url) {
-        this.orcidRestConnector = new OrcidRestConnector(url);
-    }
-
     @Override
     public Optional<ExternalDataObject> getExternalDataObject(String id) {
         Person person = getBio(id);
@@ -122,12 +120,12 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
         String lastName = "";
         String firstName = "";
         if (person.getName().getFamilyName() != null) {
-            lastName = person.getName().getFamilyName().getValue();
+            lastName = person.getName().getFamilyName().getContent();
             externalDataObject.addMetadata(new MetadataValueDTO("person", "familyName", null, null,
                                                                 lastName));
         }
         if (person.getName().getGivenNames() != null) {
-            firstName = person.getName().getGivenNames().getValue();
+            firstName = person.getName().getGivenNames().getContent();
             externalDataObject.addMetadata(new MetadataValueDTO("person", "givenName", null, null,
                                                                 firstName));
 
@@ -161,7 +159,6 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
             return null;
         }
         InputStream bioDocument = orcidRestConnector.get(id + ((id.endsWith("/person")) ? "" : "/person"), accessToken);
-        XMLtoBio converter = new XMLtoBio();
         Person person = converter.convertSinglePerson(bioDocument);
         try {
             bioDocument.close();
@@ -189,14 +186,13 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
         String searchPath = "search?q=" + URLEncoder.encode(query) + "&start=" + start + "&rows=" + limit;
         log.debug("queryBio searchPath=" + searchPath + " accessToken=" + accessToken);
         InputStream bioDocument = orcidRestConnector.get(searchPath, accessToken);
-        XMLtoBio converter = new XMLtoBio();
         List<Result> results = converter.convert(bioDocument);
         List<Person> bios = new LinkedList<>();
         for (Result result : results) {
-            OrcidId orcidIdentifier = result.getOrcidIdentifier();
+            OrcidIdentifier orcidIdentifier = result.getOrcidIdentifier();
             if (orcidIdentifier != null) {
                 log.debug("Found OrcidId=" + orcidIdentifier.toString());
-                String orcid = orcidIdentifier.getUriPath();
+                String orcid = orcidIdentifier.getPath();
                 Person bio = getBio(orcid);
                 if (bio != null) {
                     bios.add(bio);
@@ -225,7 +221,6 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
         String searchPath = "search?q=" + URLEncoder.encode(query) + "&start=" + 0 + "&rows=" + 0;
         log.debug("queryBio searchPath=" + searchPath + " accessToken=" + accessToken);
         InputStream bioDocument = orcidRestConnector.get(searchPath, accessToken);
-        XMLtoBio converter = new XMLtoBio();
         return converter.getNumberOfResultsFromXml(bioDocument);
     }
 
@@ -279,4 +274,13 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
     public void setClientSecret(String clientSecret) {
         this.clientSecret = clientSecret;
     }
+
+    public OrcidRestConnector getOrcidRestConnector() {
+        return orcidRestConnector;
+    }
+
+    public void setOrcidRestConnector(OrcidRestConnector orcidRestConnector) {
+        this.orcidRestConnector = orcidRestConnector;
+    }
+
 }

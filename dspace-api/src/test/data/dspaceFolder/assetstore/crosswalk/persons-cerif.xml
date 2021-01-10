@@ -1,0 +1,61 @@
+<Persons>
+	<Person xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
+		<PersonName>
+			<FamilyNames>Smith</FamilyNames>
+			<FirstNames>John</FirstNames>
+			<OtherNames>J.S.</OtherNames>
+			<OtherNames>Smith John</OtherNames>
+		</PersonName>
+		<Gender>M</Gender>
+		<ORCID>0000-0002-9079-5932</ORCID>
+		<ResearcherID>R-01</ResearcherID>
+		<ResearcherID>R-02</ResearcherID>
+		<ScopusAuthorID>SA-01</ScopusAuthorID>
+		<ElectronicAddress>test@test.com</ElectronicAddress>
+		<Affiliation
+			startDate="2018-01-01"
+			role="Developer"
+		>
+			<OrgUnit> 
+				<Name>Company</Name> 
+			</OrgUnit>
+		</Affiliation>
+		<Affiliation
+			startDate="2017-01-01"
+			endDate="2017-12-31"
+			role="Developer"
+		>
+			<OrgUnit> 
+				<Name>Another Company</Name> 
+			</OrgUnit>
+		</Affiliation>
+		<Affiliation> 
+			<OrgUnit> 
+				<Acronym>University</Acronym> 
+			</OrgUnit> 
+		</Affiliation>
+	</Person>
+	<Person xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
+		<PersonName>
+			<FamilyNames>White</FamilyNames>
+			<FirstNames>Walter</FirstNames>
+		</PersonName>
+		<Gender>M</Gender>
+		<ORCID>0000-0002-9079-5938</ORCID>
+		<ResearcherID>R-03</ResearcherID>
+		<ElectronicAddress>w.w@test.com</ElectronicAddress>
+		<Affiliation
+			startDate="2018-01-01"
+			role="Developer"
+		>
+			<OrgUnit> 
+				<Name>Company</Name> 
+			</OrgUnit>
+		</Affiliation>
+		<Affiliation> 
+			<OrgUnit> 
+				<Acronym>University</Acronym> 
+			</OrgUnit> 
+		</Affiliation>
+	</Person>
+</Persons>

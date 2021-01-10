@@ -1572,7 +1572,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         String qualifier = "author";
         String value = "value";
 
-        Iterator<Item> result = itemService.findByMetadataField(context, schema, element, qualifier, value);
+        Iterator<Item> result = itemService.findArchivedByMetadataField(context, schema, element, qualifier, value);
         assertThat("testFindByMetadataField 0", result, notNullValue());
         assertFalse("testFindByMetadataField 1", result.hasNext());
 
@@ -1582,7 +1582,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         itemService.update(context, it);
         context.restoreAuthSystemState();
 
-        result = itemService.findByMetadataField(context, schema, element, qualifier, value);
+        result = itemService.findArchivedByMetadataField(context, schema, element, qualifier, value);
         assertThat("testFindByMetadataField 3", result, notNullValue());
         assertTrue("testFindByMetadataField 4", result.hasNext());
         assertTrue("testFindByMetadataField 5", result.next().equals(it));
@@ -1598,8 +1598,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         assertThat("testGetAdminObject 0", (Item) itemService.getAdminObject(context, it, Constants.REMOVE),
                    equalTo(it));
         assertThat("testGetAdminObject 1", (Item) itemService.getAdminObject(context, it, Constants.ADD), equalTo(it));
-        assertThat("testGetAdminObject 2", (Collection) itemService.getAdminObject(context, it, Constants.DELETE),
-                   equalTo(collection));
+        assertThat("testGetAdminObject 2", (Item) itemService.getAdminObject(context, it, Constants.DELETE),
+                   equalTo(it));
         assertThat("testGetAdminObject 3", (Item) itemService.getAdminObject(context, it, Constants.ADMIN),
                    equalTo(it));
     }

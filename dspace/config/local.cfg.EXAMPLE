@@ -217,6 +217,15 @@ db.schema = public
 #spring.servlet.multipart.max-request-size = 512MB
 
 ##########################
+# COMMERCIAL DATABASE    #
+##########################
+# Additional settings are defined below or in specific module file, i.e metrics.cfg
+scopus.apiKey =
+# leave empty if you don't need to use an institutional token
+scopus.instToken =
+wos.apiKey =
+
+##########################
 # METADATA EXTRACTION #
 ##########################
 # Grobid url.
@@ -229,7 +238,7 @@ bte.crossref.apikey =
 ############################################
 # In order to use the Scopus services you need to obtain an API Key from Scopus. Once you get it, add it to the following configuration value.
 # Note that when apikey is configured by default the service is enabled, see bte.xml for further configuration
-submission.lookup.scopus.apikey =
+submission.lookup.scopus.apikey = ${scopus.apiKey}
 # use SciVal or Scopus service
 submission.lookup.scivalcontent.apikey =
 

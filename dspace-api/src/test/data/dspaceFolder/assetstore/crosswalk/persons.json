@@ -1,0 +1,85 @@
+{
+	"persons": [
+		{
+			"names" : {
+				"preferred-name": "John Smith",
+				"variants": [
+				],
+				"given-name": "John",
+				"family-name": "Smith"
+			},
+			"birth-date": "1992-06-26",
+			"gender": "M",
+			"working-groups": [
+			],
+			"personal-sites": [
+			],
+			"interests": [
+			],
+			"identifiers": {
+				"scopus-author-ids": [
+				],
+				"researcher-ids": [
+				]
+			},
+			"affiliations": [
+				{
+					"name": "Company",
+					"start-date": "2018-01-01",
+					"role": "Developer"
+				}
+			],
+			"educations": [
+			],
+			"qualifications": [
+			],
+			"knows-languages": [
+			],
+			"publications": [
+			]
+		},
+		{
+			"names" : {
+				"preferred-name": "Adam White",
+				"variants": [
+				],
+				"given-name": "Adam",
+				"family-name": "White"
+			},
+			"birth-date": "1962-03-23",
+			"gender": "M",
+			"job-title": "Researcher",
+			"main-affiliation": "University",
+			"working-groups": [
+			],
+			"personal-sites": [
+			],
+			"interests": [
+			],
+			"identifiers": {
+				"scopus-author-ids": [
+				],
+				"researcher-ids": [
+				]
+			},
+			"affiliations": [
+			],
+			"educations": [
+				{
+					"name": "School",
+					"start-date": "2000-01-01",
+					"end-date": "2005-01-01",
+					"role": "Student"
+				}
+			],
+			"qualifications": [
+			],
+			"knows-languages": [
+				"English",
+				"Italian"
+			],
+			"publications": [
+			]
+		}
+	]
+}

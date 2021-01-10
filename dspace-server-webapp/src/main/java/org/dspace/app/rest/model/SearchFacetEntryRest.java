@@ -30,6 +30,13 @@ public class SearchFacetEntryRest extends RestAddressableModel {
     private Boolean hasMore = null;
     private int facetLimit;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String missing;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String more;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String totalElements;
+
     @JsonIgnore
     private boolean exposeMinMax = false;
 
@@ -40,6 +47,8 @@ public class SearchFacetEntryRest extends RestAddressableModel {
 
     @JsonIgnore
     private List<SearchFacetValueRest> values = new LinkedList<>();
+    private boolean exposeMore;
+    private boolean exposeMissing;
 
     public SearchFacetEntryRest(final String name) {
         this.name = name;
@@ -141,5 +150,45 @@ public class SearchFacetEntryRest extends RestAddressableModel {
      */
     public void setMaxValue(String maxValue) {
         this.maxValue = maxValue;
+    }
+
+    public void setMissing(String missing) {
+        this.missing = missing;
+    }
+
+    public String getMissing() {
+        return missing;
+    }
+
+    public void setMore(String more) {
+        this.more = more;
+    }
+
+    public String getMore() {
+        return more;
+    }
+
+    public void setTotalElements(String totalElements) {
+        this.totalElements = totalElements;
+    }
+
+    public String getTotalElements() {
+        return totalElements;
+    }
+
+    public boolean exposeMore() {
+        return exposeMore;
+    }
+
+    public void setExposeMore(boolean exposeMore) {
+        this.exposeMore = exposeMore;
+    }
+
+    public boolean exposeMissing() {
+        return exposeMissing;
+    }
+
+    public void setExposeMissing(boolean exposeMissing) {
+        this.exposeMissing = exposeMissing;
     }
 }

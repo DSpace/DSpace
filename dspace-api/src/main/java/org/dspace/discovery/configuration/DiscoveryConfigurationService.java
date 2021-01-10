@@ -31,6 +31,16 @@ public class DiscoveryConfigurationService {
 
     public void setMap(Map<String, DiscoveryConfiguration> map) {
         this.map = map;
+        if (map != null) {
+            // improve the configuration assigning the map key as id to any configuration
+            // that doesn't have one
+            for (Map.Entry<String, DiscoveryConfiguration> entry : map.entrySet()) {
+                DiscoveryConfiguration conf = entry.getValue();
+                if (StringUtils.isBlank(conf.getId())) {
+                    conf.setId(entry.getKey());
+                }
+            }
+        }
     }
 
     public Map<Integer, List<String>> getToIgnoreMetadataFields() {
@@ -51,13 +61,12 @@ public class DiscoveryConfigurationService {
             name = dso.getUniqueIndexID();
         }
 
-        return getDiscoveryConfiguration(name);
+        return getDiscoveryConfigurationByNameOrDefault(name);
     }
 
-    public DiscoveryConfiguration getDiscoveryConfiguration(final String name) {
-        DiscoveryConfiguration result;
+    public DiscoveryConfiguration getDiscoveryConfigurationByNameOrDefault(final String name) {
 
-        result = StringUtils.isBlank(name) ? null : getMap().get(name);
+        DiscoveryConfiguration result = getDiscoveryConfigurationByName(name);
 
         if (result == null) {
             //No specific configuration, get the default one
@@ -65,6 +74,10 @@ public class DiscoveryConfigurationService {
         }
 
         return result;
+    }
+
+    public DiscoveryConfiguration getDiscoveryConfigurationByName(String name) {
+        return StringUtils.isBlank(name) ? null : getMap().get(name);
     }
 
     public DiscoveryConfiguration getDiscoveryConfigurationByNameOrDso(final String configurationName,

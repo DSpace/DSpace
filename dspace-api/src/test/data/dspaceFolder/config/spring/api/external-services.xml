@@ -10,13 +10,45 @@
         <property name="sourceIdentifier" value="mock"/>
 
     </bean>
+
+    <bean class="org.dspace.external.provider.impl.MockDataProvider" init-method="init">
+        <property name="sourceIdentifier" value="mock2"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean class="org.dspace.external.provider.impl.MockDataProvider" init-method="init">
+        <property name="sourceIdentifier" value="mock3"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+            </list>
+        </property>
+    </bean>
+    
+    <bean class="org.dspace.external.provider.impl.MockDataProvider" init-method="init">
+        <property name="sourceIdentifier" value="mock4"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>OrgUnit</value>
+            </list>
+        </property>
+    </bean>
+
     <bean class="org.dspace.external.provider.impl.OrcidV3AuthorDataProvider" init-method="init">
-        <constructor-arg value="${orcid.api.url}"/>
         <property name="sourceIdentifier" value="orcid"/>
         <property name="orcidUrl" value="${orcid.url}" />
         <property name="clientId" value="${orcid.clientid}" />
         <property name="clientSecret" value="${orcid.clientsecret}" />
         <property name="OAUTHUrl" value="${orcid.oauth.url}" />
+        <property name="orcidRestConnector" ref="orcidRestConnector"/>
+    </bean>
+
+    <bean id="orcidRestConnector" class="org.dspace.external.OrcidRestConnector">
+        <constructor-arg value="${orcid.api.url}"/>
     </bean>
 
     <bean class="org.dspace.app.suggestion.MockSuggestionExternalDataSource" />

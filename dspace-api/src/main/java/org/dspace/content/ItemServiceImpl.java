@@ -232,6 +232,12 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
+    public Iterator<Item> findBySubmitter(Context context, EPerson eperson, boolean retrieveAllItems)
+        throws SQLException {
+        return itemDAO.findBySubmitter(context, eperson, retrieveAllItems);
+    }
+
+    @Override
     public Iterator<Item> findBySubmitterDateSorted(Context context, EPerson eperson, Integer limit)
         throws SQLException {
 
@@ -1033,7 +1039,7 @@ prevent the generation of resource policy entry values with null dspace_object a
      *                            to perform a particular action.
      */
     @Override
-    public Iterator<Item> findByMetadataField(Context context,
+    public Iterator<Item> findArchivedByMetadataField(Context context,
                                               String schema, String element, String qualifier, String value)
         throws SQLException, AuthorizeException {
         MetadataSchema mds = metadataSchemaService.find(context, schema);
@@ -1050,6 +1056,26 @@ prevent the generation of resource policy entry values with null dspace_object a
             return itemDAO.findByMetadataField(context, mdf, null, true);
         } else {
             return itemDAO.findByMetadataField(context, mdf, value, true);
+        }
+    }
+
+    @Override
+    public Iterator<Item> findUnfilteredByMetadataField(Context context, String schema, String element,
+        String qualifier, String value) throws SQLException, AuthorizeException {
+        MetadataSchema mds = metadataSchemaService.find(context, schema);
+        if (mds == null) {
+            throw new IllegalArgumentException("No such metadata schema: " + schema);
+        }
+        MetadataField mdf = metadataFieldService.findByElement(context, mds, element, qualifier);
+        if (mdf == null) {
+            throw new IllegalArgumentException(
+                "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
+        }
+
+        if (Item.ANY.equals(value)) {
+            return itemDAO.findByMetadataField(context, mdf, null);
+        } else {
+            return itemDAO.findByMetadataField(context, mdf, value);
         }
     }
 
@@ -1099,19 +1125,7 @@ prevent the generation of resource policy entry values with null dspace_object a
                 }
                 break;
             case Constants.DELETE:
-                if (item.getOwningCollection() != null) {
-                    if (AuthorizeConfiguration.canCollectionAdminPerformItemDeletion()) {
-                        adminObject = collection;
-                    } else if (AuthorizeConfiguration.canCommunityAdminPerformItemDeletion()) {
-                        adminObject = community;
-                    }
-                } else {
-                    if (AuthorizeConfiguration.canCollectionAdminManageTemplateItem()) {
-                        adminObject = collection;
-                    } else if (AuthorizeConfiguration.canCommunityAdminManageCollectionTemplateItem()) {
-                        adminObject = community;
-                    }
-                }
+                adminObject = item;
                 break;
             case Constants.WRITE:
                 // if it is a template item we need to check the
@@ -1339,7 +1353,7 @@ prevent the generation of resource policy entry values with null dspace_object a
         if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName()) && !StringUtils.equals(element, "type")) {
 
             List<RelationshipMetadataValue> relationMetadata = relationshipMetadataService
-                .getRelationshipMetadata(item, false);
+                .getRelationshipMetadata(item, enableVirtualMetadata);
             List<MetadataValue> listToReturn = new LinkedList<>();
             for (MetadataValue metadataValue : relationMetadata) {
                 if (StringUtils.equals(metadataValue.getMetadataField().getElement(), element)) {

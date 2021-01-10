@@ -26,6 +26,17 @@
           <hint />
         </field>
       </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>type</dc-element>
+          <label>File type</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint>Personal picture, logo, main article, etc.</hint>
+        </field>
+      </row>
     </form>
     <form name="publication-dc-contributor-author">
       <row>
@@ -420,7 +431,7 @@
           <label>Description</label>
           <input-type>textarea</input-type>
           <repeatable>false</repeatable>
-          <required>Enter the description of the journal</required>
+          <required />
           <hint />
         </field>
       </row>
@@ -1546,7 +1557,7 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <label>Director</label>
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
-          <required>You must enter the director name.</required>
+          <required />
           <hint />
         </field>
       </row>
@@ -1585,6 +1596,18 @@ You can leave out the day and/or month if they aren't applicable.</hint>
       </row>
       <row>
         <field>
+          <dc-schema>oairecerif</dc-schema>
+          <dc-element>identifier</dc-element>
+          <dc-qualifier>url</dc-qualifier>
+          <label>Website(s)</label>
+          <input-type>onebox</input-type>
+          <repeatable>true</repeatable>
+          <required />
+          <hint />
+        </field>
+      </row>
+      <row>
+        <field>
           <dc-schema>dc</dc-schema>
           <dc-element>description</dc-element>
           <dc-qualifier>abstract</dc-qualifier>
@@ -1603,11 +1626,9 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <label>City</label>
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
-          <required>You must enter the city name.</required>
+          <required />
           <hint />
         </field>
-      </row>
-      <row>
         <field>
           <dc-schema>organization</dc-schema>
           <dc-element>address</dc-element>
@@ -1615,16 +1636,18 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <label>Country</label>
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
-          <required>You must enter the city name.</required>
+          <required />
           <hint />
         </field>
+      </row>
+      <row>
         <field>
           <dc-schema>dc</dc-schema>
           <dc-element>type</dc-element>
-          <label>Country</label>
+          <label>Type</label>
           <input-type value-pairs-name="orgunit_types">dropdown</input-type>
           <repeatable>false</repeatable>
-          <required>You must enter the city name.</required>
+          <required>You must specify the organisation type</required>
           <hint />
         </field>
       </row>
@@ -1699,18 +1722,6 @@ You can leave out the day and/or month if they aren't applicable.</hint>
       <row>
         <field>
           <dc-schema>crispj</dc-schema>
-          <dc-element>award</dc-element>
-          <dc-qualifier>url</dc-qualifier>
-          <label>Award URL</label>
-          <input-type>onebox</input-type>
-          <repeatable>true</repeatable>
-          <required />
-          <hint />
-        </field>
-      </row>
-      <row>
-        <field>
-          <dc-schema>crispj</dc-schema>
           <dc-element>openaireid</dc-element>
           <label>OpenAIRE ID</label>
           <input-type>onebox</input-type>
@@ -1759,7 +1770,7 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <label>OA Policy URL</label>
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
-          <required>The Open Access policy that applies to the project</required>
+          <required />
           <hint />
         </field>
       </row>
@@ -1814,7 +1825,7 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <dc-element>description</dc-element>
           <dc-qualifier>abstract</dc-qualifier>
           <label>Abstract</label>
-          <input-type>onebox</input-type>
+          <input-type>textarea</input-type>
           <repeatable>false</repeatable>
           <required />
           <hint />
@@ -1880,7 +1891,7 @@ You can leave out the day and/or month if they aren't applicable.</hint>
         <field>
           <dc-schema>oairecerif</dc-schema>
           <dc-element>internalid</dc-element>
-          <label>Funding code</label>
+          <label>Internal Funding code</label>
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
           <required />
@@ -1895,7 +1906,7 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <label>Funded project</label>
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
-          <required>The project that receive the funding</required>
+          <required />
           <hint />
         </field>
       </row>
@@ -1921,6 +1932,18 @@ You can leave out the day and/or month if they aren't applicable.</hint>
       </row>
       <row>
         <field>
+          <dc-schema>crisfund</dc-schema>
+          <dc-element>award</dc-element>
+          <dc-qualifier>url</dc-qualifier>
+          <label>Award Url</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required>The url preferably on the funder website of the award notice</required>
+          <hint />
+        </field>
+      </row>
+      <row>
+        <field>
           <dc-schema>oairecerif</dc-schema>
           <dc-element>oamandate</dc-element>
           <label>OA Mandate</label>
@@ -1936,7 +1959,7 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <label>OA Policy URL</label>
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
-          <required>The Open Access policy that applies to the project</required>
+          <required />
           <hint />
         </field>
       </row>
@@ -1944,9 +1967,8 @@ You can leave out the day and/or month if they aren't applicable.</hint>
         <field>
           <dc-schema>oairecerif</dc-schema>
           <dc-element>amount</dc-element>
-          <dc-qualifier>currency</dc-qualifier>
-          <label>Currency</label>
-          <input-type value-pairs-name="currency">dropdown</input-type>
+          <label>Amount</label>
+          <input-type>onebox</input-type>
           <repeatable>false</repeatable>
           <required />
           <hint />
@@ -1954,8 +1976,9 @@ You can leave out the day and/or month if they aren't applicable.</hint>
         <field>
           <dc-schema>oairecerif</dc-schema>
           <dc-element>amount</dc-element>
-          <label>Amount</label>
-          <input-type>onebox</input-type>
+          <dc-qualifier>currency</dc-qualifier>
+          <label>Currency</label>
+          <input-type value-pairs-name="currency">dropdown</input-type>
           <repeatable>false</repeatable>
           <required />
           <hint />
@@ -1975,9 +1998,19 @@ You can leave out the day and/or month if they aren't applicable.</hint>
         <field>
           <dc-schema>oairecerif</dc-schema>
           <dc-element>funding</dc-element>
-          <dc-qualifier>duration</dc-qualifier>
-          <label>Duration</label>
-          <input-type>onebox</input-type>
+          <dc-qualifier>startDate</dc-qualifier>
+          <label>Start date</label>
+          <input-type>date</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint />
+        </field>
+        <field>
+          <dc-schema>oairecerif</dc-schema>
+          <dc-element>funding</dc-element>
+          <dc-qualifier>endDate</dc-qualifier>
+          <label>End date</label>
+          <input-type>date</input-type>
           <repeatable>false</repeatable>
           <required />
           <hint />
@@ -1998,7 +2031,7 @@ You can leave out the day and/or month if they aren't applicable.</hint>
         <field>
           <dc-schema>dc</dc-schema>
           <dc-element>description</dc-element>
-          <label>Equipment Description</label>
+          <label>Funding Description</label>
           <input-type>textarea</input-type>
           <repeatable>false</repeatable>
           <required />

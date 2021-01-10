@@ -128,7 +128,7 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
     protected WorkspaceItemBuilder addMetadataValue(final String schema,
             final String element, final String qualifier, final String value) {
         try {
-            itemService.addMetadata(context, workspaceItem.getItem(), schema, element, qualifier, Item.ANY,
+            itemService.addMetadata(context, workspaceItem.getItem(), schema, element, qualifier, null,
                     value, null, -1);
         } catch (Exception e) {
             return handleException(e);
@@ -136,10 +136,15 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
         return this;
     }
 
+    public WorkspaceItemBuilder withSubmitter(EPerson ePerson) {
+        workspaceItem.getItem().setSubmitter(ePerson);
+        return this;
+    }
+
     protected WorkspaceItemBuilder setMetadataSingleValue(final String schema,
             final String element, final String qualifier, final String value) {
         try {
-            itemService.setMetadataSingleValue(context, workspaceItem.getItem(), schema, element, qualifier, Item.ANY,
+            itemService.setMetadataSingleValue(context, workspaceItem.getItem(), schema, element, qualifier, null,
                     value);
         } catch (Exception e) {
             return handleException(e);
@@ -182,6 +187,14 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
 
     public WorkspaceItemBuilder withRelationshipType(final String relationshipType) {
         return addMetadataValue("relationship", "type", null, relationshipType);
+    }
+
+    public WorkspaceItemBuilder withCrisSourceId(String sourceId) {
+        return addMetadataValue("cris", "sourceId", null, sourceId);
+    }
+
+    public WorkspaceItemBuilder withDoiIdentifier(String doi) {
+        return addMetadataValue("dc", "identifier", "doi", doi);
     }
 
     public WorkspaceItemBuilder grantLicense() {

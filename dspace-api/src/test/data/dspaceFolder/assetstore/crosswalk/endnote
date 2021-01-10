@@ -1,0 +1,15 @@
+%0 Generic
+%A John Smith and Walter White and Jessie Pinkman
+%T Test Publication
+%D 2020-01-01
+%I Publisher
+%J Journal
+%V V.01
+%N Issue
+%X This is a publication to test export
+%K test
+%K publication
+%U http://localhost:4000/handle/123456789/xxx
+%R doi:111.111/publication
+%P 2 - 20
+%G en

@@ -34,10 +34,11 @@ public class WorkflowTest extends AbstractUnitTest {
     public void defaultWorkflow() {
         assertEquals("reviewstep", defaultWorkflow.getFirstStep().getId());
         List<Step> steps = defaultWorkflow.getSteps();
-        assertEquals(3, steps.size());
+        assertEquals(4, steps.size());
         assertTrue(this.containsStepNamed(steps, "reviewstep"));
         assertTrue(this.containsStepNamed(steps, "editstep"));
         assertTrue(this.containsStepNamed(steps, "finaleditstep"));
+        assertTrue(this.containsStepNamed(steps, "checkcorrectionstep"));
     }
 
     @Test

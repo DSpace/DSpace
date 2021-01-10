@@ -10,6 +10,7 @@ package org.dspace.external.service.impl;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.suggestion.SolrSuggestionStorageService;
@@ -75,6 +76,12 @@ public class ExternalDataServiceImpl implements ExternalDataService {
     }
 
     @Override
+    public List<ExternalDataProvider> getExternalDataProvidersForEntityType(String entityType) {
+        return externalDataProviders.stream().filter(edp -> edp.supportsEntityType(entityType))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public ExternalDataProvider getExternalDataProvider(String sourceIdentifier) {
         for (ExternalDataProvider externalDataProvider : externalDataProviders) {
             if (externalDataProvider.supports(sourceIdentifier)) {
@@ -99,9 +106,6 @@ public class ExternalDataServiceImpl implements ExternalDataService {
                                                                     ExternalDataObject externalDataObject,
                                                                     Collection collection)
         throws AuthorizeException, SQLException {
-        if (!authorizeService.isAdmin(context)) {
-            throw new AuthorizeException("You have to be an admin to create an Item from an ExternalDataObject");
-        }
         WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, true);
         Item item = workspaceItem.getItem();
         for (MetadataValueDTO metadataValueDTO : externalDataObject.getMetadata()) {

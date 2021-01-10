@@ -1,0 +1,92 @@
+{
+	"projects": [
+		{
+			"acronym":"TP",
+			"title":"Test Project",
+			"openaireid": [
+				"11-22-33"
+			],
+			"url": [
+				"www.project.test"
+			],
+			"startDate":"2020-01-01",
+			"endDate":"2020-12-31",
+			"status":"OPEN",
+			"consortium": {
+				"coordinators": [
+					{ "name": "First Coordinator OrgUnit" }
+				],
+				"partners": [
+					{	"name": "Partner OrgUnit" }
+				],
+				"members": [
+					{	"name": "Member OrgUnit" }
+				]
+			},
+			"team": {
+				"principalInvestigator": "Investigator",
+				"members": [
+					"First coinvestigator",
+					"Second coinvestigator"
+				]
+			},
+			"uses": {
+				"equipment": [
+					"Test equipment"
+				]
+			},
+			"funded": [
+			],
+			"keywords": [
+				"project",
+				"test"
+			],
+			"abstract": "This is a project to test the export",
+			"OAMandate": {
+				"mandated": "true",
+				"URL": "oamandate-url" 
+			}
+		},
+		{
+			"acronym":"STP",
+			"title":"Second Test Project",
+			"openaireid": [
+				"55-66-77",
+				"11-33-22"
+			],
+			"url": [
+				"www.project.test"
+			],
+			"startDate":"2010-01-01",
+			"endDate":"2012-12-31",
+			"status":"Status",
+			"consortium": {
+				"coordinators": [
+					{ "name": "Second Coordinator OrgUnit" }
+				],
+				"partners": [
+				],
+				"members": [
+				]
+			},
+			"team": {
+				"principalInvestigator": "Second investigator",
+				"members": [
+					"Coinvestigator"
+				]
+			},
+			"uses": {
+				"equipment": [
+					"Another test equipment"
+				]
+			},
+			"funded": [
+			],
+			"keywords": [
+			],
+			"OAMandate": {
+				"URL": "oamandate" 
+			}
+		}
+	]
+}

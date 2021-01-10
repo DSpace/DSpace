@@ -19,6 +19,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -35,7 +36,10 @@ import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.services.ConfigurationService;
+import org.dspace.utils.DSpace;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -169,6 +173,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         // Below settings default to Full Admin Rights (but not Community Admin rights)
         // Allow full Admin perms
         when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
+        when(authorizeServiceSpy.isAdmin(context, eperson)).thenReturn(true);
 
         //Test that a full Admin can create a Community without a parent (Top-Level Community)
         Community created = communityService.create(null, context);
@@ -206,6 +211,14 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     public void testCreateWithValidHandle() throws Exception {
         // Allow full Admin perms
         when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
+        doReturn(true).when(authorizeServiceSpy).isAdmin(eq(context), any(EPerson.class));
+
+        // provide additional prefixes to the configuration in order to support them
+        final ConfigurationService configurationService = new DSpace().getConfigurationService();
+        String handleAdditionalPrefixes = configurationService.getProperty("handle.additional.prefixes");
+
+        try {
+        configurationService.setProperty("handle.additional.prefixes", "987654321");
 
         // test creating community with a specified handle which is NOT already in use
         // (this handle should not already be used by system, as it doesn't start with "1234567689" prefix)
@@ -214,6 +227,10 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         // check that community was created, and that its handle was set to proper value
         assertThat("testCreateWithValidHandle 0", created, notNullValue());
         assertThat("testCreateWithValidHandle 1", created.getHandle(), equalTo("987654321/100c"));
+
+        } finally {
+            configurationService.setProperty("handle.additional.prefixes", handleAdditionalPrefixes);
+        }
     }
 
 
@@ -602,6 +619,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     public void testCreateCollectionAuth() throws Exception {
         // Allow current Community ADD perms
         doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADD);
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADD, true);
 
         Collection result = collectionService.create(context, c);
         assertThat("testCreateCollectionAuth 0", result, notNullValue());
@@ -628,6 +646,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     public void testAddCollectionAuth() throws Exception {
         // Allow current Community ADD perms
         doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADD);
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADD, true);
 
         Collection col = collectionService.create(context, c);
         c.addCollection(col);
@@ -929,7 +948,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     @SuppressWarnings("ObjectEqualsNull")
     public void testEquals() throws SQLException, AuthorizeException {
         // Allow full Admin perms (just to create top-level community)
-        when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
+        doReturn(true).when(authorizeServiceSpy).isAdmin(eq(context));
+        doReturn(true).when(authorizeServiceSpy).isAdmin(eq(context), any(EPerson.class));
 
         assertFalse("testEquals 0", c.equals(null));
         assertFalse("testEquals 1", c.equals(communityService.create(null, context)));
@@ -1013,7 +1033,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
                    equalTo(c));
         assertThat("testGetAdminObject 1", (Community) communityService.getAdminObject(context, c, Constants.ADD),
                    equalTo(c));
-        assertThat("testGetAdminObject 2", communityService.getAdminObject(context, c, Constants.DELETE), nullValue());
+        assertThat("testGetAdminObject 2", (Community) communityService.getAdminObject(context, c, Constants.DELETE),
+                   equalTo(c));
         assertThat("testGetAdminObject 3", (Community) communityService.getAdminObject(context, c, Constants.ADMIN),
                    equalTo(c));
     }

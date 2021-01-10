@@ -1,0 +1,19 @@
+{
+	"equipments": [
+		{
+			"name": "First Test Equipment",
+			"acronym": "FT-EQ",
+			"identifier": "ID-01",
+			"description": "This is an equipment to test the export functionality",
+			"ownerOrgUnit": "Test OrgUnit",
+			"ownerPerson": "Walter White"
+		},
+		{
+			"name": "Second Test Equipment",
+			"acronym": "ST-EQ",
+			"identifier": "ID-02",
+			"description": "This is another equipment to test the export functionality",
+			"ownerPerson": "John Smith"
+		}
+	]
+}

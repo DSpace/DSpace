@@ -279,7 +279,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             Context context = obtainContext();
             long total = es.searchResultCount(context, query);
             List<EPerson> epersons = es.search(context, query, Math.toIntExact(pageable.getOffset()),
-                                               Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+                                                               Math.toIntExact(pageable.getPageSize()));
             return converter.toRestPage(epersons, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -310,19 +310,11 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         EPerson eperson = null;
         try {
             eperson = es.find(context, id);
-            List<String> constraints = es.getDeleteConstraints(context, eperson);
-            if (constraints != null && constraints.size() > 0) {
-                throw new UnprocessableEntityException(
-                        "The eperson cannot be deleted due to the following constraints: "
-                                + StringUtils.join(constraints, ", "));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-        try {
             es.delete(context, eperson);
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
+        } catch (IllegalStateException e) {
+            throw  new UnprocessableEntityException(e.getMessage(), e);
         }
     }
 

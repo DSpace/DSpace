@@ -7,23 +7,25 @@
  */
 package org.dspace.app.harvest;
 
-import java.io.IOException;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -35,7 +37,10 @@ import org.dspace.harvest.HarvestedCollection;
 import org.dspace.harvest.HarvestingException;
 import org.dspace.harvest.OAIHarvester;
 import org.dspace.harvest.factory.HarvestServiceFactory;
+import org.dspace.harvest.model.OAIHarvesterOptions;
 import org.dspace.harvest.service.HarvestedCollectionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test class for harvested collections.
@@ -43,6 +48,13 @@ import org.dspace.harvest.service.HarvestedCollectionService;
  * @author Alexey Maslov
  */
 public class Harvest {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Harvest.class);
+
+    public static final String LOG_PREFIX = "PROCESSINGDATA ";
+
+    public static final String LOG_DELIMITER = "|";
+
     private static Context context;
 
     private static final HarvestedCollectionService harvestedCollectionService =
@@ -50,10 +62,12 @@ public class Harvest {
     private static final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     private static final CollectionService collectionService =
         ContentServiceFactory.getInstance().getCollectionService();
+    private static final OAIHarvester harvester = HarvestServiceFactory.getInstance().getOAIHarvester();
+    private static final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
 
     public static void main(String[] argv) throws Exception {
         // create an options object and populate it
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
 
         Options options = new Options();
 
@@ -65,6 +79,10 @@ public class Harvest {
         options.addOption("S", "start", false, "start the harvest loop");
         options.addOption("R", "reset", false, "reset harvest status on all collections");
         options.addOption("P", "purge", false, "purge all harvestable collections");
+
+        options.addOption("F", "force synchronization", false, "force the synchronization");
+        options.addOption("V", "validate", false, "to enable the item validation");
+        options.addOption("W", "workflow", false, "to start the item workflow after its creation");
 
 
         options.addOption("e", "eperson", true,
@@ -92,6 +110,9 @@ public class Harvest {
         String oaiSetID = null;
         String metadataKey = null;
         int harvestType = 0;
+        boolean forceSynch = false;
+        boolean validation = false;
+        boolean submitEnabled = true;
 
         if (line.hasOption('h')) {
             HelpFormatter myhelp = new HelpFormatter();
@@ -159,11 +180,20 @@ public class Harvest {
         if (line.hasOption('m')) {
             metadataKey = line.getOptionValue('m');
         }
+        if (line.hasOption('F')) {
+            forceSynch = true;
+        }
+        if (line.hasOption('V')) {
+            validation = true;
+        }
+        if (line.hasOption('W')) {
+            submitEnabled = false;
+        }
 
 
         // Instantiate our class
         Harvest harvester = new Harvest();
-        harvester.context = new Context(Context.Mode.BATCH_EDIT);
+        Harvest.context = new Context(Context.Mode.BATCH_EDIT);
 
 
         // Check our options
@@ -180,7 +210,8 @@ public class Harvest {
                 System.exit(1);
             }
 
-            harvester.runHarvest(collection, eperson);
+            harvester.runHarvest(collection, eperson, new OAIHarvesterOptions(forceSynch, validation, submitEnabled));
+
         } else if ("start".equals(command)) {
             // start the harvest loop
             startHarvester();
@@ -375,39 +406,40 @@ public class Harvest {
     /**
      * Run a single harvest cycle on the specified collection under the authorization of the supplied EPerson
      */
-    private void runHarvest(String collectionID, String email) {
+    private void runHarvest(String collectionID, String email, OAIHarvesterOptions options) {
         System.out.println("Running: a harvest cycle on " + collectionID);
 
         System.out.print("Initializing the harvester... ");
-        OAIHarvester harvester = null;
         try {
+
             Collection collection = resolveCollection(collectionID);
             HarvestedCollection hc = harvestedCollectionService.find(context, collection);
-            harvester = new OAIHarvester(context, collection, hc);
+
+            if (hc == null) {
+                throw new HarvestingException("Provided collection is not set up for harvesting");
+            }
+
+            // Harvest will not work for an anonymous user
+            EPerson eperson = ePersonService.findByEmail(context, email);
+
+            System.out.println("Harvest started... ");
+            context.setCurrentUser(eperson);
+
+            long startTimestamp = System.currentTimeMillis();
+
+            logProcess(options.getProcessId(), hc, true, startTimestamp);
+
+            harvester.runHarvest(context, hc, options);
+            context.complete();
+
+            logProcess(options.getProcessId(), hc, false, startTimestamp);
+
             System.out.println("success. ");
-        } catch (HarvestingException hex) {
-            System.out.print("failed. ");
-            System.out.println(hex.getMessage());
-            throw new IllegalStateException("Unable to harvest", hex);
+
         } catch (SQLException se) {
             System.out.print("failed. ");
             System.out.println(se.getMessage());
             throw new IllegalStateException("Unable to access database", se);
-        }
-
-        try {
-            // Harvest will not work for an anonymous user
-            EPerson eperson = ePersonService.findByEmail(context, email);
-            System.out.println("Harvest started... ");
-            context.setCurrentUser(eperson);
-            harvester.runHarvest();
-            context.complete();
-        } catch (SQLException e) {
-            throw new IllegalStateException("Failed to run harvester", e);
-        } catch (AuthorizeException e) {
-            throw new IllegalStateException("Failed to run harvester", e);
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to run harvester", e);
         }
 
         System.out.println("Harvest complete. ");
@@ -479,5 +511,26 @@ public class Harvest {
                 System.err.println(error);
             }
         }
+    }
+
+    private static void logProcess(UUID processId, HarvestedCollection harvestRow, boolean start, long startTimestamp)
+        throws SQLException {
+
+        Collection collection = harvestRow.getCollection();
+        Community parentCommunity = (Community) collectionService.getParentObject(context, collection);
+
+        String logMessage = new StringBuilder(LOG_PREFIX)
+            .append(processId).append(LOG_DELIMITER)
+            .append(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(new Date())).append(LOG_DELIMITER)
+            .append(harvestRow.getOaiSource()).append(LOG_DELIMITER)
+            .append(harvestRow.getOaiSetId() != null ? harvestRow.getOaiSetId() : "").append(LOG_DELIMITER)
+            .append(communityService.getName(parentCommunity)).append(LOG_DELIMITER)
+            .append(collection.getID()).append(LOG_DELIMITER)
+            .append(collectionService.getName(collection)).append(LOG_DELIMITER)
+            .append(start ? "START" : "FINISH").append(LOG_DELIMITER)
+            .append(start ? 0 : System.currentTimeMillis() - startTimestamp)
+            .toString();
+
+        LOGGER.trace(logMessage);
     }
 }

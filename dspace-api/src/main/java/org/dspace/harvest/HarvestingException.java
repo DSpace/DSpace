@@ -14,7 +14,10 @@ package org.dspace.harvest;
  *
  * @author alexey
  */
-public class HarvestingException extends Exception {
+public class HarvestingException extends RuntimeException {
+
+    private static final long serialVersionUID = 1L;
+
     public HarvestingException() {
         super();
     }

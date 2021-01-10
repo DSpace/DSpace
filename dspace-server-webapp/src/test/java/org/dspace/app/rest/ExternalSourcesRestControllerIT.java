@@ -28,7 +28,7 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
                                 ExternalSourceMatcher.matchExternalSource("mock", "mock", false),
                                 ExternalSourceMatcher.matchExternalSource("orcid", "orcid", false)
                             )))
-                            .andExpect(jsonPath("$.page.totalElements", Matchers.is(2)));
+                            .andExpect(jsonPath("$.page.totalElements", Matchers.is(5)));
     }
 
     @Test
@@ -41,7 +41,7 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
     }
     @Test
     public void findOneExternalSourcesNotExistingSources() throws Exception {
-        getClient().perform(get("/api/integration/externalsources/mock2"))
+        getClient().perform(get("/api/integration/externalsources/mocktwo"))
                    .andExpect(status().isNotFound());
     }
 

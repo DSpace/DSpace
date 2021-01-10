@@ -82,6 +82,9 @@ public class DiscoverFacetsConverter {
                 handleExposeMinMaxValues(context, field, facetEntry);
             }
             facetEntry.setExposeMinMax(field.exposeMinAndMaxValue());
+            handleExposeMore(field, facetEntry, searchResult);
+            handleExposeMissing(field, facetEntry, searchResult);
+            handleExposeTotalValues(field, facetEntry, searchResult);
             facetEntry.setFacetType(field.getType());
             for (DiscoverResult.FacetResult value : CollectionUtils.emptyIfNull(facetValues)) {
                 // The discover results contains max facetLimit + 1 values. If we reach the "+1", indicate that there
@@ -99,6 +102,38 @@ public class DiscoverFacetsConverter {
             }
 
             resultsRest.addFacetEntry(facetEntry);
+        }
+    }
+
+    public void handleExposeTotalValues(DiscoverySearchFilterFacet field,
+            SearchFacetEntryRest facetEntry, DiscoverResult searchResult) {
+        if (field.exposeTotalElements()) {
+            Long totalElems = searchResult.getFacetResultTotalElements(field.getIndexFieldName());
+            if (totalElems != null) {
+                facetEntry.setTotalElements(String.valueOf(totalElems));
+            }
+        }
+    }
+
+    public void handleExposeMissing(DiscoverySearchFilterFacet field, SearchFacetEntryRest facetEntry,
+            DiscoverResult searchResult) {
+        facetEntry.setExposeMissing(field.exposeMissing());
+        if (field.exposeMissing()) {
+            Long facetResultMissing = searchResult.getFacetResultMissing(field.getIndexFieldName());
+            if (facetResultMissing != null) {
+                facetEntry.setMissing(String.valueOf(facetResultMissing));
+            }
+        }
+    }
+
+    public void handleExposeMore(DiscoverySearchFilterFacet field, SearchFacetEntryRest facetEntry,
+            DiscoverResult searchResult) {
+        facetEntry.setExposeMore(field.exposeMore());
+        if (field.exposeMore()) {
+            Long facetResultMore = searchResult.getFacetResultMore(field.getIndexFieldName());
+            if (facetResultMore != null) {
+                facetEntry.setMore(String.valueOf(facetResultMore));
+            }
         }
     }
 

@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class VirtualFieldRefererType implements VirtualField {
 
-    private static final String PROPERTY_PREFIX = "crosswalk.virtualname.referer.type.";
+    private static final String PROPERTY_PREFIX = "crosswalk.virtualfield.referer-type.";
 
     private final ConfigurationService configurationService;
 
