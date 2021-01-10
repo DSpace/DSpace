@@ -45,18 +45,20 @@ public class ExternalSourcesByEntityTypesIT extends AbstractControllerIntegratio
                                 ExternalSourceMatcher.matchExternalSource("mock", "mock", false),
                                 ExternalSourceMatcher.matchExternalSource("mock2", "mock2", false),
                                 ExternalSourceMatcher.matchExternalSource("mock3", "mock3", false),
-                                ExternalSourceMatcher.matchExternalSource("orcid", "orcid", false)
+                                ExternalSourceMatcher.matchExternalSource("orcid", "orcid", false),
+                                ExternalSourceMatcher.matchExternalSource("suggestion", "suggestion", false)
                             )))
-                            .andExpect(jsonPath("$.page.totalElements", Matchers.is(4)));
+                            .andExpect(jsonPath("$.page.totalElements", Matchers.is(5)));
         // mock and ORCID are configured without any entity type
         getClient()
                 .perform(get("/api/integration/externalsources/search/findByEntityType").param("entityType", "Funding"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.externalsources", Matchers.contains(
                 ExternalSourceMatcher.matchExternalSource("mock", "mock", false),
-                ExternalSourceMatcher.matchExternalSource("orcid", "orcid", false)
+                ExternalSourceMatcher.matchExternalSource("orcid", "orcid", false),
+                ExternalSourceMatcher.matchExternalSource("suggestion", "suggestion", false)
             )))
-            .andExpect(jsonPath("$.page.totalElements", Matchers.is(2)));
+            .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
     }
 
     @Test
@@ -69,7 +71,7 @@ public class ExternalSourcesByEntityTypesIT extends AbstractControllerIntegratio
                                 ExternalSourceMatcher.matchExternalSource("mock3", "mock3", false),
                                 ExternalSourceMatcher.matchExternalSource("orcid", "orcid", false)
                             )))
-                            .andExpect(jsonPath("$.page.totalElements", Matchers.is(4)));
+                            .andExpect(jsonPath("$.page.totalElements", Matchers.is(5)));
     }
     @Test
     public void findAllByAuthorizedExternalSource() throws Exception {
@@ -114,11 +116,13 @@ public class ExternalSourcesByEntityTypesIT extends AbstractControllerIntegratio
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.entitytypes", Matchers.hasSize(1)))
                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
-        // temporary alter the mock and orcid data providers to restrict them to Publication
+        // temporary alter the mock, orcid and suggestion data providers to restrict them to Publication
         try {
             ((AbstractExternalDataProvider) externalDataService.getExternalDataProvider("mock"))
                     .setSupportedEntityTypes(Arrays.asList("Publication"));
             ((AbstractExternalDataProvider) externalDataService.getExternalDataProvider("orcid"))
+                    .setSupportedEntityTypes(Arrays.asList("Publication"));
+            ((AbstractExternalDataProvider) externalDataService.getExternalDataProvider("suggestion"))
                     .setSupportedEntityTypes(Arrays.asList("Publication"));
             getClient(token).perform(get("/api/core/entitytypes/search/findAllByAuthorizedExternalSource"))
                     .andExpect(status().isOk())
@@ -136,6 +140,8 @@ public class ExternalSourcesByEntityTypesIT extends AbstractControllerIntegratio
             ((AbstractExternalDataProvider) externalDataService.getExternalDataProvider("mock"))
                     .setSupportedEntityTypes(null);
             ((AbstractExternalDataProvider) externalDataService.getExternalDataProvider("orcid"))
+                    .setSupportedEntityTypes(null);
+            ((AbstractExternalDataProvider) externalDataService.getExternalDataProvider("suggestion"))
                     .setSupportedEntityTypes(null);
         }
     }

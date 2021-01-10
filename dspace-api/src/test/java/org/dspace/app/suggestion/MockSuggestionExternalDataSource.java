@@ -13,7 +13,7 @@ import java.util.Optional;
 import org.apache.commons.codec.binary.StringUtils;
 import org.dspace.core.Context;
 import org.dspace.external.model.ExternalDataObject;
-import org.dspace.external.provider.ExternalDataProvider;
+import org.dspace.external.provider.AbstractExternalDataProvider;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.dspace.utils.DSpace;
@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MockSuggestionExternalDataSource implements ExternalDataProvider {
+public class MockSuggestionExternalDataSource extends AbstractExternalDataProvider {
     public static final String NAME = "suggestion";
     @Autowired
     private SuggestionService suggestionService;
