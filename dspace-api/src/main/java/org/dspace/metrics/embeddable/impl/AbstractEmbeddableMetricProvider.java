@@ -24,6 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class AbstractEmbeddableMetricProvider implements EmbeddableMetricProvider {
 
+    public static final String DYNAMIC_ID_SEPARATOR = ":";
+
     protected static final Logger log = LoggerFactory.getLogger(AbstractEmbeddableMetricProvider.class);
 
     @Autowired(required = true)
@@ -66,19 +68,19 @@ public abstract class AbstractEmbeddableMetricProvider implements EmbeddableMetr
 
     @Override
     public Optional<EmbeddableCrisMetrics> provide(Context context, String metricId) throws SQLException {
-        UUID itemUuid = UUID.fromString(metricId.split("/")[0]);
+        UUID itemUuid = UUID.fromString(metricId.split(DYNAMIC_ID_SEPARATOR)[0]);
         Item item = itemService.find(context, itemUuid);
         return provide(context, item);
     }
 
     @Override
     public boolean support(String metricId) {
-        return metricId.split("/")[1].equals(this.getMetricType());
+        return metricId.split(DYNAMIC_ID_SEPARATOR)[1].equals(this.getMetricType());
     }
 
     @Override
     public String getId(Context context, Item item) {
-        return item.getID() + "/" + this.getMetricType();
+        return item.getID() + DYNAMIC_ID_SEPARATOR + this.getMetricType();
     }
 
     public boolean isEnabled() {

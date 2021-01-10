@@ -14,10 +14,12 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.UUID;
 
 import org.dspace.app.metrics.CrisMetrics;
 import org.dspace.app.rest.model.CrisMetricsRest;
 import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 
 /**
  * Provide convenient org.hamcrest.Matcher to verify a CrisMetricsRest json response
@@ -40,6 +42,13 @@ public class CrisMetricsMatcher {
                      hasJsonPath("$.rank", is(crisMetrics.getRank())),
                      hasJsonPath("$.type", is(CrisMetricsRest.NAME))
                      );
+    }
+
+    public static Matcher<? super Object> matchCrisDynamicMetrics(UUID itemUuid, String type) {
+        return allOf(
+                hasJsonPath("$.id",
+                        itemUuid != null ? is(itemUuid.toString() + ":" + type) : Matchers.endsWith("-" + type)),
+                hasJsonPath("$.metricType", is(type)), hasJsonPath("$.type", is(CrisMetricsRest.NAME)));
     }
 
     private static String formatDate(Date date) {

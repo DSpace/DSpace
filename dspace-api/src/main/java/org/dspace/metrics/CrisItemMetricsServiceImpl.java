@@ -98,18 +98,11 @@ public class CrisItemMetricsServiceImpl implements CrisItemMetricsService {
     }
 
     private List<CrisMetrics> findMetricsByItemUUID(Context context, UUID itemUuid) {
-
         // Solr metrics
         SolrDocument solrDocument = findMetricsDocumentInSolr(context, itemUuid);
         Collection<String> fields = Optional.ofNullable(solrDocument)
             .map(SolrDocument::getFieldNames).orElseGet(Collections::emptyList);
         List<CrisMetrics> metrics = buildCrisMetric(context, getMetricFields(fields), solrDocument);
-
-        // Embeddable metrics
-        List<EmbeddableCrisMetrics> embeddableMetrics =
-                this.getEmbeddableMetrics(context, itemUuid);
-        metrics.addAll(embeddableMetrics);
-
         return metrics;
     }
 
