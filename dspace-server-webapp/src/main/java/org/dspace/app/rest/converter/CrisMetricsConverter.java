@@ -9,6 +9,7 @@ package org.dspace.app.rest.converter;
 import org.dspace.app.metrics.CrisMetrics;
 import org.dspace.app.rest.model.CrisMetricsRest;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.metrics.embeddable.model.EmbeddableCrisMetrics;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,7 +27,7 @@ public class CrisMetricsConverter implements DSpaceConverter<CrisMetrics, CrisMe
     @Override
     public CrisMetricsRest convert(CrisMetrics model, Projection projection) {
         CrisMetricsRest rest = new CrisMetricsRest();
-        rest.setId(model.getId());
+        rest.setId(convertId(model));
         rest.setMetricType(model.getMetricType());
         rest.setMetricCount(model.getMetricCount());
         rest.setAcquisitionDate(model.getAcquisitionDate());
@@ -38,6 +39,13 @@ public class CrisMetricsConverter implements DSpaceConverter<CrisMetrics, CrisMe
         rest.setDeltaPeriod2(model.getDeltaPeriod2());
         rest.setRank(model.getRank());
         return rest;
+    }
+
+    protected String convertId(CrisMetrics model) {
+        if (model instanceof EmbeddableCrisMetrics) {
+            return ((EmbeddableCrisMetrics)model).getEmbeddableId();
+        }
+        return String.valueOf(model.getId());
     }
 
     /* (non-Javadoc)

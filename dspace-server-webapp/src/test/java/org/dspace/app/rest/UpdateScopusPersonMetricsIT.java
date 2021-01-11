@@ -95,8 +95,7 @@ public class UpdateScopusPersonMetricsIT extends AbstractControllerIntegrationTe
 
             context.restoreAuthSystemState();
 
-            String[] args = new String[] { "update-metrics", "-s", "scopus-person", "-p",
-                    ScopusPersonMetric.H_INDEX.name() };
+            String[] args = new String[] { "update-metrics", "-s", "scopus-person"};
             TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
             assertEquals(0, handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin));
@@ -156,8 +155,7 @@ public class UpdateScopusPersonMetricsIT extends AbstractControllerIntegrationTe
 
             context.restoreAuthSystemState();
 
-            String[] args = new String[] { "update-metrics", "-s", "scopus-person", "-p",
-                    ScopusPersonMetric.CITED.name() };
+            String[] args = new String[] { "update-metrics", "-s", "scopus-person"};
             TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
             assertEquals(0, handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin));
@@ -218,8 +216,7 @@ public class UpdateScopusPersonMetricsIT extends AbstractControllerIntegrationTe
 
             context.restoreAuthSystemState();
 
-            String[] args = new String[] { "update-metrics", "-s", "scopus-person", "-p",
-                    ScopusPersonMetric.DOCUMENT.name() };
+            String[] args = new String[] { "update-metrics", "-s", "scopus-person"};
             TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
             assertEquals(0, handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin));
@@ -279,8 +276,7 @@ public class UpdateScopusPersonMetricsIT extends AbstractControllerIntegrationTe
 
             context.restoreAuthSystemState();
 
-            String[] args = new String[] { "update-metrics", "-s", "scopus-person", "-p",
-                                            ScopusPersonMetric.CITATION.name() };
+            String[] args = new String[] { "update-metrics", "-s", "scopus-person"};
             TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
             assertEquals(0, handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin));
@@ -340,8 +336,7 @@ public class UpdateScopusPersonMetricsIT extends AbstractControllerIntegrationTe
 
             context.restoreAuthSystemState();
 
-            String[] args = new String[] { "update-metrics", "-s", "scopus-person", "-p",
-                    ScopusPersonMetric.COAUTHOR.name() };
+            String[] args = new String[] { "update-metrics", "-s", "scopus-person"};
             TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
             assertEquals(0, handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin));
@@ -400,8 +395,7 @@ public class UpdateScopusPersonMetricsIT extends AbstractControllerIntegrationTe
 
             context.restoreAuthSystemState();
 
-            String[] args = new String[] { "update-metrics", "-s", "scopus-person", "-p",
-                    ScopusPersonMetric.H_INDEX.name() };
+            String[] args = new String[] { "update-metrics", "-s", "scopus-person"};
             TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
             assertEquals(0, handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin));
@@ -456,8 +450,7 @@ public class UpdateScopusPersonMetricsIT extends AbstractControllerIntegrationTe
 
             context.restoreAuthSystemState();
 
-            String[] args = new String[] { "update-metrics", "-s", "scopus-person", "-p",
-                    ScopusPersonMetric.H_INDEX.name() };
+            String[] args = new String[] { "update-metrics", "-s", "scopus-person"};
             TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
             assertEquals(0, handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin));
@@ -511,8 +504,7 @@ public class UpdateScopusPersonMetricsIT extends AbstractControllerIntegrationTe
 
             context.restoreAuthSystemState();
 
-            String[] args = new String[] { "update-metrics", "-s", "scopus-person", "-p",
-                    ScopusPersonMetric.H_INDEX.name() };
+            String[] args = new String[] { "update-metrics", "-s", "scopus-person"};
             TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
             assertEquals(0, handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin));

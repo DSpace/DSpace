@@ -2908,6 +2908,11 @@
         <property name="indexFieldName" value="graphpubldate" />
         <!-- isDate cannot be true if the splitter is set -->
         <property name="isDate" value="true" />
+		<!-- force solr to reverse its order, as it is by value this mean descending 
+			(by COUNT is descending by default so the inverse flag would make it ascending) -->
+        <property name="inverseDirection" value="true" />
+        <!-- force to return 0 count buckets for years between the range -->
+        <property name="fillDateGaps" value="true" />
         <property name="metadataFields">
             <list>
                 <value>dc.date.issued</value>

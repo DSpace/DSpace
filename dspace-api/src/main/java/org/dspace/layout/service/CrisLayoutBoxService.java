@@ -13,6 +13,7 @@ import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.EntityType;
+import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
@@ -156,10 +157,11 @@ public interface CrisLayoutBoxService extends DSpaceCRUDService<CrisLayoutBox> {
      * 
      * @param context The relevant DSpace Context
      * @param box     CrisLayoutBox instance
+     * @param item    the box's item
      * @param values  metadataValue of item
      * @return true if the box has content to show, false otherwise
      */
-    public boolean hasContent(Context context, CrisLayoutBox box, List<MetadataValue> values);
+    public boolean hasContent(Context context, CrisLayoutBox box, Item item, List<MetadataValue> values);
 
     /**
      * Retrieve the configuration details of a specific box. By default the

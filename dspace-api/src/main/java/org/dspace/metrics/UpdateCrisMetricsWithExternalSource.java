@@ -84,12 +84,15 @@ public class UpdateCrisMetricsWithExternalSource extends
             throw new IllegalArgumentException("The name of service must be provided");
         }
         try {
+            context.turnOffAuthorisationSystem();
             performUpdate(context, externalService, param);
             context.complete();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             handler.handleException(e);
             context.abort();
+        } finally {
+            context.restoreAuthSystemState();
         }
     }
 

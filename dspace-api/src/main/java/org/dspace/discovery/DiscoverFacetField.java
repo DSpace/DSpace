@@ -25,6 +25,8 @@ public class DiscoverFacetField {
     private boolean exposeMore;
     private boolean exposeMissing;
     private boolean exposeTotalElements;
+    private boolean fillGaps;
+    private boolean inverseDirection;
 
     public DiscoverFacetField(String field, String type, int limit, DiscoveryConfigurationParameters.SORT sortOrder) {
         this.field = field;
@@ -52,7 +54,8 @@ public class DiscoverFacetField {
     }
 
     public DiscoverFacetField(String field, String type, int limit, DiscoveryConfigurationParameters.SORT sortOrder,
-                              String prefix, boolean exposeMore, boolean exposeMissing, boolean exposeTotalElements) {
+                              String prefix, boolean exposeMore, boolean exposeMissing, boolean exposeTotalElements,
+                              boolean fillGaps, boolean inverseDirection) {
         this.prefix = prefix;
         this.limit = limit;
         this.type = type;
@@ -61,6 +64,8 @@ public class DiscoverFacetField {
         this.exposeMore = exposeMore;
         this.exposeMissing = exposeMissing;
         this.exposeTotalElements = exposeTotalElements;
+        this.fillGaps = fillGaps;
+        this.inverseDirection = inverseDirection;
     }
 
     public DiscoverFacetField(String field, String type, int limit, DiscoveryConfigurationParameters.SORT sortOrder,
@@ -113,4 +118,11 @@ public class DiscoverFacetField {
         return exposeTotalElements;
     }
 
+    public boolean fillGaps() {
+        return fillGaps;
+    }
+
+    public boolean inverseDirection() {
+        return inverseDirection;
+    }
 }

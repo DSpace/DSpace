@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -801,9 +802,15 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 String field = transformFacetField(facetFieldConfig, facetFieldConfig.getField(), false);
                 solrQuery.addFacetField(field);
 
-                // Setting the facet limit in this fashion ensures that each facet can have its own max
-                solrQuery
-                    .add("f." + field + "." + FacetParams.FACET_LIMIT, String.valueOf(facetFieldConfig.getLimit()));
+                if (!facetFieldConfig.fillGaps() && !facetFieldConfig.inverseDirection()) {
+                    // Setting the facet limit in this fashion ensures that each facet can have its own max
+                    solrQuery
+                        .add("f." + field + "." + FacetParams.FACET_LIMIT, String.valueOf(facetFieldConfig.getLimit()));
+                } else {
+                    // as we need to fill the gaps or reverse the order all the values must be returned
+                    solrQuery
+                        .add("f." + field + "." + FacetParams.FACET_LIMIT, String.valueOf(Integer.MAX_VALUE));
+                }
                 String facetSort;
                 if (DiscoveryConfigurationParameters.SORT.COUNT.equals(facetFieldConfig.getSortOrder())) {
                     facetSort = FacetParams.FACET_SORT_COUNT;
@@ -811,7 +818,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     facetSort = FacetParams.FACET_SORT_INDEX;
                 }
                 solrQuery.add("f." + field + "." + FacetParams.FACET_SORT, facetSort);
-                if (facetFieldConfig.getOffset() != -1) {
+                if (facetFieldConfig.getOffset() != -1 && !facetFieldConfig.fillGaps()
+                        && !facetFieldConfig.inverseDirection()) {
                     solrQuery.setParam("f." + field + "."
                                            + FacetParams.FACET_OFFSET,
                                        String.valueOf(facetFieldConfig.getOffset()));
@@ -836,10 +844,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         if (discoveryQuery.getFacetMinCount() != -1) {
             solrQuery.setFacetMinCount(discoveryQuery.getFacetMinCount());
-        }
-
-        if (CollectionUtils.isNotEmpty(facetFields) || CollectionUtils.isNotEmpty(facetQueries)) {
-            solrQuery.setParam(FacetParams.FACET_OFFSET, String.valueOf(discoveryQuery.getFacetOffset()));
         }
 
         if (0 < discoveryQuery.getHitHighlightingFields().size()) {
@@ -936,6 +940,57 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                             //If we have a date & are sorting by value, ensure that the results are flipped for a
                             // proper result
                             Collections.reverse(facetValues);
+                        }
+
+                        if (facetFieldConfig.fillGaps() && facetValues.size() > 0) {
+                            // only years sorted in ascending order can have such flag
+                            String separator = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                    .getProperty("discovery.solr.facets.split.char");
+                            if (separator == null) {
+                                separator = SearchUtils.FILTER_SEPARATOR;
+                            }
+                            String separatorSplit = java.util.regex.Pattern.quote(separator);
+                            List<FacetField.Count> resultValues = new ArrayList<FacetField.Count>();
+                            int prevYear = Integer.MIN_VALUE;
+                            for (FacetField.Count facetValue : facetValues) {
+                                if (StringUtils.isBlank(facetValue.getName())) {
+                                    resultValues.add(facetValue);
+                                    continue;
+                                }
+                                int currYear = Integer.parseInt(facetValue.getName().split(separatorSplit)[0]);
+                                if (prevYear != Integer.MIN_VALUE && currYear != prevYear - 1) {
+                                    for (int idx = prevYear + 1; idx < currYear; idx++) {
+                                        resultValues.add(new FacetField.Count(facetValue.getFacetField(),
+                                                String.valueOf(idx) + separator + String.valueOf(idx), 0));
+                                    }
+                                }
+                                prevYear = currYear;
+                                resultValues.add(facetValue);
+                            }
+                            facetValues = resultValues;
+                        }
+                        if (facetFieldConfig.inverseDirection()) {
+                            if (StringUtils.isBlank(facetValues.get(facetValues.size() - 1).getName())) {
+                                // the missing facet if here must be keep as the last one
+                                FacetField.Count missing = facetValues.remove(facetValues.size() - 1);
+                                facetValues.add(0, missing);
+                            }
+                            Collections.reverse(facetValues);
+                        }
+
+                        if (facetFieldConfig.inverseDirection() || facetFieldConfig.fillGaps()) {
+                            FacetField.Count missing = null;
+                            if (StringUtils.isBlank(facetValues.get(facetValues.size() - 1).getName())) {
+                                // the missing facet if here must be keep as the last one
+                                missing = facetValues.remove(facetValues.size() - 1);
+                            }
+                            // we need to extract the requested page
+                            facetValues = facetValues.stream()
+                                    .skip(facetFieldConfig.getOffset() > 0 ? facetFieldConfig.getOffset() : 0)
+                                    .limit(facetFieldConfig.getLimit()).collect(Collectors.toList());
+                            if (missing != null) {
+                                facetValues.add(missing);
+                            }
                         }
 
                         String field = transformFacetField(facetFieldConfig, facetField.getName(), true);
