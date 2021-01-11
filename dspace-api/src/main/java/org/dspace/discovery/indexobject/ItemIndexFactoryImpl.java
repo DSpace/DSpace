@@ -41,6 +41,7 @@ import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
+import org.dspace.core.CrisConstants;
 import org.dspace.core.LogManager;
 import org.dspace.discovery.FullTextContentStreams;
 import org.dspace.discovery.IndexableObject;
@@ -323,6 +324,20 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                     continue;
                 }
 
+                if (StringUtils.equals(value, CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE)) {
+                    if (toProjectionFields.contains(field) || toProjectionFields
+                            .contains(unqualifiedField + "." + Item.ANY)) {
+                        doc.addField(
+                                field + "_stored",
+                                value + STORE_SEPARATOR + "null" // preferedLabel
+                                        + STORE_SEPARATOR
+                                        + "null" // variants
+                                        + STORE_SEPARATOR + "null" // authority
+                                        + STORE_SEPARATOR + meta.getLanguage());
+                    }
+                    continue;
+                }
+
                 String authority = null;
                 String preferedLabel = null;
                 List<String> variants = null;
@@ -352,11 +367,11 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                                 DSpaceServicesFactory
                                         .getInstance()
                                         .getConfigurationService()
-                                        .getPropertyAsType("discovery.index.authority.ignore-prefered." + field,
+                                        .getPropertyAsType("discovery.index.authority.ignore-preferred." + field,
                                                 DSpaceServicesFactory
                                                         .getInstance()
                                                         .getConfigurationService()
-                                                        .getPropertyAsType("discovery.index.authority.ignore-prefered",
+                                                        .getPropertyAsType("discovery.index.authority.ignore-preferred",
                                                                 new Boolean(false)),
                                                 true);
                         if (!ignorePrefered) {
