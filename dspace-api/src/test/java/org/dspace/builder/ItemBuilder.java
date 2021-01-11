@@ -27,6 +27,7 @@ import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
+import org.dspace.core.CrisConstants;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
@@ -99,8 +100,18 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "oairecerif", "author", "affiliation", affiliation);
     }
 
+    public ItemBuilder withAuthorAffiliationPlaceholder() {
+        return addMetadataValue(item, "oairecerif", "author", "affiliation",
+                CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE);
+    }
+
     public ItemBuilder withEditor(final String editorName) {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "contributor", "editor", editorName);
+    }
+
+    public ItemBuilder withEditorAffiliationPlaceholder() {
+        return addMetadataValue(item, "oairecerif", "editor", "affiliation",
+                CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE);
     }
 
     public ItemBuilder withEditor(final String editorName, final String authority) {
@@ -633,4 +644,5 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
             c.complete();
         }
     }
+
 }
