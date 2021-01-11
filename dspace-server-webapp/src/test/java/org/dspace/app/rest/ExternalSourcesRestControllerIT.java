@@ -11,14 +11,28 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.UUID;
+
 import org.dspace.app.rest.matcher.ExternalSourceEntryMatcher;
 import org.dspace.app.rest.matcher.ExternalSourceMatcher;
 import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.WorkflowItemBuilder;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.services.ConfigurationService;
+import org.dspace.util.UUIDUtils;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     @Test
     public void findAllExternalSources() throws Exception {
@@ -117,4 +131,56 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
         getClient().perform(get("/api/integration/externalsources/mock/entries"))
                    .andExpect(status().isBadRequest());
     }
+
+    @Test
+    public void testAuthorityImportDataProviderExternalSource() throws Exception {
+        context.turnOffAuthorisationSystem();
+        configurationService.setProperty("choises.externalsource.dc.contributor.author", "authorAuthority");
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                .withWorkflowGroup(1, admin).build();
+
+        //2. a workflow item
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                .withTitle("Workflow Item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withAuthorAffiliation("Affiliation one").withAuthorAffiliation("Affiliation two")
+                .withSubject("ExtraEntry")
+                .build();
+
+        UUID itemUUID = witem.getItem().getID();
+
+        context.restoreAuthSystemState();
+
+        String exteranlSourceId = UUIDUtils.toString(itemUUID) + ":0";
+        getClient().perform(get("/api/integration/externalsources/authorAuthority/entryValues/" + exteranlSourceId))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", Matchers.is(
+                           ExternalSourceEntryMatcher.matchItemWithGivenMetadata("dc.title",
+                                   "Smith, Donald", "0"))))
+                   .andExpect(jsonPath("$", Matchers.is(
+                           ExternalSourceEntryMatcher.matchItemWithGivenMetadata("person.affiliation.name",
+                                   "Affiliation one", "0"))));
+
+        exteranlSourceId = UUIDUtils.toString(itemUUID) + ":1";
+        getClient().perform(get("/api/integration/externalsources/authorAuthority/entryValues/" + exteranlSourceId))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", Matchers.is(
+                           ExternalSourceEntryMatcher.matchItemWithGivenMetadata("dc.title",
+                                   "Doe, John", "0"))))
+                   .andExpect(jsonPath("$", Matchers.is(
+                           ExternalSourceEntryMatcher.matchItemWithGivenMetadata("person.affiliation.name",
+                                   "Affiliation two", "0"))));
+
+        exteranlSourceId = UUIDUtils.toString(itemUUID) + ":2";
+        getClient().perform(get("/api/integration/externalsources/authorAuthority/entryValues/" + exteranlSourceId))
+                   .andExpect(status().isBadRequest());
+    }
+
 }

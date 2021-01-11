@@ -179,6 +179,10 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
         return addMetadataValue(MetadataSchemaEnum.DC.getName(), "contributor", "author", authorName);
     }
 
+    public WorkflowItemBuilder withAuthorAffiliation(final String affilation) {
+        return addMetadataValue(MetadataSchemaEnum.OAIRECERIF.getName(), "author", "affiliation", affilation);
+    }
+
     public WorkflowItemBuilder withSubject(final String subject) {
         return addMetadataValue(MetadataSchemaEnum.DC.getName(), "subject", null, subject);
     }
