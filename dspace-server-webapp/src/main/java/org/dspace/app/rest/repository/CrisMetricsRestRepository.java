@@ -13,6 +13,7 @@ import org.dspace.app.metrics.service.CrisMetricsService;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.CrisMetricsRest;
 import org.dspace.core.Context;
+import org.dspace.metrics.CrisItemMetricsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,18 +26,21 @@ import org.springframework.stereotype.Component;
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
 @Component(CrisMetricsRest.CATEGORY + "." + CrisMetricsRest.NAME)
-public class CrisMetricsRestRepository extends DSpaceRestRepository<CrisMetricsRest, Integer>
+public class CrisMetricsRestRepository extends DSpaceRestRepository<CrisMetricsRest, String>
                                        implements ReloadableEntityObjectRepository<CrisMetrics, Integer> {
 
     @Autowired
     private CrisMetricsService crisMetricsService;
 
+    @Autowired
+    private CrisItemMetricsService crisItemMetricsService;
+
     @Override
     @PreAuthorize("hasPermission(#id, 'METRIC', 'READ')")
-    public CrisMetricsRest findOne(Context context, Integer id) {
+    public CrisMetricsRest findOne(Context context, String id) {
         CrisMetrics crisMetrics = null;
         try {
-            crisMetrics = crisMetricsService.find(context, id);
+            crisMetrics = crisItemMetricsService.find(context, id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

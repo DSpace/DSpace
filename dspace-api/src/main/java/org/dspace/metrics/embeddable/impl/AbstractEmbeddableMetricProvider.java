@@ -29,7 +29,7 @@ public abstract class AbstractEmbeddableMetricProvider implements EmbeddableMetr
     protected static final Logger log = LoggerFactory.getLogger(AbstractEmbeddableMetricProvider.class);
 
     @Autowired(required = true)
-    protected ItemService itemService;
+    private ItemService itemService;
 
     private Filter filterService;
 
@@ -63,13 +63,13 @@ public abstract class AbstractEmbeddableMetricProvider implements EmbeddableMetr
     }
 
     protected String getRelationshipType(Item item) {
-        return itemService.getMetadataFirstValue(item, "relationship", "type", null, Item.ANY);
+        return getItemService().getMetadataFirstValue(item, "relationship", "type", null, Item.ANY);
     }
 
     @Override
     public Optional<EmbeddableCrisMetrics> provide(Context context, String metricId) throws SQLException {
         UUID itemUuid = UUID.fromString(metricId.split(DYNAMIC_ID_SEPARATOR)[0]);
-        Item item = itemService.find(context, itemUuid);
+        Item item = getItemService().find(context, itemUuid);
         return provide(context, item);
     }
 
@@ -97,6 +97,14 @@ public abstract class AbstractEmbeddableMetricProvider implements EmbeddableMetr
 
     public void setFilterService(Filter filterService) {
         this.filterService = filterService;
+    }
+
+    protected ItemService getItemService() {
+        return itemService;
+    }
+
+    protected void setItemService(ItemService itemService) {
+        this.itemService = itemService;
     }
 
 
