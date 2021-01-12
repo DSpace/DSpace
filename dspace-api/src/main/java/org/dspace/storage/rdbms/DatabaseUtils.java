@@ -1221,7 +1221,7 @@ public class DatabaseUtils {
      * Discovery/Solr needs reindexing.
      * @return whether reindexing should happen.
      */
-    public static boolean getReindexDiscovery() {
+    public static synchronized boolean getReindexDiscovery() {
         boolean autoReindex = DSpaceServicesFactory.getInstance()
             .getConfigurationService()
             .getBooleanProperty("discovery.autoReindex", true);

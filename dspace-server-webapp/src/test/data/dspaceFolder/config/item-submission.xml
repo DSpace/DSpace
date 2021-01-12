@@ -28,7 +28,7 @@
     <!-- defined in this section. EVERY 'step' in this section MUST have a -->
     <!-- unique identifier in the 'id' attribute! -->
     <!-- -->
-    <!-- Each <step> REQUIRES the following attributes (@) and properties: -->
+    <!-- Each <step-definition> REQUIRES the following attributes (@) and properties: -->
     <!-- @id - The unique identifier for this step -->
     <!-- -->
     <!-- <processing-class> - The class which will process all information for -->
@@ -38,7 +38,7 @@
     <!-- This property should reference the full path of the class -->
     <!-- (e.g. org.dspace.submit.step.MyCustomStep) -->
     <!-- -->
-    <!-- The following properties are OPTIONAL for each <step>: -->
+    <!-- The following properties are OPTIONAL for each <step-definition>: -->
     <!-- <heading> - References the message key, from the -->
     <!-- Messages.properties -->
     <!-- -->
@@ -46,128 +46,128 @@
         <!-- The "collection" step is a "special step" which is *REQUIRED* -->
         <!-- In DSpace, all submitted items must be immediately assigned --> 
         <!-- to a collection. This step ensures that a collection is always selected. -->
-        <step id="collection">
+        <step-definition id="collection">
             <heading></heading>
             <processing-class>org.dspace.app.rest.submit.step.CollectionStep</processing-class>
             <type>collection</type>
             <scope visibility="hidden" visibilityOutside="hidden">submission</scope>
-        </step>
-        <step id="traditionalpageone" mandatory="true">
+        </step-definition>
+        <step-definition id="traditionalpageone" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
-        </step>
-        <step id="traditionalpagetwo" mandatory="true">
+        </step-definition>
+        <step-definition id="traditionalpagetwo" mandatory="true">
             <heading>submit.progressbar.describe.steptwo</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
-        </step>
+        </step-definition>
 
-        <step id="peopleStep" mandatory="true">
+        <step-definition id="peopleStep" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
-        </step>
-        <step id="projectStep" mandatory="true">
+        </step-definition>
+        <step-definition id="projectStep" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
-        </step>
-        <step id="orgUnitStep" mandatory="true">
+        </step-definition>
+        <step-definition id="orgUnitStep" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
-        </step>
-        <step id="journalStep" mandatory="true">
+        </step-definition>
+        <step-definition id="journalStep" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
-        </step>
-        <step id="journalVolumeStep" mandatory="true">
+        </step-definition>
+        <step-definition id="journalVolumeStep" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
-        </step>
-        <step id="journalIssueStep" mandatory="true">
+        </step-definition>
+        <step-definition id="journalIssueStep" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
-        </step>
+        </step-definition>
 
-        <step id="upload">
+        <step-definition id="upload">
             <heading>submit.progressbar.upload</heading>
             <processing-class>org.dspace.app.rest.submit.step.UploadStep</processing-class>
             <type>upload</type>
-        </step>
-        <step id="license">
+        </step-definition>
+        <step-definition id="license">
             <heading>submit.progressbar.license</heading>
             <processing-class>org.dspace.app.rest.submit.step.LicenseStep</processing-class>
             <type>license</type>
             <scope visibilityOutside="read-only">submission</scope>
-        </step>
+        </step-definition>
 
         <!-- Step Upload Item with Embargo Features to enable this step, please 
-            make sure to comment-out the previous step "UploadStep" <step id="upload-with-embargo"> 
+            make sure to comment-out the previous step "UploadStep" <step-definition id="upload-with-embargo">
             <heading>submit.progressbar.upload</heading> <processing-class>org.dspace.submit.step.UploadWithEmbargoStep</processing-class> 
-            <type>uploadWithEmbargo</type> </step> -->
+            <type>uploadWithEmbargo</type> </step-definition> -->
 
 
         <!--Step will be to select a Creative Commons License -->
         <!-- Uncomment this step to allow the user to select a Creative Commons 
             license -->
-         <step id="cclicense"> <heading>submit.progressbar.CClicense</heading>
+         <step-definition id="cclicense"> <heading>submit.progressbar.CClicense</heading>
             <processing-class>org.dspace.app.rest.submit.step.CCLicenseStep</processing-class>
-	       <type>cclicense</type> </step>
+	       <type>cclicense</type> </step-definition>
 
         <!--Step will be to Check for potential duplicate -->
-        <!-- <step id="detect-duplicate"> <heading>submit.progressbar.detect.duplicate</heading> 
+        <!-- <step-definition id="detect-duplicate"> <heading>submit.progressbar.detect.duplicate</heading>
             <processing-class>org.dspace.submit.step.DetectPotentialDuplicate</processing-class> 
-            <type>duplicate</type> </step> -->
+            <type>duplicate</type> </step-definition> -->
 
         <!--Step will be to Verify/Review everything -->
-        <!-- <step id="verify"> <heading>submit.progressbar.verify</heading> <processing-class>org.dspace.submit.step.VerifyStep</processing-class> 
-            <type>verify</type> </step> -->
+        <!-- <step-definition id="verify"> <heading>submit.progressbar.verify</heading> <processing-class>org.dspace.submit.step.VerifyStep</processing-class>
+            <type>verify</type> </step-definition> -->
 
         <!-- Fake Steps to test parsing of all options -->
-        <!-- <step mandatory="false"> <heading>fake.submission.readonly</heading> 
+        <!-- <step-definition mandatory="false"> <heading>fake.submission.readonly</heading>
             <processing-class>org.dspace.submit.step.SampleStep</processing-class> <type>sample</type> 
-            <scope visibility="read-only">submission</scope> </step> <step mandatory="false"> 
+            <scope visibility="read-only">submission</scope> </step-definition> <step-definition mandatory="false">
             <heading>fake.workflow.readonly</heading> <processing-class>org.dspace.submit.step.SampleStep</processing-class> 
-            <type>sample</type> <scope visibility="read-only">workflow</scope> </step> -->
+            <type>sample</type> <scope visibility="read-only">workflow</scope> </step-definition> -->
 
         <!-- OpenAIRE submission steps/forms -->
-        <step id="openAIREProjectForm" mandatory="true">
+        <step-definition id="openAIREProjectForm" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
-        </step>
-        <step id="openAIREPersonForm" mandatory="true">
+        </step-definition>
+        <step-definition id="openAIREPersonForm" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
-        </step>
-        <step id="openAIREOrganizationForm" mandatory="true">
+        </step-definition>
+        <step-definition id="openAIREOrganizationForm" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
-        </step>
-        <step id="openAIREPublicationPageoneForm" mandatory="true">
+        </step-definition>
+        <step-definition id="openAIREPublicationPageoneForm" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
-        </step>
-        <step id="openAIREPublicationPagetwoForm" mandatory="true">
+        </step-definition>
+        <step-definition id="openAIREPublicationPagetwoForm" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
-        </step>
+        </step-definition>
 
         <!-- This is the Sample Step which utilizes the JSPSampleStep class -->
-        <step id="sample">
+        <step-definition id="sample">
             <heading>Sample</heading>
             <processing-class>org.dspace.submit.step.SampleStep</processing-class>
             <type>sample</type>
-        </step>
+        </step-definition>
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->

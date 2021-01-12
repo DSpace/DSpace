@@ -198,7 +198,9 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                        //The server should indicate we support Range requests
                        .andExpect(header().string("Accept-Ranges", "bytes"))
                        //The ETag has to be based on the checksum
-                       .andExpect(header().string("ETag", bitstream.getChecksum()))
+                       // We're checking this with quotes because it is required:
+                       // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag
+                       .andExpect(header().string("ETag", "\"" + bitstream.getChecksum() + "\""))
                        //We expect the content type to match the bitstream mime type
                        .andExpect(content().contentType("text/plain"))
                        //THe bytes of the content must match the original content
@@ -258,7 +260,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                        //The server should indicate we support Range requests
                        .andExpect(header().string("Accept-Ranges", "bytes"))
                        //The ETag has to be based on the checksum
-                       .andExpect(header().string("ETag", bitstream.getChecksum()))
+                       .andExpect(header().string("ETag", "\"" + bitstream.getChecksum() + "\""))
                        //The response should give us details about the range
                        .andExpect(header().string("Content-Range", "bytes 1-3/10"))
                        //We expect the content type to match the bitstream mime type
@@ -279,7 +281,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                        //The server should indicate we support Range requests
                        .andExpect(header().string("Accept-Ranges", "bytes"))
                        //The ETag has to be based on the checksum
-                       .andExpect(header().string("ETag", bitstream.getChecksum()))
+                       .andExpect(header().string("ETag", "\"" + bitstream.getChecksum() + "\""))
                        //The response should give us details about the range
                        .andExpect(header().string("Content-Range", "bytes 4-9/10"))
                        //We expect the content type to match the bitstream mime type
@@ -775,7 +777,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                     //The server should indicate we support Range requests
                     .andExpect(header().string("Accept-Ranges", "bytes"))
                     //The ETag has to be based on the checksum
-                    .andExpect(header().string("ETag", bitstream.getChecksum()))
+                    .andExpect(header().string("ETag", "\"" + bitstream.getChecksum() + "\""))
                     //We expect the content type to match the bitstream mime type
                     .andExpect(content().contentType("application/pdf"))
                     //THe bytes of the content must match the original content

@@ -19,12 +19,11 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -73,7 +72,7 @@ public class RDFizer {
     /**
      * Set to remember with DSpaceObject were converted or deleted from the
      * triplestore already. This set is helpful when converting or deleting
-     * multiple DSpaceObjects (e.g. Communities with all Subcommunities and
+     * multiple DSpaceObjects (e.g. Communities with all sub-Communities and
      * Items).
      */
     protected Set<UUID> processed;
@@ -83,7 +82,7 @@ public class RDFizer {
         this.verbose = false;
         this.dryrun = false;
         this.lang = "TURTLE";
-        this.processed = new CopyOnWriteArraySet<UUID>();
+        this.processed = new CopyOnWriteArraySet<>();
         this.context = new Context(Context.Mode.READ_ONLY);
 
         this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
@@ -473,7 +472,7 @@ public class RDFizer {
     protected void runCLI(String[] args) {
         // prepare CLI and parse arguments
         Options options = createOptions();
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
         CommandLine line = null;
         try {
             line = parser.parse(options, args);
@@ -487,7 +486,7 @@ public class RDFizer {
 
         String[] remainingArgs = line.getArgs();
         if (remainingArgs.length > 0) {
-            this.usage(options);
+            usage(options);
             System.err.println();
             StringBuilder builder = new StringBuilder(100);
             for (String argument : remainingArgs) {
@@ -647,7 +646,7 @@ public class RDFizer {
             System.exit(0);
         }
 
-        this.usage(options);
+        usage(options);
         System.exit(0);
     }
 
@@ -708,38 +707,40 @@ public class RDFizer {
             "depending on the number of stored communties, collections and " +
             "items. Existing information in the triple store will be updated.");
 
-        Option optIdentifiers = OptionBuilder.withLongOpt("identifiers")
-                                             .hasArgs()
-                                             .withArgName("handle")
-                                             .withValueSeparator(' ')
-                                             .withDescription("Only convert these DSpace Objects. If you specify "
-                                                                  + "a Community or Collection all of their Items " +
-                                                                  "will be "
-                                                                  + "converted as well. Separate multiple identifiers" +
-                                                                  " with a "
-                                                                  + "space.")
-                                             .create('i');
+        Option optIdentifiers = Option.builder("i")
+                .longOpt("identifiers")
+                .hasArgs()
+                .argName("handle")
+                .valueSeparator(' ')
+                .desc("Only convert these DSpace Objects. If you specify "
+                        + "a Community or Collection all of their Items "
+                        + "will be "
+                        + "converted as well. Separate multiple identifiers"
+                        + " with a space.")
+                .build();
         options.addOption(optIdentifiers);
 
-        Option optDelete = OptionBuilder.withLongOpt("delete")
-                                        .hasArgs()
-                                        .withArgName("hdl:handle | URI")
-                                        .withValueSeparator(' ')
-                                        .withDescription("Delete previously converted data. Specify "
-                                                             + "either the handle of a DSpaceObject in the format "
-                                                             + "'hdl:<handle>' or the URI used to identify the rdf "
-                                                             + "data in the triplestore. If you specify a Community, "
-                                                             + "Collection or Item by its handle all converted "
-                                                             + "information about attached Subcommunities, "
-                                                             + "Collections, Items, Bundles and Bitstreams will be "
-                                                             + "deleted as well. Separate multiple identifiers with "
-                                                             + "a space.")
-                                        .create();
+        Option optDelete = Option.builder()
+                .longOpt("delete")
+                .hasArgs()
+                .argName("hdl:handle | URI")
+                .valueSeparator(' ')
+                .desc("Delete previously converted data. Specify "
+                        + "either the handle of a DSpaceObject in the format "
+                        + "'hdl:<handle>' or the URI used to identify the rdf "
+                        + "data in the triplestore. If you specify a Community, "
+                        + "Collection or Item by its handle all converted "
+                        + "information about attached Subcommunities, "
+                        + "Collections, Items, Bundles and Bitstreams will be "
+                        + "deleted as well. Separate multiple identifiers with "
+                        + "a space.")
+                .build();
         options.addOption(optDelete);
 
-        Option optDeleteAll = OptionBuilder.withLongOpt("delete-all")
-                                           .withDescription("Delete all converted data from the triplestore.")
-                                           .create();
+        Option optDeleteAll = Option.builder()
+                .longOpt("delete-all")
+                .desc("Delete all converted data from the triplestore.")
+                .build();
         options.addOption(optDeleteAll);
 
         return options;
@@ -768,8 +769,7 @@ public class RDFizer {
         // We won't change the database => read_only context will assure this.
         Context context = new Context(Context.Mode.READ_ONLY);
 
-        RDFizer myself = null;
-        myself = new RDFizer();
+        RDFizer myself = new RDFizer();
         myself.overrideContext(context);
         myself.runCLI(args);
 

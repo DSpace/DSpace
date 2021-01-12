@@ -11,14 +11,16 @@ import java.util.List;
 
 import org.apache.abdera.i18n.iri.IRI;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.swordapp.server.SwordCollection;
 
 /**
@@ -26,11 +28,14 @@ import org.swordapp.server.SwordCollection;
  * DSpace Collections
  */
 public class CollectionCollectionGenerator implements AtomCollectionGenerator {
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(
+    private static final Logger log = LogManager.getLogger(
         CommunityCollectionGenerator.class);
 
     protected CollectionService collectionService =
         ContentServiceFactory.getInstance().getCollectionService();
+
+    protected ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
      * Build the collection for the given DSpaceObject.  In this implementation,
@@ -41,6 +46,7 @@ public class CollectionCollectionGenerator implements AtomCollectionGenerator {
      * @return the SWORD ATOM collection
      * @throws DSpaceSwordException can be thrown by the internals of the DSpace SWORD implementation
      */
+    @Override
     public SwordCollection buildCollection(Context context, DSpaceObject dso,
                                            SwordConfigurationDSpace swordConfig)
         throws DSpaceSwordException {
@@ -118,7 +124,7 @@ public class CollectionCollectionGenerator implements AtomCollectionGenerator {
 
         // should we offer the items in the collection up as deposit
         // targets?
-        boolean itemService = ConfigurationManager.getBooleanProperty(
+        boolean itemService = configurationService.getBooleanProperty(
             "sword.expose-items");
         if (itemService) {
             String subService = urlManager.constructSubServiceUrl(col);

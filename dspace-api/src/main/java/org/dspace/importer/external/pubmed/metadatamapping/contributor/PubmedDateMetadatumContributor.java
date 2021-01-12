@@ -21,7 +21,7 @@ import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
 import org.dspace.importer.external.metadatamapping.MetadataFieldMapping;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.dspace.importer.external.metadatamapping.contributor.MetadataContributor;
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Pubmed specific implementation of {@link MetadataContributor}
@@ -43,7 +43,7 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
         return dateFormatsToAttempt;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setDateFormatsToAttempt(List<String> dateFormatsToAttempt) {
         this.dateFormatsToAttempt = dateFormatsToAttempt;
     }

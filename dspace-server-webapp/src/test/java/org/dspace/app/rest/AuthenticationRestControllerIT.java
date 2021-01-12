@@ -403,7 +403,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     public void testLoginEmptyRequest() throws Exception {
         getClient().perform(post("/api/authn/login"))
                    .andExpect(status().isUnauthorized())
-                   .andExpect(status().reason(containsString("Login failed")));
+                   .andExpect(status().reason(containsString("Authentication failed")));
     }
 
     @Test

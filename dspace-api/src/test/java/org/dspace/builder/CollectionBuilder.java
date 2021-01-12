@@ -9,11 +9,11 @@ package org.dspace.builder;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.CharEncoding;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -84,7 +84,7 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
 
     public CollectionBuilder withLogo(final String content) throws AuthorizeException, IOException, SQLException {
 
-        InputStream is = IOUtils.toInputStream(content, CharEncoding.UTF_8);
+        InputStream is = IOUtils.toInputStream(content, StandardCharsets.UTF_8);
         try {
             collectionService.setLogo(context, collection, is);
             return this;

@@ -539,6 +539,26 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
         assertRelationship(items[2], items[0], 1, "left", 0);
     }
 
+    @Test
+    public void testRelationToVirtualDataInReferences() throws Exception {
+
+        Item testItem = ItemBuilder.createItem(context, col1)
+                                   .withTitle("Person")
+                                   .withIssueDate("2017-10-17")
+                                   .withAuthor("Smith, Donald")
+                                   .withPersonIdentifierLastName("Smith")
+                                   .withPersonIdentifierFirstName("Donald")
+                                   .withRelationshipType("Person")
+                                   .withIdentifierOther("testItemOne")
+                                   .build();
+
+
+        String[] csv = {"id,relationship.type,relation.isAuthorOfPublication,collection,dc.identifier.other,rowName",
+            "+,Publication," + testItem.getID() + "::virtual::4::600," + col1.getHandle() + ",0,1"};
+        Item[] items = runImport(csv);
+        assertRelationship(items[0], testItem, 1, "left", 0);
+    }
+
     /**
      * Test relationship validation with invalid relationship definition by incorrect typeName usage
      */

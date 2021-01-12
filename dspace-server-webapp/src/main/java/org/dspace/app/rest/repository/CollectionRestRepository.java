@@ -177,7 +177,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             }
             List<Collection> collections = cs.findCollectionsWithSubmit(q, context, com,
                                               Math.toIntExact(pageable.getOffset()),
-                                              Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+                                              Math.toIntExact(pageable.getPageSize()));
             int tot = cs.countCollectionsWithSubmit(q, context, com);
             return converter.toRestPage(collections, pageable, tot , utils.obtainProjection());
         } catch (SQLException | SearchServiceException e) {
@@ -192,7 +192,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             Context context = obtainContext();
             List<Collection> collections = cs.findCollectionsWithSubmit(q, context, null,
                                               Math.toIntExact(pageable.getOffset()),
-                                              Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+                                              Math.toIntExact(pageable.getPageSize()));
             int tot = cs.countCollectionsWithSubmit(q, context, null);
             return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
         } catch (SQLException e) {
@@ -245,7 +245,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             }
             collection = cs.create(context, parent);
             cs.update(context, collection);
-            metadataConverter.setMetadata(context, collection, collectionRest.getMetadata());
+            metadataConverter.mergeMetadata(context, collection, collectionRest.getMetadata());
         } catch (SQLException e) {
             throw new RuntimeException("Unable to create new Collection under parent Community " + id, e);
         }
