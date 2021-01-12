@@ -187,6 +187,19 @@
      -->
     <bean id="item-has-googlescholar" class="org.dspace.content.logic.DefaultFilter">
         <property name="statement">
+            <bean class="org.dspace.content.logic.operator.And">
+                <property name="statements">
+                    <list>
+                        <ref bean="title-or-gscholarlink"/>
+                        <ref bean="person-or-publication"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="person-or-publication" class="org.dspace.content.logic.DefaultFilter">
+        <property name="statement">
             <bean class="org.dspace.content.logic.operator.Or">
                 <property name="statements">
                     <list>
@@ -195,6 +208,37 @@
                     </list>
                 </property>
             </bean>
+        </property>
+    </bean>
+
+    <bean id="title-or-gscholarlink" class="org.dspace.content.logic.DefaultFilter">
+        <property name="statement">
+            <bean class="org.dspace.content.logic.operator.Or">
+                <property name="statements">
+                    <list>
+                        <ref bean="item-has-gscholar-field"/>
+                        <ref bean="item-has-gscholar-fallback-field"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="item-has-gscholar-field"
+          class="org.dspace.content.logic.condition.RequiredMetadataCondition">
+        <property name="parameters">
+            <map>
+                <entry key="field" value="${google-scholar.field}" />
+            </map>
+        </property>
+    </bean>
+
+    <bean id="item-has-gscholar-fallback-field"
+          class="org.dspace.content.logic.condition.RequiredMetadataCondition">
+        <property name="parameters">
+            <map>
+                <entry key="field" value="${google-scholar.fallbackField}" />
+            </map>
         </property>
     </bean>
 

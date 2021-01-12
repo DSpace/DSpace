@@ -191,6 +191,13 @@ public class DatabaseUtils {
                             // Update the database to latest version, but set "outOfOrder=true"
                             // This will ensure any old migrations in the "ignored" state are now run
                             updateDatabase(dataSource, connection, null, true);
+                        } else if (argv[1].equalsIgnoreCase("ignore-missing")) {
+                            System.out.println(
+                                    "Migrating database to latest version ignoring \"Missing\" " +
+                                        "migrations... (Check logs for details)");
+                            // Update the database to latest version, but set "outOfOrder=true"
+                            // This will ensure any old migrations in the "ignored" state are now run
+                            updateDatabase(dataSource, connection, null, false, true);
                         } else {
                             // Otherwise, we assume "argv[1]" is a valid migration version number
                             // This is only for testing! Never specify for Production!
@@ -635,6 +642,11 @@ public class DatabaseUtils {
         updateDatabase(datasource, connection, null, false);
     }
 
+    protected static synchronized void updateDatabase(DataSource datasource, Connection connection,
+            String targetVersion, boolean outOfOrder) throws SQLException {
+        updateDatabase(datasource, connection, targetVersion, outOfOrder, false);
+    }
+
     /**
      * Ensures the current database is up-to-date with regards
      * to the latest DSpace DB schema. If the scheme is not up-to-date,
@@ -651,11 +663,12 @@ public class DatabaseUtils {
      *                      If null, the database is migrated to the latest version.
      * @param outOfOrder    If true, Flyway will run any lower version migrations that were previously "ignored".
      *                      If false, Flyway will only run new migrations with a higher version number.
+     * @param missing       If true, Flyway will ignore any missing previous migration
      * @throws SQLException if database error
      *                      If database cannot be upgraded.
      */
     protected static synchronized void updateDatabase(DataSource datasource,
-                                                      Connection connection, String targetVersion, boolean outOfOrder)
+            Connection connection, String targetVersion, boolean outOfOrder, boolean missing)
         throws SQLException {
         if (null == datasource) {
             throw new SQLException("The datasource is a null reference -- cannot continue.");
@@ -668,6 +681,7 @@ public class DatabaseUtils {
             // Set whether Flyway will run migrations "out of order". By default, this is false,
             // and Flyway ONLY runs migrations that have a higher version number.
             flywayConfiguration.outOfOrder(outOfOrder);
+            flywayConfiguration.ignoreMissingMigrations(missing);
 
             // If a target version was specified, tell Flyway to ONLY migrate to that version
             // (i.e. all later migrations are left as "pending"). By default we always migrate to latest version.

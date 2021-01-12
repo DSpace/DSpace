@@ -57,7 +57,7 @@
         <property name="prefixToNamespaceMapping" ref="pubEuPrefixToNamespaceMapping"/>
     </bean>
     <bean id="pubeu.other" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier.other"/>
+        <constructor-arg value="dc.identifier.pmid"/>
     </bean>
 
 
@@ -167,7 +167,7 @@
         <property name="prefixToNamespaceMapping" ref="pubEuPrefixToNamespaceMapping"/>
     </bean>
      <bean id="pubeu.doi" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier"/>
+        <constructor-arg value="dc.identifier.doi"/>
     </bean>
 	
 

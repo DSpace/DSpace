@@ -41,6 +41,7 @@ import org.dspace.submit.extraction.grobid.Date;
 import org.dspace.submit.extraction.grobid.FileDesc;
 import org.dspace.submit.extraction.grobid.Forename;
 import org.dspace.submit.extraction.grobid.Idno;
+import org.dspace.submit.extraction.grobid.Imprint;
 import org.dspace.submit.extraction.grobid.Keywords;
 import org.dspace.submit.extraction.grobid.Monogr;
 import org.dspace.submit.extraction.grobid.P;
@@ -79,7 +80,6 @@ public class GrobidFileDataLoader extends FileDataLoader {
             try {
                 CloseableHttpClient client = HttpClients.createDefault();
                 method = new HttpPost(url + "/api/processHeaderDocument");
-                System.out.println(filename);
                 InputStream inputStream = new FileInputStream(new File(filename));
                 MultipartEntityBuilder builder = MultipartEntityBuilder.create();
                 builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
@@ -194,6 +194,8 @@ public class GrobidFileDataLoader extends FileDataLoader {
                 extractInfo(record, ((Term) object).getContent(), prefix + "term");
             } else if (object instanceof Date) {
                 extractDate(record, ((Date) object), prefix + "date");
+            } else if (object instanceof Imprint) {
+                extractInfo(record, ((Imprint) object).getBiblScopesAndDatesAndPubPlaces(), prefix + "imprint");
             } else if (object instanceof String) {
                 String str = (String) object;
                 if (StringUtils.isNotBlank(str)) {
