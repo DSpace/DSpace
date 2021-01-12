@@ -13,7 +13,6 @@ import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.Link;
 
 /**
@@ -23,7 +22,7 @@ import org.springframework.hateoas.Link;
  * the constructor. Embedding will be allowed if any of the given projections allow them. Linking will
  * be allowed if all of the given projections allow them.
  */
-public class CompositeProjection implements Projection {
+public class CompositeProjection extends AbstractProjection {
 
     public final static String NAME = "composite";
 
@@ -81,10 +80,5 @@ public class CompositeProjection implements Projection {
             }
         }
         return true;
-    }
-
-    @Override
-    public PageRequest getPagingOptions(String rel) {
-        return null;
     }
 }

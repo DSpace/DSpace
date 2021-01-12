@@ -15,13 +15,12 @@ import org.dspace.app.rest.model.MockObjectRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.Link;
 
 /**
  * A projection for use in tests.
  */
-public class MockProjection implements Projection {
+public class MockProjection extends AbstractProjection {
 
     public static final String NAME = "mock";
 
@@ -96,10 +95,5 @@ public class MockProjection implements Projection {
 
     public boolean allowLinking(HALResource halResource, LinkRest linkRest) {
         return false;
-    }
-
-    @Override
-    public PageRequest getPagingOptions(String rel) {
-        return null;
     }
 }
