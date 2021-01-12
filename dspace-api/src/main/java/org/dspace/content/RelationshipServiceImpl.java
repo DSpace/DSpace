@@ -395,15 +395,13 @@ public class RelationshipServiceImpl implements RelationshipService {
             }
 
             for (Item item : itemsToUpdate) {
-                if (!item.isMetadataModified()) {
-                    updateItem(context, item);
-                }
+                updateItem(context, item);
             }
-
         } catch (AuthorizeException e) {
             log.error("Authorization Exception while authorization has been disabled", e);
+        } finally {
+            context.restoreAuthSystemState();
         }
-        context.restoreAuthSystemState();
     }
 
     /**
