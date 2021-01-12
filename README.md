@@ -30,6 +30,20 @@ cd /apps/git/drum/dspace
 mvn install
 ```
 
+### Building Images for K8s Deployment
+
+#### Postgres Image
+
+To build postgres image with pgcrypto module.
+
+```
+cd dspace/src/main/docker/dspace-postgres-pgcrypto
+docker build -t docker.lib.umd.edu/dspace-postgres:<VERSION> .
+```
+
+The postgres image can be built when there is a relevant change.
+
+
 ### Deployment
 
 The `dspace-installer` directory that contains all the artifacts and the ant script to perform the deployment. The `installer-dist` maven profile creates a tar file of the installer directory which can be pushed to the UMD nexus by using the `deploy-release` or `deploy-snapshot` profile.
