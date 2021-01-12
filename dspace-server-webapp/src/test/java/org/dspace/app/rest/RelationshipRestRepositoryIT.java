@@ -20,7 +20,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -2684,6 +2684,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
             RelationshipBuilder.deleteRelationship(idRef.get());
         }
     }
+
     @Test
     public void testVirtualMdInRESTAndSolrDoc() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -2744,14 +2745,17 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         if (journalSchema == null) {
             journalSchema = metadataSchemaService.create(context, "journal", "journal");
         }
-        MetadataField journalTitleField = metadataFieldService.findByString(context, "journal.title", '.');
+        String journalTitleVirtualMdField = "journal.title";
+        MetadataField journalTitleField = metadataFieldService.findByString(context, journalTitleVirtualMdField, '.');
         if (journalTitleField == null) {
-            journalTitleField = metadataFieldService.create(context, journalSchema, "title", null, "Journal Title");
+            metadataFieldService.create(context, journalSchema, "title", null, "Journal Title");
         }
+
+        String journalTitle = "Journal Title Test";
 
         // Create entity items
         Item journal =
-            ItemBuilder.createItem(context, col1).withRelationshipType("Journal").withTitle("Journal").build();
+            ItemBuilder.createItem(context, col1).withRelationshipType("Journal").withTitle(journalTitle).build();
         Item journalVolume =
             ItemBuilder.createItem(context, col1).withRelationshipType("JournalVolume").withTitle("JournalVolume")
                        .build();
@@ -2772,14 +2776,14 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         // Verify Publication item via REST does not contain virtual md journal.title
         getClient().perform(get("/api/core/items/" + publication.getID()))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.metadata.journal.title").doesNotExist());
+                   .andExpect(jsonPath("$.metadata." + journalTitleVirtualMdField).doesNotExist());
 
         // Verify Publication item via Solr does not contain virtual md journal.title
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setQuery("search.resourceid:" + publication.getID());
         QueryResponse queryResponse = mockSolrSearchCore.getSolr().query(solrQuery);
         assertThat(queryResponse.getResults().size(), equalTo(1));
-        assertTrue(queryResponse.getResults().get(0).getFieldValues("journal.title") == null);
+        assertNull(queryResponse.getResults().get(0).getFieldValues(journalTitleVirtualMdField));
 
         // Link Journal Volume - Journal
         RelationshipBuilder.createRelationshipBuilder(context, journal, journalVolume, isVolumeOfJournal).build();
@@ -2789,12 +2793,39 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         getClient().perform(get("/api/core/items/" + publication.getID()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.metadata", allOf(
-                       matchMetadata("journal.title", "Journal"))));
+                       matchMetadata(journalTitleVirtualMdField, journalTitle))));
 
-        // Verify Publication item via Solr contain virtual md journal.title
+        // Verify Publication item via Solr contains virtual md journal.title
         queryResponse = mockSolrSearchCore.getSolr().query(solrQuery);
         assertThat(queryResponse.getResults().size(), equalTo(1));
-        assertEquals("Journal", ((List) queryResponse.getResults().get(0).getFieldValues("journal.title")).get(0));
+        assertEquals(journalTitle,
+            ((List) queryResponse.getResults().get(0).getFieldValues(journalTitleVirtualMdField)).get(0));
+
+        // Verify Journal Volume item via REST also contains virtual md journal.title
+        getClient().perform(get("/api/core/items/" + journalVolume.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.metadata", allOf(
+                       matchMetadata(journalTitleVirtualMdField, journalTitle))));
+
+        // Verify Journal Volume item via Solr also contains virtual md journal.title
+        solrQuery.setQuery("search.resourceid:" + journalVolume.getID());
+        queryResponse = mockSolrSearchCore.getSolr().query(solrQuery);
+        assertThat(queryResponse.getResults().size(), equalTo(1));
+        assertEquals(journalTitle,
+            ((List) queryResponse.getResults().get(0).getFieldValues(journalTitleVirtualMdField)).get(0));
+
+        // Verify Journal Issue item via REST also contains virtual md journal.title
+        getClient().perform(get("/api/core/items/" + journalIssue.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.metadata", allOf(
+                       matchMetadata(journalTitleVirtualMdField, journalTitle))));
+
+        // Verify Journal Issue item via Solr also contains virtual md journal.title
+        solrQuery.setQuery("search.resourceid:" + journalIssue.getID());
+        queryResponse = mockSolrSearchCore.getSolr().query(solrQuery);
+        assertThat(queryResponse.getResults().size(), equalTo(1));
+        assertEquals(journalTitle,
+            ((List) queryResponse.getResults().get(0).getFieldValues(journalTitleVirtualMdField)).get(0));
 
         context.restoreAuthSystemState();
     }
