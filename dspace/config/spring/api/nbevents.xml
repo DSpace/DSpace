@@ -61,4 +61,9 @@
 	         </map>
 	     </property>    
      </bean>
+     
+     <bean id="import-nbevents" class="org.dspace.app.nbevent.NBEventsCliScriptConfiguration" primary="true">
+        <property name="description" value="Import new openAIRE notification broker events"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.nbevent.NBEventsRunnableCli"/>
+     </bean>
  </beans>

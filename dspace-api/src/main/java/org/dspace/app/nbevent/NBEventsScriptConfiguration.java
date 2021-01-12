@@ -7,6 +7,7 @@
  */
 package org.dspace.app.nbevent;
 
+import java.io.InputStream;
 import java.sql.SQLException;
 
 import org.apache.commons.cli.Options;
@@ -29,7 +30,7 @@ public class NBEventsScriptConfiguration<T extends NBEventsRunnable> extends Scr
 
     /**
      * Generic setter for the dspaceRunnableClass
-     * @param dspaceRunnableClass   The dspaceRunnableClass to be set on this MetadataExportScriptConfiguration
+     * @param dspaceRunnableClass   The dspaceRunnableClass to be set on this NBEventsScriptConfiguration
      */
     @Override
     public void setDspaceRunnableClass(Class<T> dspaceRunnableClass) {
@@ -50,11 +51,9 @@ public class NBEventsScriptConfiguration<T extends NBEventsRunnable> extends Scr
         if (options == null) {
             Options options = new Options();
 
-            options.addOption("f", "id", true, "Import data from OpenAIRE notification broker files");
-
-            options.addOption("h", "help", false, "help");
-            options.getOption("h").setType(boolean.class);
-
+            options.addOption("f", "file", true, "Import data from OpenAIRE notification broker files");
+            options.getOption("f").setType(InputStream.class);
+            options.getOption("f").setRequired(true);
 
             super.options = options;
         }

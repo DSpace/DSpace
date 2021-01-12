@@ -367,13 +367,6 @@
         </step>
     </command>
     <command>
-        <name>import-nbevents</name>
-        <description>Import events from openAIRE notification broker JSON</description>
-        <step>
-            <class>org.dspace.app.nbevent.NBEventsCli</class>
-        </step>
-    </command>
-    <command>
         <name>import-oaire-suggestions</name>
         <description>Import and store locally metadata from OpenAIRE</description>
         <step>
