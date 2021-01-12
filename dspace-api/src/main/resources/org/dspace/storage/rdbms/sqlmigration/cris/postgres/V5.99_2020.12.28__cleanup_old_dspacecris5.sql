@@ -5,6 +5,15 @@
 --
 -- http://www.dspace.org/license/
 --
+
+-- ===============================================================
+-- WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
+--
+-- DO NOT MANUALLY RUN THIS DATABASE MIGRATION. IT WILL BE EXECUTED
+-- AUTOMATICALLY (IF NEEDED) BY "FLYWAY" WHEN YOU STARTUP DSPACE.
+-- http://flywaydb.org/
+-- ===============================================================
+
 DROP SEQUENCE IF EXISTS potentialmatches_seq;
 DROP SEQUENCE IF EXISTS jdyna_widget_seq;
 DROP SEQUENCE IF EXISTS jdyna_values_seq;
