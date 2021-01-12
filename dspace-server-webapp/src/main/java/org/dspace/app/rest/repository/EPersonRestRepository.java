@@ -279,7 +279,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             Context context = obtainContext();
             long total = es.searchResultCount(context, query);
             List<EPerson> epersons = es.search(context, query, Math.toIntExact(pageable.getOffset()),
-                                               Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+                                                               Math.toIntExact(pageable.getPageSize()));
             return converter.toRestPage(epersons, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);

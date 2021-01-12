@@ -8,6 +8,7 @@
 package org.dspace.app.util;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -49,7 +50,6 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.indexobject.IndexableCollection;
@@ -102,7 +102,7 @@ public class SyndicationFeed {
         };
     protected String defaultExternalMedia = "dc.source.uri";
 
-    private final ConfigurationService configurationService =
+    private static final ConfigurationService configurationService =
         DSpaceServicesFactory.getInstance().getConfigurationService();
 
     // metadata field for Item title in entry:
@@ -196,18 +196,19 @@ public class SyndicationFeed {
 
         // dso is null for the whole site, or a search without scope
         if (dso == null) {
-            defaultTitle = ConfigurationManager.getProperty("dspace.name");
+            defaultTitle = configurationService.getProperty("dspace.name");
             feed.setDescription(localize(labels, MSG_FEED_DESCRIPTION));
             objectURL = resolveURL(request, null);
-            logoURL = ConfigurationManager.getProperty("webui.feed.logo.url");
+            logoURL = configurationService.getProperty("webui.feed.logo.url");
         } else {
             Bitstream logo = null;
             if (dso instanceof IndexableCollection) {
                 Collection col = ((IndexableCollection) dso).getIndexedObject();
                 defaultTitle = col.getName();
-                feed.setDescription(collectionService.getMetadata(col, "short_description"));
+                feed.setDescription(collectionService.getMetadataFirstValue(col,
+                        CollectionService.MD_SHORT_DESCRIPTION, Item.ANY));
                 logo = col.getLogo();
-                String cols = ConfigurationManager.getProperty("webui.feed.podcast.collections");
+                String cols = configurationService.getProperty("webui.feed.podcast.collections");
                 if (cols != null && cols.length() > 1 && cols.contains(col.getHandle())) {
                     podcastFeed = true;
                 }
@@ -215,9 +216,10 @@ public class SyndicationFeed {
             } else if (dso instanceof IndexableCommunity) {
                 Community comm = ((IndexableCommunity) dso).getIndexedObject();
                 defaultTitle = comm.getName();
-                feed.setDescription(communityService.getMetadata(comm, "short_description"));
+                feed.setDescription(communityService.getMetadataFirstValue(comm,
+                        CommunityService.MD_SHORT_DESCRIPTION, Item.ANY));
                 logo = comm.getLogo();
-                String comms = ConfigurationManager.getProperty("webui.feed.podcast.communities");
+                String comms = configurationService.getProperty("webui.feed.podcast.communities");
                 if (comms != null && comms.length() > 1 && comms.contains(comm.getHandle())) {
                     podcastFeed = true;
                 }
@@ -251,7 +253,7 @@ public class SyndicationFeed {
 
         // add entries for items
         if (items != null) {
-            List<SyndEntry> entries = new ArrayList<SyndEntry>();
+            List<SyndEntry> entries = new ArrayList<>();
             for (IndexableObject idxObj : items) {
                 if (!(idxObj instanceof IndexableItem)) {
                     continue;
@@ -277,7 +279,7 @@ public class SyndicationFeed {
                 // date of last change to Item
                 entry.setUpdatedDate(item.getLastModified());
 
-                StringBuffer db = new StringBuffer();
+                StringBuilder db = new StringBuilder();
                 for (String df : descriptionFields) {
                     // Special Case: "(date)" in field name means render as date
                     boolean isDate = df.indexOf("(date)") > 0;
@@ -313,7 +315,7 @@ public class SyndicationFeed {
                 // This gets the authors into an ATOM feed
                 List<MetadataValue> authors = itemService.getMetadataByMetadataString(item, authorField);
                 if (authors.size() > 0) {
-                    List<SyndPerson> creators = new ArrayList<SyndPerson>();
+                    List<SyndPerson> creators = new ArrayList<>();
                     for (MetadataValue author : authors) {
                         SyndPerson sp = new SyndPersonImpl();
                         sp.setName(author.getValue());
@@ -329,7 +331,7 @@ public class SyndicationFeed {
                     if (dcCreatorField != null) {
                         List<MetadataValue> dcAuthors = itemService.getMetadataByMetadataString(item, dcCreatorField);
                         if (dcAuthors.size() > 0) {
-                            List<String> creators = new ArrayList<String>();
+                            List<String> creators = new ArrayList<>();
                             for (MetadataValue author : dcAuthors) {
                                 creators.add(author.getValue());
                             }
@@ -345,7 +347,7 @@ public class SyndicationFeed {
                     if (dcDescriptionField != null) {
                         List<MetadataValue> v = itemService.getMetadataByMetadataString(item, dcDescriptionField);
                         if (v.size() > 0) {
-                            StringBuffer descs = new StringBuffer();
+                            StringBuilder descs = new StringBuilder();
                             for (MetadataValue d : v) {
                                 if (descs.length() > 0) {
                                     descs.append("\n\n");
@@ -374,8 +376,6 @@ public class SyndicationFeed {
                                     enc.setLength(bit.getSizeBytes());
                                     enc.setUrl(urlOfBitstream(request, bit));
                                     enclosures.add(enc);
-                                } else {
-                                    continue;
                                 }
                             }
                         }
@@ -395,7 +395,7 @@ public class SyndicationFeed {
                             }
                         }
 
-                    } catch (Exception e) {
+                    } catch (SQLException e) {
                         System.out.println(e.getMessage());
                     }
                     entry.setEnclosures(enclosures);
@@ -501,7 +501,7 @@ public class SyndicationFeed {
 
     // utility to get config property with default value when not set.
     protected static String getDefaultedConfiguration(String key, String dfl) {
-        String result = ConfigurationManager.getProperty(key);
+        String result = configurationService.getProperty(key);
         return (result == null) ? dfl : result;
     }
 
@@ -531,14 +531,14 @@ public class SyndicationFeed {
         if (dso == null) {
             if (baseURL == null) {
                 if (request == null) {
-                    baseURL = ConfigurationManager.getProperty("dspace.ui.url");
+                    baseURL = configurationService.getProperty("dspace.ui.url");
                 } else {
-                    baseURL = ConfigurationManager.getProperty("dspace.ui.url");
+                    baseURL = configurationService.getProperty("dspace.ui.url");
                     baseURL += request.getContextPath();
                 }
             }
             return baseURL;
-        } else if (ConfigurationManager.getBooleanProperty("webui.feed.localresolve")) {
+        } else if (configurationService.getBooleanProperty("webui.feed.localresolve")) {
             // return a link to handle in repository
             return resolveURL(request, null) + "/handle/" + dso.getHandle();
         } else {

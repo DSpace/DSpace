@@ -157,6 +157,7 @@ public class Constants {
     /**
      * @deprecated As of DSpace 1.6, replaced by Constants.ADMIN
      */
+    @Deprecated
     public static final int COLLECTION_ADMIN = 11;
 
     /**

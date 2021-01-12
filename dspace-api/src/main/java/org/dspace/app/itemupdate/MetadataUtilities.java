@@ -38,8 +38,8 @@ import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -226,7 +226,9 @@ public class MetadataUtilities {
             if (language == null) {
                 language = "en";
             } else if ("".equals(language)) {
-                language = ConfigurationManager.getProperty("default.language");
+                language = DSpaceServicesFactory.getInstance()
+                        .getConfigurationService()
+                        .getProperty("default.language");
             }
 
             DtoMetadata dtom = DtoMetadata.create(schema, element, qualifier, language, value);

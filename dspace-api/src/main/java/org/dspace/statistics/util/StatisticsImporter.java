@@ -15,8 +15,10 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,13 +29,15 @@ import java.util.Random;
 import java.util.UUID;
 
 import com.maxmind.geoip2.DatabaseReader;
+import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.CityResponse;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -49,10 +53,11 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.DSpaceObjectLegacySupportService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.SolrLoggerServiceImpl;
 import org.dspace.statistics.factory.StatisticsServiceFactory;
 import org.dspace.statistics.service.SolrLoggerService;
@@ -64,7 +69,7 @@ import org.dspace.statistics.service.SolrLoggerService;
  * @see ClassicDSpaceLogConverter
  */
 public class StatisticsImporter {
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(StatisticsImporter.class);
+    private static final Logger log = LogManager.getLogger(StatisticsImporter.class);
 
     /**
      * Date format (for solr)
@@ -75,7 +80,11 @@ public class StatisticsImporter {
             return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         }
     };
-    protected final SolrLoggerService solrLoggerService = StatisticsServiceFactory.getInstance().getSolrLoggerService();
+
+    protected final SolrLoggerService solrLoggerService
+            = StatisticsServiceFactory.getInstance().getSolrLoggerService();
+    protected static final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
      * Solr server connection
@@ -176,7 +185,7 @@ public class StatisticsImporter {
                 }
                 System.out.println("Found " + localBitstreams.size());
 
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 System.err.println("Error retrieving items from DSpace database:");
                 e.printStackTrace();
                 System.exit(1);
@@ -256,7 +265,7 @@ public class StatisticsImporter {
                         try {
                             dns = DnsLookup.reverseDns(ip);
                             dnsCache.put(ip, dns);
-                        } catch (Exception e) {
+                        } catch (IOException e) {
                             dns = "";
                         }
                     }
@@ -297,7 +306,7 @@ public class StatisticsImporter {
                         }
                         continue;
                     }
-                } catch (Exception e) {
+                } catch (GeoIp2Exception | IOException e) {
                     // No problem - just can't look them up
                 }
 
@@ -370,7 +379,7 @@ public class StatisticsImporter {
 
         } catch (RuntimeException re) {
             throw re;
-        } catch (Exception e) {
+        } catch (IOException | SQLException | ParseException | SolrServerException e) {
             System.err.println(e.getMessage());
             log.error(e.getMessage(), e);
         }
@@ -425,7 +434,7 @@ public class StatisticsImporter {
      * @throws Exception If something goes wrong
      */
     public static void main(String[] args) throws Exception {
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
 
         Options options = new Options();
 
@@ -464,13 +473,13 @@ public class StatisticsImporter {
         boolean verbose = line.hasOption('v');
 
         // Find our solr server
-        String sserver = ConfigurationManager.getProperty("solr-statistics", "server");
+        String sserver = configurationService.getProperty("solr-statistics", "server");
         if (verbose) {
             System.out.println("Writing to solr server at: " + sserver);
         }
         solr = new HttpSolrClient.Builder(sserver).build();
 
-        String dbPath = ConfigurationManager.getProperty("usage-statistics", "dbfile");
+        String dbPath = configurationService.getProperty("usage-statistics", "dbfile");
         try {
             File dbFile = new File(dbPath);
             geoipLookup = new DatabaseReader.Builder(dbFile).build();
