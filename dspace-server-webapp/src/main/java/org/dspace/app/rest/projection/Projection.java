@@ -138,5 +138,10 @@ public interface Projection {
      */
     boolean allowLinking(HALResource halResource, LinkRest linkRest);
 
+    /**
+     * This method will return the {@link PageRequest} object for a specific given rel
+     * @param rel   The rel for which the {@link PageRequest} object will be made
+     * @return      The {@link PageRequest} object for the given rel
+     */
     PageRequest getPagingOptions(String rel);
 }
