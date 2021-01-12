@@ -29,6 +29,11 @@ public class EmbedRelsProjection extends AbstractProjection {
     public final static String NAME = "embedrels";
 
     private final Set<String> embedRels;
+
+    /**
+     * This variable contains a map with the key being the rel as a String and the value being the size of the embed
+     * as an Integer
+     */
     private Map<String, Integer> embedSizes;
 
     public EmbedRelsProjection(Set<String> embedRels, Set<String> embedSizes) {
