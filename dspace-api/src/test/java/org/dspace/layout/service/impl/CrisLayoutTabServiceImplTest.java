@@ -84,28 +84,28 @@ public class CrisLayoutTabServiceImplTest {
         List<MetadataValue> itemMetadata = Arrays.asList(metadataValue(), metadataValue());
 
         CrisLayoutTab tabOne = grantedAccessTab("tab1",
-                                                boxWithContent(itemMetadata),
-                                                boxWithoutContent(itemMetadata),
-                                                restrictedBox(itemMetadata));
+                                                boxWithContent(item, itemMetadata),
+                                                boxWithoutContent(item, itemMetadata),
+                                                restrictedBox(item, itemMetadata));
         CrisLayoutTab tabTwo = grantedAccessTab("tab2",
-                                                restrictedBox(itemMetadata),
-                                                boxWithContent(itemMetadata),
-                                                boxWithContent(itemMetadata));
+                                                restrictedBox(item, itemMetadata),
+                                                boxWithContent(item, itemMetadata),
+                                                boxWithContent(item, itemMetadata));
         CrisLayoutTab tabThree = grantedAccessTab("tab3",
-                                                  boxWithoutContent(itemMetadata),
-                                                  boxWithoutContent(itemMetadata));
+                                                  boxWithoutContent(item, itemMetadata),
+                                                  boxWithoutContent(item, itemMetadata));
 
         CrisLayoutTab tabWithoutBoxes = grantedAccessTab("empty");
         CrisLayoutTab tabWithOnlyForbiddenBoxes = grantedAccessTab("forbidden",
-                                                                   restrictedBox(itemMetadata),
-                                                                   restrictedBox(itemMetadata),
-                                                                   restrictedBox(itemMetadata),
-                                                                   restrictedBox(itemMetadata));
+                                                                   restrictedBox(item, itemMetadata),
+                                                                   restrictedBox(item, itemMetadata),
+                                                                   restrictedBox(item, itemMetadata),
+                                                                   restrictedBox(item, itemMetadata));
 
         forbiddenAccessTab("forbidden-tab",
-                           boxWithContent(itemMetadata),
-                           boxWithContent(itemMetadata),
-                           boxWithoutContent(itemMetadata));
+                           boxWithContent(item, itemMetadata),
+                           boxWithContent(item, itemMetadata),
+                           boxWithoutContent(item, itemMetadata));
 
         when(itemService.find(context, UUID.fromString(itemUuid)))
             .thenReturn(item);
@@ -173,10 +173,12 @@ public class CrisLayoutTabServiceImplTest {
 
         List<MetadataValue> itemMetadata = Collections.emptyList();
 
-        CrisLayoutTab tabOne = grantedAccessTab("tab1", boxWithContent(itemMetadata), boxWithoutContent(itemMetadata));
-        CrisLayoutTab tabTwo = grantedAccessTab("tab2", boxWithContent(itemMetadata), boxWithContent(itemMetadata));
-        CrisLayoutTab tabThree = grantedAccessTab("tab3", boxWithoutContent(itemMetadata),
-            boxWithoutContent(itemMetadata));
+        CrisLayoutTab tabOne = grantedAccessTab("tab1", boxWithContent(item, itemMetadata),
+                boxWithoutContent(item, itemMetadata));
+        CrisLayoutTab tabTwo = grantedAccessTab("tab2", boxWithContent(item, itemMetadata),
+                boxWithContent(item, itemMetadata));
+        CrisLayoutTab tabThree = grantedAccessTab("tab3", boxWithoutContent(item, itemMetadata),
+            boxWithoutContent(item, itemMetadata));
 
         when(itemService.find(context, UUID.fromString(itemUuid)))
             .thenReturn(item);
@@ -202,10 +204,12 @@ public class CrisLayoutTabServiceImplTest {
 
         List<MetadataValue> itemMetadata = null;
 
-        CrisLayoutTab tabOne = grantedAccessTab("tab1", boxWithContent(itemMetadata), boxWithoutContent(itemMetadata));
-        CrisLayoutTab tabTwo = grantedAccessTab("tab2", boxWithContent(itemMetadata), boxWithContent(itemMetadata));
-        CrisLayoutTab tabThree = grantedAccessTab("tab3", boxWithoutContent(itemMetadata),
-            boxWithoutContent(itemMetadata));
+        CrisLayoutTab tabOne = grantedAccessTab("tab1", boxWithContent(item, itemMetadata),
+                boxWithoutContent(item, itemMetadata));
+        CrisLayoutTab tabTwo = grantedAccessTab("tab2", boxWithContent(item, itemMetadata),
+                boxWithContent(item, itemMetadata));
+        CrisLayoutTab tabThree = grantedAccessTab("tab3", boxWithoutContent(item, itemMetadata),
+            boxWithoutContent(item, itemMetadata));
 
         when(itemService.find(context, UUID.fromString(itemUuid)))
             .thenReturn(item);
@@ -262,23 +266,23 @@ public class CrisLayoutTabServiceImplTest {
         return mock(MetadataValue.class);
     }
 
-    private CrisLayoutBox boxWithContent(List<MetadataValue> itemMetadata) throws SQLException {
-        return box(itemMetadata, true, true);
+    private CrisLayoutBox boxWithContent(Item item, List<MetadataValue> itemMetadata) throws SQLException {
+        return box(item, itemMetadata, true, true);
     }
 
-    private CrisLayoutBox boxWithoutContent(List<MetadataValue> itemMetadata) throws SQLException {
-        return box(itemMetadata, false, true);
+    private CrisLayoutBox boxWithoutContent(Item item, List<MetadataValue> itemMetadata) throws SQLException {
+        return box(item, itemMetadata, false, true);
     }
 
-    private CrisLayoutBox restrictedBox(List<MetadataValue> itemMetadata) throws SQLException {
-        return box(itemMetadata, true, false);
+    private CrisLayoutBox restrictedBox(Item item, List<MetadataValue> itemMetadata) throws SQLException {
+        return box(item, itemMetadata, true, false);
     }
 
-    private CrisLayoutBox box(List<MetadataValue> itemMetadata, boolean hasContent, boolean grantedAccess)
+    private CrisLayoutBox box(Item item, List<MetadataValue> itemMetadata, boolean hasContent, boolean grantedAccess)
         throws SQLException {
         CrisLayoutBox box = new CrisLayoutBox();
         box.setId(new Random().nextInt(10000));
-        when(boxService.hasContent(context, box, itemMetadata))
+        when(boxService.hasContent(context, box, item, itemMetadata))
             .thenReturn(hasContent);
         when(crisLayoutBoxAccessService.hasAccess(any(), any(), eq(box), any()))
             .thenReturn(grantedAccess);

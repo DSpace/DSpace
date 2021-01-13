@@ -64,6 +64,10 @@ public class ItemCorrectionFeature implements AuthorizationFeature {
             return false;
         }
 
+        if (configurationService.getBooleanProperty("item-correction.permit-all", false)) {
+            return true;
+        }
+
         return isAuthorizedToCorrectItem(context, (ItemRest) object);
     }
 

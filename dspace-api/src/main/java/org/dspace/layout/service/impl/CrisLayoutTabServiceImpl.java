@@ -214,7 +214,7 @@ public class CrisLayoutTabServiceImpl implements CrisLayoutTabService {
     private boolean hasABoxToDisplay(Context context, CrisLayoutTab tab,
                                      Item item) {
         Predicate<CrisLayoutBox> isGranted = box -> boxGrantedAccess(context, item, box);
-        Predicate<CrisLayoutBox> hasContent = box -> boxService.hasContent(context, box, item.getMetadata());
+        Predicate<CrisLayoutBox> hasContent = box -> boxService.hasContent(context, box, item, item.getMetadata());
         return tab.getTab2Box().stream()
                   .map(t2b -> t2b.getBox())
                   .anyMatch(isGranted.and(hasContent));

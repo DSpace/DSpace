@@ -310,6 +310,7 @@
     <dynamicField name="*_filter" type="keywordFilter" indexed="true" stored="true" multiValued="true" omitNorms="true" />
     <dynamicField name="*_authority" type="keywordFilter" indexed="true" stored="true" multiValued="true" omitNorms="true" />
     <dynamicField name="*_keyword" type="keywordFilter" indexed="true" stored="true" multiValued="true" omitNorms="true" />
+    <dynamicField name="*_statfilter" type="string" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" />
 
 	<!--Dynamic field used for SOLR browse by partial value -->
     <dynamicField name="*_partial" type="text" indexed="true" stored="true" multiValued="true" omitNorms="true" />

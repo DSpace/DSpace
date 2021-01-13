@@ -22,7 +22,6 @@ import java.util.UUID;
 import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.metrics.CrisMetrics;
 import org.dspace.app.rest.matcher.CrisMetricsMatcher;
-import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
 import org.dspace.authorize.service.AuthorizeService;
@@ -336,9 +335,7 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
         context.restoreAuthSystemState();
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(get("/api/core/items/" + UUID.randomUUID().toString() + "/metrics"))
-                             .andExpect(status().isOk())
-                             .andExpect(jsonPath("$.page",
-                                     is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 0, 0))));
+                             .andExpect(status().isNotFound());
     }
 
     @Test
@@ -406,11 +403,13 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
                                .andExpect(jsonPath("$._embedded.metrics", Matchers.containsInAnyOrder(
                                           CrisMetricsMatcher.matchCrisMetrics(metric),
                                           CrisMetricsMatcher.matchCrisMetrics(metric2),
-                                          CrisMetricsMatcher.matchCrisMetrics(metric3)
+                                          CrisMetricsMatcher.matchCrisMetrics(metric3),
+                                          CrisMetricsMatcher.matchCrisDynamicMetrics(itemA.getID(), "google-scholar"),
+                                          CrisMetricsMatcher.matchCrisDynamicMetrics(itemA.getID(), "altmetrics")
                                           )))
                                .andExpect(jsonPath("$._links.self.href",
                                    Matchers.containsString("api/core/items/" + itemA.getID() + "/metrics")))
-                               .andExpect(jsonPath("$.page.totalElements", is(3)));
+                               .andExpect(jsonPath("$.page.totalElements", is(5)));
     }
 
     @Test

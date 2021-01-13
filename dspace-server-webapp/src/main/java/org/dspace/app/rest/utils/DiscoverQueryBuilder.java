@@ -191,14 +191,14 @@ public class DiscoverQueryBuilder implements InitializingBean {
         queryArgs.setMaxResults(0);
 
         //Configure pagination
-        configurePaginationForFacets(page, queryArgs);
+        configurePaginationForFacet(page, queryArgs);
 
         return queryArgs;
     }
 
-    private void configurePaginationForFacets(Pageable page, DiscoverQuery queryArgs) {
-        if (page != null) {
-            queryArgs.setFacetOffset(Math.toIntExact(page.getOffset()));
+    private void configurePaginationForFacet(Pageable page, DiscoverQuery queryArgs) {
+        if (page != null && queryArgs.getFacetFields().size() == 1) {
+            queryArgs.getFacetFields().get(0).setOffset((int) page.getOffset());
         }
     }
 
@@ -241,7 +241,9 @@ public class DiscoverQueryBuilder implements InitializingBean {
             int facetLimit = pageSize + 1;
             //This should take care of the sorting for us
             queryArgs.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(), facet.getType(), facetLimit,
-                    facet.getSortOrderSidebar(), StringUtils.trimToNull(prefix)));
+                    facet.getSortOrderSidebar(), StringUtils.trimToNull(prefix),
+                    facet.exposeMore(), facet.exposeMissing(), facet.exposeTotalElements(), facet.fillDateGaps(),
+                    facet.inverseDirection()));
         }
     }
 

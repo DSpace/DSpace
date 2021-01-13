@@ -5329,7 +5329,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
-    public void createEmptyWorkspateItemWithEntityTypeTest() throws Exception {
+    public void createEmptyWorkspaceItemWithEntityTypeTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         //** GIVEN **
@@ -5362,6 +5362,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             // create a workspaceitem explicitly with entityType Publication
             getClient(authToken).perform(post("/api/submission/workspaceitems")
                     .param("entityType", "Publication")
+                    .param("projection", "full")
                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$._embedded.collection.metadata.['relationship.type'][0].value",

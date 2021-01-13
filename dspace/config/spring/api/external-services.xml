@@ -49,7 +49,7 @@
     <bean id="pubmedLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="pubmedImportService"/>
         <property name="sourceIdentifier" value="pubmed"/>
-        <property name="recordIdMetadata" value="dc.identifier.other"/>
+        <property name="recordIdMetadata" value="dc.identifier.pmid"/>
         <property name="supportedEntityTypes">
             <list>
                 <value>Publication</value>
@@ -60,7 +60,7 @@
     <bean id="arxivLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="ArXivImportService"/>
         <property name="sourceIdentifier" value="arxiv"/>
-        <property name="recordIdMetadata" value="dc.identifier.other"/>
+        <property name="recordIdMetadata" value="dc.identifier.arxiv"/>
         <property name="supportedEntityTypes">
             <list>
                 <value>Publication</value>
@@ -71,7 +71,7 @@
     <bean id="scopusLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="ScopusImportService"/>
         <property name="sourceIdentifier" value="scopus"/>
-        <property name="recordIdMetadata" value="dc.identifier.other"/>
+        <property name="recordIdMetadata" value="dc.identifier.scopus"/>
         <property name="supportedEntityTypes">
             <list>
                 <value>Publication</value>
@@ -93,7 +93,7 @@
     <bean id="crossRefLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="CrossRefImportService"/>
         <property name="sourceIdentifier" value="crossref"/>
-        <property name="recordIdMetadata" value="dc.identifier.other"/>
+        <property name="recordIdMetadata" value="dc.identifier.doi"/>
         <property name="supportedEntityTypes">
             <list>
                 <value>Publication</value>
@@ -115,7 +115,7 @@
     <bean id="adsLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="ADSImportService"/>
         <property name="sourceIdentifier" value="ads"/>
-        <property name="recordIdMetadata" value="dc.identifier.other"/>
+        <property name="recordIdMetadata" value="dc.identifier.adsbibcode"/>
         <property name="supportedEntityTypes">
             <list>
                 <value>Publication</value>
@@ -126,7 +126,7 @@
     <bean id="pubmedEULiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="PubmedEuropeImportService"/>
         <property name="sourceIdentifier" value="pubmedeu"/>
-        <property name="recordIdMetadata" value="dc.identifier.other"/>
+        <property name="recordIdMetadata" value="dc.identifier.pmid"/>
         <property name="supportedEntityTypes">
             <list>
                 <value>Publication</value>

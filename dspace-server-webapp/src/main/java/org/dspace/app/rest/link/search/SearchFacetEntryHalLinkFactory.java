@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.link.search;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.dspace.app.rest.model.DiscoveryResultsRest;
 import org.dspace.app.rest.model.SearchFacetEntryRest;
+import org.dspace.app.rest.model.SearchFacetValueRest;
 import org.dspace.app.rest.model.hateoas.EmbeddedPageHeader;
 import org.dspace.app.rest.model.hateoas.SearchFacetEntryResource;
 import org.springframework.data.domain.PageImpl;
@@ -56,11 +58,23 @@ public class SearchFacetEntryHalLinkFactory extends DiscoveryRestHalLinkFactory<
                                                .isTrue(facetData.isHasMore()) ? 1 : 0));
 
             halResource.setPageHeader(new EmbeddedPageHeader(uriBuilder, page, false));
-
         } else {
             list.add(buildLink(IanaLinkRelations.SELF.value(), uriBuilder.build().toUriString()));
         }
-
+        if (facetData.exposeMore()) {
+            UriComponentsBuilder moreBuilder = uriBuilder.cloneBuilder();
+            List<String> values = new ArrayList<String>();
+            for (SearchFacetValueRest fv : facetData.getValues()) {
+                values.add(fv.getFilterValue() + ",notequals");
+            }
+            moreBuilder.queryParam("f." + facetData.getName(), values);
+            list.add(buildLink("more", moreBuilder.toUriString()));
+        }
+        if (facetData.exposeMissing()) {
+            UriComponentsBuilder moreBuilder = uriBuilder.cloneBuilder();
+            moreBuilder.queryParam("f." + facetData.getName(), "[* TO *],notequals");
+            list.add(buildLink("missing", moreBuilder.toUriString()));
+        }
     }
 
     @Override

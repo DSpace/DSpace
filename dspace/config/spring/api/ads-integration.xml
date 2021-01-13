@@ -32,6 +32,7 @@
         <entry key-ref="ads.keywrd" value-ref="adsKeywordContrib"/>
         <entry key-ref="ads.lang" value-ref="adsLangContrib"/>
         <entry key-ref="ads.source" value-ref="adsSourceContrib"/>
+        <entry key-ref="ads.title" value-ref="adsTitleContrib"/>
     </util:map>
 
     <bean id="adsTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
@@ -79,7 +80,7 @@
         <property name="query" value="$.bibcode"/>
     </bean>
     <bean id="ads.id" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier.other"/>
+        <constructor-arg value="dc.identifier.adsbibcode"/>
     </bean>
 
     <bean id="adsTypeContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
@@ -95,7 +96,7 @@
         <property name="query" value="$.doi[*]"/>
     </bean>
     <bean id="ads.doi" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier"/>
+        <constructor-arg value="dc.identifier.doi"/>
     </bean>
 
     <bean id="adsAuthorContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">

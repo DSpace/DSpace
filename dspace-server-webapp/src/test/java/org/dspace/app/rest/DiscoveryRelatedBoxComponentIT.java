@@ -241,8 +241,8 @@ public class DiscoveryRelatedBoxComponentIT extends AbstractControllerIntegratio
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
-                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.anyFacet("graphitemtype", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("graphpubldate", "chart.bar"),
 //                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.anyFacet("editor", "text"),
@@ -283,8 +283,8 @@ public class DiscoveryRelatedBoxComponentIT extends AbstractControllerIntegratio
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
-                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.anyFacet("graphitemtype", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("graphpubldate", "chart.bar"),
 //                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.anyFacet("editor", "text"),
@@ -326,8 +326,8 @@ public class DiscoveryRelatedBoxComponentIT extends AbstractControllerIntegratio
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                        FacetEntryMatcher.anyFacet("chart.pie.itemtype_filter", "chart.pie"),
-                        FacetEntryMatcher.anyFacet("chart.bar.dateIssued.year", "chart.bar"),
+                        FacetEntryMatcher.anyFacet("graphitemtype", "chart.pie"),
+                        FacetEntryMatcher.anyFacet("graphpubldate", "chart.bar"),
 //                        FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.authorFacet(false),
                         FacetEntryMatcher.anyFacet("editor", "text"),
