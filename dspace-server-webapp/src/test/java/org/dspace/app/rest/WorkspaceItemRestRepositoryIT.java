@@ -9,12 +9,17 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.dspace.app.matcher.ResourcePolicyMatcher.matches;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
+import static org.dspace.authorize.ResourcePolicy.TYPE_SUBMISSION;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
 import static org.springframework.http.MediaType.parseMediaType;
@@ -50,6 +55,8 @@ import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.RemoveOperation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -66,6 +73,8 @@ import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -93,6 +102,12 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
     @Autowired
     private ItemService itemService;
+
+    @Autowired
+    private WorkspaceItemService workspaceItemService;
+
+    @Autowired
+    private AuthorizeService authorizeService;
 
     private Group embargoedGroups;
     private Group embargoedGroup1;
@@ -5453,6 +5468,106 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         } finally {
 
+        }
+    }
+
+    @Test
+    public void testWorkspaceItemPoliciesWithSharedWorkspace() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        context.setCurrentUser(eperson);
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("Collection")
+            .withRelationshipType("Publication")
+            .withSubmitterGroup(eperson)
+            .withSharedWorkspace()
+            .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+        try {
+
+            String authToken = getAuthToken(eperson.getEmail(), password);
+
+            getClient(authToken).perform(post("/api/submission/workspaceitems")
+                .param("owningCollection", col1.getID().toString())
+                .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$._embedded.collection.id", is(col1.getID().toString())))
+                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            WorkspaceItem workspaceItem = workspaceItemService.find(context, idRef.get());
+            assertThat(workspaceItem, notNullValue());
+
+            List<ResourcePolicy> policies = authorizeService.getPolicies(context, workspaceItem.getItem());
+            assertThat(policies, hasSize(10));
+
+            assertThat(policies, hasItem(matches(Constants.READ, eperson, TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.WRITE, eperson, TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.DELETE, eperson, TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.REMOVE, eperson, TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.ADD, eperson, TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.READ, col1.getSubmitters(), TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.WRITE, col1.getSubmitters(), TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.DELETE, col1.getSubmitters(), TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.REMOVE, col1.getSubmitters(), TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.ADD, col1.getSubmitters(), TYPE_SUBMISSION)));
+
+        } finally {
+            WorkspaceItemBuilder.deleteWorkspaceItem(idRef.get());
+        }
+    }
+
+    @Test
+    public void testWorkspaceItemPoliciesWithoutSharedWorkspace() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        context.setCurrentUser(eperson);
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("Collection")
+            .withRelationshipType("Publication")
+            .withSubmitterGroup(eperson)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+        try {
+
+            String authToken = getAuthToken(eperson.getEmail(), password);
+
+            getClient(authToken).perform(post("/api/submission/workspaceitems")
+                .param("owningCollection", col1.getID().toString())
+                .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$._embedded.collection.id", is(col1.getID().toString())))
+                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            WorkspaceItem workspaceItem = workspaceItemService.find(context, idRef.get());
+            assertThat(workspaceItem, notNullValue());
+
+            List<ResourcePolicy> policies = authorizeService.getPolicies(context, workspaceItem.getItem());
+            assertThat(policies, hasSize(5));
+
+            assertThat(policies, hasItem(matches(Constants.READ, eperson, TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.WRITE, eperson, TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.DELETE, eperson, TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.REMOVE, eperson, TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.ADD, eperson, TYPE_SUBMISSION)));
+
+        } finally {
+            WorkspaceItemBuilder.deleteWorkspaceItem(idRef.get());
         }
     }
 }

@@ -37,6 +37,7 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
+import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
@@ -122,6 +123,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     protected BitstreamFormatService bitstreamFormatService;
     @Autowired(required = true)
     protected BitstreamService bitstreamService;
+    @Autowired(required = true)
+    protected CollectionService collectionService;
 
     protected XmlWorkflowServiceImpl() {
 
@@ -204,7 +207,11 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             wfi.setMultipleTitles(wsi.hasMultipleTitles());
             wfi.setPublishedBefore(wsi.isPublishedBefore());
             xmlWorkflowItemService.update(context, wfi);
+
             removeUserItemPolicies(context, myitem, myitem.getSubmitter());
+            if (collectionService.isSharedWorkspace(context, collection)) {
+                removeGroupItemPolicies(context, myitem, collection.getSubmitters());
+            }
             grantSubmitterReadPolicies(context, myitem);
 
             context.turnOffAuthorisationSystem();
@@ -1010,8 +1017,13 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         workflowItemRoleService.deleteForWorkflowItem(c, wfi);
 
         Item myitem = wfi.getItem();
+        Collection collection = wfi.getCollection();
+
         //Restore permissions for the submitter
         grantUserAllItemPolicies(c, myitem, myitem.getSubmitter(), ResourcePolicy.TYPE_SUBMISSION);
+        if (collectionService.isSharedWorkspace(c, collection)) {
+            grantGroupAllItemPolicies(c, myitem, collection.getSubmitters(), ResourcePolicy.TYPE_SUBMISSION);
+        }
 
         // FIXME: How should this interact with the workflow system?
         // FIXME: Remove license
