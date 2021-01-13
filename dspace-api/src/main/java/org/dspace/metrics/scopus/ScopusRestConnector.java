@@ -7,6 +7,8 @@
  */
 package org.dspace.metrics.scopus;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
@@ -51,7 +53,7 @@ public class ScopusRestConnector {
         try (CloseableHttpClient httpClient = Optional.ofNullable(this.httpClient)
             .orElseGet(HttpClients::createDefault)) {
 
-            HttpGet httpGet = new HttpGet(scopusUrl + id);
+            HttpGet httpGet = new HttpGet(scopusUrl + URLEncoder.encode(id, Charset.defaultCharset()));
             httpGet.setHeader("Accept-Encoding", "gzip, deflate, br");
             httpGet.setHeader("Connection", "keep-alive");
             httpGet.setHeader("X-ELS-APIKey", apiKey);

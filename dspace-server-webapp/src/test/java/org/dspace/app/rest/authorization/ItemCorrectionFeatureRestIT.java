@@ -86,6 +86,7 @@ public class ItemCorrectionFeatureRestIT extends AbstractControllerIntegrationTe
 
         ItemRest itemRest = itemConverter.convert(item, Projection.DEFAULT);
 
+        configurationService.setProperty("item-correction.permit-all", false);
         configurationService.setProperty("item-correction.enabled", false);
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -113,6 +114,8 @@ public class ItemCorrectionFeatureRestIT extends AbstractControllerIntegrationTe
 
         ItemRest itemRest = itemConverter.convert(item, Projection.DEFAULT);
 
+        configurationService.setProperty("item-correction.permit-all", false);
+
         String token = getAuthToken(admin.getEmail(), password);
 
         Authorization expectedAuthorization = new Authorization(admin, canCorrectItem, itemRest);
@@ -139,6 +142,8 @@ public class ItemCorrectionFeatureRestIT extends AbstractControllerIntegrationTe
 
         ItemRest itemRest = itemConverter.convert(item, Projection.DEFAULT);
 
+        configurationService.setProperty("item-correction.permit-all", false);
+
         String token = getAuthToken(eperson.getEmail(), password);
 
         getClient(token).perform(get("/api/authz/authorizations/search/object")
@@ -147,6 +152,34 @@ public class ItemCorrectionFeatureRestIT extends AbstractControllerIntegrationTe
             .param("feature", ItemCorrectionFeature.NAME))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations").doesNotExist());
+
+    }
+
+    @Test
+    public void testFeatureWithPermitAllEnabled() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("Test publication")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        ItemRest itemRest = itemConverter.convert(item, Projection.DEFAULT);
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        configurationService.setProperty("item-correction.permit-all", true);
+
+        Authorization expectedAuthorization = new Authorization(eperson, canCorrectItem, itemRest);
+
+        getClient(token).perform(get("/api/authz/authorizations/search/object")
+                .param("uri", getItemUri(itemRest))
+                .param("eperson", String.valueOf(eperson.getID()))
+                .param("feature", ItemCorrectionFeature.NAME))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.authorizations", hasItem(matchAuthorization(expectedAuthorization))));
 
     }
 
