@@ -30,7 +30,7 @@ public class WOSFieldMapping extends AbstractMetadataFieldMapping {
      */
     @Override
     @SuppressWarnings("unchecked")
-    @Resource(name = "scopusMetadataFieldMap")
+    @Resource(name = "wosMetadataFieldMap")
     public void setMetadataFieldMap(Map metadataFieldMap) {
         super.setMetadataFieldMap(metadataFieldMap);
     }

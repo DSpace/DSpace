@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import javax.el.MethodNotFoundException;
 
@@ -56,7 +57,6 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
     private static final String ENDPOINT_SEARCH_WCOS = "https://wos-api.clarivate.com/api/wos/?databaseId=WOS&lang=en&usrQuery=";
 
     private int timeout = 1000;
-    int itemPerPage = 25;
 
     @Autowired
     private ConfigurationService configurationService;
@@ -99,7 +99,7 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
     @Override
     public int getRecordsCount(String query) throws MetadataSourceException {
-        throw new MethodNotFoundException("This method is not implemented for WOS");
+        return retry(new SearchNBByQueryCallable(query));
     }
 
     @Override
@@ -117,6 +117,76 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
         throw new MethodNotFoundException("This method is not implemented for WOS");
     }
 
+    /**
+     * This class implements a callable to get the numbers of result
+     * 
+     * @author Boychuk Mykhaylo
+     */
+    private class SearchNBByQueryCallable implements Callable<Integer> {
+
+        private String query;
+
+        private SearchNBByQueryCallable(String queryString) {
+            this.query = queryString;
+        }
+
+        private SearchNBByQueryCallable(Query query) {
+            this.query = query.getParameterAsClass("query", String.class);
+        }
+
+        @Override
+        public Integer call() throws Exception {
+            String proxyHost = configurationService.getProperty("http.proxy.host");
+            String proxyPort = configurationService.getProperty("http.proxy.port");
+            String apiKey = configurationService.getProperty("submission.lookup.wos.apikey");
+            if (apiKey != null && !apiKey.equals("")) {
+                HttpGet method = null;
+                try {
+                    HttpClientBuilder hcBuilder = HttpClients.custom();
+                    Builder requestConfigBuilder = RequestConfig.custom();
+                    requestConfigBuilder.setConnectionRequestTimeout(timeout);
+
+                    if (StringUtils.isNotBlank(proxyHost) && StringUtils.isNotBlank(proxyPort)) {
+                        HttpHost proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort), "http");
+                        DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxy);
+                        hcBuilder.setRoutePlanner(routePlanner);
+                    }
+                    HttpClient client = hcBuilder.build();
+                    method = new HttpGet(ENDPOINT_SEARCH_WCOS + "TS="
+                             + URLEncoder.encode(query, StandardCharsets.UTF_8) + "&count=1&firstRecord=1");
+                    method.setHeader("X-ApiKey", apiKey);
+                    method.setHeader("Accept", "application/xml");
+                    method.setConfig(requestConfigBuilder.build());
+                    HttpResponse httpResponse = client.execute(method);
+                    int statusCode = httpResponse.getStatusLine().getStatusCode();
+                    if (statusCode != HttpStatus.SC_OK) {
+                        throw new RuntimeException("WS call failed: " + statusCode);
+                    }
+                    InputStream is = httpResponse.getEntity().getContent();
+                    String response = IOUtils.toString(is, StandardCharsets.UTF_8);
+                    OMXMLParserWrapper records = OMXMLBuilderFactory.createOMBuilder(new StringReader(response));
+                    OMElement element = records.getDocumentElement();
+                    AXIOMXPath xpath = null;
+                    try {
+                        xpath = new AXIOMXPath("//ns:val[@name='RecordsFound']");
+                        xpath.addNamespace("ns", "http://www.isinet.com/xrpc42");
+                        OMElement count = (OMElement) xpath.selectSingleNode(element);
+                        return Integer.parseInt(count.getText());
+                    } catch (JaxenException e) {
+                        return null;
+                    }
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                } finally {
+                    if (method != null) {
+                        method.releaseConnection();
+                    }
+                }
+            }
+            return null;
+        }
+    }
+
     private class FindByIdCallable implements Callable<List<ImportRecord>> {
 
         private String doi;
@@ -128,7 +198,7 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
         @Override
         public List<ImportRecord> call() throws Exception {
             List<ImportRecord> results = new ArrayList<>();
-            String queryString = "DOI(" + doi.replace("!", "/") + ")";
+            String queryString = "(" + doi.replace("!", "/") + ")";
             String proxyHost = configurationService.getProperty("http.proxy.host");
             String proxyPort = configurationService.getProperty("http.proxy.port");
             String apiKey = configurationService.getProperty("submission.lookup.wos.apikey");
@@ -147,11 +217,11 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
                     HttpClient client = hcBuilder.build();
                     method = new HttpGet(ENDPOINT_SEARCH_WCOS + "DO="
-                                         + URLEncoder.encode(queryString, StandardCharsets.UTF_8));
+                                         + URLEncoder.encode(queryString, StandardCharsets.UTF_8)
+                                         + "&count=10&firstRecord=1");
                     method.setHeader("X-ApiKey", apiKey);
-                    method.setHeader("Accept", "application/json");
+                    method.setHeader("Accept", "application/xml");
                     method.setConfig(requestConfigBuilder.build());
-                        // Execute the method.
                     HttpResponse httpResponse = client.execute(method);
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
                     if (statusCode != HttpStatus.SC_OK) {
@@ -193,66 +263,97 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
         @Override
         public List<ImportRecord> call() throws Exception {
+            int totalWorked = 0;
+            int record = 1;
+            final Integer count = 10;
+            int recordsFound = -1;
+            boolean error = false;
             List<ImportRecord> results = new ArrayList<>();
             String queryString = query.getParameterAsClass("query", String.class);
-            Integer start = query.getParameterAsClass("start", Integer.class);
-            Integer count = query.getParameterAsClass("count", Integer.class);
             String proxyHost = configurationService.getProperty("http.proxy.host");
             String proxyPort = configurationService.getProperty("http.proxy.port");
             String apiKey = configurationService.getProperty("submission.lookup.wos.apikey");
             if (apiKey != null && !apiKey.equals("")) {
                 HttpGet method = null;
-                try {
-                    HttpClientBuilder hcBuilder = HttpClients.custom();
-                    Builder requestConfigBuilder = RequestConfig.custom();
-                    requestConfigBuilder.setConnectionRequestTimeout(timeout);
-
-                    if (StringUtils.isNotBlank(proxyHost)
-                        && StringUtils.isNotBlank(proxyPort)) {
-                        HttpHost proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort), "http");
-                        DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxy);
-                        hcBuilder.setRoutePlanner(routePlanner);
-                    }
-                    HttpClient client = hcBuilder.build();
-                    method = new HttpGet(ENDPOINT_SEARCH_WCOS + "TS="
-                                         + URLEncoder.encode(queryString, StandardCharsets.UTF_8)
-                                         + "&count=" + (count != null ? count : 20)
-                                         + "&firstRecord=" + (start != null && start != 0  ? start : 1)
-                                         );
-                    method.setHeader("X-ApiKey", apiKey);
-                    method.setHeader("Accept", "application/json");
-                    method.setConfig(requestConfigBuilder.build());
-                    HttpResponse httpResponse = client.execute(method);
-                    int statusCode = httpResponse.getStatusLine().getStatusCode();
-                    if (statusCode != HttpStatus.SC_OK) {
-                        throw new RuntimeException("WS call failed: " + statusCode);
-                    }
-                    InputStream is = httpResponse.getEntity().getContent();
-                    String response = IOUtils.toString(is, StandardCharsets.UTF_8);
-                    List<OMElement> omElements = splitToRecords(response);
-                    for (OMElement record : omElements) {
-                        results.add(transformSourceRecords(record));
-                    }
-                } catch (Exception e1) {
-                    log.error(e1.getMessage(), e1);
-                } finally {
-                    if (method != null) {
-                        method.releaseConnection();
+                while (!error && (recordsFound == -1 || totalWorked < recordsFound)) {
+                    try {
+                        HttpClientBuilder hcBuilder = HttpClients.custom();
+                        Builder requestConfigBuilder = RequestConfig.custom();
+                        requestConfigBuilder.setConnectionRequestTimeout(timeout);
+                        if (StringUtils.isNotBlank(proxyHost) && StringUtils.isNotBlank(proxyPort)) {
+                            HttpHost proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort), "http");
+                            DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxy);
+                            hcBuilder.setRoutePlanner(routePlanner);
+                        }
+                        HttpClient client = hcBuilder.build();
+                        method = new HttpGet(ENDPOINT_SEARCH_WCOS + "TS="
+                                             + URLEncoder.encode(queryString, StandardCharsets.UTF_8)
+                                             + "&count=" + count + "&firstRecord=" + record);
+                        method.setHeader("X-ApiKey", apiKey);
+                        method.setHeader("Accept", "application/xml");
+                        method.setConfig(requestConfigBuilder.build());
+                        HttpResponse httpResponse = client.execute(method);
+                        int statusCode = httpResponse.getStatusLine().getStatusCode();
+                        if (statusCode != HttpStatus.SC_OK) {
+                            throw new RuntimeException("WS call failed: " + statusCode);
+                        }
+                        InputStream is = httpResponse.getEntity().getContent();
+                        String response = IOUtils.toString(is, StandardCharsets.UTF_8);
+                        List<OMElement> omElements = splitToRecords(response);
+                        for (OMElement el : omElements) {
+                            results.add(transformSourceRecords(el));
+                        }
+                        recordsFound = getTotRecords(response);
+                        totalWorked += omElements.size();
+                        record += count;
+                    } catch (Exception e1) {
+                        log.error(e1.getMessage(), e1);
+                        error = true;
                     }
                 }
             }
             return results;
         }
+
+        private int getTotRecords(String response) {
+            OMXMLParserWrapper records = OMXMLBuilderFactory.createOMBuilder(new StringReader(response));
+            OMElement element = records.getDocumentElement();
+            AXIOMXPath xpath = null;
+            try {
+                xpath = new AXIOMXPath("//ns:val[@name='RecordsFound']");
+                xpath.addNamespace("ns", "http://www.isinet.com/xrpc42");
+                OMElement count = (OMElement) xpath.selectSingleNode(element);
+                return Integer.parseInt(count.getText());
+            } catch (JaxenException e) {
+                return 0;
+            }
+        }
     }
 
-    @SuppressWarnings("unchecked")
     private List<OMElement> splitToRecords(String recordsSrc) {
         OMXMLParserWrapper records = OMXMLBuilderFactory.createOMBuilder(new StringReader(recordsSrc));
         OMElement element = records.getDocumentElement();
         AXIOMXPath xpath = null;
         try {
-            xpath = new AXIOMXPath("ns:entry");
-            xpath.addNamespace("ns", "http://www.w3.org/2005/Atom");
+            xpath = new AXIOMXPath("//ns:val[@name='Records']");
+            xpath.addNamespace("ns", "http://www.isinet.com/xrpc42");
+            OMElement record = (OMElement) xpath.selectSingleNode(element);
+            if (Objects.nonNull(record)) {
+                return getRecords(record.getText());
+            }
+            return new ArrayList<OMElement>();
+        } catch (JaxenException e) {
+            return null;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<OMElement> getRecords(String recordsSrc) {
+        OMXMLParserWrapper records = OMXMLBuilderFactory.createOMBuilder(new StringReader(recordsSrc));
+        OMElement element = records.getDocumentElement();
+        AXIOMXPath xpath = null;
+        try {
+            xpath = new AXIOMXPath("REC");
             List<OMElement> recordsList = xpath.selectNodes(element);
             return recordsList;
         } catch (JaxenException e) {
