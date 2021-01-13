@@ -49,11 +49,11 @@ import org.xml.sax.SAXException;
  *
  * @author Tim Donohue
  */
-public class DatabaseRegistryUpdater implements Callback {
+public class RegistryUpdater implements Callback {
     /**
      * logging category
      */
-    private static final Logger log = LoggerFactory.getLogger(DatabaseRegistryUpdater.class);
+    private static final Logger log = LoggerFactory.getLogger(RegistryUpdater.class);
 
     /**
      * Method to actually update our registries from latest configuration files.
