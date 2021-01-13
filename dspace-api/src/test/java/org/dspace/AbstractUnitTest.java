@@ -11,6 +11,7 @@ import static org.junit.Assert.fail;
 
 import java.sql.SQLException;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -20,6 +21,8 @@ import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -119,6 +122,9 @@ public class AbstractUnitTest extends AbstractDSpaceTest {
 
             context.restoreAuthSystemState();
 
+            // Ensure all tests run with Solr indexing disabled
+            disableSolrIndexing();
+
         } catch (AuthorizeException ex) {
             log.error("Error creating initial eperson or default groups", ex);
             fail("Error creating initial eperson or default groups in AbstractUnitTest init()");
@@ -160,4 +166,23 @@ public class AbstractUnitTest extends AbstractDSpaceTest {
             c = null;
         }
     }
+
+    /**
+     * Utility method which ensures Solr indexing is DISABLED in all Tests. We turn this off because
+     * Solr is NOT used in the dspace-api test framework. Instead, Solr/Discovery indexing is
+     * exercised in the dspace-server Integration Tests (which use an embedded Solr).
+     */
+    protected static void disableSolrIndexing() {
+        // Get our currently configured list of event consumers
+        ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+        String[] consumers = configurationService.getArrayProperty("event.dispatcher.default.consumers");
+
+        // Remove "discovery" from the configured consumers (if it exists).
+        // This turns off Discovery/Solr indexing after any object changes.
+        if (ArrayUtils.contains(consumers, "discovery")) {
+            consumers = ArrayUtils.removeElement(consumers, "discovery");
+            configurationService.setProperty("event.dispatcher.default.consumers", consumers);
+        }
+    }
+
 }
