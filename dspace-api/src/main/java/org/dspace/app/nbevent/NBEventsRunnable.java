@@ -67,7 +67,7 @@ public class NBEventsRunnable extends DSpaceRunnable<NBEventsScriptConfiguration
         nbEventService =  dspace.getSingletonService(NBEventService.class);
         if (nbEventService == null) {
             LOGGER.error("nbEventService is NULL. Error in spring configuration");
-            System.exit(1);
+            throw new IllegalStateException();
         } else {
             LOGGER.debug("nbEventService correctly loaded");
         }
@@ -84,8 +84,8 @@ public class NBEventsRunnable extends DSpaceRunnable<NBEventsScriptConfiguration
     public void internalRun() throws Exception {
 
         if (StringUtils.isEmpty(fileLocation)) {
-            LOGGER.info("No file location was entered");
-            System.exit(1);
+            LOGGER.error("No file location was entered");
+            throw new IllegalStateException();
         }
 
         context = new Context();
@@ -98,7 +98,7 @@ public class NBEventsRunnable extends DSpaceRunnable<NBEventsScriptConfiguration
         } catch (IOException e) {
             LOGGER.error("File is not found or not readable: " + fileLocation);
             e.printStackTrace();
-            System.exit(1);
+            throw new IllegalStateException();
         }
 
         for (NBEvent entry : entries) {
@@ -109,7 +109,7 @@ public class NBEventsRunnable extends DSpaceRunnable<NBEventsScriptConfiguration
             try {
                 nbEventService.store(context, entry);
             } catch (RuntimeException e) {
-                System.out.println("Skip event for originalId " + entry.getOriginalId() + " item not found");
+                LOGGER.info("Skip event for originalId " + entry.getOriginalId() + " item not found");
             }
         }
 

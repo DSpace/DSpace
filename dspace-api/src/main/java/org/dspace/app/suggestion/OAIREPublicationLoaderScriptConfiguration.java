@@ -15,7 +15,7 @@ import org.dspace.core.Context;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class OAIREPublicationLoaderScriptConfiguration<T extends OAIREPublicationLoaderCli>
+public class OAIREPublicationLoaderScriptConfiguration<T extends OAIREPublicationLoaderRunnable>
     extends ScriptConfiguration<T> {
 
     @Autowired

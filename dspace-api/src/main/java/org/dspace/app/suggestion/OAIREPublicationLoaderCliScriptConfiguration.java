@@ -9,7 +9,7 @@ package org.dspace.app.suggestion;
 
 import org.apache.commons.cli.Options;
 
-public class OAIREPublicationLoaderCliScriptConfiguration<T extends OAIREPublicationLoaderCli>
+public class OAIREPublicationLoaderCliScriptConfiguration<T extends OAIREPublicationLoaderRunnable>
     extends OAIREPublicationLoaderScriptConfiguration<T> {
 
     @Override
