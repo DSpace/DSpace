@@ -8,6 +8,7 @@
 package org.dspace.app.rest.matcher;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.dspace.app.rest.test.AbstractControllerIntegrationTest.REST_SERVER_URL;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
@@ -22,7 +23,9 @@ public class ExternalSourceMatcher {
         return allOf(
             hasJsonPath("$.id", is(id)),
             hasJsonPath("$.name", is(name)),
-            hasJsonPath("$.hierarchical", is(hierarchical))
+            hasJsonPath("$.hierarchical", is(hierarchical)),
+            hasJsonPath("$._links.entries.href", is(REST_SERVER_URL +
+                                                            "integration/externalsources/" + name + "/entries"))
         );
     }
 }
