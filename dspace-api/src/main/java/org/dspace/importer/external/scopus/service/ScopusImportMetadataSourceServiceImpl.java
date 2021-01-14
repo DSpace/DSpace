@@ -184,7 +184,8 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
                     // open session
                     method = new HttpGet(
                         ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey=" + apiKey +
-                        (instKey != null ? "&insttoken=" + instKey : "") + "&query=" + query);
+                        (instKey != null ? "&insttoken=" + instKey : "") +
+                            "&query=" + URLEncoder.encode(query, Charset.defaultCharset()));
                     method.setConfig(requestConfigBuilder.build());
                         // Execute the method.
                     HttpResponse httpResponse = client.execute(method);

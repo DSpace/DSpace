@@ -121,4 +121,10 @@
         <scope_note></scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>cris</schema>
+        <element>identifier</element>
+        <qualifier>gscholar</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
 </dspace-dc-types>
