@@ -24,6 +24,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * This contributor checks for each node returned for the given path if the node contains "this.attribute"
+ * and then checks if the attribute value is one of the values configured
+ * in the "this.attributeValue2metadata" map, if the value of the current known is taken.
+ * If "this.firstChild" is true, it takes the value of the child of the known.
+ *
  * @author Boychuk Mykhaylo (boychuk.mykhaylo at 4Science dot it)
  */
 public class WosAttribute2ValueContributor implements MetadataContributor<OMElement> {
@@ -70,12 +75,12 @@ public class WosAttribute2ValueContributor implements MetadataContributor<OMElem
                     String attributeValue = element.getAttributeValue(new QName(this.attribute));
                     setField(attributeValue, element, values);
                 } else {
-                    log.error("node of type: " + el.getClass());
+                    log.warn("node of type: " + el.getClass());
                 }
             }
             return values;
         } catch (JaxenException e) {
-            log.error(query, e);
+            log.warn(query, e);
             throw new RuntimeException(e);
         }
     }

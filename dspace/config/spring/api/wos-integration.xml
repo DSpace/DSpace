@@ -102,7 +102,7 @@
         <constructor-arg value="oaire.citation.issue"/>
     </bean>
 
-    <bean id="wosIdentifierContrib" class="org.dspace.importer.external.metadatamapping.contributor.WosIdentifireContributor">
+    <bean id="wosIdentifierContrib" class="org.dspace.importer.external.metadatamapping.contributor.WosIdentifierContributor">
         <property name="query" value="dynamic_data/cluster_related/identifiers/identifier"/>
         <property name="prefixToNamespaceMapping" ref="wosNs"/>
         <property name="identifire2field" ref="identifires2fields"/>

@@ -19,6 +19,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * This contributor is able to concat multi value.
+ * Given a certain path, if it contains several nodes,
+ * the values of nodes will be concatenated into a single one
+ * 
  * @author Boychuk Mykhaylo (boychuk.mykhaylo at 4Science dot it)
  */
 public class SimpleConcatContributor extends SimpleXpathMetadatumContributor {
@@ -42,7 +46,7 @@ public class SimpleConcatContributor extends SimpleXpathMetadatumContributor {
                         text.append(element.getText());
                     }
                 } else {
-                    log.error("node of type: " + el.getClass());
+                    log.warn("node of type: " + el.getClass());
                 }
             }
             if (StringUtils.isNotBlank(text.toString())) {

@@ -21,6 +21,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * This contributor checks for each node returned for the supplied path
+ * if node contains supplied attribute - the value of the current node is taken,
+ * otherwise #PLACEHOLDER_PARENT_METADATA_VALUE#
+ * 
  * @author Boychuk Mykhaylo (boychuk.mykhaylo at 4Science dot it)
  */
 public class SimpleXpathMetadatumAndAttributeContributor extends SimpleXpathMetadatumContributor {
@@ -50,7 +54,7 @@ public class SimpleXpathMetadatumAndAttributeContributor extends SimpleXpathMeta
                                 CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE));
                     }
                 } else {
-                    log.error("node of type: " + el.getClass());
+                    log.warn("node of type: " + el.getClass());
                 }
             }
             return values;

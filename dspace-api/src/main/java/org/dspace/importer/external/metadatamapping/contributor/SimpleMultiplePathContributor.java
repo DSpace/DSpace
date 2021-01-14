@@ -18,6 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * This contributor can perform research on multi-paths
+ * 
  * @author Boychuk Mykhaylo (boychuk.mykhaylo at 4Science dot it)
  */
 public class SimpleMultiplePathContributor extends SimpleXpathMetadatumContributor {
@@ -47,7 +49,7 @@ public class SimpleMultiplePathContributor extends SimpleXpathMetadatumContribut
                     if (el instanceof OMElement) {
                         values.add(metadataFieldMapping.toDCValue(field, ((OMElement) el).getText()));
                     } else {
-                        log.error("node of type: " + el.getClass());
+                        log.warn("node of type: " + el.getClass());
                     }
                 }
             }

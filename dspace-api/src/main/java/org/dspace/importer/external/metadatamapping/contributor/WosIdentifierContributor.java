@@ -22,11 +22,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * This contributor can retrieve the identifiers
+ * configured in "this.identifire2field" from the WOS response.
+ * 
  * @author Boychuk Mykhaylo (boychuk.mykhaylo at 4Science dot it)
  */
-public class WosIdentifireContributor extends SimpleXpathMetadatumContributor {
+public class WosIdentifierContributor extends SimpleXpathMetadatumContributor {
 
-    private static final Logger log = LoggerFactory.getLogger(WosIdentifireContributor.class);
+    private static final Logger log = LoggerFactory.getLogger(WosIdentifierContributor.class);
 
     protected Map<String, MetadataFieldConfig> identifire2field;
 
@@ -46,7 +49,7 @@ public class WosIdentifireContributor extends SimpleXpathMetadatumContributor {
                     String type = element.getAttributeValue(new QName("type"));
                     setIdentyfire(type, element, values);
                 } else {
-                    log.error("node of type: " + el.getClass());
+                    log.warn("node of type: " + el.getClass());
                 }
             }
             return values;
