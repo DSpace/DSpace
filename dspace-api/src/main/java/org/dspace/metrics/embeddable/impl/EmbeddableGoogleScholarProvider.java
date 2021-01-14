@@ -17,7 +17,7 @@ import org.dspace.core.Context;
 
 public class EmbeddableGoogleScholarProvider extends AbstractEmbeddableMetricProvider {
 
-    private final String PERSON_TEMPLATE =
+    protected final String PERSON_TEMPLATE =
             "<a "
             + "target=\"_blank\" "
             + "title=\"\" "
@@ -26,7 +26,7 @@ public class EmbeddableGoogleScholarProvider extends AbstractEmbeddableMetricPro
             + "Check"
             + "</a>";
 
-    private final String PUBLICATION_TEMPLATE =
+    protected final String PUBLICATION_TEMPLATE =
             "<a "
             + "target=\"_blank\" "
             + "title=\"\" "
@@ -35,9 +35,9 @@ public class EmbeddableGoogleScholarProvider extends AbstractEmbeddableMetricPro
             + "Check"
             + "</a>";
 
-    private String field;
+    protected String field;
 
-    private String fallbackField;
+    protected String fallbackField;
 
     @Override
     public String getMetricType() {
@@ -59,13 +59,13 @@ public class EmbeddableGoogleScholarProvider extends AbstractEmbeddableMetricPro
 
     protected String calculateSearchText(Item item) {
         if (field != null) {
-            List<MetadataValue> values = this.itemService.getMetadataByMetadataString(item, field);
+            List<MetadataValue> values = this.getItemService().getMetadataByMetadataString(item, field);
             if (!values.isEmpty()) {
                 return values.get(0).getValue();
             }
         }
         if (fallbackField != null) {
-            List<MetadataValue> values = this.itemService.getMetadataByMetadataString(item, fallbackField);
+            List<MetadataValue> values = this.getItemService().getMetadataByMetadataString(item, fallbackField);
             if (!values.isEmpty()) {
                 return values.get(0).getValue();
             }
