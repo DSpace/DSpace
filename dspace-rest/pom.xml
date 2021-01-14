@@ -156,6 +156,11 @@
                     <groupId>jakarta.annotation</groupId>
                     <artifactId>jakarta.annotation-api</artifactId>
                 </exclusion>
+                <!-- Newer version provided by solr-cell -->
+                <exclusion>
+                    <groupId>org.ow2.asm</groupId>
+                    <artifactId>asm-commons</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
