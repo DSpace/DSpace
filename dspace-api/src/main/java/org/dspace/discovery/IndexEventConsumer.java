@@ -140,7 +140,8 @@ public class IndexEventConsumer implements Consumer {
                     if (event.getSubjectType() == Constants.ITEM) {
                         WorkflowItem workflowItem = workflowItemService.findByItem(ctx, (Item) subject);
                         if (workflowItem != null) {
-                            String detail = Constants.typeText[event.getSubjectType()] + "-" + event.getSubjectID().toString();
+                            String detail =
+                                    Constants.typeText[event.getSubjectType()] + "-" + event.getSubjectID().toString();
                             uniqueIdsToDelete.add(detail);
                         }
                     }
