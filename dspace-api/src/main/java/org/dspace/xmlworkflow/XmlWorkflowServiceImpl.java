@@ -211,6 +211,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             removeUserItemPolicies(context, myitem, myitem.getSubmitter());
             if (collectionService.isSharedWorkspace(context, collection)) {
                 removeGroupItemPolicies(context, myitem, collection.getSubmitters());
+                grantSubmitterGroupReadPolicies(context, myitem, collection.getSubmitters());
             }
             grantSubmitterReadPolicies(context, myitem);
 
@@ -297,6 +298,21 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             if (!userHasPolicies.contains(Constants.READ)) {
                 addPolicyToItem(context, item, Constants.READ, submitter, ResourcePolicy.TYPE_SUBMISSION);
             }
+        }
+    }
+
+    protected void grantSubmitterGroupReadPolicies(Context context, Item item, Group group)
+        throws SQLException, AuthorizeException {
+
+        if (group == null) {
+            return;
+        }
+
+        boolean isNotReadPolicyAlreadyPresent = authorizeService.getPolicies(context, item).stream()
+            .noneMatch(policy -> group.equals(policy.getGroup()) && policy.getAction() == Constants.READ);
+
+        if (isNotReadPolicyAlreadyPresent) {
+            addGroupPolicyToItem(context, item, Constants.READ, group, ResourcePolicy.TYPE_SUBMISSION);
         }
     }
 
@@ -863,19 +879,19 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     }
 
 
-    protected void removeGroupItemPolicies(Context context, Item item, Group e)
+    protected void removeGroupItemPolicies(Context context, Item item, Group group)
         throws SQLException, AuthorizeException {
-        if (e != null && item.getSubmitter() != null) {
-            //Also remove any lingering authorizations from this user
-            authorizeService.removeGroupPolicies(context, item, e);
-            //Remove the bundle rights
-            List<Bundle> bundles = item.getBundles();
-            for (Bundle bundle : bundles) {
-                authorizeService.removeGroupPolicies(context, bundle, e);
-                List<Bitstream> bitstreams = bundle.getBitstreams();
-                for (Bitstream bitstream : bitstreams) {
-                    authorizeService.removeGroupPolicies(context, bitstream, e);
-                }
+        if (group == null) {
+            return;
+        }
+
+        authorizeService.removeGroupPolicies(context, item, group);
+        List<Bundle> bundles = item.getBundles();
+        for (Bundle bundle : bundles) {
+            authorizeService.removeGroupPolicies(context, bundle, group);
+            List<Bitstream> bitstreams = bundle.getBitstreams();
+            for (Bitstream bitstream : bitstreams) {
+                authorizeService.removeGroupPolicies(context, bitstream, group);
             }
         }
     }
