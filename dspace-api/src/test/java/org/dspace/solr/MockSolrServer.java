@@ -9,6 +9,9 @@ package org.dspace.solr;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -157,9 +160,9 @@ public class MockSolrServer {
      */
     private static synchronized void initSolrContainer() {
         if (container == null) {
-            String solrDir = AbstractDSpaceIntegrationTest.getDspaceDir() + File.separator + "solr";
-            log.info("Initializing SOLR CoreContainer with directory " + solrDir);
-            container = new CoreContainer(solrDir);
+            Path solrDir = Paths.get(AbstractDSpaceIntegrationTest.getDspaceDir() + File.separator + "solr");
+            log.info("Initializing SOLR CoreContainer with directory " + solrDir.toAbsolutePath().toString());
+            container = new CoreContainer(solrDir, new Properties());
             container.load();
             log.info("SOLR CoreContainer initialized");
         }
