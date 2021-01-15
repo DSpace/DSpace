@@ -8,7 +8,6 @@
 package org.dspace.app.nbevent.service.impl;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -208,7 +207,13 @@ public class NBEventServiceImpl implements NBEventService {
                     doc.addField(TRUST, dto.getTrust());
                     doc.addField(MESSAGE, dto.getMessage());
                     doc.addField(LAST_UPDATE, new Date());
-                    doc.addField(RESOURCE_UUID, getResourceUUID(context, dto.getOriginalId()));
+                    final String resourceUUID = getResourceUUID(context, dto.getOriginalId());
+                    if (resourceUUID == null) {
+                        log.warn("Skipped event " + checksum + " related to the oai record " + dto.getOriginalId()
+                                + " as the record was not found");
+                        return;
+                    }
+                    doc.addField(RESOURCE_UUID, resourceUUID);
                     doc.addField(RELATED_UUID, dto.getRelated());
                     updateRequest.add(doc);
                     updateRequest.process(getSolr());
@@ -292,21 +297,18 @@ public class NBEventServiceImpl implements NBEventService {
     }
 
     private String getResourceUUID(Context context, String originalId) throws Exception {
-        try {
-            String id = getHandleFromOriginalId(originalId);
-            if (id != null) {
-                Item item = (Item) handleService.resolveToObject(context, id);
-                if (item != null) {
-                    return item.getID().toString();
-                } else {
-                    throw new RuntimeException();
-                }
+        String id = getHandleFromOriginalId(originalId);
+        if (id != null) {
+            Item item = (Item) handleService.resolveToObject(context, id);
+            if (item != null) {
+                final String itemUuid = item.getID().toString();
+                context.uncacheEntity(item);
+                return itemUuid;
             } else {
-                throw new RuntimeException();
+                return null;
             }
-        } catch (RuntimeException | SQLException e) {
-            log.warn("OriginalID " + originalId + " not found");
-            throw e;
+        } else {
+            throw new RuntimeException("Malformed originalId " + originalId);
         }
     }
 

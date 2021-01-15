@@ -66,11 +66,13 @@ public class NBEventsCli {
                     try {
                         nbEventService.store(context, entry);
                     } catch (RuntimeException e) {
-                        System.out.println("Skip event for originalId " + entry.getOriginalId() + " item not found");
+                        System.out
+                                .println("Skip event for originalId " + entry.getOriginalId() + ": " + e.getMessage());
+                        e.printStackTrace();
                     }
                 } else {
                     System.out.println(
-                            "Skip event for topic " + entry.getTopic() + " has not allowed in the oaire-nbevents.cfg");
+                            "Skip event for topic " + entry.getTopic() + " is not allowed in the oaire-nbevents.cfg");
                 }
             }
         } catch (JsonParseException | JsonMappingException e) {
