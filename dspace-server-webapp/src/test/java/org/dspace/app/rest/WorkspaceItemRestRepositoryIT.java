@@ -4724,14 +4724,27 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         String token = getAuthToken(admin.getEmail(), password);
 
+        getClient(token).perform(get("/api/core/relationships/" + relationship1.getID()))
+                .andExpect(status().is(200));
         getClient(token).perform(delete("/api/core/relationships/" + relationship1.getID()))
                         .andExpect(status().is(400));
+        //Both relationships still exist
+        getClient(token).perform(get("/api/core/relationships/" + relationship1.getID()))
+                .andExpect(status().is(200));
+        getClient(token).perform(get("/api/core/relationships/" + relationship2.getID()))
+                .andExpect(status().is(200));
 
         //Delete the workspaceitem
         getClient(token).perform(delete("/api/submission/workspaceitems/" + workspaceItem.getID()))
                         .andExpect(status().is(204));
+        //The workspaceitem has been deleted
         getClient(token).perform(get("/api/submission/workspaceitems/" + workspaceItem.getID()))
                         .andExpect(status().is(404));
+        //The relationships have been deleted
+        getClient(token).perform(get("/api/core/relationships/" + relationship1.getID()))
+                .andExpect(status().is(404));
+        getClient(token).perform(get("/api/core/relationships/" + relationship2.getID()))
+                .andExpect(status().is(404));
 
     }
 }

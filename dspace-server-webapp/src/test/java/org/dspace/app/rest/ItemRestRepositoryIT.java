@@ -2799,13 +2799,27 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String token = getAuthToken(admin.getEmail(), password);
 
+        getClient(token).perform(get("/api/core/relationships/" + relationship1.getID()))
+                        .andExpect(status().is(200));
         getClient(token).perform(delete("/api/core/relationships/" + relationship1.getID()))
                         .andExpect(status().is(400));
+        //Both relationships still exist
+        getClient(token).perform(get("/api/core/relationships/" + relationship1.getID()))
+                .andExpect(status().is(200));
+        getClient(token).perform(get("/api/core/relationships/" + relationship2.getID()))
+                .andExpect(status().is(200));
+
         //Delete public item
         getClient(token).perform(delete("/api/core/items/" + publication1.getID()))
                         .andExpect(status().is(204));
+        //The item has been deleted
         getClient(token).perform(get("/api/core/items/" + publication1.getID()))
                         .andExpect(status().is(404));
+        //The relationships have been deleted
+        getClient(token).perform(get("/api/core/relationships/" + relationship1.getID()))
+                .andExpect(status().is(404));
+        getClient(token).perform(get("/api/core/relationships/" + relationship2.getID()))
+                .andExpect(status().is(404));
 
     }
 
