@@ -59,4 +59,13 @@ public interface CrisItemMetricsService {
      */
     Optional<EmbeddableCrisMetrics> getEmbeddableById(Context context, String id) throws SQLException;
 
+    /**
+     * find a {@link CrisMetrics} given a metricId
+     * @param context
+     * @param metricId
+     * @return
+     * @throws SQLException
+     */
+    CrisMetrics find(Context context, String metricId) throws SQLException;
+
 }
