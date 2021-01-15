@@ -84,8 +84,8 @@ public class NBEventsRunnable extends DSpaceRunnable<NBEventsScriptConfiguration
     public void internalRun() throws Exception {
 
         if (StringUtils.isEmpty(fileLocation)) {
-            LOGGER.error("No file location was entered");
-            throw new IllegalStateException();
+            LOGGER.info("No file location was entered");
+            System.exit(1);
         }
 
         context = new Context();
@@ -98,7 +98,7 @@ public class NBEventsRunnable extends DSpaceRunnable<NBEventsScriptConfiguration
         } catch (IOException e) {
             LOGGER.error("File is not found or not readable: " + fileLocation);
             e.printStackTrace();
-            throw new IllegalStateException();
+            System.exit(1);
         }
 
         for (NBEvent entry : entries) {
@@ -109,7 +109,7 @@ public class NBEventsRunnable extends DSpaceRunnable<NBEventsScriptConfiguration
             try {
                 nbEventService.store(context, entry);
             } catch (RuntimeException e) {
-                LOGGER.info("Skip event for originalId " + entry.getOriginalId() + " item not found");
+                System.out.println("Skip event for originalId " + entry.getOriginalId() + " item not found");
             }
         }
 
