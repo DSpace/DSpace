@@ -21,7 +21,9 @@ public interface NBEventService {
 
     public long countTopics(Context context);
 
-    public List<NBEvent> findEventsByTopicAndPage(Context context, String topic, long offset, int pageSize);
+    public List<NBEvent> findEventsByTopicAndPage(Context context, String topic,
+            long offset, int pageSize,
+            String orderField, boolean ascending);
 
     public long countEventsByTopic(Context context, String topic);
 

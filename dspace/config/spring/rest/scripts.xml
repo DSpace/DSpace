@@ -32,7 +32,7 @@
         <property name="description" value="Perform the bulk import of an excel file with a list of item to add, update or remove"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.BulkImport"/>
     </bean>
-    
+
     <bean id="item-export" class="org.dspace.content.integration.crosswalks.script.ItemExportScriptConfiguration" primary="true">
         <property name="description" value="Perform the item export in the given format"/>
         <property name="dspaceRunnableClass" value="org.dspace.content.integration.crosswalks.script.ItemExport"/>
@@ -42,15 +42,21 @@
         <property name="description" value="Perform the multiple items export in the given format"/>
         <property name="dspaceRunnableClass" value="org.dspace.content.integration.crosswalks.script.BulkItemExport"/>
     </bean>
-    
+
     <bean id="collection-export" class="org.dspace.app.bulkedit.CollectionExportScriptConfiguration" primary="true">
         <property name="description" value="Perform the export of all the archived items of the given collection in xls format"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.CollectionExport"/>
     </bean>
-    
-    <bean id="import-nbevents" class="org.dspace.app.nbevent.NBEventsScriptConfiguration" primary="true">
+
+     <bean id="import-nbevents" class="org.dspace.app.nbevent.NBEventsCliScriptConfiguration" primary="true">
         <property name="description" value="Import new openAIRE notification broker events"/>
-        <property name="dspaceRunnableClass" value="org.dspace.app.nbevent.NBEventsRunnable"/>
-    </bean>    
+        <property name="dspaceRunnableClass" value="org.dspace.app.nbevent.NBEventsRunnableCli"/>
+     </bean>
+
+     <bean id="import-oaire-suggestions" class="org.dspace.app.suggestion.OAIREPublicationLoaderCliScriptConfiguration" primary="true">
+        <property name="description" value="Import and store locally metadata from OpenAIRE"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.suggestion.OAIREPublicationLoaderRunnableCli"/>
+     </bean>
 
 </beans>
+
