@@ -22,8 +22,9 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 public class VersionManager {
     protected ItemService itemService = ContentServiceFactory.getInstance()
@@ -35,10 +36,13 @@ public class VersionManager {
     protected BitstreamService bitstreamService = ContentServiceFactory
         .getInstance().getBitstreamService();
 
+    protected ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
+
     public void removeBundle(Context context, Item item, String name)
         throws SQLException, AuthorizeException, IOException {
-        boolean keep = ConfigurationManager
-            .getBooleanProperty("swordv2-server", "versions.keep");
+        boolean keep = configurationService
+            .getBooleanProperty("swordv2-server.versions.keep");
         Iterator<Bundle> bundles = item.getBundles().iterator();
         while (bundles.hasNext()) {
             Bundle b = bundles.next();
@@ -51,8 +55,8 @@ public class VersionManager {
 
     public void removeBundle(Context context, Item item, Bundle source)
         throws SQLException, AuthorizeException, IOException {
-        boolean keep = ConfigurationManager
-            .getBooleanProperty("swordv2-server", "versions.keep");
+        boolean keep = configurationService
+            .getBooleanProperty("swordv2-server.versions.keep");
         this.removeBundle(context, item, source, keep);
     }
 
@@ -80,8 +84,8 @@ public class VersionManager {
 
     public void removeBitstream(Context context, Item item, Bitstream bitstream)
         throws SQLException, AuthorizeException, IOException {
-        boolean keep = ConfigurationManager
-            .getBooleanProperty("swordv2-server", "versions.keep");
+        boolean keep = configurationService
+            .getBooleanProperty("swordv2-server.versions.keep");
         this.removeBitstream(context, item, bitstream, keep);
     }
 
@@ -121,11 +125,8 @@ public class VersionManager {
     private Bundle archiveBitstream(Context context, Item item,
                                     Bitstream bitstream)
         throws SQLException, AuthorizeException, IOException {
-        String swordBundle = ConfigurationManager
-            .getProperty("swordv2-server", "bundle.deleted");
-        if (swordBundle == null) {
-            swordBundle = "DELETED";
-        }
+        String swordBundle = configurationService
+            .getProperty("swordv2-server.bundle.deleted", "DELETED");
 
         List<Bundle> bundles = item.getBundles();
         Bundle archive = null;

@@ -1333,7 +1333,7 @@ prevent the generation of resource policy entry values with null dspace_object a
         if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName()) && !StringUtils.equals(element, "type")) {
 
             List<RelationshipMetadataValue> relationMetadata = relationshipMetadataService
-                .getRelationshipMetadata(item, false);
+                .getRelationshipMetadata(item, enableVirtualMetadata);
             List<MetadataValue> listToReturn = new LinkedList<>();
             for (MetadataValue metadataValue : relationMetadata) {
                 if (StringUtils.equals(metadataValue.getMetadataField().getElement(), element)) {

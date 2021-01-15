@@ -19,6 +19,7 @@ import java.util.UUID;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
@@ -96,13 +97,20 @@ public class CollectionIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Ind
 
 
         // Add collection metadata
-        String description = collectionService.getMetadata(collection, "introductory_text");
-        String description_abstract = collectionService.getMetadata(collection, "short_description");
-        String description_table = collectionService.getMetadata(collection, "side_bar_text");
-        String provenance = collectionService.getMetadata(collection, "provenance_description");
-        String rights = collectionService.getMetadata(collection, "copyright_text");
-        String rights_license = collectionService.getMetadata(collection, "license");
-        String title = collectionService.getMetadata(collection, "name");
+        String description = collectionService.getMetadataFirstValue(collection,
+                CollectionService.MD_INTRODUCTORY_TEXT, Item.ANY);
+        String description_abstract = collectionService.getMetadataFirstValue(collection,
+                CollectionService.MD_SHORT_DESCRIPTION, Item.ANY);
+        String description_table = collectionService.getMetadataFirstValue(collection,
+                CollectionService.MD_SIDEBAR_TEXT, Item.ANY);
+        String provenance = collectionService.getMetadataFirstValue(collection,
+                CollectionService.MD_PROVENANCE_DESCRIPTION, Item.ANY);
+        String rights = collectionService.getMetadataFirstValue(collection,
+                CollectionService.MD_COPYRIGHT_TEXT, Item.ANY);
+        String rights_license = collectionService.getMetadataFirstValue(collection,
+                CollectionService.MD_LICENSE, Item.ANY);
+        String title = collectionService.getMetadataFirstValue(collection,
+                CollectionService.MD_NAME, Item.ANY);
 
         List<String> toIgnoreMetadataFields = SearchUtils.getIgnoredMetadataFields(collection.getType());
         addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.description",

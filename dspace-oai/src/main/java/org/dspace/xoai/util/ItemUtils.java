@@ -31,10 +31,11 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xoai.data.DSpaceItem;
 
 /**
@@ -56,6 +57,8 @@ public class ItemUtils {
     private static final BitstreamService bitstreamService
             = ContentServiceFactory.getInstance().getBitstreamService();
 
+    private static final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
     /**
      * Default constructor
      */
@@ -105,7 +108,7 @@ public class ItemUtils {
                 String url = "";
                 String bsName = bit.getName();
                 String sid = String.valueOf(bit.getSequenceID());
-                String baseUrl = ConfigurationManager.getProperty("oai", "bitstream.baseUrl");
+                String baseUrl = configurationService.getProperty("oai", "bitstream.baseUrl");
                 String handle = null;
                 // get handle of parent Item of this bitstream, if there
                 // is one:
@@ -284,9 +287,9 @@ public class ItemUtils {
 
         // Repository Info
         Element repository = create("repository");
-        repository.getField().add(createValue("url", ConfigurationManager.getProperty("dspace.ui.url")));
-        repository.getField().add(createValue("name", ConfigurationManager.getProperty("dspace.name")));
-        repository.getField().add(createValue("mail", ConfigurationManager.getProperty("mail.admin")));
+        repository.getField().add(createValue("url", configurationService.getProperty("dspace.ui.url")));
+        repository.getField().add(createValue("name", configurationService.getProperty("dspace.name")));
+        repository.getField().add(createValue("mail", configurationService.getProperty("mail.admin")));
         metadata.getElement().add(repository);
 
         // Licensing info

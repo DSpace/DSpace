@@ -117,6 +117,11 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
         return this;
     }
 
+    public EPersonBuilder withCanLogin(final boolean canLogin) {
+        ePerson.setCanLogIn(canLogin);
+        return this;
+    }
+
     public static void deleteEPerson(UUID uuid) throws SQLException, IOException {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();

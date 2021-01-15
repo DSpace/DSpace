@@ -12,24 +12,30 @@ import static org.dspace.harvest.OAIHarvester.OAI_DMD_ERROR;
 import static org.dspace.harvest.OAIHarvester.OAI_ORE_ERROR;
 import static org.dspace.harvest.OAIHarvester.OAI_SET_ERROR;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import ORG.oclc.oai.harvester2.verb.Identify;
 import ORG.oclc.oai.harvester2.verb.ListIdentifiers;
 import org.dspace.content.Collection;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.harvest.dao.HarvestedCollectionDAO;
 import org.dspace.harvest.service.HarvestedCollectionService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.input.DOMBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.w3c.dom.DOMException;
+import org.xml.sax.SAXException;
 
 /**
  * Service implementation for the HarvestedCollection object.
@@ -108,12 +114,14 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
 
     @Override
     public List<HarvestedCollection> findReady(Context context) throws SQLException {
-        int harvestInterval = ConfigurationManager.getIntProperty("oai", "harvester.harvestFrequency");
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        int harvestInterval = configurationService.getIntProperty("oai.harvester.harvestFrequency");
         if (harvestInterval == 0) {
             harvestInterval = 720;
         }
 
-        int expirationInterval = ConfigurationManager.getIntProperty("oai", "harvester.threadTimeout");
+        int expirationInterval = configurationService.getIntProperty("oai.harvester.threadTimeout");
         if (expirationInterval == 0) {
             expirationInterval = 24;
         }
@@ -182,14 +190,15 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
      * @param testORE    whether the method should also check the PMH provider for ORE support
      * @return list of errors encountered during verification. Empty list indicates a "success" condition.
      */
+    @Override
     public List<String> verifyOAIharvester(String oaiSource,
                                                   String oaiSetId, String metaPrefix, boolean testORE) {
-        List<String> errorSet = new ArrayList<String>();
+        List<String> errorSet = new ArrayList<>();
 
         // First, see if we can contact the target server at all.
         try {
             new Identify(oaiSource);
-        } catch (Exception ex) {
+        } catch (IOException | ParserConfigurationException | TransformerException | SAXException ex) {
             errorSet.add(OAI_ADDRESS_ERROR + ": OAI server could not be reached.");
             return errorSet;
         }
@@ -207,7 +216,7 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
         try {
             OREOAIPrefix = OAIHarvester.oaiResolveNamespaceToPrefix(oaiSource, OAIHarvester.getORENamespace().getURI());
             DMDOAIPrefix = OAIHarvester.oaiResolveNamespaceToPrefix(oaiSource, DMD_NS.getURI());
-        } catch (Exception ex) {
+        } catch (IOException | ParserConfigurationException | TransformerException | SAXException ex) {
             errorSet.add(OAI_ADDRESS_ERROR
                 + ": OAI did not respond to ListMetadataFormats query  ("
                 + ORE_NS.getPrefix() + ":" + OREOAIPrefix + " ; "
@@ -251,11 +260,11 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
                     }
                 }
             }
-        } catch (RuntimeException re) {
-            throw re;
-        } catch (Exception e) {
+        } catch (IOException | ParserConfigurationException | TransformerException | DOMException | SAXException e) {
             errorSet.add(OAI_ADDRESS_ERROR + ": OAI server could not be reached");
             return errorSet;
+        } catch (RuntimeException re) {
+            throw re;
         }
 
         return errorSet;

@@ -30,13 +30,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SearchUtils;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * This class performs all the actual analysis of a given set of DSpace log
@@ -268,7 +269,7 @@ public class LogAnalyser {
     /**
      * the log directory to be analysed
      */
-    private static String logDir = ConfigurationManager.getProperty("log.report.dir");
+    private static String logDir;
 
     /**
      * the regex to describe the file name format
@@ -276,16 +277,14 @@ public class LogAnalyser {
     private static String fileTemplate = "dspace\\.log.*";
 
     /**
-     * the config file from which to configure the analyser
+     * the configuration file from which to configure the analyser
      */
-    private static String configFile = ConfigurationManager.getProperty("dspace.dir") +
-        File.separator + "config" + File.separator +
-        "dstat.cfg";
+    private static String configFile;
 
     /**
      * the output file to which to write aggregation data
      */
-    private static String outFile = ConfigurationManager.getProperty("log.report.dir") + File.separator + "dstat.dat";
+    private static String outFile;
 
     /**
      * the starting date of the report
@@ -582,9 +581,11 @@ public class LogAnalyser {
         }
 
         // now do the host name and url lookup
-        hostName = Utils.getHostName(ConfigurationManager.getProperty("dspace.ui.url"));
-        name = ConfigurationManager.getProperty("dspace.name").trim();
-        url = ConfigurationManager.getProperty("dspace.ui.url").trim();
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        hostName = Utils.getHostName(configurationService.getProperty("dspace.ui.url"));
+        name = configurationService.getProperty("dspace.name").trim();
+        url = configurationService.getProperty("dspace.ui.url").trim();
         if ((url != null) && (!url.endsWith("/"))) {
             url = url + "/";
         }
@@ -622,8 +623,13 @@ public class LogAnalyser {
                                      String myConfigFile, String myOutFile,
                                      Date myStartDate, Date myEndDate,
                                      boolean myLookUp) {
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+
         if (myLogDir != null) {
             logDir = myLogDir;
+        } else {
+            logDir = configurationService.getProperty("log.report.dir");
         }
 
         if (myFileTemplate != null) {
@@ -632,6 +638,9 @@ public class LogAnalyser {
 
         if (myConfigFile != null) {
             configFile = myConfigFile;
+        } else {
+            configFile = configurationService.getProperty("dspace.dir")
+                    + File.separator + "config" + File.separator + "dstat.cfg";
         }
 
         if (myStartDate != null) {
@@ -644,9 +653,9 @@ public class LogAnalyser {
 
         if (myOutFile != null) {
             outFile = myOutFile;
+        } else {
+            outFile = configurationService.getProperty("log.report.dir") + File.separator + "dstat.dat";
         }
-
-        return;
     }
 
 
@@ -657,7 +666,7 @@ public class LogAnalyser {
      */
     public static String createOutput() {
         // start a string buffer to hold the final output
-        StringBuffer summary = new StringBuffer();
+        StringBuilder summary = new StringBuilder();
 
         // define an iterator that will be used to go over the hashmap keys
         Iterator<String> keys = null;
@@ -820,7 +829,7 @@ public class LogAnalyser {
      */
     public static void setRegex(String fileTemplate) {
         // build the exclude characters regular expression
-        StringBuffer charRegEx = new StringBuffer();
+        StringBuilder charRegEx = new StringBuilder();
         charRegEx.append("[");
         for (int i = 0; i < excludeChars.size(); i++) {
             charRegEx.append("\\").append(excludeChars.get(i));
@@ -864,7 +873,7 @@ public class LogAnalyser {
         logRegex = Pattern.compile(fileTemplate);
 
         // set up the pattern for matching any of the query types
-        StringBuffer typeRXString = new StringBuffer();
+        StringBuilder typeRXString = new StringBuilder();
         typeRXString.append("(");
         for (int i = 0; i < excludeTypes.size(); i++) {
             if (i > 0) {
@@ -876,7 +885,7 @@ public class LogAnalyser {
         typeRX = Pattern.compile(typeRXString.toString());
 
         // set up the pattern for matching any of the words to exclude
-        StringBuffer wordRXString = new StringBuffer();
+        StringBuilder wordRXString = new StringBuilder();
         wordRXString.append("(");
         for (int i = 0; i < excludeWords.size(); i++) {
             if (i > 0) {
@@ -890,8 +899,6 @@ public class LogAnalyser {
         }
         wordRXString.append(")");
         wordRX = Pattern.compile(wordRXString.toString());
-
-        return;
     }
 
     /**
@@ -920,18 +927,18 @@ public class LogAnalyser {
      */
     public static void readConfig(String configFile) throws IOException {
         //instantiate aggregators
-        actionAggregator = new HashMap<String, Integer>();
-        searchAggregator = new HashMap<String, Integer>();
-        userAggregator = new HashMap<String, Integer>();
-        itemAggregator = new HashMap<String, Integer>();
-        archiveStats = new HashMap<String, Integer>();
+        actionAggregator = new HashMap<>();
+        searchAggregator = new HashMap<>();
+        userAggregator = new HashMap<>();
+        itemAggregator = new HashMap<>();
+        archiveStats = new HashMap<>();
 
         //instantiate lists
-        generalSummary = new ArrayList<String>();
-        excludeWords = new ArrayList<String>();
-        excludeTypes = new ArrayList<String>();
-        excludeChars = new ArrayList<String>();
-        itemTypes = new ArrayList<String>();
+        generalSummary = new ArrayList<>();
+        excludeWords = new ArrayList<>();
+        excludeTypes = new ArrayList<>();
+        excludeChars = new ArrayList<>();
+        itemTypes = new ArrayList<>();
 
         // prepare our standard file readers and buffered readers
         FileReader fr = null;
@@ -1002,8 +1009,6 @@ public class LogAnalyser {
         // close the inputs
         br.close();
         fr.close();
-
-        return;
     }
 
     /**
