@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -19,8 +18,9 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.SelfNamedPlugin;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom.Namespace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,7 +83,6 @@ import org.slf4j.LoggerFactory;
  * does this automatically.
  *
  * @author Larry Stone
- * @version $Revision$
  */
 public abstract class XSLTCrosswalk extends SelfNamedPlugin {
     /**
@@ -98,7 +97,7 @@ public abstract class XSLTCrosswalk extends SelfNamedPlugin {
         Namespace.getNamespace("dim", "http://www.dspace.org/xmlns/dspace/dim");
 
     /**
-     * Prefix for all lines in the config file for XSLT plugins.
+     * Prefix for all lines in the configuration file for XSLT plugins.
      */
     protected static final String CONFIG_PREFIX = "crosswalk.";
 
@@ -117,12 +116,13 @@ public abstract class XSLTCrosswalk extends SelfNamedPlugin {
         String suffix = CONFIG_STYLESHEET;
 
         List<String> aliasList = new ArrayList<>();
-        Enumeration<String> pe = (Enumeration<String>) ConfigurationManager.propertyNames();
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        List<String> configKeys = configurationService.getPropertyKeys(prefix);
 
         LOG.debug("XSLTCrosswalk: Looking for config prefix = {}", prefix);
-        while (pe.hasMoreElements()) {
-            String key = pe.nextElement();
-            if (key.startsWith(prefix) && key.endsWith(suffix)) {
+        for (String key : configKeys) {
+            if (key.endsWith(suffix)) {
                 LOG.debug("Getting XSLT plugin name from config line: {}", key);
                 aliasList.add(key.substring(prefix.length(), key.length() - suffix.length()));
             }
@@ -155,13 +155,15 @@ public abstract class XSLTCrosswalk extends SelfNamedPlugin {
                 return null;
             }
             String cmPropName = CONFIG_PREFIX + direction + "." + myAlias + CONFIG_STYLESHEET;
-            String fname = ConfigurationManager.getProperty(cmPropName);
+            ConfigurationService configurationService
+                    = DSpaceServicesFactory.getInstance().getConfigurationService();
+            String fname = configurationService.getProperty(cmPropName);
             if (fname == null) {
                 LOG.error("Missing configuration filename for XSLT-based crosswalk: no " +
                               "value for property = {}", cmPropName);
                 return null;
             } else {
-                String parent = ConfigurationManager.getProperty("dspace.dir") +
+                String parent = configurationService.getProperty("dspace.dir") +
                     File.separator + "config" + File.separator;
                 transformFile = new File(parent, fname);
             }

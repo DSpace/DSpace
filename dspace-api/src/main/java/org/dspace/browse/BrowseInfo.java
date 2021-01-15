@@ -475,6 +475,7 @@ public class BrowseInfo {
      * @return an empty array of Item.
      * @deprecated
      */
+    @Deprecated
     public Item[] getItemResults() {
         return new Item[0];
     }

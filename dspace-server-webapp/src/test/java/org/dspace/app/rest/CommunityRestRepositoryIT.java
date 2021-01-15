@@ -11,6 +11,8 @@ import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static junit.framework.TestCase.assertEquals;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataNotEmpty;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataStringEndsWith;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -117,6 +119,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         // Capture the UUID of the created Community (see andDo() below)
         AtomicReference<UUID> idRef = new AtomicReference<>();
         AtomicReference<UUID> idRefNoEmbeds = new AtomicReference<>();
+        AtomicReference<String> handle = new AtomicReference<>();
+
         try {
             getClient(authToken).perform(post("/api/core/communities")
                                         .content(mapper.writeValueAsBytes(comm))
@@ -136,15 +140,26 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                     hasJsonPath("$._links.subcommunities.href", not(empty())),
                                     hasJsonPath("$._links.self.href", not(empty())),
                                     hasJsonPath("$.metadata", Matchers.allOf(
-                                        matchMetadata("dc.description", "<p>Some cool HTML code here</p>"),
-                                        matchMetadata("dc.description.abstract",
-                                               "Sample top-level community created via the REST API"),
-                                        matchMetadata("dc.description.tableofcontents", "<p>HTML News</p>"),
-                                        matchMetadata("dc.rights", "Custom Copyright Text"),
-                                        matchMetadata("dc.title", "Title Text")
+                                            matchMetadata("dc.description", "<p>Some cool HTML code here</p>"),
+                                            matchMetadata("dc.description.abstract",
+                                                   "Sample top-level community created via the REST API"),
+                                            matchMetadata("dc.description.tableofcontents", "<p>HTML News</p>"),
+                                            matchMetadata("dc.rights", "Custom Copyright Text"),
+                                            matchMetadata("dc.title", "Title Text")
+                                            )
                                         )
-                                    )
                                 )))
+
+                                // capture "handle" returned in JSON response and check against the metadata
+                                .andDo(result -> handle.set(
+                                        read(result.getResponse().getContentAsString(), "$.handle")))
+                                .andExpect(jsonPath("$",
+                                    hasJsonPath("$.metadata", Matchers.allOf(
+                                        matchMetadataNotEmpty("dc.identifier.uri"),
+                                        matchMetadataStringEndsWith("dc.identifier.uri", handle.get())
+                                        )
+                                    )))
+
                                 // capture "id" returned in JSON response
                                 .andDo(result -> idRef
                                     .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
@@ -233,8 +248,9 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
             .put("dc.title",
                 new MetadataValueRest("Title Text")));
 
-        // Capture the UUID of the created Community (see andDo() below)
+        // Capture the UUID and Handle of the created Community (see andDo() below)
         AtomicReference<UUID> idRef = new AtomicReference<>();
+        AtomicReference<String> handle = new AtomicReference<>();
         try {
             getClient(authToken).perform(post("/api/core/communities")
                 .content(mapper.writeValueAsBytes(comm))
@@ -253,17 +269,26 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                     hasJsonPath("$._links.subcommunities.href", not(empty())),
                                     hasJsonPath("$._links.self.href", not(empty())),
                                     hasJsonPath("$.metadata", Matchers.allOf(
-                                        MetadataMatcher.matchMetadata("dc.description",
-                                            "<p>Some cool HTML code here</p>"),
-                                        MetadataMatcher.matchMetadata("dc.description.abstract",
-                                            "Sample top-level community created via the REST API"),
-                                        MetadataMatcher.matchMetadata("dc.description.tableofcontents",
-                                            "<p>HTML News</p>"),
-                                        MetadataMatcher.matchMetadata("dc.rights",
-                                            "Custom Copyright Text"),
-                                        MetadataMatcher.matchMetadata("dc.title",
-                                            "Title Text")
+                                            MetadataMatcher.matchMetadata("dc.description",
+                                                "<p>Some cool HTML code here</p>"),
+                                            MetadataMatcher.matchMetadata("dc.description.abstract",
+                                                "Sample top-level community created via the REST API"),
+                                            MetadataMatcher.matchMetadata("dc.description.tableofcontents",
+                                                "<p>HTML News</p>"),
+                                            MetadataMatcher.matchMetadata("dc.rights",
+                                                "Custom Copyright Text"),
+                                            MetadataMatcher.matchMetadata("dc.title",
+                                                "Title Text")
+                                            )
                                         )
+                                )))
+                                // capture "handle" returned in JSON response and check against the metadata
+                                .andDo(result -> handle.set(
+                                        read(result.getResponse().getContentAsString(), "$.handle")))
+                                .andExpect(jsonPath("$",
+                                    hasJsonPath("$.metadata", Matchers.allOf(
+                                        matchMetadataNotEmpty("dc.identifier.uri"),
+                                        matchMetadataStringEndsWith("dc.identifier.uri", handle.get())
                                     )
                                 )))
                                 // capture "id" returned in JSON response

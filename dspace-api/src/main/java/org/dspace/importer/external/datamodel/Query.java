@@ -10,7 +10,8 @@ package org.dspace.importer.external.datamodel;
 
 import java.util.Collection;
 
-import org.apache.commons.collections4.map.MultiValueMap;
+import org.apache.commons.collections4.MultiValuedMap;
+import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
 
 /**
  * Represents a query to a source. Subclasses may enforce stricter typing or more verbose setting of parameters.
@@ -19,14 +20,14 @@ import org.apache.commons.collections4.map.MultiValueMap;
  */
 public class Query {
 
-    private MultiValueMap parameters = new MultiValueMap();
+    private MultiValuedMap parameters = new ArrayListValuedHashMap();
 
     /**
      * Retrieve the parameters set to this Query object
      *
-     * @return the {@link org.apache.commons.collections.map.MultiValueMap} set to this object
+     * @return the {@link org.apache.commons.collections4.MultiValuedMap} set to this object
      */
-    public MultiValueMap getParameters() {
+    public MultiValuedMap getParameters() {
         return parameters;
     }
 
@@ -66,7 +67,7 @@ public class Query {
      * @return the selected parameter, or null.
      */
     public <T> T getParameterAsClass(String key, Class<T> clazz) {
-        Collection c = parameters.getCollection(key);
+        Collection c = parameters.get(key);
         if (c == null || c.isEmpty()) {
             return null;
         } else {
@@ -87,16 +88,16 @@ public class Query {
      * @return the collection mapped to the key, null if no mapping
      */
     public Collection getParameter(String key) {
-        return parameters.getCollection(key);
+        return parameters.get(key);
     }
 
 
     /**
-     * Set the parameters of this query object based on a given {@link org.apache.commons.collections.map.MultiValueMap}
+     * Set the parameters of this query object based on a given {@link org.apache.commons.collections4.MultiValuedMap}
      *
-     * @param parameters a {@link org.apache.commons.collections.map.MultiValueMap} to set to this Query object
+     * @param parameters a {@link org.apache.commons.collections.map.MultiValuedMap} to set to this Query object
      */
-    public void setParameters(MultiValueMap parameters) {
+    public void setParameters(MultiValuedMap parameters) {
         this.parameters = parameters;
     }
 }

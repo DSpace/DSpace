@@ -12,7 +12,6 @@ import org.dspace.core.Context;
 import org.dspace.identifier.service.IdentifierService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * @author Fabio Bolognesi (fabio at atmire dot com)
@@ -25,8 +24,7 @@ public abstract class IdentifierProvider {
 
     protected ConfigurationService configurationService;
 
-    @Autowired
-    @Required
+    @Autowired(required = true)
     public void setConfigurationService(ConfigurationService configurationService) {
         this.configurationService = configurationService;
     }

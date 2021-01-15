@@ -19,10 +19,11 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.packager.PackageDisseminator;
 import org.dspace.content.packager.PackageException;
 import org.dspace.content.packager.PackageParameters;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -85,7 +86,7 @@ public class METSDisseminationCrosswalk
     public List<Element> disseminateList(Context context, DSpaceObject dso)
         throws CrosswalkException,
         IOException, SQLException, AuthorizeException {
-        List<Element> result = new ArrayList<Element>(1);
+        List<Element> result = new ArrayList<>(1);
         result.add(disseminateElement(context, dso));
         return result;
     }
@@ -114,8 +115,11 @@ public class METSDisseminationCrosswalk
             pparams.put("manifestOnly", "true");
 
             // Create a temporary file to disseminate into
-            String tempDirectory = (ConfigurationManager.getProperty("upload.temp.dir") != null)
-                ? ConfigurationManager.getProperty("upload.temp.dir") : System.getProperty("java.io.tmpdir");
+            ConfigurationService configurationService
+                    = DSpaceServicesFactory.getInstance().getConfigurationService();
+            String tempDirectory = (configurationService.hasProperty("upload.temp.dir"))
+                ? configurationService.getProperty("upload.temp.dir")
+                    : System.getProperty("java.io.tmpdir");
 
             File tempFile = File.createTempFile("METSDissemination" + dso.hashCode(), null, new File(tempDirectory));
             tempFile.deleteOnExit();

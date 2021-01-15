@@ -14,9 +14,9 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 import org.apache.xpath.XPathAPI;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataField;
@@ -94,7 +94,7 @@ public class MetadataImporter {
         boolean forceUpdate = false;
 
         // create an options object and populate it
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
         Options options = new Options();
         options.addOption("f", "file", true, "source xml file for DC fields");
         options.addOption("u", "update", false, "update an existing schema");

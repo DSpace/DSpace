@@ -13,4 +13,6 @@ public interface ConfigurationService {
     String getProperty(String module, String key);
 
     boolean getBooleanProperty(String module, String key, boolean defaultValue);
+
+    boolean getBooleanProperty(String key, boolean defaultValue);
 }
