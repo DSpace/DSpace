@@ -97,7 +97,13 @@ public class CrisItemMetricsServiceImpl implements CrisItemMetricsService {
             Optional<EmbeddableCrisMetrics> metrics = getEmbeddableById(context, metricId);
             return metrics.isPresent() ? (CrisMetrics)metrics.get() : null;
         }
-        return crisMetricsService.find(context, Integer.parseInt(metricId));
+        return crisMetricsService.find(context,
+                Integer.parseInt(metricId.replace(CrisMetrics.STORED_METRIC_ID_PREFIX, "")));
+    }
+
+    @Override
+    public boolean isEmbeddableMetricId(String id) {
+        return id.contains(AbstractEmbeddableMetricProvider.DYNAMIC_ID_SEPARATOR);
     }
 
     private SolrDocument findMetricsDocumentInSolr(Context context, UUID itemUuid) {
@@ -166,10 +172,5 @@ public class CrisItemMetricsServiceImpl implements CrisItemMetricsService {
         }
         return metricsField;
     }
-
-    protected boolean isEmbeddableMetricId(String id) {
-        return id.split(AbstractEmbeddableMetricProvider.DYNAMIC_ID_SEPARATOR).length == 2;
-    }
-
 
 }

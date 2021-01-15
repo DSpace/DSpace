@@ -9,7 +9,6 @@ package org.dspace.app.rest.repository;
 import java.sql.SQLException;
 
 import org.dspace.app.metrics.CrisMetrics;
-import org.dspace.app.metrics.service.CrisMetricsService;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.CrisMetricsRest;
 import org.dspace.core.Context;
@@ -27,10 +26,7 @@ import org.springframework.stereotype.Component;
  */
 @Component(CrisMetricsRest.CATEGORY + "." + CrisMetricsRest.NAME)
 public class CrisMetricsRestRepository extends DSpaceRestRepository<CrisMetricsRest, String>
-                                       implements ReloadableEntityObjectRepository<CrisMetrics, Integer> {
-
-    @Autowired
-    private CrisMetricsService crisMetricsService;
+                                       implements ReloadableEntityObjectRepository<CrisMetrics, String> {
 
     @Autowired
     private CrisItemMetricsService crisItemMetricsService;
@@ -56,8 +52,8 @@ public class CrisMetricsRestRepository extends DSpaceRestRepository<CrisMetricsR
     }
 
     @Override
-    public CrisMetrics findDomainObjectByPk(Context context, Integer id) throws SQLException {
-        return crisMetricsService.find(context, id);
+    public CrisMetrics findDomainObjectByPk(Context context, String id) throws SQLException {
+        return crisItemMetricsService.find(context, id);
     }
 
     @Override
@@ -66,7 +62,7 @@ public class CrisMetricsRestRepository extends DSpaceRestRepository<CrisMetricsR
     }
 
     @Override
-    public Class<Integer> getPKClass() {
-        return Integer.class;
+    public Class<String> getPKClass() {
+        return String.class;
     }
 }

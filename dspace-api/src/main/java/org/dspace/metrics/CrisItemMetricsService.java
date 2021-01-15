@@ -68,4 +68,11 @@ public interface CrisItemMetricsService {
      */
     CrisMetrics find(Context context, String metricId) throws SQLException;
 
+    /**
+     * Return true if the id represent and embeddable metric. False otherwise (stored metric)
+     * @param id the metric Id
+     * @return
+     */
+    boolean isEmbeddableMetricId(String id);
+
 }

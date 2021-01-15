@@ -45,7 +45,7 @@ public class CrisMetricsConverter implements DSpaceConverter<CrisMetrics, CrisMe
         if (model instanceof EmbeddableCrisMetrics) {
             return ((EmbeddableCrisMetrics)model).getEmbeddableId();
         }
-        return String.valueOf(model.getId());
+        return CrisMetrics.STORED_METRIC_ID_PREFIX + model.getId();
     }
 
     /* (non-Javadoc)

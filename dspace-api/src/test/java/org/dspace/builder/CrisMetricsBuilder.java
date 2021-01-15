@@ -148,4 +148,8 @@ public class CrisMetricsBuilder extends AbstractBuilder<CrisMetrics, CrisMetrics
         return this;
     }
 
+    public static String getRestStoredMetricId(String metricId) {
+        return CrisMetrics.STORED_METRIC_ID_PREFIX + metricId;
+    }
+
 }
