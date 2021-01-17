@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.UpdateRequest;
@@ -259,10 +260,13 @@ public class NBEventServiceImpl implements NBEventService {
     }
 
     @Override
-    public List<NBEvent> findEventsByTopicAndPage(Context context, String topic, long offset, int pageSize) {
+    public List<NBEvent> findEventsByTopicAndPage(Context context, String topic,
+            long offset, int pageSize,
+            String orderField, boolean ascending) {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setStart(((Long) offset).intValue());
         solrQuery.setRows(pageSize);
+        solrQuery.setSort(orderField, ascending ? ORDER.asc : ORDER.desc);
         solrQuery.setQuery(TOPIC + ":" + topic.replaceAll("!", "/"));
         QueryResponse response;
         try {

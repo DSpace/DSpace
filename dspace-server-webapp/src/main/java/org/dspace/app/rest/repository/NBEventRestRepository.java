@@ -31,11 +31,14 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 @Component(NBEventRest.CATEGORY + "." + NBEventRest.NAME)
 public class NBEventRestRepository extends DSpaceRestRepository<NBEventRest, String> {
+
+    final static String ORDER_FIELD = "trust";
 
     @Autowired
     private NBEventService nbEventService;
@@ -76,8 +79,13 @@ public class NBEventRestRepository extends DSpaceRestRepository<NBEventRest, Str
             Pageable pageable) {
         List<NBEvent> nbEvents = null;
         Long count = 0L;
-        nbEvents = nbEventService.findEventsByTopicAndPage(context, topic, pageable.getOffset(),
-                pageable.getPageSize());
+        boolean ascending = false;
+        if (pageable.getSort() != null && pageable.getSort().getOrderFor(ORDER_FIELD) != null) {
+            ascending = pageable.getSort().getOrderFor(ORDER_FIELD).getDirection() == Direction.ASC;
+        }
+        nbEvents = nbEventService.findEventsByTopicAndPage(context, topic,
+                pageable.getOffset(), pageable.getPageSize(),
+                ORDER_FIELD, ascending);
         count = nbEventService.countEventsByTopic(context, topic);
         if (nbEvents == null) {
             return null;
