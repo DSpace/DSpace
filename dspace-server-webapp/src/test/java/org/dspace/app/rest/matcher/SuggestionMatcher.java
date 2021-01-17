@@ -28,7 +28,30 @@ public class SuggestionMatcher {
                 hasJsonPath("$.metadata['dc.title'][0].value", is("Title Suggestion " + suggestionId )),
                 hasJsonPath("$.metadata['dc.source'][0].value", is("Source 1")),
                 hasJsonPath("$.metadata['dc.source'][1].value", is("Source 2")),
+                hasJsonPath("$.score"),
+                hasJsonPath("$.evidences"),
                 hasJsonPath("$.type", is("suggestion"))
         );
     }
+
+    public static Matcher<? super Object> matchSuggestion(String source, Item target, String display,
+            String suggestionId, double score, String evidenceName, double evidenceScore, String evidenceNote) {
+        return Matchers.allOf(
+                hasJsonPath("$.display", is(display)),
+                hasJsonPath("$.source", is(source)),
+                hasJsonPath("$.id", is(source + ":" + target.getID().toString() + ":" + suggestionId)),
+                hasJsonPath("$.metadata['dc.title'][0].value", is("Title Suggestion " + suggestionId )),
+                hasJsonPath("$.metadata['dc.source'][0].value", is("Source 1")),
+                hasJsonPath("$.metadata['dc.source'][1].value", is("Source 2")),
+                hasJsonPath("$.score", is(String.valueOf(score))),
+                hasJsonPath("$.evidences." + evidenceName, Matchers.is(
+                        hasJsonPath("$",
+                                Matchers.allOf(
+                                        hasJsonPath("$.score", is(String.valueOf(evidenceScore))),
+                                        hasJsonPath("$.notes", is(evidenceNote))))
+                        )),
+                hasJsonPath("$.type", is("suggestion"))
+        );
+    }
+
 }

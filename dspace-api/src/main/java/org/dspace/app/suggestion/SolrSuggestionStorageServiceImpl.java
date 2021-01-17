@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -48,8 +49,10 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
     }
 
     @Override
-    public void addSuggestion(Suggestion suggestion, boolean commit) throws SolrServerException, IOException {
-        if (!exist(suggestion)) {
+    public void addSuggestion(Suggestion suggestion, boolean force, boolean commit)
+            throws SolrServerException, IOException {
+        if (force || !exist(suggestion)) {
+            Gson gson = new Gson();
             SolrInputDocument document = new SolrInputDocument();
             document.addField(SOURCE, suggestion.getSource());
             String suggestionFullID = suggestion.getID();
@@ -63,7 +66,9 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
             document.addField(ABSTRACT, getFirstValue(suggestion, "dc", "description", "abstract"));
             document.addField(CATEGORY, getAllValues(suggestion, "dc", "source", null));
             document.addField(EXTERNAL_URI, suggestion.getExternalSourceUri());
+            document.addField(SCORE, suggestion.getScore());
             document.addField(PROCESSED, false);
+            document.addField(EVIDENCES, gson.toJson(suggestion.getEvidences()));
             getSolr().add(document);
             if (commit) {
                 getSolr().commit();
@@ -94,7 +99,8 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
 
     @Override
     public boolean exist(Suggestion suggestion) throws SolrServerException, IOException {
-        SolrQuery query = new SolrQuery(SUGGESTION_FULLID + ":\"" + suggestion.getID() + "\"");
+        SolrQuery query = new SolrQuery(
+                SUGGESTION_FULLID + ":\"" + suggestion.getID() + "\" AND " + PROCESSED + ":true");
         return getSolr().query(query).getResults().getNumFound() == 1;
     }
 

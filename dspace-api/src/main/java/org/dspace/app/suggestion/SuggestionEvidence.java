@@ -23,6 +23,12 @@ public class SuggestionEvidence {
     public SuggestionEvidence() {
     }
 
+    public SuggestionEvidence(String name, double score, String notes) {
+        this.name = name;
+        this.score = score;
+        this.notes = notes;
+    }
+
     public String getName() {
         return name;
     }

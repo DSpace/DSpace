@@ -75,4 +75,15 @@ public class Suggestion {
     public String getID() {
         return id;
     }
+
+    public Double getScore() {
+        if (evidences != null && evidences.size() > 0) {
+            double score = 0;
+            for (SuggestionEvidence evidence : evidences) {
+                score += evidence.getScore();
+            }
+            return score;
+        }
+        return null;
+    }
 }

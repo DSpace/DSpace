@@ -68,7 +68,7 @@ public class OAIREPublicationLoaderCli {
 
             // load all author publication
             for (Item researcher : researchers) {
-                getOAIREPublicationLoader().importAuthorRecords(researcher);
+                getOAIREPublicationLoader().importAuthorRecords(context, researcher);
             }
             System.out.println("Process complete");
             System.exit(0);

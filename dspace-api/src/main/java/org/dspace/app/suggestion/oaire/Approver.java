@@ -7,8 +7,7 @@
  */
 package org.dspace.app.suggestion.oaire;
 
-import java.util.List;
-
+import org.dspace.app.suggestion.SuggestionEvidence;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 
@@ -27,9 +26,9 @@ public interface Approver {
      * Filter method which return a subset of ImportRecord starting from the existing list.
      * 
      * @param researcher DSpace item
-     * @param importRecords list of importRecords
-     * @return filtered list of importRecords
+     * @param importRecord the record to evaluate
+     * @return the generated suggestion evidence or null if the record should be discarded
      */
-    public List<ImportRecord> filter(Item researcher, List<ImportRecord> importRecords);
+    public SuggestionEvidence filter(Item researcher, ImportRecord importRecords);
 
 }

@@ -35,8 +35,10 @@ public class SuggestionConverter
         targetRest.setDisplay(target.getDisplay());
         targetRest.setExternalSourceUri(target.getExternalSourceUri());
         targetRest.setSource(target.getSource());
+        targetRest.setScore(String.valueOf(target.getScore()));
         for (SuggestionEvidence se : target.getEvidences()) {
-            targetRest.getEvidences().put(se.getName(), new SuggestionRest.EvidenceRest(se.getScore(), se.getNotes()));
+            targetRest.getEvidences().put(se.getName(),
+                    new SuggestionRest.EvidenceRest(String.valueOf(se.getScore()), se.getNotes()));
         }
         targetRest.setMetadata(metadataConverter.convert(target.getMetadata()));
         return targetRest;

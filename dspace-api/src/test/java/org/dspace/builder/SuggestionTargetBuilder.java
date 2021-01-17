@@ -15,6 +15,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.suggestion.MockSuggestionExternalDataSource;
 import org.dspace.app.suggestion.SolrSuggestionStorageService;
 import org.dspace.app.suggestion.Suggestion;
+import org.dspace.app.suggestion.SuggestionEvidence;
 import org.dspace.app.suggestion.SuggestionTarget;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
@@ -28,7 +29,8 @@ import org.dspace.eperson.EPerson;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class SuggestionTargetBuilder extends AbstractBuilder<SuggestionTarget, SolrSuggestionStorageService> {
-
+    public final static String EVIDENCE_MOCK_NAME = "MockEvidence";
+    public final static String EVIDENCE_MOCK_NOTE = "Generated for testing purpose...";
     private Item item;
     private SuggestionTarget target;
     private List<Suggestion> suggestions;
@@ -96,7 +98,7 @@ public class SuggestionTargetBuilder extends AbstractBuilder<SuggestionTarget, S
         suggestions = generateAllSuggestion();
         try {
             for (Suggestion s : suggestions) {
-                solrSuggestionService.addSuggestion(s, false);
+                solrSuggestionService.addSuggestion(s, false, false);
             }
             solrSuggestionService.commit();
         } catch (SolrServerException | IOException e) {
@@ -149,6 +151,8 @@ public class SuggestionTargetBuilder extends AbstractBuilder<SuggestionTarget, S
             sug.setExternalSourceUri(
                     "http://localhost/api/integration/externalsources/" + MockSuggestionExternalDataSource.NAME
                             + "/entryValues/" + idPartStr);
+            sug.getEvidences().add(new SuggestionEvidence(EVIDENCE_MOCK_NAME,
+                    idx % 2 == 0 ? 100 - idx : (double) idx / 2, EVIDENCE_MOCK_NOTE));
             allSuggestions.add(sug);
         }
         return allSuggestions;

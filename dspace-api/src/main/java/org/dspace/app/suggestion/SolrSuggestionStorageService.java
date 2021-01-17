@@ -32,22 +32,26 @@ public interface SolrSuggestionStorageService {
     public static final String CATEGORY = "category";
     public static final String EXTERNAL_URI = "external-uri";
     public static final String PROCESSED = "processed";
+    public static final String SCORE = "score";
+    public static final String EVIDENCES = "evidences";
 
     /**
-     * Add a new suggestion to SOLR (only if not yet present)
+     * Add a new suggestion to SOLR
      * 
      * @param suggestion
+     * @param force true if the suggestion must be reindexed
      * @param commit
      * @throws IOException
      * @throws SolrServerException
      */
-    public void addSuggestion(Suggestion suggestion, boolean commit) throws SolrServerException, IOException;
+    public void addSuggestion(Suggestion suggestion, boolean force, boolean commit)
+            throws SolrServerException, IOException;
 
     /**
-     * Return true if the suggestion is already in SOLR
+     * Return true if the suggestion is already in SOLR and flagged as processed
      * 
      * @param suggestion
-     * @return true if the suggestion is already in SOLR
+     * @return true if the suggestion is already in SOLR and flagged as processed
      * @throws IOException
      * @throws SolrServerException
      */

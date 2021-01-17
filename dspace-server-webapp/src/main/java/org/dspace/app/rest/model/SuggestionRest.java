@@ -31,6 +31,7 @@ public class SuggestionRest extends BaseObjectRest<String> {
     private String display;
     private String source;
     private String externalSourceUri;
+    private String score;
     private Map<String, EvidenceRest> evidences = new HashMap<String, EvidenceRest>();
     private MetadataRest metadata = new MetadataRest();
 
@@ -74,6 +75,14 @@ public class SuggestionRest extends BaseObjectRest<String> {
         this.externalSourceUri = externalSourceUri;
     }
 
+    public void setScore(String score) {
+        this.score = score;
+    }
+
+    public String getScore() {
+        return score;
+    }
+
     public Map<String, EvidenceRest> getEvidences() {
         return evidences;
     }
@@ -91,9 +100,9 @@ public class SuggestionRest extends BaseObjectRest<String> {
     }
 
     public static class EvidenceRest {
-        public double score;
+        public String score;
         public String notes;
-        public EvidenceRest(double score, String notes) {
+        public EvidenceRest(String score, String notes) {
             this.score = score;
             this.notes = notes;
         }

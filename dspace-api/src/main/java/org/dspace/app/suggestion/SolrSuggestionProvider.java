@@ -12,6 +12,7 @@ import static org.dspace.app.suggestion.SolrSuggestionStorageService.CATEGORY;
 import static org.dspace.app.suggestion.SolrSuggestionStorageService.CONTRIBUTORS;
 import static org.dspace.app.suggestion.SolrSuggestionStorageService.DATE;
 import static org.dspace.app.suggestion.SolrSuggestionStorageService.DISPLAY;
+import static org.dspace.app.suggestion.SolrSuggestionStorageService.EVIDENCES;
 import static org.dspace.app.suggestion.SolrSuggestionStorageService.EXTERNAL_URI;
 import static org.dspace.app.suggestion.SolrSuggestionStorageService.PROCESSED;
 import static org.dspace.app.suggestion.SolrSuggestionStorageService.SOURCE;
@@ -20,11 +21,14 @@ import static org.dspace.app.suggestion.SolrSuggestionStorageService.TARGET_ID;
 import static org.dspace.app.suggestion.SolrSuggestionStorageService.TITLE;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -186,8 +190,7 @@ public class SolrSuggestionProvider implements SuggestionProvider {
         solrQuery.addFilterQuery(
                 SOURCE + ":" + sourceName,
                 TARGET_ID + ":" + target.toString(),
-                SUGGESTION_ID + ":\"" + id + "\"",
-                PROCESSED + ":false");
+                SUGGESTION_ID + ":\"" + id + "\"");
         QueryResponse response = null;
         try {
             response = getSolr().query(solrQuery);
@@ -260,6 +263,10 @@ public class SolrSuggestionProvider implements SuggestionProvider {
                         new MetadataValueDTO("dc", "contributor", "author", null, (String) o));
             }
         }
+        String evidencesJson = (String) solrDoc.getFieldValue(EVIDENCES);
+        Type listType = new TypeToken<ArrayList<SuggestionEvidence>>() {}.getType();
+        List<SuggestionEvidence> evidences = new Gson().fromJson(evidencesJson, listType);
+        suggestion.getEvidences().addAll(evidences);
         return suggestion;
     }
 

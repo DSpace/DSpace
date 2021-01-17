@@ -9,6 +9,8 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.SuggestionMatcher.matchSuggestion;
+import static org.dspace.builder.SuggestionTargetBuilder.EVIDENCE_MOCK_NAME;
+import static org.dspace.builder.SuggestionTargetBuilder.EVIDENCE_MOCK_NOTE;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
 import static org.springframework.http.MediaType.parseMediaType;
@@ -91,9 +93,12 @@ public class SuggestionRestRepositoryIT extends AbstractControllerIntegrationTes
                         .param("target", itemFirst.getID().toString()))
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.suggestions", Matchers.contains(
-                        matchSuggestion("scopus", itemFirst, "Suggestion scopus 1", "1"),
-                        matchSuggestion("scopus", itemFirst, "Suggestion scopus 2", "2"),
-                        matchSuggestion("scopus", itemFirst, "Suggestion scopus 3", "3"))))
+                        matchSuggestion("scopus", itemFirst, "Suggestion scopus 1", "1",
+                                100.0, EVIDENCE_MOCK_NAME, 100.0, EVIDENCE_MOCK_NOTE),
+                        matchSuggestion("scopus", itemFirst, "Suggestion scopus 2", "2",
+                                0.5, EVIDENCE_MOCK_NAME, 0.5, EVIDENCE_MOCK_NOTE),
+                        matchSuggestion("scopus", itemFirst, "Suggestion scopus 3", "3",
+                                98.0, EVIDENCE_MOCK_NAME, 98.0, EVIDENCE_MOCK_NOTE))))
                 .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
                         Matchers.containsString(
                                 "/api/integration/suggestions/search/findByTargetAndSource?"),

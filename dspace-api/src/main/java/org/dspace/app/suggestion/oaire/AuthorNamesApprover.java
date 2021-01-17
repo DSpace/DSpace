@@ -11,7 +11,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.suggestion.SuggestionEvidence;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
@@ -65,44 +68,46 @@ public class AuthorNamesApprover implements Approver {
     }
 
     /**
-     * Method which is responsible to filter ImportRecords based on authors name.
+     * Method which is responsible to evaluate ImportRecord based on authors name.
      * This method extract the researcher name from Item using contributorMetadata fields
      * and try to match them with values extract from ImportRecord using metadata keys defined
      * in names.
      * ImportRecords which don't match will be discarded.
      * 
-     * @param importRecords list of import records
+     * @param importRecord the import record to check
      * @param researcher DSpace item
-     * @return list of filtered importRecord
+     * @return the generated evidence or null if the record must be discarded
      */
     @Override
-    public List<ImportRecord> filter(Item researcher, List<ImportRecord> importRecords) {
+    public SuggestionEvidence filter(Item researcher, ImportRecord importRecord) {
         List<ImportRecord> filteredRecords = new ArrayList<>();
         List<String> authors = searchMetadataValues(researcher);
-        for (ImportRecord importRecord : importRecords) {
-            List<String> metadataAuthors = new ArrayList<>();
-            Collection<MetadatumDTO> metadata = new ArrayList<>();
-            for (String contributorMetadatum : contributorMetadata) {
-                String[] fields = contributorMetadatum.split("\\.");
-                if (fields.length == 2) {
-                    metadata.addAll(importRecord.getValue(fields[0], fields[1], null));
-                } else {
-                    metadata.addAll(importRecord.getValue(fields[0], fields[1], fields[2]));
-                }
-            }
-            if (metadata != null) {
-                for (MetadatumDTO metadatum : metadata) {
-                    metadataAuthors.add(metadatum.getValue());
-                }
-            }
-            for (String metadataAuthor : metadataAuthors) {
-                if (authors.contains(metadataAuthor)) {
-                    filteredRecords.add(importRecord);
-                    break;
-                }
+        List<String> metadataAuthors = new ArrayList<>();
+        Collection<MetadatumDTO> metadata = new ArrayList<>();
+        for (String contributorMetadatum : contributorMetadata) {
+            String[] fields = contributorMetadatum.split("\\.");
+            if (fields.length == 2) {
+                metadata.addAll(importRecord.getValue(fields[0], fields[1], null));
+            } else {
+                metadata.addAll(importRecord.getValue(fields[0], fields[1], fields[2]));
             }
         }
-        return filteredRecords;
+        if (metadata != null) {
+            for (MetadatumDTO metadatum : metadata) {
+                metadataAuthors.add(metadatum.getValue());
+            }
+        }
+        for (String metadataAuthor : metadataAuthors) {
+            int idx = authors.indexOf(metadataAuthor);
+            if (idx != -1) {
+                filteredRecords.add(importRecord);
+                return new SuggestionEvidence(this.getClass().getSimpleName(), 100 - (20 * idx / authors.size()),
+                        "The author " + metadataAuthor + " matches the name with idx " + idx
+                                + " of the ones stored in the researcher profile [" + StringUtils.join(authors, ", ")
+                                + "]");
+            }
+        }
+        return null;
     }
 
     /**
@@ -114,9 +119,11 @@ public class AuthorNamesApprover implements Approver {
     public List<String> searchMetadataValues(Item researcher) {
         List<String> authors = new ArrayList<String>();
         for (String name : names) {
-            String value = itemService.getMetadata(researcher, name);
-            if (value != null) {
-                authors.add(value);
+            List<MetadataValue> values = itemService.getMetadataByMetadataString(researcher, name);
+            if (values != null) {
+                for (MetadataValue v : values) {
+                    authors.add(v.getValue());
+                }
             }
         }
         return authors;

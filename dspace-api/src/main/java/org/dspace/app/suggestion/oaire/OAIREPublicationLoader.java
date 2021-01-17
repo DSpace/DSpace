@@ -17,9 +17,11 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.suggestion.SolrSuggestionProvider;
 import org.dspace.app.suggestion.SolrSuggestionStorageService;
 import org.dspace.app.suggestion.Suggestion;
+import org.dspace.app.suggestion.SuggestionEvidence;
 import org.dspace.content.Item;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Context;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
@@ -46,9 +48,6 @@ public class OAIREPublicationLoader extends SolrSuggestionProvider {
     private List<String> names;
 
     @Autowired
-    private OAIREPublicationApproverServiceImpl oairePublicationApproverServiceImpl;
-
-    @Autowired
     private OpenAireImportMetadataSourceServiceImpl openaireImportService;
 
     @Autowired
@@ -60,22 +59,62 @@ public class OAIREPublicationLoader extends SolrSuggestionProvider {
     @Autowired
     private SolrSuggestionStorageService solrSuggestionService;
 
+    private List<Approver> pipeline;
+
+    /**
+     * Set the pipeline of Approver
+     * @param pipeline list Approver
+     */
+    public void setPipeline(List<Approver> pipeline) {
+        this.pipeline = pipeline;
+    }
+
+    /**
+     * This method filter a list of ImportRecords using a pipeline of AuthorNamesApprover
+     * and return a filtered list of ImportRecords.
+     * 
+     * @see org.dspace.app.suggestion.oaire.AuthorNamesApprover
+     * @param researcher the researcher Item
+     * @param importRecords List of import record
+     * @return a list of filtered import records
+     */
+    public List<Suggestion> reduceAndTransform(Item researcher, List<ImportRecord> importRecords) {
+        List<Suggestion> results = new ArrayList<>();
+        for (ImportRecord r : importRecords) {
+            boolean skip = false;
+            List<SuggestionEvidence> evidences = new ArrayList<SuggestionEvidence>();
+            for (Approver authorNameApprover : pipeline) {
+                SuggestionEvidence evidence = authorNameApprover.filter(researcher, r);
+                if (evidence != null) {
+                    evidences.add(evidence);
+                } else {
+                    skip = true;
+                    break;
+                }
+            }
+            if (!skip) {
+                Suggestion suggestion = translateImportRecordToSuggestion(researcher, r);
+                suggestion.getEvidences().addAll(evidences);
+            }
+        }
+        return results;
+    }
+
     /**
      * Save a List of ImportRecord into Solr.
      * ImportRecord will be translate into a SolrDocument by the method translateImportRecordToSolrDocument.
-     * 
+     *
+     * @param context the DSpace Context
      * @param researcher a DSpace Item
-     * @param records List of importRecord
      * @throws SolrServerException
      * @throws IOException
      */
-    public void importAuthorRecords(Item researcher)
+    public void importAuthorRecords(Context context, Item researcher)
             throws SolrServerException, IOException {
         List<ImportRecord> metadata = getImportRecords(researcher);
-        List<ImportRecord> records = oairePublicationApproverServiceImpl.approve(researcher, metadata);
-        for (ImportRecord record : records) {
-            Suggestion suggestion = translateImportRecordToSuggestion(researcher, record);
-            solrSuggestionService.addSuggestion(suggestion, false);
+        List<Suggestion> records = reduceAndTransform(researcher, metadata);
+        for (Suggestion record : records) {
+            solrSuggestionService.addSuggestion(record, false, false);
         }
         solrSuggestionService.commit();
     }

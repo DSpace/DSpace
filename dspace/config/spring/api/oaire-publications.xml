@@ -9,9 +9,20 @@
 
 	<context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
-    <bean
-        id="org.dspace.app.suggestion.oaire.OAIREPublicationApproverService"
-        class="org.dspace.app.suggestion.oaire.OAIREPublicationApproverServiceImpl">
+    <bean id="OAIREPublicationLoader" class="org.dspace.app.suggestion.oaire.OAIREPublicationLoader">
+        <property name="sourceName" value="oaire" />
+        <property name="identifierSchema" value="dc" />
+        <property name="identifierElement" value="identifier" />
+        <property name="identifierQualifier" value="other" />
+        <property name="openaireExternalSourceName" value="openaire" />
+        <property name="names">
+            <list>
+                <value>dc.title</value>
+                <value>crisrp.name</value>
+                <value>crisrp.translated</value>
+                <value>crisrp.variants</value>
+            </list>
+        </property>
         <property name="pipeline">
             <list>
                 <bean
@@ -30,22 +41,6 @@
                         </list>
                     </property>
                 </bean>
-            </list>
-        </property>
-    </bean>
-
-    <bean id="OAIREPublicationLoader" class="org.dspace.app.suggestion.oaire.OAIREPublicationLoader">
-        <property name="sourceName" value="oaire" />
-        <property name="identifierSchema" value="dc" />
-        <property name="identifierElement" value="identifier" />
-        <property name="identifierQualifier" value="other" />
-        <property name="openaireExternalSourceName" value="openaire" />
-        <property name="names">
-            <list>
-                <value>dc.title</value>
-                <value>crisrp.name</value>
-                <value>crisrp.translated</value>
-                <value>crisrp.variants</value>
             </list>
         </property>
     </bean>
