@@ -59,13 +59,13 @@ public class OAIREPublicationLoader extends SolrSuggestionProvider {
     @Autowired
     private SolrSuggestionStorageService solrSuggestionService;
 
-    private List<Approver> pipeline;
+    private List<EvidenceScorer> pipeline;
 
     /**
      * Set the pipeline of Approver
      * @param pipeline list Approver
      */
-    public void setPipeline(List<Approver> pipeline) {
+    public void setPipeline(List<EvidenceScorer> pipeline) {
         this.pipeline = pipeline;
     }
 
@@ -73,7 +73,7 @@ public class OAIREPublicationLoader extends SolrSuggestionProvider {
      * This method filter a list of ImportRecords using a pipeline of AuthorNamesApprover
      * and return a filtered list of ImportRecords.
      * 
-     * @see org.dspace.app.suggestion.oaire.AuthorNamesApprover
+     * @see org.dspace.app.suggestion.oaire.AuthorNamesScorer
      * @param researcher the researcher Item
      * @param importRecords List of import record
      * @return a list of filtered import records
@@ -83,8 +83,8 @@ public class OAIREPublicationLoader extends SolrSuggestionProvider {
         for (ImportRecord r : importRecords) {
             boolean skip = false;
             List<SuggestionEvidence> evidences = new ArrayList<SuggestionEvidence>();
-            for (Approver authorNameApprover : pipeline) {
-                SuggestionEvidence evidence = authorNameApprover.filter(researcher, r);
+            for (EvidenceScorer authorNameApprover : pipeline) {
+                SuggestionEvidence evidence = authorNameApprover.computeEvidence(researcher, r);
                 if (evidence != null) {
                     evidences.add(evidence);
                 } else {

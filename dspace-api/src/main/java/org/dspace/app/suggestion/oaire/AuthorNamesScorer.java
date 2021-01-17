@@ -21,13 +21,14 @@ import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Implementation of { @see org.dspace.app.suggestion.oaire.Approver} which filter ImportRecords
+ * Implementation of {@see org.dspace.app.suggestion.oaire.EvidenceScorer} which evaluate ImportRecords
  * based on Author's name.
  * 
+ * @author Andrea Bollini (andrea.bollini at 4science dot it)
  * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
  *
  */
-public class AuthorNamesApprover implements Approver {
+public class AuthorNamesScorer implements EvidenceScorer {
 
     private List<String> contributorMetadata;
 
@@ -79,7 +80,7 @@ public class AuthorNamesApprover implements Approver {
      * @return the generated evidence or null if the record must be discarded
      */
     @Override
-    public SuggestionEvidence filter(Item researcher, ImportRecord importRecord) {
+    public SuggestionEvidence computeEvidence(Item researcher, ImportRecord importRecord) {
         List<ImportRecord> filteredRecords = new ArrayList<>();
         List<String> authors = searchMetadataValues(researcher);
         List<String> metadataAuthors = new ArrayList<>();

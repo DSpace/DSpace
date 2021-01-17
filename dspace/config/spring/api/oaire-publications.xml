@@ -26,7 +26,7 @@
         <property name="pipeline">
             <list>
                 <bean
-                    class="org.dspace.app.suggestion.oaire.AuthorNamesApprover">
+                    class="org.dspace.app.suggestion.oaire.AuthorNamesScorer">
                     <property name="contributorMetadata">
                         <list>
                             <value>dc.contributor.author</value>
