@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -3454,6 +3455,71 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void findPoolTaskByItemArchivedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+                                          .withEmail("reviewer1@example.com")
+                                          .withPassword(password).build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .withWorkflowGroup(1, reviewer1).build();
+
+        Item publicItem = ItemBuilder.createItem(context, col1)
+                                     .withTitle("Public item")
+                                     .withIssueDate("2020-06-25")
+                                     .withAuthor("Smith, Donald")
+                                     .withSubject("ExtraEntry").build();
+
+        context.restoreAuthSystemState();
+
+        String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
+        getClient(reviewer1Token).perform(get("/api/workflow/pooltasks/search/findByItem")
+                                 .param("uuid", publicItem.getID().toString()))
+                                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void findAllPoolTaskByItemArchivedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+                                          .withEmail("reviewer1@example.com")
+                                          .withPassword(password).build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .withWorkflowGroup(1, reviewer1).build();
+
+        Item publicItem = ItemBuilder.createItem(context, col1)
+                                     .withTitle("Public item")
+                                     .withIssueDate("2020-06-25")
+                                     .withAuthor("Smith, Donald")
+                                     .withSubject("ExtraEntry").build();
+
+        context.restoreAuthSystemState();
+
+        String reviewer1Token = getAuthToken(admin.getEmail(), password);
+        getClient(reviewer1Token).perform(get("/api/workflow/pooltasks/search/findAllByItem")
+                                 .param("uuid", publicItem.getID().toString()))
+                                 .andExpect(status().isOk())
+                                 .andExpect(content().contentType(contentType))
+                                 .andExpect(jsonPath("$.page.totalPages", is(0)))
+                                 .andExpect(jsonPath("$.page.totalElements", is(0)));
+    }
+
+    @Test
     public void findAllClaimedTaskByItemTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -3691,6 +3757,40 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         // the required param is no provided
         getClient(tokenAdmin).perform(get("/api/workflow/claimedtasks/search/findAllByItem"))
                              .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findAllClaimedTaskByItemArchivedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+                                          .withEmail("reviewer1@example.com")
+                                          .withPassword(password).build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .withWorkflowGroup(1, reviewer1).build();
+
+        Item publicItem = ItemBuilder.createItem(context, col1)
+                                     .withTitle("Public item")
+                                     .withIssueDate("2020-06-25")
+                                     .withAuthor("Smith, Donald")
+                                     .withSubject("ExtraEntry").build();
+
+        context.restoreAuthSystemState();
+
+        String reviewer1Token = getAuthToken(admin.getEmail(), password);
+        getClient(reviewer1Token).perform(get("/api/workflow/claimedtasks/search/findAllByItem")
+                                 .param("uuid", publicItem.getID().toString()))
+                                 .andExpect(status().isOk())
+                                 .andExpect(content().contentType(contentType))
+                                 .andExpect(jsonPath("$.page.totalPages", is(0)))
+                                 .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
