@@ -27,22 +27,25 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.Entity;
-import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
-import org.dspace.content.service.EntityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.DiscoverResult;
+import org.dspace.discovery.SearchService;
+import org.dspace.discovery.SearchServiceException;
+import org.dspace.discovery.SearchUtils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -64,7 +67,7 @@ public class GenerateSitemaps {
     private static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     private static final ConfigurationService configurationService =
         DSpaceServicesFactory.getInstance().getConfigurationService();
-    private static final EntityService entityService = ContentServiceFactory.getInstance().getEntityService();
+    private static final SearchService searchService = SearchUtils.getSearchService();
 
     /**
      * Default constructor
@@ -241,22 +244,33 @@ public class GenerateSitemaps {
 
         while (allItems.hasNext()) {
             Item i = allItems.next();
-            Entity entity = entityService.findByItemId(c, i.getID());
-            EntityType entityType = entityService.getType(c, entity);
 
-            String url;
-            if (entityType != null) {
-                url = uiURLStem + "/entities/" + entityType.getLabel() + "/" + i.getID();
-            } else {
-                url = uiURLStem + "/items/" + i.getID();
-            }
-            Date lastMod = i.getLastModified();
+            DiscoverQuery entityQuery = new DiscoverQuery();
+            entityQuery.setQuery("search.uniqueid:\"Item-" + i.getID() + "\" and entityType:*");
+            entityQuery.addSearchField("entityType");
 
-            if (makeHTMLMap) {
-                html.addURL(url, lastMod);
-            }
-            if (makeSitemapOrg) {
-                sitemapsOrg.addURL(url, lastMod);
+            try {
+                DiscoverResult discoverResult = searchService.search(c, entityQuery);
+
+                String url;
+                if (CollectionUtils.isNotEmpty(discoverResult.getIndexableObjects())
+                    && CollectionUtils.isNotEmpty(discoverResult.getSearchDocument(discoverResult.getIndexableObjects().get(0)).get(0).getSearchFieldValues("entityType"))
+                    && StringUtils.isNotBlank(discoverResult.getSearchDocument(discoverResult.getIndexableObjects().get(0)).get(0).getSearchFieldValues("entityType").get(0)))
+                {
+                    url = uiURLStem + "/entities/" + StringUtils.lowerCase(discoverResult.getSearchDocument(discoverResult.getIndexableObjects().get(0)).get(0).getSearchFieldValues("entityType").get(0)) + "/" + i.getID();
+                } else {
+                    url = uiURLStem + "/items/" + i.getID();
+                }
+                Date lastMod = i.getLastModified();
+
+                if (makeHTMLMap) {
+                    html.addURL(url, lastMod);
+                }
+                if (makeSitemapOrg) {
+                    sitemapsOrg.addURL(url, lastMod);
+                }
+            } catch (SearchServiceException e) {
+                log.error("Failed getting entitytype through solr for item " + i.getID() + ": " + e.getMessage());
             }
 
             c.uncacheEntity(i);
