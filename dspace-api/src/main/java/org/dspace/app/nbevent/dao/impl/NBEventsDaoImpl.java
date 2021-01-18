@@ -29,7 +29,7 @@ public class NBEventsDaoImpl extends AbstractHibernateDAO<NBEventProcessed> impl
         nbEvent.setItem(item);
         nbEvent.setEventTimestamp(new Date());
         try {
-            save(context, nbEvent);
+            create(context, nbEvent);
             return true;
         } catch (SQLException e) {
             return false;
