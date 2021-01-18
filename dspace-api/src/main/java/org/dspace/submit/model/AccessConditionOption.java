@@ -7,6 +7,19 @@
  */
 package org.dspace.submit.model;
 
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.Bitstream;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.service.GroupService;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.sql.SQLException;
+import java.util.Date;
+
 /**
  * This class represents an option available in the submission upload section to
  * set permission on a file. An option is defined by a name such as "open
@@ -18,6 +31,13 @@ package org.dspace.submit.model;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class AccessConditionOption {
+
+    @Autowired
+    AuthorizeService authorizeService;
+
+    @Autowired
+    GroupService groupService;
+
     /** An unique name identifying the access contion option **/
     private String name;
 
@@ -117,5 +137,26 @@ public class AccessConditionOption {
 
     public void setSelectGroupName(String selectGroupName) {
         this.selectGroupName = selectGroupName;
+    }
+
+    public void createResourcePolicy(Context context, Bitstream b, String name, String description,
+                                     Date startDate, Date endDate) throws SQLException, AuthorizeException {
+        if (getHasStartDate() && startDate == null) {
+            throw new IllegalStateException("The access condition " + getName() + " requires a start date.");
+        }
+        if (getHasEndDate() && endDate == null) {
+            throw new IllegalStateException("The access condition " + getName() + " requires an end date.");
+        }
+        if (!getHasStartDate() && startDate != null) {
+            startDate = null;
+        }
+        if (!getHasEndDate() && endDate != null) {
+            endDate = null;
+        }
+        //TODO: check date limits as well
+        Group group = groupService.findByName(context, getGroupName());
+        authorizeService.createResourcePolicy(context, b, group, null, Constants.READ,
+                ResourcePolicy.TYPE_CUSTOM, name, description, startDate,
+                endDate);
     }
 }
