@@ -44,6 +44,8 @@ public class OpenAireImportMetadataSourceServiceImpl extends AbstractImportMetad
 
     private WebTarget webTarget;
 
+    private String queryParam;
+
     @Override
     public String getImportSource() {
         return "openaire";
@@ -150,6 +152,23 @@ public class OpenAireImportMetadataSourceServiceImpl extends AbstractImportMetad
     }
 
     /**
+     * Set the name of the query param, this correspond to the index used (title, author)
+     * 
+     * @param queryParam on which index make the query
+     */
+    public void setQueryParam(String queryParam) {
+        this.queryParam = queryParam;
+    }
+
+    /**
+     * Get the name of the query param for the rest call
+     * 
+     * @return the name of the query param, i.e. the index (title, author) to use
+     */
+    public String getQueryParam() {
+        return queryParam;
+    }
+    /**
      * Initialize the class
      *
      * @throws Exception on generic exception
@@ -159,6 +178,9 @@ public class OpenAireImportMetadataSourceServiceImpl extends AbstractImportMetad
         Client client = ClientBuilder.newClient();
         if (baseAddress == null) {
             baseAddress = "http://api.openaire.eu/search/publications";
+        }
+        if (queryParam == null) {
+            queryParam = "title";
         }
         webTarget = client.target(baseAddress);
     }
@@ -198,19 +220,19 @@ public class OpenAireImportMetadataSourceServiceImpl extends AbstractImportMetad
 
     public class CountByQueryCallable implements Callable<Integer> {
 
-        String author;
+        String q;
 
         public CountByQueryCallable(String query) {
-            author = query;
+            q = query;
         }
 
         public CountByQueryCallable(Query query) {
-            author = query.getParameterAsClass("query", String.class);
+            q = query.getParameterAsClass("query", String.class);
         }
 
         @Override
         public Integer call() throws Exception {
-            WebTarget localTarget = webTarget.queryParam("author", author);
+            WebTarget localTarget = webTarget.queryParam(queryParam, q);
             Invocation.Builder invocationBuilder = localTarget.request();
             Response response = invocationBuilder.get();
             if (response.getStatus() == 200) {
@@ -233,18 +255,18 @@ public class OpenAireImportMetadataSourceServiceImpl extends AbstractImportMetad
 
     public class SearchByQueryCallable implements Callable<List<ImportRecord>> {
 
-        String author;
+        String q;
         int page;
         int count;
 
         public SearchByQueryCallable(String query, int start, int count) {
-            this.author = query;
+            this.q = query;
             this.page = start / count;
             this.count = count;
         }
 
         public SearchByQueryCallable(Query query) {
-            this.author = query.getParameterAsClass("query", String.class);
+            this.q = query.getParameterAsClass("query", String.class);
             this.page = query.getParameterAsClass("start", Integer.class) /
                 query.getParameterAsClass("count", Integer.class);
             this.count = query.getParameterAsClass("count", Integer.class);
@@ -252,7 +274,7 @@ public class OpenAireImportMetadataSourceServiceImpl extends AbstractImportMetad
 
         @Override
         public List<ImportRecord> call() throws Exception {
-            WebTarget localTarget = webTarget.queryParam("author", author);
+            WebTarget localTarget = webTarget.queryParam(queryParam, q);
             localTarget = localTarget.queryParam("page", page + 1);
             localTarget = localTarget.queryParam("size", count);
             List<ImportRecord> results = new ArrayList<ImportRecord>();

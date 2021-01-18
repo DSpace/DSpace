@@ -19,8 +19,8 @@
             <list>
                 <value>dc.title</value>
                 <value>crisrp.name</value>
-                <value>crisrp.translated</value>
-                <value>crisrp.variants</value>
+                <value>crisrp.name.translated</value>
+                <value>crisrp.name.variant</value>
             </list>
         </property>
         <property name="pipeline">
@@ -36,13 +36,14 @@
                         <list>
                             <value>dc.title</value>
                             <value>crisrp.name</value>
-                            <value>crisrp.translated</value>
-                            <value>crisrp.variants</value>
+                            <value>crisrp.name.translated</value>
+                            <value>crisrp.name.variant</value>
                         </list>
                     </property>
                 </bean>
             </list>
         </property>
+        <property name="openaireImportService" ref="openaireImportServiceByAuthor" />
     </bean>
 
 </beans>
