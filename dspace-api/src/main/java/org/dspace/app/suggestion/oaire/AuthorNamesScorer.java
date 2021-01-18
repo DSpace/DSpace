@@ -8,9 +8,16 @@
 package org.dspace.app.suggestion.oaire;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
+import com.ibm.icu.text.CharsetDetector;
+import com.ibm.icu.text.CharsetMatch;
+import com.ibm.icu.text.Normalizer;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.suggestion.SuggestionEvidence;
 import org.dspace.content.Item;
@@ -81,9 +88,10 @@ public class AuthorNamesScorer implements EvidenceScorer {
      */
     @Override
     public SuggestionEvidence computeEvidence(Item researcher, ImportRecord importRecord) {
-        List<ImportRecord> filteredRecords = new ArrayList<>();
-        List<String> authors = searchMetadataValues(researcher);
+        List<String[]> names = searchMetadataValues(researcher);
+        int maxNameLenght = names.stream().mapToInt(n -> n[0].length()).max().orElse(1);
         List<String> metadataAuthors = new ArrayList<>();
+        List<String> normalizedMetadataAuthors = new ArrayList<>();
         Collection<MetadatumDTO> metadata = new ArrayList<>();
         for (String contributorMetadatum : contributorMetadata) {
             String[] fields = contributorMetadatum.split("\\.");
@@ -96,17 +104,21 @@ public class AuthorNamesScorer implements EvidenceScorer {
         if (metadata != null) {
             for (MetadatumDTO metadatum : metadata) {
                 metadataAuthors.add(metadatum.getValue());
+                normalizedMetadataAuthors.add(normalize(metadatum.getValue()));
             }
         }
-        for (String metadataAuthor : metadataAuthors) {
-            int idx = authors.indexOf(metadataAuthor);
-            if (idx != -1) {
-                filteredRecords.add(importRecord);
-                return new SuggestionEvidence(this.getClass().getSimpleName(), 100 - (20 * idx / authors.size()),
-                        "The author " + metadataAuthor + " matches the name with idx " + idx
-                                + " of the ones stored in the researcher profile [" + StringUtils.join(authors, ", ")
-                                + "]");
+        int idx = 0;
+        for (String nMetadataAuthor : normalizedMetadataAuthors) {
+            Optional<String[]> found = names.stream()
+                    .filter(a -> StringUtils.equalsIgnoreCase(a[0], nMetadataAuthor)).findFirst();
+            if (found.isPresent()) {
+                return new SuggestionEvidence(this.getClass().getSimpleName(),
+                        100 * ((double) nMetadataAuthor.length() / (double) maxNameLenght),
+                        "The author " + metadataAuthors.get(idx) + " at position " + idx
+                                + " in the authors list matches the name " + found.get()[1]
+                                + " in the researcher profile");
             }
+            idx++;
         }
         return null;
     }
@@ -117,17 +129,30 @@ public class AuthorNamesScorer implements EvidenceScorer {
      * @param researcher DSpace item
      * @return list of metadata values
      */
-    public List<String> searchMetadataValues(Item researcher) {
-        List<String> authors = new ArrayList<String>();
+    private List<String[]> searchMetadataValues(Item researcher) {
+        List<String[]> authors = new ArrayList<String[]>();
         for (String name : names) {
             List<MetadataValue> values = itemService.getMetadataByMetadataString(researcher, name);
             if (values != null) {
                 for (MetadataValue v : values) {
-                    authors.add(v.getValue());
+                    authors.add(new String[] {normalize(v.getValue()), v.getValue()});
                 }
             }
         }
         return authors;
+    }
+
+    private String normalize(String value) {
+        String norm = Normalizer.normalize(value, Normalizer.NFD);
+        CharsetDetector cd = new CharsetDetector();
+        cd.setText(value.getBytes());
+        CharsetMatch detect = cd.detect();
+        if (detect != null && detect.getLanguage() != null) {
+            norm = norm.replaceAll("[^\\p{L}]", " ").toLowerCase(new Locale(detect.getLanguage()));
+        } else {
+            norm = norm.replaceAll("[^\\p{L}]", " ").toLowerCase();
+        }
+        return Arrays.asList(norm.split("\\s+")).stream().sorted().collect(Collectors.joining());
     }
 
 }

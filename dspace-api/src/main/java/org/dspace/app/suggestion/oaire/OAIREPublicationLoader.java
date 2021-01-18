@@ -47,7 +47,6 @@ public class OAIREPublicationLoader extends SolrSuggestionProvider {
 
     private List<String> names;
 
-    @Autowired
     private OpenAireImportMetadataSourceServiceImpl openaireImportService;
 
     @Autowired
@@ -60,6 +59,10 @@ public class OAIREPublicationLoader extends SolrSuggestionProvider {
     private SolrSuggestionStorageService solrSuggestionService;
 
     private List<EvidenceScorer> pipeline;
+
+    public void setOpenaireImportService(OpenAireImportMetadataSourceServiceImpl openaireImportService) {
+        this.openaireImportService = openaireImportService;
+    }
 
     /**
      * Set the pipeline of Approver
@@ -95,6 +98,7 @@ public class OAIREPublicationLoader extends SolrSuggestionProvider {
             if (!skip) {
                 Suggestion suggestion = translateImportRecordToSuggestion(researcher, r);
                 suggestion.getEvidences().addAll(evidences);
+                results.add(suggestion);
             }
         }
         return results;
