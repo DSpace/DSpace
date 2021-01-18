@@ -93,19 +93,23 @@ public class NBEventActionServiceImpl implements NBEventActionService {
     }
 
     private void makeAcknowledgement(String eventId, String status) {
-        String ackwnoledgeCallback = configurationService.getProperty("acknowledge-url");
-        if (StringUtils.isNotBlank(ackwnoledgeCallback)) {
-            ObjectNode node = jsonMapper.createObjectNode();
-            node.put("eventId", eventId);
-            node.put("status", status);
-            StringEntity requestEntity = new StringEntity(node.toString(), ContentType.APPLICATION_JSON);
-            CloseableHttpClient httpclient = HttpClients.createDefault();
-            HttpPost postMethod = new HttpPost(ackwnoledgeCallback);
-            postMethod.setEntity(requestEntity);
-            try {
-                httpclient.execute(postMethod);
-            } catch (IOException e) {
-                log.error(e.getMessage(), e);
+        String[] ackwnoledgeCallbacks = configurationService.getArrayProperty("acknowledge-url");
+        if (ackwnoledgeCallbacks != null) {
+            for (String ackwnoledgeCallback : ackwnoledgeCallbacks) {
+                if (StringUtils.isNotBlank(ackwnoledgeCallback)) {
+                    ObjectNode node = jsonMapper.createObjectNode();
+                    node.put("eventId", eventId);
+                    node.put("status", status);
+                    StringEntity requestEntity = new StringEntity(node.toString(), ContentType.APPLICATION_JSON);
+                    CloseableHttpClient httpclient = HttpClients.createDefault();
+                    HttpPost postMethod = new HttpPost(ackwnoledgeCallback);
+                    postMethod.setEntity(requestEntity);
+                    try {
+                        httpclient.execute(postMethod);
+                    } catch (IOException e) {
+                        log.error(e.getMessage(), e);
+                    }
+                }
             }
         }
     }
