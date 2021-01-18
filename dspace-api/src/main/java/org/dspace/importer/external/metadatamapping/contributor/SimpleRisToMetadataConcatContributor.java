@@ -10,9 +10,9 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 
@@ -31,17 +31,11 @@ public class SimpleRisToMetadataConcatContributor extends SimpleRisToMetadataCon
     @Override
     public Collection<MetadatumDTO> contributeMetadata(Map<String, List<String>> record) {
         List<MetadatumDTO> values = new LinkedList<>();
-        StringBuilder text = null;
         List<String> fieldValues = record.get(this.tag);
-        if (Objects.nonNull(fieldValues)) {
-            text = new StringBuilder();
-            for (String value : fieldValues) {
-                text.append(value).append(" ");
-            }
-        }
-        if (StringUtils.isNotBlank(text.toString())) {
-            values.add(metadataFieldMapping.toDCValue(this.metadata, text.toString()));
-        }
+        Optional.ofNullable(fieldValues)
+                .map(fv -> fv.stream())
+                .map(s -> s.collect(Collectors.joining(" ")))
+                .ifPresent(t -> values.add(this.metadataFieldMapping.toDCValue(this.metadata, t)));
         return values;
     }
 
