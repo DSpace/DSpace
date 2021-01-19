@@ -142,11 +142,12 @@ public class SubmissionFormsMigration extends DSpaceRunnable<SubmissionFormsMigr
 
     private void createDTDFileDummiesIfNotPresent() {
         // Create temporary dummy item-submission.dtd in directory of input item-submission.xml if not present
-        this.createDummyFileIfNotPresent(itemSubmissionsFilePath, NAME_DTD_ITEM_SUBMISSION, CONTENT_DTD_ITEM_SUBMISSION_DUMMY);
+        this.createDummyFileIfNotPresent(itemSubmissionsFilePath, NAME_DTD_ITEM_SUBMISSION,
+                                         CONTENT_DTD_ITEM_SUBMISSION_DUMMY);
         // Create temporary dummy input-forms.dtd in directory of input input-forms.xml if not present
         this.createDummyFileIfNotPresent(inputFormsFilePath, NAME_DTD_INPUT_FORMS, CONTENT_DTD_INPUT_FORMS_DUMMY);
     }
-    
+
     private void createDummyFileIfNotPresent(String fileInInputDir, String dummyFileName, String dummyContent) {
         String dir = StringUtils.substringBeforeLast(fileInInputDir, File.separator);
         File dummyFile = new File (dir + File.separator + dummyFileName);
