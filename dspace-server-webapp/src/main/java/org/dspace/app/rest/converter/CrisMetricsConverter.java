@@ -9,6 +9,7 @@ package org.dspace.app.rest.converter;
 import org.dspace.app.metrics.CrisMetrics;
 import org.dspace.app.rest.model.CrisMetricsRest;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.metrics.CrisItemMetricsService;
 import org.dspace.metrics.embeddable.model.EmbeddableCrisMetrics;
 import org.springframework.stereotype.Component;
 
@@ -45,7 +46,7 @@ public class CrisMetricsConverter implements DSpaceConverter<CrisMetrics, CrisMe
         if (model instanceof EmbeddableCrisMetrics) {
             return ((EmbeddableCrisMetrics)model).getEmbeddableId();
         }
-        return String.valueOf(model.getId());
+        return CrisItemMetricsService.STORED_METRIC_ID_PREFIX + model.getId();
     }
 
     /* (non-Javadoc)

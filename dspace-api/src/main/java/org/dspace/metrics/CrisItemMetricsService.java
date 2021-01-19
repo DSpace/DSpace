@@ -25,6 +25,7 @@ import org.dspace.metrics.embeddable.model.EmbeddableCrisMetrics;
  * returned values are stored on DSpace database.
  */
 public interface CrisItemMetricsService {
+    public final static String STORED_METRIC_ID_PREFIX = "storedmetric-";
 
     /**
      * Returns both embeddable and stored metrics.
@@ -58,5 +59,21 @@ public interface CrisItemMetricsService {
      * @throws SQLException
      */
     Optional<EmbeddableCrisMetrics> getEmbeddableById(Context context, String id) throws SQLException;
+
+    /**
+     * find a {@link CrisMetrics} given a metricId
+     * @param context
+     * @param metricId
+     * @return
+     * @throws SQLException
+     */
+    CrisMetrics find(Context context, String metricId) throws SQLException;
+
+    /**
+     * Return true if the id represent and embeddable metric. False otherwise (stored metric)
+     * @param id the metric Id
+     * @return
+     */
+    boolean isEmbeddableMetricId(String id);
 
 }

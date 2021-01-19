@@ -16,9 +16,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.dspace.app.metrics.CrisMetrics;
+import org.dspace.app.metrics.service.CrisMetricsService;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
@@ -34,12 +36,15 @@ public class CrisItemMetricsServiceImpl implements CrisItemMetricsService {
     protected static final Logger log = LoggerFactory.getLogger(CrisItemMetricsServiceImpl.class);
 
     @Autowired(required = true)
-    private ItemService itemService;
+    protected ItemService itemService;
 
     @Autowired
-    private IndexingService indexingService;
+    protected IndexingService indexingService;
 
-    private List<EmbeddableMetricProvider> providers;
+    @Autowired
+    protected CrisMetricsService crisMetricsService;
+
+    protected List<EmbeddableMetricProvider> providers;
 
     @Autowired
     public void setProviders(List<EmbeddableMetricProvider> providers) {
@@ -86,6 +91,24 @@ public class CrisItemMetricsServiceImpl implements CrisItemMetricsService {
         return Optional.empty();
     }
 
+    @Override
+    public CrisMetrics find(Context context, String metricId) throws SQLException {
+        if (this.isEmbeddableMetricId(metricId)) {
+            Optional<EmbeddableCrisMetrics> metrics = getEmbeddableById(context, metricId);
+            return metrics.isPresent() ? (CrisMetrics)metrics.get() : null;
+        }
+        if (StringUtils.startsWith(metricId, STORED_METRIC_ID_PREFIX)) {
+            return crisMetricsService.find(context,
+                    Integer.parseInt(metricId.substring(STORED_METRIC_ID_PREFIX.length())));
+        }
+        return null;
+    }
+
+    @Override
+    public boolean isEmbeddableMetricId(String id) {
+        return !StringUtils.startsWith(id, STORED_METRIC_ID_PREFIX);
+    }
+
     private SolrDocument findMetricsDocumentInSolr(Context context, UUID itemUuid) {
         indexingService.retriveSolrDocByUniqueID(itemUuid.toString());
         QueryResponse queryResponse = indexingService.retriveSolrDocByUniqueID(itemUuid.toString());
@@ -97,7 +120,7 @@ public class CrisItemMetricsServiceImpl implements CrisItemMetricsService {
         return solrDocument;
     }
 
-    private List<CrisMetrics> findMetricsByItemUUID(Context context, UUID itemUuid) {
+    protected List<CrisMetrics> findMetricsByItemUUID(Context context, UUID itemUuid) {
         // Solr metrics
         SolrDocument solrDocument = findMetricsDocumentInSolr(context, itemUuid);
         Collection<String> fields = Optional.ofNullable(solrDocument)

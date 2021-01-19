@@ -134,7 +134,7 @@ public class CrisMetrics  implements ReloadableEntity<Integer> {
 
     @Override
     public Integer getID() {
-        return getId();
+        return this.getId();
     }
 
     public Double getDeltaPeriod1() {

@@ -104,13 +104,14 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
         context.restoreAuthSystemState();
 
         String tokenEperson = getAuthToken(eperson.getEmail(), password);
-        getClient(tokenEperson).perform(get("/api/cris/metrics/" + metric.getID()))
+        getClient(tokenEperson).perform(
+                get("/api/cris/metrics/" + CrisMetricsBuilder.getRestStoredMetricId(metric.getID())))
                                .andExpect(status().isOk())
                                .andExpect(jsonPath("$", is(
                                           CrisMetricsMatcher.matchCrisMetrics(metric)
                                           )))
-                               .andExpect(jsonPath("$._links.self.href", Matchers
-                               .containsString("/api/cris/metrics/" + metric.getID())));
+                               .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/cris/metrics/"
+                                          + CrisMetricsBuilder.getRestStoredMetricId(metric.getID()))));
 
     }
 
@@ -137,7 +138,8 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
         context.restoreAuthSystemState();
 
         String tokenEperson = getAuthToken(eperson.getEmail(), password);
-        getClient(tokenEperson).perform(get("/api/cris/metrics/" + metric.getID()))
+        getClient(tokenEperson).perform(
+                get("/api/cris/metrics/" + CrisMetricsBuilder.getRestStoredMetricId(metric.getID())))
                                .andExpect(status().isForbidden());
 
     }
@@ -163,7 +165,7 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/cris/metrics/" + metric.getID()))
+        getClient().perform(get("/api/cris/metrics/" + CrisMetricsBuilder.getRestStoredMetricId(metric.getID())))
                    .andExpect(status().isUnauthorized());
     }
 
@@ -222,13 +224,15 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
         context.restoreAuthSystemState();
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(get("/api/cris/metrics/" + metric.getID()))
+        String restMetricId = CrisMetricsBuilder.getRestStoredMetricId(metric.getID());
+        getClient(tokenAdmin).perform(
+                get("/api/cris/metrics/" + restMetricId))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", is(
                                         CrisMetricsMatcher.matchCrisMetrics(metric)
                                         )))
                              .andExpect(jsonPath("$._links.self.href", Matchers
-                             .containsString("/api/cris/metrics/" + metric.getID())));
+                             .containsString("/api/cris/metrics/" +  restMetricId)));
 
     }
 
