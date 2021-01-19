@@ -154,3 +154,13 @@ This image can also be rebuilt using the `../docker-compose/docker-compose-shibb
 ## local.cfg and test/ folder
 
 These resources are bundled into the `dspace/dspace` image at build time.
+
+
+## Debugging Docker builds
+
+When updating or debugging Docker image builds, it can be useful to briefly
+spin up an "intermediate container".  Here's how to do that:
+```
+# First find the intermediate container/image ID in your commandline logs
+docker run -i -t [container-id] /bin/bash
+```
