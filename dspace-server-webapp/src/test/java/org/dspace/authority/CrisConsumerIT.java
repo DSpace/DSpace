@@ -462,12 +462,7 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
                 .build();
 
         context.turnOffAuthorisationSystem();
-        // create a Person collection in a separate repository branch so that it is not eligible as target
-        Community unrelatedCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
-        createCollection("Collection of persons", "Person", unrelatedCommunity);
-        context.restoreAuthSystemState();
+        // no person collection is created so it will be not possible to create a related person item
 
         String authToken = getAuthToken(submitter.getEmail(), password);
 
