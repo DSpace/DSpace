@@ -176,8 +176,8 @@ public class CrisConsumer implements Consumer {
             }
 
             if (!relatedItemAlreadyPresent) {
-
-                Collection collection = collectionService.retrieveCollectionByRelationshipType(item, relationshipType);
+                Collection collection = collectionService.retrieveCollectionByRelationshipType(context, item,
+                        relationshipType);
                 if (collection == null) {
                     log.warn(NO_COLLECTION_FOUND_MSG, relationshipType, item.getID());
                     continue;

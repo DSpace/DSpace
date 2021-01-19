@@ -1024,15 +1024,17 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
-    public Collection retrieveCollectionByRelationshipType(Item item, String relationshipType) throws SQLException {
+    public Collection retrieveCollectionByRelationshipType(Context context, Item item, String relationshipType)
+            throws SQLException {
         Collection ownCollection = item.getOwningCollection();
-        return retrieveCollectionByRelationshipType(ownCollection.getCommunities(), relationshipType);
+        return retrieveCollectionByRelationshipType(context, ownCollection.getCommunities(), relationshipType);
     }
 
-    private Collection retrieveCollectionByRelationshipType(List<Community> communities, String relationshipType) {
+    private Collection retrieveCollectionByRelationshipType(Context context, List<Community> communities,
+            String relationshipType) {
 
         for (Community community : communities) {
-            Collection collection = retriveCollectionByRelationshipType(community, relationshipType);
+            Collection collection = retriveCollectionByRelationshipType(context, community, relationshipType);
             if (collection != null) {
                 return collection;
             }
@@ -1040,7 +1042,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         for (Community community : communities) {
             List<Community> parentCommunities = community.getParentCommunities();
-            Collection collection = retrieveCollectionByRelationshipType(parentCommunities, relationshipType);
+            Collection collection = retrieveCollectionByRelationshipType(context, parentCommunities, relationshipType);
             if (collection != null) {
                 return collection;
             }
@@ -1050,21 +1052,27 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
-    public Collection retriveCollectionByRelationshipType(Community community, String relationshipType) {
-
-        for (Collection collection : community.getCollections()) {
-            if (relationshipService.hasRelationshipType(collection, relationshipType)) {
-                return collection;
+    public Collection retriveCollectionByRelationshipType(Context context, Community community,
+            String relationshipType) {
+        context.turnOffAuthorisationSystem();
+        List<Collection> collections;
+        try {
+            collections = findCollectionsWithSubmit(null, context, community, relationshipType, 0, 1);
+        } catch (SQLException | SearchServiceException e) {
+            throw new RuntimeException(e);
+        }
+        context.restoreAuthSystemState();
+        if (collections != null && collections.size() > 0) {
+            return collections.get(0);
+        }
+        if (community != null) {
+            for (Community subCommunity : community.getSubcommunities()) {
+                Collection collection = retriveCollectionByRelationshipType(context, subCommunity, relationshipType);
+                if (collection != null) {
+                    return collection;
+                }
             }
         }
-
-        for (Community subCommunity : community.getSubcommunities()) {
-            Collection collection = retriveCollectionByRelationshipType(subCommunity, relationshipType);
-            if (collection != null) {
-                return collection;
-            }
-        }
-
         return null;
     }
 

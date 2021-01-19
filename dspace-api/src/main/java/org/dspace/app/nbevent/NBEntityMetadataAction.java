@@ -95,7 +95,8 @@ public class NBEntityMetadataAction implements NBAction {
                         relatedItem.getName(), relatedItem.getID().toString(), Choices.CF_ACCEPTED);
                 itemService.update(context, item);
             } else {
-                Collection collection = collectionService.retrieveCollectionByRelationshipType(item, entityType);
+                Collection collection = collectionService.retrieveCollectionByRelationshipType(context, item,
+                        entityType);
                 WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
                 relatedItem = workspaceItem.getItem();
                 for (String key : entityMetadata.keySet()) {

@@ -412,13 +412,15 @@ public interface CollectionService
     /**
      * Retrieve the first collection in the community or its descending that support
      * the provided relationshipType
-     * 
+     *
+     * @param context    the DSpace context
      * @param community        the root from where the search start
      * @param relationshipType the requested entity type
      * @return the first collection in the community or its descending that support
      *         the provided relationshipType
      */
-    public Collection retriveCollectionByRelationshipType(Community community, String relationshipType);
+    public Collection retriveCollectionByRelationshipType(Context context, Community community,
+            String relationshipType);
 
     /**
      * Retrieve the close collection to the item that support the provided
@@ -426,10 +428,12 @@ public interface CollectionService
      * minimum steps starting from the item (owningCollection, brothers collections,
      * etc)
      * 
+     * @param context    the DSpace context
      * @param item        the item from where the search start
      * @param relationshipType the requested entity type
      * @return the first collection in the community or its descending that support
      *         the provided relationshipType
      */
-    public Collection retrieveCollectionByRelationshipType(Item item, String relationshipType) throws SQLException;
+    public Collection retrieveCollectionByRelationshipType(Context context, Item item, String relationshipType)
+            throws SQLException;
 }
