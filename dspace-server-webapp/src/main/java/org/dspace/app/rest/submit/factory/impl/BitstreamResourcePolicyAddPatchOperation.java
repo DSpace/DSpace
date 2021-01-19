@@ -7,16 +7,13 @@
  */
 package org.dspace.app.rest.submit.factory.impl;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import org.dspace.app.rest.model.UploadBitstreamAccessConditionDTO;
 import org.dspace.app.rest.model.patch.LateObjectEvaluator;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -26,11 +23,8 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.services.model.Request;
-import org.dspace.submit.model.AccessConditionOption;
 import org.dspace.submit.model.UploadConfiguration;
 import org.dspace.submit.model.UploadConfigurationService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
