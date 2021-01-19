@@ -177,7 +177,8 @@ public class CrisItemMetricsServiceImplTest {
         // should return crisMetricService.find otherwise (stored metric)
         Integer id = 1;
         when(crisMetricsService.find(eq(context), eq(id))).thenReturn(stored);
-        assertEquals(crisItemMetricsService.find(context, String.valueOf(id)), stored);
+        assertEquals(crisItemMetricsService.find(context,
+                CrisItemMetricsService.STORED_METRIC_ID_PREFIX + String.valueOf(id)), stored);
 
     }
 

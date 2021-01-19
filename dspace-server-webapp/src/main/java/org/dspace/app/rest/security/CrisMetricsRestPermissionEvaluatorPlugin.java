@@ -97,9 +97,13 @@ public class CrisMetricsRestPermissionEvaluatorPlugin extends RestObjectPermissi
     private Item itemFromMetricId(Context context, String target) throws SQLException {
 
         if (crisItemMetricsService.isEmbeddableMetricId(target.toString())) {
-
-            String uuid = target.substring(0, target.indexOf(AbstractEmbeddableMetricProvider.DYNAMIC_ID_SEPARATOR));
-            return itemService.find(context, UUID.fromString(uuid));
+            int indexOf = target.indexOf(AbstractEmbeddableMetricProvider.DYNAMIC_ID_SEPARATOR);
+            if (indexOf != -1) {
+                String uuid = target.substring(0, indexOf);
+                return itemService.find(context, UUID.fromString(uuid));
+            } else {
+                return null;
+            }
 
         } else {
 

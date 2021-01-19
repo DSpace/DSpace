@@ -193,6 +193,13 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
         String tokenEperson = getAuthToken(eperson.getEmail(), password);
         getClient(tokenEperson).perform(get("/api/cris/metrics/" + Integer.MAX_VALUE))
                                .andExpect(status().isNotFound());
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/cris/metrics/" + Integer.MAX_VALUE))
+                .andExpect(status().isNotFound());
+        getClient(tokenAdmin)
+                .perform(get("/api/cris/metrics/" + CrisMetricsBuilder.getRestStoredMetricId(Integer.MAX_VALUE)))
+                .andExpect(status().isNotFound());
     }
 
     @Test
