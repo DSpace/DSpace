@@ -1048,7 +1048,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             }
         }
 
-        return null;
+        return retriveCollectionByRelationshipType(context, null, relationshipType);
     }
 
     @Override
