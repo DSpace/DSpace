@@ -104,13 +104,13 @@ public class UpdateScopusPersonMetricsIT extends AbstractControllerIntegrationTe
                                     ScopusPersonMetric.H_INDEX.metricType(), itemA.getID());
 
             assertNotEquals(newHIndexMetric.getID(), metric.getID());
-
+            String restId = CrisMetricsBuilder.getRestStoredMetricId(newHIndexMetric.getID());
             String tokenAdmin = getAuthToken(admin.getEmail(), password);
-            getClient(tokenAdmin).perform(get("/api/cris/metrics/" + newHIndexMetric.getID()))
+            getClient(tokenAdmin).perform(get("/api/cris/metrics/" + restId))
                                  .andExpect(status().isOk())
                                  .andExpect(jsonPath("$", is(CrisMetricsMatcher.matchCrisMetrics(newHIndexMetric))))
                                  .andExpect(jsonPath("$._links.self.href", Matchers.containsString(
-                                                     "/api/cris/metrics/" + newHIndexMetric.getID())));
+                                                     "/api/cris/metrics/" + restId)));
         } finally {
             CrisMetricsBuilder.deleteCrisMetrics(itemA);
             scopusPersonRestConnector.setHttpClient(originalHttpClient);
@@ -164,13 +164,13 @@ public class UpdateScopusPersonMetricsIT extends AbstractControllerIntegrationTe
                     ScopusPersonMetric.CITED.metricType(), itemA.getID());
 
             assertNotEquals(newCitedMetric.getID(), metric1.getID());
-
+            String restId = CrisMetricsBuilder.getRestStoredMetricId(newCitedMetric.getID());
             String tokenAdmin = getAuthToken(admin.getEmail(), password);
-            getClient(tokenAdmin).perform(get("/api/cris/metrics/" + newCitedMetric.getID()))
+            getClient(tokenAdmin).perform(get("/api/cris/metrics/" + restId))
                                  .andExpect(status().isOk())
                                  .andExpect(jsonPath("$", is(CrisMetricsMatcher.matchCrisMetrics(newCitedMetric))))
                                  .andExpect(jsonPath("$._links.self.href", Matchers.containsString(
-                                                     "/api/cris/metrics/" + newCitedMetric.getID())));
+                                                     "/api/cris/metrics/" + restId)));
         } finally {
             CrisMetricsBuilder.deleteCrisMetrics(itemA);
             scopusPersonRestConnector.setHttpClient(originalHttpClient);
@@ -225,13 +225,13 @@ public class UpdateScopusPersonMetricsIT extends AbstractControllerIntegrationTe
                     ScopusPersonMetric.DOCUMENT.metricType(), itemA.getID());
 
             assertNotEquals(newDocumentMetric.getID(), metric1.getID());
-
+            String restId = CrisMetricsBuilder.getRestStoredMetricId(newDocumentMetric.getID());
             String tokenAdmin = getAuthToken(admin.getEmail(), password);
-            getClient(tokenAdmin).perform(get("/api/cris/metrics/" + newDocumentMetric.getID()))
+            getClient(tokenAdmin).perform(get("/api/cris/metrics/" + restId))
                                  .andExpect(status().isOk())
                                  .andExpect(jsonPath("$", is(CrisMetricsMatcher.matchCrisMetrics(newDocumentMetric))))
                                  .andExpect(jsonPath("$._links.self.href", Matchers.containsString(
-                                                     "/api/cris/metrics/" + newDocumentMetric.getID())));
+                                                     "/api/cris/metrics/" + restId)));
         } finally {
             CrisMetricsBuilder.deleteCrisMetrics(itemA);
             scopusPersonRestConnector.setHttpClient(originalHttpClient);
@@ -285,13 +285,13 @@ public class UpdateScopusPersonMetricsIT extends AbstractControllerIntegrationTe
                     ScopusPersonMetric.CITATION.metricType(), itemA.getID());
 
             assertNotEquals(newCitationMetric.getID(), metric1.getID());
-
+            String restId = CrisMetricsBuilder.getRestStoredMetricId(newCitationMetric.getID());
             String tokenAdmin = getAuthToken(admin.getEmail(), password);
-            getClient(tokenAdmin).perform(get("/api/cris/metrics/" + newCitationMetric.getID()))
+            getClient(tokenAdmin).perform(get("/api/cris/metrics/" + restId))
                                  .andExpect(status().isOk())
                                  .andExpect(jsonPath("$", is(CrisMetricsMatcher.matchCrisMetrics(newCitationMetric))))
                                  .andExpect(jsonPath("$._links.self.href", Matchers.containsString(
-                                                     "/api/cris/metrics/" + newCitationMetric.getID())));
+                                                     "/api/cris/metrics/" + restId)));
         } finally {
             CrisMetricsBuilder.deleteCrisMetrics(itemA);
             scopusPersonRestConnector.setHttpClient(originalHttpClient);
@@ -345,13 +345,13 @@ public class UpdateScopusPersonMetricsIT extends AbstractControllerIntegrationTe
                     ScopusPersonMetric.COAUTHOR.metricType(), itemA.getID());
 
             assertNotEquals(newCoauthorMetric.getID(), metric1.getID());
-
+            String restId = CrisMetricsBuilder.getRestStoredMetricId(newCoauthorMetric.getID());
             String tokenAdmin = getAuthToken(admin.getEmail(), password);
-            getClient(tokenAdmin).perform(get("/api/cris/metrics/" + newCoauthorMetric.getID()))
+            getClient(tokenAdmin).perform(get("/api/cris/metrics/" + restId))
                                  .andExpect(status().isOk())
                                  .andExpect(jsonPath("$", is(CrisMetricsMatcher.matchCrisMetrics(newCoauthorMetric))))
                                  .andExpect(jsonPath("$._links.self.href", Matchers.containsString(
-                                                     "/api/cris/metrics/" + newCoauthorMetric.getID())));
+                                                     "/api/cris/metrics/" + restId)));
         } finally {
             CrisMetricsBuilder.deleteCrisMetrics(itemA);
             scopusPersonRestConnector.setHttpClient(originalHttpClient);

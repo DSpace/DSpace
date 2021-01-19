@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.dspace.app.metrics.CrisMetrics;
@@ -25,7 +26,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexingService;
 import org.dspace.metrics.embeddable.EmbeddableMetricProvider;
-import org.dspace.metrics.embeddable.impl.AbstractEmbeddableMetricProvider;
 import org.dspace.metrics.embeddable.model.EmbeddableCrisMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,13 +97,16 @@ public class CrisItemMetricsServiceImpl implements CrisItemMetricsService {
             Optional<EmbeddableCrisMetrics> metrics = getEmbeddableById(context, metricId);
             return metrics.isPresent() ? (CrisMetrics)metrics.get() : null;
         }
-        return crisMetricsService.find(context,
-                Integer.parseInt(metricId.replace(CrisMetrics.STORED_METRIC_ID_PREFIX, "")));
+        if (StringUtils.startsWith(metricId, STORED_METRIC_ID_PREFIX)) {
+            return crisMetricsService.find(context,
+                    Integer.parseInt(metricId.substring(STORED_METRIC_ID_PREFIX.length())));
+        }
+        return null;
     }
 
     @Override
     public boolean isEmbeddableMetricId(String id) {
-        return id.contains(AbstractEmbeddableMetricProvider.DYNAMIC_ID_SEPARATOR);
+        return !StringUtils.startsWith(id, STORED_METRIC_ID_PREFIX);
     }
 
     private SolrDocument findMetricsDocumentInSolr(Context context, UUID itemUuid) {

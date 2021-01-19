@@ -16,6 +16,7 @@ import org.dspace.app.metrics.service.CrisMetricsService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.metrics.CrisItemMetricsService;
 
 /**
  * Builder to construct CrisMetrics objects
@@ -148,8 +149,8 @@ public class CrisMetricsBuilder extends AbstractBuilder<CrisMetrics, CrisMetrics
         return this;
     }
 
-    public static String getRestStoredMetricId(String metricId) {
-        return CrisMetrics.STORED_METRIC_ID_PREFIX + metricId;
+    public static String getRestStoredMetricId(Integer metricId) {
+        return CrisItemMetricsService.STORED_METRIC_ID_PREFIX + metricId;
     }
 
 }

@@ -28,9 +28,7 @@ import org.dspace.core.ReloadableEntity;
  */
 @Entity
 @Table(name = "cris_metrics")
-public class CrisMetrics  implements ReloadableEntity<String> {
-
-    public final static String STORED_METRIC_ID_PREFIX = "storedmetric-";
+public class CrisMetrics  implements ReloadableEntity<Integer> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cris_metrics_seq")
@@ -135,8 +133,8 @@ public class CrisMetrics  implements ReloadableEntity<String> {
     }
 
     @Override
-    public String getID() {
-        return String.valueOf(this.getId());
+    public Integer getID() {
+        return this.getId();
     }
 
     public Double getDeltaPeriod1() {

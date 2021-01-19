@@ -25,6 +25,7 @@ import org.dspace.metrics.embeddable.model.EmbeddableCrisMetrics;
  * returned values are stored on DSpace database.
  */
 public interface CrisItemMetricsService {
+    public final static String STORED_METRIC_ID_PREFIX = "storedmetric-";
 
     /**
      * Returns both embeddable and stored metrics.

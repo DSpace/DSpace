@@ -25,8 +25,7 @@ import org.springframework.stereotype.Component;
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
 @Component(CrisMetricsRest.CATEGORY + "." + CrisMetricsRest.NAME)
-public class CrisMetricsRestRepository extends DSpaceRestRepository<CrisMetricsRest, String>
-                                       implements ReloadableEntityObjectRepository<CrisMetrics, String> {
+public class CrisMetricsRestRepository extends DSpaceRestRepository<CrisMetricsRest, String> {
 
     @Autowired
     private CrisItemMetricsService crisItemMetricsService;
@@ -52,17 +51,8 @@ public class CrisMetricsRestRepository extends DSpaceRestRepository<CrisMetricsR
     }
 
     @Override
-    public CrisMetrics findDomainObjectByPk(Context context, String id) throws SQLException {
-        return crisItemMetricsService.find(context, id);
-    }
-
-    @Override
     public Class<CrisMetricsRest> getDomainClass() {
         return CrisMetricsRest.class;
     }
 
-    @Override
-    public Class<String> getPKClass() {
-        return String.class;
-    }
 }
