@@ -93,7 +93,7 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
     public Page<EntityTypeRest> findAllByAuthorizedCollection(Pageable pageable) {
         try {
             Context context = obtainContext();
-            List<String> types = getSubmitAuthorizedTypes(pageable, context);
+            List<String> types = getSubmitAuthorizedTypes(context);
             List<EntityType> entityTypes = types.stream().map(type -> {
                 if (StringUtils.isBlank(type)) {
                     return null;
@@ -114,8 +114,9 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
     public Page<EntityTypeRest> findAllByAuthorizedExternalSource(Pageable pageable) {
         try {
             Context context = obtainContext();
-            List<String> types = getSubmitAuthorizedTypes(pageable, context);
+            List<String> types = getSubmitAuthorizedTypes(context);
             List<EntityType> entityTypes = types.stream()
+                    .filter(x -> externalDataService.getExternalDataProvidersForEntityType(x).size() > 0)
                     .map(type -> {
                         if (StringUtils.isBlank(type)) {
                             return null;
@@ -125,15 +126,15 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
                         } catch (SQLException e) {
                             throw new RuntimeException(e.getMessage(), e);
                         }
-                    }).filter(x -> x != null)
-                    .filter(x -> externalDataService.getExternalDataProvidersForEntityType(x.getLabel()).size() > 0)
+                    })
+                    .filter(x -> x != null)
                     .collect(Collectors.toList());
             return converter.toRestPage(entityTypes, pageable, utils.obtainProjection());
         } catch (SQLException | SolrServerException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-    private List<String> getSubmitAuthorizedTypes(Pageable pageable, Context context)
+    private List<String> getSubmitAuthorizedTypes(Context context)
             throws SQLException, SolrServerException, IOException {
         List<String> types = new ArrayList<>();
         StringBuilder query = new StringBuilder();
@@ -157,17 +158,13 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
         sQuery.addFilterQuery("search.resourcetype:" + IndexableCollection.TYPE);
         sQuery.setRows(0);
         sQuery.addFacetField("search.entitytype");
-        sQuery.setFacetLimit((int) (pageable.getPageSize() + pageable.getOffset()));
+        sQuery.setFacetMinCount(1);
+        sQuery.setFacetLimit(Integer.MAX_VALUE);
         sQuery.setFacetSort(FacetParams.FACET_SORT_INDEX);
         QueryResponse qResp = searchService.getSolrSearchCore().getSolr().query(sQuery);
         FacetField ff = qResp.getFacetField("search.entitytype");
         if (ff != null) {
-            int skipped = 0;
             for (Count c : ff.getValues()) {
-                if (skipped < pageable.getOffset()) {
-                    skipped++;
-                    continue;
-                }
                 types.add(c.getName());
             }
         }
