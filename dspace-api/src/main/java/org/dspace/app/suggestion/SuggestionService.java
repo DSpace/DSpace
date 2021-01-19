@@ -40,7 +40,7 @@ public interface SuggestionService {
     public void rejectSuggestion(Context context, String id);
 
     public List<Suggestion> findByTargetAndSource(Context context, UUID target, String source, int pageSize,
-            long offset);
+            long offset, boolean ascending);
 
     public long countAllByTargetAndSource(Context context, String source, UUID target);
 }

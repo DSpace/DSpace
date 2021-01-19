@@ -23,6 +23,7 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +35,7 @@ import org.springframework.stereotype.Component;
 
 @Component(SuggestionRest.CATEGORY + "." + SuggestionRest.NAME)
 public class SuggestionRestRepository extends DSpaceRestRepository<SuggestionRest, String> {
+    private final static String ORDER_FIELD = "trust";
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SuggestionRestRepository.class);
 
@@ -62,8 +64,12 @@ public class SuggestionRestRepository extends DSpaceRestRepository<SuggestionRes
             @Parameter(required = true, value = "source") String source,
             @Parameter(required = true, value = "target") UUID target, Pageable pageable) {
         Context context = obtainContext();
+        boolean ascending = false;
+        if (pageable.getSort() != null && pageable.getSort().getOrderFor(ORDER_FIELD) != null) {
+            ascending = pageable.getSort().getOrderFor(ORDER_FIELD).getDirection() == Direction.ASC;
+        }
         List<Suggestion> suggestions = suggestionService.findByTargetAndSource(context, target, source,
-                pageable.getPageSize(), pageable.getOffset());
+                pageable.getPageSize(), pageable.getOffset(), ascending);
         long tot = suggestionService.countAllByTargetAndSource(context, source, target);
         return converter.toRestPage(suggestions, pageable, tot, utils.obtainProjection());
     }

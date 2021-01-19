@@ -32,7 +32,7 @@ public interface SolrSuggestionStorageService {
     public static final String CATEGORY = "category";
     public static final String EXTERNAL_URI = "external-uri";
     public static final String PROCESSED = "processed";
-    public static final String SCORE = "score";
+    public static final String SCORE = "trust";
     public static final String EVIDENCES = "evidences";
 
     /**

@@ -519,7 +519,7 @@
     <field name="category" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
     <field name="external-uri" type="string" indexed="true" stored="true" omitNorms="true" />
     <field name="processed" type="boolean" indexed="true" stored="true" omitNorms="true" />
-    <field name="score" type="double" indexed="true" stored="true" omitNorms="true" />
+    <field name="trust" type="double" indexed="true" stored="true" omitNorms="true" />
     <field name="evidences" type="string" indexed="false" stored="true" omitNorms="true" />
     
     <dynamicField name="*_i"  type="int"    indexed="true"  stored="true" multiValued="true" docValues="true"/>

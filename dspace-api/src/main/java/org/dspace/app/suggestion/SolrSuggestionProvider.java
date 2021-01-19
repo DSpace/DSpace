@@ -31,6 +31,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrQuery.SortClause;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.FacetField;
@@ -126,7 +127,8 @@ public class SolrSuggestionProvider implements SuggestionProvider {
     }
 
     @Override
-    public List<Suggestion> findAllUnprocessedSuggestions(Context context, UUID target, int pageSize, long offset) {
+    public List<Suggestion> findAllUnprocessedSuggestions(Context context, UUID target, int pageSize, long offset,
+            boolean ascending) {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(pageSize);
         solrQuery.setStart((int) offset);
@@ -135,6 +137,14 @@ public class SolrSuggestionProvider implements SuggestionProvider {
                 SOURCE + ":" + sourceName,
                 TARGET_ID + ":" + target.toString(),
                 PROCESSED + ":false");
+        if (ascending) {
+            solrQuery.addSort(SortClause.asc("trust"));
+        } else {
+            solrQuery.addSort(SortClause.desc("trust"));
+        }
+        solrQuery.addSort(SortClause.desc("date"));
+        solrQuery.addSort(SortClause.asc("title"));
+
         QueryResponse response = null;
         try {
             response = getSolr().query(solrQuery);

@@ -95,10 +95,10 @@ public class SuggestionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .andExpect(jsonPath("$._embedded.suggestions", Matchers.contains(
                         matchSuggestion("scopus", itemFirst, "Suggestion scopus 1", "1",
                                 100.0, EVIDENCE_MOCK_NAME, 100.0, EVIDENCE_MOCK_NOTE),
-                        matchSuggestion("scopus", itemFirst, "Suggestion scopus 2", "2",
-                                0.5, EVIDENCE_MOCK_NAME, 0.5, EVIDENCE_MOCK_NOTE),
                         matchSuggestion("scopus", itemFirst, "Suggestion scopus 3", "3",
-                                98.0, EVIDENCE_MOCK_NAME, 98.0, EVIDENCE_MOCK_NOTE))))
+                                98.0, EVIDENCE_MOCK_NAME, 98.0, EVIDENCE_MOCK_NOTE),
+                        matchSuggestion("scopus", itemFirst, "Suggestion scopus 2", "2",
+                                0.5, EVIDENCE_MOCK_NAME, 0.5, EVIDENCE_MOCK_NOTE))))
                 .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
                         Matchers.containsString(
                                 "/api/integration/suggestions/search/findByTargetAndSource?"),
@@ -110,7 +110,7 @@ public class SuggestionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .perform(get("/api/integration/suggestions/search/findByTargetAndSource").param("source", "reciter")
                         .param("target", itemSecond.getID().toString()))
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.suggestions", Matchers.contains(
+                .andExpect(jsonPath("$._embedded.suggestions", Matchers.containsInAnyOrder(
                         matchSuggestion("reciter", itemSecond, "Suggestion reciter 1", "1"),
                         matchSuggestion("reciter", itemSecond, "Suggestion reciter 2", "2"),
                         matchSuggestion("reciter", itemSecond, "Suggestion reciter 3", "3"),
@@ -133,7 +133,7 @@ public class SuggestionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .perform(get("/api/integration/suggestions/search/findByTargetAndSource").param("source", "reciter")
                         .param("target", itemSecond.getID().toString()))
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.suggestions", Matchers.contains(
+                .andExpect(jsonPath("$._embedded.suggestions", Matchers.containsInAnyOrder(
                         matchSuggestion("reciter", itemSecond, "Suggestion reciter 1", "1"),
                         matchSuggestion("reciter", itemSecond, "Suggestion reciter 2", "2"),
                         matchSuggestion("reciter", itemSecond, "Suggestion reciter 3", "3"),
@@ -169,10 +169,10 @@ public class SuggestionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.suggestions", Matchers.contains(
                         matchSuggestion("reciter", itemSecond, "Suggestion reciter 1", "1"),
-                        matchSuggestion("reciter", itemSecond, "Suggestion reciter 2", "2"),
                         matchSuggestion("reciter", itemSecond, "Suggestion reciter 3", "3"),
-                        matchSuggestion("reciter", itemSecond, "Suggestion reciter 4", "4"),
-                        matchSuggestion("reciter", itemSecond, "Suggestion reciter 5", "5"))))
+                        matchSuggestion("reciter", itemSecond, "Suggestion reciter 5", "5"),
+                        matchSuggestion("reciter", itemSecond, "Suggestion reciter 7", "7"),
+                        matchSuggestion("reciter", itemSecond, "Suggestion reciter 9", "9"))))
                 .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
                         Matchers.containsString(
                                 "/api/integration/suggestions/search/findByTargetAndSource?"),
@@ -213,11 +213,11 @@ public class SuggestionRestRepositoryIT extends AbstractControllerIntegrationTes
                         .param("target", itemSecond.getID().toString()))
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.suggestions", Matchers.contains(
-                        matchSuggestion("reciter", itemSecond, "Suggestion reciter 6", "6"),
-                        matchSuggestion("reciter", itemSecond, "Suggestion reciter 7", "7"),
+                        matchSuggestion("reciter", itemSecond, "Suggestion reciter 11", "11"),
+                        matchSuggestion("reciter", itemSecond, "Suggestion reciter 10", "10"),
                         matchSuggestion("reciter", itemSecond, "Suggestion reciter 8", "8"),
-                        matchSuggestion("reciter", itemSecond, "Suggestion reciter 9", "9"),
-                        matchSuggestion("reciter", itemSecond, "Suggestion reciter 10", "10"))))
+                        matchSuggestion("reciter", itemSecond, "Suggestion reciter 6", "6"),
+                        matchSuggestion("reciter", itemSecond, "Suggestion reciter 4", "4"))))
                 .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
                         Matchers.containsString(
                                 "/api/integration/suggestions/search/findByTargetAndSource?"),
@@ -266,7 +266,7 @@ public class SuggestionRestRepositoryIT extends AbstractControllerIntegrationTes
                         .param("target", itemSecond.getID().toString()))
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.suggestions", Matchers.contains(
-                        matchSuggestion("reciter", itemSecond, "Suggestion reciter 11", "11"))))
+                        matchSuggestion("reciter", itemSecond, "Suggestion reciter 2", "2"))))
                 .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
                         Matchers.containsString(
                                 "/api/integration/suggestions/search/findByTargetAndSource?"),

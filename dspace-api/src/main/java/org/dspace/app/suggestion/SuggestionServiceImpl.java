@@ -126,9 +126,9 @@ public class SuggestionServiceImpl implements SuggestionService {
 
     @Override
     public List<Suggestion> findByTargetAndSource(Context context, UUID target, String source, int pageSize,
-            long offset) {
+            long offset, boolean ascending) {
         if (providersMap.containsKey(source)) {
-            return providersMap.get(source).findAllUnprocessedSuggestions(context, target, pageSize, offset);
+            return providersMap.get(source).findAllUnprocessedSuggestions(context, target, pageSize, offset, ascending);
         }
         return null;
     }
