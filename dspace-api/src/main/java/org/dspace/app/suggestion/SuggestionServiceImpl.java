@@ -57,7 +57,7 @@ public class SuggestionServiceImpl implements SuggestionService {
     public long countAllByTarget(Context context, UUID target) {
         int count = 0;
         for (String provider : providersMap.keySet()) {
-            if (providersMap.get(provider).countSuggestionByTarget(context, target) > 0) {
+            if (providersMap.get(provider).countUnprocessedSuggestionByTarget(context, target) > 0) {
                 count++;
             }
         }
@@ -119,7 +119,7 @@ public class SuggestionServiceImpl implements SuggestionService {
     @Override
     public long countAllByTargetAndSource(Context context, String source, UUID target) {
         if (providersMap.containsKey(source)) {
-            return providersMap.get(source).countSuggestionByTarget(context, target);
+            return providersMap.get(source).countUnprocessedSuggestionByTarget(context, target);
         }
         return 0;
     }
@@ -128,13 +128,13 @@ public class SuggestionServiceImpl implements SuggestionService {
     public List<Suggestion> findByTargetAndSource(Context context, UUID target, String source, int pageSize,
             long offset) {
         if (providersMap.containsKey(source)) {
-            return providersMap.get(source).findAllSuggestions(context, target, pageSize, offset);
+            return providersMap.get(source).findAllUnprocessedSuggestions(context, target, pageSize, offset);
         }
         return null;
     }
 
     @Override
-    public Suggestion findSuggestion(Context context, String id) {
+    public Suggestion findUnprocessedSuggestion(Context context, String id) {
         String source = null;
         UUID target = null;
         String idPart = null;
@@ -152,7 +152,7 @@ public class SuggestionServiceImpl implements SuggestionService {
             return null;
         }
         if (providersMap.containsKey(source)) {
-            return providersMap.get(source).findSuggestion(context, target, idPart);
+            return providersMap.get(source).findUnprocessedSuggestion(context, target, idPart);
         }
         return null;
     }

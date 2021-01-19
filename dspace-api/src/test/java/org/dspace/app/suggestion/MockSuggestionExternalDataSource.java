@@ -36,7 +36,7 @@ public class MockSuggestionExternalDataSource extends AbstractExternalDataProvid
         RequestService requestService = new DSpace().getRequestService();
         Request currentRequest = requestService.getCurrentRequest();
         Context context = (Context) currentRequest.getAttribute("dspace.context");
-        Suggestion suggestion = suggestionService.findSuggestion(context, id);
+        Suggestion suggestion = suggestionService.findUnprocessedSuggestion(context, id);
         if (suggestion != null) {
             ExternalDataObject extDataObj = new ExternalDataObject(suggestion.getSource());
             extDataObj.setDisplayValue(suggestion.getDisplay());

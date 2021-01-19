@@ -35,7 +35,7 @@ public interface SuggestionService {
 
     public List<SuggestionSource> findAllSources(Context context, int pageSize, long offset);
 
-    public Suggestion findSuggestion(Context context, String id);
+    public Suggestion findUnprocessedSuggestion(Context context, String id);
 
     public void rejectSuggestion(Context context, String id);
 

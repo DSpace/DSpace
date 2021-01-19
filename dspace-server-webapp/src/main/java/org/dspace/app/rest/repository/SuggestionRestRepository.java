@@ -43,7 +43,7 @@ public class SuggestionRestRepository extends DSpaceRestRepository<SuggestionRes
     @Override
     @PreAuthorize("hasPermission(#id, 'SUGGESTION', 'READ')")
     public SuggestionRest findOne(Context context, String id) {
-        Suggestion suggestion = suggestionService.findSuggestion(context, id);
+        Suggestion suggestion = suggestionService.findUnprocessedSuggestion(context, id);
         if (suggestion == null) {
             return null;
         }

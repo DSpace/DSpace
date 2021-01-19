@@ -108,7 +108,7 @@ public class SolrSuggestionProvider implements SuggestionProvider {
     }
 
     @Override
-    public long countSuggestionByTarget(Context context, UUID target) {
+    public long countUnprocessedSuggestionByTarget(Context context, UUID target) {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
         solrQuery.setQuery("*:*");
@@ -126,7 +126,7 @@ public class SolrSuggestionProvider implements SuggestionProvider {
     }
 
     @Override
-    public List<Suggestion> findAllSuggestions(Context context, UUID target, int pageSize, long offset) {
+    public List<Suggestion> findAllUnprocessedSuggestions(Context context, UUID target, int pageSize, long offset) {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(pageSize);
         solrQuery.setStart((int) offset);
@@ -183,14 +183,15 @@ public class SolrSuggestionProvider implements SuggestionProvider {
     }
 
     @Override
-    public Suggestion findSuggestion(Context context, UUID target, String id) {
+    public Suggestion findUnprocessedSuggestion(Context context, UUID target, String id) {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(1);
         solrQuery.setQuery("*:*");
         solrQuery.addFilterQuery(
                 SOURCE + ":" + sourceName,
                 TARGET_ID + ":" + target.toString(),
-                SUGGESTION_ID + ":\"" + id + "\"");
+                SUGGESTION_ID + ":\"" + id + "\"",
+                PROCESSED + ":false");
         QueryResponse response = null;
         try {
             response = getSolr().query(solrQuery);
@@ -230,7 +231,7 @@ public class SolrSuggestionProvider implements SuggestionProvider {
 
     @Override
     public void rejectSuggestion(Context context, UUID target, String idPart) {
-        Suggestion suggestion = findSuggestion(context, target, idPart);
+        Suggestion suggestion = findUnprocessedSuggestion(context, target, idPart);
         try {
             solrSuggestionStorageService.flagSuggestionAsProcessed(suggestion);
         } catch (SolrServerException | IOException e) {

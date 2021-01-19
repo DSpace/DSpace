@@ -19,11 +19,11 @@ public interface SuggestionProvider {
 
     public SuggestionTarget findTarget(Context context, UUID target);
 
-    public List<Suggestion> findAllSuggestions(Context context, UUID target, int pageSize, long offset);
+    public List<Suggestion> findAllUnprocessedSuggestions(Context context, UUID target, int pageSize, long offset);
 
-    public long countSuggestionByTarget(Context context, UUID target);
+    public long countUnprocessedSuggestionByTarget(Context context, UUID target);
 
-    public Suggestion findSuggestion(Context context, UUID target, String id);
+    public Suggestion findUnprocessedSuggestion(Context context, UUID target, String id);
 
     public void rejectSuggestion(Context context, UUID target, String idPart);
 
