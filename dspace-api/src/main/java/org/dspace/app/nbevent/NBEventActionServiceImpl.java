@@ -93,7 +93,7 @@ public class NBEventActionServiceImpl implements NBEventActionService {
     }
 
     private void makeAcknowledgement(String eventId, String status) {
-        String[] ackwnoledgeCallbacks = configurationService.getArrayProperty("acknowledge-url");
+        String[] ackwnoledgeCallbacks = configurationService.getArrayProperty("oaire-nbevents.acknowledge-url");
         if (ackwnoledgeCallbacks != null) {
             for (String ackwnoledgeCallback : ackwnoledgeCallbacks) {
                 if (StringUtils.isNotBlank(ackwnoledgeCallback)) {
