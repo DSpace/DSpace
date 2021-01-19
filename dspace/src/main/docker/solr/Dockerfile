@@ -9,29 +9,25 @@
 # Define a 'dspace' alias for our latest v7 image
 FROM dspace/dspace:dspace-7_x as dspace
 
-# Pin to Solr v7
-# Note: The WORKDIR changes to /var/solr in v8 and directory layout is different
-# See README at https://github.com/docker-solr/docker-solr/pull/210
-FROM solr:7
+# Pin to Solr v8.x
+FROM solr:8
 # Directory on 'dspace' image (see above) where DSpace is installed
 ENV DSPACE_INSTALL=/dspace
-# Solr user
+# User that Solr runs as
 ENV SOLR_USER=solr
 # Expose Solr on localhost:8983
 EXPOSE 8983 8983
 
-WORKDIR /opt/solr/server/solr
+# Solr Data Directory (NOTE: logs are in /var/solr/logs)
+WORKDIR /var/solr/data
 USER $SOLR_USER
-# Create DSpace-specific Solr cores (based on default configset provided by Solr)
+# Create DSpace-specific Solr cores (under our WORKDIR)
 RUN \
-    cp -r configsets/_default authority && \
-    mkdir authority/data &&\
-    cp -r configsets/_default oai && \
-    mkdir oai/data &&\
-    cp -r configsets/_default search && \
-    mkdir search/data &&\
-    cp -r configsets/_default statistics && \
-    mkdir statistics/data
+    init-var-solr && \
+    precreate-core authority && \
+    precreate-core oai && \
+    precreate-core search && \
+    precreate-core statistics
 
 # Copy the DSpace-specific Solr schemas & configs (from our 'dspace' image)
 # into corresponding Solr core directory
