@@ -110,8 +110,8 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
                                .andExpect(jsonPath("$", is(
                                           CrisMetricsMatcher.matchCrisMetrics(metric)
                                           )))
-                               .andExpect(jsonPath("$._links.self.href", Matchers
-                               .containsString("/api/cris/metrics/" + metric.getID())));
+                               .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/cris/metrics/"
+                                          + CrisMetricsBuilder.getRestStoredMetricId(metric.getID()))));
 
     }
 
