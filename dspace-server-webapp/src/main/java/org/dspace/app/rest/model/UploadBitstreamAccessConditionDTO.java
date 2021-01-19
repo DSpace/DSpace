@@ -8,7 +8,6 @@
 package org.dspace.app.rest.model;
 
 import java.util.Date;
-import java.util.UUID;
 
 import org.dspace.app.rest.model.step.UploadBitstreamRest;
 

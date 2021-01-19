@@ -7,6 +7,9 @@
  */
 package org.dspace.submit.model;
 
+import java.sql.SQLException;
+import java.util.Date;
+
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
@@ -16,9 +19,6 @@ import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.sql.SQLException;
-import java.util.Date;
 
 /**
  * This class represents an option available in the submission upload section to
@@ -148,10 +148,10 @@ public class AccessConditionOption {
             throw new IllegalStateException("The access condition " + getName() + " requires an end date.");
         }
         if (!getHasStartDate() && startDate != null) {
-            startDate = null;
+            throw new IllegalStateException("The access condition " + getName() + " cannot contain a start date.");
         }
         if (!getHasEndDate() && endDate != null) {
-            endDate = null;
+            throw new IllegalStateException("The access condition " + getName() + " cannot contain an end date.");
         }
         //TODO: check date limits as well
         Group group = groupService.findByName(context, getGroupName());

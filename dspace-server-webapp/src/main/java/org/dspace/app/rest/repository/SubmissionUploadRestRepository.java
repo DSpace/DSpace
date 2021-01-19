@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.repository;
 
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
