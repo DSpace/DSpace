@@ -111,7 +111,7 @@ public class ItemConverter
                 // the context could be null if the converter is used to prepare test data or in a batch script
                 boxes = new ArrayList<CrisLayoutBox>();
             }
-            
+
             Optional<List<DCInputSet>> submissionDefinitionInputs = submissionDefinitionInputs();
             if (submissionDefinitionInputs.isPresent()) {
                 return fromSubmissionDefinition(context, boxes, obj, submissionDefinitionInputs.get(), fullList);
@@ -161,7 +161,7 @@ public class ItemConverter
         Predicate<MetadataValue> inDcInputs = mv -> dcInputSets.stream()
                 .anyMatch((dc) -> {
                     try {
-                        return dc.isFieldPresent(mv.getMetadataField().toString('.')) || 
+                        return dc.isFieldPresent(mv.getMetadataField().toString('.')) ||
                                 checkMetadataFieldVisibilityByBoxes(context, boxes, item, mv.getMetadataField());
                     } catch (SQLException e) {
                         return false;
@@ -218,7 +218,7 @@ public class ItemConverter
                 return true;
             }
         }
-        
+
         return false;
     }
 
