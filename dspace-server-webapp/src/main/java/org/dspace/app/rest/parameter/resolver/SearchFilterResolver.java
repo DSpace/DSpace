@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.query.RestSearchOperator;
 import org.dspace.app.rest.parameter.SearchFilter;
 import org.springframework.core.MethodParameter;
@@ -68,7 +69,7 @@ public class SearchFilterResolver implements HandlerMethodArgumentResolver {
     private void checkIfValidOperator(String filterOperator) {
         if (StringUtils.isNotBlank(filterOperator)) {
             if (!ALLOWED_SEARCH_OPERATORS.contains(filterOperator.trim())) {
-                throw new DSpaceBadRequestException(
+                throw new UnprocessableEntityException(
                     "The operator can't be \"" + filterOperator + "\", must be the of one of: " +
                     String.join(", ", ALLOWED_SEARCH_OPERATORS));
             }
