@@ -18,6 +18,7 @@ import java.util.UUID;
 
 import org.dspace.app.metrics.CrisMetrics;
 import org.dspace.app.rest.model.CrisMetricsRest;
+import org.dspace.builder.CrisMetricsBuilder;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
@@ -31,7 +32,7 @@ public class CrisMetricsMatcher {
     private CrisMetricsMatcher() {}
 
     public static Matcher<? super Object> matchCrisMetrics(CrisMetrics crisMetrics) {
-        return allOf(hasJsonPath("$.id", is(String.valueOf(crisMetrics.getID()))),
+        return allOf(hasJsonPath("$.id", is(CrisMetricsBuilder.getRestStoredMetricId(crisMetrics.getID()))),
                      hasJsonPath("$.metricType", is(crisMetrics.getMetricType())),
                      hasJsonPath("$.metricCount", is(crisMetrics.getMetricCount())),
                      hasJsonPath("$.acquisitionDate", is(formatDate(crisMetrics.getAcquisitionDate()))),

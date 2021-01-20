@@ -13,7 +13,6 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.metrics.CrisMetrics;
-import org.dspace.app.metrics.service.CrisMetricsService;
 import org.dspace.app.rest.model.CrisMetricsRest;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.service.AuthorizeService;
@@ -23,6 +22,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.metrics.CrisItemMetricsService;
 import org.dspace.metrics.embeddable.impl.AbstractEmbeddableMetricProvider;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
@@ -52,7 +52,7 @@ public class CrisMetricsRestPermissionEvaluatorPlugin extends RestObjectPermissi
     private EPersonService ePersonService;
 
     @Autowired
-    private CrisMetricsService crisMetricsService;
+    private CrisItemMetricsService crisItemMetricsService;
 
     @Autowired
     private ItemService itemService;
@@ -79,41 +79,37 @@ public class CrisMetricsRestPermissionEvaluatorPlugin extends RestObjectPermissi
                 return false;
             }
 
-            String target = targetId.toString();
+            Item item = itemFromMetricId(context, targetId.toString());
 
-            if (isEmbedded(target)) {
-                return evaluateEmbeddedMetric(target, context);
+            if (Objects.isNull(item)) {
+                // this is needed to allow 404 instead than 403
+                return true;
             }
-            return evaluateStoredMetric(target, context);
+
+            return authorizeService.authorizeActionBoolean(context, item, Constants.READ);
+
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
         }
         return false;
     }
 
-    private boolean evaluateEmbeddedMetric(String target, Context context) throws SQLException {
-        String uuid = target.substring(0, target.indexOf(AbstractEmbeddableMetricProvider.DYNAMIC_ID_SEPARATOR));
-        Item item = itemService.find(context, UUID.fromString(uuid));
+    private Item itemFromMetricId(Context context, String target) throws SQLException {
 
-        if (Objects.isNull(item)) {
-            // this is needed to allow 404 instead than 403
-            return true;
+        if (crisItemMetricsService.isEmbeddableMetricId(target.toString())) {
+            int indexOf = target.indexOf(AbstractEmbeddableMetricProvider.DYNAMIC_ID_SEPARATOR);
+            if (indexOf != -1) {
+                String uuid = target.substring(0, indexOf);
+                return itemService.find(context, UUID.fromString(uuid));
+            } else {
+                return null;
+            }
+
+        } else {
+
+            CrisMetrics metric = crisItemMetricsService.find(context, target.toString());
+            return metric != null ? metric.getResource() : null;
         }
-        return authorizeService.authorizeActionBoolean(context, item, Constants.READ);
-    }
-
-    private boolean isEmbedded(Serializable targetId) {
-        return targetId.toString().contains(AbstractEmbeddableMetricProvider.DYNAMIC_ID_SEPARATOR);
-    }
-
-    private boolean evaluateStoredMetric(String target, Context context) throws SQLException {
-        Integer crisMetricId = Integer.parseInt(target);
-        CrisMetrics metric = crisMetricsService.find(context, crisMetricId);
-        if (Objects.isNull(metric)) {
-            // this is needed to allow 404 instead than 403
-            return true;
-        }
-        return authorizeService.authorizeActionBoolean(context, metric.getResource(), Constants.READ);
     }
 
 }

@@ -396,4 +396,15 @@ public interface CollectionService
      */
     public int countCollectionsWithSubmit(String q, Context context, Community community, String entityType)
         throws SQLException, SearchServiceException;
+
+    /**
+     * Returns true if the given collection is configured so that all items are
+     * shared among all submitters of the collection itself.
+     *
+     * @param  context    the DSpace context
+     * @param  collection the collection to test
+     * @return            true if the given collection's workspace is shared, false
+     *                    otherwise
+     */
+    boolean isSharedWorkspace(Context context, Collection collection);
 }

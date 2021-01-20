@@ -1,0 +1,109 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context-2.5.xsd
+                           http://www.springframework.org/schema/util
+                           http://www.springframework.org/schema/util/spring-util.xsd"
+       default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
+
+    <context:annotation-config/>
+    <!-- allows us to use spring annotations in beans -->
+
+    <util:map id="scieloMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+              value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
+        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
+            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
+            what metadatafield is generated.
+        </description>
+        <entry key-ref="scielo.doi" value-ref="scieloSimpleContrib"/>
+        <entry key-ref="scielo.abstract" value-ref="scieloAbstractContrib"/>
+    </util:map>
+
+    <bean id="scieloAbstractContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleRisToMetadataConcatContributor">
+        <property name="tag" value="AB"/>
+        <property name="metadata" ref="scielo.abstract"/>
+    </bean>
+
+    <bean id="scielo.abstract" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.description.abstract"/>
+    </bean>
+
+    <bean id="scieloSimpleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleRisToMetadataContributor">
+        <property name="fieldToMetadata" ref="tag2metadata"/>
+    </bean>
+
+    <util:map id="tag2metadata" map-class="java.util.HashMap"
+        key-type="java.lang.String" value-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <entry key="DO" value-ref="scielo.doi"/>
+        <entry key="AU" value-ref="scielo.author"/>
+        <entry key="TI" value-ref="scielo.title"/>
+        <entry key="SN" value-ref="scielo.issn"/>
+        <entry key="VL" value-ref="scielo.volume"/>
+        <entry key="IS" value-ref="scielo.issueIdentifier"/>
+        <entry key="ID" value-ref="scielo.id"/>
+        <entry key="SP" value-ref="scielo.startPage"/>
+        <entry key="EP" value-ref="scielo.endPage"/>
+        <entry key="KW" value-ref="scielo.keywords"/>
+        <entry key="TY" value-ref="scielo.type"/>
+        <entry key="PY" value-ref="scielo.publicationYear"/>
+        <entry key="JO" value-ref="scielo.isPartOf"/>
+    </util:map>
+
+    <bean id="scielo.doi" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.doi"/>
+    </bean>
+
+    <bean id="scielo.author" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.contributor.author"/>
+    </bean>
+
+    <bean id="scielo.title" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.title"/>
+    </bean>
+
+    <bean id="scielo.issn" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.issn"/>
+    </bean>
+
+    <bean id="scielo.volume" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="oaire.citation.volume"/>
+    </bean>
+
+    <bean id="scielo.issueIdentifier" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="oaire.citation.issue"/>
+    </bean>
+
+    <bean id="scielo.id" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.other"/>
+    </bean>
+
+    <bean id="scielo.startPage" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="oaire.citation.startPage"/>
+    </bean>
+    	
+    <bean id="scielo.endPage" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="oaire.citation.endPage"/>
+    </bean>
+
+    <bean id="scielo.keywords" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.subject"/>
+    </bean>
+
+    <bean id="scielo.type" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.type"/>
+    </bean>
+
+    <bean id="scielo.publicationYear" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.date.issued"/>
+    </bean>
+
+    <bean id="scielo.isPartOf" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.relation.ispartof"/>
+    </bean>
+
+
+</beans>

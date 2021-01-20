@@ -163,13 +163,13 @@ public class UpdateWOSMetricsIT extends AbstractControllerIntegrationTest {
                                      UpdateWOSMetrics.WOS_METRIC_TYPE, itemA.getID());
 
             assertEquals(metric1.getID(), metric.getID());
-
+            String restId = CrisMetricsBuilder.getRestStoredMetricId(metric.getID());
             String tokenAdmin = getAuthToken(admin.getEmail(), password);
-            getClient(tokenAdmin).perform(get("/api/cris/metrics/" + metric.getID()))
+            getClient(tokenAdmin).perform(get("/api/cris/metrics/" + restId))
                                  .andExpect(status().isOk())
                                  .andExpect(jsonPath("$", is(CrisMetricsMatcher.matchCrisMetrics(metric))))
                                  .andExpect(jsonPath("$._links.self.href", Matchers.containsString(
-                                                     "/api/cris/metrics/" + metric.getID())));
+                                                     "/api/cris/metrics/" + restId)));
         } finally {
             CrisMetricsBuilder.deleteCrisMetrics(itemA);
             wosRestConnector.setHttpClient(originalHttpClient);

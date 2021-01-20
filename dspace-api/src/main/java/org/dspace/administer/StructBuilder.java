@@ -7,6 +7,8 @@
  */
 package org.dspace.administer;
 
+import static org.dspace.content.MetadataSchemaEnum.CRIS;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -272,6 +274,7 @@ public class StructBuilder {
         collectionMap.put("entity-type", "entity-type");
         collectionMap.put("submission-type", "submission-type");
         collectionMap.put("workflow-name", "workflow-name");
+        collectionMap.put("shared-workspace", "shared-workspace");
         collectionMap.put("description", "short_description");
         collectionMap.put("intro", "introductory_text");
         collectionMap.put("copyright", "copyright_text");
@@ -397,6 +400,12 @@ public class StructBuilder {
                 "workflow", "name", Item.ANY);
         if (StringUtils.isNotBlank(workflowName)) {
             element.addContent(new Element("workflow-name").setText(workflowName));
+        }
+
+        String sharedWorkspace = collectionService.getMetadataFirstValue(collection, MetadataSchemaEnum.CRIS.getName(),
+            "workspace", "shared", Item.ANY);
+        if (StringUtils.isNotBlank(sharedWorkspace)) {
+            element.addContent(new Element("shared-workspace").setText(sharedWorkspace));
         }
 
         return element;
@@ -811,6 +820,13 @@ public class StructBuilder {
             if (StringUtils.isNotBlank(workflowName)) {
                 element.addContent(new Element("workflow-name").setText(workflowName));
             }
+
+            String sharedWorkspace = collectionService.getMetadataFirstValue(collection, CRIS.getName(),
+                "workspace", "shared", Item.ANY);
+            if (StringUtils.isNotBlank(sharedWorkspace)) {
+                element.addContent(new Element("shared-workspace").setText(sharedWorkspace));
+            }
+
             elements[i] = element;
         }
 

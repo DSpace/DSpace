@@ -22,17 +22,17 @@ public class EmbeddableAltmetricsProvider extends AbstractEmbeddableMetricProvid
             + "data-badge-type=\"{{badgeType}}\" "
             + "{{doiAttr}} {{pmidAttr}}></div>";
 
-    private String doiField;
+    protected String doiField;
 
-    private String doiDataAttr;
+    protected String doiDataAttr;
 
-    private String pmidField;
+    protected String pmidField;
 
-    private String pmidDataAttr;
+    protected String pmidDataAttr;
 
-    private String badgeType = "medium-donut";
+    protected String badgeType = "medium-donut";
 
-    private String popover = "bottom";
+    protected String popover = "bottom";
 
     private String details;
 
@@ -48,22 +48,26 @@ public class EmbeddableAltmetricsProvider extends AbstractEmbeddableMetricProvid
         String doiAttr = this.calculateAttribute(item, doiField, doiDataAttr);
         String pmidAtt = this.calculateAttribute(item, pmidField, pmidDataAttr);
 
-        return  TEMPLATE
+        return  getTemplate()
                 .replace("{{popover}}", this.popover)
                 .replace("{{badgeType}}", this.badgeType)
                 .replace("{{doiAttr}}", doiAttr)
                 .replace("{{pmidAttr}}", pmidAtt);
     }
 
-    private String calculateAttribute(Item item, String field, String attr) {
+    protected String calculateAttribute(Item item, String field, String attr) {
         if (field != null && attr != null) {
-            List<MetadataValue> values = this.itemService.getMetadataByMetadataString(item, field);
+            List<MetadataValue> values = this.getItemService().getMetadataByMetadataString(item, field);
             if (!values.isEmpty()) {
                 return attr + "=" + Optional.ofNullable(values.get(0))
                     .map(MetadataValue::getValue).orElse("");
             }
         }
         return "";
+    }
+
+    protected String getTemplate() {
+        return TEMPLATE;
     }
 
     @Override

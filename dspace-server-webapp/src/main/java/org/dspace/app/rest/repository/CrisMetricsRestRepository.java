@@ -9,10 +9,10 @@ package org.dspace.app.rest.repository;
 import java.sql.SQLException;
 
 import org.dspace.app.metrics.CrisMetrics;
-import org.dspace.app.metrics.service.CrisMetricsService;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.CrisMetricsRest;
 import org.dspace.core.Context;
+import org.dspace.metrics.CrisItemMetricsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,18 +25,17 @@ import org.springframework.stereotype.Component;
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
 @Component(CrisMetricsRest.CATEGORY + "." + CrisMetricsRest.NAME)
-public class CrisMetricsRestRepository extends DSpaceRestRepository<CrisMetricsRest, Integer>
-                                       implements ReloadableEntityObjectRepository<CrisMetrics, Integer> {
+public class CrisMetricsRestRepository extends DSpaceRestRepository<CrisMetricsRest, String> {
 
     @Autowired
-    private CrisMetricsService crisMetricsService;
+    private CrisItemMetricsService crisItemMetricsService;
 
     @Override
     @PreAuthorize("hasPermission(#id, 'METRIC', 'READ')")
-    public CrisMetricsRest findOne(Context context, Integer id) {
+    public CrisMetricsRest findOne(Context context, String id) {
         CrisMetrics crisMetrics = null;
         try {
-            crisMetrics = crisMetricsService.find(context, id);
+            crisMetrics = crisItemMetricsService.find(context, id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -52,17 +51,8 @@ public class CrisMetricsRestRepository extends DSpaceRestRepository<CrisMetricsR
     }
 
     @Override
-    public CrisMetrics findDomainObjectByPk(Context context, Integer id) throws SQLException {
-        return crisMetricsService.find(context, id);
-    }
-
-    @Override
     public Class<CrisMetricsRest> getDomainClass() {
         return CrisMetricsRest.class;
     }
 
-    @Override
-    public Class<Integer> getPKClass() {
-        return Integer.class;
-    }
 }

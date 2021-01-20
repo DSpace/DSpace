@@ -31,6 +31,7 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.services.ConfigurationService;
 import org.junit.Assume;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -40,6 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author fcadili (francesco.cadili at 4science.it)
  *
  */
+@Ignore
 public class WorkspaceItemPatentStepIT extends AbstractControllerIntegrationTest {
 
     @Autowired
