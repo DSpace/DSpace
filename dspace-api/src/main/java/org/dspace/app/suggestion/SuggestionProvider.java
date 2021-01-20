@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dspace.core.Context;
+import org.dspace.external.model.ExternalDataObject;
 
 public interface SuggestionProvider {
     public List<SuggestionTarget> findAllTargets(Context context, int pageSize, long offset);
@@ -27,5 +28,7 @@ public interface SuggestionProvider {
     public Suggestion findUnprocessedSuggestion(Context context, UUID target, String id);
 
     public void rejectSuggestion(Context context, UUID target, String idPart);
+
+    public void flagRelatedSuggestionsAsProcessed(Context context, ExternalDataObject externalDataObject);
 
 }

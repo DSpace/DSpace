@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.suggestion.SolrSuggestionStorageService;
+import org.dspace.app.suggestion.SuggestionProvider;
+import org.dspace.app.suggestion.SuggestionService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
@@ -50,6 +52,9 @@ public class ExternalDataServiceImpl implements ExternalDataService {
 
     @Autowired
     private SolrSuggestionStorageService solrSuggestionStorageService;
+
+    @Autowired
+    private SuggestionService suggestionService;
 
     @Override
     public Optional<ExternalDataObject> getExternalDataObject(String source, String id) {
@@ -119,8 +124,12 @@ public class ExternalDataServiceImpl implements ExternalDataService {
             "with id: " + item.getID() + " from source: " + externalDataObject.getSource() + " with identifier: " +
             externalDataObject.getId()));
         try {
-            solrSuggestionStorageService.flagAllSuggestionAsProcessed(externalDataObject.getSource(),
-                    externalDataObject.getId());
+            List<SuggestionProvider> providers = suggestionService.getSuggestionProviders();
+            if (providers != null) {
+                for (SuggestionProvider p : providers) {
+                    p.flagRelatedSuggestionsAsProcessed(context, externalDataObject);
+                }
+            }
         } catch (Exception e) {
             log.error("Got problems with the solr suggestion storage service: " + e.getMessage(), e);
         }

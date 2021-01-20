@@ -7,6 +7,9 @@
  */
 package org.dspace.app.suggestion;
 
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.core.Context;
+import org.dspace.external.model.ExternalDataObject;
 import org.dspace.solr.MockSolrServer;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -28,5 +31,10 @@ public class MockSolrSuggestionProvider extends SolrSuggestionProvider implement
     @Override
     public void destroy() throws Exception {
         mockSolrServer.destroy();
+    }
+
+    @Override
+    protected boolean isExternalDataObjectPotentiallySuggested(Context context, ExternalDataObject externalDataObject) {
+        return StringUtils.equals(MockSuggestionExternalDataSource.NAME, externalDataObject.getSource());
     }
 }

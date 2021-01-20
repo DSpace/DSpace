@@ -43,4 +43,6 @@ public interface SuggestionService {
             long offset, boolean ascending);
 
     public long countAllByTargetAndSource(Context context, String source, UUID target);
+
+    public List<SuggestionProvider> getSuggestionProviders();
 }

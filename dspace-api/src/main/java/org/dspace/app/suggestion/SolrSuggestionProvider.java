@@ -29,6 +29,7 @@ import java.util.UUID;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
@@ -42,6 +43,7 @@ import org.dspace.content.Item;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.external.model.ExternalDataObject;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -52,7 +54,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Andrea Bollini (andrea.bollini at 4science dot it)
  *
  */
-public class SolrSuggestionProvider implements SuggestionProvider {
+public abstract class SolrSuggestionProvider implements SuggestionProvider {
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SolrSuggestionProvider.class);
+
     protected SolrClient solrSuggestionClient;
 
     @Autowired
@@ -281,4 +285,25 @@ public class SolrSuggestionProvider implements SuggestionProvider {
         return suggestion;
     }
 
+    @Override
+    public void flagRelatedSuggestionsAsProcessed(Context context, ExternalDataObject externalDataObject) {
+        if (!isExternalDataObjectPotentiallySuggested(context, externalDataObject)) {
+            return;
+        }
+        try {
+            solrSuggestionStorageService.flagAllSuggestionAsProcessed(sourceName, externalDataObject.getId());
+        } catch (SolrServerException | IOException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 
+     * @param context
+     * @param externalDataObject
+     * @return true if the externalDataObject could be suggested by this provider
+     *         (i.e. it comes from a DataProvider used by this suggestor)
+     */
+    protected abstract boolean isExternalDataObjectPotentiallySuggested(Context context,
+            ExternalDataObject externalDataObject);
 }

@@ -9,7 +9,7 @@ package org.dspace.app.suggestion.oaire;
 
 import org.dspace.app.suggestion.SuggestionEvidence;
 import org.dspace.content.Item;
-import org.dspace.importer.external.datamodel.ImportRecord;
+import org.dspace.external.model.ExternalDataObject;
 
 /**
  * Interface used in {@see org.dspace.app.suggestion.oaire.OAIREPublicationApproverServiceImpl}
@@ -32,6 +32,6 @@ public interface EvidenceScorer {
      * @return the generated suggestion evidence or null if the record should be
      *         discarded
      */
-    public SuggestionEvidence computeEvidence(Item researcher, ImportRecord importRecords);
+    public SuggestionEvidence computeEvidence(Item researcher, ExternalDataObject importRecords);
 
 }

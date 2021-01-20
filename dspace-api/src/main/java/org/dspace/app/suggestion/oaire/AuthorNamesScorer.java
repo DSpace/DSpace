@@ -7,9 +7,10 @@
  */
 package org.dspace.app.suggestion.oaire;
 
+import static org.dspace.app.suggestion.SuggestionUtils.getAllEntriesByMetadatum;
+
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -23,8 +24,7 @@ import org.dspace.app.suggestion.SuggestionEvidence;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
-import org.dspace.importer.external.datamodel.ImportRecord;
-import org.dspace.importer.external.metadatamapping.MetadatumDTO;
+import org.dspace.external.model.ExternalDataObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -87,26 +87,15 @@ public class AuthorNamesScorer implements EvidenceScorer {
      * @return the generated evidence or null if the record must be discarded
      */
     @Override
-    public SuggestionEvidence computeEvidence(Item researcher, ImportRecord importRecord) {
+    public SuggestionEvidence computeEvidence(Item researcher, ExternalDataObject importRecord) {
         List<String[]> names = searchMetadataValues(researcher);
         int maxNameLenght = names.stream().mapToInt(n -> n[0].length()).max().orElse(1);
         List<String> metadataAuthors = new ArrayList<>();
-        List<String> normalizedMetadataAuthors = new ArrayList<>();
-        Collection<MetadatumDTO> metadata = new ArrayList<>();
         for (String contributorMetadatum : contributorMetadata) {
-            String[] fields = contributorMetadatum.split("\\.");
-            if (fields.length == 2) {
-                metadata.addAll(importRecord.getValue(fields[0], fields[1], null));
-            } else {
-                metadata.addAll(importRecord.getValue(fields[0], fields[1], fields[2]));
-            }
+            metadataAuthors.addAll(getAllEntriesByMetadatum(importRecord, contributorMetadatum));
         }
-        if (metadata != null) {
-            for (MetadatumDTO metadatum : metadata) {
-                metadataAuthors.add(metadatum.getValue());
-                normalizedMetadataAuthors.add(normalize(metadatum.getValue()));
-            }
-        }
+        List<String> normalizedMetadataAuthors = metadataAuthors.stream().map(x -> normalize(x))
+                .collect(Collectors.toList());
         int idx = 0;
         for (String nMetadataAuthor : normalizedMetadataAuthors) {
             Optional<String[]> found = names.stream()
@@ -114,7 +103,7 @@ public class AuthorNamesScorer implements EvidenceScorer {
             if (found.isPresent()) {
                 return new SuggestionEvidence(this.getClass().getSimpleName(),
                         100 * ((double) nMetadataAuthor.length() / (double) maxNameLenght),
-                        "The author " + metadataAuthors.get(idx) + " at position " + idx
+                        "The author " + metadataAuthors.get(idx) + " at position " + (idx + 1)
                                 + " in the authors list matches the name " + found.get()[1]
                                 + " in the researcher profile");
             }

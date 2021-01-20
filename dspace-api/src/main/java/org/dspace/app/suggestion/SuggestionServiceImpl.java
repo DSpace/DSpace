@@ -27,6 +27,14 @@ public class SuggestionServiceImpl implements SuggestionService {
     private Map<String, SuggestionProvider> providersMap;
 
     @Override
+    public List<SuggestionProvider> getSuggestionProviders() {
+        if (providersMap != null) {
+            return providersMap.values().stream().collect(Collectors.toList());
+        }
+        return null;
+    }
+
+    @Override
     public SuggestionTarget find(Context context, String source, UUID id) {
         if (providersMap.containsKey(source)) {
             return providersMap.get(source).findTarget(context, id);

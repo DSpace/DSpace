@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class MockSuggestionExternalDataSource extends AbstractExternalDataProvider {
     public static final String NAME = "suggestion";
+
     @Autowired
     private SuggestionService suggestionService;
 
@@ -38,7 +39,7 @@ public class MockSuggestionExternalDataSource extends AbstractExternalDataProvid
         Context context = (Context) currentRequest.getAttribute("dspace.context");
         Suggestion suggestion = suggestionService.findUnprocessedSuggestion(context, id);
         if (suggestion != null) {
-            ExternalDataObject extDataObj = new ExternalDataObject(suggestion.getSource());
+            ExternalDataObject extDataObj = new ExternalDataObject(NAME);
             extDataObj.setDisplayValue(suggestion.getDisplay());
             extDataObj.setId(suggestion.getExternalSourceUri()
                     .substring(suggestion.getExternalSourceUri().lastIndexOf("/") + 1));
