@@ -41,13 +41,16 @@
         <entry key="DO" value-ref="scielo.doi"/>
         <entry key="AU" value-ref="scielo.author"/>
         <entry key="TI" value-ref="scielo.title"/>
-        <entry key="TI" value-ref="scielo.issn"/>
+        <entry key="SN" value-ref="scielo.issn"/>
         <entry key="VL" value-ref="scielo.volume"/>
         <entry key="IS" value-ref="scielo.issueIdentifier"/>
         <entry key="ID" value-ref="scielo.id"/>
         <entry key="SP" value-ref="scielo.startPage"/>
         <entry key="EP" value-ref="scielo.endPage"/>
         <entry key="KW" value-ref="scielo.keywords"/>
+        <entry key="TY" value-ref="scielo.type"/>
+        <entry key="PY" value-ref="scielo.publicationYear"/>
+        <entry key="JO" value-ref="scielo.isPartOf"/>
     </util:map>
 
     <bean id="scielo.doi" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
@@ -75,7 +78,7 @@
     </bean>
 
     <bean id="scielo.id" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier.scielo"/>
+        <constructor-arg value="dc.identifier.other"/>
     </bean>
 
     <bean id="scielo.startPage" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
@@ -89,5 +92,18 @@
     <bean id="scielo.keywords" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.subject"/>
     </bean>
+
+    <bean id="scielo.type" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.type"/>
+    </bean>
+
+    <bean id="scielo.publicationYear" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.date.issued"/>
+    </bean>
+
+    <bean id="scielo.isPartOf" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.relation.ispartof"/>
+    </bean>
+
 
 </beans>

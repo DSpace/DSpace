@@ -54,7 +54,8 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
     private static final Logger log = Logger.getLogger(WOSImportMetadataSourceServiceImpl.class);
 
-    private static final String ENDPOINT_SEARCH_WCOS = "https://wos-api.clarivate.com/api/wos/?databaseId=WOS&lang=en&usrQuery=";
+    private static final String ENDPOINT_SEARCH_WOS = "https://wos-api.clarivate.com/api/wos/?databaseId=WOS&lang=en&usrQuery=";
+    private static final String ENDPOINT_SEARCH_BY_ID_WOS = "https://wos-api.clarivate.com/api/wos/id/";
 
     private int timeout = 1000;
 
@@ -152,7 +153,7 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
                         hcBuilder.setRoutePlanner(routePlanner);
                     }
                     HttpClient client = hcBuilder.build();
-                    method = new HttpGet(ENDPOINT_SEARCH_WCOS + "TS="
+                    method = new HttpGet(ENDPOINT_SEARCH_WOS + "TS="
                              + URLEncoder.encode(query, StandardCharsets.UTF_8) + "&count=1&firstRecord=1");
                     method.setHeader("X-ApiKey", apiKey);
                     method.setHeader("Accept", "application/xml");
@@ -160,7 +161,8 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
                     HttpResponse httpResponse = client.execute(method);
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
                     if (statusCode != HttpStatus.SC_OK) {
-                        throw new RuntimeException("WS call failed: " + statusCode);
+                        log.warn("call to ws to get number of result failed: " + statusCode);
+                        return 0;
                     }
                     InputStream is = httpResponse.getEntity().getContent();
                     String response = IOUtils.toString(is, StandardCharsets.UTF_8);
@@ -198,7 +200,7 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
         @Override
         public List<ImportRecord> call() throws Exception {
             List<ImportRecord> results = new ArrayList<>();
-            String queryString = "(" + doi.replace("!", "/") + ")";
+//            String queryString = "(" + doi.replace("!", "/") + ")";
             String proxyHost = configurationService.getProperty("http.proxy.host");
             String proxyPort = configurationService.getProperty("http.proxy.port");
             String apiKey = configurationService.getProperty("submission.lookup.wos.apikey");
@@ -216,9 +218,9 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
                     }
 
                     HttpClient client = hcBuilder.build();
-                    method = new HttpGet(ENDPOINT_SEARCH_WCOS + "DO="
-                                         + URLEncoder.encode(queryString, StandardCharsets.UTF_8)
-                                         + "&count=10&firstRecord=1");
+                    method = new HttpGet(ENDPOINT_SEARCH_BY_ID_WOS
+                                         + URLEncoder.encode(doi, StandardCharsets.UTF_8)
+                                         + "?databaseId=WOS&lang=en&count=10&firstRecord=1");
                     method.setHeader("X-ApiKey", apiKey);
                     method.setHeader("Accept", "application/xml");
                     method.setConfig(requestConfigBuilder.build());
@@ -286,7 +288,7 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
                             hcBuilder.setRoutePlanner(routePlanner);
                         }
                         HttpClient client = hcBuilder.build();
-                        method = new HttpGet(ENDPOINT_SEARCH_WCOS + "TS="
+                        method = new HttpGet(ENDPOINT_SEARCH_WOS + "TS="
                                              + URLEncoder.encode(queryString, StandardCharsets.UTF_8)
                                              + "&count=" + count + "&firstRecord=" + record);
                         method.setHeader("X-ApiKey", apiKey);
