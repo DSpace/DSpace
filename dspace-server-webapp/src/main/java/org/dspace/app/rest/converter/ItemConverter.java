@@ -100,11 +100,6 @@ public class ItemConverter
     public MetadataValueList getPermissionFilteredMetadata(Context context, Item obj) {
         List<MetadataValue> fullList = itemService.getMetadata(obj, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
 
-        Optional<List<DCInputSet>> submissionDefinitionInputs = submissionDefinitionInputs();
-        if (submissionDefinitionInputs.isPresent()) {
-            return fromSubmissionDefinition(submissionDefinitionInputs.get(), fullList);
-        }
-
         List<MetadataValue> returnList = new LinkedList<>();
         String entityType = itemService.getMetadataFirstValue(obj, MetadataSchemaEnum.RELATIONSHIP.getName(),
                 "type", null, Item.ANY);
@@ -116,6 +111,12 @@ public class ItemConverter
                 // the context could be null if the converter is used to prepare test data or in a batch script
                 boxes = new ArrayList<CrisLayoutBox>();
             }
+            
+            Optional<List<DCInputSet>> submissionDefinitionInputs = submissionDefinitionInputs();
+            if (submissionDefinitionInputs.isPresent()) {
+                return fromSubmissionDefinition(context, boxes, obj, submissionDefinitionInputs.get(), fullList);
+            }
+
             for (MetadataValue metadataValue : fullList) {
                 MetadataField metadataField = metadataValue.getMetadataField();
                 if (checkMetadataFieldVisibility(context, boxes, obj, metadataField)) {
@@ -154,12 +155,19 @@ public class ItemConverter
         }
     }
 
-    private MetadataValueList fromSubmissionDefinition(final List<DCInputSet> dcInputSets,
-                                                       final List<MetadataValue> fullList) {
-        Predicate<MetadataValue> inDcInputs = mv -> dcInputSets
-                                                        .stream()
-                                                        .anyMatch(dc -> dc.isFieldPresent(
-                                                            mv.getMetadataField().toString('.')));
+    private MetadataValueList fromSubmissionDefinition(Context context, List<CrisLayoutBox> boxes, Item item,
+            final List<DCInputSet> dcInputSets, final List<MetadataValue> fullList) {
+
+        Predicate<MetadataValue> inDcInputs = mv -> dcInputSets.stream()
+                .anyMatch((dc) -> {
+                    try {
+                        return dc.isFieldPresent(mv.getMetadataField().toString('.')) || 
+                                checkMetadataFieldVisibilityByBoxes(context, boxes, item, mv.getMetadataField());
+                    } catch (SQLException e) {
+                        return false;
+                    }
+                });
+
         List<MetadataValue> metadataFields = fullList.stream()
                                                      .filter(inDcInputs)
                                                      .collect(Collectors.toList());
@@ -181,29 +189,36 @@ public class ItemConverter
                 }
             }
         } else {
-            List<MetadataField> allPublicMetadata = getPublicMetadata(boxes);
-            EPerson currentUser = context.getCurrentUser();
-            if (isPublicMetadataField(metadataField, allPublicMetadata)) {
-                return true;
-            } else if (currentUser != null) {
-                List<CrisLayoutBox> boxesWithMetadataFieldExcludedPublic = getBoxesWithMetadataFieldExcludedPublic(
-                        metadataField, boxes);
-                for (CrisLayoutBox box : boxesWithMetadataFieldExcludedPublic) {
-                    if (crisLayoutBoxAccessService.hasAccess(context, currentUser, box, item)) {
-                        return true;
-                    }
-                }
-                // the metadata is not included in any box so use the default dspace security
-                if (boxesWithMetadataFieldExcludedPublic.size() == 0) {
-                    if (!metadataExposureService
-                            .isHidden(context, metadataField.getMetadataSchema().getName(),
-                                      metadataField.getElement(),
-                                      metadataField.getQualifier())) {
-                        return true;
-                    }
+            return checkMetadataFieldVisibilityByBoxes(context, boxes, item, metadataField);
+        }
+        return false;
+    }
+
+    private boolean checkMetadataFieldVisibilityByBoxes(Context context, List<CrisLayoutBox> boxes, Item item,
+            MetadataField metadataField) throws SQLException {
+        List<MetadataField> allPublicMetadata = getPublicMetadata(boxes);
+        List<CrisLayoutBox> boxesWithMetadataFieldExcludedPublic = getBoxesWithMetadataFieldExcludedPublic(
+                metadataField, boxes);
+        EPerson currentUser = context.getCurrentUser();
+        if (isPublicMetadataField(metadataField, allPublicMetadata)) {
+            return true;
+        } else if (currentUser != null) {
+            for (CrisLayoutBox box : boxesWithMetadataFieldExcludedPublic) {
+                if (crisLayoutBoxAccessService.hasAccess(context, currentUser, box, item)) {
+                    return true;
                 }
             }
         }
+        // the metadata is not included in any box so use the default dspace security
+        if (boxesWithMetadataFieldExcludedPublic.size() == 0) {
+            if (!metadataExposureService
+                    .isHidden(context, metadataField.getMetadataSchema().getName(),
+                              metadataField.getElement(),
+                              metadataField.getQualifier())) {
+                return true;
+            }
+        }
+        
         return false;
     }
 

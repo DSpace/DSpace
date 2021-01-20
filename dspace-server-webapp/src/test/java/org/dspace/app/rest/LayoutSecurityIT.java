@@ -1929,7 +1929,8 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                                 hasJsonPath("$['dc.contributor.author'][0].value", is("Smith, Donald")),
                                 hasJsonPath("$['dc.contributor.author'][1].value", is("Doe, John")),
                                 hasJsonPath("$['dc.date.issued'][0].value", is("2017-10-17")),
-                                hasJsonPath("$['dc.title'][0].value", is("Title Workspace 1"))
+                                hasJsonPath("$['dc.title'][0].value", is("Title Workspace 1")),
+                                hasJsonPath("$['relationship.type'][0].value", is("Publication"))
                                 )));
     }
 
