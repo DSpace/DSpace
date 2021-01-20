@@ -175,5 +175,12 @@
           class="org.dspace.importer.external.scopus.service.ScopusFieldMapping">
     </bean>
 
+    <bean id="ScieloImportService"
+          class="org.dspace.importer.external.scielo.service.ScieloImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="scieloMetadataFieldMapping"/>
+    </bean>
+    <bean id="scieloMetadataFieldMapping"
+          class="org.dspace.importer.external.scielo.service.ScieloFieldMapping">
+    </bean>
 
 </beans>
