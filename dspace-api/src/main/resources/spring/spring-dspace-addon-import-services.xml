@@ -182,5 +182,12 @@
     <bean id="scieloMetadataFieldMapping"
           class="org.dspace.importer.external.scielo.service.ScieloFieldMapping">
     </bean>
+    <bean id="WosImportService"
+          class="org.dspace.importer.external.wos.service.WOSImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="wosMetadataFieldMapping"/>
+    </bean>
+    <bean id="wosMetadataFieldMapping"
+          class="org.dspace.importer.external.wos.service.WOSFieldMapping">
+    </bean>
 
 </beans>
