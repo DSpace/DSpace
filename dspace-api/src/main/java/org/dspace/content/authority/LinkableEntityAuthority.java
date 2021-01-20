@@ -7,6 +7,8 @@
  */
 package org.dspace.content.authority;
 
+import java.util.Map;
+
 /**
  * Plugin interface that supplies mechanism for linkable entities.
  *
@@ -22,4 +24,10 @@ public interface LinkableEntityAuthority {
      */
     public String getLinkedEntityType();
 
+    /**
+     * Get the eternal source configured for this authority by given metadata key
+     *
+     * @return the linked external source identifier as a String
+     */
+    public Map<String,String> getExternalSource();
 }
