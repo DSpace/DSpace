@@ -145,6 +145,7 @@ public class DCInput {
     private String relationshipType = null;
     private String searchConfiguration = null;
     private String filter;
+    private List<String> externalSources;
 
     /**
      * The scope of the input sets, this restricts hidden metadata fields from
@@ -226,6 +227,15 @@ public class DCInput {
         relationshipType = fieldMap.get("relationship-type");
         searchConfiguration = fieldMap.get("search-configuration");
         filter = fieldMap.get("filter");
+        externalSources = new ArrayList<>();
+        String externalSourcesDef = fieldMap.get("externalsources");
+        if (StringUtils.isNotBlank(externalSourcesDef)) {
+            String[] sources = StringUtils.split(externalSourcesDef, ",");
+            for (String source: sources) {
+                externalSources.add(StringUtils.trim(source));
+            }
+        }
+
     }
 
     /**
@@ -520,6 +530,10 @@ public class DCInput {
 
     public String getFilter() {
         return filter;
+    }
+
+    public List<String> getExternalSources() {
+        return externalSources;
     }
 
     public boolean isQualdropValue() {
