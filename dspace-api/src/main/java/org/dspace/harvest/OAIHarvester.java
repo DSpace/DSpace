@@ -25,12 +25,11 @@ import static org.dspace.harvest.model.OAIHarvesterAction.NONE;
 import static org.dspace.harvest.model.OAIHarvesterAction.UPDATE;
 import static org.dspace.harvest.service.OAIHarvesterClient.OAI_IDENTIFIER_NS;
 import static org.dspace.harvest.util.NamespaceUtils.METADATA_FORMATS_KEY;
+import static org.dspace.util.ExceptionMessageUtils.getRootMessage;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -42,7 +41,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -56,7 +54,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authority.service.ItemSearchService;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
@@ -78,8 +75,6 @@ import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
-import org.dspace.core.Email;
-import org.dspace.core.I18nUtil;
 import org.dspace.core.Utils;
 import org.dspace.core.exception.SQLRuntimeException;
 import org.dspace.core.service.PluginService;
@@ -92,6 +87,7 @@ import org.dspace.harvest.model.OAIHarvesterValidationResult;
 import org.dspace.harvest.service.HarvestedCollectionService;
 import org.dspace.harvest.service.HarvestedItemService;
 import org.dspace.harvest.service.OAIHarvesterClient;
+import org.dspace.harvest.service.OAIHarvesterEmailSender;
 import org.dspace.harvest.service.OAIHarvesterValidator;
 import org.dspace.harvest.util.NamespaceUtils;
 import org.dspace.services.ConfigurationService;
@@ -181,6 +177,9 @@ public class OAIHarvester {
     @Autowired
     private OAIHarvesterValidator oaiHarvesterValidator;
 
+    @Autowired
+    private OAIHarvesterEmailSender oaiHarvesterEmailSender;
+
     /**
      * Performs a harvest cycle on this collection. This will query the remote
      * OAI-PMH provider, check for updates since last harvest, and ingest the
@@ -209,6 +208,8 @@ public class OAIHarvester {
                 setReadyStatus(context, harvestRow, getReportMessage(report), toDate);
             } else {
                 setRetryStatus(context, harvestRow, getReportMessage(report));
+                oaiHarvesterEmailSender.notifyCompletionWithErrors(getEmailRecipient(harvestRow),
+                    harvestRow, report.getErrorMessages());
             }
 
         } catch (NoRecordsMatchException nrme) {
@@ -219,7 +220,7 @@ public class OAIHarvester {
             log.error(message, ex);
             if (harvestRow != null) {
                 setRetryStatus(context, harvestRow, message);
-                alertAdmin(harvestRow, STATUS_RETRY, ex);
+                oaiHarvesterEmailSender.notifyFailure(getEmailRecipient(harvestRow), harvestRow, ex);
             }
         } finally {
             context.setMode(originalMode);
@@ -318,7 +319,9 @@ public class OAIHarvester {
                 report.incrementSuccessCount();
 
             } catch (Exception ex) {
-                log.error("An error occurs while process the record " + getItemIdentifier(record), ex);
+                String errorMessage = "An error occurs while process the record " + getItemIdentifier(record);
+                log.error(errorMessage, ex);
+                report.addErrorMessage(errorMessage + ": " + getRootMessage(ex));
                 report.incrementFailureCount();
                 harvestRow = rollbackAndReloadEntity(context, harvestRow);
                 logRecord(context, options.getProcessId(), harvestRow, false, startTimestamp, getItemIdentifier(record),
@@ -478,17 +481,11 @@ public class OAIHarvester {
 
     private void installOrStartWorkflow(Context context, WorkspaceItem workspaceItem, String handle,
         boolean submissionEnabled) throws Exception {
-        try {
 
-            if (submissionEnabled) {
-                installItemService.installItem(context, workspaceItem, handle);
-            } else {
-                workflowService.start(context, workspaceItem);
-            }
-
-        } catch (SQLException | IOException | AuthorizeException se) {
-            workspaceItemService.deleteWrapper(context, workspaceItem);
-            throw se;
+        if (submissionEnabled) {
+            installItemService.installItem(context, workspaceItem, handle);
+        } else {
+            workflowService.start(context, workspaceItem);
         }
     }
 
@@ -1102,46 +1099,6 @@ public class OAIHarvester {
         }
 
         return configs;
-    }
-
-    /**
-     * Generate and send an email to the administrator. Prompted by errors
-     * encountered during harvesting.
-     *
-     * @param status the current status of the collection
-     */
-    private void alertAdmin(HarvestedCollection harvestRow, int status, Exception ex) {
-        try {
-
-            String recipient = getEmailRecipient(harvestRow);
-
-            if (StringUtils.isNotBlank(recipient)) {
-                Email email = Email.getEmail(I18nUtil.getEmailFilename(Locale.getDefault(), "harvesting_error"));
-                email.addRecipient(recipient);
-                email.addArgument(harvestRow.getCollection().getID());
-                email.addArgument(new Date());
-                email.addArgument(status);
-
-                String stackTrace;
-
-                if (ex != null) {
-                    email.addArgument(ex.getMessage());
-
-                    StringWriter sw = new StringWriter();
-                    PrintWriter pw = new PrintWriter(sw);
-                    ex.printStackTrace(pw);
-                    pw.flush();
-                    stackTrace = sw.toString();
-                } else {
-                    stackTrace = "No exception";
-                }
-
-                email.addArgument(stackTrace);
-                email.send();
-            }
-        } catch (Exception e) {
-            log.warn("Unable to send email alert", e);
-        }
     }
 
     private String getEmailRecipient(HarvestedCollection harvestRow) {

@@ -63,5 +63,8 @@ public class OAIHarvesterReport {
         errorMessages.add(message);
     }
 
+    public List<String> getErrorMessages() {
+        return errorMessages;
+    }
 
 }
