@@ -8,6 +8,7 @@
 package org.dspace.app.nbevent.service;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.dspace.app.nbevent.NBTopic;
 import org.dspace.content.NBEvent;
@@ -32,5 +33,7 @@ public interface NBEventService {
     public void store(Context context, NBEvent event);
 
     public void deleteEventByEventId(Context context, String id);
+
+    public void deleteEventsByTargetId(Context context, UUID targetId);
 
 }

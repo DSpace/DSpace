@@ -662,4 +662,40 @@ public class NBEventRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", NBEventMatcher.matchNBEventFullEntry(event)));
     }
+
+    @Test
+    public void deleteItemWithEventTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        NBEvent event1 = NBEventBuilder.createTarget(context, col1, "Science and Freedom")
+                .withTopic("ENRICH/MISSING/PID")
+                .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
+        NBEvent event2 = NBEventBuilder.createTarget(context, col1, "Science and Freedom 2")
+                .withTopic("ENRICH/MISSING/PID")
+                .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144301\"}").build();
+        context.restoreAuthSystemState();
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken)
+                .perform(get("/api/integration/nbevents/search/findByTopic").param("topic", "ENRICH!MISSING!PID"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.nbevents", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$._embedded.nbevents",
+                        Matchers.containsInAnyOrder(NBEventMatcher.matchNBEventEntry(event1),
+                                NBEventMatcher.matchNBEventEntry(event2))))
+                .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(2)));
+
+        getClient(authToken).perform(delete("/api/core/items/" + event1.getTarget()))
+                .andExpect(status().is(204));
+
+        getClient(authToken).perform(get("/api/core/items/" + event1.getTarget()))
+                .andExpect(status().is(404));
+
+        getClient(authToken)
+                .perform(get("/api/integration/nbevents/search/findByTopic").param("topic", "ENRICH!MISSING!PID"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.nbevents", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$._embedded.nbevents",
+                        Matchers.containsInAnyOrder(
+                                NBEventMatcher.matchNBEventEntry(event2))))
+                .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
 }

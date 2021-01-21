@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -109,6 +110,16 @@ public class NBEventServiceImpl implements NBEventService {
     public void deleteEventByEventId(Context context, String id) {
         try {
             getSolr().deleteById(id);
+            getSolr().commit();
+        } catch (SolrServerException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void deleteEventsByTargetId(Context context, UUID targetId) {
+        try {
+            getSolr().deleteByQuery(RESOURCE_UUID + ":" + targetId.toString());
             getSolr().commit();
         } catch (SolrServerException | IOException e) {
             throw new RuntimeException(e);
