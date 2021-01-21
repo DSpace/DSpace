@@ -103,6 +103,7 @@
     <bean class="org.dspace.harvest.HarvestSchedulingServiceImpl"/>
     <bean class="org.dspace.harvest.OAIHarvester"/>
     <bean class="org.dspace.harvest.OAIHarvesterClientImpl"/>
+    <bean class="org.dspace.harvest.OAIHarvesterValidatorImpl"/>
 
     <bean class="org.dspace.identifier.DOIServiceImpl"/>
 

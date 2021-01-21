@@ -7,6 +7,9 @@
  */
 package org.dspace.harvest.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A class that model a report of an OAI harvesting.
  *
@@ -21,8 +24,11 @@ public class OAIHarvesterReport {
 
     private final int totalRecordSize;
 
+    private final List<String> errorMessages;
+
     public OAIHarvesterReport(int totalRecordSize) {
         this.totalRecordSize = totalRecordSize;
+        this.errorMessages = new ArrayList<>();
     }
 
     public boolean noRecordImportFails() {
@@ -51,6 +57,10 @@ public class OAIHarvesterReport {
 
     public int getCurrentRecord() {
         return successCount + failureCount + 1;
+    }
+
+    public void addErrorMessage(String message) {
+        errorMessages.add(message);
     }
 
 

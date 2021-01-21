@@ -1,0 +1,141 @@
+Option
+Definition
+Example and Usage Notes 
+IsCitedBy 
+indicates that B includes A in a citation 
+Recommended for discovery. 
+<relatedIdentifier relatedIdentifierType="DOI"relationType="IsCitedBy">10.4232/10.ASEAS-5.2-1 </relatedIdentifier> 
+Cites 
+indicates that A includes B in a citation 
+Recommended for discovery. 
+<relatedIdentifier relatedIdentifierType="ISBN” relationType="Cites“>0761964312 </relatedIdentifier> 
+IsSupplementTo 
+indicates that A is a supplement to B 
+Recommended for discovery. 
+<relatedIdentifier relatedIdentifierType="URN" relationType="IsSupplementTo">urn:nbn:de:0168-ssoar-13172 </relatedIdentifier> 
+IsSupplementedBy 
+indicates that B is a supplement to A 
+Recommended for discovery. 
+<relatedIdentifier relatedIdentifierType="PMID" relationType="IsSupplementedBy">16911322/ </relatedIdentifier>
+IsContinuedBy
+indicates A is continued by the work B
+<relatedIdentifier relatedIdentifierType="URN"
+relationType="IsContinuedBy">urn:nbn:de:bsz:21-opus-4967 </relatedIdentifier>
+Continues
+indicates A is a continuation of the work B
+<relatedIdentifier relatedIdentifierType="URN"
+relationType="Continues">urn:nbn:de:bsz:21-opus-4966 </relatedIdentifier>
+DataCite Metadata Schema V 4.1 52
+Option
+Definition
+Example and Usage Notes
+Describes
+indicates A describes B
+<relatedIdentifier relatedIdentifierType="DOI"
+relationType="">10.6084/m9.figshare.c.3288407</relatedIdentifier>
+IsDescribedBy
+indicates A is described by B
+<relatedIdentifier relatedIdentifierType="DOI"
+relationType="">10.1038/sdata.2016.123</relatedIdentifier>
+HasMetadata
+indicates resource A has additional metadata B
+<relatedIdentifier relatedIdentifierType="DOI" relationType="HasMetadata" relatedMetadataSchema="DDI-L" schemeURI="http://www.ddialliance.org/Specification/DDI-Lifecycle/3.1/XMLSchema/instance.xsd">10.1234/567890</relatedIdentifier>
+IsMetadataFor
+indicates additional metadata A for a resource B
+<relatedIdentifier relatedIdentifierType="DOI" relationType="IsMetadataFor “relatedMetadataSchema="DDI-L" schemeURI="http://www.ddialliance.org/Specification/DDI-Lifecycle/3.1/XMLSchema/instance.xsd">10.1234/567891</relatedIdentifier>
+HasVersion
+indicates A has a version (B)
+The registered resource such as a software package or code repository has a versioned instance (indicates A has the instance B) e.g. it may be used to relate an un-versioned code repository to one of its specific software versions. 
+<relatedIdentifier relatedIdentifierType="DOI" relationType="HasVersion">10.5281/ZENODO.832053 </relatedIdentifier>
+IsVersionOf
+indicates A is a version of B
+The registered resource is an instance of a target resource (indicates that A is an instance of B) e.g. it may be used to relate a specific version of a software package to its software code repository. 
+<relatedIdentifier relatedIdentifierType="DOI" relationType="IsVersionOf">10.5281/ZENODO.832054 </relatedIdentifier>
+DataCite Metadata Schema V 4.1 53
+Option
+Definition
+Example and Usage Notes
+IsNewVersionOf
+indicates A is a new edition of B, where the new edition has been modified or updated
+<relatedIdentifier relatedIdentifierType="DOI"
+relationType="IsNewVersionOf">10.5438/0005 </relatedIdentifier>
+IsPreviousVersionOf
+indicates A is a previous edition of B
+<relatedIdentifier relatedIdentifierType="DOI" relationType="IsPreviousVersionOf">10.5438/0007 </relatedIdentifier> 
+IsPartOf indicates A is a portion of B; may be used for elements of a series 
+Primarily this relation is applied to container-contained type relationships. Note: May be used for individual software modules; note that code repository-to-version relationships should be modeled using IsVersionOf and HasVersion 
+Recommended for discovery. <relatedIdentifier relatedIdentifierType="DOI" relationType="IsPartOf">10.5281/zenodo.754312 </relatedIdentifier> 
+HasPart 
+indicates A includes the part B 
+Primarily this relation is applied to container-contained type relationships. 
+Note: May be used for individual software modules; note that code repository-to-version relationships should be modeled using IsVersionOf and HasVersion 
+Recommended for discovery. <relatedIdentifier relatedIdentifierType="URL" relationType="HasPart">https://zenodo.org/record/16564/files/dune-stuff-LSSC_15.zip</relatedIdentifier>
+IsReferencedBy
+indicates A is used as a source of information by B
+<relatedIdentifier relatedIdentifierType="URL" relationType="IsReferencedBy">http://www.testpubl.de </relatedIdentifier>
+DataCite Metadata Schema V 4.1 54
+Option
+Definition
+Example and Usage Notes
+References
+indicates B is used as a source of information for A
+<relatedIdentifier relatedIdentifierType="URN" relationType="References">urn:nbn:de:bsz:21-opus-963</relatedIdentifier>
+IsDocumentedBy
+indicates B is documentation about/
+explaining A; e.g. points to software documentation
+<relatedIdentifier relatedIdentifierType="URL" relationType="IsDocumentedBy">http://tobias-lib.uni-tuebingen.de/volltexte/2000/96/ </relatedIdentifier>
+Documents
+indicates A is documentation about/B; e.g. points to software documentation
+<relatedIdentifier relatedIdentifierType="DOI" relationType="Documents">10.1234/7836 </relatedIdentifier>
+IsCompiledBy
+indicates B is used to compile or create A
+<relatedIdentifier relatedIdentifierType="URL" relationType="isCompiledBy">http://d-nb.info/gnd/4513749-3 </relatedIdentifier>
+Compiles
+indicates B is the result of a compile or creation event using A
+<relatedIdentifier relatedIdentifierType="URN" relationType="Compiles">urn:nbn:de:bsz:21-opus-963 </relatedIdentifier>
+IsVariantFormOf
+indicates A is a variant or different form of B
+<relatedIdentifier relatedIdentifierType="DOI" relationType="IsVariantFormOf">10.1234/8675 </relatedIdentifier>
+Use for a different form of one thing.
+May be used for different software operating systems or compiler formats, for example.
+DataCite Metadata Schema V 4.1 55
+Option
+Definition
+Example and Usage Notes
+IsOriginalFormOf
+indicates A is the original form of B
+<relatedIdentifier relatedIdentifierType="DOI" relationType="IsOriginalFormOf">10.1234/9035 </relatedIdentifier>
+May be used for different software operating systems or compiler formats, for example.
+IsIdenticalTo
+indicates that A is identical to B, for use when there is a need to register two separate instances of the same resource
+<relatedIdentifier relatedIdentifierType="URL" relationType="IsIdenticalTo">http://oac.cdlib.org/findaid/ark:/13030/c8r78fzq </relatedIdentifier>
+IsIdenticalTo should be used for a resource that is the same as the registered resource but is saved on another location, maybe another institution.
+IsReviewedBy
+indicates that A is reviewed by B
+<relatedIdentifier relatedIdentifierType="DOI" relationType="IsReviewedBy">10.5256/F1000RESEARCH.4288.R4745 </relatedIdentifier>
+Reviews
+indicates that A is a review of B
+<relatedIdentifier relatedIdentifierType="DOI"
+relationType="Reviews">10.12688/f1000research.4001.1 </relatedIdentifier>
+IsDerivedFrom
+indicates B is a source upon which A is based
+<relatedIdentifier relatedIdentifierType="DOI" relationType="IsDerivedFrom">10.6078/M7DZ067C </relatedIdentifier>
+IsDerivedFrom should be used for a resource that is a derivative of an original resource.
+In this example, the dataset is derived from a larger dataset and data values have been manipulated from their original state.
+DataCite Metadata Schema V 4.1 56
+Option
+Definition
+Example and Usage Notes
+IsSourceOf
+indicates A is a source upon which B is based
+<relatedIdentifier relatedIdentifierType="URL" relationType="IsSourceOf"> http://opencontext.org/projects/81204AF8-127C-4686-E9B0-1202C3A47959 </relatedIdentifier>
+IsSourceOf is the original resource from which a derivative resource was created.
+In this example, this is the original dataset without value manipulation, and the source of the derived dataset.
+IsRequiredBy
+Indicates A is required by B
+<relatedIdentifier relatedIdentifierType="DOI" relationType="IsRequiredBy">10.1234/8675 </relatedIdentifier>
+Note: May be used to indicate software dependencies.
+Requires
+Indicates A requires B
+<relatedIdentifier relatedIdentifierType="DOI" relationType="IsRequiredBy">10.1234/8675 </relatedIdentifier>
+Note: May be used to indicate software dependencies.

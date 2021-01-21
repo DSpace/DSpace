@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://issn.org/vocabularies/Medium" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:cf="urn:xmlns:org.eurocris.cerif" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" targetNamespace="http://issn.org/vocabularies/Medium" xsi:schemaLocation="http://www.w3.org/2001/XMLSchema https://www.w3.org/2012/04/XMLSchema.xsd">
+    <xs:annotation>
+        <xs:documentation>ISSN Media List</xs:documentation>
+        <xs:appinfo>
+            <cf:ClassScheme id="http://issn.org/vocabularies/Medium">
+                <cf:Term xmlns="en">ISSN Media List</cf:Term>
+                <cf:Description xmlns="en">List of media types as defined in the "ISSN linked data application profile" (http://www.issn.org/understanding-the-issn/assignment-rules/issn-linked-data-application-profile/) document.</cf:Description>
+            </cf:ClassScheme>
+        </xs:appinfo>
+    </xs:annotation>
+
+    <xs:include schemaLocation="../includes/cerif-commons.xsd" />
+
+    <xs:element name="Type">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="Enum">
+                    <xs:attributeGroup ref="cfExtension__AttributeGroup" />
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:simpleType name="Enum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="http://issn.org/vocabularies/Medium#Print">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Print</xs:documentation>
+                    <xs:appinfo>
+                        <cf:Class id="http://issn.org/vocabularies/Medium#Print" classSchemeId="http://issn.org/vocabularies/Medium">
+                            <cf:Term xml:lang="en" trans="o">Print</cf:Term>
+                            <cf:Definition xml:lang="en">Print (paper)</cf:Definition>
+                        </cf:Class>
+                    </xs:appinfo>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="http://issn.org/vocabularies/Medium#Online">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Online</xs:documentation>
+                    <xs:appinfo>
+                        <cf:Class id="http://issn.org/vocabularies/Medium#Online" classSchemeId="http://issn.org/vocabularies/Medium">
+                            <cf:Term xml:lang="en" trans="o">Online</cf:Term>
+                            <cf:Definition xml:lang="en">Online (online publication)</cf:Definition>
+                        </cf:Class>
+                    </xs:appinfo>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="http://issn.org/vocabularies/Medium#DigitalCarrier">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Digital carrier</xs:documentation>
+                    <xs:appinfo>
+                        <cf:Class id="http://issn.org/vocabularies/Medium#DigitalCarrier" classSchemeId="http://issn.org/vocabularies/Medium">
+                            <cf:Term xml:lang="en" trans="o">Digital carrier</cf:Term>
+                            <cf:Definition xml:lang="en">Digital carrier (CD-ROM, USB keys)</cf:Definition>
+                        </cf:Class>
+                    </xs:appinfo>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="http://issn.org/vocabularies/Medium#Other">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Other</xs:documentation>
+                    <xs:appinfo>
+                        <cf:Class id="http://issn.org/vocabularies/Medium#Other" classSchemeId="http://issn.org/vocabularies/Medium">
+                            <cf:Term xml:lang="en" trans="o">Other</cf:Term>
+                            <cf:Definition xml:lang="en">Other (Loose-leaf publications, braille, etc.)</cf:Definition>
+                        </cf:Class>
+                    </xs:appinfo>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+</xs:schema>

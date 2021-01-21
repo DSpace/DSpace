@@ -88,9 +88,11 @@ import org.dspace.harvest.model.OAIHarvesterAction;
 import org.dspace.harvest.model.OAIHarvesterOptions;
 import org.dspace.harvest.model.OAIHarvesterReport;
 import org.dspace.harvest.model.OAIHarvesterResponseDTO;
+import org.dspace.harvest.model.OAIHarvesterValidationResult;
 import org.dspace.harvest.service.HarvestedCollectionService;
 import org.dspace.harvest.service.HarvestedItemService;
 import org.dspace.harvest.service.OAIHarvesterClient;
+import org.dspace.harvest.service.OAIHarvesterValidator;
 import org.dspace.harvest.util.NamespaceUtils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -175,6 +177,9 @@ public class OAIHarvester {
 
     @Autowired
     private CommunityService communityService;
+
+    @Autowired
+    private OAIHarvesterValidator oaiHarvesterValidator;
 
     /**
      * Performs a harvest cycle on this collection. This will query the remote
@@ -301,7 +306,7 @@ public class OAIHarvester {
 
             try {
 
-                processRecord(context, harvestRow, record, repositoryId, options, startTimestamp);
+                processRecord(context, harvestRow, record, repositoryId, options, startTimestamp, report);
 
                 harvestRow.setHarvestMessage(formatIntermediateMessage(report));
                 harvestRow = updateHarvestRow(context, harvestRow);
@@ -326,7 +331,7 @@ public class OAIHarvester {
     }
 
     private void processRecord(Context context, HarvestedCollection harvestRow, Element record, String repositoryId,
-        OAIHarvesterOptions options, long startTime) throws Exception {
+        OAIHarvesterOptions options, long startTime, OAIHarvesterReport report) throws Exception {
 
         Collection targetCollection = harvestRow.getCollection();
         String itemOaiID = getItemIdentifier(record);
@@ -356,7 +361,7 @@ public class OAIHarvester {
         if (item != null) {
             harvestedItem = updateItem(context, harvestedItem, harvestRow, record, repositoryId, options, startTime);
         } else {
-            harvestedItem = createItem(context, harvestRow, record, repositoryId, options, startTime);
+            harvestedItem = createItem(context, harvestRow, record, repositoryId, options, startTime, report);
             item = harvestedItem.getItem();
         }
 
@@ -418,13 +423,19 @@ public class OAIHarvester {
     }
 
     private HarvestedItem createItem(Context context, HarvestedCollection harvestRow, Element record,
-        String repositoryId, OAIHarvesterOptions options, long startTimestamp) throws Exception {
+        String repositoryId, OAIHarvesterOptions options, long startTimestamp, OAIHarvesterReport report)
+        throws Exception {
 
         Collection targetCollection = harvestRow.getCollection();
 
         WorkspaceItem workspaceItem = workspaceItemService.create(context, targetCollection, false);
         Item item = workspaceItem.getItem();
         String itemOaiID = getItemIdentifier(record);
+
+        boolean isItemValid = true;
+        if (options.isValidationEnabled()) {
+            isItemValid = validateRecord(record, harvestRow, report);
+        }
 
         HarvestedItem harvestedItem = harvestedItemService.create(context, item, itemOaiID);
 
@@ -446,7 +457,9 @@ public class OAIHarvester {
             handleORE(context, harvestRow, repositoryId, itemOaiID, item);
         }
 
-        boolean isItemValid = options.isValidationEnabled() ? validateItem(context, workspaceItem) : true;
+        if (options.isValidationEnabled()) {
+            isItemValid = isItemValid && validateItem(context, workspaceItem, report);
+        }
 
         if (isItemValid) {
             installOrStartWorkflow(context, workspaceItem, handle, options.isSubmissionEnabled());
@@ -479,17 +492,32 @@ public class OAIHarvester {
         }
     }
 
-    private boolean validateItem(Context context, WorkspaceItem workspaceItem) {
+    private boolean validateItem(Context context, WorkspaceItem workspaceItem, OAIHarvesterReport report) {
 
         Item item = workspaceItem.getItem();
         List<ValidationError> errors = validationService.validate(context, workspaceItem);
 
         boolean isItemValid = CollectionUtils.isEmpty(errors);
         if (!isItemValid) {
-            log.error("The item with id " + item.getID() + " is not valid: " + formatValidationErrors(errors));
+            String validationError = "Item with id " + item.getID() + " invalid:" + formatValidationErrors(errors);
+            report.addErrorMessage(validationError);
+            log.error(validationError);
         }
 
         return isItemValid;
+    }
+
+    private boolean validateRecord(Element record, HarvestedCollection harvestRow,
+        OAIHarvesterReport report) {
+
+        OAIHarvesterValidationResult result = oaiHarvesterValidator.validate(record, harvestRow);
+        if (result.isNotValid()) {
+            String validationError = "Record with id " + getItemIdentifier(record) + " invalid: " + result.getMessage();
+            report.addErrorMessage(validationError);
+            log.error(validationError);
+        }
+
+        return result.isValid();
     }
 
     private void fillItemWithMetadata(Context context, HarvestedCollection harvestRow, Element record, Item item,
