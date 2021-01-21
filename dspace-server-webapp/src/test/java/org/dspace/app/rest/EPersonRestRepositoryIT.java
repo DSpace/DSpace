@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -31,9 +32,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.core.MediaType;
@@ -41,6 +44,7 @@ import javax.ws.rs.core.MediaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.exception.EPersonNameNotProvidedException;
+import org.dspace.app.rest.exception.RESTEmptyWorkflowGroupException;
 import org.dspace.app.rest.jackson.IgnoreJacksonWriteOnlyAccess;
 import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.matcher.GroupMatcher;
@@ -62,8 +66,8 @@ import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.EmptyWorkflowGroupException;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.PasswordHash;
 import org.dspace.eperson.dao.RegistrationDataDAO;
@@ -864,16 +868,34 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         Group workflowGroup = collection.getWorkflowStep1(context);
         context.restoreAuthSystemState();
 
-        // generate expectations
-        String expectedErrorMsg = String.format(
-            EmptyWorkflowGroupException.msgFmt, ePerson.getID(), workflowGroup.getID()
-        );
+        // enable Polish locale
+        configurationService.setProperty("webui.supported.locales", "en, pl");
 
-        // verify 422 with correct error message
+        // generate expectations
+        String key = RESTEmptyWorkflowGroupException.MESSAGE_KEY;
+        String[] values = {
+            ePerson.getID().toString(),
+            workflowGroup.getID().toString(),
+        };
+        MessageFormat defaultFmt = new MessageFormat(I18nUtil.getMessage(key));
+        MessageFormat plFmt = new MessageFormat(I18nUtil.getMessage(key, new Locale("pl")));
+
+        // make request using Polish locale
+        getClient(getAuthToken(admin.getEmail(), password))
+            .perform(
+                delete("/api/eperson/epersons/" + ePerson.getID())
+                    .header("Accept-Language", "pl") // request Polish response
+            )
+            .andExpect(status().isUnprocessableEntity())
+            .andExpect(status().reason(is(plFmt.format(values))))
+            .andExpect(status().reason(startsWith("[PL]"))); // verify it did not fall back to default locale
+
+        // make request using Polish locale
         getClient(getAuthToken(admin.getEmail(), password))
             .perform(delete("/api/eperson/epersons/" + ePerson.getID()))
             .andExpect(status().isUnprocessableEntity())
-            .andExpect(status().reason(is(expectedErrorMsg)));
+            .andExpect(status().reason(is(defaultFmt.format(values))))
+            .andExpect(status().reason(not(startsWith("[PL]"))));
     }
 
     @Test
@@ -2565,13 +2587,33 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
 
+        // enable Polish locale
+        configurationService.setProperty("webui.supported.locales", "en, pl");
+
         try {
+            // make request using Polish locale
             getClient().perform(post("/api/eperson/epersons")
-                                         .param("token", newRegisterToken)
-                                         .content(mapper.writeValueAsBytes(ePersonRest))
-                                         .contentType(MediaType.APPLICATION_JSON))
+                                        .header("Accept-Language", "pl") // request Polish response
+                                        .param("token", newRegisterToken)
+                                        .content(mapper.writeValueAsBytes(ePersonRest))
+                                        .contentType(MediaType.APPLICATION_JSON))
                             .andExpect(status().isUnprocessableEntity())
-                            .andExpect(status().reason(is(EPersonNameNotProvidedException.message)));
+                            .andExpect(status().reason(is(
+                                // find message in dspace-server-webapp/src/test/resources/Messages_pl.properties
+                                I18nUtil.getMessage(EPersonNameNotProvidedException.MESSAGE_KEY, new Locale("pl"))
+                            )))
+                            .andExpect(status().reason(startsWith("[PL]"))); // verify default locale was NOT used
+
+            // make request using default locale
+            getClient().perform(post("/api/eperson/epersons")
+                                        .param("token", newRegisterToken)
+                                        .content(mapper.writeValueAsBytes(ePersonRest))
+                                        .contentType(MediaType.APPLICATION_JSON))
+                            .andExpect(status().isUnprocessableEntity())
+                            .andExpect(status().reason(is(
+                                I18nUtil.getMessage(EPersonNameNotProvidedException.MESSAGE_KEY)
+                            )))
+                            .andExpect(status().reason(not(startsWith("[PL]"))));
 
             EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
             assertNull(createdEPerson);
@@ -2612,13 +2654,34 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
 
+        // enable Polish locale
+        configurationService.setProperty("webui.supported.locales", "en, pl");
+
         try {
+            // make request using Polish locale
             getClient().perform(post("/api/eperson/epersons")
-                                         .param("token", newRegisterToken)
-                                         .content(mapper.writeValueAsBytes(ePersonRest))
-                                         .contentType(MediaType.APPLICATION_JSON))
+                                        .header("Accept-Language", "pl") // request Polish response
+                                        .param("token", newRegisterToken)
+                                        .content(mapper.writeValueAsBytes(ePersonRest))
+                                        .contentType(MediaType.APPLICATION_JSON))
                             .andExpect(status().isUnprocessableEntity())
-                            .andExpect(status().reason(is(EPersonNameNotProvidedException.message)));
+                            .andExpect(status().reason(is(
+                                // find message in dspace-server-webapp/src/test/resources/Messages_pl.properties
+                                I18nUtil.getMessage(EPersonNameNotProvidedException.MESSAGE_KEY, new Locale("pl"))
+                            )))
+                            .andExpect(status().reason(startsWith("[PL]"))); // verify default locale was NOT used
+
+            // make request using default locale
+            getClient().perform(post("/api/eperson/epersons")
+                                        .param("token", newRegisterToken)
+                                        .content(mapper.writeValueAsBytes(ePersonRest))
+                                        .contentType(MediaType.APPLICATION_JSON))
+                            .andExpect(status().isUnprocessableEntity())
+                            .andExpect(status().reason(is(
+                                // find message in dspace-server-webapp/src/test/resources/Messages_pl.properties
+                                I18nUtil.getMessage(EPersonNameNotProvidedException.MESSAGE_KEY)
+                            )))
+                            .andExpect(status().reason(not(startsWith("[PL]"))));
 
             EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
             assertNull(createdEPerson);

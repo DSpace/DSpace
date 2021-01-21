@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.exception;
 
+import org.dspace.core.I18nUtil;
+
 /**
  * <p>Extend {@link UnprocessableEntityException} to provide a specific error message
  * in the REST response. The error message is added to the response in
@@ -15,16 +17,20 @@ package org.dspace.app.rest.exception;
  *
  * @author Bruno Roemers (bruno.roemers at atmire.com)
  */
-public class EPersonNameNotProvidedException extends UnprocessableEntityException {
+public class EPersonNameNotProvidedException extends UnprocessableEntityException implements TranslatableException {
 
-    public static final String message = "The eperson.firstname and eperson.lastname values need to be filled in";
+    public static final String MESSAGE_KEY = "org.dspace.app.rest.exception.EPersonNameNotProvidedException.message";
 
     public EPersonNameNotProvidedException() {
-        super(message);
+        super(I18nUtil.getMessage(MESSAGE_KEY));
     }
 
     public EPersonNameNotProvidedException(Throwable cause) {
-        super(message, cause);
+        super(I18nUtil.getMessage(MESSAGE_KEY), cause);
+    }
+
+    public String getMessageKey() {
+        return MESSAGE_KEY;
     }
 
 }

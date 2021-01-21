@@ -316,7 +316,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         } catch (EmptyWorkflowGroupException e) {
-            throw new RESTEmptyWorkflowGroupException(e.getLocalizedMessage(), e);
+            throw new RESTEmptyWorkflowGroupException(e);
         } catch (IllegalStateException e) {
             throw new UnprocessableEntityException(e.getMessage(), e);
         }

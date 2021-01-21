@@ -24,8 +24,21 @@ public class EmptyWorkflowGroupException extends IllegalStateException {
     public static final String msgFmt = "Refused to delete user %s because it is the only member of the " +
         "workflow group %s. Delete the tasks and group first if you want to remove this user.";
 
+    private final UUID ePersonId;
+    private final UUID groupId;
+
     public EmptyWorkflowGroupException(UUID ePersonId, UUID groupId) {
         super(String.format(msgFmt, ePersonId, groupId));
+        this.ePersonId = ePersonId;
+        this.groupId = groupId;
+    }
+
+    public UUID getEPersonId() {
+        return ePersonId;
+    }
+
+    public UUID getGroupId() {
+        return groupId;
     }
 
 }

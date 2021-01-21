@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.exception;
 
+import org.dspace.core.I18nUtil;
+
 /**
  * <p>Extend {@link UnprocessableEntityException} to provide a specific error message
  * in the REST response. The error message is added to the response in
@@ -15,16 +17,19 @@ package org.dspace.app.rest.exception;
  *
  * @author Bruno Roemers (bruno.roemers at atmire.com)
  */
-public class GroupNameNotProvidedException extends UnprocessableEntityException {
+public class GroupNameNotProvidedException extends UnprocessableEntityException implements TranslatableException {
 
-    public static final String message = "cannot create group, no group name is provided";
+    public static final String MESSAGE_KEY = "org.dspace.app.rest.exception.GroupNameNotProvidedException.message";
 
     public GroupNameNotProvidedException() {
-        super(message);
+        super(I18nUtil.getMessage(MESSAGE_KEY));
     }
 
     public GroupNameNotProvidedException(Throwable cause) {
-        super(message, cause);
+        super(I18nUtil.getMessage(MESSAGE_KEY), cause);
     }
 
+    public String getMessageKey() {
+        return MESSAGE_KEY;
+    }
 }
