@@ -14,13 +14,15 @@ import java.util.List;
 
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.request.AbstractUpdateRequest;
-import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.params.ModifiableSolrParams;
-import org.apache.solr.handler.extraction.ExtractingParams;
+import org.apache.tika.exception.TikaException;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.csv.TextAndCSVParser;
+import org.apache.tika.sax.BodyContentHandler;
 import org.dspace.core.Context;
 import org.dspace.discovery.FullTextContentStreams;
 import org.dspace.discovery.IndexableObject;
@@ -31,12 +33,15 @@ import org.dspace.discovery.indexobject.factory.IndexFactory;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.SolrUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.xml.sax.SAXException;
 
 /**
  * Basis factory interface implementation for indexing/retrieving any IndexableObject in the search core
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
 public abstract class IndexFactoryImpl<T extends IndexableObject, S> implements IndexFactory<T, S> {
+
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(IndexFactoryImpl.class);
 
     @Autowired
     protected List<SolrServiceIndexPlugin> solrServiceIndexPlugins;
@@ -74,7 +79,7 @@ public abstract class IndexFactoryImpl<T extends IndexableObject, S> implements 
      * Write the document to the index under the appropriate unique identifier.
      *
      * @param doc     the solr document to be written to the server
-     * @param streams list of bitstream content streams    DiscoverQueryBuilderTest.java:285
+     * @param streams list of bitstream content streams
      * @throws IOException A general class of exceptions produced by failed or interrupted I/O operations.
      */
     protected void writeDocument(SolrInputDocument doc, FullTextContentStreams streams)
@@ -82,24 +87,51 @@ public abstract class IndexFactoryImpl<T extends IndexableObject, S> implements 
         final SolrClient solr = solrSearchCore.getSolr();
         if (solr != null) {
             if (streams != null && !streams.isEmpty()) {
-                ContentStreamUpdateRequest req = new ContentStreamUpdateRequest("/update/extract");
-                req.addContentStream(streams);
+                // limit full text indexing to first 100,000 characters unless configured otherwise
+                final int charLimit = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                           .getIntProperty("discovery.solr.fulltext.charLimit",
+                                                                           100000);
 
-                ModifiableSolrParams params = new ModifiableSolrParams();
+                // Use Tika's Text parser as the streams are always from the TEXT bundle (i.e. already extracted text)
+                // TODO: We may wish to consider using Tika to extract the text in the future.
+                TextAndCSVParser tikaParser = new TextAndCSVParser();
+                BodyContentHandler tikaHandler = new BodyContentHandler(charLimit);
+                Metadata tikaMetadata = new Metadata();
+                ParseContext tikaContext = new ParseContext();
 
-                //req.setParam(ExtractingParams.EXTRACT_ONLY, "true");
-                for (String name : doc.getFieldNames()) {
-                    for (Object val : doc.getFieldValues(name)) {
-                        params.add(ExtractingParams.LITERALS_PREFIX + name, val.toString());
+                // Use Apache Tika to parse the full text stream
+                try {
+                    tikaParser.parse(streams.getStream(), tikaHandler, tikaMetadata, tikaContext);
+                } catch (SAXException saxe) {
+                    // Check if this SAXException is just a notice that this file was longer than the character limit.
+                    // Unfortunately there is not a unique, public exception type to catch here. This error is thrown
+                    // by Tika's WriteOutContentHandler when it encounters a document longer than the char limit
+                    // https://github.com/apache/tika/blob/main/tika-core/src/main/java/org/apache/tika/sax/WriteOutContentHandler.java
+                    if (saxe.getMessage().contains("limit has been reached")) {
+                        // log that we only indexed up to that configured limit
+                        log.info("Full text is larger than the configured limit (discovery.solr.fulltext.charLimit)."
+                                     + " Only the first " + charLimit + " characters were indexed.");
+                    } else {
+                        throw new IOException("Tika parsing error. Could not index full text.", saxe);
+                    }
+                } catch (TikaException ex) {
+                    throw new IOException("Tika parsing error. Could not index full text.", ex);
+                }
+
+                // Write Tika metadata to "tika_meta_*" fields.
+                // This metadata is not very useful right now, but we'll keep it just in case it becomes more useful.
+                for (String name : tikaMetadata.names()) {
+                    for (String value : tikaMetadata.getValues(name)) {
+                        doc.addField("tika_meta_" + name, value);
                     }
                 }
 
-                req.setParams(params);
-                req.setParam(ExtractingParams.UNKNOWN_FIELD_PREFIX, "attr_");
-                req.setParam(ExtractingParams.MAP_PREFIX + "content", "fulltext");
-                req.setParam(ExtractingParams.EXTRACT_FORMAT, "text");
-                req.setAction(AbstractUpdateRequest.ACTION.COMMIT, true, true);
-                req.process(solr);
+                // Save (parsed) full text to "fulltext" field
+                doc.addField("fulltext", tikaHandler.toString());
+
+                // Add document & commit immediately
+                solr.add(doc);
+                solr.commit(true, true);
             } else {
                 solr.add(doc);
             }
