@@ -1213,6 +1213,12 @@
                 <artifactId>lucene-core</artifactId>
                 <version>${solr.client.version}</version>
             </dependency>
+            <!-- Used for full-text indexing with Solr. Should be synced with version of Tika in solr-cell -->
+            <dependency>
+                <groupId>org.apache.tika</groupId>
+                <artifactId>tika-core</artifactId>
+                <version>1.24.1</version>
+            </dependency>
             <!-- Reminder: Keep icu4j (in Parent POM) synced with version used by lucene-analyzers-icu below,
              otherwise ICUFoldingFilterFactory may throw errors in tests.  -->
             <dependency>
@@ -1233,6 +1239,7 @@
                 <version>${solr.client.version}</version>
                 <scope>test</scope>
             </dependency>
+
 
             <dependency>
                 <groupId>org.apache.ant</groupId>
