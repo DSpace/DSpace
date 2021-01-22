@@ -30,7 +30,7 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
                                 ExternalSourceMatcher.matchExternalSource(
                                     "sherpaJournalIssn", "sherpaJournalIssn", false),
                                 ExternalSourceMatcher.matchExternalSource(
-                                    "sherpaJournal", "sherpaPublisher", false),
+                                    "sherpaPublisher", "sherpaPublisher", false),
                                 ExternalSourceMatcher.matchExternalSource(
                                     "sherpaPublisher", "sherpaPublisher", false)
                             )))
