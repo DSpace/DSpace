@@ -81,7 +81,8 @@ public class Harvest {
         options.addOption("P", "purge", false, "purge all harvestable collections");
 
         options.addOption("F", "force synchronization", false, "force the synchronization");
-        options.addOption("V", "validate", false, "to enable the item validation");
+        options.addOption("iv", "item validation", false, "to enable the item validation");
+        options.addOption("rv", "record validation", false, "to enable the record validation");
         options.addOption("W", "workflow", false, "to start the item workflow after its creation");
 
 
@@ -111,7 +112,8 @@ public class Harvest {
         String metadataKey = null;
         int harvestType = 0;
         boolean forceSynch = false;
-        boolean validation = false;
+        boolean itemValidation = false;
+        boolean recordValidation = false;
         boolean submitEnabled = true;
 
         if (line.hasOption('h')) {
@@ -183,8 +185,11 @@ public class Harvest {
         if (line.hasOption('F')) {
             forceSynch = true;
         }
-        if (line.hasOption('V')) {
-            validation = true;
+        if (line.hasOption("iv")) {
+            itemValidation = true;
+        }
+        if (line.hasOption("rv")) {
+            recordValidation = true;
         }
         if (line.hasOption('W')) {
             submitEnabled = false;
@@ -210,7 +215,8 @@ public class Harvest {
                 System.exit(1);
             }
 
-            harvester.runHarvest(collection, eperson, new OAIHarvesterOptions(forceSynch, validation, submitEnabled));
+            harvester.runHarvest(collection, eperson, new OAIHarvesterOptions(forceSynch, recordValidation,
+                itemValidation, submitEnabled));
 
         } else if ("start".equals(command)) {
             // start the harvest loop

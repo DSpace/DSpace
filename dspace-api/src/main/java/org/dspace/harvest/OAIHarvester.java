@@ -54,6 +54,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authority.service.ItemSearchService;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
@@ -208,8 +209,10 @@ public class OAIHarvester {
                 setReadyStatus(context, harvestRow, getReportMessage(report), toDate);
             } else {
                 setRetryStatus(context, harvestRow, getReportMessage(report));
-                oaiHarvesterEmailSender.notifyCompletionWithErrors(getEmailRecipient(harvestRow),
-                    harvestRow, report.getErrorMessages());
+            }
+
+            if (report.hasErrors()) {
+                oaiHarvesterEmailSender.notifyCompletionWithErrors(getEmailRecipient(harvestRow), harvestRow, report);
             }
 
         } catch (NoRecordsMatchException nrme) {
@@ -319,13 +322,11 @@ public class OAIHarvester {
                 report.incrementSuccessCount();
 
             } catch (Exception ex) {
-                String errorMessage = "An error occurs while process the record " + getItemIdentifier(record);
-                log.error(errorMessage, ex);
-                report.addErrorMessage(errorMessage + ": " + getRootMessage(ex));
+                log.error("An error occurs while process the record " + getItemIdentifier(record), ex);
+                report.addError(getItemIdentifier(record), getRootMessage(ex), NONE.getAction());
                 report.incrementFailureCount();
                 harvestRow = rollbackAndReloadEntity(context, harvestRow);
-                logRecord(context, options.getProcessId(), harvestRow, false, startTimestamp, getItemIdentifier(record),
-                    NONE);
+                logRecord(context, options, harvestRow, false, startTimestamp, getItemIdentifier(record), NONE);
             }
 
         }
@@ -343,7 +344,7 @@ public class OAIHarvester {
         Item item = harvestedItem != null ? harvestedItem.getItem() : null;
 
         if (item == null) {
-            item = itemSearchService.search(context, calculateCrisSourceId(record, repositoryId));
+            item = searchItem(context, record, repositoryId, targetCollection);
             if (item != null) {
                 harvestedItem = harvestedItemService.create(context, item, itemOaiID);
             }
@@ -355,7 +356,7 @@ public class OAIHarvester {
                 collectionService.removeItem(context, targetCollection, item);
             }
 
-            logRecord(context, options.getProcessId(), harvestRow, true, startTime, itemOaiID, DELETION);
+            logRecord(context, options, harvestRow, true, startTime, itemOaiID, DELETION);
             return;
         }
 
@@ -373,6 +374,11 @@ public class OAIHarvester {
 
         context.restoreAuthSystemState();
 
+    }
+
+    private Item searchItem(Context context, Element record, String repositoryId, Collection collection) {
+        Item item = itemSearchService.search(context, calculateCrisSourceId(record, repositoryId));
+        return item != null && collection.equals(item.getOwningCollection()) ? item : null;
     }
 
     private void handleORE(Context context, HarvestedCollection harvestRow, String repositoryId, String itemOaiID,
@@ -420,7 +426,7 @@ public class OAIHarvester {
             handleORE(context, harvestRow, repositoryId, itemOaiID, item);
         }
 
-        logRecord(context, options.getProcessId(), harvestRow, true, startTimestamp, itemOaiID, UPDATE);
+        logRecord(context, options, harvestRow, true, startTimestamp, itemOaiID, UPDATE);
 
         return harvestedItem;
     }
@@ -434,11 +440,6 @@ public class OAIHarvester {
         WorkspaceItem workspaceItem = workspaceItemService.create(context, targetCollection, false);
         Item item = workspaceItem.getItem();
         String itemOaiID = getItemIdentifier(record);
-
-        boolean isItemValid = true;
-        if (options.isValidationEnabled()) {
-            isItemValid = validateRecord(record, harvestRow, report);
-        }
 
         HarvestedItem harvestedItem = harvestedItemService.create(context, item, itemOaiID);
 
@@ -460,8 +461,14 @@ public class OAIHarvester {
             handleORE(context, harvestRow, repositoryId, itemOaiID, item);
         }
 
-        if (options.isValidationEnabled()) {
-            isItemValid = isItemValid && validateItem(context, workspaceItem, report);
+        boolean isRecordValid = true;
+        if (options.isRecordValidationEnabled()) {
+            isRecordValid = validateRecord(record, harvestRow, report);
+        }
+
+        boolean isItemValid = true;
+        if (options.isItemValidationEnabled()) {
+            isItemValid = validateItem(context, record, workspaceItem, report);
         }
 
         if (isItemValid) {
@@ -473,45 +480,61 @@ public class OAIHarvester {
 
         context.uncacheEntity(workspaceItem);
 
-        logRecord(context, options.getProcessId(), harvestRow, isItemValid, startTimestamp, getItemIdentifier(record),
-            ADDITION);
+        logRecord(context, options, harvestRow, isItemValid && isRecordValid, startTimestamp, itemOaiID, ADDITION);
 
         return harvestedItem;
     }
 
     private void installOrStartWorkflow(Context context, WorkspaceItem workspaceItem, String handle,
         boolean submissionEnabled) throws Exception {
+        try {
 
-        if (submissionEnabled) {
-            installItemService.installItem(context, workspaceItem, handle);
-        } else {
-            workflowService.start(context, workspaceItem);
+            if (submissionEnabled) {
+                installItemService.installItem(context, workspaceItem, handle);
+            } else {
+                workflowService.start(context, workspaceItem);
+            }
+
+        } catch (SQLException | IOException | AuthorizeException se) {
+            workspaceItemService.deleteWrapper(context, workspaceItem);
+            throw se;
         }
     }
 
-    private boolean validateItem(Context context, WorkspaceItem workspaceItem, OAIHarvesterReport report) {
+    private boolean validateItem(Context context, Element record, WorkspaceItem wsItem, OAIHarvesterReport report) {
 
-        Item item = workspaceItem.getItem();
-        List<ValidationError> errors = validationService.validate(context, workspaceItem);
+        Item item = wsItem.getItem();
+        List<ValidationError> errors = validationService.validate(context, wsItem);
 
         boolean isItemValid = CollectionUtils.isEmpty(errors);
         if (!isItemValid) {
-            String validationError = "Item with id " + item.getID() + " invalid:" + formatValidationErrors(errors);
-            report.addErrorMessage(validationError);
-            log.error(validationError);
+            report.addError(getItemIdentifier(record), formatValidationErrors(errors), ADDITION.getAction());
+            log.error("Item with id " + item.getID() + " invalid:" + formatValidationErrors(errors));
         }
 
         return isItemValid;
     }
 
-    private boolean validateRecord(Element record, HarvestedCollection harvestRow,
-        OAIHarvesterReport report) {
+    private boolean validateRecord(Element record, HarvestedCollection harvestRow, OAIHarvesterReport report) {
 
-        OAIHarvesterValidationResult result = oaiHarvesterValidator.validate(record, harvestRow);
+        List<Element> metadataElements = getMetadataElements(record);
+        if (CollectionUtils.isEmpty(metadataElements)) {
+            String recordIdentifier = getItemIdentifier(record);
+            report.addError(recordIdentifier, "No metadata element found", NONE.getAction());
+            return false;
+        }
+
+        if (metadataElements.size() > 1) {
+            String recordIdentifier = getItemIdentifier(record);
+            report.addError(recordIdentifier, "More than one metadata element found", ADDITION.getAction());
+            return false;
+        }
+
+        OAIHarvesterValidationResult result = oaiHarvesterValidator.validate(metadataElements.get(0), harvestRow);
         if (result.isNotValid()) {
-            String validationError = "Record with id " + getItemIdentifier(record) + " invalid: " + result.getMessage();
-            report.addErrorMessage(validationError);
-            log.error(validationError);
+            String recordIdentifier = getItemIdentifier(record);
+            report.addError(recordIdentifier, result.getMessages(), ADDITION.getAction());
+            log.error("Record with id " + recordIdentifier + " invalid: " + result.getMessages());
         }
 
         return result.isValid();
@@ -524,10 +547,8 @@ public class OAIHarvester {
         IngestionCrosswalk metadataElementCrosswalk = getIngestionCrosswalk(metadataConfig, harvestRow, repositoryId);
 
         List<Element> metadataElements = getMetadataElements(record);
-        if (metadataElements.size() == 1) {
+        if (CollectionUtils.isNotEmpty(metadataElements)) {
             metadataElementCrosswalk.ingest(context, item, metadataElements.get(0), false);
-        } else {
-            metadataElementCrosswalk.ingest(context, item, metadataElements, false);
         }
 
         if (CollectionUtils.isEmpty(itemService.getMetadata(item, CRIS.getName(), "sourceId", null, null))) {
@@ -691,10 +712,10 @@ public class OAIHarvester {
         return message;
     }
 
-    private String formatValidationErrors(List<ValidationError> errors) {
+    private List<String> formatValidationErrors(List<ValidationError> errors) {
         return errors.stream()
             .map(error -> error.getMessage() + " - " + error.getPaths())
-            .collect(Collectors.joining(",", "[", "]"));
+            .collect(Collectors.toList());
     }
 
     private HarvestedCollection setBusyStatus(Context context, HarvestedCollection harvestRow, Date startDate) {
@@ -1001,15 +1022,14 @@ public class OAIHarvester {
         return message + " - Record import failures: " + report.getFailureCount();
     }
 
-    private void logRecord(Context context, UUID processId, HarvestedCollection harvestRow, boolean isValid,
-        Long startTimestamp,
-        String itemIdentifier, OAIHarvesterAction action) {
+    private void logRecord(Context context, OAIHarvesterOptions options, HarvestedCollection harvestRow,
+        boolean isValid, Long startTimestamp, String itemIdentifier, OAIHarvesterAction action) {
 
         Collection collection = harvestRow.getCollection();
         long duration = System.currentTimeMillis() - startTimestamp;
 
         String logMessage = new StringBuilder(LOG_PREFIX)
-            .append(processId).append(LOG_DELIMITER)
+            .append(options.getProcessId()).append(LOG_DELIMITER)
             .append(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(new Date())).append(LOG_DELIMITER)
             .append(itemIdentifier).append(LOG_DELIMITER)
             .append(harvestRow.getOaiSource()).append(LOG_DELIMITER)
@@ -1132,6 +1152,14 @@ public class OAIHarvester {
 
     public void setOaiHarvesterClient(OAIHarvesterClient oaiHarvesterClient) {
         this.oaiHarvesterClient = oaiHarvesterClient;
+    }
+
+    public OAIHarvesterEmailSender getOaiHarvesterEmailSender() {
+        return oaiHarvesterEmailSender;
+    }
+
+    public void setOaiHarvesterEmailSender(OAIHarvesterEmailSender oaiHarvesterEmailSender) {
+        this.oaiHarvesterEmailSender = oaiHarvesterEmailSender;
     }
 
 }

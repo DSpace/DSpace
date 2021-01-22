@@ -22,19 +22,24 @@ public class OAIHarvesterOptions {
 
     private final boolean forceSynchronization;
 
-    private final boolean validationEnabled;
+    private final boolean recordValidationEnabled;
+
+    private final boolean itemValidationEnabled;
 
     private final boolean submissionEnabled;
 
-    public OAIHarvesterOptions(boolean forceSynchronization, boolean validationEnabled, boolean submissionEnabled) {
-        this(UUID.randomUUID(), forceSynchronization, validationEnabled, submissionEnabled);
+    public OAIHarvesterOptions(boolean forceSynchronization, boolean recordValidationEnabled,
+        boolean itemValidationEnabled, boolean submissionEnabled) {
+        this(UUID.randomUUID(), forceSynchronization, recordValidationEnabled, itemValidationEnabled,
+            submissionEnabled);
     }
 
-    public OAIHarvesterOptions(UUID processId, boolean forceSynchronization, boolean validationEnabled,
-        boolean submissionEnabled) {
+    public OAIHarvesterOptions(UUID processId, boolean forceSynchronization, boolean recordValidationEnabled,
+        boolean itemValidationEnabled, boolean submissionEnabled) {
         this.processId = processId;
         this.forceSynchronization = forceSynchronization;
-        this.validationEnabled = validationEnabled;
+        this.itemValidationEnabled = itemValidationEnabled;
+        this.recordValidationEnabled = recordValidationEnabled;
         this.submissionEnabled = submissionEnabled;
     }
 
@@ -45,13 +50,16 @@ public class OAIHarvesterOptions {
     public boolean isForceSynchronization() {
         return forceSynchronization;
     }
-
-    public boolean isValidationEnabled() {
-        return validationEnabled;
-    }
-
     public boolean isSubmissionEnabled() {
         return submissionEnabled;
+    }
+
+    public boolean isRecordValidationEnabled() {
+        return recordValidationEnabled;
+    }
+
+    public boolean isItemValidationEnabled() {
+        return itemValidationEnabled;
     }
 
 }

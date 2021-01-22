@@ -9,8 +9,10 @@ package org.dspace.harvest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -60,11 +62,11 @@ public class OAIHarvesterValidatorTest {
 
         OAIHarvesterValidationResult validationResult = validator.validate(record, harvestRow);
         assertThat(validationResult.isValid(), is(true));
-        assertThat(validationResult.getMessage(), isEmptyString());
+        assertThat(validationResult.getMessages(), empty());
     }
 
     @Test
-    public void testPersonValidationWithErrors() {
+    public void testPersonValidationWithSingleError() {
 
         when(configurationService.getProperty("oai.harvester.validation-dir")).thenReturn(VALIDATION_DIR);
         when(configurationService.getProperty("oai.harvester.validation.cerif.xsd")).thenReturn(CERIF_XSD_NAME);
@@ -74,8 +76,10 @@ public class OAIHarvesterValidatorTest {
 
         OAIHarvesterValidationResult validationResult = validator.validate(record, harvestRow);
         assertThat(validationResult.isValid(), is(false));
-        assertThat(validationResult.getMessage(), containsString(
-            "Invalid content was found starting with element '{\"https://www.openaire.eu/cerif-profile/1.1/\":PersonName}'"));
+        assertThat(validationResult.getMessages(), hasSize(1));
+        assertThat(validationResult.getMessages(), hasItem(containsString(
+            "Invalid content was found starting with element "
+                + "'{\"https://www.openaire.eu/cerif-profile/1.1/\":PersonName}'")));
     }
 
     @Test
@@ -89,11 +93,29 @@ public class OAIHarvesterValidatorTest {
 
         OAIHarvesterValidationResult validationResult = validator.validate(record, harvestRow);
         assertThat(validationResult.isValid(), is(true));
-        assertThat(validationResult.getMessage(), isEmptyString());
+        assertThat(validationResult.getMessages(), empty());
     }
 
     @Test
-    public void testPublicationValidationWithErrors() {
+    public void testPublicationValidationWithSingleError() {
+
+        when(configurationService.getProperty("oai.harvester.validation-dir")).thenReturn(VALIDATION_DIR);
+        when(configurationService.getProperty("oai.harvester.validation.cerif.xsd")).thenReturn(CERIF_XSD_NAME);
+
+        Element record = readDocument(OAI_PMH_CERIF_DIR_PATH, "publication-with-wrong-order.xml");
+        HarvestedCollection harvestRow = buildHarvestedCollection("cerif");
+
+        OAIHarvesterValidationResult validationResult = validator.validate(record, harvestRow);
+        assertThat(validationResult.isValid(), is(false));
+        assertThat(validationResult.getMessages(), hasSize(1));
+
+        assertThat(validationResult.getMessages(), hasItem(containsString(
+            "Invalid content was found starting with element "
+                + "'{\"https://www.openaire.eu/cerif-profile/1.1/\":StartPage}'")));
+    }
+
+    @Test
+    public void testPublicationValidationWithManyErrors() {
 
         when(configurationService.getProperty("oai.harvester.validation-dir")).thenReturn(VALIDATION_DIR);
         when(configurationService.getProperty("oai.harvester.validation.cerif.xsd")).thenReturn(CERIF_XSD_NAME);
@@ -103,8 +125,22 @@ public class OAIHarvesterValidatorTest {
 
         OAIHarvesterValidationResult validationResult = validator.validate(record, harvestRow);
         assertThat(validationResult.isValid(), is(false));
-        assertThat(validationResult.getMessage(), containsString(
-            "Invalid content was found starting with element '{\"https://www.openaire.eu/cerif-profile/1.1/\":StartPage}'"));
+        assertThat(validationResult.getMessages(), hasSize(4));
+
+        assertThat(validationResult.getMessages(), hasItem(containsString(
+            "Element 'oai_cerif:PartOf' cannot have character [children], "
+                + "because the type's content type is element-only.")));
+
+        assertThat(validationResult.getMessages(), hasItem(containsString(
+            "The content of element 'oai_cerif:PartOf' is not complete.")));
+
+        assertThat(validationResult.getMessages(), hasItem(containsString(
+            "Invalid content was found starting with element "
+                + "'{\"https://www.openaire.eu/cerif-profile/1.1/\":PublicationDate}'")));
+
+        assertThat(validationResult.getMessages(), hasItem(containsString(
+            "Invalid content was found starting with element "
+                + "'{\"https://www.openaire.eu/cerif-profile/1.1/\":Type}'")));
     }
 
     @Test
@@ -114,7 +150,7 @@ public class OAIHarvesterValidatorTest {
 
         OAIHarvesterValidationResult validationResult = validator.validate(record, harvestRow);
         assertThat(validationResult.isValid(), is(true));
-        assertThat(validationResult.getMessage(), isEmptyString());
+        assertThat(validationResult.getMessages(), empty());
     }
 
     @Test
@@ -122,12 +158,12 @@ public class OAIHarvesterValidatorTest {
 
         when(configurationService.getProperty("oai.harvester.validation-dir")).thenReturn(VALIDATION_DIR);
 
-        Element record = readDocument(OAI_PMH_CERIF_DIR_PATH, "invalid-person.xml");
+        Element record = readDocument(OAI_PMH_CERIF_DIR_PATH, "publication-with-wrong-order.xml");
         HarvestedCollection harvestRow = buildHarvestedCollection("cerif");
 
         OAIHarvesterValidationResult validationResult = validator.validate(record, harvestRow);
         assertThat(validationResult.isValid(), is(true));
-        assertThat(validationResult.getMessage(), isEmptyString());
+        assertThat(validationResult.getMessages(), empty());
     }
 
     private HarvestedCollection buildHarvestedCollection(String metadataConfig) {

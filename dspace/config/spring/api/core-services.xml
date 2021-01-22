@@ -105,6 +105,7 @@
     <bean class="org.dspace.harvest.OAIHarvesterClientImpl"/>
     <bean class="org.dspace.harvest.OAIHarvesterValidatorImpl"/>
     <bean class="org.dspace.harvest.OAIHarvesterEmailSenderImpl"/>
+    <bean class="org.dspace.harvest.OAIHarvesterXlsReportGeneratorImpl"/>
     
 
     <bean class="org.dspace.identifier.DOIServiceImpl"/>

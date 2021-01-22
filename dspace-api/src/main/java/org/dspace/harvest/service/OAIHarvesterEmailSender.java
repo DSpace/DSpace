@@ -7,9 +7,8 @@
  */
 package org.dspace.harvest.service;
 
-import java.util.List;
-
 import org.dspace.harvest.HarvestedCollection;
+import org.dspace.harvest.model.OAIHarvesterReport;
 
 /**
  * Service to send an email related to the result of an harvesting process.
@@ -23,19 +22,19 @@ public interface OAIHarvesterEmailSender {
      * Send an email to the given recipient address to notify that the harvesting
      * related to the given harvested collection completed with some errors.
      *
-     * @param recipient           the mail's recipient
-     * @param harvestedCollection the harvested collection
-     * @param errors              the error messages
+     * @param recipient  the mail's recipient
+     * @param harvestRow the harvested collection
+     * @param report     the harvesting report
      */
-    void notifyCompletionWithErrors(String recipient, HarvestedCollection harvestedCollection, List<String> errors);
+    void notifyCompletionWithErrors(String recipient, HarvestedCollection harvestRow, OAIHarvesterReport report);
 
     /**
      * Send an email to the given recipient address to notify that the harvesting
      * related to the given harvested collection fails for the given exception.
      *
-     * @param recipient           the mail's recipient
-     * @param harvestedCollection the harvested collection
-     * @param ex                  the exception occured
+     * @param recipient  the mail's recipient
+     * @param harvestRow the harvested collection
+     * @param ex         the exception occured
      */
-    void notifyFailure(String recipient, HarvestedCollection harvestedCollection, Exception ex);
+    void notifyFailure(String recipient, HarvestedCollection harvestRow, Exception ex);
 }

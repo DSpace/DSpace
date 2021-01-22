@@ -8,8 +8,8 @@
 package org.dspace.harvest;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import javax.mail.MessagingException;
 
@@ -19,8 +19,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
+import org.dspace.harvest.model.OAIHarvesterReport;
 import org.dspace.harvest.service.OAIHarvesterEmailSender;
+import org.dspace.harvest.service.OAIHarvesterReportGenerator;
 import org.dspace.util.ExceptionMessageUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implementation of {@link OAIHarvesterEmailSender}.
@@ -32,13 +35,28 @@ public class OAIHarvesterEmailSenderImpl implements OAIHarvesterEmailSender {
 
     private static final Logger LOGGER = LogManager.getLogger(OAIHarvesterEmailSenderImpl.class);
 
+    @Autowired
+    private OAIHarvesterReportGenerator oaiHarvesterReportGenerator;
+
     @Override
-    public void notifyCompletionWithErrors(String recipient, HarvestedCollection harvestRow, List<String> errors) {
+    public void notifyCompletionWithErrors(String recipient, HarvestedCollection harvestRow,
+        OAIHarvesterReport report) {
 
         if (StringUtils.isEmpty(recipient)) {
             return;
         }
 
+        Object[] args = {
+            harvestRow.getCollection().getID(),
+            new Date(),
+            harvestRow.getHarvestStatus()
+        };
+
+        String attachmentName = oaiHarvesterReportGenerator.getName();
+        String attachmentMimeType = oaiHarvesterReportGenerator.getMimeType();
+        InputStream reportIs = oaiHarvesterReportGenerator.generate(report);
+
+        sendEmail(recipient, "harvesting_completed_with_errors", reportIs, attachmentName, attachmentMimeType, args);
     }
 
     @Override
@@ -61,6 +79,12 @@ public class OAIHarvesterEmailSenderImpl implements OAIHarvesterEmailSender {
     }
 
     private void sendEmail(String recipient, String emailFile, Object... arguments) {
+        sendEmail(recipient, emailFile, null, null, null, arguments);
+    }
+
+    private void sendEmail(String recipient, String emailFile, InputStream attachment,
+        String attachmentName, String attachmentMimeType, Object... arguments) {
+
         try {
 
             Email email = Email.getEmail(I18nUtil.getEmailFilename(Locale.getDefault(), emailFile));
@@ -69,6 +93,10 @@ public class OAIHarvesterEmailSenderImpl implements OAIHarvesterEmailSender {
 
             for (Object argument : arguments) {
                 email.addArgument(argument);
+            }
+
+            if (attachment != null) {
+                email.addAttachment(attachment, attachmentName, attachmentMimeType);
             }
 
             email.send();

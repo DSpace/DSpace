@@ -7,17 +7,21 @@
  */
 package org.dspace.harvest;
 
-import static org.dspace.harvest.model.OAIHarvesterValidationResult.invalid;
+import static org.dspace.harvest.model.OAIHarvesterValidationResult.buildFromException;
+import static org.dspace.harvest.model.OAIHarvesterValidationResult.buildFromExceptions;
 import static org.dspace.harvest.model.OAIHarvesterValidationResult.valid;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.xml.XMLConstants;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.harvest.model.OAIHarvesterValidationResult;
@@ -26,7 +30,9 @@ import org.dspace.services.ConfigurationService;
 import org.jdom.Element;
 import org.jdom.transform.JDOMSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 /**
  * Implementation of {@link OAIHarvesterValidator} that validate the given
@@ -55,12 +61,21 @@ public class OAIHarvesterValidatorImpl implements OAIHarvesterValidator {
 
     private OAIHarvesterValidationResult validate(Element element, String xsdPath) {
         try {
+
             Schema schema = getSchema(xsdPath);
-            schema.newValidator().validate(new JDOMSource(element));
-        } catch (IOException | SAXException e) {
-            return invalid(e.getMessage());
+            Validator validator = schema.newValidator();
+
+            CustomErrorHandler errorHandler = new CustomErrorHandler();
+            validator.setErrorHandler(errorHandler);
+
+            validator.validate(new JDOMSource(element));
+
+            return buildFromExceptions(errorHandler.getExceptions());
+
+        } catch (SAXException | IOException e) {
+            return buildFromException(e);
         }
-        return valid();
+
     }
 
     private Schema getSchema(String xsdPath) throws SAXException {
@@ -87,6 +102,35 @@ public class OAIHarvesterValidatorImpl implements OAIHarvesterValidator {
         }
 
         return Optional.of(new File(validationDirectory, xsdName).getAbsolutePath());
+    }
+
+    private static class CustomErrorHandler implements ErrorHandler {
+
+        private final List<Exception> exceptions;
+
+        public CustomErrorHandler() {
+            this.exceptions = new ArrayList<>();
+        }
+
+        @Override
+        public void warning(SAXParseException exception) throws SAXException {
+            exceptions.add(exception);
+        }
+
+        @Override
+        public void error(SAXParseException exception) throws SAXException {
+            exceptions.add(exception);
+        }
+
+        @Override
+        public void fatalError(SAXParseException exception) throws SAXException {
+            exceptions.add(exception);
+        }
+
+        public List<Exception> getExceptions() {
+            return exceptions;
+        }
+
     }
 
 }
