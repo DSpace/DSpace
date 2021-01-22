@@ -11,6 +11,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.dspace.app.rest.matcher.ItemAuthorityMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
@@ -374,6 +377,49 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
        getClient().perform(get("/api/submission/vocabularies/GroupAuthority/entries")
                   .param("filter", "wrong text"))
                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void itemAuthorityWithValidExternalSourceTest() throws Exception {
+        Map<String, String> exptectedMap = new HashMap<String, String>(
+                Map.of("dc.contributor.author", "authorAuthority"));
+       context.turnOffAuthorisationSystem();
+
+       configurationService.setProperty("choises.externalsource.dc.contributor.author", "authorAuthority");
+
+       // These clears have to happen so that the config is actually reloaded in those classes. This is needed for
+       // the properties that we're altering above and this is only used within the tests
+       pluginService.clearNamedPluginClasses();
+       cas.clearCache();
+
+       context.restoreAuthSystemState();
+
+       String token = getAuthToken(eperson.getEmail(), password);
+       getClient(token).perform(get("/api/submission/vocabularies/AuthorAuthority"))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$.entity", Matchers.is("Person")))
+                       .andExpect(jsonPath("$.externalSource", Matchers.is(exptectedMap)));
+    }
+
+    @Test
+    public void itemAuthorityWithNotValidExternalSourceTest() throws Exception {
+        Map<String, String> exptectedMap = new HashMap<String, String>();
+       context.turnOffAuthorisationSystem();
+
+       configurationService.setProperty("choises.externalsource.dc.contributor.author", "fakeAuthorAuthority");
+
+       // These clears have to happen so that the config is actually reloaded in those classes. This is needed for
+       // the properties that we're altering above and this is only used within the tests
+       pluginService.clearNamedPluginClasses();
+       cas.clearCache();
+
+       context.restoreAuthSystemState();
+
+       String token = getAuthToken(eperson.getEmail(), password);
+       getClient(token).perform(get("/api/submission/vocabularies/AuthorAuthority"))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$.entity", Matchers.is("Person")))
+                       .andExpect(jsonPath("$.externalSource", Matchers.is(exptectedMap)));
     }
 
     @Override
