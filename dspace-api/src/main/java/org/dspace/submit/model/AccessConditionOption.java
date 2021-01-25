@@ -8,6 +8,7 @@
 package org.dspace.submit.model;
 
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.Date;
 
 import org.dspace.authorize.AuthorizeException;
@@ -18,6 +19,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.util.DateMathParser;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -37,6 +39,8 @@ public class AccessConditionOption {
 
     @Autowired
     GroupService groupService;
+
+    DateMathParser dateMathParser = new DateMathParser();
 
     /** An unique name identifying the access contion option **/
     private String name;
@@ -140,7 +144,8 @@ public class AccessConditionOption {
     }
 
     public void createResourcePolicy(Context context, Bitstream b, String name, String description,
-                                     Date startDate, Date endDate) throws SQLException, AuthorizeException {
+                                     Date startDate, Date endDate)
+            throws SQLException, AuthorizeException, ParseException {
         if (getHasStartDate() && startDate == null) {
             throw new IllegalStateException("The access condition " + getName() + " requires a start date.");
         }
@@ -153,7 +158,39 @@ public class AccessConditionOption {
         if (!getHasEndDate() && endDate != null) {
             throw new IllegalStateException("The access condition " + getName() + " cannot contain an end date.");
         }
-        //TODO: check date limits as well
+
+        Date earliestStartDate = null;
+        if (getStartDateLimit() != null) {
+            earliestStartDate = dateMathParser.parseMath(getStartDateLimit());
+        }
+
+        Date latestEndDate = null;
+        if (getEndDateLimit() != null) {
+            latestEndDate = dateMathParser.parseMath(getEndDateLimit());
+        }
+
+        // throw if latestEndDate before earliestStartDate
+        if (earliestStartDate != null && latestEndDate != null && earliestStartDate.compareTo(latestEndDate) > 0) {
+            throw new IllegalStateException(String.format(
+                "The boundaries of %s overlap: [%s, %s]", getName(), getStartDateLimit(), getEndDateLimit()
+            ));
+        }
+
+        // throw if startDate before earliestStartDate
+        if (earliestStartDate != null && earliestStartDate.compareTo(startDate) > 0) {
+            throw new IllegalStateException(String.format(
+                "The start date of access condition %s should be later than %s from now.",
+                getName(), getStartDateLimit()
+            ));
+        }
+
+        // throw if endDate after latestEndDate
+        if (latestEndDate != null && latestEndDate.compareTo(endDate) < 0) {
+            throw new IllegalStateException(String.format(
+                "The end date of access condition %s should be earlier than %s from now.", getName(), getEndDateLimit()
+            ));
+        }
+
         Group group = groupService.findByName(context, getGroupName());
         authorizeService.createResourcePolicy(context, b, group, null, Constants.READ,
                 ResourcePolicy.TYPE_CUSTOM, name, description, startDate,
