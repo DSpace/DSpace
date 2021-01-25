@@ -8,6 +8,7 @@
 package org.dspace.app.rest.submit.factory.impl;
 
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -47,7 +48,7 @@ public class BitstreamResourcePolicyUtils {
      */
     public static void findApplyResourcePolicy(Context context, Iterator<UploadConfiguration> uploadConfigs,
                                          Bitstream b, UploadBitstreamAccessConditionDTO newAccessCondition)
-            throws SQLException, AuthorizeException {
+            throws SQLException, AuthorizeException, ParseException {
         String name = newAccessCondition.getName();
         String description = newAccessCondition.getDescription();
 
@@ -75,7 +76,7 @@ public class BitstreamResourcePolicyUtils {
     public static void findApplyResourcePolicy(Context context, Iterator<UploadConfiguration> uploadConfigs,
                                                Bitstream b, String name, String description,
                                                Date startDate, Date endDate)
-            throws SQLException, AuthorizeException {
+            throws SQLException, AuthorizeException, ParseException {
         while (uploadConfigs
                 .hasNext()) {
             UploadConfiguration uploadConfiguration = uploadConfigs.next();
