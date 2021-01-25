@@ -68,14 +68,14 @@ public class OpenAIREFunderDataProvider implements ExternalDataProvider {
         return sourceIdentifier;
     }
 
-    /**
-     * Initialize the class
-     *
-     * @throws java.io.IOException passed through from HTTPclient.
-     */
-    public void init() throws IOException {
-
-    }
+//    /**
+//     * Initialize the class
+//     *
+//     * @throws java.io.IOException passed through from HTTPclient.
+//     */
+//    public void init() throws IOException {
+//
+//    }
 
     /**
      * Makes an instance of the OpenAIREFunderDataProvider class based on the
@@ -116,7 +116,7 @@ public class OpenAIREFunderDataProvider implements ExternalDataProvider {
                 .getEntity()
                 .getProject();
         if (project == null) {
-           throw new IllegalStateException("No project found");
+            throw new IllegalStateException("No project found");
         }
 
         String funderName = "";
@@ -166,7 +166,7 @@ public class OpenAIREFunderDataProvider implements ExternalDataProvider {
         String fundingItemAcronym = "";
         if (project.getAcronym() != null) {
             fundingItemAcronym = project.getAcronym();
-            externalDataObject.addMetadata(new MetadataValueDTO("oaire", 
+            externalDataObject.addMetadata(new MetadataValueDTO("oaire",
                     "fundingItemAcronym", null, null, fundingItemAcronym));
         }
 
@@ -178,7 +178,7 @@ public class OpenAIREFunderDataProvider implements ExternalDataProvider {
                    .getFundingTreeType()
                    .getFunder()
                    .getJurisdiction();
-            externalDataObject.addMetadata(new MetadataValueDTO("oaire", 
+            externalDataObject.addMetadata(new MetadataValueDTO("oaire",
                     "funderJuristiction", null, null, funderJuristiction));
         }
 
@@ -193,7 +193,8 @@ public class OpenAIREFunderDataProvider implements ExternalDataProvider {
      * @return Response
      */
     public Response getResponse(String projectID, String projectFunder) throws MalformedURLException, JAXBException {
-        URL url = new URL(this.getOpenAIREAPIUrl() + "search/projects?grantID=" + projectID + "&funder=" + projectFunder);
+        URL url = new URL(this.getOpenAIREAPIUrl() + "search/projects?grantID="
+                + projectID + "&funder=" + projectFunder);
         Response response = OpenAIREHandler.unmarshal(url);
         return response;
     }
