@@ -141,6 +141,13 @@
         <qualifier>forceSynchronization</qualifier>
         <scope_note></scope_note>
     </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>harvesting</element>
+        <qualifier>ccAddress</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
     
     <dc-type>
         <schema>cris</schema>
