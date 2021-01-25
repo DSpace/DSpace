@@ -81,7 +81,7 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
     }
 
     /**
-     * Match a proposed value against existend DSpace item applying an optional
+     * Match a proposed value against existent DSpace item applying an optional
      * filter query to limit the scope only to specific item types
      */
     @Override
