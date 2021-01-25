@@ -39,7 +39,7 @@ public class OAIHarvesterXlsReportGeneratorImpl implements OAIHarvesterReportGen
             addRow(sheet, 0, "Record identifier", "Error", "Action");
             addErrors(sheet, report.getErrors());
 
-            workbook.write(new ByteArrayOutputStream());
+            workbook.write(baos);
             return new ByteArrayInputStream(baos.toByteArray());
 
         } catch (IOException e) {
@@ -59,7 +59,7 @@ public class OAIHarvesterXlsReportGeneratorImpl implements OAIHarvesterReportGen
     }
 
     private Row addRow(Sheet sheet, int rowIndex, String identifier, String error, String action) {
-        Row row = sheet.createRow(0);
+        Row row = sheet.createRow(rowIndex);
         row.createCell(0).setCellValue(identifier);
         row.createCell(1).setCellValue(error);
         row.createCell(2).setCellValue(action);

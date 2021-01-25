@@ -7,7 +7,8 @@
  */
 package org.dspace.harvest.model;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +30,7 @@ public class OAIHarvesterReport {
 
     public OAIHarvesterReport(int totalRecordSize) {
         this.totalRecordSize = totalRecordSize;
-        this.errors = new HashMap<String, ErrorDetails>();
+        this.errors = new LinkedHashMap<String, ErrorDetails>();
     }
 
     public boolean noRecordImportFails() {
@@ -91,7 +92,8 @@ public class OAIHarvesterReport {
         private final String action;
 
         public ErrorDetails(String message, String action) {
-            this(List.of(message), action);
+            this(new ArrayList<>(), action);
+            addMessage(message);
         }
 
         public ErrorDetails(List<String> messages, String action) {
