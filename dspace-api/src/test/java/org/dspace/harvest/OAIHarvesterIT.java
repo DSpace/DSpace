@@ -1272,6 +1272,7 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
                 .withRelationshipType("Publication")
                 .withAdminGroup(eperson)
                 .withHarvestingEmail("IDENTIFY")
+                .withHarvestingItemValidationEnabled()
                 .build();
 
             HarvestedCollection harvestRow = HarvestedCollectionBuilder.create(context, collection)
@@ -1283,7 +1284,7 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
                 .build();
             context.restoreAuthSystemState();
 
-            harvester.runHarvest(context, harvestRow, getOptionsWithItemValidationEnabled());
+            harvester.runHarvest(context, harvestRow, getDefaultOptions());
 
             verify(mockClient).resolveNamespaceToPrefix(BASE_URL, getMetadataFormatNamespace("cerif").getURI());
             verify(mockClient, times(2)).identify(BASE_URL);
@@ -1339,6 +1340,7 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
                 .withRelationshipType("Publication")
                 .withAdminGroup(eperson)
                 .withHarvestingEmail("dspace@test.it")
+                .withHarvestingRecordValidationEnabled()
                 .build();
 
             HarvestedCollection harvestRow = HarvestedCollectionBuilder.create(context, collection)
@@ -1350,7 +1352,7 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
                 .build();
             context.restoreAuthSystemState();
 
-            harvester.runHarvest(context, harvestRow, getOptionsWithRecordValidationEnabled());
+            harvester.runHarvest(context, harvestRow, getDefaultOptions());
 
             verify(mockClient).resolveNamespaceToPrefix(BASE_URL, getMetadataFormatNamespace("cerif").getURI());
             verify(mockClient).identify(BASE_URL);
@@ -1557,27 +1559,27 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
     }
 
     private OAIHarvesterOptions getDefaultOptions() {
-        return new OAIHarvesterOptions(UUID.randomUUID(), false, false, false, true);
+        return new OAIHarvesterOptions(UUID.randomUUID(), null, null, null, true);
     }
 
     private OAIHarvesterOptions getOptionsWithForceSynchronization() {
-        return new OAIHarvesterOptions(randomUUID(), true, false, false, true);
+        return new OAIHarvesterOptions(randomUUID(), true, null, null, true);
     }
 
     private OAIHarvesterOptions getOptionsWithItemValidationEnabled() {
-        return new OAIHarvesterOptions(randomUUID(), false, false, true, true);
+        return new OAIHarvesterOptions(randomUUID(), null, null, true, true);
     }
 
     private OAIHarvesterOptions getOptionsWithRecordValidationEnabled() {
-        return new OAIHarvesterOptions(randomUUID(), false, true, false, true);
+        return new OAIHarvesterOptions(randomUUID(), null, true, null, true);
     }
 
     private OAIHarvesterOptions getOptionsWithRecordAndItemValidationEnabled() {
-        return new OAIHarvesterOptions(randomUUID(), false, true, true, true);
+        return new OAIHarvesterOptions(randomUUID(), null, true, true, true);
     }
 
     private OAIHarvesterOptions getOptionsWithSubmissionNotEnabled() {
-        return new OAIHarvesterOptions(randomUUID(), false, false, false, false);
+        return new OAIHarvesterOptions(randomUUID(), null, null, null, false);
     }
 
     private void deletePoolTask(PoolTask poolTask) {

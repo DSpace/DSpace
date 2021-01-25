@@ -9,6 +9,7 @@ package org.dspace.harvest;
 
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
+import static org.apache.commons.lang3.BooleanUtils.toBoolean;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.dspace.app.harvest.Harvest.LOG_DELIMITER;
@@ -199,7 +200,10 @@ public class OAIHarvester {
                 throw new HarvestingException("Provided collection is not set up for harvesting");
             }
 
-            Date fromDate = options.isForceSynchronization() ? null : harvestRow.getLastHarvestDate();
+            Date fromDate = harvestRow.getLastHarvestDate();
+            if (isForceSynchronization(harvestRow.getCollection(), options)) {
+                fromDate = null;
+            }
 
             harvestRow = setBusyStatus(context, harvestRow, toDate);
 
@@ -410,7 +414,7 @@ public class OAIHarvester {
 
         log.debug("Item " + item.getHandle() + " was found locally. Using it to harvest " + itemOaiID + ".");
 
-        if (!options.isForceSynchronization() && isLocalItemMoreRecent(harvestedItem, getHeader(record))) {
+        if (!isForceSynchronization(collection, options) && isLocalItemMoreRecent(harvestedItem, getHeader(record))) {
             log.info("Item " + item.getHandle() + " was harvested more recently than the last update time "
                 + "reported by the OAI server; skipping.");
             return harvestedItem;
@@ -462,12 +466,12 @@ public class OAIHarvester {
         }
 
         boolean isRecordValid = true;
-        if (options.isRecordValidationEnabled()) {
+        if (isRecordValidationEnabled(targetCollection, options)) {
             isRecordValid = validateRecord(record, harvestRow, report);
         }
 
         boolean isItemValid = true;
-        if (options.isItemValidationEnabled()) {
+        if (isItemValidationEnabled(targetCollection, options)) {
             isItemValid = validateItem(context, record, workspaceItem, report);
         }
 
@@ -1144,6 +1148,31 @@ public class OAIHarvester {
             .map(document -> document.getRootElement().getChild("Identify", OAI_NS))
             .map(identifyElement -> identifyElement.getChild("adminEmail", OAI_NS))
             .map(emailElement -> emailElement.getText());
+    }
+
+    private boolean isForceSynchronization(Collection collection, OAIHarvesterOptions options) {
+        return getOptionOrMetadataValue(collection, options.isForceSynchronization(),
+            "cris.harvesting.forceSynchronization");
+    }
+
+    private boolean isItemValidationEnabled(Collection collection, OAIHarvesterOptions options) {
+        return getOptionOrMetadataValue(collection, options.isItemValidationEnabled(),
+            "cris.harvesting.itemValidationEnabled");
+    }
+
+    private boolean isRecordValidationEnabled(Collection collection, OAIHarvesterOptions options) {
+        return getOptionOrMetadataValue(collection, options.isRecordValidationEnabled(),
+            "cris.harvesting.recordValidationEnabled");
+    }
+
+    private boolean getOptionOrMetadataValue(Collection collection, Boolean optionValue, String metadataField) {
+        return optionValue != null ? optionValue : toBoolean(getFistMetadatavalue(collection, metadataField));
+    }
+
+    private String getFistMetadatavalue(Collection collection, String metadataField) {
+        return collectionService.getMetadataByMetadataString(collection, metadataField).stream()
+            .map((metadatavalue) -> metadatavalue.getValue())
+            .findFirst().orElse(null);
     }
 
     public OAIHarvesterClient getOaiHarvesterClient() {

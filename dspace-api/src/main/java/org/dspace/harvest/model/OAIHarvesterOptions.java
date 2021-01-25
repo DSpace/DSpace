@@ -20,22 +20,22 @@ public class OAIHarvesterOptions {
 
     private final UUID processId;
 
-    private final boolean forceSynchronization;
+    private final Boolean forceSynchronization;
 
-    private final boolean recordValidationEnabled;
+    private final Boolean recordValidationEnabled;
 
-    private final boolean itemValidationEnabled;
+    private final Boolean itemValidationEnabled;
 
-    private final boolean submissionEnabled;
+    private final Boolean submissionEnabled;
 
-    public OAIHarvesterOptions(boolean forceSynchronization, boolean recordValidationEnabled,
-        boolean itemValidationEnabled, boolean submissionEnabled) {
+    public OAIHarvesterOptions(Boolean forceSynchronization, Boolean recordValidationEnabled,
+        Boolean itemValidationEnabled, Boolean submissionEnabled) {
         this(UUID.randomUUID(), forceSynchronization, recordValidationEnabled, itemValidationEnabled,
             submissionEnabled);
     }
 
-    public OAIHarvesterOptions(UUID processId, boolean forceSynchronization, boolean recordValidationEnabled,
-        boolean itemValidationEnabled, boolean submissionEnabled) {
+    public OAIHarvesterOptions(UUID processId, Boolean forceSynchronization, Boolean recordValidationEnabled,
+        Boolean itemValidationEnabled, Boolean submissionEnabled) {
         this.processId = processId;
         this.forceSynchronization = forceSynchronization;
         this.itemValidationEnabled = itemValidationEnabled;
@@ -47,18 +47,19 @@ public class OAIHarvesterOptions {
         return processId;
     }
 
-    public boolean isForceSynchronization() {
+    public Boolean isForceSynchronization() {
         return forceSynchronization;
     }
-    public boolean isSubmissionEnabled() {
+
+    public Boolean isSubmissionEnabled() {
         return submissionEnabled;
     }
 
-    public boolean isRecordValidationEnabled() {
+    public Boolean isRecordValidationEnabled() {
         return recordValidationEnabled;
     }
 
-    public boolean isItemValidationEnabled() {
+    public Boolean isItemValidationEnabled() {
         return itemValidationEnabled;
     }
 
