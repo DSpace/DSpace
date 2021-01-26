@@ -702,7 +702,7 @@
         <property name="defaultFilterQueries">
             <list>
                 <!--Only find items, workspace and accepted for workflow -->
-                <value>search.resourcetype:Item OR search.resourcetype:WorkspaceItem OR search.resourcetype:XmlWorkflowItem</value>
+                <value>search.resourcetype:Item OR search.resourcetype:WorkspaceItem OR search.resourcetype:WorkflowItem</value>
             </list>
         </property>
         <!--Default result per page  -->
@@ -855,7 +855,7 @@
             queries done by discovery for this configuration -->
         <property name="defaultFilterQueries">
             <list>
-                <value>search.resourcetype:XmlWorkflowItem</value>
+                <value>search.resourcetype:WorkflowItem</value>
             </list>
         </property>
         <!--Default result per page  -->

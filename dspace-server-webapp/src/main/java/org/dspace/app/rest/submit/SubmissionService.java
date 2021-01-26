@@ -49,9 +49,9 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.dspace.workflow.WorkflowException;
+import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.WorkflowService;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.init.UncategorizedScriptException;
 import org.springframework.stereotype.Component;
@@ -75,9 +75,9 @@ public class SubmissionService {
     @Autowired
     protected WorkspaceItemService workspaceItemService;
     @Autowired
-    protected WorkflowItemService<XmlWorkflowItem> workflowItemService;
+    protected WorkflowItemService workflowItemService;
     @Autowired
-    protected WorkflowService<XmlWorkflowItem> workflowService;
+    protected WorkflowService workflowService;
     @Autowired
     protected CreativeCommonsService creativeCommonsService;
     @Autowired
@@ -215,9 +215,9 @@ public class SubmissionService {
      * @throws AuthorizeException
      * @throws WorkflowException
      */
-    public XmlWorkflowItem createWorkflowItem(Context context, String requestUriListString)
+    public WorkflowItem createWorkflowItem(Context context, String requestUriListString)
             throws SQLException, AuthorizeException, WorkflowException {
-        XmlWorkflowItem wi = null;
+        WorkflowItem wi = null;
         if (StringUtils.isBlank(requestUriListString)) {
             throw new UnprocessableEntityException("Malformed body..." + requestUriListString);
         }
@@ -271,7 +271,7 @@ public class SubmissionService {
         return accessCondition;
     }
 
-    public void saveWorkflowItem(Context context, XmlWorkflowItem source) throws SQLException, AuthorizeException {
+    public void saveWorkflowItem(Context context, WorkflowItem source) throws SQLException, AuthorizeException {
         workflowItemService.update(context, source);
     }
 

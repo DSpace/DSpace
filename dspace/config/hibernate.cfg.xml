@@ -80,7 +80,7 @@
         <mapping class="org.dspace.xmlworkflow.storedcomponents.InProgressUser"/>
         <mapping class="org.dspace.xmlworkflow.storedcomponents.PoolTask"/>
         <mapping class="org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole"/>
-        <mapping class="org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem"/>
+        <mapping class="org.dspace.workflow.WorkflowItem"/>
 
         <mapping class="org.dspace.statistics.export.OpenURLTracker"/>
 

@@ -18,8 +18,8 @@ import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 
 /**
@@ -30,7 +30,7 @@ public class PoolTaskBuilder extends AbstractBuilder<PoolTask, PoolTaskService> 
 
     private WorkspaceItem workspaceItem;
 
-    private XmlWorkflowItem workflowItem;
+    private WorkflowItem workflowItem;
 
     private PoolTask poolTask;
 

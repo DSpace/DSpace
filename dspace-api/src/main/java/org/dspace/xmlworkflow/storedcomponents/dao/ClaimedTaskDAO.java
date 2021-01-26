@@ -13,8 +13,8 @@ import java.util.List;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 import org.dspace.eperson.EPerson;
+import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * Database Access Object interface class for the ClaimedTask object.
@@ -26,21 +26,21 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  */
 public interface ClaimedTaskDAO extends GenericDAO<ClaimedTask> {
 
-    public List<ClaimedTask> findByWorkflowItem(Context context, XmlWorkflowItem workflowItem) throws SQLException;
+    public List<ClaimedTask> findByWorkflowItem(Context context, WorkflowItem workflowItem) throws SQLException;
 
-    public ClaimedTask findByWorkflowItemAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson)
+    public ClaimedTask findByWorkflowItemAndEPerson(Context context, WorkflowItem workflowItem, EPerson ePerson)
         throws SQLException;
 
     public List<ClaimedTask> findByEperson(Context context, EPerson ePerson) throws SQLException;
 
-    public List<ClaimedTask> findByWorkflowItemAndStepId(Context context, XmlWorkflowItem workflowItem, String stepID)
+    public List<ClaimedTask> findByWorkflowItemAndStepId(Context context, WorkflowItem workflowItem, String stepID)
         throws SQLException;
 
     public ClaimedTask findByEPersonAndWorkflowItemAndStepIdAndActionId(Context context, EPerson ePerson,
-                                                                        XmlWorkflowItem workflowItem, String stepID,
+                                                                        WorkflowItem workflowItem, String stepID,
                                                                         String actionID) throws SQLException;
 
-    public List<ClaimedTask> findByWorkflowItemAndStepIdAndActionId(Context c, XmlWorkflowItem workflowItem,
+    public List<ClaimedTask> findByWorkflowItemAndStepIdAndActionId(Context c, WorkflowItem workflowItem,
                                                                     String stepID, String actionID) throws SQLException;
 
     public List<ClaimedTask> findByStep(Context context, String stepID) throws SQLException;

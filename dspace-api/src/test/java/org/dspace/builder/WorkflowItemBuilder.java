@@ -22,21 +22,21 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
-import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowItemService;
 
 /**
  * Builder to construct WorkflowItem objects
  *
  **/
-public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWorkflowItemService> {
+public class WorkflowItemBuilder extends AbstractBuilder<WorkflowItem, WorkflowItemService> {
 
     /** Keep a reference to the underlying Item for cleanup **/
     private Item item;
 
     private WorkspaceItem workspaceItem;
 
-    private XmlWorkflowItem workflowItem;
+    private WorkflowItem workflowItem;
 
     protected WorkflowItemBuilder(Context context) {
         super(context);
@@ -72,7 +72,7 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
     }
 
     @Override
-    public XmlWorkflowItem build() {
+    public WorkflowItem build() {
         try {
             workflowItem = workflowService.start(context, workspaceItem);
             workspaceItem = null;
@@ -86,7 +86,7 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
     }
 
     @Override
-    public void delete(Context c, XmlWorkflowItem dso) throws Exception {
+    public void delete(Context c, WorkflowItem dso) throws Exception {
         if (dso != null) {
             getService().delete(c, dso);
             item = null;
@@ -136,7 +136,7 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
     }
 
     @Override
-    protected XmlWorkflowItemService getService() {
+    protected WorkflowItemService getService() {
         return workflowItemService;
     }
 
@@ -223,7 +223,7 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
             throws SQLException, IOException, SearchServiceException {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
-            XmlWorkflowItem wi = workflowItemService.find(c, id);
+            WorkflowItem wi = workflowItemService.find(c, id);
             if (wi != null) {
                 try {
                     workflowItemService.delete(c, wi);

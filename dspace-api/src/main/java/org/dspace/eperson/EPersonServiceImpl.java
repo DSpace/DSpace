@@ -49,26 +49,17 @@ import org.dspace.versioning.dao.VersionDAO;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
+import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.WorkflowService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
-import org.dspace.workflowbasic.BasicWorkflowItem;
-import org.dspace.workflowbasic.BasicWorkflowServiceImpl;
-import org.dspace.workflowbasic.factory.BasicWorkflowServiceFactory;
-import org.dspace.workflowbasic.service.BasicWorkflowItemService;
-import org.dspace.workflowbasic.service.BasicWorkflowService;
-import org.dspace.workflowbasic.service.TaskListItemService;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
-import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
-import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
-import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -294,10 +285,6 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         if (constraintList.size() > 0) {
             // Check if the constraints we found should be deleted
             if (cascade) {
-                boolean isBasicFramework = WorkflowServiceFactory.getInstance().getWorkflowService()
-                                           instanceof BasicWorkflowService;
-                boolean isXmlFramework = WorkflowServiceFactory.getInstance().getWorkflowService()
-                                         instanceof XmlWorkflowService;
                 Iterator<String> constraintsIterator = constraintList.iterator();
 
                 while (constraintsIterator.hasNext()) {
@@ -334,23 +321,21 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
                                 itemService.update(context, item);
                             }
                         }
-                    } else if (StringUtils.equals(tableName, "cwf_claimtask") && isXmlFramework) {
+                    } else if (StringUtils.equals(tableName, "cwf_claimtask")) {
                          // Unclaim all XmlWorkflow tasks
-                        XmlWorkflowItemService xmlWorkflowItemService = XmlWorkflowServiceFactory
-                                                                        .getInstance().getXmlWorkflowItemService();
-                        ClaimedTaskService claimedTaskService = XmlWorkflowServiceFactory
+                        WorkflowItemService workflowItemService = WorkflowServiceFactory
+                                                                        .getInstance().getWorkflowItemService();
+                        ClaimedTaskService claimedTaskService = WorkflowServiceFactory
                                                                 .getInstance().getClaimedTaskService();
-                        XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory
-                                                                .getInstance().getXmlWorkflowService();
-                        WorkflowRequirementsService workflowRequirementsService = XmlWorkflowServiceFactory
+                        WorkflowService workflowService = WorkflowServiceFactory
+                                                                .getInstance().getWorkflowService();
+                        WorkflowRequirementsService workflowRequirementsService = WorkflowServiceFactory
                                                                        .getInstance().getWorkflowRequirementsService();
 
-                        List<XmlWorkflowItem> xmlWorkflowItems = xmlWorkflowItemService
-                                                                 .findBySubmitter(context, ePerson);
                         List<ClaimedTask> claimedTasks = claimedTaskService.findByEperson(context, ePerson);
 
                         for (ClaimedTask task : claimedTasks) {
-                            xmlWorkflowService.deleteClaimedTask(context, task.getWorkflowItem(), task);
+                            workflowService.deleteClaimedTask(context, task.getWorkflowItem(), task);
 
                             try {
                                 workflowRequirementsService.removeClaimedUser(context, task.getWorkflowItem(),
@@ -362,45 +347,15 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
                                                                                           .singletonList(tableName)));
                             }
                         }
-                    } else if (StringUtils.equals(tableName, "workflowitem") && isBasicFramework) {
-                        // Remove basicWorkflow workflowitem and unclaim them
-                        BasicWorkflowItemService basicWorkflowItemService = BasicWorkflowServiceFactory.getInstance()
-                                                                            .getBasicWorkflowItemService();
-                        BasicWorkflowService basicWorkflowService = BasicWorkflowServiceFactory.getInstance()
-                                                                    .getBasicWorkflowService();
-                        TaskListItemService taskListItemService = BasicWorkflowServiceFactory.getInstance()
-                                                                  .getTaskListItemService();
-                        List<BasicWorkflowItem> workflowItems = basicWorkflowItemService.findByOwner(context, ePerson);
-                        for (BasicWorkflowItem workflowItem : workflowItems) {
-                            int state = workflowItem.getState();
-                            // unclaim tasks that are in the pool.
-                            if (state == BasicWorkflowServiceImpl.WFSTATE_STEP1
-                                    || state == BasicWorkflowServiceImpl.WFSTATE_STEP2
-                                    || state == BasicWorkflowServiceImpl.WFSTATE_STEP3) {
-                                log.info(LogManager.getHeader(context, "unclaim_workflow",
-                                        "workflow_id=" + workflowItem.getID() + ", claiming EPerson is deleted"));
-                                basicWorkflowService.unclaim(context, workflowItem, context.getCurrentUser());
-                                // remove the EPerson from the list of persons that can (re-)claim the task
-                                // while we are doing it below, we must do this here as well as the previously
-                                // unclaimed tasks was put back into pool and we do not know the order the tables
-                                // are checked.
-                                taskListItemService.deleteByWorkflowItemAndEPerson(context, workflowItem, ePerson);
-                            }
-                        }
                     } else if (StringUtils.equals(tableName, "resourcepolicy")) {
                         // we delete the EPerson, it won't need any rights anymore.
                         authorizeService.removeAllEPersonPolicies(context, ePerson);
-                    } else if (StringUtils.equals(tableName, "tasklistitem") && isBasicFramework) {
-                        // remove EPerson from the list of EPersons that may claim some specific workflow tasks.
-                        TaskListItemService taskListItemService = BasicWorkflowServiceFactory.getInstance()
-                                                                  .getTaskListItemService();
-                        taskListItemService.deleteByEPerson(context, ePerson);
-                    } else if (StringUtils.equals(tableName, "cwf_pooltask") && isXmlFramework) {
-                        PoolTaskService poolTaskService = XmlWorkflowServiceFactory.getInstance().getPoolTaskService();
+                    } else if (StringUtils.equals(tableName, "cwf_pooltask")) {
+                        PoolTaskService poolTaskService = WorkflowServiceFactory.getInstance().getPoolTaskService();
                         poolTaskService.deleteByEperson(context, ePerson);
-                    } else if (StringUtils.equals(tableName, "cwf_workflowitemrole") && isXmlFramework) {
-                        WorkflowItemRoleService workflowItemRoleService = XmlWorkflowServiceFactory.getInstance()
-                                                                          .getWorkflowItemRoleService();
+                    } else if (StringUtils.equals(tableName, "cwf_workflowitemrole")) {
+                        WorkflowItemRoleService workflowItemRoleService = WorkflowServiceFactory.getInstance()
+                                .getWorkflowItemRoleService();
                         workflowItemRoleService.deleteByEPerson(context, ePerson);
                     } else {
                         log.warn("EPerson is referenced in table '" + tableName

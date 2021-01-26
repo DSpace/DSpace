@@ -40,8 +40,8 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
+import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -250,7 +250,7 @@ public class LoginAsEPersonIT extends AbstractControllerIntegrationTest {
                                            .withAuthor("Smith, Donald").withAuthor("Doe, John")
                                            .withSubject("ExtraEntry")
                                            .build();
-        XmlWorkflowItem witem = poolTask.getWorkflowItem();
+        WorkflowItem witem = poolTask.getWorkflowItem();
 
         context.restoreAuthSystemState();
 
