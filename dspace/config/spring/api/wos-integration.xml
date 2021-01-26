@@ -259,7 +259,7 @@
         <property name="prefixToNamespaceMapping" ref="wosNs"/>
     </bean>
     <bean id="wos.wosId" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier.other"/>
+        <constructor-arg value="dc.identifier.isi"/>
     </bean>
 
     <util:map id="contributorEditor2fields" map-class="java.util.HashMap"

@@ -137,11 +137,10 @@
     <bean id="wosLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="WosImportService"/>
         <property name="sourceIdentifier" value="wos"/>
-        <property name="recordIdMetadata" value="dc.identifier.other"/>
+        <property name="recordIdMetadata" value="dc.identifier.isi"/>
         <property name="supportedEntityTypes">
             <list>
                 <value>Publication</value>
-                <value>InstitutionPublication</value>
             </list>
         </property>
     </bean>
