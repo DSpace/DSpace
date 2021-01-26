@@ -14,6 +14,7 @@ import java.util.Set;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.indexobject.factory.IndexFactory;
@@ -21,6 +22,9 @@ import org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactory;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowItemService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 /**
  * Class for updating search indices in discovery from content events.
@@ -46,6 +50,9 @@ public class IndexEventConsumer implements Consumer {
                                                                      IndexingService.class);
 
     IndexObjectFactoryFactory indexObjectServiceFactory = IndexObjectFactoryFactory.getInstance();
+
+    private WorkflowItemService workflowItemService = WorkflowServiceFactory.getInstance().getWorkflowItemService();
+
 
     @Override
     public void initialize() throws Exception {
@@ -130,6 +137,14 @@ public class IndexEventConsumer implements Consumer {
                     }
                 } else {
                     log.debug("consume() adding event to update queue: " + event.toString());
+                    if (event.getSubjectType() == Constants.ITEM) {
+                        WorkflowItem workflowItem = workflowItemService.findByItem(ctx, (Item) subject);
+                        if (workflowItem != null) {
+                            String detail =
+                                    Constants.typeText[event.getSubjectType()] + "-" + event.getSubjectID().toString();
+                            uniqueIdsToDelete.add(detail);
+                        }
+                    }
                     objectsToUpdate.addAll(indexObjectServiceFactory.getIndexableObjects(ctx, subject));
                 }
                 break;
@@ -151,7 +166,7 @@ public class IndexEventConsumer implements Consumer {
                 if (event.getSubjectType() == -1 || event.getSubjectID() == null) {
                     log.warn("got null subject type and/or ID on DELETE event, skipping it.");
                 } else {
-                    String detail = event.getSubjectType() + "-" + event.getSubjectID().toString();
+                    String detail = Constants.typeText[event.getSubjectType()] + "-" + event.getSubjectID().toString();
                     log.debug("consume() adding event to delete queue: " + event.toString());
                     uniqueIdsToDelete.add(detail);
                 }
@@ -175,6 +190,16 @@ public class IndexEventConsumer implements Consumer {
     public void end(Context ctx) throws Exception {
 
         try {
+            for (String uid : uniqueIdsToDelete) {
+                try {
+                    indexer.unIndexContent(ctx, uid, false);
+                    if (log.isDebugEnabled()) {
+                        log.debug("UN-Indexed Item, handle=" + uid);
+                    }
+                } catch (Exception e) {
+                    log.error("Failed while UN-indexing object: " + uid, e);
+                }
+            }
             // update the changed Items not deleted because they were on create list
             for (IndexableObject iu : objectsToUpdate) {
                 /* we let all types through here and
@@ -183,7 +208,7 @@ public class IndexEventConsumer implements Consumer {
                  */
                 iu.setIndexedObject(ctx.reloadEntity(iu.getIndexedObject()));
                 String uniqueIndexID = iu.getUniqueIndexID();
-                if (uniqueIndexID != null && !uniqueIdsToDelete.contains(uniqueIndexID)) {
+                if (uniqueIndexID != null) {
                     try {
                         indexer.indexContent(ctx, iu, true, false);
                         log.debug("Indexed "
@@ -193,17 +218,6 @@ public class IndexEventConsumer implements Consumer {
                     } catch (Exception e) {
                         log.error("Failed while indexing object: ", e);
                     }
-                }
-            }
-
-            for (String uid : uniqueIdsToDelete) {
-                try {
-                    indexer.unIndexContent(ctx, uid, false);
-                    if (log.isDebugEnabled()) {
-                        log.debug("UN-Indexed Item, handle=" + uid);
-                    }
-                } catch (Exception e) {
-                    log.error("Failed while UN-indexing object: " + uid, e);
                 }
             }
         } finally {
