@@ -86,20 +86,14 @@ public class CrisLayoutTabRepository extends DSpaceRestRepository<CrisLayoutTabR
             @Parameter(value = "uuid", required = true) String itemUuid, Pageable pageable) {
         Context context = obtainContext();
         List<CrisLayoutTab> tabList = null;
-        Long totalRow = null;
         try {
             tabList = service.findByItem(
                 context,
                 itemUuid);
-            totalRow = Long.valueOf(tabList.size());
-            int lastIndex = (pageable.getPageNumber() + 1) * pageable.getPageSize();
-            tabList = tabList.subList(
-                    pageable.getPageNumber() * pageable.getPageSize(),
-                    (tabList.size() < lastIndex) ? tabList.size() : lastIndex );
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        return converter.toRestPage(tabList, pageable, totalRow, utils.obtainProjection());
+        return converter.toRestPage(tabList, pageable, utils.obtainProjection());
     }
 
     @SearchRestMethod(name = "findByEntityType")

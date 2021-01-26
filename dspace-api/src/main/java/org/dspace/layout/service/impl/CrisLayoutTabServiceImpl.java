@@ -198,9 +198,11 @@ public class CrisLayoutTabServiceImpl implements CrisLayoutTabService {
                                            "The itemUuid entered does not match with any item");
 
         String entityType  = itemService.getMetadata(item, "relationship.type");
-
+        if (entityType == null) {
+            return Collections.emptyList();
+        }
         List<CrisLayoutTab> tabs = dao.findByEntityType(context, entityType);
-        if (CollectionUtils.isEmpty(tabs) || CollectionUtils.isEmpty(item.getMetadata())) {
+        if (CollectionUtils.isEmpty(tabs)) {
             return Collections.emptyList();
         }
 

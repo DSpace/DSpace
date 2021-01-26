@@ -35,4 +35,12 @@ public interface CrisSecurityService {
      * @throws SQLException is an SQL error occurs
      */
     boolean hasAccess(Context context, Item item, EPerson user, AccessItemMode accessMode) throws SQLException;
+
+    /**
+     * Returns true if the given eperson is the owner of item, false otherwise
+     * @param  item
+     * @param  eperson
+     * @return         true if the given eperson is the owner, false otherwise
+     */
+    boolean isOwner(EPerson eperson, Item item);
 }

@@ -18,6 +18,7 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.security.service.CrisSecurityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -35,14 +36,17 @@ public class LayoutSecurityServiceImpl implements LayoutSecurityService {
     private final AuthorizeService authorizeService;
     private final ItemService itemService;
     private final GroupService groupService;
+    private final CrisSecurityService crisSecurityService;
 
     @Autowired
     public LayoutSecurityServiceImpl(AuthorizeService authorizeService,
                                      ItemService itemService,
-                                     final GroupService groupService) {
+                                     final GroupService groupService,
+                                     CrisSecurityService crisSecurityService) {
         this.authorizeService = authorizeService;
         this.itemService = itemService;
         this.groupService = groupService;
+        this.crisSecurityService = crisSecurityService;
     }
 
 
@@ -54,13 +58,13 @@ public class LayoutSecurityServiceImpl implements LayoutSecurityService {
             case PUBLIC:
                 return true;
             case OWNER_ONLY:
-                return isOwner(user, item);
+                return crisSecurityService.isOwner(user, item);
             case CUSTOM_DATA:
                 return customDataGrantAccess(context, user, metadataSecurityFields, item);
             case ADMINISTRATOR:
                 return authorizeService.isAdmin(context);
             case OWNER_AND_ADMINISTRATOR:
-                return authorizeService.isAdmin(context) || isOwner(user, item);
+                return authorizeService.isAdmin(context) || crisSecurityService.isOwner(user, item);
             default:
                 return false;
         }
@@ -107,10 +111,4 @@ public class LayoutSecurityServiceImpl implements LayoutSecurityService {
         }
     }
 
-    private boolean isOwner(EPerson currentUser, Item item) {
-        String uuidOwner = itemService.getMetadataFirstValue(item, "cris", "owner", null, Item.ANY);
-
-        return Optional.ofNullable(uuidOwner).map(ownerId -> ownerId.equals(currentUser.getID().toString()))
-                       .orElse(false);
-    }
 }

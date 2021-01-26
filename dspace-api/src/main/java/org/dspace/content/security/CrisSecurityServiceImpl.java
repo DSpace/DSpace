@@ -10,10 +10,13 @@ package org.dspace.content.security;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.security.service.CrisSecurityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
@@ -38,20 +41,19 @@ public class CrisSecurityServiceImpl implements CrisSecurityService {
     @Override
     public boolean hasAccess(Context context, Item item, EPerson user, AccessItemMode accessMode)
         throws SQLException {
-        boolean isOwner = isOwner(item, user);
+        boolean isOwner = isOwner(user, item);
         boolean isAdmin = authorizeService.isAdmin(context, user);
         return hasAccess(context, item, user, isOwner, isAdmin, accessMode);
     }
 
-    /**
-     * Returns true if the given eperson is the owner of item, false otherwise
-     * @param  item
-     * @param  eperson
-     * @return         true if the given eperson is the owner, false otherwise
-     */
-    private boolean isOwner(Item item, EPerson eperson) {
-        return itemService.getMetadata(item, "cris", "owner", null, Item.ANY).stream()
-            .anyMatch(value -> eperson.getID().toString().equals(value.getAuthority()));
+    @Override
+    public boolean isOwner(EPerson eperson, Item item) {
+        if (eperson == null) {
+            return false;
+        }
+        List<MetadataValue> owners = itemService.getMetadataByMetadataString(item, "cris.owner");
+        Predicate<MetadataValue> checkOwner = v -> StringUtils.equals(v.getAuthority(), eperson.getID().toString());
+        return owners.stream().anyMatch(checkOwner);
     }
 
     private boolean hasAccess(Context context, Item item, EPerson user, boolean isOwner,
@@ -87,7 +89,7 @@ public class CrisSecurityServiceImpl implements CrisSecurityService {
     private boolean hasAccessByGroup(Context context, Item item, EPerson user, List<String> groups)
         throws SQLException {
 
-        if (CollectionUtils.isEmpty(groups)) {
+        if (user == null || CollectionUtils.isEmpty(groups)) {
             return false;
         }
 
@@ -109,7 +111,7 @@ public class CrisSecurityServiceImpl implements CrisSecurityService {
 
     private boolean hasAccessByUser(Context context, Item item, EPerson user, List<String> users) throws SQLException {
 
-        if (CollectionUtils.isEmpty(users)) {
+        if (user == null || CollectionUtils.isEmpty(users)) {
             return false;
         }
 
