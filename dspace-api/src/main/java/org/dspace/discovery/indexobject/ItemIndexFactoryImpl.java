@@ -64,8 +64,8 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.MultiFormatDateParser;
 import org.dspace.util.SolrUtils;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
-import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -91,7 +91,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
     @Autowired
     protected WorkspaceItemService workspaceItemService;
     @Autowired
-    protected XmlWorkflowItemService xmlWorkflowItemService;
+    protected WorkflowItemService workflowItemService;
     @Autowired
     protected WorkflowItemIndexFactory workflowItemIndexFactory;
     @Autowired
@@ -718,9 +718,9 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                 results.addAll(workspaceItemIndexFactory.getIndexableObjects(context, workspaceItem));
             } else {
                 // Check if we a workflow item
-                final XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemService.findByItem(context, object);
-                if (xmlWorkflowItem != null) {
-                    results.addAll(workflowItemIndexFactory.getIndexableObjects(context, xmlWorkflowItem));
+                final WorkflowItem workflowItem = workflowItemService.findByItem(context, object);
+                if (workflowItem != null) {
+                    results.addAll(workflowItemIndexFactory.getIndexableObjects(context, workflowItem));
                 }
             }
         }

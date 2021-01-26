@@ -53,17 +53,17 @@ die "Cannot find dspace directory tree $dspace_dir - edit dspace-info.pl 'dspace
 
 # count DSpace objects ######################
 
-my $bitstream_count     = CountRows( "bitstream"     );
-my $bundle_count        = CountRows( "bundle"        );
-my $collection_count    = CountRows( "collection"    );
-my $community_count     = CountRows( "community"     );
-my $dcvalue_count       = CountRows( "dcvalue"       );
-my $eperson_count       = CountRows( "eperson"       );
-my $item_count          = CountRows( "item"          );
-my $handle_count        = CountRows( "handle"        );
-my $group_count         = CountRows( "epersongroup"  );
-my $workflowitem_count  = CountRows( "workflowitem"  );
-my $workspaceitem_count = CountRows( "workspaceitem" );
+my $bitstream_count     = CountRows( "bitstream"       );
+my $bundle_count        = CountRows( "bundle"          );
+my $collection_count    = CountRows( "collection"      );
+my $community_count     = CountRows( "community"       );
+my $dcvalue_count       = CountRows( "dcvalue"         );
+my $eperson_count       = CountRows( "eperson"         );
+my $item_count          = CountRows( "item"            );
+my $handle_count        = CountRows( "handle"          );
+my $group_count         = CountRows( "epersongroup"    );
+my $workflowitem_count  = CountRows( "cwf_workflowitem");
+my $workspaceitem_count = CountRows( "workspaceitem"   );
 
 # find sizes of dspace directories ##########
 

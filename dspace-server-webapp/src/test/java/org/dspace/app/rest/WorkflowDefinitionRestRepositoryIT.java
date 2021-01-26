@@ -27,8 +27,8 @@ import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
-import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -42,7 +42,7 @@ import org.junit.Test;
 public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     private final XmlWorkflowFactory xmlWorkflowFactory
-            = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory();
+            = WorkflowServiceFactory.getInstance().getWorkflowFactory();
 
     private static final String WORKFLOW_DEFINITIONS_ENDPOINT
         = "/api/" + WorkflowDefinitionRest.CATEGORY + "/" + WorkflowDefinitionRest.NAME_PLURAL;

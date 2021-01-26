@@ -20,8 +20,8 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
+import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +72,7 @@ public class PoolTaskRestPermissionEvaluatorPlugin extends RestObjectPermissionE
                 return true;
             }
 
-            XmlWorkflowItem workflowItem = poolTask.getWorkflowItem();
+            WorkflowItem workflowItem = poolTask.getWorkflowItem();
 
             PoolTask poolTask2 = poolTaskService.findByWorkflowIdAndEPerson(context, workflowItem, ePerson);
             if (poolTask2 != null && poolTask2.getID().equals(poolTask.getID())) {

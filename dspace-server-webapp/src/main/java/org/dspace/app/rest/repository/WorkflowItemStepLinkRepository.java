@@ -16,13 +16,13 @@ import org.dspace.app.rest.model.WorkflowItemRest;
 import org.dspace.app.rest.model.WorkflowStepRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.core.Context;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowItemService;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
-import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
 public class WorkflowItemStepLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
     @Autowired
-    private XmlWorkflowItemService xmlWorkflowItemService;
+    private WorkflowItemService workflowItemService;
 
     @Autowired
     private PoolTaskService poolTaskService;
@@ -63,12 +63,12 @@ public class WorkflowItemStepLinkRepository extends AbstractDSpaceRestRepository
 
         Context context = obtainContext();
         try {
-            XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemService.find(context, workflowItemId);
-            if (xmlWorkflowItem == null) {
-                throw new ResourceNotFoundException("XmlWorkflowItem with id: " + workflowItemId + " wasn't found");
+            WorkflowItem workflowItem = workflowItemService.find(context, workflowItemId);
+            if (workflowItem == null) {
+                throw new ResourceNotFoundException("WorkflowItem with id: " + workflowItemId + " wasn't found");
             }
-            List<PoolTask> poolTasks = poolTaskService.find(context, xmlWorkflowItem);
-            List<ClaimedTask> claimedTasks = claimedTaskService.find(context, xmlWorkflowItem);
+            List<PoolTask> poolTasks = poolTaskService.find(context, workflowItem);
+            List<ClaimedTask> claimedTasks = claimedTaskService.find(context, workflowItem);
             for (PoolTask poolTask : poolTasks) {
                 return converter.toRest(xmlWorkflowFactory.getStepByName(poolTask.getStepID()), projection);
             }

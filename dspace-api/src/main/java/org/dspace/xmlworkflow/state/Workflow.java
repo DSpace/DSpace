@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.dspace.core.Context;
+import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.Role;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -55,7 +55,7 @@ public class Workflow implements BeanNameAware {
         throw new WorkflowConfigurationException("Step definition not found for: " + stepID);
     }
 
-    public Step getNextStep(Context context, XmlWorkflowItem wfi, Step currentStep, int outcome)
+    public Step getNextStep(Context context, WorkflowItem wfi, Step currentStep, int outcome)
         throws WorkflowConfigurationException, SQLException {
         Step nextStep = currentStep.getNextStep(outcome);
         if (nextStep != null) {

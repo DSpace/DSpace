@@ -35,7 +35,7 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
-import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
 import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
 
@@ -566,7 +566,7 @@ public class AuthorizeUtil {
     public static void authorizeManageGroup(Context context, Group group) throws SQLException, AuthorizeException {
         AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-        CollectionRoleService collectionRoleService = XmlWorkflowServiceFactory.getInstance()
+        CollectionRoleService collectionRoleService = WorkflowServiceFactory.getInstance()
                                                                                .getCollectionRoleService();
         if (authorizeService.isAdmin(context)) {
             return;

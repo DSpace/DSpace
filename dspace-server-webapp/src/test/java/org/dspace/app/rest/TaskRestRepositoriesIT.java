@@ -45,12 +45,12 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
+import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -290,21 +290,21 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         context.setCurrentUser(submitter);
 
         //5. our workflow items
-        XmlWorkflowItem witem1 = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        WorkflowItem witem1 = WorkflowItemBuilder.createWorkflowItem(context, col1)
                 .withTitle("Workflow Item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withSubject("ExtraEntry")
                 .build();
 
-        XmlWorkflowItem witem2 = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        WorkflowItem witem2 = WorkflowItemBuilder.createWorkflowItem(context, col1)
                 .withTitle("Workflow Item 2")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withSubject("ExtraEntry")
                 .build();
 
-        XmlWorkflowItem witem3 = WorkflowItemBuilder.createWorkflowItem(context, col2)
+        WorkflowItem witem3 = WorkflowItemBuilder.createWorkflowItem(context, col2)
                 .withTitle("Workflow Item 3")
                 .withIssueDate("2017-10-18")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
@@ -434,21 +434,21 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         context.setCurrentUser(submitter);
 
         //5. our workflow items
-        XmlWorkflowItem witem1 = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        WorkflowItem witem1 = WorkflowItemBuilder.createWorkflowItem(context, col1)
                 .withTitle("Workflow Item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withSubject("ExtraEntry")
                 .build();
 
-        XmlWorkflowItem witem2 = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        WorkflowItem witem2 = WorkflowItemBuilder.createWorkflowItem(context, col1)
                 .withTitle("Workflow Item 2")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withSubject("ExtraEntry")
                 .build();
 
-        XmlWorkflowItem witem3 = WorkflowItemBuilder.createWorkflowItem(context, col2)
+        WorkflowItem witem3 = WorkflowItemBuilder.createWorkflowItem(context, col2)
                 .withTitle("Workflow Item 3")
                 .withIssueDate("2017-10-18")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
@@ -566,7 +566,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withSubject("ExtraEntry")
                 .build();
-        XmlWorkflowItem witem = poolTask.getWorkflowItem();
+        WorkflowItem witem = poolTask.getWorkflowItem();
 
         context.restoreAuthSystemState();
 
@@ -640,7 +640,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withSubject("ExtraEntry")
                 .build();
-        XmlWorkflowItem witem = poolTask.getWorkflowItem();
+        WorkflowItem witem = poolTask.getWorkflowItem();
 
         context.restoreAuthSystemState();
 
@@ -703,7 +703,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withSubject("ExtraEntry")
                 .build();
-        XmlWorkflowItem witem = poolTask.getWorkflowItem();
+        WorkflowItem witem = poolTask.getWorkflowItem();
 
         context.restoreAuthSystemState();
 
@@ -768,7 +768,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withSubject("ExtraEntry")
                 .build();
-        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
+        WorkflowItem witem = claimedTask.getWorkflowItem();
 
         context.restoreAuthSystemState();
 
@@ -833,7 +833,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withSubject("ExtraEntry")
                 .build();
-        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
+        WorkflowItem witem = claimedTask.getWorkflowItem();
 
         context.restoreAuthSystemState();
 
@@ -892,7 +892,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withSubject("ExtraEntry")
                 .build();
-        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
+        WorkflowItem witem = claimedTask.getWorkflowItem();
 
         context.restoreAuthSystemState();
 
@@ -948,7 +948,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withSubject("ExtraEntry")
                 .build();
-        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
+        WorkflowItem witem = claimedTask.getWorkflowItem();
 
         context.restoreAuthSystemState();
 
@@ -1014,7 +1014,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withSubject("ExtraEntry")
                 .build();
-        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
+        WorkflowItem witem = claimedTask.getWorkflowItem();
 
         context.restoreAuthSystemState();
 
@@ -1201,9 +1201,9 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .withSubject("ExtraEntry3")
                 .build();
 
-        XmlWorkflowItem witem1 = claimedTask1.getWorkflowItem();
-        XmlWorkflowItem witem2 = claimedTask2.getWorkflowItem();
-        XmlWorkflowItem witem3 = claimedTask3.getWorkflowItem();
+        WorkflowItem witem1 = claimedTask1.getWorkflowItem();
+        WorkflowItem witem2 = claimedTask2.getWorkflowItem();
+        WorkflowItem witem3 = claimedTask3.getWorkflowItem();
 
         context.restoreAuthSystemState();
 
@@ -1340,9 +1340,9 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .withSubject("ExtraEntry3")
                 .build();
 
-        XmlWorkflowItem witem1 = claimedTask1.getWorkflowItem();
-        XmlWorkflowItem witem2 = claimedTask2.getWorkflowItem();
-        XmlWorkflowItem witem3 = claimedTask3.getWorkflowItem();
+        WorkflowItem witem1 = claimedTask1.getWorkflowItem();
+        WorkflowItem witem2 = claimedTask2.getWorkflowItem();
+        WorkflowItem witem3 = claimedTask3.getWorkflowItem();
 
         context.restoreAuthSystemState();
 
@@ -1407,7 +1407,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withSubject("ExtraEntry")
                 .build();
-        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
+        WorkflowItem witem = claimedTask.getWorkflowItem();
         Item item = witem.getItem();
 
         context.restoreAuthSystemState();
@@ -1483,7 +1483,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withSubject("ExtraEntry")
                 .build();
-        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
+        WorkflowItem witem = claimedTask.getWorkflowItem();
         Item item = witem.getItem();
 
         context.restoreAuthSystemState();
@@ -1548,7 +1548,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withSubject("ExtraEntry")
                 .build();
-        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
+        WorkflowItem witem = claimedTask.getWorkflowItem();
         Item item = witem.getItem();
 
         context.restoreAuthSystemState();
@@ -1657,7 +1657,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withSubject("ExtraEntry")
                 .build();
-        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
+        WorkflowItem witem = claimedTask.getWorkflowItem();
         Item item = witem.getItem();
 
         context.restoreAuthSystemState();
@@ -1726,7 +1726,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withSubject("ExtraEntry")
                 .build();
-        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
+        WorkflowItem witem = claimedTask.getWorkflowItem();
         Item item = witem.getItem();
 
         context.restoreAuthSystemState();
@@ -1800,7 +1800,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         context.setCurrentUser(submitter);
 
         //3. create a workflowitem (so a pool task in step1)
-        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        WorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
                         .withTitle("Test item full workflow")
                         .withIssueDate("2019-03-06")
                         .withSubject("ExtraEntry")
@@ -2029,7 +2029,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         context.setCurrentUser(submitter);
 
         //3. create a workflowitem (so a pool task in step1)
-        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        WorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
             .withTitle("Test item full workflow")
             .withIssueDate("2019-03-06")
             .withSubject("ExtraEntry")
@@ -2051,7 +2051,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
                 Matchers.allOf(
                     Matchers.is(PoolTaskMatcher.matchPoolTask(null, "reviewstep")),
-                    hasJsonPath("$._embedded.workflowitem",
+                        hasJsonPath("$._embedded.workflowitem",
                         Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
                 ))))
@@ -2074,7 +2074,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 Matchers.allOf(
                     hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
                     hasJsonPath("$.type", Matchers.is("claimedtask")),
-                    hasJsonPath("$._embedded.workflowitem",
+                        hasJsonPath("$._embedded.workflowitem",
                         Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
                 ))))
@@ -2144,7 +2144,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         context.setCurrentUser(submitter);
 
         //3. create a workflowitem (so a pool task in step1)
-        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        WorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
             .withTitle("Test item full workflow")
             .withIssueDate("2019-03-06")
             .withSubject("ExtraEntry")
@@ -2163,7 +2163,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
                 Matchers.allOf(
                     Matchers.is(PoolTaskMatcher.matchPoolTask(null, "reviewstep")),
-                    hasJsonPath("$._embedded.workflowitem",
+                        hasJsonPath("$._embedded.workflowitem",
                         Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
                 ))))
@@ -2186,7 +2186,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 Matchers.allOf(
                     hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
                     hasJsonPath("$.type", Matchers.is("claimedtask")),
-                    hasJsonPath("$._embedded.workflowitem",
+                        hasJsonPath("$._embedded.workflowitem",
                         Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
                 ))))
@@ -2243,7 +2243,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         context.setCurrentUser(submitter);
 
         //3. create a workflowitem (so a pool task in step1)
-        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        WorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
             .withTitle("Test item full workflow")
             .withIssueDate("2019-03-06")
             .withSubject("ExtraEntry")
@@ -2265,7 +2265,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
                 Matchers.allOf(
                     Matchers.is(PoolTaskMatcher.matchPoolTask(null, "editstep")),
-                    hasJsonPath("$._embedded.workflowitem",
+                        hasJsonPath("$._embedded.workflowitem",
                         Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
                 ))))
@@ -2288,7 +2288,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 Matchers.allOf(
                     hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
                     hasJsonPath("$.type", Matchers.is("claimedtask")),
-                    hasJsonPath("$._embedded.workflowitem",
+                        hasJsonPath("$._embedded.workflowitem",
                         Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
                 ))))
@@ -2356,7 +2356,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         context.setCurrentUser(submitter);
 
         //3. create a workflowitem (so a pool task in step1)
-        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        WorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
             .withTitle("Test item full workflow")
             .withIssueDate("2019-03-06")
             .withSubject("ExtraEntry")
@@ -2378,7 +2378,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
                 Matchers.allOf(
                     Matchers.is(PoolTaskMatcher.matchPoolTask(null, "editstep")),
-                    hasJsonPath("$._embedded.workflowitem",
+                        hasJsonPath("$._embedded.workflowitem",
                         Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
                 ))))
@@ -2401,7 +2401,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 Matchers.allOf(
                     hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
                     hasJsonPath("$.type", Matchers.is("claimedtask")),
-                    hasJsonPath("$._embedded.workflowitem",
+                        hasJsonPath("$._embedded.workflowitem",
                         Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
                 ))))
@@ -2464,7 +2464,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         context.setCurrentUser(submitter);
 
         //3. create a workflowitem (so a pool task in step1)
-        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        WorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
             .withTitle("Test item full workflow")
             .withIssueDate("2019-03-06")
             .withSubject("ExtraEntry")
@@ -2486,7 +2486,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
                 Matchers.allOf(
                     Matchers.is(PoolTaskMatcher.matchPoolTask(null, "finaleditstep")),
-                    hasJsonPath("$._embedded.workflowitem",
+                        hasJsonPath("$._embedded.workflowitem",
                         Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
                 ))))
@@ -2509,7 +2509,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 Matchers.allOf(
                     hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
                     hasJsonPath("$.type", Matchers.is("claimedtask")),
-                    hasJsonPath("$._embedded.workflowitem",
+                        hasJsonPath("$._embedded.workflowitem",
                         Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
                 ))))
@@ -2572,7 +2572,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         context.setCurrentUser(submitter);
 
         //3. create a workflowitem (so a pool task in step1)
-        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        WorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
             .withTitle("Test item full workflow")
             .withIssueDate("2019-03-06")
             .withSubject("ExtraEntry")
@@ -2594,7 +2594,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
                 Matchers.allOf(
                     Matchers.is(PoolTaskMatcher.matchPoolTask(null, "finaleditstep")),
-                    hasJsonPath("$._embedded.workflowitem",
+                        hasJsonPath("$._embedded.workflowitem",
                         Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
                 ))))
@@ -2617,7 +2617,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 Matchers.allOf(
                     hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
                     hasJsonPath("$.type", Matchers.is("claimedtask")),
-                    hasJsonPath("$._embedded.workflowitem",
+                        hasJsonPath("$._embedded.workflowitem",
                         Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
                 ))))
@@ -2670,7 +2670,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         context.setCurrentUser(submitter);
 
         //3. create a workflowitem (so a pool task in step1)
-        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        WorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
             .withTitle("Test item full workflow")
             .withIssueDate("2019-03-06")
             .withSubject("ExtraEntry")
@@ -2692,7 +2692,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
                 Matchers.allOf(
                     Matchers.is(PoolTaskMatcher.matchPoolTask(null, "finaleditstep")),
-                    hasJsonPath("$._embedded.workflowitem",
+                        hasJsonPath("$._embedded.workflowitem",
                         Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
                 ))))
@@ -2715,7 +2715,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 Matchers.allOf(
                     hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
                     hasJsonPath("$.type", Matchers.is("claimedtask")),
-                    hasJsonPath("$._embedded.workflowitem",
+                        hasJsonPath("$._embedded.workflowitem",
                         Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
                 ))))
@@ -2782,7 +2782,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .withAuthor("Smith, Donald").withAuthor("Doe, John")
             .withSubject("ExtraEntry")
             .build();
-        XmlWorkflowItem witem = poolTask.getWorkflowItem();
+        WorkflowItem witem = poolTask.getWorkflowItem();
         poolTask.setStepID("editstep");
         poolTask.setActionID("editaction");
 
@@ -2835,7 +2835,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         context.setCurrentUser(submitter);
 
         //3. create a workflowitem (so a pool task in step1)
-        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        WorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
             .withTitle("Test item full workflow")
             .withIssueDate("2019-03-06")
             .withSubject("ExtraEntry")
@@ -2854,7 +2854,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
                 Matchers.allOf(
                     Matchers.is(PoolTaskMatcher.matchPoolTask(null, "editstep")),
-                    hasJsonPath("$._embedded.workflowitem",
+                        hasJsonPath("$._embedded.workflowitem",
                         Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
                 ))))
@@ -2924,7 +2924,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .build();
         claimedTask.setStepID("reviewstep");
         claimedTask.setActionID("reviewaction");
-        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
+        WorkflowItem witem = claimedTask.getWorkflowItem();
 
         context.restoreAuthSystemState();
 
@@ -2982,7 +2982,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         context.setCurrentUser(submitter);
 
         //3. create a workflowitem (so a pool task in step1)
-        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        WorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
             .withTitle("Test item full workflow")
             .withIssueDate("2019-03-06")
             .withSubject("ExtraEntry")
@@ -3001,7 +3001,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
                 Matchers.allOf(
                     Matchers.is(PoolTaskMatcher.matchPoolTask(null, "reviewstep")),
-                    hasJsonPath("$._embedded.workflowitem",
+                        hasJsonPath("$._embedded.workflowitem",
                         Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
                 ))))
@@ -3076,7 +3076,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .build();
         claimedTask.setStepID("editstep");
         claimedTask.setActionID("editaction");
-        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
+        WorkflowItem witem = claimedTask.getWorkflowItem();
 
         context.restoreAuthSystemState();
         String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);

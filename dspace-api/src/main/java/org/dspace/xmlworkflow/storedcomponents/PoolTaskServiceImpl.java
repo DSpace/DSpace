@@ -21,6 +21,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.dao.PoolTaskDAO;
 import org.dspace.xmlworkflow.storedcomponents.service.InProgressUserService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
@@ -67,7 +68,7 @@ public class PoolTaskServiceImpl implements PoolTaskService {
         for (Group group : groups) {
             List<PoolTask> groupTasks = poolTaskDAO.findByGroup(context, group);
             for (PoolTask poolTask : groupTasks) {
-                XmlWorkflowItem workflowItem = poolTask.getWorkflowItem();
+                WorkflowItem workflowItem = poolTask.getWorkflowItem();
                 if (inProgressUserService.findByWorkflowItemAndEPerson(context, workflowItem, ePerson) == null) {
                     result.add(poolTask);
                 }
@@ -78,12 +79,12 @@ public class PoolTaskServiceImpl implements PoolTaskService {
 
 
     @Override
-    public List<PoolTask> find(Context context, XmlWorkflowItem workflowItem) throws SQLException {
+    public List<PoolTask> find(Context context, WorkflowItem workflowItem) throws SQLException {
         return poolTaskDAO.findByWorkflowItem(context, workflowItem);
     }
 
     @Override
-    public PoolTask findByWorkflowIdAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson)
+    public PoolTask findByWorkflowIdAndEPerson(Context context, WorkflowItem workflowItem, EPerson ePerson)
         throws SQLException, AuthorizeException, IOException {
         PoolTask poolTask = poolTaskDAO.findByWorkflowItemAndEPerson(context, workflowItem, ePerson);
 
@@ -113,9 +114,9 @@ public class PoolTaskServiceImpl implements PoolTaskService {
     }
 
     @Override
-    public void deleteByWorkflowItem(Context context, XmlWorkflowItem xmlWorkflowItem)
+    public void deleteByWorkflowItem(Context context, WorkflowItem workflowItem)
         throws SQLException, AuthorizeException {
-        List<PoolTask> tasks = find(context, xmlWorkflowItem);
+        List<PoolTask> tasks = find(context, workflowItem);
         //Use an iterator to remove the tasks !
         Iterator<PoolTask> iterator = tasks.iterator();
         while (iterator.hasNext()) {

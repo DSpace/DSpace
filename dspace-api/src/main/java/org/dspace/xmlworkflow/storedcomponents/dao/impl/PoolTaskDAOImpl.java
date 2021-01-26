@@ -17,9 +17,9 @@ import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask_;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.dao.PoolTaskDAO;
 
 /**
@@ -56,7 +56,7 @@ public class PoolTaskDAOImpl extends AbstractHibernateDAO<PoolTask> implements P
     }
 
     @Override
-    public List<PoolTask> findByWorkflowItem(Context context, XmlWorkflowItem workflowItem) throws SQLException {
+    public List<PoolTask> findByWorkflowItem(Context context, WorkflowItem workflowItem) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, PoolTask.class);
         Root<PoolTask> poolTaskRoot = criteriaQuery.from(PoolTask.class);
@@ -66,7 +66,7 @@ public class PoolTaskDAOImpl extends AbstractHibernateDAO<PoolTask> implements P
     }
 
     @Override
-    public PoolTask findByWorkflowItemAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson)
+    public PoolTask findByWorkflowItemAndEPerson(Context context, WorkflowItem workflowItem, EPerson ePerson)
         throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, PoolTask.class);
@@ -81,7 +81,7 @@ public class PoolTaskDAOImpl extends AbstractHibernateDAO<PoolTask> implements P
     }
 
     @Override
-    public PoolTask findByWorkflowItemAndGroup(Context context, Group group, XmlWorkflowItem workflowItem)
+    public PoolTask findByWorkflowItemAndGroup(Context context, Group group, WorkflowItem workflowItem)
         throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, PoolTask.class);

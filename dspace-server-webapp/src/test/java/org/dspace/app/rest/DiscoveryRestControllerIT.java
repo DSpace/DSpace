@@ -52,8 +52,8 @@ import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -3244,7 +3244,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         WorkspaceItem wsItem2 = WorkspaceItemBuilder.createWorkspaceItem(context, col2).withTitle("Workspace Item 2")
                 .build();
 
-        XmlWorkflowItem wfItem1 = WorkflowItemBuilder.createWorkflowItem(context, col2).withTitle("Workflow Item 1")
+        WorkflowItem wfItem1 = WorkflowItemBuilder.createWorkflowItem(context, col2).withTitle("Workflow Item 1")
                 .build();
 
         // 4. a claimed task from the administrator
@@ -3259,7 +3259,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         WorkspaceItem wsItem2Admin = WorkspaceItemBuilder.createWorkspaceItem(context, col2)
                 .withTitle("Admin Workspace Item 2").build();
 
-        XmlWorkflowItem wfItem1Admin = WorkflowItemBuilder.createWorkflowItem(context, col2)
+        WorkflowItem wfItem1Admin = WorkflowItemBuilder.createWorkflowItem(context, col2)
                 .withTitle("Admin Workflow Item 1").build();
 
         context.restoreAuthSystemState();
@@ -3380,7 +3380,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withIssueDate("2010-11-03")
                 .build();
 
-        XmlWorkflowItem wfItem1 = WorkflowItemBuilder.createWorkflowItem(context, col2).withTitle("Workflow Item 1")
+        WorkflowItem wfItem1 = WorkflowItemBuilder.createWorkflowItem(context, col2).withTitle("Workflow Item 1")
                 .withIssueDate("2010-11-03")
                 .build();
 
@@ -3399,7 +3399,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withIssueDate("2010-11-03")
                 .withTitle("Admin Workspace Item 2").build();
 
-        XmlWorkflowItem wfItem1Admin = WorkflowItemBuilder.createWorkflowItem(context, col2)
+        WorkflowItem wfItem1Admin = WorkflowItemBuilder.createWorkflowItem(context, col2)
                 .withIssueDate("2010-11-03")
                 .withTitle("Admin Workflow Item 1").build();
 
@@ -3583,7 +3583,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withIssueDate("2010-11-03")
                 .build();
 
-        XmlWorkflowItem wfItem1 = WorkflowItemBuilder.createWorkflowItem(context, col2).withTitle("Workflow Item 1")
+        WorkflowItem wfItem1 = WorkflowItemBuilder.createWorkflowItem(context, col2).withTitle("Workflow Item 1")
                 .withIssueDate("2010-11-03")
                 .build();
 
@@ -3602,7 +3602,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withIssueDate("2010-11-03")
                 .withTitle("Admin Workspace Item 2").build();
 
-        XmlWorkflowItem wfItem1Admin = WorkflowItemBuilder.createWorkflowItem(context, col2)
+        WorkflowItem wfItem1Admin = WorkflowItemBuilder.createWorkflowItem(context, col2)
                 .withIssueDate("2010-11-03")
                 .withTitle("Admin Workflow Item 1").build();
 
@@ -3853,7 +3853,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withIssueDate("2010-11-03")
                 .build();
 
-        XmlWorkflowItem wfItem1 = WorkflowItemBuilder.createWorkflowItem(context, col2).withTitle("Workflow Item 1")
+        WorkflowItem wfItem1 = WorkflowItemBuilder.createWorkflowItem(context, col2).withTitle("Workflow Item 1")
                 .withIssueDate("2010-11-03")
                 .build();
 
@@ -3872,7 +3872,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withIssueDate("2010-11-03")
                 .withTitle("Admin Workspace Item 2").build();
 
-        XmlWorkflowItem wfItem1Admin = WorkflowItemBuilder.createWorkflowItem(context, col2)
+        WorkflowItem wfItem1Admin = WorkflowItemBuilder.createWorkflowItem(context, col2)
                 .withIssueDate("2010-11-03")
                 .withTitle("Admin Workflow Item 1").build();
 

@@ -17,17 +17,17 @@ import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowItemService;
+import org.dspace.workflow.WorkflowService;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
-import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.storedcomponents.InProgressUser;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.InProgressUserService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
-import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -52,22 +52,22 @@ public class WorkflowRequirementsServiceImpl implements WorkflowRequirementsServ
     @Autowired(required = true)
     protected XmlWorkflowFactory workflowFactory;
     @Autowired(required = true)
-    protected XmlWorkflowItemService xmlWorkflowItemService;
+    protected WorkflowItemService workflowItemService;
     @Autowired(required = true)
-    protected XmlWorkflowService xmlWorkflowService;
+    protected WorkflowService workflowService;
 
     protected WorkflowRequirementsServiceImpl() {
 
     }
 
     @Override
-    public void addClaimedUser(Context context, XmlWorkflowItem wfi, Step step, EPerson user)
+    public void addClaimedUser(Context context, WorkflowItem wfi, Step step, EPerson user)
         throws SQLException, AuthorizeException, IOException {
 
         //Make sure we delete the pooled task for our current user if the task is not a group pooltask
         PoolTask task = poolTaskService.findByWorkflowIdAndEPerson(context, wfi, user);
         if (task != null && task.getEperson() != null) {
-            xmlWorkflowService.deletePooledTask(context, wfi, task);
+            workflowService.deletePooledTask(context, wfi, task);
         }
 
         InProgressUser ipu = inProgressUserService.create(context);
@@ -77,21 +77,21 @@ public class WorkflowRequirementsServiceImpl implements WorkflowRequirementsServ
         inProgressUserService.update(context, ipu);
 
         //Make sure the user has the necessary rights to update the item after the tasks is removed from the pool
-        xmlWorkflowService.grantUserAllItemPolicies(context, wfi.getItem(), user, ResourcePolicy.TYPE_WORKFLOW);
+        workflowService.grantUserAllItemPolicies(context, wfi.getItem(), user, ResourcePolicy.TYPE_WORKFLOW);
 
         int totalUsers = inProgressUserService.getNumberOfInProgressUsers(context, wfi) + inProgressUserService
             .getNumberOfFinishedUsers(context, wfi);
 
         if (totalUsers == step.getRequiredUsers()) {
             //If enough users have claimed/finished this step then remove the tasks
-            xmlWorkflowService.deleteAllPooledTasks(context, wfi);
+            workflowService.deleteAllPooledTasks(context, wfi);
         }
 
-        xmlWorkflowItemService.update(context, wfi);
+        workflowItemService.update(context, wfi);
     }
 
     @Override
-    public void removeClaimedUser(Context context, XmlWorkflowItem wfi, EPerson user, String stepID)
+    public void removeClaimedUser(Context context, WorkflowItem wfi, EPerson user, String stepID)
         throws SQLException, IOException, WorkflowConfigurationException, AuthorizeException {
         //Check if we had reached our max number @ this moment
         int totalUsers = inProgressUserService.getNumberOfInProgressUsers(context, wfi) + inProgressUserService
@@ -101,7 +101,7 @@ public class WorkflowRequirementsServiceImpl implements WorkflowRequirementsServ
         inProgressUserService.delete(context, inProgressUserService.findByWorkflowItemAndEPerson(context, wfi, user));
 
         //Make sure the removed user has his custom rights removed
-        xmlWorkflowService.removeUserItemPolicies(context, wfi.getItem(), user);
+        workflowService.removeUserItemPolicies(context, wfi.getItem(), user);
 
         Workflow workflow = workflowFactory.getWorkflow(wfi.getCollection());
         Step step = workflow.getStep(stepID);
@@ -142,7 +142,7 @@ public class WorkflowRequirementsServiceImpl implements WorkflowRequirementsServ
     }
 
     @Override
-    public void addFinishedUser(Context c, XmlWorkflowItem wfi, EPerson user) throws AuthorizeException, SQLException {
+    public void addFinishedUser(Context c, WorkflowItem wfi, EPerson user) throws AuthorizeException, SQLException {
         InProgressUser ipu = inProgressUserService.findByWorkflowItemAndEPerson(c, wfi, user);
         ipu.setFinished(true);
         inProgressUserService.update(c, ipu);
@@ -150,7 +150,7 @@ public class WorkflowRequirementsServiceImpl implements WorkflowRequirementsServ
 
 
     @Override
-    public void clearInProgressUsers(Context c, XmlWorkflowItem wfi) throws AuthorizeException, SQLException {
+    public void clearInProgressUsers(Context c, WorkflowItem wfi) throws AuthorizeException, SQLException {
         Iterator<InProgressUser> ipus = inProgressUserService.findByWorkflowItem(c, wfi).iterator();
         while (ipus.hasNext()) {
             InProgressUser ipu = ipus.next();

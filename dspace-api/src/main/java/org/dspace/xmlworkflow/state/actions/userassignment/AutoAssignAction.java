@@ -19,16 +19,16 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.Role;
 import org.dspace.xmlworkflow.RoleMembers;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
-import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 import org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -51,12 +51,12 @@ public class AutoAssignAction extends UserSelectionAction {
     protected WorkflowRequirementsService workflowRequirementsService;
 
     @Override
-    public void activate(Context c, XmlWorkflowItem wfItem) {
+    public void activate(Context c, WorkflowItem wfItem) {
 
     }
 
     @Override
-    public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
+    public ActionResult execute(Context c, WorkflowItem wfi, Step step, HttpServletRequest request)
         throws SQLException, AuthorizeException, IOException {
         try {
             Role role = getParent().getStep().getRole();
@@ -124,27 +124,27 @@ public class AutoAssignAction extends UserSelectionAction {
      * @throws AuthorizeException ...
      * @throws IOException        ...
      */
-    protected void createTaskForEPerson(Context c, XmlWorkflowItem wfi, Step step, WorkflowActionConfig actionConfig,
+    protected void createTaskForEPerson(Context c, WorkflowItem wfi, Step step, WorkflowActionConfig actionConfig,
                                         EPerson user) throws SQLException, AuthorizeException, IOException {
         if (claimedTaskService.find(c, wfi, step.getId(), actionConfig.getId()) != null) {
             workflowRequirementsService.addClaimedUser(c, wfi, step, c.getCurrentUser());
-            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
+            WorkflowServiceFactory.getInstance().getWorkflowService()
                                      .createOwnedTask(c, wfi, step, actionConfig, user);
         }
     }
 
     @Override
-    public boolean isFinished(XmlWorkflowItem wfi) {
+    public boolean isFinished(WorkflowItem wfi) {
         return true;
     }
 
     @Override
-    public void regenerateTasks(Context c, XmlWorkflowItem wfi, RoleMembers roleMembers) throws SQLException {
+    public void regenerateTasks(Context c, WorkflowItem wfi, RoleMembers roleMembers) throws SQLException {
 
     }
 
     @Override
-    public boolean isValidUserSelection(Context context, XmlWorkflowItem wfi, boolean hasUI)
+    public boolean isValidUserSelection(Context context, WorkflowItem wfi, boolean hasUI)
         throws WorkflowConfigurationException, SQLException {
         //This is an automatic assign action, it can never have a user interface
         Role role = getParent().getStep().getRole();

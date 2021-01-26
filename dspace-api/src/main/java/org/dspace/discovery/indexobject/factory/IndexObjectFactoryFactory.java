@@ -15,9 +15,9 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.workflow.WorkflowItemService;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
-import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -29,7 +29,7 @@ public abstract class IndexObjectFactoryFactory {
     @Autowired
     protected WorkspaceItemService workspaceItemService;
     @Autowired
-    protected XmlWorkflowItemService xmlWorkflowItemService;
+    protected WorkflowItemService workflowItemService;
     @Autowired
     protected ClaimedTaskService claimedTaskService;
     @Autowired

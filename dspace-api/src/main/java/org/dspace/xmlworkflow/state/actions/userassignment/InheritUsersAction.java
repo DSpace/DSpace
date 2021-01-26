@@ -13,11 +13,11 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.core.Context;
+import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.RoleMembers;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * A user selection action that inherits user
@@ -31,11 +31,11 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 public class InheritUsersAction extends UserSelectionAction {
 
     @Override
-    public void activate(Context c, XmlWorkflowItem wfItem) {
+    public void activate(Context c, WorkflowItem wfItem) {
     }
 
     @Override
-    public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request) {
+    public ActionResult execute(Context c, WorkflowItem wfi, Step step, HttpServletRequest request) {
         return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
     }
 
@@ -45,16 +45,16 @@ public class InheritUsersAction extends UserSelectionAction {
     }
 
     @Override
-    public boolean isFinished(XmlWorkflowItem wfi) {
+    public boolean isFinished(WorkflowItem wfi) {
         return false;
     }
 
     @Override
-    public void regenerateTasks(Context c, XmlWorkflowItem wfi, RoleMembers roleMembers) throws SQLException {
+    public void regenerateTasks(Context c, WorkflowItem wfi, RoleMembers roleMembers) throws SQLException {
     }
 
     @Override
-    public boolean isValidUserSelection(Context context, XmlWorkflowItem wfi, boolean hasUI)
+    public boolean isValidUserSelection(Context context, WorkflowItem wfi, boolean hasUI)
         throws WorkflowConfigurationException, SQLException {
         return false;
     }

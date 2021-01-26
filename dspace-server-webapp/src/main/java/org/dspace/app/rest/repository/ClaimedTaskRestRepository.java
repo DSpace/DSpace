@@ -33,16 +33,16 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.workflow.WorkflowException;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
-import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
-import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.state.actions.Action;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +75,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
     ClaimedTaskService claimedTaskService;
 
     @Autowired
-    XmlWorkflowService workflowService;
+    WorkflowService workflowService;
 
     @Autowired
     WorkflowRequirementsService workflowRequirementsService;
@@ -139,7 +139,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
         if (task == null) {
             throw new ResourceNotFoundException("ClaimedTask ID " + id + " not found");
         }
-        XmlWorkflowServiceFactory factory = (XmlWorkflowServiceFactory) XmlWorkflowServiceFactory.getInstance();
+        WorkflowServiceFactory factory = WorkflowServiceFactory.getInstance();
         Workflow workflow;
         try {
             workflow = factory.getWorkflowFactory().getWorkflow(task.getWorkflowItem().getCollection());
@@ -183,7 +183,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
             if (task == null) {
                 throw new ResourceNotFoundException("ClaimedTask ID " + id + " not found");
             }
-            XmlWorkflowItem workflowItem = task.getWorkflowItem();
+            WorkflowItem workflowItem = task.getWorkflowItem();
             workflowService.deleteClaimedTask(context, workflowItem, task);
             workflowRequirementsService.removeClaimedUser(context, workflowItem, task.getOwner(), task.getStepID());
         } catch (AuthorizeException e) {

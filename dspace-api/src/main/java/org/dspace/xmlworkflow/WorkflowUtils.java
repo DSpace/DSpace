@@ -32,8 +32,8 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
-import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
 import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
@@ -53,9 +53,9 @@ public class WorkflowUtils extends Util {
     public static Logger log = LogManager.getLogger(WorkflowUtils.class);
 
     protected static final CollectionRoleService collectionRoleService =
-        XmlWorkflowServiceFactory.getInstance().getCollectionRoleService();
+        WorkflowServiceFactory.getInstance().getCollectionRoleService();
     protected static final GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-    protected static final XmlWorkflowFactory xmlWorkflowFactory = XmlWorkflowServiceFactory.getInstance()
+    protected static final XmlWorkflowFactory xmlWorkflowFactory = WorkflowServiceFactory.getInstance()
                                                                                             .getWorkflowFactory();
     protected static final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();

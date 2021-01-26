@@ -45,6 +45,8 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.EPersonServiceImpl;
 import org.dspace.services.ConfigurationService;
 import org.dspace.workflow.WorkflowException;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.WorkflowService;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
@@ -52,9 +54,7 @@ import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
-import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -78,7 +78,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
     private static final Logger log = Logger.getLogger(WorkflowItemRestRepository.class);
 
     @Autowired
-    XmlWorkflowItemService wis;
+    WorkflowItemService wis;
 
     @Autowired
     ItemService itemService;
@@ -99,7 +99,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
     EPersonServiceImpl epersonService;
 
     @Autowired
-    WorkflowService<XmlWorkflowItem> wfs;
+    WorkflowService wfs;
 
     @Autowired
     AuthorizeService authorizeService;
@@ -108,7 +108,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
     ClaimedTaskService claimedTaskService;
 
     @Autowired
-    protected XmlWorkflowItemService xmlWorkflowItemService;
+    protected WorkflowItemService workflowItemService;
 
     @Autowired
     protected XmlWorkflowFactory workflowFactory;
@@ -122,7 +122,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
     @Override
     @PreAuthorize("hasPermission(#id, 'WORKFLOWITEM', 'READ')")
     public WorkflowItemRest findOne(Context context, Integer id) {
-        XmlWorkflowItem witem = null;
+        WorkflowItem witem = null;
         try {
             witem = wis.find(context, id);
         } catch (SQLException e) {
@@ -139,7 +139,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
     public Page<WorkflowItemRest> findAll(Context context, Pageable pageable) {
         try {
             long total = wis.countAll(context);
-            List<XmlWorkflowItem> witems = wis.findAll(context, pageable.getPageNumber(), pageable.getPageSize());
+            List<WorkflowItem> witems = wis.findAll(context, pageable.getPageNumber(), pageable.getPageSize());
             return converter.toRestPage(witems, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException("SQLException in " + this.getClass() + "#findAll trying to retrieve all " +
@@ -154,7 +154,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
             Context context = obtainContext();
             EPerson ep = epersonService.find(context, submitterID);
             long total = wis.countBySubmitter(context, ep);
-            List<XmlWorkflowItem> witems = wis.findBySubmitter(context, ep, pageable.getPageNumber(),
+            List<WorkflowItem> witems = wis.findBySubmitter(context, ep, pageable.getPageNumber(),
                     pageable.getPageSize());
             return converter.toRestPage(witems, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
@@ -165,7 +165,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
 
     @Override
     protected WorkflowItemRest createAndReturn(Context context, List<String> stringList) {
-        XmlWorkflowItem source;
+        WorkflowItem source;
         if (stringList == null || stringList.isEmpty() || stringList.size() > 1) {
             throw new UnprocessableEntityException("The given URI list could not be properly parsed to one result");
         }
@@ -198,7 +198,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
 
         Context context = obtainContext();
         WorkflowItemRest wsi = findOne(context, id);
-        XmlWorkflowItem source = wis.find(context, id);
+        WorkflowItem source = wis.find(context, id);
 
         this.checkIfEditMetadataAllowedInCurrentStep(context, source);
 
@@ -249,7 +249,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
                       Patch patch) throws SQLException, AuthorizeException {
         List<Operation> operations = patch.getOperations();
         WorkflowItemRest wsi = findOne(context, id);
-        XmlWorkflowItem source = wis.find(context, id);
+        WorkflowItem source = wis.find(context, id);
 
         this.checkIfEditMetadataAllowedInCurrentStep(context, source);
 
@@ -267,7 +267,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
         wis.update(context, source);
     }
 
-    private void evaluatePatch(Context context, HttpServletRequest request, XmlWorkflowItem source,
+    private void evaluatePatch(Context context, HttpServletRequest request, WorkflowItem source,
                                WorkflowItemRest wsi, String section, Operation op) {
         SubmissionConfig submissionConfig =
             submissionConfigReader.getSubmissionConfigByName(wsi.getSubmissionDefinition().getName());
@@ -315,7 +315,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
      * move the workflowitem back to the submitter workspace regardless to how the workflow is designed
      */
     protected void delete(Context context, Integer id) {
-        XmlWorkflowItem witem = null;
+        WorkflowItem witem = null;
         try {
             witem = wis.find(context, id);
             if (witem == null) {
@@ -337,14 +337,14 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
      * Checks if @link{SUBMIT_EDIT_METADATA} is a valid option in the workflow step this task is currently at.
      * Patching and uploading is only allowed if this is the case.
      * @param context               Context
-     * @param xmlWorkflowItem       WorkflowItem of the task
+     * @param workflowItem       WorkflowItem of the task
      */
-    private void checkIfEditMetadataAllowedInCurrentStep(Context context, XmlWorkflowItem xmlWorkflowItem) {
+    private void checkIfEditMetadataAllowedInCurrentStep(Context context, WorkflowItem workflowItem) {
         try {
-            ClaimedTask claimedTask = claimedTaskService.findByWorkflowIdAndEPerson(context, xmlWorkflowItem,
+            ClaimedTask claimedTask = claimedTaskService.findByWorkflowIdAndEPerson(context, workflowItem,
                 context.getCurrentUser());
             if (claimedTask == null) {
-                throw new UnprocessableEntityException("WorkflowItem with id " + xmlWorkflowItem.getID()
+                throw new UnprocessableEntityException("WorkflowItem with id " + workflowItem.getID()
                     + " has not been claimed yet.");
             }
             Workflow workflow = workflowFactory.getWorkflow(claimedTask.getWorkflowItem().getCollection());
@@ -378,14 +378,14 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
         try {
             Context context = obtainContext();
             Item item = itemService.find(context, itemUuid);
-            XmlWorkflowItem xmlWorkflowItem = wis.findByItem(context, item);
-            if (xmlWorkflowItem == null) {
+            WorkflowItem workflowItem = wis.findByItem(context, item);
+            if (workflowItem == null) {
                 return null;
             }
-            if (!authorizeService.authorizeActionBoolean(context, xmlWorkflowItem.getItem(), Constants.READ)) {
+            if (!authorizeService.authorizeActionBoolean(context, workflowItem.getItem(), Constants.READ)) {
                 throw new AccessDeniedException("The current user does not have rights to view the WorkflowItem");
             }
-            return converter.toRest(xmlWorkflowItem, utils.obtainProjection());
+            return converter.toRest(workflowItem, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

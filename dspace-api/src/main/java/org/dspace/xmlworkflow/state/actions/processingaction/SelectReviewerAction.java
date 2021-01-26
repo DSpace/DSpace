@@ -18,11 +18,11 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.Role;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
 import org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -54,12 +54,12 @@ public class SelectReviewerAction extends ProcessingAction {
     private WorkflowItemRoleService workflowItemRoleService;
 
     @Override
-    public void activate(Context c, XmlWorkflowItem wf) {
+    public void activate(Context c, WorkflowItem wf) {
 
     }
 
     @Override
-    public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
+    public ActionResult execute(Context c, WorkflowItem wfi, Step step, HttpServletRequest request)
             throws SQLException, AuthorizeException {
         String submitButton = Util.getSubmitButton(request, SUBMIT_CANCEL);
 
