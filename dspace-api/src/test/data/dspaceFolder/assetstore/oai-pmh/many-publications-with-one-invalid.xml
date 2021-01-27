@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href='static/style.xsl' type='text/xsl'?>
+<OAI-PMH
+    xmlns="http://www.openarchives.org/OAI/2.0/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+    <responseDate>2020-11-23T15:56:46Z</responseDate>
+    <request verb="ListRecords" metadataPrefix="oai_cerif_openaire" set="openaire_cris_publications">https://test-harvest/oai/openairecris</request>
+    <ListRecords>
+        <record>
+            <header>
+                <identifier>oai:test-harvest:Publications/123456789/1001</identifier>
+                <datestamp>2020-03-30T22:25:27Z</datestamp>
+                <setSpec>openaire_cris_publications</setSpec>
+            </header>
+            <metadata>
+                <oai_cerif:Publication
+                    xmlns:oai_cerif="https://www.openaire.eu/cerif-profile/1.1/"
+                    xmlns:doc="http://www.lyncode.com/xoai"
+                    xmlns:dc="http://purl.org/dc/elements/1.1/"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="123456789/1001">
+                    <oai_cerif:Type xmlns:oai_cerif="https://www.openaire.eu/cerif-profile/vocab/COAR_Publication_Types">http://purl.org/coar/resource_type/c_0640</oai_cerif:Type>
+                    <oai_cerif:Title xml:lang="en">The International Journal of Digital Curation</oai_cerif:Title>
+                    <oai_cerif:ISSN>1746-8256</oai_cerif:ISSN>
+                </oai_cerif:Publication>
+            </metadata>
+        </record>
+        <record>
+            <header>
+                <identifier>oai:test-harvest:Publications/123456789/1002</identifier>
+                <datestamp>2020-03-30T22:25:27Z</datestamp>
+                <setSpec>com_123456789_1</setSpec>
+                <setSpec>col_123456789_2</setSpec>
+                <setSpec>openaire_cris_publications</setSpec>
+            </header>
+            <metadata>
+                <oai_cerif:Publication
+                    xmlns:oai_cerif="https://www.openaire.eu/cerif-profile/1.1/"
+                    xmlns:doc="http://www.lyncode.com/xoai"
+                    xmlns:dc="http://purl.org/dc/elements/1.1/"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="123456789/1002">
+                    <oai_cerif:Type xmlns:oai_cerif="https://www.openaire.eu/cerif-profile/vocab/COAR_Publication_Types">http://purl.org/coar/resource_type/c_5794</oai_cerif:Type>
+                    <oai_cerif:Title xml:lang="en">Metadata and Semantics Research</oai_cerif:Title>
+                    <oai_cerif:Subtitle xml:lang="en">6th Research Conference, MTSR 2012, Cádiz, Spain, November 28-30, 2012. Proceedings</oai_cerif:Subtitle>
+                    <oai_cerif:PublicationDate>2020-03-30</oai_cerif:PublicationDate>
+                    <oai_cerif:DOI>10.1007/978-3-642-35233-1</oai_cerif:DOI>
+                    <oai_cerif:Handle>123456789/6</oai_cerif:Handle>
+                    <oai_cerif:ISBN>9783642352324</oai_cerif:ISBN>
+                    <oai_cerif:URN>http://hdl.handle.net/123456789/1002</oai_cerif:URN>
+                    <oai_cerif:Publishers>
+                        Springer, Berlin, Heidelberg
+                    </oai_cerif:Publishers>
+                    <oai_cerif:Keyword xml:lang="en">cultural heritage</oai_cerif:Keyword>
+                    <oai_cerif:Keyword xml:lang="en">digital libraries</oai_cerif:Keyword>
+                    <oai_cerif:Keyword xml:lang="en">learning objects</oai_cerif:Keyword>
+                    <oai_cerif:Keyword xml:lang="en">linked open data</oai_cerif:Keyword>
+                    <oai_cerif:Keyword xml:lang="en">scholarly publications</oai_cerif:Keyword>
+                    <oai_cerif:PresentedAt>
+                        <oai_cerif:Event id="05af052c-6ba7-4a1b-86cd-50bec84323e3">
+                            <oai_cerif:Type scheme="https://w3id.org/cerif/vocab/EventTypes">https://w3id.org/cerif/vocab/EventTypes#Conference</oai_cerif:Type>
+                            <oai_cerif:Acronym>MTSR 2012</oai_cerif:Acronym>
+                            <oai_cerif:Name xml:lang="en">6th Research Conference on Metadata and Semantics Research</oai_cerif:Name>
+                            <oai_cerif:Place>Roma</oai_cerif:Place>
+                            <oai_cerif:Country>IT</oai_cerif:Country>
+                            <oai_cerif:StartDate>2019-10-01</oai_cerif:StartDate>
+                            <oai_cerif:EndDate>2019-10-04</oai_cerif:EndDate>
+                            <oai_cerif:Description xml:lang="en">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</oai_cerif:Description>
+                            <oai_cerif:Keyword xml:lang="en">test</oai_cerif:Keyword>
+                        </oai_cerif:Event>
+                    </oai_cerif:PresentedAt>
+                    <ns4:Access xmlns:ns4="http://purl.org/coar/access_right">http://purl.org/coar/access_right/c_abf2</ns4:Access>
+                </oai_cerif:Publication>
+            </metadata>
+        </record>
+        <record>
+            <header>
+                <identifier>oai:test-harvest:Publications/123456789/1003</identifier>
+                <datestamp>2019-09-05T21:52:21Z</datestamp>
+                <setSpec>com_123456789_1</setSpec>
+                <setSpec>col_123456789_2</setSpec>
+                <setSpec>openaire_cris_publications</setSpec>
+            </header>
+            <metadata>
+                <oai_cerif:Publication
+                    xmlns:oai_cerif="https://www.openaire.eu/cerif-profile/1.1/"
+                    xmlns:doc="http://www.lyncode.com/xoai"
+                    xmlns:dc="http://purl.org/dc/elements/1.1/"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="123456789/1003">
+                    <oai_cerif:Type xmlns:oai_cerif="https://www.openaire.eu/cerif-profile/vocab/COAR_Publication_Types">http://purl.org/coar/resource_type/c_5794</oai_cerif:Type>
+                    <oai_cerif:Title xml:lang="en">TEST</oai_cerif:Title>
+                    <oai_cerif:PublicationDate>2012-11-30</oai_cerif:PublicationDate>
+                    <oai_cerif:Volume>343</oai_cerif:Volume>
+                    <oai_cerif:Issue>168</oai_cerif:Issue>
+                    <oai_cerif:StartPage>168</oai_cerif:StartPage>
+                    <oai_cerif:EndPage>180</oai_cerif:EndPage>
+                    <oai_cerif:DOI>10.1007/978-3-642-35233-1_18</oai_cerif:DOI>
+                    <oai_cerif:Handle>123456789/7</oai_cerif:Handle>
+                    <oai_cerif:URN>http://hdl.handle.net/123456789/1003</oai_cerif:URN>
+                    <oai_cerif:Authors>
+                        <oai_cerif:Author>
+                            <oai_cerif:DisplayName>Manghi, Paolo</oai_cerif:DisplayName>
+                            <oai_cerif:Person id="d1d9582d-1a8b-4e1b-882f-1b421f5a95d3">
+                                <oai_cerif:PersonName>
+                                    <oai_cerif:FamilyNames>
+                              Manghi</oai_cerif:FamilyNames>
+                                    <oai_cerif:FirstNames>Paolo
+                           </oai_cerif:FirstNames>
+                                </oai_cerif:PersonName>
+                            </oai_cerif:Person>
+                        </oai_cerif:Author>
+                        <oai_cerif:Author>
+                            <oai_cerif:DisplayName>Houssos, Nikos</oai_cerif:DisplayName>
+                            <oai_cerif:Person id="797a27d6-f2a1-4cf1-8b2d-c25f79de742a">
+                                <oai_cerif:PersonName>
+                                    <oai_cerif:FamilyNames>
+                              Houssos</oai_cerif:FamilyNames>
+                                    <oai_cerif:FirstNames>Nikos
+                           </oai_cerif:FirstNames>
+                                </oai_cerif:PersonName>
+                                <oai_cerif:Affiliation startDate="2006-09-01">
+                                    <oai_cerif:OrgUnit id="8a17cae0-242a-4154-8bd6-6ea16ae1fe32">
+                                        <oai_cerif:Name xml:lang="en">National Hellenic Research Foundation | EIE</oai_cerif:Name>
+                                    </oai_cerif:OrgUnit>
+                                </oai_cerif:Affiliation>
+                            </oai_cerif:Person>
+                        </oai_cerif:Author>
+                        <oai_cerif:Author>
+                            <oai_cerif:DisplayName>Mikulicic, Marko</oai_cerif:DisplayName>
+                            <oai_cerif:Person id="ed964c75-25f4-4106-a559-ea4015601e48">
+                                <oai_cerif:PersonName>
+                                    <oai_cerif:FamilyNames>
+                              Mikulicic</oai_cerif:FamilyNames>
+                                    <oai_cerif:FirstNames>Marko
+                           </oai_cerif:FirstNames>
+                                </oai_cerif:PersonName>
+                            </oai_cerif:Person>
+                        </oai_cerif:Author>
+                        <oai_cerif:Author>
+                            <oai_cerif:DisplayName>Jörg, Brigitte</oai_cerif:DisplayName>
+                            <oai_cerif:Person id="02b50a4a-2749-40a3-b56f-3b3d02c69c16">
+                                <oai_cerif:PersonName>
+                                    <oai_cerif:FamilyNames>
+                              Jörg</oai_cerif:FamilyNames>
+                                    <oai_cerif:FirstNames>Brigitte
+                           </oai_cerif:FirstNames>
+                                </oai_cerif:PersonName>
+                            </oai_cerif:Person>
+                        </oai_cerif:Author>
+                    </oai_cerif:Authors>
+                    <oai_cerif:Keyword xml:lang="en">open access</oai_cerif:Keyword>
+                    <oai_cerif:Keyword xml:lang="en">infrastructure</oai_cerif:Keyword>
+                    <oai_cerif:Keyword xml:lang="en">data model</oai_cerif:Keyword>
+                    <oai_cerif:Keyword xml:lang="en">CERIF</oai_cerif:Keyword>
+                    <oai_cerif:Keyword xml:lang="en">DataCite</oai_cerif:Keyword>
+                    <oai_cerif:Abstract xml:lang="en">The OpenAIREplus project aims to further develop and operate the OpenAIRE e-infrastructure, in order to provide a central entry point to Open Access and 	non-Open Access publications and datasets funded by the European Commission and National agencies. The infrastructure provides the services to populate, curate, and enrich an Information Space by collecting metadata descriptions relative to organizations, data sources, projects, funding programmes, persons, publications, and datasets. Stakeholders in the research process and				scientific communication, such as researchers, funding agencies, organizations nvolved in projects, project coordinators, can here find the information to improve their research and statistics to measure the impact of Open Access and funding schemes over research. In this paper, we introduce the functional requirements to be satisfied and describe the OpenAIREplus data model entities and relationships required to represent information capable of meeting them.</oai_cerif:Abstract>
+                    <oai_cerif:OriginatesFrom>
+                        <oai_cerif:Project id="e9ed438e-c7f7-4a18-95e5-3f635ea65fee">
+                            <oai_cerif:Title xml:lang="en">2nd-Generation Open Access Infrastructure for Research in Europe</oai_cerif:Title>
+                            <oai_cerif:Team>
+                                <oai_cerif:PrincipalInvestigator>
+                                    <oai_cerif:DisplayName>4Science, Team</oai_cerif:DisplayName>
+                                    <oai_cerif:Person />
+                                </oai_cerif:PrincipalInvestigator>
+                            </oai_cerif:Team>
+                            <oai_cerif:Funded>
+                                <oai_cerif:By>
+                                    <oai_cerif:DisplayName>EC</oai_cerif:DisplayName>
+                                    <oai_cerif:OrgUnit>
+                                        <oai_cerif:Name xml:lang="en"></oai_cerif:Name>
+                                    </oai_cerif:OrgUnit>
+                                </oai_cerif:By>
+                                <oai_cerif:As
+                                    xmlns:oafunding="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">
+                                    <oai_cerif:Funding>
+                                        <oafunding:Type>https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#Grant</oafunding:Type>
+                                        <oai_cerif:Amount currency="EUR">99999</oai_cerif:Amount>
+                                        <oai_cerif:Identifier type="https://w3id.org/cerif/vocab/IdentifierTypes#ProjectReference">283595</oai_cerif:Identifier>
+                                        <oai_cerif:PartOf>
+                                            <oai_cerif:Funding>
+                                                <oafunding:Type>https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#FundingProgramme</oafunding:Type>
+                                                <oai_cerif:Name xml:lang="en">FP7</oai_cerif:Name>
+                                            </oai_cerif:Funding>
+                                        </oai_cerif:PartOf>
+                                    </oai_cerif:Funding>
+                                </oai_cerif:As>
+                            </oai_cerif:Funded>
+                            <oai_cerif:OAMandate mandated="true" />
+                        </oai_cerif:Project>
+                    </oai_cerif:OriginatesFrom>
+                    <ns4:Access xmlns:ns4="http://purl.org/coar/access_right">http://purl.org/coar/access_right/c_abf2</ns4:Access>
+                </oai_cerif:Publication>
+            </metadata>
+        </record>
+    </ListRecords>
+</OAI-PMH>

@@ -123,6 +123,34 @@
 
     <dc-type>
         <schema>cris</schema>
+        <element>harvesting</element>
+        <qualifier>itemValidationEnabled</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>harvesting</element>
+        <qualifier>recordValidationEnabled</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>harvesting</element>
+        <qualifier>forceSynchronization</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>harvesting</element>
+        <qualifier>ccAddress</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>cris</schema>
         <element>identifier</element>
         <qualifier>gscholar</qualifier>
         <scope_note></scope_note>

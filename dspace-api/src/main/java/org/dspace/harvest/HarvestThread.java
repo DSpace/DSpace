@@ -53,7 +53,7 @@ public class HarvestThread extends Thread {
             dso = collectionService.find(context, collectionId);
             hc = harvestedCollectionService.find(context, dso);
             try {
-                harvester.runHarvest(context, hc, new OAIHarvesterOptions(false, false, true));
+                harvester.runHarvest(context, hc, new OAIHarvesterOptions(false, false, false, true));
             } catch (RuntimeException e) {
                 log.error("Runtime exception in thread: " + this.toString());
                 log.error(e.getMessage() + " " + e.getCause());

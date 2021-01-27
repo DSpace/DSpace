@@ -11,8 +11,6 @@
       </oai_cerif:Publication>
    </oai_cerif:PartOf>
    <oai_cerif:PublicationDate>2020-03-30</oai_cerif:PublicationDate>
-   <oai_cerif:StartPage>10</oai_cerif:StartPage>
-   <oai_cerif:EndPage>20</oai_cerif:EndPage>
    <oai_cerif:DOI>10.1007/978-3-642-35233-1</oai_cerif:DOI>
    <oai_cerif:Handle>123456789/6</oai_cerif:Handle>
    <oai_cerif:ISBN>9783642352324</oai_cerif:ISBN>
@@ -24,6 +22,8 @@
          </oai_cerif:OrgUnit>
       </oai_cerif:Publisher>
    </oai_cerif:Publishers>
+   <oai_cerif:StartPage>10</oai_cerif:StartPage>
+   <oai_cerif:EndPage>20</oai_cerif:EndPage>
    <oai_cerif:Keyword xml:lang="en">cultural heritage</oai_cerif:Keyword>
    <oai_cerif:Keyword xml:lang="en">digital libraries</oai_cerif:Keyword>
    <oai_cerif:Keyword xml:lang="en">learning objects</oai_cerif:Keyword>

@@ -1,0 +1,1472 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+	xmlns="http://purl.org/coar/access_right/"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+	xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:dct="http://purl.org/dc/terms/"
+	xmlns:foaf="http://xmlns.com/foaf/0.1/"
+	xmlns:skosxl="http://www.w3.org/2008/05/skos-xl#"
+	xmlns:sw-vocab="http://www.w3.org/2003/06/sw-vocab-status/ns#"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:dc="http://purl.org/dc/elements/1.1/">
+
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right">
+	<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#ConceptScheme"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://www.w3.org/2004/02/skos/core#Concept">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/def_3599516e177772b5">
+	<rdf:value xml:lang="en">available in SKOS Used by DCTERMS</rdf:value>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://www.w3.org/2004/02/skos/core#Concept">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/def_47472f85f4a9daa0">
+	<rdf:value xml:lang="en">available in SKOS Used by DCTERMS</rdf:value>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://www.w3.org/2004/02/skos/core#Concept">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/def_209f946ff5e5f20e">
+	<rdf:value xml:lang="en">available in SKOS Used by DCTERMS</rdf:value>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://www.w3.org/2004/02/skos/core#Concept">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/def_fcd1f94f91059506">
+	<rdf:value xml:lang="en">available in SKOS Used by DCTERMS</rdf:value>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://www.w3.org/2004/02/skos/core#Concept">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/def_3cf2a8114f1d2e21">
+	<rdf:value xml:lang="en">available in SKOS</rdf:value>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://www.w3.org/2004/02/skos/core#Concept">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/def_b99936c78ae27dee">
+	<rdf:value xml:lang="en">URI available at the Linked Data Service of LC</rdf:value>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://www.w3.org/2004/02/skos/core#Concept">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/def_6a4bc36b7d6ddccb">
+	<rdf:value xml:lang="en">URI available at the Linked Data Service of LC</rdf:value>
+</rdf:Description>
+
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_abf2">
+	<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://www.w3.org/2004/02/skos/core#Concept">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_abf2">
+	<skos:definition rdf:resource="http://purl.org/coar/access_right/xDef_ec7bf438"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xDef_ec7bf438">
+	<rdf:value xml:lang="en">Open access refers to a resource that is immediately and permanently online, and free for all on the Web, without financial and technical barriers.The resource is either stored in the repository or referenced to an external journal or trustworthy archive.</rdf:value>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:14:28Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-12-14T18:13:03Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_abf2">
+	<skos:inScheme rdf:resource="http://purl.org/coar/access_right"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_abf2">
+	<skos:topConceptOf rdf:resource="http://purl.org/coar/access_right"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_abf2">
+	<skos:relatedMatch rdf:resource="http://purl.org/eprint/accessRights/OpenAccess"/>
+	<skos:relatedMatch rdf:resource="https://vocabs.acdh.oeaw.ac.at/archeaccessrestrictions/public"/>
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_en_098e1e85"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_en_098e1e85">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="en">open access</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-17T12:30:59Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-17T14:59:54Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_abf2">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_es_c171be05"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_es_c171be05">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="es">acceso abierto</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-23T11:10:47Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:14Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_abf2">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_tr_5d0f187a"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_tr_5d0f187a">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="tr">açık erişim</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-14T10:34:15Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:46Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_abf2">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_fr_09ee2f0f"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_fr_09ee2f0f">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="fr">libre accès</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-19T12:28:19Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:46Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_abf2">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_ja_8cd74eab"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_ja_8cd74eab">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="ja">オープンアクセス</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T02:34:02Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:25:07Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_abf2">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_de_c2b89582"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_de_c2b89582">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="de">offener Zugang</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T11:07:25Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:25:20Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_abf2">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_ru_134239ac"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_ru_134239ac">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="ru">открытый доступ</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-05-07T16:56:11Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-06-07T07:41:17Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_abf2">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_pt_651a4942"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_pt_651a4942">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="pt">acesso aberto</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-06-13T14:01:10Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-09-18T11:37:42Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_abf2">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_ar_b4310ffb"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_ar_b4310ffb">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="ar">الوصول الحر</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-06-29T06:20:15Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-09-18T11:37:57Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_abf2">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_ca_1fb0de55"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_ca_1fb0de55">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="ca">accés obert </skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-05-14T10:45:49Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-03T14:29:35Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_abf2">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_sl_2971c701"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_sl_2971c701">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="sl">odprti dostop</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-07-25T14:23:31Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-03T14:29:35Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_abf2">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_nl_513ca904"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_nl_513ca904">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="nl">vrij toegankelijk</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-03T11:37:44Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-10T18:04:13Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_abf2">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_it_c71d8bf2"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_it_c71d8bf2">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="it">accesso aperto</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-03T13:07:31Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-10T18:04:23Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_abf2">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_es_dd695122"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_es_dd695122">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="es">acceso abierto gratuito</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-23T11:11:19Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:31Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_abf2">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_es_d2000f89"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_es_d2000f89">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="es">acceso público</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-23T11:27:53Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:31Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_abf2">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_fr_15c1b6d8"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_fr_15c1b6d8">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="fr">accès ouvert</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-19T12:28:43Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:46Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_abf2">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_fr_164728e3"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_fr_164728e3">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="fr">accès libre</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-19T12:28:58Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:46Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_abf2">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_fr_6376ab2a"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_fr_6376ab2a">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="fr">open access</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-19T12:29:09Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:47Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_abf2">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_de_bcabdaa9"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_de_bcabdaa9">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="de">freier Zugang</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T11:07:32Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:25:20Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_abf2">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_ru_e6f91ec2"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_ru_e6f91ec2">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="ru">бесплатный доступ</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-05-07T16:59:25Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-06-07T07:41:16Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_abf2">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_pt_a40850fe"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_pt_a40850fe">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="pt">acesso livre</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-06-13T14:01:28Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-09-18T11:37:42Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_abf2">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_nl_1bc45157"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_nl_1bc45157">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="nl">vrij beschikbaar</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-03T14:48:32Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-10T18:04:12Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_abf2">
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-17T12:30:59Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-12-19T21:32:06Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://www.w3.org/2004/02/skos/core#Concept">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<skos:definition rdf:resource="http://purl.org/coar/access_right/xDef_0f4afbac"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xDef_0f4afbac">
+	<rdf:value xml:lang="en">Embargoed access refers to a resource that is metadata only access until released for open access on a certain date. Embargoes can be required by publishers and funders policies, or set by the author (e.g such as in the case of theses and dissertations).</rdf:value>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:17:08Z</dct:created>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<skos:inScheme rdf:resource="http://purl.org/coar/access_right"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<skos:topConceptOf rdf:resource="http://purl.org/coar/access_right"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_en_912bbf0d"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_en_912bbf0d">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="en">embargoed access</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-17T13:55:08Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-17T14:59:55Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_es_6c25ea8c"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_es_6c25ea8c">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="es">acceso embargado</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-23T11:08:40Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:12Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_tr_c7b05c00"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_tr_c7b05c00">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="tr">ambargolu erişim</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-14T10:34:33Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:46Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_fr_92aa5558"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_fr_92aa5558">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="fr">sous embargo</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-19T12:35:18Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:25:06Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_ja_a6db8fe3"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_ja_a6db8fe3">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="ja">エンバーゴ有</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T02:34:18Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:25:07Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_de_e1424bf0"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_de_e1424bf0">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="de">Zugang unterliegt Embargo</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T11:10:06Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:25:20Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_ru_78950110"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_ru_78950110">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="ru">доступ с эмбарго</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-05-07T17:04:57Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-06-07T07:41:17Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_pt_8f87c9df"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_pt_8f87c9df">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="pt">acesso embargado</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-06-13T14:00:38Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-09-18T11:37:42Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_ar_e65bc326"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_ar_e65bc326">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="ar">الوصول المحظور</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-06-29T06:25:11Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-09-18T11:37:57Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_ca_abf5b9e0"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_ca_abf5b9e0">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="ca">accés embargat </skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-05-14T10:46:37Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-03T14:29:35Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_sl_eb4fa3eb"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_sl_eb4fa3eb">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="sl">odlog javne objave</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-07-25T14:25:03Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-03T14:29:36Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_it_1cccfd78"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_it_1cccfd78">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="it">accesso sottoposto a periodo di embargo</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-03T13:08:08Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-10T18:04:23Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_nl_efbeb78b"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_nl_efbeb78b">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="nl">onder embargo</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-03T14:49:07Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-10T18:04:13Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_es_06231871"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_es_06231871">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="es">acceso con periodo de carencia</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-23T11:09:01Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:13Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_es_9b4593e3"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_es_9b4593e3">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="es">acceso con periodo de embargo</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-23T11:09:41Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:13Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_es_aa526684"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_es_aa526684">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="es">acceso bajo período de embargo</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-30T23:18:58Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:30Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_es_a3660843"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_es_a3660843">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="es">acceso bajo periodo de embargo</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-30T23:19:09Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:31Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_es_92e51d09"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_es_92e51d09">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="es">depósito oscuro</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-31T21:05:59Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:30Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_es_f53889fe"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_es_f53889fe">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="es">deposito oscuro</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-31T21:06:11Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:31Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_fr_d29a5a4a"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_fr_d29a5a4a">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="fr">libre accès après durée d'embargo</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-19T12:35:32Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:25:06Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_fr_e9ebecd2"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_fr_e9ebecd2">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="fr">accès libre retardé</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-19T12:35:49Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:25:07Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_fr_f250db91"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_fr_f250db91">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="fr">libre accès différé</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-19T12:36:00Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:25:07Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_fr_3ff6ebe6"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_fr_3ff6ebe6">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="fr">accès sous embargo</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-19T12:36:15Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:25:06Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_pt_0f9e11fb"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_pt_0f9e11fb">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="pt">acesso sob embargo</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-06-13T14:00:50Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-09-18T11:37:42Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_sl_96c96181"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_sl_96c96181">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="sl">dostop z embargom</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-07-25T14:40:03Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-03T14:29:35Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_f1cf">
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-17T13:55:08Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-10T18:04:23Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://www.w3.org/2004/02/skos/core#Concept">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<skos:definition rdf:resource="http://purl.org/coar/access_right/xDef_bb394a5b"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xDef_bb394a5b">
+	<rdf:value xml:lang="en">Restricted access refers to a resource that is available in a system but with some type of restriction for full open access. This type of access can occur in a number of different situations. Some examples are described below:
+The user must log-in to the system in order to access the resource
+The user must send an email to the author or system administrator to access the resource
+Access to the resource is restricted to a specific community (e.g. limited to a university community)</rdf:value>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:17:41Z</dct:created>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<skos:inScheme rdf:resource="http://purl.org/coar/access_right"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<skos:topConceptOf rdf:resource="http://purl.org/coar/access_right"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<skos:relatedMatch rdf:resource="http://purl.org/eprint/accessRights/RestrictedAccess"/>
+	<skos:relatedMatch rdf:resource="https://vocabs.acdh.oeaw.ac.at/archeaccessrestrictions/restricted"/>
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_en_b6cb1738"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_en_b6cb1738">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="en">restricted access</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-17T13:56:13Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-17T14:59:55Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_es_7db0a845"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_es_7db0a845">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="es">acceso restringido</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-23T11:17:38Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:12Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_tr_641e2edc"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_tr_641e2edc">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="tr">sınırlı erişim</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-14T10:33:36Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:31Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_fr_ddcb79f8"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_fr_ddcb79f8">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="fr">accès réservé</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-19T12:37:31Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:25:07Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_ja_df7ed107"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_ja_df7ed107">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="ja">アクセス制限有</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T02:33:36Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:25:06Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_de_8a7f2709"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_de_8a7f2709">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="de">eingeschränkter Zugang</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T11:06:27Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:25:20Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_ru_f33c463f"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_ru_f33c463f">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="ru">ограниченный доступ</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-05-07T16:54:58Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-06-07T07:41:17Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_pt_54136234"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_pt_54136234">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="pt">acesso restrito</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-06-13T14:02:05Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-09-18T11:37:41Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_ar_b250933f"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_ar_b250933f">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="ar">الوصول المقيد</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-06-29T06:24:34Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-09-18T11:37:57Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_ca_c65753c4"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_ca_c65753c4">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="ca">accés restringit </skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-05-14T10:47:34Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-03T14:29:35Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_sl_13392c3e"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_sl_13392c3e">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="sl">omejen dostop</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-07-25T14:22:37Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-03T14:29:35Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_it_2918de9c"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_it_2918de9c">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="it">accesso riservato</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-03T13:06:48Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-10T18:04:23Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_nl_b17fde39"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_nl_b17fde39">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="nl">beperkt toegankelijk</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-03T14:50:18Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-10T18:04:13Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_es_f1b011c7"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_es_f1b011c7">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="es">acceso bajo restricciones</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-23T11:19:39Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:14Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_es_0c629e74"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_es_0c629e74">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="es">acceso gratuito mediado</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-23T11:19:51Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:30Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_es_548188f2"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_es_548188f2">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="es">acceso gratuito bajo restricciones</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-23T11:26:49Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:14Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_es_4a0fcd4f"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_es_4a0fcd4f">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="es">acceso bajo condiciones</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-30T23:18:01Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:30Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_es_174e5f2a"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_es_174e5f2a">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="es">acceso con limitaciones</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-30T23:18:19Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:31Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_tr_f829170b"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_tr_f829170b">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="tr">kısıtlı erişim</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-14T10:33:54Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:46Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_fr_4cf48e25"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_fr_4cf48e25">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="fr">accès restreint</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-19T12:36:57Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:25:07Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_fr_ce17ec2b"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_fr_ce17ec2b">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="fr">accès sous condition</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-19T12:37:04Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:25:07Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_fr_09bdfee9"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_fr_09bdfee9">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="fr">accès limité</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-19T12:37:12Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:25:07Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_fr_f6fb477f"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_fr_f6fb477f">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="fr">accès aux abonnés</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-19T12:37:21Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:25:06Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_nl_a7ff2c0a"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_nl_a7ff2c0a">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="nl">beperkte toegang</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-03T14:50:35Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-10T18:04:13Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_16ec">
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-17T13:56:13Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-12-19T23:05:36Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://www.w3.org/2004/02/skos/core#Concept">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skos:definition rdf:resource="http://purl.org/coar/access_right/xDef_ba6df2d6"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xDef_ba6df2d6">
+	<rdf:value xml:lang="en">Metadata only access refers to a resource in which access is limited to metadata only. The resource itself is described by the metadata, but neither is directly available through the system or platform nor can be referenced to an open access copy in an external journal or trustworthy archive.</rdf:value>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:16:25Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-12-14T18:10:21Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skos:inScheme rdf:resource="http://purl.org/coar/access_right"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skos:topConceptOf rdf:resource="http://purl.org/coar/access_right"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skos:relatedMatch rdf:resource="http://purl.org/eprint/accessRights/ClosedAccess"/>
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_en_fdf68ccc"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_en_fdf68ccc">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="en">metadata only access</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-17T13:56:50Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-17T14:59:55Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_es_f14878c4"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_es_f14878c4">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="es">registro bibliográfico</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-30T23:14:50Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-03T14:29:35Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_tr_dc852f2f"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_tr_dc852f2f">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="tr">sadece üstveri erişimi</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-14T10:32:56Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:30Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_fr_85cfec33"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_fr_85cfec33">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="fr">accès aux seules métadonnées</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-19T12:30:22Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:46Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_ja_6936300e"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_ja_6936300e">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="ja">メタデータのみ</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T02:32:32Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:25:07Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_de_b7d28156"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_de_b7d28156">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="de">nur Metadaten</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T11:08:52Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:25:20Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_ru_b0b797c8"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_ru_b0b797c8">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="ru"> доступ к метаданным</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-05-07T16:54:14Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-06-07T07:41:17Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_pt_8a662e89"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_pt_8a662e89">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="pt">acesso a metadados</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-06-13T14:03:38Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-09-18T11:37:41Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_ar_af7f46ca"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_ar_af7f46ca">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="ar">الوصول المحدود بالميتاداتا</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-06-29T06:22:41Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-09-18T11:37:57Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_ca_577ee5d7"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_ca_577ee5d7">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="ca">accés només a metadades </skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-05-14T10:48:45Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-03T14:29:35Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_sl_0da0c790"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_sl_0da0c790">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="sl">samo metapodatki</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-07-25T14:21:59Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-03T14:29:36Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_it_c35e8d9e"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_it_c35e8d9e">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="it">accesso limitato ai metadati</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-03T13:06:22Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-10T18:04:23Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skosxl:prefLabel rdf:resource="http://purl.org/coar/access_right/xl_nl_4edb9fcf"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_nl_4edb9fcf">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="nl">alleen metadata beschikbaar</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-03T14:51:47Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-10T18:04:13Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_es_815f362d"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_es_815f362d">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="es">acceso a metadatos</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-23T11:15:41Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:14Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_es_d407a72a"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_es_d407a72a">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="es">acceso a registro bibliográfico</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-23T11:16:04Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:13Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_es_ca81d5db"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_es_ca81d5db">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="es">acceso a registro bibliografico</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-23T11:16:20Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:14Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_es_b51acdc1"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_es_b51acdc1">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="es">acceso a metadatos solamente</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-30T23:15:27Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:30Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_es_91a4dc61"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_es_91a4dc61">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="es">registro bibliografico</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-30T23:15:59Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:31Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_tr_44b1d2ed"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_tr_44b1d2ed">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="tr">sadece metadata erişimi</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-14T10:33:19Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:31Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_fr_675ec0c2"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_fr_675ec0c2">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="fr">libre accès aux seules métadonnées</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-19T12:30:41Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:46Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_fr_c71f7c27"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_fr_c71f7c27">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="fr">accès limité aux métadonnées</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-19T12:31:02Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:46Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_fr_82c44592"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_fr_82c44592">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="fr">accès uniquement aux métadonnées</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-19T12:33:48Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:46Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_fr_c3db6dcd"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_fr_c3db6dcd">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="fr">accès restreint aux métadonnées</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-19T12:34:00Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-04-20T13:24:46Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_pt_d95fdcd5"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_pt_d95fdcd5">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="pt">acesso limitado a metadados</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-06-13T14:00:16Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-09-18T11:37:42Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_sl_5141e7cc"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_sl_5141e7cc">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="sl">samo dostop do metapodatkov</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-07-25T14:30:36Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-03T14:29:35Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<skosxl:altLabel rdf:resource="http://purl.org/coar/access_right/xl_nl_efc4692e"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/xl_nl_efc4692e">
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="nl">alleen metadata</skosxl:literalForm>
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-03T14:52:02Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-09-10T18:04:12Z</dct:modified>
+</rdf:Description>
+
+<rdf:Description rdf:about="http://purl.org/coar/access_right/c_14cb">
+	<hasStatus xmlns="http://art.uniroma2.it/ontologies/vocbench#">Published</hasStatus>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-03-17T13:56:50Z</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-12-19T23:06:41Z</dct:modified>
+</rdf:Description>
+
+</rdf:RDF>

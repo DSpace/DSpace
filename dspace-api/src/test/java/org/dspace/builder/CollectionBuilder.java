@@ -103,6 +103,18 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
         return addMetadataValue(collection, "cris", "harvesting", "postTransform", null, postTransform);
     }
 
+    public CollectionBuilder withHarvestingEmail(String email) {
+        return addMetadataValue(collection, "cris", "harvesting", "email", null, email);
+    }
+
+    public CollectionBuilder withHarvestingItemValidationEnabled() {
+        return addMetadataValue(collection, "cris", "harvesting", "itemValidationEnabled", null, "true");
+    }
+
+    public CollectionBuilder withHarvestingRecordValidationEnabled() {
+        return addMetadataValue(collection, "cris", "harvesting", "recordValidationEnabled", null, "true");
+    }
+
     public CollectionBuilder withLogo(final String content) throws AuthorizeException, IOException, SQLException {
 
         InputStream is = IOUtils.toInputStream(content, CharEncoding.UTF_8);

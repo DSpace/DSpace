@@ -1,0 +1,538 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types"
+           xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+           xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+           xmlns:skosxl="http://www.w3.org/2008/05/skos-xl#"
+           xmlns:cf="urn:xmlns:org.eurocris.cerif"
+           xmlns:dc-term="http://purl.org/dc/terms/"
+           xmlns:vocbench="http://art.uniroma2.it/ontologies/vocbench#"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           targetNamespace="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types"
+           xsi:schemaLocation="http://www.w3.org/2001/XMLSchema https://www.w3.org/2012/04/XMLSchema.xsd">
+   <xs:annotation>
+      <xs:documentation>Product types extracted from the COAR Resource Types concept scheme: Types of products as extracted from the COAR Resource Types concept scheme (http://vocabularies.coar-repositories.org/documentation/resource_types/, all types that do not descend from 'text').</xs:documentation>
+      <xs:appinfo>
+         <cf:ClassScheme id="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types">
+            <cf:Term xmlns="en">Product types extracted from the COAR Resource Types concept scheme</cf:Term>
+            <cf:Description xmlns="en">Types of products as extracted from the COAR Resource Types concept scheme (http://vocabularies.coar-repositories.org/documentation/resource_types/, all types that do not descend from 'text').</cf:Description>
+         </cf:ClassScheme>
+      </xs:appinfo>
+   </xs:annotation>
+   
+   <xs:include schemaLocation="../includes/cerif-commons.xsd"/>
+   <xs:element name="Type">
+      <xs:complexType>
+         <xs:simpleContent>
+            <xs:extension base="Enum">
+               <xs:attributeGroup ref="cfExtension__AttributeGroup"/>
+            </xs:extension>
+         </xs:simpleContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:simpleType name="Enum">
+      <xs:restriction base="xs:string">
+         <xs:enumeration value="http://purl.org/coar/resource_type/c_7ad9">
+            <xs:annotation>
+               <xs:documentation xml:lang="en">website</xs:documentation>
+               <xs:documentation xml:lang="zh">网站</xs:documentation>
+               <xs:documentation xml:lang="es">sitio web</xs:documentation>
+               <xs:documentation xml:lang="it">sito web</xs:documentation>
+               <xs:documentation xml:lang="ru">веб-сайт</xs:documentation>
+               <xs:documentation xml:lang="ca">lloc web</xs:documentation>
+               <xs:documentation xml:lang="pt">sítio web</xs:documentation>
+               <xs:documentation xml:lang="de">Webseite</xs:documentation>
+               <xs:documentation xml:lang="fr">site web</xs:documentation>
+               <xs:documentation xml:lang="nl">website</xs:documentation>
+               <xs:documentation xml:lang="ja">ウェブサイト</xs:documentation>
+               <xs:documentation xml:lang="tr">web sitesi</xs:documentation>
+               <xs:appinfo>
+                  <cf:Class id="http://purl.org/coar/resource_type/c_7ad9"
+                            classSchemeId="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types">
+                     <cf:Term xml:lang="en" trans="o">website</cf:Term>
+                     <cf:Term xml:lang="zh" trans="h">网站</cf:Term>
+                     <cf:Term xml:lang="es" trans="h">sitio web</cf:Term>
+                     <cf:Term xml:lang="it" trans="h">sito web</cf:Term>
+                     <cf:Term xml:lang="ru" trans="h">веб-сайт</cf:Term>
+                     <cf:Term xml:lang="ca" trans="h">lloc web</cf:Term>
+                     <cf:Term xml:lang="pt" trans="h">sítio web</cf:Term>
+                     <cf:Term xml:lang="de" trans="h">Webseite</cf:Term>
+                     <cf:Term xml:lang="fr" trans="h">site web</cf:Term>
+                     <cf:Term xml:lang="nl" trans="h">website</cf:Term>
+                     <cf:Term xml:lang="ja" trans="h">ウェブサイト</cf:Term>
+                     <cf:Term xml:lang="tr" trans="h">web sitesi</cf:Term>
+                     <cf:Definition xml:lang="en">A website, also written as web site or simply site, is a set of related web pages typically served from a single web domain. A website is hosted on at least one web server, accessible via a network such as the Internet or a private local area network through an Internet address known as a uniform resource locator (URL). All publicly accessible websites collectively constitute the World Wide Web.</cf:Definition>
+                     <cf:Broader>
+                        <cf:Class id="http://purl.org/coar/resource_type/c_e9a0"
+                                  classSchemeId="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types"/>
+                     </cf:Broader>
+                  </cf:Class>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="http://purl.org/coar/resource_type/c_e9a0">
+            <xs:annotation>
+               <xs:documentation xml:lang="en">interactive resource</xs:documentation>
+               <xs:documentation xml:lang="zh">互动资源</xs:documentation>
+               <xs:documentation xml:lang="es">recurso interactivo</xs:documentation>
+               <xs:documentation xml:lang="ru">интерактивный ресурс</xs:documentation>
+               <xs:documentation xml:lang="ca">recurs interactiu</xs:documentation>
+               <xs:documentation xml:lang="it">risorsa interattiva</xs:documentation>
+               <xs:documentation xml:lang="pt">recurso interativo</xs:documentation>
+               <xs:documentation xml:lang="de">interaktive Ressource</xs:documentation>
+               <xs:documentation xml:lang="fr">ressource interactive</xs:documentation>
+               <xs:documentation xml:lang="nl">interactieve bron</xs:documentation>
+               <xs:documentation xml:lang="ja">インタラクティブリソース</xs:documentation>
+               <xs:documentation xml:lang="tr">etkileşimli kaynak</xs:documentation>
+               <xs:appinfo>
+                  <cf:Class id="http://purl.org/coar/resource_type/c_e9a0"
+                            classSchemeId="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types">
+                     <cf:Term xml:lang="en" trans="o">interactive resource</cf:Term>
+                     <cf:Term xml:lang="zh" trans="h">互动资源</cf:Term>
+                     <cf:Term xml:lang="es" trans="h">recurso interactivo</cf:Term>
+                     <cf:Term xml:lang="ru" trans="h">интерактивный ресурс</cf:Term>
+                     <cf:Term xml:lang="ca" trans="h">recurs interactiu</cf:Term>
+                     <cf:Term xml:lang="it" trans="h">risorsa interattiva</cf:Term>
+                     <cf:Term xml:lang="pt" trans="h">recurso interativo</cf:Term>
+                     <cf:Term xml:lang="de" trans="h">interaktive Ressource</cf:Term>
+                     <cf:Term xml:lang="fr" trans="h">ressource interactive</cf:Term>
+                     <cf:Term xml:lang="nl" trans="h">interactieve bron</cf:Term>
+                     <cf:Term xml:lang="ja" trans="h">インタラクティブリソース</cf:Term>
+                     <cf:Term xml:lang="tr" trans="h">etkileşimli kaynak</cf:Term>
+                     <cf:Definition xml:lang="en">A resource requiring interaction from the user to be understood, executed, or experienced. Examples include forms on Web pages, applets, multimedia learning objects, chat services, or virtual reality environments.</cf:Definition>
+                  </cf:Class>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="http://purl.org/coar/resource_type/c_ddb1">
+            <xs:annotation>
+               <xs:documentation xml:lang="en">dataset</xs:documentation>
+               <xs:documentation xml:lang="zh">数据集</xs:documentation>
+               <xs:documentation xml:lang="es">conjunto de datos</xs:documentation>
+               <xs:documentation xml:lang="fr">jeu de données</xs:documentation>
+               <xs:documentation xml:lang="it">dataset</xs:documentation>
+               <xs:documentation xml:lang="ru">набор данных</xs:documentation>
+               <xs:documentation xml:lang="de">Datensatz</xs:documentation>
+               <xs:documentation xml:lang="ca">conjunt de dades</xs:documentation>
+               <xs:documentation xml:lang="pt">conjunto de dados</xs:documentation>
+               <xs:documentation xml:lang="nl">dataset</xs:documentation>
+               <xs:documentation xml:lang="ja">データセット</xs:documentation>
+               <xs:documentation xml:lang="tr">veri seti</xs:documentation>
+               <xs:appinfo>
+                  <cf:Class id="http://purl.org/coar/resource_type/c_ddb1"
+                            classSchemeId="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types">
+                     <cf:Term xml:lang="en" trans="o">dataset</cf:Term>
+                     <cf:Term xml:lang="zh" trans="h">数据集</cf:Term>
+                     <cf:Term xml:lang="es" trans="h">conjunto de datos</cf:Term>
+                     <cf:Term xml:lang="fr" trans="h">jeu de données</cf:Term>
+                     <cf:Term xml:lang="it" trans="h">dataset</cf:Term>
+                     <cf:Term xml:lang="ru" trans="h">набор данных</cf:Term>
+                     <cf:Term xml:lang="de" trans="h">Datensatz</cf:Term>
+                     <cf:Term xml:lang="ca" trans="h">conjunt de dades</cf:Term>
+                     <cf:Term xml:lang="pt" trans="h">conjunto de dados</cf:Term>
+                     <cf:Term xml:lang="nl" trans="h">dataset</cf:Term>
+                     <cf:Term xml:lang="ja" trans="h">データセット</cf:Term>
+                     <cf:Term xml:lang="tr" trans="h">veri seti</cf:Term>
+                     <cf:Definition xml:lang="en">A collection of related facts and data encoded in a defined structure.
+(adapted from fabio; DataCite)</cf:Definition>
+                  </cf:Class>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="http://purl.org/coar/resource_type/c_c513">
+            <xs:annotation>
+               <xs:documentation xml:lang="en">image</xs:documentation>
+               <xs:documentation xml:lang="zh">图像</xs:documentation>
+               <xs:documentation xml:lang="es">imagen</xs:documentation>
+               <xs:documentation xml:lang="it">immagine</xs:documentation>
+               <xs:documentation xml:lang="ru">изображение </xs:documentation>
+               <xs:documentation xml:lang="de">Bild</xs:documentation>
+               <xs:documentation xml:lang="ca">imatge</xs:documentation>
+               <xs:documentation xml:lang="pt">imagem</xs:documentation>
+               <xs:documentation xml:lang="fr">image</xs:documentation>
+               <xs:documentation xml:lang="nl">afbeelding</xs:documentation>
+               <xs:documentation xml:lang="ja">画像</xs:documentation>
+               <xs:documentation xml:lang="tr">görüntü</xs:documentation>
+               <xs:appinfo>
+                  <cf:Class id="http://purl.org/coar/resource_type/c_c513"
+                            classSchemeId="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types">
+                     <cf:Term xml:lang="en" trans="o">image</cf:Term>
+                     <cf:Term xml:lang="zh" trans="h">图像</cf:Term>
+                     <cf:Term xml:lang="es" trans="h">imagen</cf:Term>
+                     <cf:Term xml:lang="it" trans="h">immagine</cf:Term>
+                     <cf:Term xml:lang="ru" trans="h">изображение </cf:Term>
+                     <cf:Term xml:lang="de" trans="h">Bild</cf:Term>
+                     <cf:Term xml:lang="ca" trans="h">imatge</cf:Term>
+                     <cf:Term xml:lang="pt" trans="h">imagem</cf:Term>
+                     <cf:Term xml:lang="fr" trans="h">image</cf:Term>
+                     <cf:Term xml:lang="nl" trans="h">afbeelding</cf:Term>
+                     <cf:Term xml:lang="ja" trans="h">画像</cf:Term>
+                     <cf:Term xml:lang="tr" trans="h">görüntü</cf:Term>
+                     <cf:Definition xml:lang="en">A visual representation other than text, including all types of moving image and still image.</cf:Definition>
+                  </cf:Class>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="http://purl.org/coar/resource_type/c_8a7e">
+            <xs:annotation>
+               <xs:documentation xml:lang="en">moving image</xs:documentation>
+               <xs:documentation xml:lang="zh">运动图像</xs:documentation>
+               <xs:documentation xml:lang="es">imagen dinámica</xs:documentation>
+               <xs:documentation xml:lang="fr">image animée</xs:documentation>
+               <xs:documentation xml:lang="it">immagine dinamica</xs:documentation>
+               <xs:documentation xml:lang="de">Bewegte Bilder</xs:documentation>
+               <xs:documentation xml:lang="ru">движущееся изображение</xs:documentation>
+               <xs:documentation xml:lang="ca">imatge en moviment</xs:documentation>
+               <xs:documentation xml:lang="pt">imagem animada</xs:documentation>
+               <xs:documentation xml:lang="nl">filmmateriaal</xs:documentation>
+               <xs:documentation xml:lang="ja">動画</xs:documentation>
+               <xs:documentation xml:lang="tr">hareketli görüntü</xs:documentation>
+               <xs:appinfo>
+                  <cf:Class id="http://purl.org/coar/resource_type/c_8a7e"
+                            classSchemeId="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types">
+                     <cf:Term xml:lang="en" trans="o">moving image</cf:Term>
+                     <cf:Term xml:lang="zh" trans="h">运动图像</cf:Term>
+                     <cf:Term xml:lang="es" trans="h">imagen dinámica</cf:Term>
+                     <cf:Term xml:lang="fr" trans="h">image animée</cf:Term>
+                     <cf:Term xml:lang="it" trans="h">immagine dinamica</cf:Term>
+                     <cf:Term xml:lang="de" trans="h">Bewegte Bilder</cf:Term>
+                     <cf:Term xml:lang="ru" trans="h">движущееся изображение</cf:Term>
+                     <cf:Term xml:lang="ca" trans="h">imatge en moviment</cf:Term>
+                     <cf:Term xml:lang="pt" trans="h">imagem animada</cf:Term>
+                     <cf:Term xml:lang="nl" trans="h">filmmateriaal</cf:Term>
+                     <cf:Term xml:lang="ja" trans="h">動画</cf:Term>
+                     <cf:Term xml:lang="tr" trans="h">hareketli görüntü</cf:Term>
+                     <cf:Definition xml:lang="en">A moving display, either generated dynamically by a computer program or formed from a series of pre-recorded still images imparting an impression of motion when shown in succession.
+(adapted from fabio)</cf:Definition>
+                     <cf:Broader>
+                        <cf:Class id="http://purl.org/coar/resource_type/c_c513"
+                                  classSchemeId="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types"/>
+                     </cf:Broader>
+                  </cf:Class>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="http://purl.org/coar/resource_type/c_1843">
+            <xs:annotation>
+               <xs:documentation xml:lang="en">other</xs:documentation>
+               <xs:documentation xml:lang="zh">其他</xs:documentation>
+               <xs:documentation xml:lang="es">otros</xs:documentation>
+               <xs:documentation xml:lang="ru">прочее </xs:documentation>
+               <xs:documentation xml:lang="fr">autre</xs:documentation>
+               <xs:documentation xml:lang="it">altro</xs:documentation>
+               <xs:documentation xml:lang="ca">altre</xs:documentation>
+               <xs:documentation xml:lang="pt">outros</xs:documentation>
+               <xs:documentation xml:lang="de">sonstige</xs:documentation>
+               <xs:documentation xml:lang="nl">anders</xs:documentation>
+               <xs:documentation xml:lang="ja">その他</xs:documentation>
+               <xs:documentation xml:lang="tr">diğer</xs:documentation>
+               <xs:appinfo>
+                  <cf:Class id="http://purl.org/coar/resource_type/c_1843"
+                            classSchemeId="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types">
+                     <cf:Term xml:lang="en" trans="o">other</cf:Term>
+                     <cf:Term xml:lang="zh" trans="h">其他</cf:Term>
+                     <cf:Term xml:lang="es" trans="h">otros</cf:Term>
+                     <cf:Term xml:lang="ru" trans="h">прочее </cf:Term>
+                     <cf:Term xml:lang="fr" trans="h">autre</cf:Term>
+                     <cf:Term xml:lang="it" trans="h">altro</cf:Term>
+                     <cf:Term xml:lang="ca" trans="h">altre</cf:Term>
+                     <cf:Term xml:lang="pt" trans="h">outros</cf:Term>
+                     <cf:Term xml:lang="de" trans="h">sonstige</cf:Term>
+                     <cf:Term xml:lang="nl" trans="h">anders</cf:Term>
+                     <cf:Term xml:lang="ja" trans="h">その他</cf:Term>
+                     <cf:Term xml:lang="tr" trans="h">diğer</cf:Term>
+                     <cf:Definition xml:lang="en">A rest category which may cover text, interactive, sound, or image-based resources not explicitly addressed in any concept in this vocabulary </cf:Definition>
+                  </cf:Class>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="http://purl.org/coar/resource_type/c_5ce6">
+            <xs:annotation>
+               <xs:documentation xml:lang="en">software</xs:documentation>
+               <xs:documentation xml:lang="zh">软件</xs:documentation>
+               <xs:documentation xml:lang="es">software</xs:documentation>
+               <xs:documentation xml:lang="fr">développement informatique</xs:documentation>
+               <xs:documentation xml:lang="it">software</xs:documentation>
+               <xs:documentation xml:lang="ru">программное обеспечение </xs:documentation>
+               <xs:documentation xml:lang="de">Software</xs:documentation>
+               <xs:documentation xml:lang="ca">programari</xs:documentation>
+               <xs:documentation xml:lang="pt">software</xs:documentation>
+               <xs:documentation xml:lang="nl">software</xs:documentation>
+               <xs:documentation xml:lang="ja">ソフトウェア</xs:documentation>
+               <xs:documentation xml:lang="tr">yazılım</xs:documentation>
+               <xs:appinfo>
+                  <cf:Class id="http://purl.org/coar/resource_type/c_5ce6"
+                            classSchemeId="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types">
+                     <cf:Term xml:lang="en" trans="o">software</cf:Term>
+                     <cf:Term xml:lang="zh" trans="h">软件</cf:Term>
+                     <cf:Term xml:lang="es" trans="h">software</cf:Term>
+                     <cf:Term xml:lang="fr" trans="h">développement informatique</cf:Term>
+                     <cf:Term xml:lang="it" trans="h">software</cf:Term>
+                     <cf:Term xml:lang="ru" trans="h">программное обеспечение </cf:Term>
+                     <cf:Term xml:lang="de" trans="h">Software</cf:Term>
+                     <cf:Term xml:lang="ca" trans="h">programari</cf:Term>
+                     <cf:Term xml:lang="pt" trans="h">software</cf:Term>
+                     <cf:Term xml:lang="nl" trans="h">software</cf:Term>
+                     <cf:Term xml:lang="ja" trans="h">ソフトウェア</cf:Term>
+                     <cf:Term xml:lang="tr" trans="h">yazılım</cf:Term>
+                     <cf:Definition xml:lang="en">A computer program in source code (text) or compiled form.</cf:Definition>
+                  </cf:Class>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="http://purl.org/coar/resource_type/c_ecc8">
+            <xs:annotation>
+               <xs:documentation xml:lang="en">still image</xs:documentation>
+               <xs:documentation xml:lang="zh">静态图像</xs:documentation>
+               <xs:documentation xml:lang="es">imagen fija</xs:documentation>
+               <xs:documentation xml:lang="ru">статическое изображение</xs:documentation>
+               <xs:documentation xml:lang="fr">image fixe</xs:documentation>
+               <xs:documentation xml:lang="it">immagine fissa</xs:documentation>
+               <xs:documentation xml:lang="de">Einzelbild</xs:documentation>
+               <xs:documentation xml:lang="ca">imatge fixa</xs:documentation>
+               <xs:documentation xml:lang="pt">imagem estática</xs:documentation>
+               <xs:documentation xml:lang="nl">stilstaandbeeld</xs:documentation>
+               <xs:documentation xml:lang="ja">静止画</xs:documentation>
+               <xs:documentation xml:lang="tr">hareketsiz görüntü</xs:documentation>
+               <xs:appinfo>
+                  <cf:Class id="http://purl.org/coar/resource_type/c_ecc8"
+                            classSchemeId="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types">
+                     <cf:Term xml:lang="en" trans="o">still image</cf:Term>
+                     <cf:Term xml:lang="zh" trans="h">静态图像</cf:Term>
+                     <cf:Term xml:lang="es" trans="h">imagen fija</cf:Term>
+                     <cf:Term xml:lang="ru" trans="h">статическое изображение</cf:Term>
+                     <cf:Term xml:lang="fr" trans="h">image fixe</cf:Term>
+                     <cf:Term xml:lang="it" trans="h">immagine fissa</cf:Term>
+                     <cf:Term xml:lang="de" trans="h">Einzelbild</cf:Term>
+                     <cf:Term xml:lang="ca" trans="h">imatge fixa</cf:Term>
+                     <cf:Term xml:lang="pt" trans="h">imagem estática</cf:Term>
+                     <cf:Term xml:lang="nl" trans="h">stilstaandbeeld</cf:Term>
+                     <cf:Term xml:lang="ja" trans="h">静止画</cf:Term>
+                     <cf:Term xml:lang="tr" trans="h">hareketsiz görüntü</cf:Term>
+                     <cf:Definition xml:lang="en">A recorded static visual representation. This class of image includes diagrams, drawings, graphs, graphic designs, plans, photographs and prints.</cf:Definition>
+                     <cf:Broader>
+                        <cf:Class id="http://purl.org/coar/resource_type/c_c513"
+                                  classSchemeId="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types"/>
+                     </cf:Broader>
+                  </cf:Class>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="http://purl.org/coar/resource_type/c_393c">
+            <xs:annotation>
+               <xs:documentation xml:lang="en">workflow</xs:documentation>
+               <xs:documentation xml:lang="zh">工作流程</xs:documentation>
+               <xs:documentation xml:lang="es">flujo de trabajo</xs:documentation>
+               <xs:documentation xml:lang="ru">рабочий процесс</xs:documentation>
+               <xs:documentation xml:lang="it">procedura</xs:documentation>
+               <xs:documentation xml:lang="de">Workflow</xs:documentation>
+               <xs:documentation xml:lang="ca">flux de treball </xs:documentation>
+               <xs:documentation xml:lang="pt">fluxo de trabalho</xs:documentation>
+               <xs:documentation xml:lang="fr">workflow</xs:documentation>
+               <xs:documentation xml:lang="nl">workflow</xs:documentation>
+               <xs:documentation xml:lang="ja">ワークフロー</xs:documentation>
+               <xs:documentation xml:lang="tr">iş akışı</xs:documentation>
+               <xs:appinfo>
+                  <cf:Class id="http://purl.org/coar/resource_type/c_393c"
+                            classSchemeId="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types">
+                     <cf:Term xml:lang="en" trans="o">workflow</cf:Term>
+                     <cf:Term xml:lang="zh" trans="h">工作流程</cf:Term>
+                     <cf:Term xml:lang="es" trans="h">flujo de trabajo</cf:Term>
+                     <cf:Term xml:lang="ru" trans="h">рабочий процесс</cf:Term>
+                     <cf:Term xml:lang="it" trans="h">procedura</cf:Term>
+                     <cf:Term xml:lang="de" trans="h">Workflow</cf:Term>
+                     <cf:Term xml:lang="ca" trans="h">flux de treball </cf:Term>
+                     <cf:Term xml:lang="pt" trans="h">fluxo de trabalho</cf:Term>
+                     <cf:Term xml:lang="fr" trans="h">workflow</cf:Term>
+                     <cf:Term xml:lang="nl" trans="h">workflow</cf:Term>
+                     <cf:Term xml:lang="ja" trans="h">ワークフロー</cf:Term>
+                     <cf:Term xml:lang="tr" trans="h">iş akışı</cf:Term>
+                     <cf:Definition xml:lang="en">A recorded sequence of connected steps, which may be automated, specifying a reliably repeatable sequence of operations to be undertaken when conducting a particular job, for example an in silico investigation that extracts and processes information from a number of bioinformatics databases.</cf:Definition>
+                  </cf:Class>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="http://purl.org/coar/resource_type/c_12cc">
+            <xs:annotation>
+               <xs:documentation xml:lang="en">cartographic material</xs:documentation>
+               <xs:documentation xml:lang="ca">material cartogràfic</xs:documentation>
+               <xs:documentation xml:lang="es">material cartográfico</xs:documentation>
+               <xs:documentation xml:lang="it">cartografia</xs:documentation>
+               <xs:documentation xml:lang="zh">地图类资料</xs:documentation>
+               <xs:documentation xml:lang="pt">material cartográfico</xs:documentation>
+               <xs:documentation xml:lang="de">kartographisches Material</xs:documentation>
+               <xs:documentation xml:lang="fr">matériel cartographique</xs:documentation>
+               <xs:documentation xml:lang="ru">картографические ресурсы</xs:documentation>
+               <xs:documentation xml:lang="nl">cartografisch materiaal</xs:documentation>
+               <xs:documentation xml:lang="ja">地図資料</xs:documentation>
+               <xs:documentation xml:lang="tr">kartografik malzeme </xs:documentation>
+               <xs:appinfo>
+                  <cf:Class id="http://purl.org/coar/resource_type/c_12cc"
+                            classSchemeId="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types">
+                     <cf:Term xml:lang="en" trans="o">cartographic material</cf:Term>
+                     <cf:Term xml:lang="ca" trans="h">material cartogràfic</cf:Term>
+                     <cf:Term xml:lang="es" trans="h">material cartográfico</cf:Term>
+                     <cf:Term xml:lang="it" trans="h">cartografia</cf:Term>
+                     <cf:Term xml:lang="zh" trans="h">地图类资料</cf:Term>
+                     <cf:Term xml:lang="pt" trans="h">material cartográfico</cf:Term>
+                     <cf:Term xml:lang="de" trans="h">kartographisches Material</cf:Term>
+                     <cf:Term xml:lang="fr" trans="h">matériel cartographique</cf:Term>
+                     <cf:Term xml:lang="ru" trans="h">картографические ресурсы</cf:Term>
+                     <cf:Term xml:lang="nl" trans="h">cartografisch materiaal</cf:Term>
+                     <cf:Term xml:lang="ja" trans="h">地図資料</cf:Term>
+                     <cf:Term xml:lang="tr" trans="h">kartografik malzeme </cf:Term>
+                     <cf:Definition xml:lang="en">Any material representing the whole or part of the earth or any celestial body at any scale. Cartographic materials include two- and three-dimensional maps and plans (including maps of imaginary places); aeronautical, navigational, and celestial charts; atlases; globes; block diagrams; sections; aerial photographs with a cartographic purpose; bird's-eye views (map views), etc.</cf:Definition>
+                  </cf:Class>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="http://purl.org/coar/resource_type/c_12cd">
+            <xs:annotation>
+               <xs:documentation xml:lang="en">map</xs:documentation>
+               <xs:documentation xml:lang="ru">карта </xs:documentation>
+               <xs:documentation xml:lang="ca">mapa</xs:documentation>
+               <xs:documentation xml:lang="es">mapa</xs:documentation>
+               <xs:documentation xml:lang="it">mappa</xs:documentation>
+               <xs:documentation xml:lang="zh">地图</xs:documentation>
+               <xs:documentation xml:lang="pt">mapa</xs:documentation>
+               <xs:documentation xml:lang="de">Karte</xs:documentation>
+               <xs:documentation xml:lang="fr">carte géographique</xs:documentation>
+               <xs:documentation xml:lang="nl">kaart</xs:documentation>
+               <xs:documentation xml:lang="tr">harita</xs:documentation>
+               <xs:documentation xml:lang="ja">地図</xs:documentation>
+               <xs:appinfo>
+                  <cf:Class id="http://purl.org/coar/resource_type/c_12cd"
+                            classSchemeId="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types">
+                     <cf:Term xml:lang="en" trans="o">map</cf:Term>
+                     <cf:Term xml:lang="ru" trans="h">карта </cf:Term>
+                     <cf:Term xml:lang="ca" trans="h">mapa</cf:Term>
+                     <cf:Term xml:lang="es" trans="h">mapa</cf:Term>
+                     <cf:Term xml:lang="it" trans="h">mappa</cf:Term>
+                     <cf:Term xml:lang="zh" trans="h">地图</cf:Term>
+                     <cf:Term xml:lang="pt" trans="h">mapa</cf:Term>
+                     <cf:Term xml:lang="de" trans="h">Karte</cf:Term>
+                     <cf:Term xml:lang="fr" trans="h">carte géographique</cf:Term>
+                     <cf:Term xml:lang="nl" trans="h">kaart</cf:Term>
+                     <cf:Term xml:lang="tr" trans="h">harita</cf:Term>
+                     <cf:Term xml:lang="ja" trans="h">地図</cf:Term>
+                     <cf:Definition xml:lang="en">Defined as a representation normally to scale and on a flat medium, of a selection of material or abstract features on, or in relation to, the surface of the earth or of another celestial body.</cf:Definition>
+                     <cf:Definition xml:lang="tr">harita</cf:Definition>
+                     <cf:Broader>
+                        <cf:Class id="http://purl.org/coar/resource_type/c_12cc"
+                                  classSchemeId="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types"/>
+                     </cf:Broader>
+                  </cf:Class>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="http://purl.org/coar/resource_type/c_12ce">
+            <xs:annotation>
+               <xs:documentation xml:lang="en">video</xs:documentation>
+               <xs:documentation xml:lang="ru">видео</xs:documentation>
+               <xs:documentation xml:lang="zh">视频</xs:documentation>
+               <xs:documentation xml:lang="ca">vídeo</xs:documentation>
+               <xs:documentation xml:lang="es">vídeo</xs:documentation>
+               <xs:documentation xml:lang="it">video</xs:documentation>
+               <xs:documentation xml:lang="pt">vídeo</xs:documentation>
+               <xs:documentation xml:lang="de">Video</xs:documentation>
+               <xs:documentation xml:lang="fr">vidéo</xs:documentation>
+               <xs:documentation xml:lang="nl">video</xs:documentation>
+               <xs:documentation xml:lang="ja">録画資料</xs:documentation>
+               <xs:documentation xml:lang="tr">video</xs:documentation>
+               <xs:appinfo>
+                  <cf:Class id="http://purl.org/coar/resource_type/c_12ce"
+                            classSchemeId="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types">
+                     <cf:Term xml:lang="en" trans="o">video</cf:Term>
+                     <cf:Term xml:lang="ru" trans="h">видео</cf:Term>
+                     <cf:Term xml:lang="zh" trans="h">视频</cf:Term>
+                     <cf:Term xml:lang="ca" trans="h">vídeo</cf:Term>
+                     <cf:Term xml:lang="es" trans="h">vídeo</cf:Term>
+                     <cf:Term xml:lang="it" trans="h">video</cf:Term>
+                     <cf:Term xml:lang="pt" trans="h">vídeo</cf:Term>
+                     <cf:Term xml:lang="de" trans="h">Video</cf:Term>
+                     <cf:Term xml:lang="fr" trans="h">vidéo</cf:Term>
+                     <cf:Term xml:lang="nl" trans="h">video</cf:Term>
+                     <cf:Term xml:lang="ja" trans="h">録画資料</cf:Term>
+                     <cf:Term xml:lang="tr" trans="h">video</cf:Term>
+                     <cf:Definition xml:lang="en">A recording of visual images, usually in motion and with sound accompaniment.</cf:Definition>
+                     <cf:Broader>
+                        <cf:Class id="http://purl.org/coar/resource_type/c_8a7e"
+                                  classSchemeId="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types"/>
+                     </cf:Broader>
+                  </cf:Class>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="http://purl.org/coar/resource_type/c_18cc">
+            <xs:annotation>
+               <xs:documentation xml:lang="en">sound</xs:documentation>
+               <xs:documentation xml:lang="ru">фонодокумент</xs:documentation>
+               <xs:documentation xml:lang="ca">so</xs:documentation>
+               <xs:documentation xml:lang="es">sonido</xs:documentation>
+               <xs:documentation xml:lang="it">suono</xs:documentation>
+               <xs:documentation xml:lang="zh">声音</xs:documentation>
+               <xs:documentation xml:lang="pt">som</xs:documentation>
+               <xs:documentation xml:lang="de">Ton</xs:documentation>
+               <xs:documentation xml:lang="fr">son</xs:documentation>
+               <xs:documentation xml:lang="ja">音声</xs:documentation>
+               <xs:documentation xml:lang="tr">ses</xs:documentation>
+               <xs:appinfo>
+                  <cf:Class id="http://purl.org/coar/resource_type/c_18cc"
+                            classSchemeId="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types">
+                     <cf:Term xml:lang="en" trans="o">sound</cf:Term>
+                     <cf:Term xml:lang="ru" trans="h">фонодокумент</cf:Term>
+                     <cf:Term xml:lang="ca" trans="h">so</cf:Term>
+                     <cf:Term xml:lang="es" trans="h">sonido</cf:Term>
+                     <cf:Term xml:lang="it" trans="h">suono</cf:Term>
+                     <cf:Term xml:lang="zh" trans="h">声音</cf:Term>
+                     <cf:Term xml:lang="pt" trans="h">som</cf:Term>
+                     <cf:Term xml:lang="de" trans="h">Ton</cf:Term>
+                     <cf:Term xml:lang="fr" trans="h">son</cf:Term>
+                     <cf:Term xml:lang="ja" trans="h">音声</cf:Term>
+                     <cf:Term xml:lang="tr" trans="h">ses</cf:Term>
+                     <cf:Definition xml:lang="en">A resource primarily intended to be heard. Examples include a music playback file format, an audio compact disc, and recorded speech or sounds.</cf:Definition>
+                  </cf:Class>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="http://purl.org/coar/resource_type/c_18cd">
+            <xs:annotation>
+               <xs:documentation xml:lang="en">musical composition</xs:documentation>
+               <xs:documentation xml:lang="ru">музыкальная композиция</xs:documentation>
+               <xs:documentation xml:lang="ca">composició musical</xs:documentation>
+               <xs:documentation xml:lang="es">composición musical</xs:documentation>
+               <xs:documentation xml:lang="it">composizione musicale</xs:documentation>
+               <xs:documentation xml:lang="zh">音乐</xs:documentation>
+               <xs:documentation xml:lang="pt">composição musical</xs:documentation>
+               <xs:documentation xml:lang="de">musikalische Komposition</xs:documentation>
+               <xs:documentation xml:lang="fr">composition musicale</xs:documentation>
+               <xs:documentation xml:lang="nl">muzikale compositie</xs:documentation>
+               <xs:documentation xml:lang="ja">音楽</xs:documentation>
+               <xs:documentation xml:lang="tr">müzikal kompozisyon</xs:documentation>
+               <xs:appinfo>
+                  <cf:Class id="http://purl.org/coar/resource_type/c_18cd"
+                            classSchemeId="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types">
+                     <cf:Term xml:lang="en" trans="o">musical composition</cf:Term>
+                     <cf:Term xml:lang="ru" trans="h">музыкальная композиция</cf:Term>
+                     <cf:Term xml:lang="ca" trans="h">composició musical</cf:Term>
+                     <cf:Term xml:lang="es" trans="h">composición musical</cf:Term>
+                     <cf:Term xml:lang="it" trans="h">composizione musicale</cf:Term>
+                     <cf:Term xml:lang="zh" trans="h">音乐</cf:Term>
+                     <cf:Term xml:lang="pt" trans="h">composição musical</cf:Term>
+                     <cf:Term xml:lang="de" trans="h">musikalische Komposition</cf:Term>
+                     <cf:Term xml:lang="fr" trans="h">composition musicale</cf:Term>
+                     <cf:Term xml:lang="nl" trans="h">muzikale compositie</cf:Term>
+                     <cf:Term xml:lang="ja" trans="h">音楽</cf:Term>
+                     <cf:Term xml:lang="tr" trans="h">müzikal kompozisyon</cf:Term>
+                     <cf:Definition xml:lang="en">Musical composition can refer to an original piece of music, the structure of a musical piece, or the process of creating a new piece of music.  </cf:Definition>
+                     <cf:Broader>
+                        <cf:Class id="http://purl.org/coar/resource_type/c_18cc"
+                                  classSchemeId="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types"/>
+                     </cf:Broader>
+                  </cf:Class>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+      </xs:restriction>
+   </xs:simpleType>
+</xs:schema>

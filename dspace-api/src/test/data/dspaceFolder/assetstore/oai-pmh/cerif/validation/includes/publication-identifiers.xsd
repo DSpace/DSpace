@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:cf="urn:xmlns:org.eurocris.cerif" xmlns:cflink="https://w3id.org/cerif/annotations#"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" attributeFormDefault="unqualified" elementFormDefault="qualified" xml:lang="en"
+	xsi:schemaLocation="http://www.w3.org/2001/XMLSchema https://www.w3.org/2001/XMLSchema.xsd">
+	<xs:annotation>
+		<xs:documentation>This is the XML Schema component for the OpenAIRE CERIF profile 1.1 which specifies the admissible publication identifiers.
+			For further description please see the main schema file.
+			This work is licensed under a Creative Commons Attribution 4.0 International License (http://creativecommons.org/licenses/by/4.0/).
+		</xs:documentation>
+	</xs:annotation>
+
+    <xs:import namespace="http://issn.org/vocabularies/Medium" schemaLocation="../vocabularies/issn_medium_types.xsd">
+        <xs:annotation>
+            <xs:documentation>The medium types.</xs:documentation>
+        </xs:annotation>
+    </xs:import>
+
+    <xs:include schemaLocation="../includes/cerif-base-identifiers.xsd">
+        <xs:annotation>
+            <xs:documentation>The basic types of identifiers for use with schemas.</xs:documentation>
+        </xs:annotation>
+    </xs:include>
+
+	<xs:include schemaLocation="../includes/cerif-commons.xsd">
+		<xs:annotation>
+			<xs:documentation>The common building blocks for any CERIF XML Schema.</xs:documentation>
+		</xs:annotation>
+	</xs:include>
+
+	<xs:group name="PublicationIdentifiers__Group">
+		<xs:sequence>
+
+            <xs:element cflink:identifier="true" cflink:link="https://w3id.org/cerif/vocab/IdentifierTypes#DOI" minOccurs="0" name="DOI">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">The Digital Object Identifier</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="DOI__SimpleType">
+                            <xs:attributeGroup ref="cfExtension__AttributeGroup"/>
+                        </xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+            </xs:element>
+
+            <xs:element cflink:identifier="true" cflink:link="https://w3id.org/cerif/vocab/IdentifierTypes#Handle" minOccurs="0" name="Handle" type="cfString__Type"/>
+            
+            <xs:element cflink:identifier="true" cflink:link="https://w3id.org/cerif/vocab/IdentifierTypes#PMCID" minOccurs="0" name="PMCID" type="cfString__Type"/>
+            
+            <xs:element cflink:identifier="true" cflink:link="https://w3id.org/cerif/vocab/IdentifierTypes#ISI-Number" minOccurs="0" name="ISI-Number" type="cfString__Type"/>
+            
+            <xs:element cflink:identifier="true" cflink:link="https://w3id.org/cerif/vocab/IdentifierTypes#SCP-Number" minOccurs="0" name="SCP-Number" type="cfString__Type"/>
+            
+            <xs:element cflink:identifier="true" cflink:link="https://w3id.org/cerif/vocab/IdentifierTypes#ISSN" minOccurs="0" maxOccurs="unbounded" name="ISSN">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The International Standard Serial Number</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:simpleContent>
+                        <xs:extension base="ISSN__SimpleType">
+                            <xs:attribute name="medium" use="optional" type="mediumType:Enum" xmlns:mediumType="http://issn.org/vocabularies/Medium"/>
+                            <xs:attributeGroup ref="cfExtension__AttributeGroup"/>
+                        </xs:extension>
+                    </xs:simpleContent>
+                </xs:complexType>
+            </xs:element>
+            
+            <xs:element cflink:identifier="true" cflink:link="https://w3id.org/cerif/vocab/IdentifierTypes#ISBN" minOccurs="0" maxOccurs="unbounded" name="ISBN">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The International Standard Book Number</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:simpleContent>
+                        <xs:extension base="ISBN__SimpleType">
+                            <xs:attribute name="medium" use="optional" type="mediumType:Enum" xmlns:mediumType="http://issn.org/vocabularies/Medium"/>
+                            <xs:attributeGroup ref="cfExtension__AttributeGroup"/>
+                        </xs:extension>
+                    </xs:simpleContent>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element cflink:identifier="true" cflink:link="https://w3id.org/cerif/vocab/IdentifierTypes#URL" minOccurs="0" name="URL" type="cfString__Type"/>
+
+            <xs:element cflink:identifier="true" cflink:link="https://w3id.org/cerif/vocab/IdentifierTypes#URN" minOccurs="0" name="URN" type="cfString__Type"/>
+
+            <xs:element cflink:identifier="true" cflink:link="https://w3id.org/cerif/vocab/IdentifierTypes#ZDBID" minOccurs="0" name="ZDB-ID" type="ZDBID__Type"/>
+
+<!-- A skeleton for contributing new identifier types
+			## ideally please submit a GitHub pull request with branch called 'add-XXX'
+			## but we will welcome your contribution no matter how you choose to communicate it to us  
+			<xs:element cflink:identifier="true" minOccurs="0" name="XXX">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">The XXX identifier</xs:documentation>
+					<xs:appinfo>
+						## @id: please generate a fresh Version 4 UUID (e.g. through the 'uuidgen | tr A-F a-f' linux or macOS commands or online at https://www.uuidgenerator.net/version4)
+						<cf:Service id="">
+							## please keep the cf:Name equal to the beginning of the xs:documentation above, per @xml:lang
+							<cf:Name xml:lang="en">The XXX identifier</cf:Name>
+							## please provide a short description of the scope of the identifier service and supply a pointer to a webpage with more details
+							<cf:Description xml:lang="en">The service of registering YYY and assigning identifiers to them.  See ZZZ for more details.</cf:Description>
+						</cf:Service>
+					</xs:appinfo>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:restriction base="cfString__Type">
+							## @value: please supply a regular expression the values shall match
+							<xs:pattern value="">
+								<xs:annotation>
+									## and document where you got it from
+									<xs:documentation source=""/>
+								</xs:annotation>
+							</xs:pattern>
+							## or at least specify (in @value) the maximum length of the admissible values of the identifier
+							<xs:maxLength value=""/>
+						</xs:restriction>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+ -->
+		</xs:sequence>
+	</xs:group>
+    
+	<xs:complexType name="ZDBID__Type">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">The XML Schema type for the ZDB identifier</xs:documentation>
+			<xs:appinfo>
+				<cf:Service id="13609b36-0428-4003-8bb1-39174f10a211">
+					<cf:Name xml:lang="en">The ZDB identifier</cf:Name>
+					<cf:Description xml:lang="en">Service that provides identifiers for serials German National Serials Database.</cf:Description>
+				</cf:Service>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:restriction base="cfString__Type">
+				<xs:pattern value="\d{1,7}-[Xx\d]">
+					<xs:annotation>
+						<xs:documentation source="https://www.wikidata.org/wiki/Property:P1042"/>
+					</xs:annotation>
+				</xs:pattern>
+			</xs:restriction>
+		</xs:simpleContent>
+	</xs:complexType>
+
+</xs:schema>

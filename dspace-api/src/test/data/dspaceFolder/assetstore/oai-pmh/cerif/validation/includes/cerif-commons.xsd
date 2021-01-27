@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:cf="urn:xmlns:org.eurocris.cerif" xmlns:sch="http://purl.oclc.org/dsdl/schematron" xmlns:cflink="https://w3id.org/cerif/annotations#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" attributeFormDefault="unqualified" elementFormDefault="qualified" xml:lang="en" xsi:schemaLocation="http://www.w3.org/2001/XMLSchema https://www.w3.org/2001/XMLSchema.xsd">
+	<xs:annotation>
+		<xs:documentation>Basic building blocks for CERIF XML Schemas. To be xs:included by other XML Schemas.
+			Created by the CERIF and CRIS Architecture Task Group of euroCRIS.</xs:documentation>
+        <xs:appinfo>
+            <sch:pattern>
+                <sch:title>"startDate" precedes the corresponding "endDate"</sch:title>
+                <!-- TODO add xs:dateTime -->
+                <!-- TODO cases where timezones are specified -->
+                <sch:rule context="*[@startDate][@endDate][ string-length( @startDate ) le 10 and not( contains( @startDate, 'Z' ) or contains( @startDate, ':' ) ) ][ string-length( @endDate ) = 4 and not( contains( @endDate, 'Z' ) or contains( @endDate, ':' ) ) ]">
+                    <sch:report test="( substring( concat( @startDate, '-01-01' ), 1, 10 ) cast as xs:date ) gt ( ( concat( @endDate, '-01-01' ) cast as xs:date ) + xs:yearMonthDuration( 'P1Y' ) )">The "startDate" (<sch:value-of select="@startDate"/>) must not be later than the end of the corresponding "endDate" (<sch:value-of select="@endDate"/>) period</sch:report>
+                </sch:rule>
+                <sch:rule context="*[@startDate][@endDate][ string-length( @startDate ) le 10 and not( contains( @startDate, 'Z' ) or contains( @startDate, ':' ) ) ][ string-length( @endDate ) = 7 and not( contains( @endDate, 'Z' ) or contains( @endDate, ':' ) ) ]">
+                    <sch:report test="( substring( concat( @startDate, '-01-01' ), 1, 10 ) cast as xs:date ) gt ( ( concat( @endDate, '-01' ) cast as xs:date ) + xs:yearMonthDuration( 'P1M' ) )">The "startDate" (<sch:value-of select="@startDate"/>) must not be later than the end of the corresponding "endDate" (<sch:value-of select="@endDate"/>) period</sch:report>
+                </sch:rule>
+                <sch:rule context="*[@startDate][@endDate][ string-length( @startDate ) le 10 and not( contains( @startDate, 'Z' ) or contains( @startDate, ':' ) ) ][ string-length( @endDate ) = 10 and not( contains( @endDate, 'Z' ) or contains( @endDate, ':' ) ) ]">
+                    <sch:report test="( substring( concat( @startDate, '-01-01' ), 1, 10 ) cast as xs:date ) gt ( ( @endDate cast as xs:date ) + xs:dayTimeDuration( 'P1D' ) )">The "startDate" (<sch:value-of select="@startDate"/>) must not be later than the end of the corresponding "endDate" (<sch:value-of select="@endDate"/>) period</sch:report>
+                </sch:rule>
+            </sch:pattern>
+        </xs:appinfo>
+	</xs:annotation>
+
+	<xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/2001/xml.xsd">
+		<xs:annotation>
+			<xs:documentation>The `xml:lang` attribute.</xs:documentation>
+		</xs:annotation>
+	</xs:import>
+
+	<xs:element abstract="true" name="Individual__SubstitutionGroupHead" type="cfIdAttr__BaseType">
+		<xs:annotation>
+			<xs:documentation>Any CERIF base object</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	
+	<xs:element abstract="true" name="PersonOrOrgUnit__SubstitutionGroupHead" substitutionGroup="Individual__SubstitutionGroupHead" type="PersonOrOrgUnit__BaseType">
+		<xs:annotation>
+			<xs:documentation>A person or an organisational unit</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="PersonOrOrgUnit__BaseType">
+		<xs:annotation>
+			<xs:documentation>A common supertype for persons and organisational units</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="cfIdAttr__BaseType"/>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:element abstract="true" name="Person__SubstitutionGroupHead" substitutionGroup="PersonOrOrgUnit__SubstitutionGroupHead" type="Person__BaseType">
+		<xs:annotation>
+			<xs:documentation>A person</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="Person__BaseType">
+		<xs:annotation>
+			<xs:documentation>An abstract person type</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="PersonOrOrgUnit__BaseType"/>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:element abstract="true" name="OrgUnit__SubstitutionGroupHead" substitutionGroup="PersonOrOrgUnit__SubstitutionGroupHead" type="OrgUnit__BaseType">
+		<xs:annotation>
+			<xs:documentation>An organisation unit</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="OrgUnit__BaseType">
+		<xs:annotation>
+			<xs:documentation>An abstract organisation unit type</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="PersonOrOrgUnit__BaseType"/>
+		</xs:complexContent>
+	</xs:complexType>
+
+
+	<xs:complexType name="cfIdAttr__BaseType">
+		<xs:sequence/>
+		<xs:attribute name="id" type="cfId__SimpleType"/>
+		<xs:attributeGroup ref="cfExtension__AttributeGroup"/>
+	</xs:complexType>
+
+	<xs:simpleType name="cfId__SimpleType">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="128"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="cfDate__Type">
+		<xs:simpleContent>
+			<xs:extension base="xs:date">
+				<xs:attributeGroup ref="cfExtension__AttributeGroup"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<xs:complexType name="cfString__Type">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attributeGroup ref="cfExtension__AttributeGroup"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+    <xs:complexType name="cfURI__Type">
+        <xs:simpleContent>
+            <xs:extension base="xs:anyURI">
+                <xs:attributeGroup ref="cfExtension__AttributeGroup"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+	<xs:complexType name="cfMLangString__Type">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute ref="xml:lang" use="optional"/>
+				<xs:attribute default="o" name="trans" type="cfTrans__Type" use="optional"/>
+				<xs:attributeGroup ref="cfExtension__AttributeGroup"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	
+	<xs:complexType name="cfMLangStringWithOptionalSource__Type">
+		<xs:simpleContent>
+			<xs:extension base="cfMLangString__Type">
+				<xs:attribute name="source" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	
+	<xs:complexType mixed="true" name="cfMLangAnyMixed__Type">
+		<xs:sequence>
+			<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##any" processContents="lax"/>
+		</xs:sequence>
+		<xs:attribute ref="xml:lang" use="required"/>
+		<xs:attribute default="o" name="trans" type="cfTrans__Type" use="optional"/>
+	</xs:complexType>
+
+	<xs:complexType name="cfNonnegativeInteger__Type">
+		<xs:simpleContent>
+			<xs:extension base="xs:nonNegativeInteger">
+				<xs:attributeGroup ref="cfExtension__AttributeGroup"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<xs:simpleType name="cfTrans__Type">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="o">
+				<xs:annotation>
+					<xs:documentation>Value in the original language</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="h">
+				<xs:annotation>
+					<xs:documentation>Human-translated value</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="m">
+				<xs:annotation>
+					<xs:documentation>Machine-translated value</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:group name="PersonWithAffiliations__Group">
+		<xs:sequence>
+			<xs:element ref="Person__SubstitutionGroupHead"/>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="Affiliation">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element minOccurs="0" name="DisplayName" type="xs:string"/>
+						<xs:element ref="OrgUnit__SubstitutionGroupHead"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:group>
+
+	<xs:group name="__TheRestGroup">
+		<xs:sequence>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="Classification" type="cfGenericURIClassification__Type"/>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="Link" type="cfGenericLink__Type"/>
+		</xs:sequence>
+	</xs:group>
+
+
+	<xs:complexType name="cfLink__BaseType">
+		<xs:attributeGroup ref="cfStartDateEndDate__AttributeGroup"/>
+	</xs:complexType>
+
+	<xs:complexType name="cfSimpleStringLink__Type">
+		<xs:simpleContent>
+			<xs:extension base="cfString__Type">
+				<xs:attributeGroup ref="cfStartDateEndDate__AttributeGroup"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+    <xs:complexType name="cfSimpleURILink__Type">
+        <xs:simpleContent>
+            <xs:extension base="cfURI__Type">
+                <xs:attributeGroup ref="cfStartDateEndDate__AttributeGroup"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+	<xs:complexType name="cfLinkWithDisplayName__BaseType">
+		<xs:complexContent>
+			<xs:extension base="cfLink__BaseType">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="DisplayName" type="xs:string"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="cfLinkWithDisplayNameToPersonWithAffiliations__Type">
+		<xs:complexContent>
+			<xs:extension base="cfLinkWithDisplayName__BaseType">
+				<xs:sequence>
+					<xs:group ref="PersonWithAffiliations__Group"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="cfLinkWithDisplayNameToPersonWithAffiliationsOrOrgUnit__Type">
+		<xs:complexContent>
+			<xs:extension base="cfLinkWithDisplayName__BaseType">
+				<xs:choice>
+					<xs:group ref="PersonWithAffiliations__Group"/>
+					<xs:element ref="OrgUnit__SubstitutionGroupHead"/>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="cfLinkWithDisplayNameToPersonOrOrgUnit__Type">
+		<xs:complexContent>
+			<xs:extension base="cfLinkWithDisplayName__BaseType">
+				<xs:sequence>
+					<xs:element ref="PersonOrOrgUnit__SubstitutionGroupHead"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="cfLinkWithDisplayNameToOrgUnit__Type">
+		<xs:complexContent>
+			<xs:extension base="cfLinkWithDisplayName__BaseType">
+				<xs:sequence>
+					<xs:element ref="OrgUnit__SubstitutionGroupHead"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="cfGenericStringClassification__Type">
+		<xs:simpleContent>
+			<xs:extension base="cfSimpleStringLink__Type">
+				<xs:attribute name="scheme" type="xs:anyURI" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+    <xs:complexType name="cfGenericURIClassification__Type">
+        <xs:simpleContent>
+            <xs:extension base="cfSimpleURILink__Type">
+                <xs:attribute name="scheme" type="xs:anyURI" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+	<xs:complexType name="cfGenericLink__Type">
+		<xs:complexContent>
+			<xs:extension base="cfLink__BaseType">
+				<xs:sequence>
+					<xs:element ref="Individual__SubstitutionGroupHead"/>
+				</xs:sequence>
+				<xs:attribute name="type" type="xs:string" use="required">
+					<xs:annotation>
+						<xs:documentation>The type of the relationship</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="cfGenericIdentifier__Type">
+		<xs:annotation>
+			<xs:documentation>A generic federated identifier, the type of the identifier is expressed using the `type` attribute</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="cfIdentifier__Type">
+				<xs:attribute name="type" type="xs:anyURI" use="required">
+					<xs:annotation>
+						<xs:documentation>The type of the identifier</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<xs:complexType name="cfIdentifier__Type">
+		<xs:annotation>
+			<xs:documentation>A federated identifier of a specific type: the type is expressed in the type of the XML Element.</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="cfString__Type">
+				<xs:attribute name="issuerServiceId" type="cfId__SimpleType" use="optional">
+					<xs:annotation>
+						<xs:documentation>The identifier optionally links to the Service that issued it by specifying the Service ID in this attribute.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<xs:complexType name="cfAmount__Type">
+		<xs:annotation>
+			<xs:documentation>A monetary amount in a specified currency.</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="xs:float">
+				<xs:attribute name="currency" type="xs:string" use="required">
+					<xs:annotation>
+						<xs:documentation>The code of the currency</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<xs:attributeGroup name="cfStartDateEndDate__AttributeGroup">
+		<xs:annotation>
+			<xs:documentation>The validity interval specification.</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="startDate" type="cfGenericDateTime__SimpleType" use="optional">
+			<xs:annotation>
+				<xs:documentation>The instant when the particular fact or relationship starts being true.
+					When specified, the validity starts at the beginning of the datetime value (e.g. startDate="2016" means "from the beginning of the year 2016"). 
+					When missing, minus infinity is assumed, with the meaning of "from time immemorial", or from times beyond the reach of record.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="endDate" type="cfGenericDateTime__SimpleType" use="optional">
+			<xs:annotation>
+				<xs:documentation>The instant when the particular fact or relationship stops being true.
+					When specified, the validity extends up to the end of the datetime value, but it does not include the very last instant (e.g. endDate="2016" means "until the end of the year 2016" i.e., anything before 2017-01-01 00:00:00).
+					When missing, plus infinity is assumed, with the meaning of "until things change" (effectively "forever" for links with semantics that cannot change).
+					Note that translating this value to the cfEndDate attribute from the CERIF Data Model is non-trivial.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:attributeGroup>
+
+	<xs:complexType name="cfGenericDate__Type">
+		<xs:annotation>
+			<xs:documentation>A year (xs:gYear), year and month (xs:gYearMonth) or full date (xs:date). All cases can include an optional time zone specification.</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="cfGenericDate__SimpleType">
+				<xs:attributeGroup ref="cfExtension__AttributeGroup"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<xs:complexType name="cfGenericDateTime__Type">
+		<xs:annotation>
+			<xs:documentation>A year (xs:gYear), year and month (xs:gYearMonth), full date (xs:date) or date and time instant (xs:dateTime). All cases can include an optional time zone specification.</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="cfGenericDateTime__SimpleType">
+				<xs:attributeGroup ref="cfExtension__AttributeGroup"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<xs:simpleType name="cfGenericDate__SimpleType">
+		<xs:annotation>
+			<xs:documentation>A year (xs:gYear), year and month (xs:gYearMonth) or full date (xs:date). All cases can include an optional time zone specification.</xs:documentation>
+		</xs:annotation>
+		<xs:union memberTypes="xs:gYear xs:gYearMonth xs:date"/>
+	</xs:simpleType>
+
+	<xs:simpleType name="cfGenericDateTime__SimpleType">
+		<xs:annotation>
+			<xs:documentation>A year (xs:gYear), year and month (xs:gYearMonth), full date (xs:date) or date and time instant (xs:dateTime). All cases can include an optional time zone specification.</xs:documentation>
+		</xs:annotation>
+		<xs:union memberTypes="cfGenericDate__SimpleType xs:dateTime"/>
+	</xs:simpleType>
+
+	<xs:attributeGroup name="cfExtension__AttributeGroup">
+		<xs:annotation>
+			<xs:documentation>Extension mechanism: Any CERIF XML element type includes this attribute group.</xs:documentation>
+		</xs:annotation>
+		<xs:anyAttribute namespace="##other">
+			<xs:annotation>
+				<xs:documentation>Any CERIF XML element supports attributes from other namespaces.</xs:documentation>
+			</xs:annotation>
+		</xs:anyAttribute>
+	</xs:attributeGroup>
+
+</xs:schema>
