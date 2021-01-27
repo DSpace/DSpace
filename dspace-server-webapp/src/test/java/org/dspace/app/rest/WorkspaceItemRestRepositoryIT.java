@@ -3282,66 +3282,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
     @Test
     @Ignore
-    public void patchUploadAddAccessConditionTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
-
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
-
-        Collection collection1 = CollectionBuilder.createCollection(context, child1)
-                .withName("Collection 1")
-                .build();
-
-        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
-
-        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, collection1)
-                .withTitle("Test WorkspaceItem")
-                .withIssueDate("2019-10-01")
-                .withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf)
-                .build();
-
-        context.restoreAuthSystemState();
-
-        // create a list of values to use in add accessCondition
-        List<Operation> addAccessCondition = new ArrayList<Operation>();
-        Map<String, String> value = new HashMap<String, String>();
-        value.put("name", "embargoedWithGroupSelect");
-        value.put("groupUUID", embargoedGroup1.getID().toString());
-        value.put("endDate", "2030-10-02");
-        addAccessCondition.add(new AddOperation("/sections/upload/files/0/accessConditions/-", value));
-
-        String patchBody = getPatchContent(addAccessCondition);
-        String authToken = getAuthToken(eperson.getEmail(), password);
-
-        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
-                .content(patchBody)
-                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                            .andExpect(status().isOk())
-                            .andExpect(jsonPath("$",Matchers.allOf(
-                                    hasJsonPath("$.sections.upload.files[0].accessConditions[0].name",
-                                             is("embargoedWithGroupSelect")),
-                                    hasJsonPath("$.sections.upload.files[0].accessConditions[0].groupUUID",
-                                             is(embargoedGroup1.getID().toString()))
-                                    )));
-
-        // verify that the patch changes have been persisted
-        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$",Matchers.allOf(
-                    hasJsonPath("$.sections.upload.files[0].accessConditions[0].name",
-                             is("embargoedWithGroupSelect")),
-                    hasJsonPath("$.sections.upload.files[0].accessConditions[0].groupUUID",
-                             is(embargoedGroup1.getID().toString()))
-                    )));
-    }
-
-    @Test
-    @Ignore
     public void patchUploadRemoveAccessConditionTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
