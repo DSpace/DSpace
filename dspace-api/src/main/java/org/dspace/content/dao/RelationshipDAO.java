@@ -27,28 +27,31 @@ public interface RelationshipDAO extends GenericDAO<Relationship> {
     /**
      * This method returns a list of Relationship objects that have the given Item object
      * as a leftItem or a rightItem
-     * @param context   The relevant DSpace context
-     * @param item      The item that should be either a leftItem or a rightItem of all
-     *                  the Relationship objects in the returned list
-     * @return          The list of Relationship objects that contain either a left or a
-     *                  right item that is equal to the given item
-     * @throws SQLException If something goes wrong
+     * @param context         The relevant DSpace context
+     * @param item            The item that should be either a leftItem or a rightItem of all
+     *                        the Relationship objects in the returned list
+     * @param excludeTilted   If true, excludes tilted relationships
+     * @return                The list of Relationship objects that contain either a left or a
+     *                        right item that is equal to the given item
+     * @throws SQLException   If something goes wrong
      */
-    List<Relationship> findByItem(Context context, Item item) throws SQLException;
+    List<Relationship> findByItem(Context context, Item item, boolean excludeTilted) throws SQLException;
 
     /**
      * This method returns a list of Relationship objects that have the given Item object
      * as a leftItem or a rightItem
-     * @param context   The relevant DSpace context
-     * @param item      The item that should be either a leftItem or a rightItem of all
-     *                  the Relationship objects in the returned list
-     * @param limit     paging limit
-     * @param offset    paging offset
-     * @return          The list of Relationship objects that contain either a left or a
-     *                  right item that is equal to the given item
-     * @throws SQLException If something goes wrong
+     * @param context         The relevant DSpace context
+     * @param item            The item that should be either a leftItem or a rightItem of all
+     *                        the Relationship objects in the returned list
+     * @param limit           paging limit
+     * @param offset          paging offset
+     * @param excludeTilted   If true, excludes tilted relationships
+     * @return                The list of Relationship objects that contain either a left or a
+     *                        right item that is equal to the given item
+     * @throws SQLException   If something goes wrong
      */
-    List<Relationship> findByItem(Context context, Item item, Integer limit, Integer offset) throws SQLException;
+    List<Relationship> findByItem(Context context, Item item, Integer limit, Integer offset, boolean excludeTilted)
+            throws SQLException;
 
     /**
      * This method returns the next leftplace integer to use for a relationship with this item as the leftItem

@@ -44,7 +44,7 @@ public class EntityServiceImpl implements EntityService {
     public Entity findByItemId(Context context, UUID itemId, Integer limit, Integer offset) throws SQLException {
 
         Item item = itemService.find(context, itemId);
-        List<Relationship> relationshipList = relationshipService.findByItem(context, item, limit, offset);
+        List<Relationship> relationshipList = relationshipService.findByItem(context, item, limit, offset, true);
         return new Entity(item, relationshipList);
     }
 
