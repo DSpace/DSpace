@@ -134,7 +134,8 @@ public class RelationshipDAOImplTest extends AbstractIntegrationTest {
      */
     @Test
     public void testFindByItem() throws Exception {
-        assertEquals("TestFindByItem 0", relationshipsList, relationshipService.findByItem(context, itemOne, -1, -1));
+        assertEquals("TestFindByItem 0", relationshipsList, relationshipService.findByItem(context, itemOne,
+                -1, -1, false));
     }
 
     /**
