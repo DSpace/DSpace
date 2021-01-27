@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import javax.activation.DataHandler;
@@ -131,6 +130,11 @@ public class Email {
     private final List<String> recipients;
 
     /**
+     * The CC addresses
+     */
+    private final List<String> ccAddresses;
+
+    /**
      * Reply to field, if any
      */
     private String replyTo;
@@ -169,6 +173,7 @@ public class Email {
     public Email() {
         arguments = new ArrayList<>(50);
         recipients = new ArrayList<>(50);
+        ccAddresses = new ArrayList<>();
         attachments = new ArrayList<>(10);
         moreAttachments = new ArrayList<>(10);
         subject = "";
@@ -185,6 +190,15 @@ public class Email {
      */
     public void addRecipient(String email) {
         recipients.add(email);
+    }
+
+    /**
+     * Add a CC address
+     *
+     * @param email the CC's email address
+     */
+    public void addCcAddress(String email) {
+        ccAddresses.add(email);
     }
 
     /**
@@ -265,6 +279,7 @@ public class Email {
     public void reset() {
         arguments.clear();
         recipients.clear();
+        ccAddresses.clear();
         attachments.clear();
         moreAttachments.clear();
         replyTo = null;
@@ -305,11 +320,13 @@ public class Email {
         MimeMessage message = new MimeMessage(session);
 
         // Set the recipients of the message
-        Iterator<String> i = recipients.iterator();
+        for (String recipient : recipients) {
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
+        }
 
-        while (i.hasNext()) {
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(
-                i.next()));
+        // Set the CC addresses of the message
+        for (String ccAddress : ccAddresses) {
+            message.addRecipient(Message.RecipientType.CC, new InternetAddress(ccAddress));
         }
 
         // Format the mail message body

@@ -1,0 +1,1747 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="https://www.openaire.eu/cerif-profile/1.1/" xmlns:cf="urn:xmlns:org.eurocris.cerif" xmlns:cflink="https://w3id.org/cerif/annotations#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="https://www.openaire.eu/cerif-profile/1.1/" xml:lang="en" xsi:schemaLocation="http://www.w3.org/2001/XMLSchema https://www.w3.org/2001/XMLSchema.xsd">
+<xs:annotation>
+<xs:documentation>This is the XML Schema for the OpenAIRE CERIF profile 1.1, 
+			a companion artifact of the OpenAIRE Guidelines for CRIS Managers 1.1 (http://openaire-guidelines-for-cris-managers.readthedocs.io/en/latest/index.html). 
+			This work is licensed under a Creative Commons Attribution 4.0 International License (http://creativecommons.org/licenses/by/4.0/).
+		</xs:documentation>
+<xs:appinfo>
+            
+            <sch:ns xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:sch="http://purl.oclc.org/dsdl/schematron" xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" prefix="oacf" uri="https://www.openaire.eu/cerif-profile/1.1/"/>
+        </xs:appinfo>
+<xs:appinfo>
+           <sch:pattern xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:sch="http://purl.oclc.org/dsdl/schematron" xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc">
+<sch:title>Occurrence of "uri" implies an OAMandate is mandated</sch:title>
+<sch:rule context="oacf:OAMandate">
+<sch:report test="@uri and not ( @mandated = 'true' )">If the URI of an Open Access policy is given, "mandated" must be set true</sch:report>
+              </sch:rule>
+           </sch:pattern>
+        </xs:appinfo>
+</xs:annotation>
+
+	
+
+	<xs:import namespace="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types" schemaLocation="vocabularies/openaire_funding_types.xsd"/>
+
+	<xs:import namespace="https://www.openaire.eu/cerif-profile/vocab/COAR_Publication_Types" schemaLocation="vocabularies/coar_publication_types.xsd"/>
+
+	<xs:import namespace="https://www.openaire.eu/cerif-profile/vocab/COAR_Patent_Types" schemaLocation="vocabularies/coar_patent_types.xsd"/>
+
+	<xs:import namespace="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types" schemaLocation="vocabularies/coar_product_types.xsd"/>
+
+	<xs:import namespace="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Service_Compatibility" schemaLocation="vocabularies/openaire_service_compatibilities.xsd"/>
+
+	<xs:include schemaLocation="includes/person-identifiers.xsd">
+<xs:annotation>
+<xs:documentation>The person identifiers.</xs:documentation>
+</xs:annotation>
+</xs:include>
+
+	<xs:include schemaLocation="includes/orgunit-identifiers.xsd">
+<xs:annotation>
+<xs:documentation>The orgunit identifiers.</xs:documentation>
+</xs:annotation>
+</xs:include>
+
+	<xs:include schemaLocation="includes/publication-identifiers.xsd">
+<xs:annotation>
+<xs:documentation>The publication identifiers.</xs:documentation>
+</xs:annotation>
+</xs:include>
+
+	<xs:include schemaLocation="includes/patent-identifiers.xsd">
+<xs:annotation>
+<xs:documentation>The patent identifiers.</xs:documentation>
+</xs:annotation>
+</xs:include>
+
+	<xs:include schemaLocation="includes/product-identifiers.xsd">
+<xs:annotation>
+<xs:documentation>The product identifiers.</xs:documentation>
+</xs:annotation>
+</xs:include>
+
+	<xs:import namespace="http://purl.org/coar/access_right" schemaLocation="vocabularies/coar_accessrights.xsd"/>
+
+<xs:include schemaLocation="./includes/cerif-commons.xsd">
+		<xs:annotation>
+			<xs:documentation>The common building blocks for any CERIF XML Schema.</xs:documentation>
+		</xs:annotation>
+	</xs:include>
+
+	<xs:element cflink:entity="https://w3id.org/cerif/model#Person" name="Person" substitutionGroup="Person__SubstitutionGroupHead">
+		<xs:annotation>
+			<xs:documentation><![CDATA[
+A human being as an individual.
+Source: https://en.oxforddictionaries.com/definition/person
+
+The kind of involvement of a Person in the research ecosystem is specified in the links with the organisations, the services, etc. This typically includes:
+(1) researchers (Persons performing research in an Organisation Unit as employees or students);
+(2) authors and contributors (Persons signing a publication, creators of data sets, software developers, etc.);
+(3) investigators and project participants (Persons involved in a Project as principal investigators, co investigators, project managers, consultants, etc.);
+(4) management (directors, rectors, deans, department heads, etc.);
+(5) support staffs (technicians, responsible for Equipment, librarians and digital asset curators, administrative staff, etc.).
+One Person typically has many of these relationships.
+]]></xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Person__BaseType">
+					<xs:sequence minOccurs="0">
+
+						<xs:element cflink:entity="https://w3id.org/cerif/model#PersonName" minOccurs="0" name="PersonName">
+							<xs:annotation>
+								<xs:documentation>The name of the person</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:complexContent>
+									<xs:extension base="cfIdAttr__BaseType">
+										<xs:sequence>
+						
+											<xs:element cflink:attribute="https://w3id.org/cerif/model#PersonName.FamilyNames" minOccurs="0" name="FamilyNames" type="cfString__Type"/>
+						
+											<xs:element cflink:attribute="https://w3id.org/cerif/model#PersonName.FirstNames" minOccurs="0" name="FirstNames" type="cfString__Type"/>
+						
+											<xs:element cflink:attribute="https://w3id.org/cerif/model#PersonName.OtherNames" minOccurs="0" name="OtherNames" type="cfString__Type"/>
+
+											
+						
+											<xs:group ref="__TheRestGroup"/>
+												
+										</xs:sequence>
+									</xs:extension>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+
+						
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#Person.Gender" minOccurs="0" name="Gender">
+							<xs:annotation>
+								<xs:documentation>The gender of the person. Leave out in case the gender is unknown or not communicated.</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:annotation>
+									<xs:documentation>Genders (sociocultural, not linguistic)</xs:documentation>
+									<xs:appinfo>
+										<cf:ClassScheme id="http://publications.europa.eu/resource/authority/human-sex">
+											<cf:Name xml:lang="en">Genders (sociocultural, not linguistic)</cf:Name>
+										</cf:ClassScheme>
+									</xs:appinfo>
+								</xs:annotation>
+								<xs:restriction base="xs:string">
+									<xs:enumeration value="m">
+										<xs:annotation>
+											<xs:documentation>Masculine</xs:documentation>
+											<xs:appinfo>
+												<cf:Class classSchemeId="http://publications.europa.eu/resource/authority/human-sex" id="http://publications.europa.eu/resource/authority/human-sex/MALE">
+													<cf:Term xml:lang="en">Male</cf:Term>
+												</cf:Class>
+											</xs:appinfo>
+										</xs:annotation>
+									</xs:enumeration>
+									<xs:enumeration value="f">
+										<xs:annotation>
+											<xs:documentation>Feminine</xs:documentation>
+											<xs:appinfo>
+												<cf:Class classSchemeId="http://publications.europa.eu/resource/authority/human-sex" id="http://publications.europa.eu/resource/authority/human-sex/FEMALE">
+													<cf:Term xml:lang="en">Female</cf:Term>
+												</cf:Class>
+											</xs:appinfo>
+										</xs:annotation>
+									</xs:enumeration>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+
+						<xs:group ref="PersonIdentifiers__Group"/>
+
+						<xs:element cflink:entity="https://w3id.org/cerif/model#ElectronicAddress" maxOccurs="unbounded" minOccurs="0" name="ElectronicAddress" type="xs:anyURI">
+							<xs:annotation>
+								<xs:documentation>An electronic address associated with the person</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<!-- ... -->
+
+						<xs:element cflink:link="https://w3id.org/cerif/model#Person_OrganisationUnit(https://w3id.org/cerif/vocab/PersonOrganisationRoles#Affiliation)" maxOccurs="unbounded" minOccurs="0" name="Affiliation">
+<xs:annotation>
+<xs:documentation>The organisation or organisation unit the person is affiliated with</xs:documentation>
+</xs:annotation>
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="cfLink__BaseType">
+<xs:choice>
+<xs:element ref="OrgUnit"/>
+</xs:choice>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+
+<xs:group ref="__TheRestGroup"/>
+						
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element cflink:entity="https://w3id.org/cerif/model#OrganisationUnit" name="OrgUnit" substitutionGroup="OrgUnit__SubstitutionGroupHead">
+		<xs:annotation>
+			<xs:documentation><![CDATA[Organisation Unit: an organisation, a unit therein, a committee or any other group of people that has a collective goal. Organisation Units are not necessarily formalized as legal entities.
+
+In the research information domain Organisation Units typically represents:
+(1) organisations that perform research (universities, research institutes, corporations) and their subdivisions (faculties, schools, departments, research groups) and other associated bodies (boards, advisory bodies);
+(2) organisations that fund research (funders, their divisions and evaluation panels);
+(3) scientific associations and networks;
+(4) publishers, facility operators and other service providers in the research space;
+(5) authorities, such as patent offices and standardization or supervision bodies; and
+(6) other bodies: editorial boards, evaluation panels, or committees of all kinds.
+			]]></xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="OrgUnit__BaseType">
+					<xs:sequence minOccurs="0">
+
+                        <xs:element cflink:link="https://w3id.org/cerif/model#OrganisationUnit_Classification" maxOccurs="unbounded" minOccurs="0" name="Type" type="cfGenericURIClassification__Type">
+                            <xs:annotation>
+                                <xs:documentation>The type of the organisation unit</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#OrganisationUnit.Acronym" minOccurs="0" name="Acronym" type="cfString__Type">
+							<xs:annotation>
+								<xs:documentation>The acronym of the organisation unit</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#OrganisationUnit.Name" maxOccurs="unbounded" minOccurs="0" name="Name" type="cfMLangString__Type">
+							<xs:annotation>
+								<xs:documentation>The name of the organisation unit</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						
+						<xs:group ref="OrgUnitIdentifiers__Group"/>
+
+						<!-- ... -->
+
+						<xs:element cflink:entity="https://w3id.org/cerif/model#ElectronicAddress" maxOccurs="unbounded" minOccurs="0" name="ElectronicAddress" type="xs:anyURI">
+							<xs:annotation>
+								<xs:documentation>An electronic address associated with the organisation unit</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<!-- ... -->
+
+						<xs:element cflink:link="https://w3id.org/cerif/model#OrganisationUnit_OrganisationUnit(https://w3id.org/cerif/vocab/InterOrganisationalStructure#Part):1" maxOccurs="unbounded" minOccurs="0" name="PartOf">
+							<xs:annotation>
+								<xs:documentation>Link to the larger unit that encompasses this unit.
+								To be used for the immediate parents only. In order to represent the full path up through the hierarchy of an institution, use this construct recursively.
+								 
+								In specific cases there may be several such parents at one time in parallel.
+								An example: a interdisciplinary research centre within a university can be subordinated to several faculties.</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:complexContent>
+									<xs:extension base="cfLinkWithDisplayName__BaseType">
+										<xs:sequence>
+											<xs:element ref="OrgUnit"/>
+										</xs:sequence>
+									</xs:extension>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+
+						
+
+						<!-- ... -->
+
+						<xs:group ref="__TheRestGroup"/>
+						
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element abstract="true" name="ProjectFunding__SubstitutionGroupHead" substitutionGroup="Individual__SubstitutionGroupHead" type="ProjectFunding__BaseType">
+		<xs:annotation>
+			<xs:documentation>Project or Funding</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="ProjectFunding__BaseType">
+		<xs:annotation>
+			<xs:documentation>A common supertype for projects and funding</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="cfIdAttr__BaseType"/>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:element cflink:entity="https://w3id.org/cerif/model#Project" name="Project" substitutionGroup="ProjectFunding__SubstitutionGroupHead">
+		<xs:annotation>
+			<xs:documentation><![CDATA[A temporary endeavor undertaken to create a unique product, service or result.
+Source: the Project Management Institute, https://www.pmi.org/about/learn-about-pmi/what-is-project-management
+
+In the research information domain, one typically tracks:
+(1) research projects, where the result is an addition to the body of knowledge of the mankind,
+(2) technology development projects, where the result is a particular technology or product,
+(3) innovation projects, where the result is an improvement of a product or process, and
+(4) projects that create or enhance infrastructure for research, technology development or innovation.
+
+Depending on the scope one can also track finer levels of granularity: stages, work packages, sometimes even down to individual tasks. All such activities are also modelled using the Project entity and linked using the recursive link relationship.
+
+The Project entity only captures details of the project scope and plan. Information about the resources needed to execute the project such as the funding (i.e., the grants received), the people and organisations involved, the supporting infrastructures, the outputs produced, etc. is contained in separate entities (the Funding entity, the Person entity, the OrgUnit entity, the infrastructure entities, the result entities respectively) and is linked to the Project.
+]]></xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="ProjectFunding__BaseType">
+					<xs:sequence minOccurs="0">
+						
+						<xs:element cflink:link="https://w3id.org/cerif/model#Project_Classification" maxOccurs="unbounded" minOccurs="0" name="Type" type="cfGenericURIClassification__Type">
+							<xs:annotation>
+								<xs:documentation>The type of the project</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#Project.Acronym" minOccurs="0" name="Acronym" type="cfString__Type">
+							<xs:annotation>
+								<xs:documentation>The acronym of the project</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#Project.Title" maxOccurs="unbounded" minOccurs="0" name="Title" type="cfMLangString__Type">
+							<xs:annotation>
+								<xs:documentation>The title of the project</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:identifier="true" maxOccurs="unbounded" minOccurs="0" name="Identifier" type="cfGenericIdentifier__Type">
+							<xs:annotation>
+								<xs:documentation>An identifier of the project</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#Project.StartDate" minOccurs="0" name="StartDate" type="cfDate__Type">
+							<xs:annotation>
+								<xs:documentation>The start date of the project</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#Project.EndDate" minOccurs="0" name="EndDate" type="cfDate__Type">
+							<xs:annotation>
+								<xs:documentation>The end date of the project</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						
+						
+						<xs:element cflink:container="unordered" minOccurs="0" name="Consortium">
+							<xs:annotation>
+								<xs:documentation>The consortium of the project: the organisations (persons) who are contractually bound to do the work in the project</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element cflink:link="https://w3id.org/cerif/model#Project_OrganisationUnit(https://w3id.org/cerif/vocab/OrganisationProjectEngagements#Coordinator) https://w3id.org/cerif/model#Project_Person(https://w3id.org/cerif/vocab/PersonProjectEngagements#Coordinator)" maxOccurs="unbounded" minOccurs="0" name="Coordinator" type="cfLinkWithDisplayNameToPersonOrOrgUnit__Type">
+										<xs:annotation>
+											<xs:documentation>Project coordinator</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element cflink:link="https://w3id.org/cerif/model#Project_OrganisationUnit(https://w3id.org/cerif/vocab/OrganisationProjectEngagements#Partner) https://w3id.org/cerif/model#Project_Person(https://w3id.org/cerif/vocab/PersonProjectEngagements#Partner)" maxOccurs="unbounded" minOccurs="0" name="Partner" type="cfLinkWithDisplayNameToPersonOrOrgUnit__Type">
+										<xs:annotation>
+											<xs:documentation>Project partner</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element cflink:link="https://w3id.org/cerif/model#Project_OrganisationUnit(https://w3id.org/cerif/vocab/OrganisationProjectEngagements#Contractor) https://w3id.org/cerif/model#Project_Person(https://w3id.org/cerif/vocab/PersonProjectEngagements#Contractor)" maxOccurs="unbounded" minOccurs="0" name="Contractor" type="cfLinkWithDisplayNameToPersonOrOrgUnit__Type">
+										<xs:annotation>
+											<xs:documentation>Project contractor</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element cflink:link="https://w3id.org/cerif/model#Project_OrganisationUnit(https://w3id.org/cerif/vocab/OrganisationProjectEngagements#InkindContributor) https://w3id.org/cerif/model#Project_Person(https://w3id.org/cerif/vocab/PersonProjectEngagements#InkindContributor)" maxOccurs="unbounded" minOccurs="0" name="InkindContributor" type="cfLinkWithDisplayNameToPersonOrOrgUnit__Type">
+										<xs:annotation>
+											<xs:documentation>Project in kind contributor</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:sequence/>
+									<xs:element cflink:link="https://w3id.org/cerif/model#Project_OrganisationUnit(https://w3id.org/cerif/vocab/OrganisationProjectEngagements#ConsortiumMember) https://w3id.org/cerif/model#Project_Person(https://w3id.org/cerif/vocab/PersonProjectEngagements#ConsortiumMember)" maxOccurs="unbounded" minOccurs="0" name="Member" type="cfLinkWithDisplayNameToPersonOrOrgUnit__Type">
+										<xs:annotation>
+											<xs:documentation>A member of the project consortium</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						
+						<xs:element cflink:container="unordered" minOccurs="0" name="Team">
+							<xs:annotation>
+								<xs:documentation>The project team: the persons who carry out the work in the project, typically as a part of their job at the organisations from the consortium</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element cflink:link="https://w3id.org/cerif/model#Project_Person(https://w3id.org/cerif/vocab/PersonProjectEngagements#PrincipalInvestigator)" maxOccurs="unbounded" minOccurs="0" name="PrincipalInvestigator" type="cfLinkWithDisplayNameToPersonWithAffiliations__Type">
+										<xs:annotation>
+											<xs:documentation>The principal investigator: the person responsible for the whole project, the head of the project team</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element cflink:link="https://w3id.org/cerif/model#Project_Person(https://w3id.org/cerif/vocab/PersonProjectEngagements#OrganisationContact)" maxOccurs="unbounded" minOccurs="0" name="Contact" type="cfLinkWithDisplayNameToPersonWithAffiliations__Type">
+										<xs:annotation>
+											<xs:documentation>A person to contact in matters connected with her/his organisations' participation in the project</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:sequence/>
+									<xs:element cflink:link="https://w3id.org/cerif/model#Project_Person(https://w3id.org/cerif/vocab/PersonProjectEngagements#TeamMember)" maxOccurs="unbounded" minOccurs="0" name="Member" type="cfLinkWithDisplayNameToPersonWithAffiliations__Type">
+										<xs:annotation>
+											<xs:documentation>A member of the project team</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						
+						<xs:element cflink:container="unordered" maxOccurs="unbounded" minOccurs="0" name="Funded">
+							<xs:annotation>
+								<xs:documentation>Information about funding of this project</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element cflink:link="https://w3id.org/cerif/model#Project_OrganisationUnit(https://w3id.org/cerif/vocab/OrganisationProjectEngagements#Funder)" minOccurs="0" name="By" type="cfLinkWithDisplayNameToPersonOrOrgUnit__Type">
+										<xs:annotation>
+											<xs:documentation>The funder of the project</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									
+									<xs:element cflink:link="https://w3id.org/cerif/model#Project_Funding(https://w3id.org/cerif/vocab/ProjectFundingRelations#Support)" minOccurs="0" name="As">
+										<xs:annotation>
+											<xs:documentation>The specific funding device (grant, award, contract) for the project</xs:documentation>
+										</xs:annotation>
+										<xs:complexType>
+											<xs:complexContent>
+												<xs:extension base="cfLink__BaseType">
+													<xs:sequence>
+														<xs:element ref="Funding"/>
+													</xs:sequence>
+												</xs:extension>
+											</xs:complexContent>
+										</xs:complexType>
+									</xs:element>
+								</xs:sequence>
+								<xs:attributeGroup ref="cfExtension__AttributeGroup"/>
+							</xs:complexType>
+						</xs:element>
+
+						<xs:sequence/>
+						<xs:element cflink:link="https://w3id.org/cerif/model#Project_Classification" maxOccurs="unbounded" minOccurs="0" name="Subject" type="cfGenericURIClassification__Type">
+							<xs:annotation>
+								<xs:documentation>The subject classification(s) of the project</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#Project.Keywords" maxOccurs="unbounded" minOccurs="0" name="Keyword" type="cfMLangString__Type">
+							<xs:annotation>
+								<xs:documentation>A single keyword or key expression that characterize the project. Please repeat to serialize separate keywords or key expressions.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#Project.Abstract" maxOccurs="unbounded" minOccurs="0" name="Abstract" type="cfMLangAnyMixed__Type">
+							<xs:annotation>
+								<xs:documentation>The abstract of the project</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:link="https://w3id.org/cerif/model#Project_Classification" maxOccurs="unbounded" minOccurs="0" name="Status" type="cfGenericURIClassification__Type">
+							<xs:annotation>
+								<xs:documentation>The status of the project</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						
+						
+						<xs:element cflink:link="https://w3id.org/cerif/model#Project_Equipment(https://w3id.org/cerif/vocab/ProjectResearchInfrastructureRelations#User)" maxOccurs="unbounded" minOccurs="0" name="Uses">
+<xs:annotation>
+<xs:documentation>The equipment this project uses</xs:documentation>
+</xs:annotation>
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="cfLink__BaseType">
+<xs:choice>
+<xs:element ref="Equipment"/>
+</xs:choice>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+
+<xs:element maxOccurs="unbounded" minOccurs="0" name="OAMandate">
+<xs:annotation>
+<xs:documentation>Information about the Open Access mandate that applies to this project</xs:documentation>
+</xs:annotation>
+<xs:complexType>
+<xs:attribute cflink:link="https://w3id.org/cerif/model#Project_Classification(https://w3id.org/cerif/vocab/OpenAccessMandatedFlag)" name="mandated" type="xs:boolean" use="required">
+<xs:annotation>
+<xs:documentation>The flag if Open Access is mandated in the project</xs:documentation>
+</xs:annotation>
+</xs:attribute>
+<xs:attribute cflink:link="https://w3id.org/cerif/model#Project_Classification(https://w3id.org/cerif/vocab/OpenAccessMandate)" name="uri" type="xs:anyURI" use="optional">
+<xs:annotation>
+<xs:documentation>The Open Access policy that applies to the project</xs:documentation>
+</xs:annotation>
+</xs:attribute>
+<xs:attributeGroup ref="cfStartDateEndDate__AttributeGroup"/>
+<xs:attributeGroup ref="cfExtension__AttributeGroup"/>
+</xs:complexType>
+</xs:element>
+
+<xs:group ref="__TheRestGroup"/>
+						
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element cflink:entity="https://w3id.org/cerif/model#Funding" name="Funding" substitutionGroup="ProjectFunding__SubstitutionGroupHead">
+		<xs:annotation>
+			<xs:documentation/>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="ProjectFunding__BaseType">
+					<xs:sequence minOccurs="0">
+						
+						<xs:element xmlns="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types" cflink:link="https://w3id.org/cerif/model#Funding_Classification" ref="Type">
+<xs:annotation>
+<xs:documentation>The type of the funding</xs:documentation>
+</xs:annotation>
+</xs:element>
+						
+						
+						
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#Funding.Acronym" minOccurs="0" name="Acronym" type="cfString__Type">
+							<xs:annotation>
+								<xs:documentation>The acronym of the funding</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#Funding.Name" maxOccurs="unbounded" minOccurs="0" name="Name" type="cfMLangString__Type">
+							<xs:annotation>
+								<xs:documentation>The name of the funding</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#Funding.Amount https://w3id.org/cerif/model#Funding.CurrencyCode" minOccurs="0" name="Amount" type="cfAmount__Type">
+							<xs:annotation>
+								<xs:documentation>The amount of the funding and its currency</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						
+                        <xs:element cflink:identifier="true" maxOccurs="unbounded" minOccurs="0" name="Identifier" type="cfGenericIdentifier__Type">
+                            <xs:annotation>
+                                <xs:documentation>An identifier of the funding</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#Funding.Description" maxOccurs="unbounded" minOccurs="0" name="Description" type="cfMLangString__Type">
+							<xs:annotation>
+								<xs:documentation>A description of the funding</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						
+                        <xs:sequence/>
+                        <xs:element cflink:link="https://w3id.org/cerif/model#Funding_Classification" maxOccurs="unbounded" minOccurs="0" name="Subject" type="cfGenericURIClassification__Type">
+                            <xs:annotation>
+                                <xs:documentation>The subject classification(s) of the funding</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#Funding.Keywords" maxOccurs="unbounded" minOccurs="0" name="Keyword" type="cfMLangString__Type">
+							<xs:annotation>
+                                <xs:documentation>A single keyword or key expression that characterize the funding. Please repeat to serialize separate keywords or key expressions.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						
+						<xs:element cflink:link="https://w3id.org/cerif/model#OrganisationUnit_Funding(https://w3id.org/cerif/vocab/OrganisationFundingRoles#Financier)" maxOccurs="unbounded" minOccurs="0" name="Funder" type="cfLinkWithDisplayNameToPersonOrOrgUnit__Type">
+							<xs:annotation>
+								<xs:documentation>The funder or funders</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						
+						<xs:element cflink:link="https://w3id.org/cerif/model#Funding_Funding(https://w3id.org/cerif/vocab/InterFundingRelations#Part):1" minOccurs="0" name="PartOf">
+							<xs:annotation>
+								<xs:documentation>Chain up to the larger funding that encompasses this funding</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:complexContent>
+									<xs:extension base="cfLinkWithDisplayName__BaseType">
+										<xs:sequence>
+											<xs:element ref="Funding"/>
+										</xs:sequence>
+									</xs:extension>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+						
+						
+
+						
+						
+						<xs:element cflink:link="https://w3id.org/cerif/model#Funding_Classification(https://w3id.org/cerif/vocab/Durations#FundingDuration)" minOccurs="0" name="Duration" type="cfLink__BaseType">
+<xs:annotation>
+<xs:documentation>Duration of the funding</xs:documentation>
+</xs:annotation>
+</xs:element>
+
+<xs:element maxOccurs="unbounded" minOccurs="0" name="OAMandate">
+<xs:annotation>
+<xs:documentation>Information about the Open Access mandate that applies to this funding</xs:documentation>
+</xs:annotation>
+<xs:complexType>
+<xs:attribute cflink:link="https://w3id.org/cerif/model#Funding_Classification(https://w3id.org/cerif/vocab/OpenAccessMandatedFlag)" name="mandated" type="xs:boolean" use="required">
+<xs:annotation>
+<xs:documentation>The flag if Open Access is mandated for this funding</xs:documentation>
+</xs:annotation>
+</xs:attribute>
+<xs:attribute cflink:link="https://w3id.org/cerif/model#Funding_Classification(http://roarmap.eprints.org/)" name="uri" type="xs:anyURI" use="optional">
+<xs:annotation>
+<xs:documentation>The Open Access policy that applies to this funding</xs:documentation>
+</xs:annotation>
+</xs:attribute>
+<xs:attributeGroup ref="cfStartDateEndDate__AttributeGroup"/>
+<xs:attributeGroup ref="cfExtension__AttributeGroup"/>
+</xs:complexType>
+</xs:element>
+
+<xs:group ref="__TheRestGroup"/>
+						
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element abstract="true" name="ResearchOutput__SubstitutionGroupHead" substitutionGroup="Individual__SubstitutionGroupHead" type="ResearchOutput__BaseType">
+		<xs:annotation>
+			<xs:documentation>Research outputs: publications, patents, and products</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="ResearchOutput__BaseType">
+		<xs:annotation>
+			<xs:documentation>A common supertype for research outputs: publications, patents, and products</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="cfIdAttr__BaseType"/>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:element cflink:entity="https://w3id.org/cerif/model#ResultPublication" name="Publication" substitutionGroup="ResearchOutput__SubstitutionGroupHead">
+		<xs:annotation>
+			<xs:documentation><![CDATA[
+A text based scholarly publication or publishing channel that contains results of research.
+
+CRISs typically record metadata about scholarly publications from the scope of the CRIS (institutional CRIS for the institution, funder CRIS for the funding it distributed, etc.) in the context of the research projects, infrastructure, funding, organization units and authors/contributors.
+
+This entity typically represents the granularity level of a single published item for which attribution information is attached (usually in the form of a list of authors and contributors). This entity is also used to represent publishing channels and sources: journals and book series (incl. continuing conference proceedings series).
+
+(Taken from https://doi.org/10.1016/j.procs.2014.06.008)
+]]></xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="ResearchOutput__BaseType">
+					<xs:sequence minOccurs="0">
+
+						<xs:element xmlns="https://www.openaire.eu/cerif-profile/vocab/COAR_Publication_Types" cflink:link="https://w3id.org/cerif/model#ResultPublication_Classification" ref="Type">
+<xs:annotation>
+<xs:documentation>The type of the publication</xs:documentation>
+</xs:annotation>
+</xs:element>
+
+						
+
+                        <xs:element cflink:link="https://w3id.org/cerif/model#ResultPublication_Classification(http://publications.europa.eu/resource/authority/language)" minOccurs="0" name="Language" type="cfString__Type">
+                            <xs:annotation>
+                                <xs:documentation>The language of the publication.  Please use the IETF language tags as described in the IETF BCP 47 document.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#ResultPublication.Title" maxOccurs="unbounded" minOccurs="0" name="Title" type="cfMLangString__Type">
+							<xs:annotation>
+								<xs:documentation>The title of the publication</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#ResultPublication.Subtitle" maxOccurs="unbounded" minOccurs="0" name="Subtitle" type="cfMLangString__Type">
+							<xs:annotation>
+								<xs:documentation>The subtitle of the publication</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#ResultPublication.NameAbbreviation" maxOccurs="unbounded" minOccurs="0" name="NameAbbreviation" type="cfMLangString__Type">
+							<xs:annotation>
+								<xs:documentation>The abbreviation of the title of the publication. E.g. the acronym of a journal.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:link="https://w3id.org/cerif/model#ResultPublication_ResultPublication(https://w3id.org/cerif/vocab/InterPublicationRelations#Publication):1" minOccurs="0" name="PublishedIn">
+							<xs:annotation>
+								<xs:documentation>The source (another Publication) where this publication appeared. E.g. a journal article lists here the journal where it appeared. To be used for a publishing channel.</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:complexContent>
+									<xs:extension base="cfLink__BaseType">
+										<xs:sequence>
+											<xs:element ref="Publication"/>
+										</xs:sequence>
+									</xs:extension>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+
+						<xs:element cflink:link="https://w3id.org/cerif/model#ResultPublication_ResultPublication(https://w3id.org/cerif/vocab/InterPublicationRelations#Part):1" minOccurs="0" name="PartOf">
+							<xs:annotation>
+								<xs:documentation>The Publication of which this publication is a part. E.g. a book chapter lists here the book that contains it. To be used for a containing publication.</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:complexContent>
+									<xs:extension base="cfLinkWithDisplayName__BaseType">
+										<xs:sequence>
+											<xs:element ref="Publication"/>
+										</xs:sequence>
+									</xs:extension>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#ResultPublication.ResultPublicationDate" minOccurs="0" name="PublicationDate" type="cfGenericDateTime__Type">
+							<xs:annotation>
+								<xs:documentation>The date the publication appeared</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#ResultPublication.Number" minOccurs="0" name="Number" type="cfString__Type">
+							<xs:annotation>
+								<xs:documentation>The number of the publication (e.g. Article Number)</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#ResultPublication.Volume" minOccurs="0" name="Volume" type="cfString__Type">
+							<xs:annotation>
+								<xs:documentation>The volume of the publishing channel where this publication appeared</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#ResultPublication.Issue" minOccurs="0" name="Issue" type="cfString__Type">
+							<xs:annotation>
+								<xs:documentation>The issue of the publishing channel where this publication appeared</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#ResultPublication.Edition" minOccurs="0" name="Edition" type="cfString__Type">
+							<xs:annotation>
+								<xs:documentation>The edition of the publication</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#ResultPublication.StartPage" minOccurs="0" name="StartPage" type="cfString__Type">
+							<xs:annotation>
+								<xs:documentation>The page where this publication starts, in case the publishing channel or containing publication has numbered pages</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#ResultPublication.EndPage" minOccurs="0" name="EndPage" type="cfString__Type">
+							<xs:annotation>
+								<xs:documentation>The page where this publication ends, in case the publishing channel or containing publication has numbered pages</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						
+
+						<xs:group ref="PublicationIdentifiers__Group"/>
+
+						<xs:element cflink:container="ordered" minOccurs="0" name="Authors">
+							<xs:annotation>
+								<xs:documentation>The authors of this publication</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element cflink:link="https://w3id.org/cerif/model#Person_ResultPublication(https://w3id.org/cerif/vocab/PersonOutputContributions#Author) https://w3id.org/cerif/model#OrganisationUnit_ResultPublication(https://w3id.org/cerif/vocab/OrganisationOutputContributions#Author)" maxOccurs="unbounded" minOccurs="0" name="Author" type="cfLinkWithDisplayNameToPersonWithAffiliationsOrOrgUnit__Type"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+
+						<xs:element cflink:container="ordered" minOccurs="0" name="Editors">
+							<xs:annotation>
+								<xs:documentation>The editors of this publication</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element cflink:link="https://w3id.org/cerif/model#Person_ResultPublication(https://w3id.org/cerif/vocab/PersonOutputContributions#Editor) https://w3id.org/cerif/model#OrganisationUnit_ResultPublication(https://w3id.org/cerif/vocab/OrganisationOutputContributions#Editor)" maxOccurs="unbounded" minOccurs="0" name="Editor" type="cfLinkWithDisplayNameToPersonWithAffiliationsOrOrgUnit__Type"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+
+						<xs:element cflink:container="ordered" minOccurs="0" name="Publishers">
+							<xs:annotation>
+								<xs:documentation>The publishers of this publication</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element cflink:link="https://w3id.org/cerif/model#OrganisationUnit_ResultPublication(https://w3id.org/cerif/vocab/OrganisationOutputContributions#Publisher) https://w3id.org/cerif/model#Person_ResultPublication(https://w3id.org/cerif/vocab/PersonOutputContributions#Publisher)" maxOccurs="unbounded" minOccurs="0" name="Publisher" type="cfLinkWithDisplayNameToPersonOrOrgUnit__Type"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+
+						<xs:element cflink:link="https://w3id.org/cerif/model#ResultPublication_Classification" maxOccurs="unbounded" minOccurs="0" name="License" type="cfGenericURIClassification__Type">
+							<xs:annotation>
+								<xs:documentation>The license of the publication</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:link="https://w3id.org/cerif/model#ResultPublication_Classification" maxOccurs="unbounded" minOccurs="0" name="Subject" type="cfGenericURIClassification__Type">
+							<xs:annotation>
+								<xs:documentation>The subject of the publication from a classification</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#ResultPublication.Keywords" maxOccurs="unbounded" minOccurs="0" name="Keyword" type="cfMLangString__Type">
+							<xs:annotation>
+								<xs:documentation>A single keyword or key expression. Please repeat to serialize separate keywords or key expressions.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#ResultPublication.Abstract" maxOccurs="unbounded" minOccurs="0" name="Abstract" type="cfMLangString__Type"/>
+
+						<xs:element cflink:link="https://w3id.org/cerif/model#ResultPublication_Classification" maxOccurs="unbounded" minOccurs="0" name="Status" type="cfGenericURIClassification__Type">
+							<!-- any class scheme of the 'status' character -->
+						</xs:element>
+
+						<xs:element cflink:link="https://w3id.org/cerif/model#Project_ResultPublication(https://w3id.org/cerif/vocab/ProjectOutputRoles#Originator) https://w3id.org/cerif/model#ResultPublication_Funding(https://w3id.org/cerif/vocab/OutputFundingRoles#Originator)" maxOccurs="unbounded" minOccurs="0" name="OriginatesFrom">
+							<xs:complexType>
+								<xs:complexContent>
+									<xs:extension base="cfLink__BaseType">
+										<xs:sequence>
+											<xs:element ref="ProjectFunding__SubstitutionGroupHead"/>
+										</xs:sequence>
+									</xs:extension>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+						
+						<xs:element cflink:link="https://w3id.org/cerif/model#ResultPublication_Event(https://w3id.org/cerif/vocab/EventOutputRelationships#Presented)" maxOccurs="unbounded" minOccurs="0" name="PresentedAt">
+<xs:annotation>
+<xs:documentation>The event where this publication was presented. 
+						[[Note: Video recordings of conference presentations are stored as alternative representations of the primary object: the conference paper. It would be unneccessarily complex to represent them as separate, linked Products.]]</xs:documentation>
+</xs:annotation>
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="cfLink__BaseType">
+<xs:choice>
+<xs:element ref="Event"/>
+</xs:choice>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+
+<xs:element cflink:link="https://w3id.org/cerif/model#ResultPublication_Event(https://w3id.org/cerif/vocab/EventOutputRelationships#Output)" maxOccurs="unbounded" minOccurs="0" name="OutputFrom">
+<xs:annotation>
+<xs:documentation>This publication contains the proceedings from the linked event</xs:documentation>
+</xs:annotation>
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="cfLink__BaseType">
+<xs:choice>
+<xs:element ref="Event"/>
+</xs:choice>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+
+<xs:element cflink:link="https://w3id.org/cerif/model#ResultPublication_Event(https://w3id.org/cerif/vocab/EventOutputRelationships#Coverage)" maxOccurs="unbounded" minOccurs="0" name="Coverage">
+<xs:annotation>
+<xs:documentation>The event that is covered by this publication (e.g. a report about the event)</xs:documentation>
+</xs:annotation>
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="cfLink__BaseType">
+<xs:choice>
+<xs:element ref="Event"/>
+</xs:choice>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+
+<xs:element cflink:link="https://w3id.org/cerif/model#ResultPublication_ResultPublication(https://w3id.org/cerif/vocab/InterOutputRelations#Reference):1 https://w3id.org/cerif/model#ResultPublication_ResultProduct(https://w3id.org/cerif/vocab/InterOutputRelations#Reference):1 https://w3id.org/cerif/model#ResultPublication_ResultPatent(https://w3id.org/cerif/vocab/InterOutputRelations#Reference):1" maxOccurs="unbounded" minOccurs="0" name="References">
+<xs:annotation>
+<xs:documentation>Result outputs that are referenced by this publication</xs:documentation>
+</xs:annotation>
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="cfLink__BaseType">
+<xs:choice>
+<xs:element ref="ResearchOutput__SubstitutionGroupHead"/>
+</xs:choice>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+
+<xs:element xmlns:ns4="http://purl.org/coar/access_right" cflink:link="https://w3id.org/cerif/model#ResultPublication_Classification(http://purl.org/coar/access_right)" minOccurs="0" ref="ns4:Access">
+<xs:annotation>
+<xs:documentation>The open access type of the publication</xs:documentation>
+</xs:annotation>
+</xs:element>
+
+<xs:group ref="__TheRestGroup"/>
+						
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element cflink:entity="https://w3id.org/cerif/model#ResultPatent" name="Patent" substitutionGroup="ResearchOutput__SubstitutionGroupHead">
+		<xs:annotation>
+			<xs:documentation><![CDATA[A set of exclusive rights granted by a sovereign state to an inventor or assignee for a limited period of time in exchange for detailed public disclosure of an invention.
+Source: Wikipedia
+]]></xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="ResearchOutput__BaseType">
+					<xs:sequence minOccurs="0">
+						
+						<xs:element xmlns="https://www.openaire.eu/cerif-profile/vocab/COAR_Patent_Types" cflink:link="https://w3id.org/cerif/model#ResultPatent_Classification" ref="Type">
+<xs:annotation>
+<xs:documentation>The type of the patent (currently just one option)</xs:documentation>
+</xs:annotation>
+</xs:element>
+						
+						
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#ResultPatent.Title" maxOccurs="unbounded" minOccurs="0" name="Title" type="cfMLangString__Type"/>
+						
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#ResultPatent.VersionInfo" maxOccurs="unbounded" minOccurs="0" name="VersionInfo" type="cfMLangString__Type"/>
+						
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#ResultPatent.RegistrationDate" minOccurs="0" name="RegistrationDate" type="cfDate__Type"/>
+						
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#ResultPatent.ApprovalDate" minOccurs="0" name="ApprovalDate" type="cfDate__Type"/>
+						
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#ResultPatent.CountryCode" minOccurs="0" name="CountryCode" type="cfString__Type"/>
+						
+						<xs:element cflink:link="https://w3id.org/cerif/model#OrganisationUnit_ResultPatent(https://w3id.org/cerif/vocab/OrganisationOutputContributions#PatentIssuer)" maxOccurs="unbounded" minOccurs="0" name="Issuer" type="cfLinkWithDisplayNameToOrgUnit__Type">
+							<xs:annotation>
+								<xs:documentation>The issuer of the patent: the patent office</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#ResultPatent.PatentNumber" minOccurs="0" name="PatentNumber" type="cfString__Type"/>
+
+						<xs:group ref="PatentIdentifiers__Group"/>
+
+						<xs:element cflink:container="ordered" minOccurs="0" name="Inventors">
+							<xs:annotation>
+								<xs:documentation>The inventors of this patent</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element cflink:link="https://w3id.org/cerif/model#Person_ResultPatent(https://w3id.org/cerif/vocab/PersonOutputContributions#Inventor)" maxOccurs="unbounded" minOccurs="0" name="Inventor" type="cfLinkWithDisplayNameToPersonWithAffiliations__Type">
+										<xs:annotation>
+											<xs:documentation>The inventor: The actual devisor of an invention that is the subject of a patent.</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+
+						<xs:element cflink:container="ordered" minOccurs="0" name="Holders">
+							<xs:annotation>
+								<xs:documentation>The holders of this patent</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element cflink:link="https://w3id.org/cerif/model#Person_ResultPatent(https://w3id.org/cerif/vocab/PersonOutputContributions#PatentHolder) https://w3id.org/cerif/model#OrganisationUnit_ResultPatent(https://w3id.org/cerif/vocab/OrganisationOutputContributions#PatentHolder)" maxOccurs="unbounded" minOccurs="0" name="Holder" type="cfLinkWithDisplayNameToPersonOrOrgUnit__Type">
+										<xs:annotation>
+											<xs:documentation>The patent rights holder, also known as the patentee or assignee</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#ResultPatent.Abstract" maxOccurs="unbounded" minOccurs="0" name="Abstract" type="cfMLangString__Type"/>
+						
+						<xs:element cflink:link="https://w3id.org/cerif/model#ResultPatent_Classification" maxOccurs="unbounded" minOccurs="0" name="Subject" type="cfGenericURIClassification__Type">
+							<xs:annotation>
+								<xs:documentation>The subject of the patent from a classification</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#ResultPatent.Keywords" maxOccurs="unbounded" minOccurs="0" name="Keyword" type="cfMLangString__Type">
+							<xs:annotation>
+								<xs:documentation>A single keyword or key expression. Please repeat to serialize separate keywords or key expressions.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						
+						<!-- TODO -->
+						
+						<xs:element cflink:link="https://w3id.org/cerif/model#Project_ResultPatent(https://w3id.org/cerif/vocab/ProjectOutputRoles#Originator) https://w3id.org/cerif/model#ResultPatent_Funding(https://w3id.org/cerif/vocab/OutputFundingRoles#Originator)" maxOccurs="unbounded" minOccurs="0" name="OriginatesFrom">
+							<xs:complexType>
+								<xs:complexContent>
+									<xs:extension base="cfLink__BaseType">
+										<xs:sequence>
+											<xs:element ref="ProjectFunding__SubstitutionGroupHead"/>
+										</xs:sequence>
+									</xs:extension>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+												
+						<xs:element cflink:link="https://w3id.org/cerif/model#ResultPatent_ResultPatent(https://w3id.org/cerif/vocab/InterPatentRelations#Predecessor):1" maxOccurs="unbounded" minOccurs="0" name="Predecessor">
+<xs:annotation>
+<xs:documentation>Patents that precede (i.e., have priority over) this patent</xs:documentation>
+</xs:annotation>
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="cfLink__BaseType">
+<xs:choice>
+<xs:element ref="Patent"/>
+</xs:choice>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+
+<xs:element cflink:link="https://w3id.org/cerif/model#ResultPublication_ResultPatent(https://w3id.org/cerif/vocab/InterOutputRelations#Reference):1 https://w3id.org/cerif/model#ResultProduct_ResultPatent(https://w3id.org/cerif/vocab/InterOutputRelations#Reference):1 https://w3id.org/cerif/model#ResultPatent_ResultPatent(https://w3id.org/cerif/vocab/InterOutputRelations#Reference):1" maxOccurs="unbounded" minOccurs="0" name="References">
+<xs:annotation>
+<xs:documentation>Result outputs that are referenced by this patent</xs:documentation>
+</xs:annotation>
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="cfLink__BaseType">
+<xs:choice>
+<xs:element ref="ResearchOutput__SubstitutionGroupHead"/>
+</xs:choice>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+
+<xs:group ref="__TheRestGroup"/>
+						
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element cflink:entity="https://w3id.org/cerif/model#ResultProduct" name="Product" substitutionGroup="ResearchOutput__SubstitutionGroupHead">
+		<xs:annotation>
+			<xs:documentation><![CDATA[Any result of research other than Publication or Patent.
+
+This includes:
+(1) research datasets,
+(2) software,
+(3) visualisations: still or moving images, including maps and other cartographic material,
+(4) audio recordings,
+(5) other objects that can be perceived through human senses.
+]]></xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="ResearchOutput__BaseType">
+					<xs:sequence minOccurs="0">
+						
+						<xs:element xmlns="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types" cflink:link="https://w3id.org/cerif/model#ResultProduct_Classification" ref="Type">
+<xs:annotation>
+<xs:documentation>The type of the resulting product (other than publication or patent)</xs:documentation>
+</xs:annotation>
+</xs:element>
+						
+						
+
+                        <xs:element cflink:link="https://w3id.org/cerif/model#ResultProduct_Classification(http://publications.europa.eu/resource/authority/language)" maxOccurs="unbounded" minOccurs="0" name="Language" type="cfString__Type">
+                            <xs:annotation>
+                                <xs:documentation>The language or languages of the product, if applicable.  Please use the IETF language tags as described in the IETF BCP 47 document.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#ResultProduct.Name" maxOccurs="unbounded" minOccurs="0" name="Name" type="cfMLangString__Type"/>
+
+						
+						
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#ResultProduct.VersionInfo" maxOccurs="unbounded" minOccurs="0" name="VersionInfo" type="cfMLangString__Type"/>
+						
+						<xs:group ref="ProductIdentifiers__Group"/>
+
+						<xs:element cflink:container="ordered" minOccurs="0" name="Creators">
+							<xs:annotation>
+								<xs:documentation>The creators of this product</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element cflink:link="https://w3id.org/cerif/model#Person_ResultProduct(https://w3id.org/cerif/vocab/PersonOutputContributions#Creator) https://w3id.org/cerif/model#OrganisationUnit_ResultProduct(https://w3id.org/cerif/vocab/OrganisationOutputContributions#Creator)" maxOccurs="unbounded" minOccurs="0" name="Creator" type="cfLinkWithDisplayNameToPersonWithAffiliationsOrOrgUnit__Type"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+
+						<xs:element cflink:container="ordered" minOccurs="0" name="Publishers">
+							<xs:annotation>
+								<xs:documentation>The publisher or publishers of this product</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element cflink:link="https://w3id.org/cerif/model#OrganisationUnit_ResultProduct(https://w3id.org/cerif/vocab/OrganisationOutputContributions#Publisher) https://w3id.org/cerif/model#Person_ResultProduct(https://w3id.org/cerif/vocab/PersonOutputContributions#Publisher)" maxOccurs="unbounded" minOccurs="0" name="Publisher" type="cfLinkWithDisplayNameToPersonOrOrgUnit__Type"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+
+						<xs:element cflink:link="https://w3id.org/cerif/model#ResultProduct_Classification" maxOccurs="unbounded" minOccurs="0" name="License" type="cfGenericURIClassification__Type">
+							<xs:annotation>
+								<xs:documentation>The license of the product</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#ResultProduct.Description" maxOccurs="unbounded" minOccurs="0" name="Description" type="cfMLangString__Type"/>
+						
+						<xs:element cflink:link="https://w3id.org/cerif/model#ResultProduct_Classification" maxOccurs="unbounded" minOccurs="0" name="Subject" type="cfGenericURIClassification__Type">
+							<xs:annotation>
+								<xs:documentation>The subject of the product from a classification</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#ResultProduct.Keywords" maxOccurs="unbounded" minOccurs="0" name="Keyword" type="cfMLangString__Type">
+							<xs:annotation>
+								<xs:documentation>A single keyword or key expression. Please repeat to serialize separate keywords or key expressions.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						
+						<xs:element cflink:link="https://w3id.org/cerif/model#ResultProduct_ResultProduct(https://w3id.org/cerif/vocab/InterProductRelations#Part):1" minOccurs="0" name="PartOf">
+							<xs:annotation>
+								<xs:documentation>Link to the research output of which this product is a part (e.g. a data set collection that contains it)</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:complexContent>
+									<xs:extension base="cfLinkWithDisplayName__BaseType">
+										<xs:sequence>
+											<xs:element ref="ResearchOutput__SubstitutionGroupHead"/>
+										</xs:sequence>
+									</xs:extension>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+
+						
+
+						<xs:element cflink:link="https://w3id.org/cerif/model#Project_ResultProduct(https://w3id.org/cerif/vocab/ProjectOutputRoles#Originator) https://w3id.org/cerif/model#ResultProduct_Funding(https://w3id.org/cerif/vocab/OutputFundingRoles#Originator)" maxOccurs="unbounded" minOccurs="0" name="OriginatesFrom">
+							<xs:complexType>
+								<xs:complexContent>
+									<xs:extension base="cfLink__BaseType">
+										<xs:sequence>
+											<xs:element ref="ProjectFunding__SubstitutionGroupHead"/>
+										</xs:sequence>
+									</xs:extension>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+						
+						<xs:element cflink:link="https://w3id.org/cerif/model#ResultProduct_Equipment(https://w3id.org/cerif/vocab/OutputResearchInfrastructureRelations#Generation)" maxOccurs="unbounded" minOccurs="0" name="GeneratedBy">
+<xs:annotation>
+<xs:documentation>The equipment that generated this product</xs:documentation>
+</xs:annotation>
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="cfLink__BaseType">
+<xs:choice>
+<xs:element ref="Equipment"/>
+</xs:choice>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+
+<xs:element cflink:link="https://w3id.org/cerif/model#ResultProduct_Event(https://w3id.org/cerif/vocab/EventOutputRelationships#Presented)" maxOccurs="unbounded" minOccurs="0" name="PresentedAt">
+<xs:annotation>
+<xs:documentation>The event where this product was presented</xs:documentation>
+</xs:annotation>
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="cfLink__BaseType">
+<xs:choice>
+<xs:element ref="Event"/>
+</xs:choice>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+
+<xs:element cflink:link="https://w3id.org/cerif/model#ResultProduct_Event(https://w3id.org/cerif/vocab/EventOutputRelationships#Coverage)" maxOccurs="unbounded" minOccurs="0" name="Coverage">
+<xs:annotation>
+<xs:documentation>The event that is covered by this product (e.g. a video or audio interview about the event)</xs:documentation>
+</xs:annotation>
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="cfLink__BaseType">
+<xs:choice>
+<xs:element ref="Event"/>
+</xs:choice>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+
+<xs:element cflink:link="https://w3id.org/cerif/model#ResultPublication_ResultProduct(https://w3id.org/cerif/vocab/InterOutputRelations#Reference):1 https://w3id.org/cerif/model#ResultProduct_ResultProduct(https://w3id.org/cerif/vocab/InterOutputRelations#Reference):1 https://w3id.org/cerif/model#ResultProduct_ResultPatent(https://w3id.org/cerif/vocab/InterOutputRelations#Reference):1" maxOccurs="unbounded" minOccurs="0" name="References">
+<xs:annotation>
+<xs:documentation>Result outputs that are referenced by this product</xs:documentation>
+</xs:annotation>
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="cfLink__BaseType">
+<xs:choice>
+<xs:element ref="ResearchOutput__SubstitutionGroupHead"/>
+</xs:choice>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+
+<xs:element xmlns:ns4="http://purl.org/coar/access_right" cflink:link="https://w3id.org/cerif/model#ResultProduct_Classification(http://purl.org/coar/access_right)" minOccurs="0" ref="ns4:Access">
+<xs:annotation>
+<xs:documentation>The open access type of the product</xs:documentation>
+</xs:annotation>
+</xs:element>
+
+<xs:group ref="__TheRestGroup"/>
+
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element cflink:entity="https://w3id.org/cerif/model#Event" name="Event" substitutionGroup="Individual__SubstitutionGroupHead">
+		<xs:annotation>
+			<xs:documentation><![CDATA[An event is something that happens at a given place and time.
+
+Definition Source: http://wordnetweb.princeton.edu/perl/webwn?s=event
+]]></xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="cfIdAttr__BaseType">
+					<xs:sequence minOccurs="0">
+ 						
+						<xs:element cflink:link="https://w3id.org/cerif/model#Event_Classification" maxOccurs="unbounded" minOccurs="0" name="Type" type="cfGenericURIClassification__Type">
+							<xs:annotation>
+								<xs:documentation>The type of the event</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#Event.Acronym" minOccurs="0" name="Acronym" type="cfString__Type">
+							<xs:annotation>
+								<xs:documentation>Acronym of the event</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#Event.Name" maxOccurs="unbounded" minOccurs="0" name="Name" type="cfMLangString__Type">
+							<xs:annotation>
+								<xs:documentation>Name of the event</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#Event.CityTown" maxOccurs="1" minOccurs="0" name="Place" type="cfString__Type">
+							<xs:annotation>
+								<xs:documentation>Location of the event (the city or town)</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#Event.CountryCode" maxOccurs="1" minOccurs="0" name="Country" type="cfString__Type">
+							<xs:annotation>
+								<xs:documentation>Country of the location of the event</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#Event.StartDate" maxOccurs="1" minOccurs="0" name="StartDate" type="cfDate__Type">
+							<xs:annotation>
+								<xs:documentation>The start date of the event</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#Event.EndDate" maxOccurs="1" minOccurs="0" name="EndDate" type="cfDate__Type">
+							<xs:annotation>
+								<xs:documentation>The end date of the event</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#Event.Description" maxOccurs="unbounded" minOccurs="0" name="Description" type="cfMLangString__Type">
+							<xs:annotation>
+								<xs:documentation>Description of the event</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						
+						<xs:element cflink:link="https://w3id.org/cerif/model#Event_Classification" maxOccurs="unbounded" minOccurs="0" name="Subject" type="cfGenericURIClassification__Type">
+							<xs:annotation>
+								<xs:documentation>The subject category of the event from a classification</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#Event.Keywords" maxOccurs="unbounded" minOccurs="0" name="Keyword" type="cfMLangString__Type">
+							<xs:annotation>
+								<xs:documentation>A single keyword or key expression that characterize the event. Please repeat to serialize separate keywords or key expressions.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						
+						<xs:element cflink:link="https://w3id.org/cerif/model#OrganisationUnit_Event(https://w3id.org/cerif/vocab/EventRelationshipKinds#Organizer) https://w3id.org/cerif/model#Project_Event(https://w3id.org/cerif/vocab/EventRelationshipKinds#Organizer)" maxOccurs="unbounded" minOccurs="0" name="Organizer">
+<xs:annotation>
+<xs:documentation>The organizer of the event</xs:documentation>
+</xs:annotation>
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="cfLink__BaseType">
+<xs:choice>
+<xs:element ref="OrgUnit"/>
+<xs:element ref="Project"/>
+</xs:choice>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+
+<xs:element cflink:link="https://w3id.org/cerif/model#OrganisationUnit_Event(https://w3id.org/cerif/vocab/EventRelationshipKinds#Sponsor) https://w3id.org/cerif/model#Project_Event(https://w3id.org/cerif/vocab/EventRelationshipKinds#Sponsor)" maxOccurs="unbounded" minOccurs="0" name="Sponsor">
+<xs:annotation>
+<xs:documentation>The sponsor of the event</xs:documentation>
+</xs:annotation>
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="cfLink__BaseType">
+<xs:choice>
+<xs:element ref="OrgUnit"/>
+<xs:element ref="Project"/>
+</xs:choice>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+
+<xs:element cflink:link="https://w3id.org/cerif/model#OrganisationUnit_Event(https://w3id.org/cerif/vocab/EventRelationshipKinds#Partner) https://w3id.org/cerif/model#Project_Event(https://w3id.org/cerif/vocab/EventRelationshipKinds#Partner)" maxOccurs="unbounded" minOccurs="0" name="Partner">
+<xs:annotation>
+<xs:documentation>The partner of the event</xs:documentation>
+</xs:annotation>
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="cfLink__BaseType">
+<xs:choice>
+<xs:element ref="OrgUnit"/>
+<xs:element ref="Project"/>
+</xs:choice>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+
+<xs:group ref="__TheRestGroup"/>
+						
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element abstract="true" name="Infrastructure__SubstitutionGroupHead" substitutionGroup="Individual__SubstitutionGroupHead" type="Infrastructure__BaseType">
+		<xs:annotation>
+			<xs:documentation>Research infrastructures: facilities, equipment, and services</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="Infrastructure__BaseType">
+		<xs:annotation>
+			<xs:documentation>A common supertype for research infrastructures: facilities, equipment, and services</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="cfIdAttr__BaseType"/>
+		</xs:complexContent>
+	</xs:complexType>
+
+	
+
+	<xs:element cflink:entity="https://w3id.org/cerif/model#Equipment" name="Equipment" substitutionGroup="Infrastructure__SubstitutionGroupHead">
+		<xs:annotation>
+			<xs:documentation><![CDATA[An equipment is an instrumentality needed for an undertaking or to perform a service:
+
+Definition Source: http://wordnetweb.princeton.edu/perl/webwn?s=equipment
+]]></xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Infrastructure__BaseType">
+					<xs:sequence minOccurs="0">
+						
+						<xs:element cflink:link="https://w3id.org/cerif/model#Equipment_Classification" maxOccurs="unbounded" minOccurs="0" name="Type" type="cfGenericURIClassification__Type">
+							<xs:annotation>
+								<xs:documentation>The type of the equipment</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#Equipment.Acronym" minOccurs="0" name="Acronym" type="cfString__Type">
+							<xs:annotation>
+								<xs:documentation>Acronym of the equipment</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#Equipment.Name" maxOccurs="unbounded" minOccurs="0" name="Name" type="cfMLangString__Type">
+							<xs:annotation>
+								<xs:documentation>Name of the equipment</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						
+						<xs:element cflink:identifier="true" maxOccurs="unbounded" minOccurs="0" name="Identifier" type="cfGenericIdentifier__Type">
+							<xs:annotation>
+								<xs:documentation>An identifier of this equipment</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#Equipment.Description" maxOccurs="unbounded" minOccurs="0" name="Description" type="cfMLangString__Type">
+							<xs:annotation>
+								<xs:documentation>Description of the equipment</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+												
+						
+
+						<xs:element cflink:link="https://w3id.org/cerif/model#Person_Service(https://w3id.org/cerif/vocab/PersonResearchInfrastructureRoles#Owner) https://w3id.org/cerif/model#OrganisationUnit_Service(https://w3id.org/cerif/vocab/OrganisationResearchInfrastructureRoles#Owner)" maxOccurs="unbounded" minOccurs="0" name="Owner" type="cfLinkWithDisplayNameToPersonOrOrgUnit__Type">
+<xs:annotation>
+<xs:documentation>The owner of the piece of equipment</xs:documentation>
+</xs:annotation>
+</xs:element>
+
+<xs:group ref="__TheRestGroup"/>
+
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element cflink:entity="https://w3id.org/cerif/model#Service" name="Service" substitutionGroup="Infrastructure__SubstitutionGroupHead">
+<xs:annotation>
+<xs:documentation>CRIS compatible with the OpenAIRE Guidelines for CRIS Managers</xs:documentation>
+</xs:annotation>
+		
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Infrastructure__BaseType">
+					<xs:sequence minOccurs="0">
+						
+						<xs:element xmlns="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Service_Compatibility" cflink:link="https://w3id.org/cerif/model#Service_Classification" maxOccurs="unbounded" minOccurs="0" ref="Compatibility">
+<xs:annotation>
+<xs:documentation>OpenAIRE compatibility of the CRIS</xs:documentation>
+</xs:annotation>
+</xs:element>
+						
+						
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#Service.Acronym" minOccurs="0" name="Acronym" type="cfString__Type">
+							<xs:annotation>
+								<xs:documentation>Acronym of the service</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#Service.Name" maxOccurs="unbounded" minOccurs="0" name="Name" type="cfMLangString__Type">
+							<xs:annotation>
+								<xs:documentation>Name of the service</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						
+						<xs:element cflink:identifier="true" maxOccurs="unbounded" minOccurs="0" name="Identifier" type="cfGenericIdentifier__Type">
+							<xs:annotation>
+								<xs:documentation>An identifier of this service</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#Service.Description" maxOccurs="unbounded" minOccurs="0" name="Description" type="cfMLangString__Type">
+							<xs:annotation>
+								<xs:documentation>Description of the service</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						
+						
+
+						<xs:element cflink:link="https://w3id.org/cerif/model#FederatedIdentifier(https://w3id.org/cerif/vocab/IdentifierTypes#URL) https://w3id.org/cerif/model#FederatedIdentifier(https://w3id.org/cerif/vocab/ElectronicAddressTypes#Website)" minOccurs="0" name="WebsiteURL" type="cfString__Type">
+<xs:annotation>
+<xs:documentation>URL of the website of the CRIS</xs:documentation>
+</xs:annotation>
+</xs:element>
+
+<xs:element cflink:link="https://w3id.org/cerif/model#FederatedIdentifier(https://w3id.org/cerif/vocab/IdentifierTypes#URL) https://w3id.org/cerif/model#FederatedIdentifier(https://w3id.org/cerif/vocab/ElectronicAddressTypes#OAI-PMH_Base)" minOccurs="0" name="OAIPMHBaseURL" type="cfString__Type">
+<xs:annotation>
+<xs:documentation>Base URL for the OAI-PMH protocol endpoint of the CRIS</xs:documentation>
+</xs:annotation>
+</xs:element>
+
+<xs:element cflink:link="https://w3id.org/cerif/model#FederatedIdentifier(https://w3id.org/cerif/vocab/IdentifierTypes#URL) https://w3id.org/cerif/model#FederatedIdentifier(https://w3id.org/cerif/vocab/ElectronicAddressTypes#SubjectHeadings)" maxOccurs="unbounded" minOccurs="0" name="SubjectHeadingsURL" type="cfString__Type">
+<xs:annotation>
+<xs:documentation>The URL where the subject classification used by the CRIS can be obtained (using the HTTP GET)</xs:documentation>
+</xs:annotation>
+</xs:element>
+
+<xs:element cflink:link="https://w3id.org/cerif/model#OrganisationUnit_Service(https://w3id.org/cerif/vocab/OrganisationResearchInfrastructureRoles#Owner)" maxOccurs="unbounded" minOccurs="0" name="Owner" type="cfLinkWithDisplayNameToPersonOrOrgUnit__Type">
+<xs:annotation>
+<xs:documentation>The owner of the CRIS: The organisation the research of which the CRIS documents</xs:documentation>
+</xs:annotation>
+</xs:element>
+
+<xs:group ref="__TheRestGroup"/>
+
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+
+<!-- 
+	<xs:element name="" substitutionGroup="Individual__SubstitutionGroupHead" cflink:entity="">
+		<xs:annotation>
+			<xs:documentation></xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="cfIdAttr__BaseType">
+					<xs:sequence>
+						
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+-->
+
+	<!-- the CERIF Semantic Layer -->
+
+	<xs:element abstract="true" name="SemanticLayer__SubstitutionGroupHead" type="SemanticLayer__BaseType">
+		<xs:annotation>
+			<xs:documentation>Semantic layer: classification schemes and classifications</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="SemanticLayer__BaseType">
+		<xs:annotation>
+			<xs:documentation>A common supertype for semantic layer objects: classification schemes and classifications</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="cfIdAttr__BaseType"/>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:element cflink:link="https://w3id.org/cerif/model#ClassificationScheme" name="ClassScheme" substitutionGroup="SemanticLayer__SubstitutionGroupHead">
+		<xs:annotation>
+			<xs:documentation><![CDATA[A structured collection of Classifications (concepts).
+
+CERIF Classification Schemes can represent flat or hierarchical lists, taxonomies, thesauri, ontologies or any general arrangement of concepts.
+
+Examples of classification schemes include:
+- the OECD Fields of Science classification (https://unstats.un.org/unsd/EconStatKB/KnowledgebaseArticle10269.aspx) and
+- the COAR Resource Types controlled vocabulary (http://vocabularies.coar-repositories.org/documentation/resource_types/).
+Another example is the Person Output Contributions scheme from the OpenAIRE Guidelines for CRIS Managers 1.0 (https://doi.org/10.5281/zenodo.17065) that consists of the concepts of Author, Editor and Publisher.
+]]></xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="SemanticLayer__BaseType">
+					<xs:sequence minOccurs="0">
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#ClassificationScheme.Name" maxOccurs="unbounded" minOccurs="0" name="Name" type="cfMLangStringWithOptionalSource__Type">
+							<xs:annotation>
+								<xs:documentation>The name of the classification scheme</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#ClassificationScheme.Description" maxOccurs="unbounded" minOccurs="0" name="Description" type="cfMLangStringWithOptionalSource__Type">
+							<xs:annotation>
+								<xs:documentation>The description of the classification scheme</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:identifier="true" maxOccurs="unbounded" minOccurs="0" name="Identifier" type="cfGenericIdentifier__Type">
+							<xs:annotation>
+								<xs:documentation>An identifier of the classification scheme</xs:documentation>
+							</xs:annotation>
+						</xs:element>						
+
+						<xs:element cflink:entity="https://w3id.org/cerif/model#Classification" maxOccurs="unbounded" minOccurs="0" name="Class" type="cfClass__BaseType">
+							<xs:annotation>
+								<xs:documentation>A classification: a single concept, category, or notion that belongs in the enclosing classification scheme</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:link="https://w3id.org/cerif/model#ClassificationScheme_ClassificationScheme https://w3id.org/cerif/model#ClassificationScheme_Classification" maxOccurs="unbounded" minOccurs="0" name="Link">
+							<xs:annotation>
+								<xs:documentation>A general link from a classification scheme to another classification scheme or a classification</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:complexContent>
+									<xs:extension base="cfLink__BaseType">
+										<xs:sequence>
+											<xs:element ref="SemanticLayer__SubstitutionGroupHead"/>
+										</xs:sequence>
+									</xs:extension>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element cflink:entity="https://w3id.org/cerif/model#Classification" name="Class" substitutionGroup="SemanticLayer__SubstitutionGroupHead">
+		<xs:annotation>
+			<xs:documentation><![CDATA[A concept to describe a characteristic of objects or to qualify relationships between objects or concepts. Classifications are organised into Classification Schemes: every Classification belongs to exactly one Classification Scheme.
+
+In CERIF a Classification usually specifies the type (e.g. "Journal Article" - http://purl.org/coar/resource_type/c_6501) or status (e.g. "Approved") of an object, or some other category – most notably a subject heading (e.g. "Analytical chemistry").
+Other Classification specify the type of relationship between two objects (e.g. "Author" between a Person and a Result Publication).
+]]></xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="cfClass__BaseType">
+					<xs:attribute name="classSchemeId" type="xs:string" use="optional">
+						<xs:annotation>
+							<xs:documentation>The classification scheme this classification belongs into</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="cfClass__BaseType">
+		<xs:annotation>
+			<xs:documentation>The base type for a CERIF classification</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="SemanticLayer__BaseType">
+				<xs:sequence minOccurs="0">
+
+					<xs:element cflink:attribute="https://w3id.org/cerif/model#Classification.Term" maxOccurs="unbounded" minOccurs="0" name="Term" type="cfMLangStringWithOptionalSource__Type">
+						<xs:annotation>
+							<xs:documentation>The term for the classification</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					
+					<xs:sequence minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Role expressions: used in case the classification represents a relationship type in a binary relationship between two CERIF objects</xs:documentation>
+						</xs:annotation>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#Classification.RoleExpression" maxOccurs="unbounded" name="RoleExpression" type="cfMLangString__Type">
+							<xs:annotation>
+								<xs:documentation>The role expression for the classification (used in case it represents a relationship type in a binary relationship)</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+						<xs:element cflink:attribute="https://w3id.org/cerif/model#Classification.RoleExpressionOpposite" maxOccurs="unbounded" name="RoleExpressionOpposite" type="cfMLangString__Type">
+							<xs:annotation>
+								<xs:documentation>The inverse role expression for the classification (used in case it represents a relationship type in a binary relationship)</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+
+					</xs:sequence>
+
+					<xs:element cflink:attribute="https://w3id.org/cerif/model#Classification.Definition" maxOccurs="unbounded" minOccurs="0" name="Definition" type="cfMLangStringWithOptionalSource__Type">
+						<xs:annotation>
+							<xs:documentation>The definition of the classification</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+
+					<xs:element cflink:attribute="https://w3id.org/cerif/model#Classification.Description" maxOccurs="unbounded" minOccurs="0" name="Description" type="cfMLangStringWithOptionalSource__Type">
+						<xs:annotation>
+							<xs:documentation>The description of the classification</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+
+					<xs:element cflink:attribute="https://w3id.org/cerif/model#Classification.Example" maxOccurs="unbounded" minOccurs="0" name="Example" type="cfMLangStringWithOptionalSource__Type">
+						<xs:annotation>
+							<xs:documentation>Example(s) of the classification</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+
+					<xs:element cflink:identifier="true" maxOccurs="unbounded" minOccurs="0" name="Identifier" type="cfGenericIdentifier__Type">
+						<xs:annotation>
+							<xs:documentation>An identifier of the classification</xs:documentation>
+						</xs:annotation>
+					</xs:element>						
+					
+					<xs:element cflink:link="https://w3id.org/cerif/model#Classification_Classification(http://www.w3.org/2004/02/skos/core#broader):1" maxOccurs="unbounded" minOccurs="0" name="Broader">
+						<xs:annotation>
+							<xs:documentation>Points at a concept that is more general in meaning than the present one: equivalent to the SKOS `skos:broader` semantic relation</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:complexContent>
+								<xs:extension base="cfLink__BaseType">
+									<xs:sequence>
+										<xs:element ref="Class"/>
+									</xs:sequence>
+								</xs:extension>
+							</xs:complexContent>
+						</xs:complexType>
+					</xs:element>
+
+					<xs:element cflink:link="https://w3id.org/cerif/model#Classification_Classification(http://www.w3.org/2004/02/skos/core#broader):2" maxOccurs="unbounded" minOccurs="0" name="Narrower">
+						<xs:annotation>
+							<xs:documentation>Points at a narrower concept than the present one: equivalent to the SKOS `skos:narrower` semantic relation which is the inverse of `skos:broader`</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:complexContent>
+								<xs:extension base="cfLink__BaseType">
+									<xs:sequence>
+										<xs:element ref="Class"/>
+									</xs:sequence>
+								</xs:extension>
+							</xs:complexContent>
+						</xs:complexType>
+					</xs:element>
+
+					<xs:element cflink:link="https://w3id.org/cerif/model#Classification_Classification(http://www.w3.org/2004/02/skos/core#related)" maxOccurs="unbounded" minOccurs="0" name="Related">
+						<xs:annotation>
+							<xs:documentation>Points at a related concept: equivalent to the SKOS `skos:related` semantic relation</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:complexContent>
+								<xs:extension base="cfLink__BaseType">
+									<xs:sequence>
+										<xs:element ref="Class"/>
+									</xs:sequence>
+								</xs:extension>
+							</xs:complexContent>
+						</xs:complexType>
+					</xs:element>
+
+					<xs:element cflink:link="https://w3id.org/cerif/model#Classification_Classification https://w3id.org/cerif/model#ClassificationScheme_Classification" maxOccurs="unbounded" minOccurs="0" name="Link">
+						<xs:annotation>
+							<xs:documentation>A general link from a classification to another classification or a classification scheme</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:complexContent>
+								<xs:extension base="cfLink__BaseType">
+									<xs:sequence>
+										<xs:element ref="SemanticLayer__SubstitutionGroupHead"/>
+									</xs:sequence>
+								</xs:extension>
+							</xs:complexContent>
+						</xs:complexType>
+					</xs:element>
+
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+</xs:schema>

@@ -7,6 +7,8 @@
  */
 package org.dspace.app.harvest;
 
+import static org.apache.commons.lang3.BooleanUtils.toBoolean;
+
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -80,9 +82,10 @@ public class Harvest {
         options.addOption("R", "reset", false, "reset harvest status on all collections");
         options.addOption("P", "purge", false, "purge all harvestable collections");
 
-        options.addOption("F", "force synchronization", false, "force the synchronization");
-        options.addOption("V", "validate", false, "to enable the item validation");
-        options.addOption("W", "workflow", false, "to start the item workflow after its creation");
+        options.addOption("f", "force synchronization", false, "force the synchronization");
+        options.addOption("iv", "item validation", false, "to enable the item validation");
+        options.addOption("rv", "record validation", false, "to enable the record validation");
+        options.addOption("w", "workflow", false, "to start the item workflow after its creation");
 
 
         options.addOption("e", "eperson", true,
@@ -110,9 +113,10 @@ public class Harvest {
         String oaiSetID = null;
         String metadataKey = null;
         int harvestType = 0;
-        boolean forceSynch = false;
-        boolean validation = false;
-        boolean submitEnabled = true;
+        Boolean forceSynch = null;
+        Boolean itemValidation = null;
+        Boolean recordValidation = null;
+        Boolean submitEnabled = true;
 
         if (line.hasOption('h')) {
             HelpFormatter myhelp = new HelpFormatter();
@@ -180,13 +184,16 @@ public class Harvest {
         if (line.hasOption('m')) {
             metadataKey = line.getOptionValue('m');
         }
-        if (line.hasOption('F')) {
-            forceSynch = true;
+        if (line.hasOption('f')) {
+            forceSynch = toBoolean(line.getOptionValue("iv", "true"));
         }
-        if (line.hasOption('V')) {
-            validation = true;
+        if (line.hasOption("iv")) {
+            itemValidation = toBoolean(line.getOptionValue("iv", "true"));
         }
-        if (line.hasOption('W')) {
+        if (line.hasOption("rv")) {
+            recordValidation = toBoolean(line.getOptionValue("rv", "true"));
+        }
+        if (line.hasOption('w')) {
             submitEnabled = false;
         }
 
@@ -210,7 +217,8 @@ public class Harvest {
                 System.exit(1);
             }
 
-            harvester.runHarvest(collection, eperson, new OAIHarvesterOptions(forceSynch, validation, submitEnabled));
+            harvester.runHarvest(collection, eperson, new OAIHarvesterOptions(forceSynch, recordValidation,
+                itemValidation, submitEnabled));
 
         } else if ("start".equals(command)) {
             // start the harvest loop

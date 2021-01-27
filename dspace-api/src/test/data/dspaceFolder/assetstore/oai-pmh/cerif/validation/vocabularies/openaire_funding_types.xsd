@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types" xmlns:cf="urn:xmlns:org.eurocris.cerif" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" targetNamespace="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types" xsi:schemaLocation="http://www.w3.org/2001/XMLSchema https://www.w3.org/2012/04/XMLSchema.xsd">
+
+	<xs:annotation>
+		<xs:documentation>Types of funding for the OpenAIRE Guidelines for CRIS Managers</xs:documentation>
+		<xs:appinfo>
+			<cf:ClassScheme id="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">
+				<cf:Name xmlns="en">Types of funding for the OpenAIRE Guidelines for CRIS Managers</cf:Name>
+				<cf:Description xmlns="en">Types of funding for the OpenAIRE Guidelines for CRIS Managers.</cf:Description>
+			</cf:ClassScheme>
+		</xs:appinfo>
+	</xs:annotation>
+
+    <xs:include schemaLocation="../includes/cerif-commons.xsd" />
+
+	<xs:element name="Type">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="Enum">
+					<xs:attributeGroup ref="cfExtension__AttributeGroup"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:simpleType name="Enum">
+		<xs:restriction base="xs:string">
+
+			<xs:enumeration value="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#FundingProgramme">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Funding Programme</xs:documentation>
+					<xs:appinfo>
+						<cf:Class id="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#FundingProgramme" classSchemeId="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">
+							<cf:Term xml:lang="en">Funding Programme</cf:Term>
+							<cf:Definition xml:lang="en">A funding programme or a similar scheme that funds some number of proposals. Funding programmes can be broken down into sub-programmes.</cf:Definition>
+						</cf:Class>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+
+			<xs:enumeration value="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#Call">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Call</xs:documentation>
+					<xs:appinfo>
+						<cf:Class id="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#Call" classSchemeId="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">
+							<cf:Term xml:lang="en">Call</cf:Term>
+							<cf:Definition xml:lang="en">Call for proposals: a specific campaign for the funder to solicit proposals from interested researchers and institutions.</cf:Definition>
+						</cf:Class>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+
+			<xs:enumeration value="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#Tender">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Tender</xs:documentation>
+					<xs:appinfo>
+						<cf:Class id="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#Tender" classSchemeId="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">
+							<cf:Term xml:lang="en">Tender</cf:Term>
+							<cf:Definition xml:lang="en">Tender for services or deliveries: a specific campaign for the funder to solicit offers for services or deliveries.</cf:Definition>
+						</cf:Class>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+
+			<xs:enumeration value="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#Gift">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Gift</xs:documentation>
+					<xs:appinfo>
+						<cf:Class id="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#Gift" classSchemeId="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">
+							<cf:Term xml:lang="en">Gift</cf:Term>
+							<cf:Definition xml:lang="en">A donation connected with specific terms and conditions.</cf:Definition>
+						</cf:Class>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+
+			<xs:enumeration value="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#InternalFunding">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Internal Funding</xs:documentation>
+					<xs:appinfo>
+						<cf:Class id="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#InternalFunding" classSchemeId="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">
+							<cf:Term xml:lang="en">Internal Funding</cf:Term>
+							<cf:Definition xml:lang="en">Internal funds used to amend or replace external funding.</cf:Definition>
+						</cf:Class>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+
+			<xs:enumeration value="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#Contract">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Contract</xs:documentation>
+					<xs:appinfo>
+						<cf:Class id="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#" classSchemeId="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">
+							<cf:Term xml:lang="en">Contract</cf:Term>
+<!-- TODO
+							<cf:Definition xml:lang="en"></cf:Definition>
+ -->
+ 						</cf:Class>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+
+			<xs:enumeration value="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#Award">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Award</xs:documentation>
+					<xs:appinfo>
+						<cf:Class id="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#Award" classSchemeId="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">
+							<cf:Term xml:lang="en">Award</cf:Term>
+<!-- TODO
+							<cf:Definition xml:lang="en"></cf:Definition>
+ -->
+						</cf:Class>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+
+			<xs:enumeration value="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#Grant">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Grant</xs:documentation>
+					<xs:appinfo>
+						<cf:Class id="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#Grant" classSchemeId="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">
+							<cf:Term xml:lang="en">Grant</cf:Term>
+<!-- TODO
+							<cf:Definition xml:lang="en"></cf:Definition>
+ -->
+						</cf:Class>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:enumeration>
+
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

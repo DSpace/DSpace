@@ -20,21 +20,26 @@ public class OAIHarvesterOptions {
 
     private final UUID processId;
 
-    private final boolean forceSynchronization;
+    private final Boolean forceSynchronization;
 
-    private final boolean validationEnabled;
+    private final Boolean recordValidationEnabled;
 
-    private final boolean submissionEnabled;
+    private final Boolean itemValidationEnabled;
 
-    public OAIHarvesterOptions(boolean forceSynchronization, boolean validationEnabled, boolean submissionEnabled) {
-        this(UUID.randomUUID(), forceSynchronization, validationEnabled, submissionEnabled);
+    private final Boolean submissionEnabled;
+
+    public OAIHarvesterOptions(Boolean forceSynchronization, Boolean recordValidationEnabled,
+        Boolean itemValidationEnabled, Boolean submissionEnabled) {
+        this(UUID.randomUUID(), forceSynchronization, recordValidationEnabled, itemValidationEnabled,
+            submissionEnabled);
     }
 
-    public OAIHarvesterOptions(UUID processId, boolean forceSynchronization, boolean validationEnabled,
-        boolean submissionEnabled) {
+    public OAIHarvesterOptions(UUID processId, Boolean forceSynchronization, Boolean recordValidationEnabled,
+        Boolean itemValidationEnabled, Boolean submissionEnabled) {
         this.processId = processId;
         this.forceSynchronization = forceSynchronization;
-        this.validationEnabled = validationEnabled;
+        this.itemValidationEnabled = itemValidationEnabled;
+        this.recordValidationEnabled = recordValidationEnabled;
         this.submissionEnabled = submissionEnabled;
     }
 
@@ -42,16 +47,20 @@ public class OAIHarvesterOptions {
         return processId;
     }
 
-    public boolean isForceSynchronization() {
+    public Boolean isForceSynchronization() {
         return forceSynchronization;
     }
 
-    public boolean isValidationEnabled() {
-        return validationEnabled;
+    public Boolean isSubmissionEnabled() {
+        return submissionEnabled;
     }
 
-    public boolean isSubmissionEnabled() {
-        return submissionEnabled;
+    public Boolean isRecordValidationEnabled() {
+        return recordValidationEnabled;
+    }
+
+    public Boolean isItemValidationEnabled() {
+        return itemValidationEnabled;
     }
 
 }
