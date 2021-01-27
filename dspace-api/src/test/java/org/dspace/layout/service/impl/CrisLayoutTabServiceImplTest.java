@@ -19,7 +19,6 @@ import static org.mockito.Mockito.when;
 
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -159,68 +158,6 @@ public class CrisLayoutTabServiceImplTest {
             .thenReturn(entityType);
 
         when(tabDao.findByEntityType(context, entityType)).thenReturn(null);
-
-        List<CrisLayoutTab> tabs = crisLayoutTabService.findByItem(context, itemUuid);
-
-        assertThat(tabs, is(emptyList()));
-    }
-
-    @Test
-    public void emptyItemMetadataReturnsEmptyList() throws SQLException {
-        String itemUuid = UUID.randomUUID().toString();
-        Item item = mock(Item.class);
-        String entityType = UUID.randomUUID().toString();
-
-        List<MetadataValue> itemMetadata = Collections.emptyList();
-
-        CrisLayoutTab tabOne = grantedAccessTab("tab1", boxWithContent(item, itemMetadata),
-                boxWithoutContent(item, itemMetadata));
-        CrisLayoutTab tabTwo = grantedAccessTab("tab2", boxWithContent(item, itemMetadata),
-                boxWithContent(item, itemMetadata));
-        CrisLayoutTab tabThree = grantedAccessTab("tab3", boxWithoutContent(item, itemMetadata),
-            boxWithoutContent(item, itemMetadata));
-
-        when(itemService.find(context, UUID.fromString(itemUuid)))
-            .thenReturn(item);
-
-        when(itemService.getMetadata(item, "relationship.type"))
-            .thenReturn(entityType);
-
-        when(item.getMetadata()).thenReturn(itemMetadata);
-
-        when(tabDao.findByEntityType(context, entityType))
-            .thenReturn(Arrays.asList(tabOne, tabTwo, tabThree));
-
-        List<CrisLayoutTab> tabs = crisLayoutTabService.findByItem(context, itemUuid);
-
-        assertThat(tabs, is(emptyList()));
-    }
-
-    @Test
-    public void nullItemMetadataReturnsEmptyList() throws SQLException {
-        String itemUuid = UUID.randomUUID().toString();
-        Item item = mock(Item.class);
-        String entityType = UUID.randomUUID().toString();
-
-        List<MetadataValue> itemMetadata = null;
-
-        CrisLayoutTab tabOne = grantedAccessTab("tab1", boxWithContent(item, itemMetadata),
-                boxWithoutContent(item, itemMetadata));
-        CrisLayoutTab tabTwo = grantedAccessTab("tab2", boxWithContent(item, itemMetadata),
-                boxWithContent(item, itemMetadata));
-        CrisLayoutTab tabThree = grantedAccessTab("tab3", boxWithoutContent(item, itemMetadata),
-            boxWithoutContent(item, itemMetadata));
-
-        when(itemService.find(context, UUID.fromString(itemUuid)))
-            .thenReturn(item);
-
-        when(itemService.getMetadata(item, "relationship.type"))
-            .thenReturn(entityType);
-
-        when(item.getMetadata()).thenReturn(itemMetadata);
-
-        when(tabDao.findByEntityType(context, entityType))
-            .thenReturn(Arrays.asList(tabOne, tabTwo, tabThree));
 
         List<CrisLayoutTab> tabs = crisLayoutTabService.findByItem(context, itemUuid);
 
