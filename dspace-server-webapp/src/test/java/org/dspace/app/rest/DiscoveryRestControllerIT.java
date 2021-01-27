@@ -3281,8 +3281,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/discover/search/objects")
             .param("f.title", "test"))
                    //** THEN **
-                   //Will result in 400 status because of missing filter operator
-                   .andExpect(status().isBadRequest());
+                   //Will result in 422 status because of missing filter operator
+                   .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
