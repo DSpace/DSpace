@@ -890,7 +890,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
             .andExpect(status().reason(is(plFmt.format(values))))
             .andExpect(status().reason(startsWith("[PL]"))); // verify it did not fall back to default locale
 
-        // make request using Polish locale
+        // make request using default locale
         getClient(getAuthToken(admin.getEmail(), password))
             .perform(delete("/api/eperson/epersons/" + ePerson.getID()))
             .andExpect(status().isUnprocessableEntity())

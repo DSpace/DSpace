@@ -30,7 +30,7 @@ public class RESTEmptyWorkflowGroupException extends UnprocessableEntityExceptio
      * @param cause {@link EmptyWorkflowGroupException}, from which EPerson id and group id are obtained
      * @return message with EPerson id and group id substituted
      */
-    public static String formatMessage(String formatStr, EmptyWorkflowGroupException cause) {
+    private static String formatMessage(String formatStr, EmptyWorkflowGroupException cause) {
         MessageFormat fmt = new MessageFormat(formatStr);
         String[] values = {
             cause.getEPersonId().toString(), // {0} in formatStr
