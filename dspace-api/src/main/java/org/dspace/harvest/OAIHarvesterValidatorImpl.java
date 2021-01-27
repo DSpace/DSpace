@@ -29,6 +29,8 @@ import org.dspace.harvest.service.OAIHarvesterValidator;
 import org.dspace.services.ConfigurationService;
 import org.jdom.Element;
 import org.jdom.transform.JDOMSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
@@ -43,9 +45,11 @@ import org.xml.sax.SAXParseException;
  */
 public class OAIHarvesterValidatorImpl implements OAIHarvesterValidator {
 
-    private ConfigurationService configurationService;
-
     private static final Map<String, Schema> SCHEMA_CACHE = new HashMap<>();
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OAIHarvesterValidatorImpl.class);
+
+    private ConfigurationService configurationService;
 
     @Autowired
     public OAIHarvesterValidatorImpl(ConfigurationService configurationService) {
@@ -92,16 +96,26 @@ public class OAIHarvesterValidatorImpl implements OAIHarvesterValidator {
 
         String validationDirectory = configurationService.getProperty("oai.harvester.validation-dir");
         if (StringUtils.isBlank(validationDirectory)) {
+            LOGGER.warn("Harvest validation enabled but no oai.harvester.validation-dir property configured");
             return Optional.empty();
         }
 
         String metadataConfig = harvestRow.getHarvestMetadataConfig();
-        String xsdName = configurationService.getProperty("oai.harvester.validation." + metadataConfig + ".xsd");
+        String xsdNameProperty = "oai.harvester.validation." + metadataConfig + ".xsd";
+
+        String xsdName = configurationService.getProperty(xsdNameProperty);
         if (StringUtils.isBlank(xsdName)) {
+            LOGGER.warn("Harvest validation enabled but no " + xsdNameProperty + " property configured");
             return Optional.empty();
         }
 
-        return Optional.of(new File(validationDirectory, xsdName).getAbsolutePath());
+        File xsdFile = new File(validationDirectory, xsdName);
+        if (!xsdFile.exists()) {
+            LOGGER.warn("Harvest validation enabled but no xsd found on path: " + xsdFile.getPath());
+            return Optional.empty();
+        }
+
+        return Optional.of(xsdFile.getAbsolutePath());
     }
 
     private static class CustomErrorHandler implements ErrorHandler {

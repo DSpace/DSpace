@@ -166,6 +166,20 @@ public class OAIHarvesterValidatorTest {
         assertThat(validationResult.getMessages(), empty());
     }
 
+    @Test
+    public void testValidationWithCerifXsdNotFound() {
+
+        when(configurationService.getProperty("oai.harvester.validation-dir")).thenReturn(VALIDATION_DIR);
+        when(configurationService.getProperty("oai.harvester.validation.cerif.xsd")).thenReturn("wrong.xsd");
+
+        Element record = readDocument(OAI_PMH_CERIF_DIR_PATH, "publication-with-wrong-order.xml");
+        HarvestedCollection harvestRow = buildHarvestedCollection("cerif");
+
+        OAIHarvesterValidationResult validationResult = validator.validate(record, harvestRow);
+        assertThat(validationResult.isValid(), is(true));
+        assertThat(validationResult.getMessages(), empty());
+    }
+
     private HarvestedCollection buildHarvestedCollection(String metadataConfig) {
         HarvestedCollection harvestedCollection = mock(HarvestedCollection.class);
         when(harvestedCollection.getHarvestMetadataConfig()).thenReturn(metadataConfig);
