@@ -13,7 +13,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.query.RestSearchOperator;
 import org.dspace.app.rest.parameter.SearchFilter;
@@ -74,7 +73,7 @@ public class SearchFilterResolver implements HandlerMethodArgumentResolver {
                     String.join(", ", ALLOWED_SEARCH_OPERATORS));
             }
         } else {
-            throw new DSpaceBadRequestException(
+            throw new UnprocessableEntityException(
                 "The operator can't be empty, must be the one of: " + String.join(", ", ALLOWED_SEARCH_OPERATORS));
         }
     }
