@@ -13,7 +13,6 @@
                 <ref bean="openAccess"/>
                 <ref bean="lease"/>
                 <ref bean="embargoed" />
-                <ref bean="embargoedWithGroupSelect" />
                 <ref bean="administrator"/>
                 <!-- <ref bean="networkAdministration"/> -->
             </list>
@@ -39,14 +38,7 @@
         <property name="hasStartDate" value="true"/>
         <property name="startDateLimit" value="+36MONTHS"/>
         <property name="hasEndDate" value="false"/>
-        
-    </bean> 
-    <bean id="embargoedWithGroupSelect" class="org.dspace.submit.model.AccessConditionOption">
-        <property name="name" value="embargo"/>
-        <property name="hasStartDate" value="true"/>
-        <property name="startDateLimit" value="+36MONTHS"/>
-        <property name="hasEndDate" value="false"/>
-    </bean> 
+    </bean>
     <bean id="administrator" class="org.dspace.submit.model.AccessConditionOption">
         <property name="groupName" value="Administrator"/>
         <property name="name" value="administrator"/>
