@@ -106,7 +106,7 @@ public class Ldap {
     env.put("com.sun.jndi.ldap.read.timeout", strReadTimeout);
 
     // Create the directory context
-    log.info("Initailizing new LDAP context");
+    log.debug("Initailizing new LDAP context");
     ctx = new InitialDirContext(env);
   }
 
