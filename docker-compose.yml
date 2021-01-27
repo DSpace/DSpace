@@ -58,10 +58,10 @@ services:
     stdin_open: true
     tty: true
     volumes:
-    - solr_authority:/opt/solr/server/solr/authority/data
-    - solr_oai:/opt/solr/server/solr/oai/data
-    - solr_search:/opt/solr/server/solr/search/data
-    - solr_statistics:/opt/solr/server/solr/statistics/data
+    - solr_authority:/var/solr/data/authority/data
+    - solr_oai:/var/solr/data/oai/data
+    - solr_search:/var/solr/data/search/data
+    - solr_statistics:/var/solr/data/statistics/data
 volumes:
   assetstore:
   pgdata:
