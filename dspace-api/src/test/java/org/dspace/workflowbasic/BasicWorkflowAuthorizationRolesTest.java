@@ -57,17 +57,23 @@ import org.junit.Test;
  * This is an integration test to ensure that the basic workflow system
  * -including methods of the collection service dealing with it- works properly
  * together with the authorization service.
- *
+ * 
+ * FIXME Due to a not optimal definition of UnitTest and IntegrationTest in
+ * DSpace see https://github.com/DSpace/DSpace/issues/3055 all the integration
+ * test that inherit from org.dspace.AbstractUnitTest without denying its init()
+ * method behavior MUST BE named as Unit Test
+ * 
  * @author Pascal-Nicolas Becker
  * @author Terry Brady
  */
 @Ignore
-public class BasicWorkflowAuthorizationRolesIT
+public class BasicWorkflowAuthorizationRolesTest
     extends AbstractIntegrationTest {
     /**
      * log4j category
      */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(BasicWorkflowAuthorizationIT.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager
+            .getLogger(BasicWorkflowAuthorizationRolesTest.class);
 
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
@@ -97,7 +103,7 @@ public class BasicWorkflowAuthorizationRolesIT
     protected HashMap<ROLE, Group> roleGroups = new HashMap<>();
     protected HashMap<ROLE, EPerson> roleEPersons = new HashMap<>();
 
-    public BasicWorkflowAuthorizationRolesIT() {
+    public BasicWorkflowAuthorizationRolesTest() {
         owningCommunity = null;
         collection = null;
         item = null;

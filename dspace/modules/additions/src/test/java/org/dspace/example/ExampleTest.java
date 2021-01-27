@@ -17,8 +17,14 @@ import org.junit.Test;
 /**
  * This IT serves as an an example of how & where to add integration tests for local customizations to the DSpace API.
  * See {@link Example} and {@link ExampleImpl} for the class of which the functionality is tested.
+ * 
+ * FIXME Due to a not optimal definition of UnitTest and IntegrationTest in
+ * DSpace see https://github.com/DSpace/DSpace/issues/3055 all the integration
+ * test that inherit from org.dspace.AbstractUnitTest without denying its init()
+ * method behavior MUST BE named as Unit Test
+ * 
  */
-public class ExampleIT extends AbstractIntegrationTest {
+public class ExampleTest extends AbstractIntegrationTest {
 
     @Test
     public void testExampleImpl() {

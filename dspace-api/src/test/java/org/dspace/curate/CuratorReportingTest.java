@@ -35,11 +35,11 @@ import org.slf4j.LoggerFactory;
  *
  * @author mhwood
  */
-public class ITCurator
+public class CuratorReportingTest
         extends AbstractUnitTest {
-    Logger LOG = LoggerFactory.getLogger(ITCurator.class);
+    Logger LOG = LoggerFactory.getLogger(CuratorReportingTest.class);
 
-    public ITCurator() {
+    public CuratorReportingTest() {
     }
 
     @BeforeClass

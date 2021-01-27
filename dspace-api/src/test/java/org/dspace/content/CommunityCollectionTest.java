@@ -42,11 +42,16 @@ import org.junit.Test;
  * This is an integration test to ensure collections and communities interact properly.
  *
  * The code below is attached as an example.
+ * 
+ * FIXME Due to a not optimal definition of UnitTest and IntegrationTest in
+ * DSpace see https://github.com/DSpace/DSpace/issues/3055 all the integration
+ * test that inherit from org.dspace.AbstractUnitTest without denying its init()
+ * method behavior MUST BE named as Unit Test
  *
  * @author pvillega
  * @author tdonohue
  */
-public class ITCommunityCollection extends AbstractIntegrationTest {
+public class CommunityCollectionTest extends AbstractIntegrationTest {
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();

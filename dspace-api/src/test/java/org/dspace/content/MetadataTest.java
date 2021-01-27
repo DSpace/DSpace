@@ -33,9 +33,14 @@ import org.junit.Test;
 /**
  * This is an integration test to validate the metadata classes
  *
+ * FIXME Due to a not optimal definition of UnitTest and IntegrationTest in
+ * DSpace see https://github.com/DSpace/DSpace/issues/3055 all the integration
+ * test that inherit from org.dspace.AbstractUnitTest without denying its init()
+ * method behavior MUST BE named as Unit Test
+ *
  * @author pvillega
  */
-public class ITMetadata extends AbstractIntegrationTest {
+public class MetadataTest extends AbstractIntegrationTest {
 
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();

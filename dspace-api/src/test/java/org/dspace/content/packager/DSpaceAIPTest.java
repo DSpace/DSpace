@@ -73,13 +73,18 @@ import org.junit.rules.TemporaryFolder;
  * Basic integration testing for the AIP Backup and Restore feature
  * https://wiki.duraspace.org/display/DSDOC5x/AIP+Backup+and+Restore
  *
+ * FIXME Due to a not optimal definition of UnitTest and IntegrationTest in
+ * DSpace see https://github.com/DSpace/DSpace/issues/3055 all the integration
+ * test that inherit from org.dspace.AbstractUnitTest without denying its init()
+ * method behavior MUST BE named as Unit Test
+ *
  * @author Tim Donohue
  */
-public class ITDSpaceAIP extends AbstractIntegrationTest {
+public class DSpaceAIPTest extends AbstractIntegrationTest {
     /**
      * log4j category
      */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ITDSpaceAIP.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DSpaceAIPTest.class);
 
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();

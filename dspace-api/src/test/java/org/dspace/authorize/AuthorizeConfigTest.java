@@ -17,10 +17,15 @@ import org.junit.Test;
  * This integration test verify that the {@link AuthorizeConfiguration} works
  * properly with the configuration reloading
  * 
+ * FIXME Due to a not optimal definition of UnitTest and IntegrationTest in
+ * DSpace see https://github.com/DSpace/DSpace/issues/3055 all the integration
+ * test that inherit from org.dspace.AbstractUnitTest without denying its init()
+ * method behavior MUST BE named as Unit Test
+ * 
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public class AuthorizeConfigIT extends AbstractIntegrationTest {
+public class AuthorizeConfigTest extends AbstractIntegrationTest {
 
     @Test
     public void testReloadConfiguration() {

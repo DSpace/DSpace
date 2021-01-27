@@ -57,16 +57,22 @@ import org.junit.Test;
  * -including methods of the collection service dealing with it- works properly
  * together with the authorization service.
  *
+ * FIXME Due to a not optimal definition of UnitTest and IntegrationTest in
+ * DSpace see https://github.com/DSpace/DSpace/issues/3055 all the integration
+ * test that inherit from org.dspace.AbstractUnitTest without denying its init()
+ * method behavior MUST BE named as Unit Test
+ *
  * @author Pascal-Nicolas Becker
  * @author Terry Brady
  */
 @Ignore
-public class BasicWorkflowAuthorizationIT
+public class BasicWorkflowAuthorizationTest
     extends AbstractIntegrationTest {
     /**
      * log4j category
      */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(BasicWorkflowAuthorizationIT.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager
+            .getLogger(BasicWorkflowAuthorizationTest.class);
 
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
@@ -88,7 +94,7 @@ public class BasicWorkflowAuthorizationIT
     protected Group group;
     protected EPerson member;
 
-    public BasicWorkflowAuthorizationIT() {
+    public BasicWorkflowAuthorizationTest() {
         owningCommunity = null;
         collection = null;
         group = null;

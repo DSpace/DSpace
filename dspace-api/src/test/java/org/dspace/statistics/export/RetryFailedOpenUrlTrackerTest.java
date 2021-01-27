@@ -28,10 +28,16 @@ import org.junit.Test;
 
 /**
  * Class to test the RetryFailedOpenUrlTracker
+ * 
+ * FIXME Due to a not optimal definition of UnitTest and IntegrationTest in
+ * DSpace see https://github.com/DSpace/DSpace/issues/3055 all the integration
+ * test that inherit from org.dspace.AbstractUnitTest without denying its init()
+ * method behavior MUST BE named as Unit Test
+ * 
  */
-public class ITRetryFailedOpenUrlTracker extends AbstractIntegrationTest {
+public class RetryFailedOpenUrlTrackerTest extends AbstractIntegrationTest {
 
-    private static Logger log = Logger.getLogger(ITRetryFailedOpenUrlTracker.class);
+    private static Logger log = Logger.getLogger(RetryFailedOpenUrlTrackerTest.class);
 
 
     protected FailedOpenURLTrackerService failedOpenURLTrackerService =

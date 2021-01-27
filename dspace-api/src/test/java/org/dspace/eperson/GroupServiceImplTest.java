@@ -18,12 +18,17 @@ import org.junit.Test;
 
 /**
  * Test integration of GroupServiceImpl.
+ * 
+ * FIXME Due to a not optimal definition of UnitTest and IntegrationTest in
+ * DSpace see https://github.com/DSpace/DSpace/issues/3055 all the integration
+ * test that inherit from org.dspace.AbstractUnitTest without denying its init()
+ * method behavior MUST BE named as Unit Test
  *
  * @author mwood
  */
-public class GroupServiceImplIT
+public class GroupServiceImplTest
     extends AbstractUnitTest {
-    public GroupServiceImplIT() {
+    public GroupServiceImplTest() {
         super();
     }
 

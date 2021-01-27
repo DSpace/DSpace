@@ -49,18 +49,23 @@ import org.xmlunit.diff.Difference;
 /**
  * Tests of {@link StructBuilder}.
  *
+ * FIXME Due to a not optimal definition of UnitTest and IntegrationTest in
+ * DSpace see https://github.com/DSpace/DSpace/issues/3055 all the integration
+ * test that inherit from org.dspace.AbstractUnitTest without denying its init()
+ * method behavior MUST BE named as Unit Test
+ *
  * @author Mark H. Wood <mwood@iupui.edu>
  */
-public class StructBuilderIT
+public class StructBuilderTest
         extends AbstractIntegrationTest {
-    private static final Logger log = LoggerFactory.getLogger(StructBuilderIT.class);
+    private static final Logger log = LoggerFactory.getLogger(StructBuilderTest.class);
 
     private static final CommunityService communityService
             = ContentServiceFactory.getInstance().getCommunityService();
     private static final CollectionService collectionService
             = ContentServiceFactory.getInstance().getCollectionService();
 
-    public StructBuilderIT() {
+    public StructBuilderTest() {
     }
 
     @BeforeClass
