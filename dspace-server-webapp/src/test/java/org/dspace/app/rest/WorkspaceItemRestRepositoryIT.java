@@ -11,6 +11,7 @@ import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -3281,7 +3282,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
-    @Ignore
     public void patchUploadRemoveAccessConditionTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -3309,7 +3309,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // date
         SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
-        Date startDate = DateUtils.addYears(new Date(), 4);
+        Date startDate = new Date();
         String startDateStr = dateFmt.format(startDate);
 
         // create a list of values to use in add operation
@@ -3344,7 +3344,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         List<Operation> removeAccessCondition = new ArrayList<>();
         removeAccessCondition.add(new RemoveOperation("/sections/upload/files/0/accessConditions"));
 
-        // remove and verify that access conditions are set to defaults
+        // remove and verify that access conditions are removed
         String patchReplaceBody = getPatchContent(removeAccessCondition);
         getClient(authToken)
             .perform(
@@ -3353,16 +3353,12 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                     .contentType(MediaType.APPLICATION_JSON_PATCH_JSON)
             )
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].name", is("openaccess")))
-            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].startDate", nullValue()))
-            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].endDate", nullValue()));
+            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions", empty()));
 
         // verify that the patch changes have been persisted
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].name", is("openaccess")))
-            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].startDate", nullValue()))
-            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].endDate", nullValue()));
+            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions", empty()));
     }
 
     @Test
@@ -4615,9 +4611,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
     }
 
-    // TODO: remove ignore
     @Test
-    @Ignore
     public void uploadBitstreamWithoutAccessConditions() throws Exception {
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).withName("Com").build();
@@ -4637,14 +4631,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         getClient(authToken)
             .perform(fileUpload("/api/submission/workspaceitems/" + wItem.getID()).file(pdfFile))
             .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].name", is("openaccess")));
-        // TODO: currently no access conditions are created by default
+            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions", empty()));
 
         // verify that access conditions have been persisted
         getClient(authToken)
             .perform(get("/api/submission/workspaceitems/" + wItem.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].name", is("openaccess")));
+            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions", empty()));
     }
 
     // TODO: remove ignore
@@ -4726,7 +4719,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
-    public void patchBitstreamWithAccessConditionLeaseAndEndDate() throws Exception {
+    public void patchBitstreamWithAccessConditionLeaseAndValidEndDate() throws Exception {
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).withName("Com").build();
         Collection collection = CollectionBuilder.createCollection(context, community).withName("Col").build();
@@ -4774,7 +4767,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
-    public void patchBitstreamWithAccessConditionEmbargoAndStartDate() throws Exception {
+    public void patchBitstreamWithAccessConditionLeaseAndInvalidEndDate() throws Exception {
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).withName("Com").build();
         Collection collection = CollectionBuilder.createCollection(context, community).withName("Col").build();
@@ -4789,7 +4782,53 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // date
         SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
-        Date startDate = DateUtils.addYears(new Date(), 4);
+        Date endDate = DateUtils.addDays(
+            // lease ends 1 day too late
+            DateUtils.addMonths(new Date(), 6), 1
+        );
+        String endDateStr = dateFmt.format(endDate);
+
+        // prepare patch body
+        Map<String, String> accessCondition = new HashMap<>();
+        accessCondition.put("name", "lease");
+        accessCondition.put("endDate", endDateStr);
+        List<Operation> ops = new ArrayList<>();
+        ops.add(new AddOperation("/sections/upload/files/0/accessConditions/-", accessCondition));
+        String patchBody = getPatchContent(ops);
+
+        // submit patch and verify response
+        getClient(authToken)
+            .perform(
+                patch("/api/submission/workspaceitems/" + wItem.getID())
+                    .content(patchBody)
+                    .contentType(MediaType.APPLICATION_JSON_PATCH_JSON)
+            )
+            .andExpect(status().isInternalServerError());
+
+        // verify that access conditions array is still empty
+        getClient(authToken)
+            .perform(get("/api/submission/workspaceitems/" + wItem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions", empty()));
+    }
+
+    @Test
+    public void patchBitstreamWithAccessConditionEmbargoAndValidStartDate() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).withName("Com").build();
+        Collection collection = CollectionBuilder.createCollection(context, community).withName("Col").build();
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+        WorkspaceItem wItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+            .withFulltext("upload.pdf", "/local/path/simple-article.pdf", pdf)
+            .build();
+        context.restoreAuthSystemState();
+
+        // auth
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        // date
+        SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
+        Date startDate = new Date();
         String startDateStr = dateFmt.format(startDate);
 
         // prepare patch body
@@ -4821,9 +4860,53 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].endDate", nullValue()));
     }
 
-    // TODO: remove ignore
     @Test
-    @Ignore
+    public void patchBitstreamWithAccessConditionEmbargoAndInvalidStartDate() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).withName("Com").build();
+        Collection collection = CollectionBuilder.createCollection(context, community).withName("Col").build();
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+        WorkspaceItem wItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+            .withFulltext("upload.pdf", "/local/path/simple-article.pdf", pdf)
+            .build();
+        context.restoreAuthSystemState();
+
+        // auth
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        // date
+        SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
+        Date startDate = DateUtils.addDays(
+            // embargo ends 1 day too late
+            DateUtils.addMonths(new Date(), 36), 1
+        );
+        String startDateStr = dateFmt.format(startDate);
+
+        // prepare patch body
+        Map<String, String> accessCondition = new HashMap<>();
+        accessCondition.put("name", "embargo");
+        accessCondition.put("startDate", startDateStr);
+        List<Operation> ops = new ArrayList<>();
+        ops.add(new AddOperation("/sections/upload/files/0/accessConditions/-", accessCondition));
+        String patchBody = getPatchContent(ops);
+
+        // submit patch and verify response
+        getClient(authToken)
+            .perform(
+                patch("/api/submission/workspaceitems/" + wItem.getID())
+                    .content(patchBody)
+                    .contentType(MediaType.APPLICATION_JSON_PATCH_JSON)
+            )
+            .andExpect(status().isInternalServerError());
+
+        // verify that access conditions have been persisted
+        getClient(authToken)
+            .perform(get("/api/submission/workspaceitems/" + wItem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions", empty()));
+    }
+
+    @Test
     public void patchBitstreamWithAccessConditionOpenAccessAndStartDate() throws Exception {
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).withName("Com").build();
@@ -4859,20 +4942,14 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             )
             .andExpect(status().isInternalServerError());
 
-        // verify that access conditions have not been modified
-        // TODO: would be better if the initial access condition is not openaccess, but the builder does not seem to
-        //       support that
+        // verify that access conditions array is still empty
         getClient(authToken)
             .perform(get("/api/submission/workspaceitems/" + wItem.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].name", is("openaccess")))
-            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].startDate", nullValue()))
-            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].endDate", nullValue()));
+            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions", empty()));
     }
 
-    // TODO: remove ignore
     @Test
-    @Ignore
     public void patchBitstreamWithAccessConditionLease() throws Exception {
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).withName("Com").build();
@@ -4902,13 +4979,11 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             )
             .andExpect(status().isInternalServerError());
 
-        // verify that access conditions have been persisted
+        // verify that access conditions array is still empty
         getClient(authToken)
             .perform(get("/api/submission/workspaceitems/" + wItem.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].name", is("openaccess")))
-            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].startDate", nullValue()))
-            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].endDate", nullValue()));
+            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions", empty()));
     }
 
 }
