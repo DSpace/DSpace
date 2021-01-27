@@ -28,12 +28,12 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.security.service.CrisSecurityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
-import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.LayoutSecurity;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,12 +53,15 @@ public class LayoutSecurityServiceImplTest {
     private ItemService itemService;
     @Mock
     private GroupService groupService;
+    @Mock
+    private CrisSecurityService crisSecurityService;
 
     private LayoutSecurityServiceImpl securityService;
 
     @Before
     public void setUp() throws Exception {
-        securityService = new LayoutSecurityServiceImpl(authorizeService, itemService, groupService);
+        securityService = new LayoutSecurityServiceImpl(authorizeService, itemService, groupService,
+                crisSecurityService);
     }
 
     /**
@@ -89,15 +92,16 @@ public class LayoutSecurityServiceImplTest {
         UUID userUuid = UUID.randomUUID();
 
         Item item = mock(Item.class);
+        EPerson ownerEperson = ePerson(userUuid);
 
-        when(itemService.getMetadataFirstValue(item, "cris", "owner", null, Item.ANY))
-            .thenReturn(userUuid.toString());
+        when(crisSecurityService.isOwner(ownerEperson, item))
+            .thenReturn(true);
 
         boolean granted =
             securityService
                 .hasAccess(LayoutSecurity.OWNER_ONLY,
                            mock(Context.class),
-                           ePerson(userUuid),
+                           ownerEperson,
                            emptySet(),
                            item);
 
@@ -112,18 +116,17 @@ public class LayoutSecurityServiceImplTest {
     @Test
     public void ownerOnlyAccessedByOtherUser() throws SQLException {
         UUID userUuid = UUID.randomUUID();
-        UUID ownerUuid = UUID.randomUUID();
 
         Item item = mock(Item.class);
 
-
-        when(itemService.getMetadataFirstValue(item, "cris", "owner", null, Item.ANY))
-            .thenReturn(ownerUuid.toString());
+        EPerson userEperson = ePerson(userUuid);
+        when(crisSecurityService.isOwner(userEperson, item))
+            .thenReturn(false);
 
         boolean granted =
             securityService
                 .hasAccess(LayoutSecurity.OWNER_ONLY,
-                           mock(Context.class), ePerson(userUuid),
+                           mock(Context.class), userEperson,
                            emptySet(),
                            item);
 
@@ -160,20 +163,19 @@ public class LayoutSecurityServiceImplTest {
     @Test
     public void ownerAndAdminAccessedByOwnerUser() throws SQLException {
 
-        UUID userUuid = UUID.randomUUID();
-
+        UUID ownerUuid = UUID.randomUUID();
+        EPerson ownerEperson = ePerson(ownerUuid);
         Context context = mock(Context.class);
         Item item = mock(Item.class);
 
         when(authorizeService.isAdmin(context)).thenReturn(false);
-
-        when(itemService.getMetadataFirstValue(item, "cris", "owner", null, Item.ANY))
-            .thenReturn(userUuid.toString());
+        when(crisSecurityService.isOwner(ownerEperson, item))
+            .thenReturn(true);
 
         boolean granted =
             securityService
                 .hasAccess(LayoutSecurity.OWNER_AND_ADMINISTRATOR,
-                           context, ePerson(userUuid), emptySet(), item);
+                           context, ownerEperson, emptySet(), item);
 
         assertThat(granted, is(true));
     }
@@ -187,20 +189,18 @@ public class LayoutSecurityServiceImplTest {
     public void ownerAndAdminAccessedByDifferentNotAdminUser() throws SQLException {
 
         UUID userUuid = UUID.randomUUID();
-        UUID ownerUuid = UUID.randomUUID();
-
+        EPerson userEperson = ePerson(userUuid);
         Context context = mock(Context.class);
         Item item = mock(Item.class);
 
         when(authorizeService.isAdmin(context)).thenReturn(false);
-
-        when(itemService.getMetadataFirstValue(item, "cris", "owner", null, Item.ANY))
-            .thenReturn(ownerUuid.toString());
+        when(crisSecurityService.isOwner(userEperson, item))
+            .thenReturn(false);
 
         boolean granted =
             securityService
                 .hasAccess(LayoutSecurity.OWNER_AND_ADMINISTRATOR,
-                           context, ePerson(userUuid), emptySet(), item);
+                           context, userEperson, emptySet(), item);
 
         assertThat(granted, is(false));
     }
@@ -493,11 +493,4 @@ public class LayoutSecurityServiceImplTest {
 
     }
 
-
-    private CrisLayoutBox box(LayoutSecurity security, MetadataField... securityFields) {
-        CrisLayoutBox box = new CrisLayoutBox();
-        box.setSecurity(security);
-        box.addMetadataSecurityFields(new HashSet<>(Arrays.asList(securityFields)));
-        return box;
-    }
 }
