@@ -14,7 +14,6 @@ import java.util.Set;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.indexobject.factory.IndexFactory;
@@ -22,9 +21,6 @@ import org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactory;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.WorkflowItemService;
-import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 /**
  * Class for updating search indices in discovery from content events.
@@ -50,9 +46,6 @@ public class IndexEventConsumer implements Consumer {
                                                                      IndexingService.class);
 
     IndexObjectFactoryFactory indexObjectServiceFactory = IndexObjectFactoryFactory.getInstance();
-
-    private WorkflowItemService workflowItemService = WorkflowServiceFactory.getInstance().getWorkflowItemService();
-
 
     @Override
     public void initialize() throws Exception {
@@ -138,12 +131,16 @@ public class IndexEventConsumer implements Consumer {
                 } else {
                     log.debug("consume() adding event to update queue: " + event.toString());
                     if (event.getSubjectType() == Constants.ITEM) {
-                        WorkflowItem workflowItem = workflowItemService.findByItem(ctx, (Item) subject);
-                        if (workflowItem != null) {
-                            String detail =
-                                    Constants.typeText[event.getSubjectType()] + "-" + event.getSubjectID().toString();
-                            uniqueIdsToDelete.add(detail);
-                        }
+                    // if it is an item we cannot know about its previous state, so it could be a
+                    // workspaceitem that has been deposited right now or an approved/reject
+                    // workflowitem.
+                    // As the workflow is not necessary enabled it can happen than a workspaceitem
+                    // became directly an item without giving us the chance to retrieve a
+                    // workflowitem... so we need to force the unindex of all the related data
+                    // before to index it again to be sure to don't leave any zombie in solr
+                        String detail =
+                                Constants.typeText[event.getSubjectType()] + "-" + event.getSubjectID().toString();
+                        uniqueIdsToDelete.add(detail);
                     }
                     objectsToUpdate.addAll(indexObjectServiceFactory.getIndexableObjects(ctx, subject));
                 }
