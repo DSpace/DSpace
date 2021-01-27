@@ -89,6 +89,8 @@ public class Ldap {
     String strUrl = configurationService.getProperty("drum.ldap.url");
     String strBindAuth = configurationService.getProperty("drum.ldap.bind.auth");
     String strBindPassword =  configurationService.getProperty("drum.ldap.bind.password");
+    String strConnectTimeout =  configurationService.getProperty("drum.ldap.connect.timeout");
+    String strReadTimeout =  configurationService.getProperty("drum.ldap.read.timeout");
 
     // Setup the JNDI environment
     Properties env = new Properties();
@@ -100,8 +102,11 @@ public class Ldap {
     env.put(Context.SECURITY_PROTOCOL, "ssl");
     env.put(javax.naming.Context.SECURITY_PRINCIPAL, strBindAuth);
     env.put(javax.naming.Context.SECURITY_CREDENTIALS, strBindPassword); 
+    env.put("com.sun.jndi.ldap.connect.timeout", strConnectTimeout);
+    env.put("com.sun.jndi.ldap.read.timeout", strReadTimeout);
 
     // Create the directory context
+    log.debug("Initailizing new LDAP context");
     ctx = new InitialDirContext(env);
   }
 
