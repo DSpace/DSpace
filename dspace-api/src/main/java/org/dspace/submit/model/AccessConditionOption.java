@@ -52,16 +52,6 @@ public class AccessConditionOption {
     private String groupName;
 
     /**
-     * this is in alternative to the {@link #groupName}. The sub-groups listed in
-     * the DSpace group identified by the name here specified will be available to
-     * the user to personalize the access condition. They can be for instance
-     * University Staff, University Students, etc. so that a "restricted access"
-     * option can be further specified without the need to create separate access
-     * condition options for each group
-     */
-    private String selectGroupName;
-
-    /**
      * set to <code>true</code> if this option requires a start date to be indicated
      * for the underlying resource policy to create
      */
@@ -119,6 +109,10 @@ public class AccessConditionOption {
         this.hasEndDate = hasEndDate;
     }
 
+    /**
+     * Explanation see: {@link #startDateLimit}
+     * @return startDateLimit
+     */
     public String getStartDateLimit() {
         return startDateLimit;
     }
@@ -127,6 +121,10 @@ public class AccessConditionOption {
         this.startDateLimit = startDateLimit;
     }
 
+    /**
+     * Explanation see: {@link #endDateLimit}
+     * @return endDateLimit
+     */
     public String getEndDateLimit() {
         return endDateLimit;
     }
@@ -135,14 +133,17 @@ public class AccessConditionOption {
         this.endDateLimit = endDateLimit;
     }
 
-    public String getSelectGroupName() {
-        return selectGroupName;
-    }
-
-    public void setSelectGroupName(String selectGroupName) {
-        this.selectGroupName = selectGroupName;
-    }
-
+    /**
+     * Create a new resource policy for a bitstream
+     * @param context DSpace context
+     * @param b bitstream for which resource policy is created
+     * @param name name of the resource policy
+     * @param description description of the resource policy
+     * @param startDate start date of the resource policy. If {@link #getHasStartDate()} returns false,
+     *                  startDate should be null. Otherwise startDate may not be null.
+     * @param endDate end date of the resource policy. If {@link #getHasEndDate()} returns false,
+     *                endDate should be null. Otherwise endDate may not be null.
+     */
     public void createResourcePolicy(Context context, Bitstream b, String name, String description,
                                      Date startDate, Date endDate)
             throws SQLException, AuthorizeException, ParseException {
@@ -159,9 +160,9 @@ public class AccessConditionOption {
             throw new IllegalStateException("The access condition " + getName() + " cannot contain an end date.");
         }
 
-        Date earliestStartDate = null;
+        Date latestStartDate = null;
         if (getStartDateLimit() != null) {
-            earliestStartDate = dateMathParser.parseMath(getStartDateLimit());
+            latestStartDate = dateMathParser.parseMath(getStartDateLimit());
         }
 
         Date latestEndDate = null;
@@ -169,25 +170,19 @@ public class AccessConditionOption {
             latestEndDate = dateMathParser.parseMath(getEndDateLimit());
         }
 
-        // throw if latestEndDate before earliestStartDate
-        if (earliestStartDate != null && latestEndDate != null && earliestStartDate.compareTo(latestEndDate) > 0) {
+        // throw if startDate after latestStartDate
+        if (startDate != null && latestStartDate != null && startDate.after(latestStartDate)) {
             throw new IllegalStateException(String.format(
-                "The boundaries of %s overlap: [%s, %s]", getName(), getStartDateLimit(), getEndDateLimit()
-            ));
-        }
-
-        // throw if startDate before earliestStartDate
-        if (earliestStartDate != null && earliestStartDate.compareTo(startDate) > 0) {
-            throw new IllegalStateException(String.format(
-                "The start date of access condition %s should be later than %s from now.",
+                "The start date of access condition %s should be earlier than %s from now.",
                 getName(), getStartDateLimit()
             ));
         }
 
         // throw if endDate after latestEndDate
-        if (latestEndDate != null && latestEndDate.compareTo(endDate) < 0) {
+        if (endDate != null && latestEndDate != null && endDate.after(latestEndDate)) {
             throw new IllegalStateException(String.format(
-                "The end date of access condition %s should be earlier than %s from now.", getName(), getEndDateLimit()
+                "The end date of access condition %s should be earlier than %s from now.",
+                getName(), getEndDateLimit()
             ));
         }
 
