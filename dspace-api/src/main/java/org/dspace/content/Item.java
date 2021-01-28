@@ -106,7 +106,7 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
      * (to drive metadata cache)
      */
     @Transient
-    private boolean modifiedMetadataCache = false;
+    private boolean modifiedMetadataCache = true;
 
     @Transient
     private List<MetadataValue> cachedMetadata = new ArrayList<>();
