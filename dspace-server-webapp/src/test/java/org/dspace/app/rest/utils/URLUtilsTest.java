@@ -61,6 +61,13 @@ public class URLUtilsTest {
         isPrefix = URLUtils.urlIsPrefixOf("http://example.com/path1/a", "http://example.com/path2/a");
         assertFalse("Should not match if paths don't match", isPrefix);
 
+        isPrefix = URLUtils.urlIsPrefixOf("http://example.com/path", "http://example.com/path/");
+        assertTrue("Should match with, without trailing slash", isPrefix);
+        isPrefix = URLUtils.urlIsPrefixOf("http://example.com/path1", "http://example.com/path2");
+        assertFalse("Should not match if paths don't match", isPrefix);
+        isPrefix = URLUtils.urlIsPrefixOf("http://example.com/path", "http://example.com/path2/sub");
+        assertFalse("Should not match if interior path elements don't match", isPrefix);
+
         // Check if a malformed URL raises an exception
         isPrefix = URLUtils.urlIsPrefixOf(null, "http://example.com/");
     }
