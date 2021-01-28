@@ -54,35 +54,55 @@ public class URLUtils {
 
     /**
      * Is one URL a prefix of another?  Ignores credentials, fragments and queries.
-     * @param candidate
-     * @param pattern
+     * @param pattern the potential prefix.
+     * @param candidate does this URL match the pattern?
      * @return {@code true} if the URLs have equal protocol, host and port,
-     *         and {@code pattern}'s path {@code String.startsWith} {@code candidate}'s path.
+     *         and {@code candidate}'s path {@code String.startsWith} {@code pattern}'s path.
      * @throws IllegalArgumentException if either URL is malformed.
      */
-    public static boolean urlIsPrefixOf(String candidate, String pattern)
+    public static boolean urlIsPrefixOf(String pattern, String candidate)
             throws IllegalArgumentException {
-        URL candidateURL;
         URL patternURL;
+        URL candidateURL;
+
         try {
-            candidateURL = new URL(candidate);
             patternURL = new URL(pattern);
         } catch (MalformedURLException e) {
-            throw new IllegalArgumentException("the supplied uri is not valid: " + pattern);
+            throw new IllegalArgumentException("The pattern URL is not valid:  " + pattern);
+        }
+
+        try {
+            candidateURL = new URL(candidate);
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("The candidate URL is not valid:  " + candidate);
+        }
+
+        // Deal with port defaults.
+        int patternPort = patternURL.getPort();
+        if (patternPort < 0) {
+            patternPort = patternURL.getDefaultPort();
         }
         int candidatePort = candidateURL.getPort();
         if (candidatePort < 0) {
             candidatePort = candidateURL.getDefaultPort();
         }
-        int patternPort = patternURL.getPort();
-        if (patternPort < 0) {
-            patternPort = patternURL.getDefaultPort();
+
+        boolean isPrefix;
+        isPrefix = StringUtils.equals(candidateURL.getProtocol(), patternURL.getProtocol());
+        isPrefix &= StringUtils.equals(candidateURL.getHost(), patternURL.getHost());
+        isPrefix &= candidatePort == patternPort;
+
+        String[] candidateElements = StringUtils.split(candidateURL.getPath(), '/');
+        String[] patternElements = StringUtils.split(patternURL.getPath(), '/');
+
+        // Candidate path cannot be shorter than pattern path.
+        if (patternElements.length > candidateElements.length) {
+            return false;
+        }
+        for (int elementN = 0; elementN < patternElements.length; elementN++) {
+            isPrefix &= candidateElements[elementN].equals(patternElements[elementN]);
         }
 
-        // FIXME paths should be compared element-by-element, not string-wise.
-        return StringUtils.equals(patternURL.getProtocol(), candidateURL.getProtocol())
-                && StringUtils.equals(patternURL.getHost(), candidateURL.getHost())
-                && patternPort == candidatePort
-                && StringUtils.startsWith(patternURL.getPath(), candidateURL.getPath());
+        return isPrefix;
     }
 }

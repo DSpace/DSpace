@@ -930,13 +930,9 @@ public class Utils {
     */
     public BaseObjectRest getBaseObjectRestFromUri(Context context, String uri) throws SQLException {
         String dspaceUrl = configurationService.getProperty("dspace.server.url");
-        // first check if the uri could be valid
-        if (!urlIsPrefixOf(dspaceUrl, uri)) {
-            throw new IllegalArgumentException("the supplied uri is not ours: " + uri);
-        }
 
-        // Extract from the URI the category, model and id components.
-        // They start after the dspaceUrl/api/{apiCategory}/{apiModel}/{id}
+        // Convert strings to URL objects.
+        // Do this early to check that inputs are well-formed.
         URL dspaceUrlObject;
         URL requestUrlObject;
         try {
@@ -946,6 +942,14 @@ public class Utils {
             throw new IllegalArgumentException(
                     String.format("Configuration '%s' or request '%s' is malformed", dspaceUrl, uri));
         }
+
+        // Check whether the URI could be valid.
+        if (!urlIsPrefixOf(dspaceUrl, uri)) {
+            throw new IllegalArgumentException("the supplied uri is not ours: " + uri);
+        }
+
+        // Extract from the URI the category, model and id components.
+        // They start after the dspaceUrl/api/{apiCategory}/{apiModel}/{id}
         int dspacePathLength = StringUtils.split(dspaceUrlObject.getPath(), '/').length;
         String[] requestPath = StringUtils.split(requestUrlObject.getPath(), '/');
         String[] uriParts = Arrays.copyOfRange(requestPath, dspacePathLength,
