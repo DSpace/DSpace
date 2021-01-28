@@ -31,7 +31,7 @@
                     <label>Title</label>
                     <input-type>onebox</input-type>
                     <hint>Enter the name of the file.</hint>
-                    <required>You must enter a main title for this item.</required>
+                    <required>You must enter a name for this file</required>
                 </field>
             </row>
             <row>
@@ -54,15 +54,19 @@
                     <search-configuration>person</search-configuration>
                     <repeatable>true</repeatable>
                     <label>Author</label>
-                    <hint>Add an author</hint>
+                    <hint>Enter the author's name (Family name, Given names).</hint>
                     <linked-metadata-field>
                         <dc-schema>dc</dc-schema>
                         <dc-element>contributor</dc-element>
                         <dc-qualifier>author</dc-qualifier>
-                        <input-type>name</input-type>
+                        <input-type>onebox</input-type>
                     </linked-metadata-field>
                     <externalsources>orcid</externalsources>
-                    <required>At least one author (plain text or relationship) is required</required>
+                    <required></required>
+                    <!-- You may choose to validate author names via a Regular Expression if it's appropriate for
+                         your institution. The below regex requires a comma to be present in the author field.
+                         However, this is disabled by default to support organizations as authors, etc. -->
+                    <!--<regex>\w+(,)+\w+</regex>-->
                 </relation-field>
             </row>
             <row>
@@ -75,7 +79,6 @@
                     <input-type>onebox</input-type>
                     <hint>Enter the main title of the item.</hint>
                     <required>You must enter a main title for this item.</required>
-                    <!--    <language value-pairs-name="common_iso_languages">true</language> -->
                 </field>
             </row>
             <row>
@@ -100,8 +103,7 @@
                     <style>col-sm-4</style>
                     <input-type>date</input-type>
                     <hint>Please give the date of previous publication or public distribution.
-                        You can leave out the day and/or month if they aren't
-                        applicable.
+                        You can leave out the day and/or month if they aren't applicable.
                     </hint>
                     <required>You must enter at least the year.</required>
                 </field>
@@ -864,7 +866,7 @@
             </row>
 
             <!-- Additional Subject with specific taxonomy (like mesh, fos, ...) -->
-            
+
             <!-- example for FOS -->
             <!-- <row>
                 <field>
@@ -1067,14 +1069,14 @@
                     <label>Name of the Funding Stream</label>
                     <input-type>onebox</input-type>
                     <hint>Enter the name of the funding stream of the project</hint>
-                </field>            
+                </field>
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>identifier</dc-element>
                     <label>Award number</label>
                     <input-type>onebox</input-type>
                     <hint>Enter the identifier of the project</hint>
-                </field>            
+                </field>
             </row>
         </form>
 
@@ -1355,9 +1357,9 @@
 
         </value-pairs>
 
-        <!-- OpenAIRE document types 
-             https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_publicationtype.html 
-             Based on COAR Vocabularies -> Controlled Vocabulary for Resource Type Genres (Version 2.0): 
+        <!-- OpenAIRE document types
+             https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_publicationtype.html
+             Based on COAR Vocabularies -> Controlled Vocabulary for Resource Type Genres (Version 2.0):
              http://vocabularies.coar-repositories.org/documentation/resource_types/
         -->
         <value-pairs value-pairs-name="openaire_types" dc-term="type">
