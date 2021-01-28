@@ -128,7 +128,7 @@
 
     <dc-type>
         <schema>oairecerif</schema>
-        <element>fundingProgram</element>
+        <element>fundingParent</element>
         <scope_note></scope_note>
     </dc-type>
 
