@@ -57,7 +57,8 @@ public class URLUtils {
      * @param pattern the potential prefix.
      * @param candidate does this URL match the pattern?
      * @return {@code true} if the URLs have equal protocol, host and port,
-     *         and {@code candidate}'s path {@code String.startsWith} {@code pattern}'s path.
+     *         and each element of {@code candidate}'s path {@link String#equals}
+     *         the corresponding element in {@code pattern}'s path.
      * @throws IllegalArgumentException if either URL is malformed.
      */
     public static boolean urlIsPrefixOf(String pattern, String candidate)
