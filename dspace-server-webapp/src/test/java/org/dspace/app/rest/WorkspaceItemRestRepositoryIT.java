@@ -4640,7 +4640,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.sections.upload.files[0].accessConditions", empty()));
     }
 
-    // TODO: remove ignore
+    // The REST endpoint doesn't seem to support uploading a bitstream with the access conditions
     @Test
     @Ignore
     public void uploadBitstreamWithAccessConditionOpenAccess() throws Exception {
