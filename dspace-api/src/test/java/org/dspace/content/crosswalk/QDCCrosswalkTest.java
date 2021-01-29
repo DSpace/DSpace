@@ -26,7 +26,6 @@ import org.junit.Test;
  *
  * @author mwood
  */
-@Ignore
 public class QDCCrosswalkTest
         extends AbstractDSpaceTest {
     private static final String PLUGIN_NAME = "qdctest";
