@@ -1,13 +1,22 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.statistics.util;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.dspace.statistics.util.IPTable.IPFormatException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
 import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  *
@@ -47,7 +56,7 @@ public class IPTableTest {
      * Test of contains method, of class IPTable.
      * @throws java.lang.Exception passed through.
      */
-    @Test(expected=IPFormatException.class)
+    @Test(expected = IPFormatException.class)
     public void testContains() throws Exception {
         String localhost = "127.0.0.1";
         IPTable instance = new IPTable();
