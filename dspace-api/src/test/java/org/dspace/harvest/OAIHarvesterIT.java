@@ -7,8 +7,6 @@
  */
 package org.dspace.harvest;
 
-
-import static java.lang.String.join;
 import static java.util.UUID.randomUUID;
 import static org.dspace.app.matcher.MetadataValueMatcher.with;
 import static org.dspace.builder.CollectionBuilder.createCollection;
@@ -51,7 +49,6 @@ import java.util.UUID;
 
 import org.apache.commons.collections4.IteratorUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
-import org.dspace.authority.CrisConsumer;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.HarvestedCollectionBuilder;
@@ -65,8 +62,6 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.event.factory.EventServiceFactory;
-import org.dspace.event.service.EventService;
 import org.dspace.harvest.factory.HarvestServiceFactory;
 import org.dspace.harvest.model.OAIHarvesterOptions;
 import org.dspace.harvest.model.OAIHarvesterReport;
@@ -100,14 +95,11 @@ import org.mockito.ArgumentCaptor;
  */
 public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
 
-    private static final String CRIS_CONSUMER = CrisConsumer.CONSUMER_NAME;
-
     private static final String BASE_URL = "https://www.test-harvest.it";
 
     private static final String OAI_PMH_DIR_PATH = "./target/testing/dspace/assetstore/oai-pmh/";
     private static final String VALIDATION_DIR = OAI_PMH_DIR_PATH + "cerif/validation/";
     private static final String CERIF_XSD_NAME = "openaire-cerif-profile.xsd";
-
 
     private OAIHarvester harvester = HarvestServiceFactory.getInstance().getOAIHarvester();
 
@@ -129,7 +121,6 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
 
     private SAXBuilder builder = new SAXBuilder();
 
-
     private Community community;
 
     private Collection collection;
@@ -137,7 +128,6 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
     private OAIHarvesterClient oaiHarvesterClient;
 
     private OAIHarvesterClient mockClient;
-
 
     @Before
     public void beforeTests() throws Exception {
@@ -737,10 +727,8 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
     @Test
     @SuppressWarnings("unchecked")
     public void testRunHarvestWithPublicationAndThenPerson() throws Exception {
-
-        String[] consumers = activateCrisConsumer();
         try {
-
+            context.setDispatcher("cris-default");
             when(mockClient.listRecords(eq(BASE_URL), isNull(), any(), eq("publications"), eq("oai_cerif_openaire")))
                 .thenReturn(buildResponse("single-publication.xml"));
 
@@ -826,17 +814,15 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
             assertThat(values, hasItems(with("person.familyName", "Manghi")));
 
         } finally {
-            resetConsumers(consumers);
+            context.setDispatcher(null);
         }
     }
 
     @Test
     @SuppressWarnings("unchecked")
     public void testRunHarvestWithPersonAndThenPublication() throws Exception {
-
-        String[] consumers = activateCrisConsumer();
         try {
-
+            context.setDispatcher("cris-default");
             when(mockClient.listRecords(eq(BASE_URL), isNull(), any(), eq("publications"), eq("oai_cerif_openaire")))
                 .thenReturn(buildResponse("single-publication.xml"));
 
@@ -904,7 +890,7 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
             assertThat(UUIDUtils.fromString(author.getAuthority()), equalTo(person.getID()));
 
         } finally {
-            resetConsumers(consumers);
+            context.setDispatcher(null);
         }
     }
 
@@ -1533,21 +1519,6 @@ public class OAIHarvesterIT extends AbstractIntegrationTestWithDatabase {
     private OAIHarvesterResponseDTO buildResponse(String documentPath, String resumptionToken, Set<String> errors) {
         Document document = readDocument(OAI_PMH_DIR_PATH, documentPath);
         return new OAIHarvesterResponseDTO(document, resumptionToken, errors);
-    }
-
-    private String[] activateCrisConsumer() {
-        ConfigurationService configService = DSpaceServicesFactory.getInstance().getConfigurationService();
-        String[] consumers = configService.getArrayProperty("event.dispatcher.default.consumers");
-        String newConsumers = consumers.length > 0 ? join(",", consumers) + "," + CRIS_CONSUMER : CRIS_CONSUMER;
-        configService.setProperty("event.dispatcher.default.consumers", newConsumers);
-        EventService eventService = EventServiceFactory.getInstance().getEventService();
-        eventService.reloadConfiguration();
-        return consumers;
-    }
-
-    private void resetConsumers(String[] consumers) {
-        ConfigurationService configService = DSpaceServicesFactory.getInstance().getConfigurationService();
-        configService.setProperty("event.dispatcher.default.consumers", consumers);
     }
 
     private Document readDocument(String dir, String name) {
