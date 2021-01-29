@@ -14,7 +14,6 @@ import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -83,7 +82,6 @@ public class DiscoveryConfiguration implements InitializingBean {
         return sidebarFacets;
     }
 
-    @Autowired(required = true)
     public void setSidebarFacets(List<DiscoverySearchFilterFacet> sidebarFacets) {
         this.sidebarFacets = sidebarFacets;
     }
@@ -131,7 +129,6 @@ public class DiscoveryConfiguration implements InitializingBean {
         return null;
     }
 
-    @Autowired(required = true)
     public void setSearchFilters(List<DiscoverySearchFilter> searchFilters) {
         this.searchFilters = searchFilters;
     }
@@ -140,7 +137,6 @@ public class DiscoveryConfiguration implements InitializingBean {
         return searchSortConfiguration;
     }
 
-    @Autowired(required = true)
     public void setSearchSortConfiguration(DiscoverySortConfiguration searchSortConfiguration) {
         this.searchSortConfiguration = searchSortConfiguration;
     }

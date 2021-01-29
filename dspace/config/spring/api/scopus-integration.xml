@@ -281,6 +281,7 @@
     </bean>
 
     <bean id="scopusAuthorMetadataContrib" class="org.dspace.importer.external.metadatamapping.contributor.AuthorMetadataContributor">
+        <property name="field" ref="scopus.authname"/>
         <property name="authname" ref="scopus.authname"/>
         <property name="orcid" ref="scopus.orcid"/>
         <property name="scopusId" ref="scopus.scopusId"/>
