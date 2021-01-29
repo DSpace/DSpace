@@ -64,6 +64,7 @@
                 <entry key="workflowAdmin" value-ref="workflowAdminConfiguration" />
                 <entry key="undiscoverable" value-ref="unDiscoverableItems" />
                 <entry key="administrativeView" value-ref="administrativeView" />
+                <entry key="backend" value-ref="backendConfiguration" />
                 <entry key="publication" value-ref="publication"/>
                 <entry key="researchoutputs" value-ref="researchoutputs"/>
                 <entry key="person" value-ref="person"/>
@@ -432,9 +433,19 @@
         <property name="id" value="homepageConfiguration"/>
     </bean>
     
+    <!--The backend configuration settings for discovery-->
+    <bean id="backendConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="commonConfiguration">
+        <property name="id" value="backendConfiguration"/>
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find items, communities and collections-->
+                <value>search.resourcetype:Item OR search.resourcetype:Collection OR search.resourcetype:Community</value>
+            </list>
+        </property>
+    </bean>
+    
     <bean id="commonConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration" abstract="true">
         <property name="indexAlways" value="true"/>
-        <property name="id" value="homepageConfiguration"/>
         <!--Which sidebar facets are to be displayed (same as defaultConfiguration above)-->
         <property name="sidebarFacets">
             <list>
