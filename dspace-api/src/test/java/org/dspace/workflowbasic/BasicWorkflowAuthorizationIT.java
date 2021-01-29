@@ -7,6 +7,8 @@
  */
 package org.dspace.workflowbasic;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -208,7 +210,7 @@ public class BasicWorkflowAuthorizationIT
         } finally {
             context.restoreAuthSystemState();
         }
-        Assert.assertThat("testsetWorkflowGroupSetsPermission 0",
+        assertThat("testsetWorkflowGroupSetsPermission 0",
                 collectionService.getWorkflowGroup(context, collection, step),
                           CoreMatchers.equalTo(group));
         Assert.assertTrue(groupService.isDirectMember(group, member));
@@ -230,11 +232,10 @@ public class BasicWorkflowAuthorizationIT
         } finally {
             context.restoreAuthSystemState();
         }
-        Assert
-                .assertThat("testsetWorkflowGroupRevokesPermission 0",
-                        collectionService.getWorkflowGroup(context, collection, step),
-                        CoreMatchers
-                            .equalTo(group));
+        assertThat("testsetWorkflowGroupRevokesPermission 0",
+                collectionService.getWorkflowGroup(context, collection, step),
+                CoreMatchers
+                    .equalTo(group));
         Assert.assertTrue("testsetWorkflowGroupRevokesPermission 1", authorizeService
             .authorizeActionBoolean(context, member, collection, Constants.WORKFLOW_STEP_1, true));
         try {
@@ -244,17 +245,16 @@ public class BasicWorkflowAuthorizationIT
         } finally {
             context.restoreAuthSystemState();
         }
-        Assert
-                .assertThat("testsetWorkflowGroupRevokesPermission 2",
-                        collectionService.getWorkflowGroup(context, collection, step),
-                        CoreMatchers
-                            .nullValue());
+        assertThat("testsetWorkflowGroupRevokesPermission 2",
+                collectionService.getWorkflowGroup(context, collection, step),
+                CoreMatchers
+                    .nullValue());
         Assert.assertFalse("testsetWorkflowGroupRevokesPermission 3", authorizeService
             .authorizeActionBoolean(context, member, collection, Constants.WORKFLOW_STEP_1, true));
     }
 
     /**
-     * Test that a member of a worfklow step group can claim a task and get the
+     * Test that a member of a workflow step group can claim a task and get the
      * appropriate policies.
      */
     @Test

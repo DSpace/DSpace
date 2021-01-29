@@ -10,6 +10,7 @@ package org.dspace.content;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -19,12 +20,14 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.RelationshipDAO;
+import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.virtual.VirtualMetadataPopulator;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class RelationshipServiceImpl implements RelationshipService {
@@ -42,6 +45,12 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     @Autowired(required = true)
     protected RelationshipTypeService relationshipTypeService;
+
+    @Autowired
+    private ConfigurationService configurationService;
+
+    @Autowired
+    private EntityTypeService entityTypeService;
 
     @Autowired
     private RelationshipMetadataService relationshipMetadataService;
@@ -126,6 +135,7 @@ public class RelationshipServiceImpl implements RelationshipService {
             Relationship relationshipToReturn = relationshipDAO.create(context, relationship);
             updatePlaceInRelationship(context, relationshipToReturn);
             update(context, relationshipToReturn);
+            updateItemsInRelationship(context, relationship);
             return relationshipToReturn;
         } else {
             throw new AuthorizeException(
@@ -234,14 +244,14 @@ public class RelationshipServiceImpl implements RelationshipService {
             return false;
         }
         if (!verifyMaxCardinality(context, relationship.getLeftItem(),
-                                  relationshipType.getLeftMaxCardinality(), relationshipType)) {
+                                  relationshipType.getLeftMaxCardinality(), relationshipType, true)) {
             log.warn("The relationship has been deemed invalid since the left item has more" +
                          " relationships than the left max cardinality allows after we'd store this relationship");
             logRelationshipTypeDetailsForError(relationshipType);
             return false;
         }
         if (!verifyMaxCardinality(context, relationship.getRightItem(),
-                                  relationshipType.getRightMaxCardinality(), relationshipType)) {
+                                  relationshipType.getRightMaxCardinality(), relationshipType, false)) {
             log.warn("The relationship has been deemed invalid since the right item has more" +
                          " relationships than the right max cardinality allows after we'd store this relationship");
             logRelationshipTypeDetailsForError(relationshipType);
@@ -264,9 +274,10 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     private boolean verifyMaxCardinality(Context context, Item itemToProcess,
                                          Integer maxCardinality,
-                                         RelationshipType relationshipType) throws SQLException {
+                                         RelationshipType relationshipType,
+                                         boolean isLeft) throws SQLException {
         List<Relationship> rightRelationships = findByItemAndRelationshipType(context, itemToProcess, relationshipType,
-                                                                              false);
+                                                                              isLeft);
         if (maxCardinality != null && rightRelationships.size() >= maxCardinality) {
             return false;
         }
@@ -401,10 +412,133 @@ public class RelationshipServiceImpl implements RelationshipService {
             authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
             relationshipDAO.delete(context, relationship);
             updatePlaceInRelationship(context, relationship);
+            updateItemsInRelationship(context, relationship);
         } else {
             throw new AuthorizeException(
                 "You do not have write rights on this relationship's items");
         }
+    }
+
+
+    /**
+     * Utility method to ensure discovery is updated for the 2 items
+     * This method is used when creating, modifying or deleting a relationship
+     * The virtual metadata of the 2 items may need to be updated, so they should be re-indexed
+     *
+     * @param context           The relevant DSpace context
+     * @param relationship      The relationship which has been created, updated or deleted
+     * @throws SQLException     If something goes wrong
+     */
+    private void updateItemsInRelationship(Context context, Relationship relationship) throws SQLException {
+        // Since this call is performed after creating, updating or deleting the relationships, the permissions have
+        // already been verified. The following updateItem calls can however call the
+        // ItemService.update() functions which would fail if the user doesn't have permission on both items.
+        // Since we allow this edits to happen under these circumstances, we need to turn off the
+        // authorization system here so that this failure doesn't happen when the items need to be update
+        context.turnOffAuthorisationSystem();
+        try {
+            // Set a limit on the total amount of items to update at once during a relationship change
+            int max = configurationService.getIntProperty("relationship.update.relateditems.max", 20);
+            // Set a limit on the total depth of relationships to traverse during a relationship change
+            int maxDepth = configurationService.getIntProperty("relationship.update.relateditems.maxdepth", 5);
+            // This is the list containing all items which will have changes to their virtual metadata
+            List<Item> itemsToUpdate = new LinkedList<>();
+            itemsToUpdate.add(relationship.getLeftItem());
+            itemsToUpdate.add(relationship.getRightItem());
+
+            if (containsVirtualMetadata(relationship.getRelationshipType().getLeftwardType())) {
+                findModifiedDiscoveryItemsForCurrentItem(context, relationship.getLeftItem(),
+                                           itemsToUpdate, max, 0, maxDepth);
+            }
+            if (containsVirtualMetadata(relationship.getRelationshipType().getRightwardType())) {
+                findModifiedDiscoveryItemsForCurrentItem(context, relationship.getRightItem(),
+                                            itemsToUpdate, max, 0, maxDepth);
+            }
+
+            for (Item item : itemsToUpdate) {
+                updateItem(context, item);
+            }
+        } catch (AuthorizeException e) {
+            log.error("Authorization Exception while authorization has been disabled", e);
+        } finally {
+            context.restoreAuthSystemState();
+        }
+    }
+
+    /**
+     * Search for items whose metadata should be updated in discovery and adds them to itemsToUpdate
+     * It starts from the given item, excludes items already in itemsToUpdate (they're already handled),
+     * and can be limited in amount of items or depth to update
+     */
+    private void findModifiedDiscoveryItemsForCurrentItem(Context context, Item item, List<Item> itemsToUpdate,
+                                                          int max, int currentDepth, int maxDepth)
+        throws SQLException {
+        if (itemsToUpdate.size() >= max) {
+            log.debug("skipping findModifiedDiscoveryItemsForCurrentItem for item "
+                    + item.getID() + " due to " + itemsToUpdate.size() + " items to be updated");
+            return;
+        }
+        if (currentDepth == maxDepth) {
+            log.debug("skipping findModifiedDiscoveryItemsForCurrentItem for item "
+                    + item.getID() + " due to " + currentDepth + " depth");
+            return;
+        }
+        String entityTypeStringFromMetadata = relationshipMetadataService.getEntityTypeStringFromMetadata(item);
+        EntityType actualEntityType = entityTypeService.findByEntityType(context, entityTypeStringFromMetadata);
+        // Get all types of relations for the current item
+        List<RelationshipType> relationshipTypes = relationshipTypeService.findByEntityType(context, actualEntityType);
+        for (RelationshipType relationshipType : relationshipTypes) {
+            //are we searching for items where the current item is on the left
+            boolean isLeft = relationshipType.getLeftType().equals(actualEntityType);
+
+            // Verify whether there's virtual metadata configured for this type of relation
+            // If it's not present, we don't need to update the virtual metadata in discovery
+            String typeToSearchInVirtualMetadata;
+            if (isLeft) {
+                typeToSearchInVirtualMetadata = relationshipType.getRightwardType();
+            } else {
+                typeToSearchInVirtualMetadata = relationshipType.getLeftwardType();
+            }
+            if (containsVirtualMetadata(typeToSearchInVirtualMetadata)) {
+                // we have a relationship type where the items attached to the current item will inherit
+                // virtual metadata from the current item
+                // retrieving the actual relationships so the related items can be updated
+                List<Relationship> list = findByItemAndRelationshipType(context, item, relationshipType, isLeft);
+                for (Relationship foundRelationship : list) {
+                    Item nextItem;
+                    if (isLeft) {
+                        // current item on the left, next item is on the right
+                        nextItem = foundRelationship.getRightItem();
+                    } else {
+                        nextItem = foundRelationship.getLeftItem();
+                    }
+
+                    // verify it hasn't been processed yet
+                    if (!itemsToUpdate.contains(nextItem)) {
+                        itemsToUpdate.add(nextItem);
+                        // continue the process for the next item, it may also inherit item from the current item
+                        findModifiedDiscoveryItemsForCurrentItem(context, nextItem,
+                                itemsToUpdate, max, currentDepth + 1, maxDepth);
+                    }
+                }
+            } else {
+                log.debug("skipping " + relationshipType.getID()
+                        + " in findModifiedDiscoveryItemsForCurrentItem for item "
+                        + item.getID() + " because no relevant virtual metadata was found");
+            }
+        }
+    }
+
+    /**
+     * Verifies whether there is virtual metadata generated for the given relationship
+     * If no such virtual metadata exists, there's no need to update the items in discovery
+     * @param typeToSearchInVirtualMetadata     a leftWardType or rightWardType of a relationship type
+     *                                          This can be e.g. isAuthorOfPublication
+     * @return                                  true if there is virtual metadata for this relationship
+     */
+    private boolean containsVirtualMetadata(String typeToSearchInVirtualMetadata) {
+        return virtualMetadataPopulator.getMap().containsKey(typeToSearchInVirtualMetadata)
+                && virtualMetadataPopulator.getMap().get(typeToSearchInVirtualMetadata).size() > 0;
     }
 
     /**
@@ -598,9 +732,9 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     @Override
-    public int countByItemAndRelationshipType(Context context, Item item, RelationshipType relationshipType)
-            throws SQLException {
-        return relationshipDAO.countByItemAndRelationshipType(context, item, relationshipType);
+    public int countByItemAndRelationshipType(Context context, Item item, RelationshipType relationshipType,
+                                              boolean isLeft) throws SQLException {
+        return relationshipDAO.countByItemAndRelationshipType(context, item, relationshipType, isLeft);
     }
 
     @Override

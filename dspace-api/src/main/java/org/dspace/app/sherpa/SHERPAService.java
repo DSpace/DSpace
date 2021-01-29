@@ -16,8 +16,10 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 public class SHERPAService {
     private CloseableHttpClient client = null;
@@ -29,7 +31,7 @@ public class SHERPAService {
     /**
      * log4j category
      */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SHERPAService.class);
+    private static final Logger log = LogManager.getLogger(SHERPAService.class);
 
     public SHERPAService() {
         HttpClientBuilder builder = HttpClientBuilder.create();
@@ -43,8 +45,10 @@ public class SHERPAService {
 
 
     public SHERPAResponse searchByJournalISSN(String query) {
-        String endpoint = ConfigurationManager.getProperty("sherpa.romeo.url");
-        String apiKey = ConfigurationManager.getProperty("sherpa.romeo.apikey");
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        String endpoint = configurationService.getProperty("sherpa.romeo.url");
+        String apiKey = configurationService.getProperty("sherpa.romeo.apikey");
 
         HttpGet method = null;
         SHERPAResponse sherpaResponse = null;

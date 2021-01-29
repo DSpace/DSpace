@@ -36,7 +36,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.log4j.Logger;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.exception.MetadataSourceException;
@@ -194,8 +193,8 @@ public class PubmedEuropeMetadataSourceServiceImpl
     }
 
     public Integer count(String query) throws URISyntaxException, ClientProtocolException, IOException, JaxenException {
-        String proxyHost = ConfigurationManager.getProperty("http.proxy.host");
-        String proxyPort = ConfigurationManager.getProperty("http.proxy.port");
+        String proxyHost = configurationService.getProperty("http.proxy.host");
+        String proxyPort = configurationService.getProperty("http.proxy.port");
         HttpGet method = null;
         HttpHost proxy = null;
         HttpClient client = new DefaultHttpClient();
@@ -268,8 +267,8 @@ public class PubmedEuropeMetadataSourceServiceImpl
 
     public List<ImportRecord> search(String query, Integer count, Integer start) throws IOException, HttpException {
         List<ImportRecord> results = new ArrayList<>();
-        String proxyHost = ConfigurationManager.getProperty("http.proxy.host");
-        String proxyPort = ConfigurationManager.getProperty("http.proxy.port");
+        String proxyHost = configurationService.getProperty("http.proxy.host");
+        String proxyPort = configurationService.getProperty("http.proxy.port");
         HttpGet method = null;
         HttpHost proxy = null;
         try {

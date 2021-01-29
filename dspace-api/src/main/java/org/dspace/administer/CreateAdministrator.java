@@ -13,10 +13,9 @@ import java.util.Locale;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
@@ -24,6 +23,8 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * A command-line tool for creating an initial administrator for setting up a
@@ -61,7 +62,7 @@ public final class CreateAdministrator {
      */
     public static void main(String[] argv)
         throws Exception {
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
         Options options = new Options();
 
         CreateAdministrator ca = new CreateAdministrator();
@@ -147,9 +148,10 @@ public final class CreateAdministrator {
                 lastName = lastName.trim();
             }
 
-            if (ConfigurationManager.getProperty("webui.supported.locales") != null) {
-                System.out.println("Select one of the following languages: " + ConfigurationManager
-                    .getProperty("webui.supported.locales"));
+            ConfigurationService cfg = DSpaceServicesFactory.getInstance().getConfigurationService();
+            if (cfg.hasProperty("webui.supported.locales")) {
+                System.out.println("Select one of the following languages: "
+                        + cfg.getProperty("webui.supported.locales"));
                 System.out.print("Language: ");
                 System.out.flush();
 

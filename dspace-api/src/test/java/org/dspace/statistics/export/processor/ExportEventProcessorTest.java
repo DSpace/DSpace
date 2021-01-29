@@ -8,9 +8,9 @@
 package org.dspace.statistics.export.processor;
 
 import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -44,15 +44,17 @@ import org.mockito.Mock;
 public class ExportEventProcessorTest extends AbstractIntegrationTestWithDatabase {
 
     @Mock
-    private HttpServletRequest request = mock(HttpServletRequest.class);
+    private final HttpServletRequest request = mock(HttpServletRequest.class);
 
-    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    private final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     private EntityType publication;
     private EntityType otherEntity;
     private final String excluded_type = "Excluded type";
 
     @Before
+    @Override
     public void setUp() throws Exception {
         super.setUp();
 

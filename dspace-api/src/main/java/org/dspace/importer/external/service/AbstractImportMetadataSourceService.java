@@ -16,16 +16,17 @@ import org.dspace.importer.external.metadatamapping.contributor.MetadataContribu
 import org.dspace.importer.external.metadatamapping.transform.GenerateQueryService;
 import org.dspace.importer.external.service.components.AbstractRemoteMetadataSource;
 import org.dspace.importer.external.service.components.MetadataSource;
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * This class is a partial implementation of {@link MetadataSource}. It provides assistance with mapping metadata
- * from source format to DSpace format.
- * AbstractImportSourceService has a generic type set 'RecordType'.
- * In the importer implementation this type set should be the class of the records received from the remote source's
- * response.
+ * This class is a partial implementation of {@link MetadataSource}.
+ * It provides assistance with mapping metadata from source format to DSpace
+ * format. AbstractImportSourceService has a generic type set 'RecordType'.
+ * In the importer implementation this type set should be the class of the
+ * records received from the remote source's response.
  *
  * @author Roeland Dillen (roeland at atmire dot com)
+ * @param <RecordType> type of records received from the remote source.
  */
 public abstract class AbstractImportMetadataSourceService<RecordType> extends AbstractRemoteMetadataSource
     implements MetadataSource {
@@ -66,7 +67,7 @@ public abstract class AbstractImportMetadataSourceService<RecordType> extends Ab
      *
      * @param metadataFieldMapping the map to be used.
      */
-    @Required
+    @Autowired(required = true)
     public void setMetadataFieldMapping(
         MetadataFieldMapping<RecordType, MetadataContributor<RecordType>> metadataFieldMapping) {
         this.metadataFieldMapping = metadataFieldMapping;

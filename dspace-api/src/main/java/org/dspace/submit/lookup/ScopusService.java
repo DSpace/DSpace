@@ -33,7 +33,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.XMLUtils;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -45,6 +46,7 @@ import org.xml.sax.SAXException;
  * @author Panagiotis Koutsourakis
  */
 public class ScopusService {
+    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     private static final String ENDPOINT_SEARCH_SCOPUS = "http://api.elsevier.com/content/search/scopus";
     //private static final String ENDPOINT_SEARCH_SCOPUS = "http://localhost:10622/content/search/scopus";
@@ -80,13 +82,13 @@ public class ScopusService {
 
     public List<Record> search(String query) throws IOException, HttpException {
 
-        String proxyHost = ConfigurationManager.getProperty("http.proxy.host");
-        String proxyPort = ConfigurationManager.getProperty("http.proxy.port");
-        String apiKey = ConfigurationManager.getProperty("submission.lookup.scopus.apikey");
+        String proxyHost = configurationService.getProperty("http.proxy.host");
+        String proxyPort = configurationService.getProperty("http.proxy.port");
+        String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
 
         List<Record> results = new ArrayList<>();
         if (!apiKey.equals("") && apiKey != null) {
-            if (!ConfigurationManager.getBooleanProperty(SubmissionLookupService.CFG_MODULE, "remoteservice.demo")) {
+            if (!configurationService.getBooleanProperty(SubmissionLookupService.CFG_MODULE + ".remoteservice.demo")) {
                 HttpGet method = null;
                 try {
                     HttpClientBuilder hcBuilder = HttpClients.custom();
@@ -180,7 +182,7 @@ public class ScopusService {
                 InputStream stream = null;
                 try {
                     File file = new File(
-                        ConfigurationManager.getProperty("dspace.dir")
+                            configurationService.getProperty("dspace.dir")
                             + "/config/crosswalks/demo/scopus-search.xml");
                     stream = new FileInputStream(file);
                     DocumentBuilderFactory factory = DocumentBuilderFactory

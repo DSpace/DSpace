@@ -52,4 +52,9 @@ public class DSpaceConfigurationService implements ConfigurationService {
         // Assume "module" properties are always prefixed with the module name
         return configurationService.getBooleanProperty(module + "." + key, defaultValue);
     }
+
+    @Override
+    public boolean getBooleanProperty(String key, boolean defaultValue) {
+        return configurationService.getBooleanProperty(key, defaultValue);
+    }
 }

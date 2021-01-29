@@ -21,11 +21,10 @@ import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
 import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
- * The role that is responsible for a certain step
- * Can either be on a group in the repo, or a collection group
+ * The role that is responsible for a certain step.
+ * Can either be on a group in the repository, or a collection group
  * or an item role will check for workflowItemRoles
  *
  * @author Bram De Schouwer (bram.deschouwer at dot com)
@@ -122,7 +121,7 @@ public class Role implements BeanNameAware {
      * The lookup will depend on the scope specified in the "scope" attribute:
      * @param name
      */
-    @Required
+    @Autowired(required = true)
     public void setName(String name) {
         this.name = name;
     }

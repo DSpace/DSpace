@@ -164,22 +164,6 @@ public class DSpaceServiceManagerTest {
         sab = null;
     }
 
-    @Test
-    public void testGetServiceByNameConfig() {
-        dsm.startup();
-
-        ConcreteExample concrete = dsm.getServiceByName(ConcreteExample.class.getName(), ConcreteExample.class);
-        assertNotNull(concrete);
-        assertEquals("azeckoski", concrete.getName());
-
-        SpringAnnotationBean spr = dsm.getServiceByName(
-            SpringAnnotationBean.class.getName(), SpringAnnotationBean.class);
-        assertNotNull(spr);
-        assertEquals("azeckoski", spr.getConcreteName());
-        assertEquals("aaronz", spr.getExampleName());
-        assertEquals(null, spr.getSampleValue());
-    }
-
     /**
      * Test method for {@link org.dspace.servicemanager.DSpaceServiceManager#getServicesByType(java.lang.Class)}.
      */

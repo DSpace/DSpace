@@ -442,12 +442,8 @@ public class Harvest {
 
             logProcess(options.getProcessId(), hc, false, startTimestamp);
 
-            System.out.println("success. ");
-
-        } catch (SQLException se) {
-            System.out.print("failed. ");
-            System.out.println(se.getMessage());
-            throw new IllegalStateException("Unable to access database", se);
+        } catch (SQLException e) {
+            throw new IllegalStateException("Failed to run harvester", e);
         }
 
         System.out.println("Harvest complete. ");

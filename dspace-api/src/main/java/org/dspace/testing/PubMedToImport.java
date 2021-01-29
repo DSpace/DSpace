@@ -18,10 +18,11 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -32,12 +33,14 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * Simple class to transform a medline.xml file from PubMed into DSpace import package(s)
+ * Simple class to transform a medline.xml file from PubMed into DSpace import package(s).
  *
+ * <p>
  * This is a distinctly incomplete implementation - it doesn't even attempt to map a number of fields,
  * and has no means of customizing the mapping. More importantly, it makes assumptions in parsing the xml
  * that would be problematic for a production instance.
  *
+ * <p>
  * However, it does use SAX parsing, which means it has no problems with handling a 1GB+ input file.
  * This means it is a good way to generate a large number of realistic import packages very quickly -
  * simply go to http://www.ncbi.nlm.nih.gov/pubmed and search for something that returns a lot of records
@@ -46,7 +49,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * which can then be loaded into DSpace using ItemImport.
  */
 public class PubMedToImport {
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(PubMedToImport.class);
+    private static final Logger log = LogManager.getLogger(PubMedToImport.class);
 
     private static File outputDir = null;
 
@@ -62,7 +65,7 @@ public class PubMedToImport {
         options.addOption(new Option("o", "output", true, "Output directory"));
 
         try {
-            CommandLine cli = new PosixParser().parse(options, args);
+            CommandLine cli = new DefaultParser().parse(options, args);
 
             String source = cli.getOptionValue("s");
             String output = cli.getOptionValue("o");
@@ -106,7 +109,7 @@ public class PubMedToImport {
 
         private static void addDCValue(String element, String qualifier, String value) {
             if (dcValues == null) {
-                dcValues = new ArrayList<MockMetadataValue>();
+                dcValues = new ArrayList<>();
             }
 
             MockMetadataValue thisValue = new MockMetadataValue();

@@ -41,12 +41,13 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.jdom.Element;
@@ -100,7 +101,6 @@ import org.jdom.Element;
  *
  * @author Larry Stone
  * @author Tim Donohue
- * @version $Revision$
  * @see org.dspace.content.packager.METSManifest
  * @see AbstractPackageIngester
  * @see PackageIngester
@@ -109,7 +109,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
     /**
      * log4j category
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(AbstractMETSIngester.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(AbstractMETSIngester.class);
 
     protected final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     protected final BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance()
@@ -121,6 +121,8 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
     protected final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
     protected final WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance()
                                                                                      .getWorkspaceItemService();
+    protected final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
      * <p>
@@ -135,7 +137,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
     protected static final class MdrefManager implements METSManifest.Mdref {
         private File packageFile = null;
 
-        private PackageParameters params;
+        private final PackageParameters params;
 
         // constructor initializes from package file
         private MdrefManager(File packageFile, PackageParameters params) {
@@ -1133,22 +1135,22 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
 
     // whether or not to save manifest as a bitstream in METADATA bundle.
     protected boolean preserveManifest() {
-        return ConfigurationManager.getBooleanProperty("mets."
-                                                           + getConfigurationName() + ".ingest.preserveManifest",
-                                                       false);
+        return configurationService.getBooleanProperty(
+                "mets." + getConfigurationName() + ".ingest.preserveManifest",
+                false);
     }
 
     // return short name of manifest bitstream format
     protected String getManifestBitstreamFormat() {
-        return ConfigurationManager.getProperty("mets."
-                                                    + getConfigurationName() + ".ingest.manifestBitstreamFormat");
+        return configurationService.getProperty(
+                "mets." + getConfigurationName() + ".ingest.manifestBitstreamFormat");
     }
 
     // whether or not to use Collection Templates when creating a new item
     protected boolean useCollectionTemplate() {
-        return ConfigurationManager.getBooleanProperty("mets."
-                                                           + getConfigurationName() + ".ingest.useCollectionTemplate",
-                                                       false);
+        return configurationService.getBooleanProperty(
+                "mets." + getConfigurationName() + ".ingest.useCollectionTemplate",
+                false);
     }
 
     /**

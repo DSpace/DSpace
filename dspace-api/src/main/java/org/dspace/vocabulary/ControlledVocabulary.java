@@ -17,7 +17,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.xpath.XPathAPI;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -57,8 +58,12 @@ public class ControlledVocabulary {
     public static ControlledVocabulary loadVocabulary(String fileName)
         throws IOException, SAXException, ParserConfigurationException, TransformerException {
         StringBuilder filePath = new StringBuilder();
-        filePath.append(ConfigurationManager.getProperty("dspace.dir")).append(File.separatorChar).append("config")
-                .append(File.separatorChar).append("controlled-vocabularies").append(File.separator).append(fileName)
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        filePath.append(configurationService.getProperty("dspace.dir"))
+                .append(File.separatorChar).append("config")
+                .append(File.separatorChar).append("controlled-vocabularies")
+                .append(File.separator).append(fileName)
                 .append(".xml");
 
         File controlledVocFile = new File(filePath.toString());
@@ -99,7 +104,7 @@ public class ControlledVocabulary {
         }
         NodeList subNodes = XPathAPI.selectNodeList(node, "isComposedBy/node");
 
-        List<ControlledVocabulary> subVocabularies = new ArrayList<ControlledVocabulary>(subNodes.getLength());
+        List<ControlledVocabulary> subVocabularies = new ArrayList<>(subNodes.getLength());
         for (int i = 0; i < subNodes.getLength(); i++) {
             subVocabularies.add(loadVocabularyNode(subNodes.item(i), value));
         }

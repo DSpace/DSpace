@@ -32,7 +32,8 @@ import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.xml.sax.SAXException;
@@ -48,6 +49,7 @@ public class ADSService {
             "title,vizier,volume,year";
     private static Logger log = Logger.getLogger(ADSService.class);
 
+    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     private int timeout = 1000;
 
@@ -105,9 +107,9 @@ public class ADSService {
 
     public List<Record> search(String query, String token) {
         List<Record> adsResults = new ArrayList<>();
-        String proxyHost = ConfigurationManager.getProperty("http.proxy.host");
-        String proxyPort = ConfigurationManager.getProperty("http.proxy.port");
-        if (!ConfigurationManager.getBooleanProperty(SubmissionLookupService.CFG_MODULE, "remoteservice.demo")) {
+        String proxyHost = configurationService.getProperty("http.proxy.host");
+        String proxyPort = configurationService.getProperty("http.proxy.port");
+        if (!configurationService.getBooleanProperty(SubmissionLookupService.CFG_MODULE + ".remoteservice.demo")) {
             HttpGet method = null;
             HttpHost proxy = null;
             try {
@@ -171,7 +173,7 @@ public class ADSService {
             InputStream stream = null;
 
             File file = new File(
-                    ConfigurationManager.getProperty("dspace.dir")
+                    configurationService.getProperty("dspace.dir")
                             + "/config/crosswalks/demo/ads-search.xml");
         }
         return adsResults;

@@ -7,12 +7,15 @@
  */
 package org.dspace.eperson.service;
 
+import static org.dspace.content.MetadataSchemaEnum.EPERSON;
+
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.MetadataFieldName;
 import org.dspace.content.service.DSpaceObjectLegacySupportService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
@@ -22,9 +25,10 @@ import org.dspace.eperson.PasswordHash;
 
 /**
  * Service interface class for the EPerson object.
- * The implementation of this class is responsible for all business logic calls for the EPerson object and is
- * autowired by spring
+ * The implementation of this class is responsible for all business logic calls
+ * for the EPerson object and is autowired by Spring.
  *
+ * <p>
  * Methods for handling registration by email and forgotten passwords. When
  * someone registers as a user, or forgets their password, the
  * sendRegistrationInfo or sendForgotPasswordInfo methods can be used to send an
@@ -33,13 +37,24 @@ import org.dspace.eperson.PasswordHash;
  * back to the system, the AccountManager can use the token to determine the
  * identity of the eperson.
  *
- * *NEW* now ignores expiration dates so that tokens never expire
+ * <p>
+ * *NEW* now ignores expiration dates so that tokens never expire.
  *
  * @author Peter Breton
  * @author kevinvandevelde at atmire.com
- * @version $Revision$
  */
 public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObjectLegacySupportService<EPerson> {
+
+    // Common metadata fields which must be defined.
+
+    public static final MetadataFieldName MD_FIRSTNAME
+            = new MetadataFieldName(EPERSON, "firstname");
+    public static final MetadataFieldName MD_LASTNAME
+            = new MetadataFieldName(EPERSON, "lastname");
+    public static final MetadataFieldName MD_PHONE
+            = new MetadataFieldName(EPERSON, "phone");
+    public static final MetadataFieldName MD_LANGUAGE
+            = new MetadataFieldName(EPERSON, "language");
 
     /**
      * Find the eperson by their email address.
@@ -102,24 +117,28 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
         throws SQLException;
 
     /**
-     * @param context   The relevant DSpace Context.
-     * @param sortField which field to sort EPersons by
-     * @return list of EPerson objects
-     * @throws SQLException An exception that provides information on a database access error or other errors.
-     * @deprecated use the paginated method. Find all the epeople in a specific order
+     * Find all the {@code EPerson}s in a specific order by field.
+     * The sortable fields are:
      * <ul>
      * <li><code>ID</code></li>
      * <li><code>LASTNAME</code></li>
      * <li><code>EMAIL</code></li>
      * <li><code>NETID</code></li>
      * </ul>
+     *
+     * @param context   The relevant DSpace Context.
+     * @param sortField which field to sort EPersons by
+     * @return list of EPerson objects
+     * @throws SQLException An exception that provides information on a database access error or other errors.
+     * @deprecated use the paginated method {@link findAll(Context, int)}.
      */
     @Deprecated
     public List<EPerson> findAll(Context context, int sortField)
         throws SQLException;
 
     /**
-     * Find all the epeople in a specific order
+     * Find all the {@code EPerson}s in a specific order by field.
+     * The sortable fields are:
      * <ul>
      * <li><code>ID</code></li>
      * <li><code>LASTNAME</code></li>
@@ -183,19 +202,6 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
      * @return boolean successful/unsuccessful
      */
     public boolean checkPassword(Context context, EPerson ePerson, String attempt);
-
-    /**
-     * Set a metadata value (in the metadatavalue table) of the metadata field
-     * specified by 'field'.
-     *
-     * @param context The relevant DSpace Context.
-     * @param ePerson EPerson whose metadata we want to set.
-     * @param field   Metadata field we want to set (e.g. "phone").
-     * @param value   Metadata value we want to set
-     * @throws SQLException if the requested metadata field doesn't exist
-     */
-    @Deprecated
-    public void setMetadata(Context context, EPerson ePerson, String field, String value) throws SQLException;
 
     /**
      * Retrieve all accounts which have a password but do not have a digest algorithm

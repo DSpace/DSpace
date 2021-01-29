@@ -7,8 +7,8 @@
  */
 package org.dspace.statistics.export.processor;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -32,11 +32,13 @@ import org.junit.Test;
 public class ItemEventProcessorTest extends AbstractIntegrationTestWithDatabase {
 
 
-    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    private final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     private String encodedUrl;
 
     @Before
+    @Override
     public void setUp() throws Exception {
         super.setUp();
         configurationService.setProperty("irus.statistics.tracker.enabled", true);

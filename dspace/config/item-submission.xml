@@ -6,118 +6,118 @@
     <name-map collection-handle="default" submission-name="product" />
   </submission-map>
   <step-definitions>
-    <step id="collection" mandatory="true">
+    <step-definition id="collection" mandatory="true">
       <heading>submit.progressbar.collection</heading>
       <processing-class>org.dspace.app.rest.submit.step.CollectionStep</processing-class>
       <type>collection</type>
       <scope visibility="hidden" visibilityOutside="hidden">submission</scope>
-    </step>
-    <step id="upload" mandatory="true">
+    </step-definition>
+    <step-definition id="upload" mandatory="true">
       <heading>submit.progressbar.upload</heading>
       <processing-class>org.dspace.app.rest.submit.step.UploadStep</processing-class>
       <type>upload</type>
-    </step>
-    <step id="license" mandatory="true">
+    </step-definition>
+    <step-definition id="license" mandatory="true">
       <heading>submit.progressbar.license</heading>
       <processing-class>org.dspace.app.rest.submit.step.LicenseStep</processing-class>
       <type>license</type>
-    </step>
-    <step id="product" mandatory="true">
+    </step-definition>
+    <step-definition id="product" mandatory="true">
       <heading>submit.progressbar.describe.product</heading>
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
       <type>submission-form</type>
-    </step>
-    <step id="product_indexing" mandatory="true">
+    </step-definition>
+    <step-definition id="product_indexing" mandatory="true">
       <heading>submit.progressbar.describe.product_indexing</heading>
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
       <type>submission-form</type>
-    </step>
-    <step id="product_references" mandatory="true">
+    </step-definition>
+    <step-definition id="product_references" mandatory="true">
       <heading>submit.progressbar.describe.product_references</heading>
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
       <type>submission-form</type>
-    </step>
-    <step id="orgunit" mandatory="true">
+    </step-definition>
+    <step-definition id="orgunit" mandatory="true">
       <heading>submit.progressbar.describe.orgunit</heading>
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
       <type>submission-form</type>
-    </step>
-    <step id="patent" mandatory="true">
+    </step-definition>
+    <step-definition id="patent" mandatory="true">
       <heading>submit.progressbar.describe.patent</heading>
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
       <type>submission-form</type>
-    </step>
-    <step id="patent_indexing" mandatory="true">
+    </step-definition>
+    <step-definition id="patent_indexing" mandatory="true">
       <heading>submit.progressbar.describe.patent_indexing</heading>
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
       <type>submission-form</type>
-    </step>
-    <step id="patent_references" mandatory="true">
+    </step-definition>
+    <step-definition id="patent_references" mandatory="true">
       <heading>submit.progressbar.describe.patent_references</heading>
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
       <type>submission-form</type>
-    </step>
-    <step id="project" mandatory="true">
+    </step-definition>
+    <step-definition id="project" mandatory="true">
       <heading>submit.progressbar.describe.project</heading>
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
       <type>submission-form</type>
-    </step>
-    <step id="journal" mandatory="true">
+    </step-definition>
+    <step-definition id="journal" mandatory="true">
       <heading>submit.progressbar.describe.journal</heading>
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
       <type>submission-form</type>
-    </step>
-    <step id="publication" mandatory="true">
+    </step-definition>
+    <step-definition id="publication" mandatory="true">
       <heading>submit.progressbar.describe.publication</heading>
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
       <type>submission-form</type>
-    </step>
-    <step id="publication_indexing" mandatory="false">
+    </step-definition>
+    <step-definition id="publication_indexing" mandatory="false">
       <heading>submit.progressbar.describe.publication_indexing</heading>
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
       <type>submission-form</type>
-    </step>
-    <step id="publication_bibliographic_details" mandatory="true">
+    </step-definition>
+    <step-definition id="publication_bibliographic_details" mandatory="true">
       <heading>submit.progressbar.describe.publication_bibliographic_details</heading>
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
       <type>submission-form</type>
-    </step>
-    <step id="publication_references" mandatory="false">
+    </step-definition>
+    <step-definition id="publication_references" mandatory="false">
       <heading>submit.progressbar.describe.publication_references</heading>
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
       <type>submission-form</type>
-    </step>
-    <step id="equipment" mandatory="true">
+    </step-definition>
+    <step-definition id="equipment" mandatory="true">
       <heading>submit.progressbar.describe.equipment</heading>
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
       <type>submission-form</type>
-    </step>
-    <step id="event" mandatory="true">
+    </step-definition>
+    <step-definition id="event" mandatory="true">
       <heading>submit.progressbar.describe.event</heading>
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
       <type>submission-form</type>
-    </step>
-    <step id="funding" mandatory="true">
+    </step-definition>
+    <step-definition id="funding" mandatory="true">
       <heading>submit.progressbar.describe.funding</heading>
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
       <type>submission-form</type>
-    </step>
-    <step id="person" mandatory="true">
+    </step-definition>
+    <step-definition id="person" mandatory="true">
       <heading>submit.progressbar.describe.person</heading>
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
       <type>submission-form</type>
-    </step>
-    <step id="detect-duplicate" mandatory="true">
+    </step-definition>
+    <step-definition id="detect-duplicate" mandatory="true">
       <heading>submit.progressbar.detect-duplicate</heading>
       <processing-class>org.dspace.app.rest.submit.step.DetectPotentialDuplicateStep</processing-class>
       <type>detect-duplicate</type>
-    </step>
-    <step id="extraction" mandatory="false">
+    </step-definition>
+    <step-definition id="extraction" mandatory="false">
       <heading>submit.progressbar.extraction</heading>
       <processing-class>org.dspace.app.rest.submit.step.ExtractMetadataStep</processing-class>
       <type>utils</type>
       <scope visibility="hidden" visibilityOutside="hidden">submission</scope>
-    </step>
+    </step-definition>
   </step-definitions>
   <submission-definitions>
     <submission-process name="product">
