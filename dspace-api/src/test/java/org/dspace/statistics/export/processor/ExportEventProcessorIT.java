@@ -41,7 +41,7 @@ import org.mockito.Mock;
 /**
  * Test for the ExportEventProcessor class
  */
-public class ExportEventProcessorTest extends AbstractIntegrationTestWithDatabase {
+public class ExportEventProcessorIT extends AbstractIntegrationTestWithDatabase {
 
     @Mock
     private final HttpServletRequest request = mock(HttpServletRequest.class);
