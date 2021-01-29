@@ -54,8 +54,6 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     @Autowired
     private RestAuthenticationService restAuthenticationService;
 
-    // NOTE: this method is also called by DSpaceAccessDeniedHandler to handle AccessDeniedExceptions thrown by
-    // Spring Security
     @ExceptionHandler({AuthorizeException.class, RESTAuthorizationException.class, AccessDeniedException.class})
     protected void handleAuthorizeException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
@@ -66,7 +64,8 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         }
     }
 
-    // NOTE: this method is also called by DSpaceAccessDeniedHandler to handle CSRF exceptions thrown by Spring Security
+    // NOTE: DSpaceAccessDeniedHandler does some preprocessing of InvalidCsrfTokenException errors (to reset the
+    // CSRF token) before sending error handling to this method.
     @ExceptionHandler({InvalidCsrfTokenException.class, MissingCsrfTokenException.class})
     protected void csrfTokenException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
