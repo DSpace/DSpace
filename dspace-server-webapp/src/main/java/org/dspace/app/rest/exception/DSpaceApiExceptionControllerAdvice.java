@@ -17,7 +17,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.security.RestAuthenticationService;
+import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.Context;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -96,6 +98,24 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         sendErrorResponse(request, response, null,
                 "Unprocessable or invalid entity",
                 HttpStatus.UNPROCESSABLE_ENTITY.value());
+    }
+
+    /**
+     * Add user-friendly error messages to the response body for selected errors.
+     * Since the error messages will be exposed to the API user, the exception classes are expected to implement
+     * {@link TranslatableException} such that the error messages can be translated.
+     */
+    @ExceptionHandler({
+        RESTEmptyWorkflowGroupException.class,
+        EPersonNameNotProvidedException.class,
+        GroupNameNotProvidedException.class,
+    })
+    protected void handleCustomUnprocessableEntityException(HttpServletRequest request, HttpServletResponse response,
+                                                            TranslatableException ex) throws IOException {
+        Context context = ContextUtil.obtainContext(request);
+        sendErrorResponse(
+            request, response, null, ex.getLocalizedMessage(context), HttpStatus.UNPROCESSABLE_ENTITY.value()
+        );
     }
 
     @ExceptionHandler(QueryMethodParameterConversionException.class)
