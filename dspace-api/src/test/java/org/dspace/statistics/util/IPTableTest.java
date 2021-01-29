@@ -23,6 +23,7 @@ import org.junit.Test;
  * @author mwood
  */
 public class IPTableTest {
+    private static final String LOCALHOST = "127.0.0.1";
 
     public IPTableTest() {
     }
@@ -56,14 +57,14 @@ public class IPTableTest {
      * Test of contains method, of class IPTable.
      * @throws java.lang.Exception passed through.
      */
-    @Test(expected = IPFormatException.class)
-    public void testContains() throws Exception {
-        String localhost = "127.0.0.1";
+    @Test
+    public void testContains()
+            throws Exception {
         IPTable instance = new IPTable();
-        instance.add(localhost);
+        instance.add(LOCALHOST);
         boolean contains;
 
-        contains = instance.contains(localhost);
+        contains = instance.contains(LOCALHOST);
         assertTrue("Address that was add()ed should match", contains);
 
         contains = instance.contains("192.168.1.1");
@@ -71,6 +72,18 @@ public class IPTableTest {
 
         contains = instance.contains("fec0:0:0:1::2");
         assertFalse("IPv6 address should not match anything.", contains);
+    }
+
+    /**
+     * Test of contains method when presented with an invalid address.
+     * @throws Exception passed through.
+     */
+    @Test(expected = IPFormatException.class)
+    public void testContainsBadFormat()
+            throws Exception {
+        IPTable instance = new IPTable();
+        instance.add(LOCALHOST);
+        boolean contains;
 
         // This should throw an IPFormatException.
         contains = instance.contains("axolotl");
