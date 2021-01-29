@@ -401,6 +401,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                                                     .cookie(cookies))
                    // Should return a 403 Forbidden, for an invalid CSRF token
                    .andExpect(status().isForbidden())
+                   // Verify it includes our custom error reason (from DSpaceApiExceptionControllerAdvice)
+                   .andExpect(status().reason(containsString("Invalid CSRF token")))
                    // And, a new/updated token should be returned (as both server-side cookie and header)
                    // This is handled by DSpaceAccessDeniedHandler
                    .andExpect(cookie().exists("DSPACE-XSRF-COOKIE"))

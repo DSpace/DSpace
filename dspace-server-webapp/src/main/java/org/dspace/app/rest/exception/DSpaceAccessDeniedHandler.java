@@ -14,13 +14,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.rest.security.WebSecurityConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.InvalidCsrfTokenException;
-import org.springframework.security.web.csrf.MissingCsrfTokenException;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 /**
  * This Handler customizes behavior of AccessDeniedException errors thrown by Spring Security/Boot.
@@ -42,6 +43,10 @@ public class DSpaceAccessDeniedHandler implements AccessDeniedHandler {
     @Autowired
     private WebSecurityConfiguration webSecurityConfiguration;
 
+    @Autowired
+    @Qualifier("handlerExceptionResolver")
+    private HandlerExceptionResolver handlerExceptionResolver;
+
     /**
      * Override handle() to pass these exceptions over to our DSpaceApiExceptionControllerAdvice handler
      * @param request request
@@ -62,6 +67,7 @@ public class DSpaceAccessDeniedHandler implements AccessDeniedHandler {
         // If we had an InvalidCsrfTokenException, this means the client sent a CSRF token which did *not* match the
         // token on the server. In this scenario, we trigger a refresh of the CSRF token...as it's possible the user
         // switched clients (from HAL Browser to UI or visa versa) and has an out-of-sync token.
+        // NOTE: this logic is tested in AuthenticationRestControllerIT.testRefreshTokenWithInvalidCSRF()
         if (ex instanceof InvalidCsrfTokenException) {
             // Get access to our enabled CSRF token repository
             CsrfTokenRepository csrfTokenRepository = webSecurityConfiguration.getCsrfTokenRepository();
@@ -72,16 +78,8 @@ public class DSpaceAccessDeniedHandler implements AccessDeniedHandler {
             csrfTokenRepository.saveToken(newToken, request, response);
         }
 
-        // Get access to our general exception handler
-        DSpaceApiExceptionControllerAdvice handler = new DSpaceApiExceptionControllerAdvice();
-
-        // If a CSRF Token was passed in but was invalid pass to csrfTokenException()
-        if (ex instanceof InvalidCsrfTokenException || ex instanceof MissingCsrfTokenException) {
-            handler.csrfTokenException(request, response, ex);
-            return;
-        }
-
-        // Otherwise, our handleAuthorizeException method will deal with generic AccessDeniedExceptions
-        handler.handleAuthorizeException(request, response, ex);
+        // Pass the exception to our general exception handler for processing
+        // (This results in passing the exception to DSpaceApiExceptionControllerAdvice to handle the response)
+        handlerExceptionResolver.resolveException(request, response, null, ex);
     }
 }
