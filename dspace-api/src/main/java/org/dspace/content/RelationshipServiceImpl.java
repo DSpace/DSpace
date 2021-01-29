@@ -377,7 +377,7 @@ public class RelationshipServiceImpl implements RelationshipService {
             authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
             relationshipDAO.delete(context, relationship);
             updatePlaceInRelationship(context, relationship);
-                updateItemsInRelationship(context, relationship);
+            updateItemsInRelationship(context, relationship);
         } else {
             throw new AuthorizeException(
                 "You do not have write rights on this relationship's items");
