@@ -15,7 +15,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.SiteDAO;
 import org.dspace.content.service.SiteService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.event.Event;
@@ -94,7 +93,7 @@ public class SiteServiceImpl extends DSpaceObjectServiceImpl<Site> implements Si
 
     @Override
     public String getName(Site dso) {
-        return ConfigurationManager.getProperty("dspace.name");
+        return configurationService.getProperty("dspace.name");
     }
 
     @Override

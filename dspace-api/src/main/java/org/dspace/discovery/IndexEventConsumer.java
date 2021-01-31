@@ -130,6 +130,18 @@ public class IndexEventConsumer implements Consumer {
                     }
                 } else {
                     log.debug("consume() adding event to update queue: " + event.toString());
+                    if (event.getSubjectType() == Constants.ITEM) {
+                    // if it is an item we cannot know about its previous state, so it could be a
+                    // workspaceitem that has been deposited right now or an approved/reject
+                    // workflowitem.
+                    // As the workflow is not necessary enabled it can happen than a workspaceitem
+                    // became directly an item without giving us the chance to retrieve a
+                    // workflowitem... so we need to force the unindex of all the related data
+                    // before to index it again to be sure to don't leave any zombie in solr
+                        String detail =
+                                Constants.typeText[event.getSubjectType()] + "-" + event.getSubjectID().toString();
+                        uniqueIdsToDelete.add(detail);
+                    }
                     objectsToUpdate.addAll(indexObjectServiceFactory.getIndexableObjects(ctx, subject));
                 }
                 break;
@@ -175,6 +187,16 @@ public class IndexEventConsumer implements Consumer {
     public void end(Context ctx) throws Exception {
 
         try {
+            for (String uid : uniqueIdsToDelete) {
+                try {
+                    indexer.unIndexContent(ctx, uid, false);
+                    if (log.isDebugEnabled()) {
+                        log.debug("UN-Indexed Item, handle=" + uid);
+                    }
+                } catch (Exception e) {
+                    log.error("Failed while UN-indexing object: " + uid, e);
+                }
+            }
             // update the changed Items not deleted because they were on create list
             for (IndexableObject iu : objectsToUpdate) {
                 /* we let all types through here and
@@ -183,7 +205,7 @@ public class IndexEventConsumer implements Consumer {
                  */
                 iu.setIndexedObject(ctx.reloadEntity(iu.getIndexedObject()));
                 String uniqueIndexID = iu.getUniqueIndexID();
-                if (uniqueIndexID != null && !uniqueIdsToDelete.contains(uniqueIndexID)) {
+                if (uniqueIndexID != null) {
                     try {
                         indexer.indexContent(ctx, iu, true, false);
                         log.debug("Indexed "
@@ -193,17 +215,6 @@ public class IndexEventConsumer implements Consumer {
                     } catch (Exception e) {
                         log.error("Failed while indexing object: ", e);
                     }
-                }
-            }
-
-            for (String uid : uniqueIdsToDelete) {
-                try {
-                    indexer.unIndexContent(ctx, uid, false);
-                    if (log.isDebugEnabled()) {
-                        log.debug("UN-Indexed Item, handle=" + uid);
-                    }
-                } catch (Exception e) {
-                    log.error("Failed while UN-indexing object: " + uid, e);
                 }
             }
         } finally {

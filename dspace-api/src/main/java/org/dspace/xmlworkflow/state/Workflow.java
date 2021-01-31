@@ -18,7 +18,7 @@ import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.springframework.beans.factory.BeanNameAware;
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Class that contains all the steps and roles involved in a certain
@@ -70,7 +70,7 @@ public class Workflow implements BeanNameAware {
         }
     }
 
-    @Required
+    @Autowired(required = true)
     public void setFirstStep(Step firstStep) {
         firstStep.setWorkflow(this);
         this.firstStep = firstStep;
@@ -88,7 +88,7 @@ public class Workflow implements BeanNameAware {
      * Set the steps that need to be executed in this workflow before the item is archived
      * @param steps the workflow steps
      */
-    @Required
+    @Autowired(required = true)
     public void setSteps(List<Step> steps) {
         for (Step step : steps) {
             step.setWorkflow(this);

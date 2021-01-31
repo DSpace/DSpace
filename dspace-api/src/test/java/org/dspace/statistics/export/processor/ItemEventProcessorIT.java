@@ -7,23 +7,17 @@
  */
 package org.dspace.statistics.export.processor;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.CharEncoding;
 import org.dspace.AbstractIntegrationTestWithDatabase;
-import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
-import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -33,22 +27,23 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Test class for the BitstreamEventProcessor
+ * Test class for the ItemEventProcessor
  */
-public class BitstreamEventProcessorTest extends AbstractIntegrationTestWithDatabase {
+public class ItemEventProcessorIT extends AbstractIntegrationTestWithDatabase {
 
-    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
+    private final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     private String encodedUrl;
 
-
     @Before
+    @Override
     public void setUp() throws Exception {
         super.setUp();
         configurationService.setProperty("irus.statistics.tracker.enabled", true);
 
-        String dspaceUrl = configurationService.getProperty("dspace.server.url");
+        String dspaceUrl = configurationService.getProperty("dspace.ui.url");
         try {
             encodedUrl = URLEncoder.encode(dspaceUrl, CharEncoding.UTF_8);
         } catch (UnsupportedEncodingException e) {
@@ -61,27 +56,23 @@ public class BitstreamEventProcessorTest extends AbstractIntegrationTestWithData
     /**
      * Test the method that adds data based on the object types
      */
-    public void testAddObectSpecificData() throws Exception {
-        HttpServletRequest request = mock(HttpServletRequest.class);
-
+    public void testAddObectSpecificData() throws UnsupportedEncodingException {
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, community).build();
         Item item = ItemBuilder.createItem(context, collection).build();
-
-        File f = new File(testProps.get("test.bitstream").toString());
-        Bitstream bitstream = BitstreamBuilder.createBitstream(context, item, new FileInputStream(f)).build();
-
         context.restoreAuthSystemState();
 
-        BitstreamEventProcessor bitstreamEventProcessor = new BitstreamEventProcessor(context, request, bitstream);
+        String encodedHandle = URLEncoder.encode(item.getHandle(), CharEncoding.UTF_8);
 
-        String result = bitstreamEventProcessor.addObjectSpecificData("existing-string", bitstream);
+        ItemEventProcessor itemEventProcessor = new ItemEventProcessor(context, null, item);
+        String result = itemEventProcessor.addObjectSpecificData("existing-string", item);
 
         assertThat(result,
-                   is("existing-string&svc_dat=" + encodedUrl + "%2Fapi%2Fcore%2Fbitstreams%2F" + bitstream.getID()
-                              + "%2Fcontent&rft_dat=Request"));
+                   is("existing-string&svc_dat=" + encodedUrl + "%2Fhandle%2F" + encodedHandle +
+                              "&rft_dat=Investigation"));
 
     }
+
 
 }

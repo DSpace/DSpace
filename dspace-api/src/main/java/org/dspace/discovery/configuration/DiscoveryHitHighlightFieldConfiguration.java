@@ -7,7 +7,7 @@
  */
 package org.dspace.discovery.configuration;
 
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Configuration class that holds hit highlighting configuration for a single metadata field
@@ -26,7 +26,7 @@ public class DiscoveryHitHighlightFieldConfiguration {
         return field;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setField(String field) {
         this.field = field;
     }

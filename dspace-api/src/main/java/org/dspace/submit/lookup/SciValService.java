@@ -31,12 +31,14 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.XMLUtils;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 public class SciValService {
+    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     private static Logger log = Logger.getLogger(SciValService.class);
 
@@ -116,7 +118,7 @@ public class SciValService {
 
         List<Record> results = new ArrayList<Record>();
         if (!clientKey.equals("") && clientKey != null) {
-            if (!ConfigurationManager.getBooleanProperty("remoteservice.demo")) {
+            if (!configurationService.getBooleanProperty("remoteservice.demo")) {
                 HttpPost method = null;
                 try {
                     HttpClient client = HttpClientBuilder.create().build();
@@ -186,7 +188,7 @@ public class SciValService {
                 InputStream stream = null;
                 try {
                     File file = new File(
-                        ConfigurationManager.getProperty("dspace.dir")
+                            configurationService.getProperty("dspace.dir")
                             + "/config/crosswalks/demo/scopus.xml");
                     stream = new FileInputStream(file);
                     DocumentBuilderFactory factory = DocumentBuilderFactory
@@ -237,7 +239,7 @@ public class SciValService {
      */
     public Record retrieve(String eid, String clientKey) throws IOException {
         Record fsi = null;
-        if (!ConfigurationManager.getBooleanProperty("remoteservice.demo")) {
+        if (!configurationService.getBooleanProperty("remoteservice.demo")) {
             String retrieveEndPoint = retrieveBaseURL + "clientKey=" + clientKey + "&retrieve=" + eid;
             if (StringUtils.isBlank(clientKey)) {
                 return fsi;
@@ -277,7 +279,7 @@ public class SciValService {
             }
         } else {
             InputStream responseStream = null;
-            File file = new File(ConfigurationManager.getProperty("dspace.dir")
+            File file = new File(configurationService.getProperty("dspace.dir")
                                      + "/config/crosswalks/demo/scopus-full.xml");
             responseStream = new FileInputStream(file);
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

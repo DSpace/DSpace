@@ -10,13 +10,13 @@ package org.dspace.app.requestitem;
 import java.sql.SQLException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -30,9 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Peter Dietz
  */
 public class RequestItemHelpdeskStrategy extends RequestItemSubmitterStrategy {
-
-    private Logger log = org.apache.logging.log4j.LogManager.getLogger(RequestItemHelpdeskStrategy.class);
-
     @Autowired(required = true)
     protected EPersonService ePersonService;
 
@@ -41,9 +38,11 @@ public class RequestItemHelpdeskStrategy extends RequestItemSubmitterStrategy {
 
     @Override
     public RequestItemAuthor getRequestItemAuthor(Context context, Item item) throws SQLException {
-        boolean helpdeskOverridesSubmitter = ConfigurationManager
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        boolean helpdeskOverridesSubmitter = configurationService
             .getBooleanProperty("request.item.helpdesk.override", false);
-        String helpDeskEmail = ConfigurationManager.getProperty("mail.helpdesk");
+        String helpDeskEmail = configurationService.getProperty("mail.helpdesk");
 
         if (helpdeskOverridesSubmitter && StringUtils.isNotBlank(helpDeskEmail)) {
             return getHelpDeskPerson(context, helpDeskEmail);
@@ -64,10 +63,8 @@ public class RequestItemHelpdeskStrategy extends RequestItemSubmitterStrategy {
      * @throws SQLException if database error
      */
     public RequestItemAuthor getHelpDeskPerson(Context context, String helpDeskEmail) throws SQLException {
-        EPerson helpdeskEPerson = null;
-
         context.turnOffAuthorisationSystem();
-        helpdeskEPerson = ePersonService.findByEmail(context, helpDeskEmail);
+        EPerson helpdeskEPerson = ePersonService.findByEmail(context, helpDeskEmail);
         context.restoreAuthSystemState();
 
         if (helpdeskEPerson != null) {

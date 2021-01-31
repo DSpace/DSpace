@@ -15,6 +15,8 @@ services:
     ports:
     - published: 8080
       target: 8080
+    - published: 8009
+      target: 8009
     stdin_open: true
     tty: true
     volumes:

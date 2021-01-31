@@ -18,7 +18,6 @@ import org.dspace.kernel.mixins.ServiceChangeListener;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-
 /**
  * This is just testing a fake service and running it through some paces to see
  * if the lifecycles work.

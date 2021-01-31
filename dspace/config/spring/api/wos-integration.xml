@@ -103,6 +103,7 @@
     </bean>
 
     <bean id="wosIdentifierContrib" class="org.dspace.importer.external.metadatamapping.contributor.WosIdentifierContributor">
+        <property name="field" ref="wos.doi"/>
         <property name="query" value="dynamic_data/cluster_related/identifiers/identifier"/>
         <property name="prefixToNamespaceMapping" ref="wosNs"/>
         <property name="identifire2field" ref="identifires2fields"/>

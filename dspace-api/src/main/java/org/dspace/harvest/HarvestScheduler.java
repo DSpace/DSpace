@@ -15,16 +15,18 @@ import java.util.List;
 import java.util.Stack;
 import java.util.UUID;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.harvest.factory.HarvestServiceFactory;
 import org.dspace.harvest.service.HarvestedCollectionService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * The class responsible for scheduling harvesting cycles are regular intervals.
@@ -32,7 +34,7 @@ import org.dspace.harvest.service.HarvestedCollectionService;
  * @author alexey
  */
 public class HarvestScheduler implements Runnable {
-    protected static Logger log = org.apache.logging.log4j.LogManager.getLogger(HarvestScheduler.class);
+    protected static Logger log = LogManager.getLogger(HarvestScheduler.class);
 
 
     protected static EPerson harvestAdmin;
@@ -77,10 +79,12 @@ public class HarvestScheduler implements Runnable {
 
     protected static long maxHeartbeat;
 
-    private static final CollectionService collectionService = ContentServiceFactory.getInstance()
-                                                                                    .getCollectionService();
-    private static final HarvestedCollectionService harvestedCollectionService =
-        HarvestServiceFactory.getInstance().getHarvestedCollectionService();
+    private static final CollectionService collectionService
+            = ContentServiceFactory.getInstance().getCollectionService();
+    private static final HarvestedCollectionService harvestedCollectionService
+            = HarvestServiceFactory.getInstance().getHarvestedCollectionService();
+    private static final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     public static boolean hasStatus(int statusToCheck) {
         return status == statusToCheck;
@@ -121,25 +125,25 @@ public class HarvestScheduler implements Runnable {
 
     public HarvestScheduler() throws SQLException, AuthorizeException {
         mainContext = new Context();
-        String harvestAdminParam = ConfigurationManager.getProperty("oai", "harvester.eperson");
+        String harvestAdminParam = configurationService.getProperty("oai.harvester.eperson");
         harvestAdmin = null;
         if (harvestAdminParam != null && harvestAdminParam.length() > 0) {
             harvestAdmin = EPersonServiceFactory.getInstance().getEPersonService()
                                                 .findByEmail(mainContext, harvestAdminParam);
         }
 
-        harvestThreads = new Stack<HarvestThread>();
+        harvestThreads = new Stack<>();
 
-        maxActiveThreads = ConfigurationManager.getIntProperty("oai", "harvester.maxThreads");
+        maxActiveThreads = configurationService.getIntProperty("oai.harvester.maxThreads");
         if (maxActiveThreads == 0) {
             maxActiveThreads = 3;
         }
-        minHeartbeat = ConfigurationManager.getIntProperty("oai", "harvester.minHeartbeat");
+        minHeartbeat = configurationService.getIntProperty("oai.harvester.minHeartbeat");
         minHeartbeat = minHeartbeat * 1000; // multiple by 1000 to turn seconds to ms
         if (minHeartbeat == 0) {
             minHeartbeat = 30000;
         }
-        maxHeartbeat = ConfigurationManager.getIntProperty("oai", "harvester.maxHeartbeat");
+        maxHeartbeat = configurationService.getIntProperty("oai.harvester.maxHeartbeat");
         maxHeartbeat = maxHeartbeat * 1000; // multiple by 1000 to turn seconds to ms
         if (maxHeartbeat == 0) {
             maxHeartbeat = 3600000;
@@ -235,7 +239,7 @@ public class HarvestScheduler implements Runnable {
                     mainContext.abort();
                 }
 
-            } catch (Exception e) {
+            } catch (IOException | InterruptedException | SQLException | AuthorizeException e) {
                 log.error("Exception on iteration: " + i);
                 e.printStackTrace();
             }
@@ -245,7 +249,7 @@ public class HarvestScheduler implements Runnable {
                 Context tempContext = new Context();
                 HarvestedCollection hc = harvestedCollectionService.findOldestHarvest(tempContext);
 
-                int harvestInterval = ConfigurationManager.getIntProperty("oai", "harvester.harvestFrequency");
+                int harvestInterval = configurationService.getIntProperty("oai.harvester.harvestFrequency");
                 if (harvestInterval == 0) {
                     harvestInterval = 720;
                 }

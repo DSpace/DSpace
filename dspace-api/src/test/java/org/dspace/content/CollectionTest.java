@@ -11,8 +11,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
@@ -32,6 +33,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
@@ -57,7 +59,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
      */
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CollectionTest.class);
 
-    private LicenseService licenseService = CoreServiceFactory.getInstance().getLicenseService();
+    private final LicenseService licenseService = CoreServiceFactory.getInstance().getLicenseService();
 
     /**
      * Collection instance for the tests
@@ -281,23 +283,8 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     }
 
     /**
-     * Test of getMetadata method, of class Collection.
-     */
-    @Test
-    public void testGetMetadata() {
-        //by default all empty values will return ""
-        assertThat("testGetMetadata 0", collectionService.getMetadata(collection, "name"), equalTo(""));
-        assertThat("testGetMetadata 1", collectionService.getMetadata(collection, "short_description"), equalTo(""));
-        assertThat("testGetMetadata 2", collectionService.getMetadata(collection, "introductory_text"), equalTo(""));
-        assertThat("testGetMetadata 4", collectionService.getMetadata(collection, "copyright_text"), equalTo(""));
-        assertThat("testGetMetadata 6", collectionService.getMetadata(collection, "provenance_description"),
-                   equalTo(""));
-        assertThat("testGetMetadata 7", collectionService.getMetadata(collection, "side_bar_text"), equalTo(""));
-        assertThat("testGetMetadata 8", collectionService.getMetadata(collection, "license"), equalTo(""));
-    }
-
-    /**
      * Test of setMetadata method, of class Collection.
+     * @throws java.sql.SQLException if metadata cannot be set.
      */
     @Test
     public void testSetMetadata() throws SQLException {
@@ -309,22 +296,42 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         String provDesc = "provenance description";
         String license = "license text";
 
-        collectionService.setMetadata(context, collection, "name", name);
-        collectionService.setMetadata(context, collection, "short_description", sdesc);
-        collectionService.setMetadata(context, collection, "introductory_text", itext);
-        collectionService.setMetadata(context, collection, "copyright_text", copy);
-        collectionService.setMetadata(context, collection, "side_bar_text", sidebar);
-        collectionService.setMetadata(context, collection, "provenance_description", provDesc);
-        collectionService.setMetadata(context, collection, "license", license);
+        collectionService.setMetadataSingleValue(context, collection,
+                CollectionService.MD_NAME, null, name);
+        collectionService.setMetadataSingleValue(context, collection,
+                CollectionService.MD_SHORT_DESCRIPTION, null, sdesc);
+        collectionService.setMetadataSingleValue(context, collection,
+                CollectionService.MD_INTRODUCTORY_TEXT, null, itext);
+        collectionService.setMetadataSingleValue(context, collection,
+                CollectionService.MD_COPYRIGHT_TEXT, null, copy);
+        collectionService.setMetadataSingleValue(context, collection,
+                CollectionService.MD_SIDEBAR_TEXT, null, sidebar);
+        collectionService.setMetadataSingleValue(context, collection,
+                CollectionService.MD_PROVENANCE_DESCRIPTION, null, provDesc);
+        collectionService.setMetadataSingleValue(context, collection,
+                CollectionService.MD_LICENSE, null, license);
 
-        assertThat("testSetMetadata 0", collectionService.getMetadata(collection, "name"), equalTo(name));
-        assertThat("testSetMetadata 1", collectionService.getMetadata(collection, "short_description"), equalTo(sdesc));
-        assertThat("testSetMetadata 2", collectionService.getMetadata(collection, "introductory_text"), equalTo(itext));
-        assertThat("testSetMetadata 4", collectionService.getMetadata(collection, "copyright_text"), equalTo(copy));
-        assertThat("testSetMetadata 5", collectionService.getMetadata(collection, "side_bar_text"), equalTo(sidebar));
-        assertThat("testGetMetadata 7", collectionService.getMetadata(collection, "provenance_description"),
-                   equalTo(provDesc));
-        assertThat("testGetMetadata 8", collectionService.getMetadata(collection, "license"), equalTo(license));
+        assertEquals("Name was not set properly.", name,
+                collectionService.getMetadataFirstValue(collection,
+                        CollectionService.MD_NAME, Item.ANY));
+        assertEquals("Short description was not set properly.", sdesc,
+                collectionService.getMetadataFirstValue(collection,
+                        CollectionService.MD_SHORT_DESCRIPTION, Item.ANY));
+        assertEquals("Introductory text was not set properly.", itext,
+                collectionService.getMetadataFirstValue(collection,
+                        CollectionService.MD_INTRODUCTORY_TEXT, Item.ANY));
+        assertEquals("Copyright text was not set properly.", copy,
+                collectionService.getMetadataFirstValue(collection,
+                        CollectionService.MD_COPYRIGHT_TEXT, Item.ANY));
+        assertEquals("Sidebar text was not set properly.", sidebar,
+                collectionService.getMetadataFirstValue(collection,
+                        CollectionService.MD_SIDEBAR_TEXT, Item.ANY));
+        assertEquals("Provenance was not set properly.", provDesc,
+                collectionService.getMetadataFirstValue(collection,
+                        CollectionService.MD_PROVENANCE_DESCRIPTION, Item.ANY));
+        assertEquals("License text was not set properly.", license,
+                collectionService.getMetadataFirstValue(collection,
+                        CollectionService.MD_LICENSE, Item.ANY));
     }
 
     /**

@@ -7,6 +7,13 @@
  */
 package org.dspace.rest;
 
+import static org.dspace.content.service.DSpaceObjectService.MD_COPYRIGHT_TEXT;
+import static org.dspace.content.service.DSpaceObjectService.MD_INTRODUCTORY_TEXT;
+import static org.dspace.content.service.DSpaceObjectService.MD_LICENSE;
+import static org.dspace.content.service.DSpaceObjectService.MD_NAME;
+import static org.dspace.content.service.DSpaceObjectService.MD_SHORT_DESCRIPTION;
+import static org.dspace.content.service.DSpaceObjectService.MD_SIDEBAR_TEXT;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -51,7 +58,7 @@ public class CommunitiesResource extends Resource {
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(CommunitiesResource.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CommunitiesResource.class);
 
     /**
      * Returns community with basic properties. If you want more, use expand
@@ -157,7 +164,7 @@ public class CommunitiesResource extends Resource {
             context = createContext();
 
             List<org.dspace.content.Community> dspaceCommunities = communityService.findAll(context);
-            communities = new ArrayList<Community>();
+            communities = new ArrayList<>();
 
             if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0))) {
                 log.warn("Paging was badly set, using default values.");
@@ -233,7 +240,7 @@ public class CommunitiesResource extends Resource {
             context = createContext();
 
             List<org.dspace.content.Community> dspaceCommunities = communityService.findAllTop(context);
-            communities = new ArrayList<Community>();
+            communities = new ArrayList<>();
 
             if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0))) {
                 log.warn("Paging was badly set, using default values.");
@@ -320,7 +327,7 @@ public class CommunitiesResource extends Resource {
                 offset = 0;
             }
 
-            collections = new ArrayList<Collection>();
+            collections = new ArrayList<>();
             List<org.dspace.content.Collection> dspaceCollections = dspaceCommunity.getCollections();
             for (int i = offset; (i < (offset + limit)) && (i < dspaceCollections.size()); i++) {
                 if (authorizeService
@@ -404,7 +411,7 @@ public class CommunitiesResource extends Resource {
                 offset = 0;
             }
 
-            communities = new ArrayList<Community>();
+            communities = new ArrayList<>();
             List<org.dspace.content.Community> dspaceCommunities = dspaceCommunity.getSubcommunities();
             for (int i = offset; (i < (offset + limit)) && (i < dspaceCommunities.size()); i++) {
                 if (authorizeService
@@ -479,15 +486,16 @@ public class CommunitiesResource extends Resource {
             writeStats(dspaceCommunity, UsageEvent.Action.CREATE, user_ip, user_agent, xforwardedfor,
                        headers, request, context);
 
-            communityService.setMetadata(context, dspaceCommunity, "name", community.getName());
-            communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.COPYRIGHT_TEXT,
-                                         community.getCopyrightText());
-            communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.INTRODUCTORY_TEXT,
-                                         community.getIntroductoryText());
-            communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.SHORT_DESCRIPTION,
-                                         community.getShortDescription());
-            communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.SIDEBAR_TEXT,
-                                         community.getSidebarText());
+            communityService.setMetadataSingleValue(context, dspaceCommunity,
+                    MD_NAME, community.getName(), null);
+            communityService.setMetadataSingleValue(context, dspaceCommunity,
+                    MD_COPYRIGHT_TEXT, community.getCopyrightText(), null);
+            communityService.setMetadataSingleValue(context, dspaceCommunity,
+                    MD_INTRODUCTORY_TEXT, community.getIntroductoryText(), null);
+            communityService.setMetadataSingleValue(context, dspaceCommunity,
+                    MD_SHORT_DESCRIPTION, community.getShortDescription(), null);
+            communityService.setMetadataSingleValue(context, dspaceCommunity,
+                    MD_SIDEBAR_TEXT, community.getSidebarText(), null);
             communityService.update(context, dspaceCommunity);
 
             retCommunity = new Community(dspaceCommunity, servletContext, "", context);
@@ -553,17 +561,19 @@ public class CommunitiesResource extends Resource {
             writeStats(dspaceCommunity, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
                        headers, request, context);
             org.dspace.content.Collection dspaceCollection = collectionService.create(context, dspaceCommunity);
-            collectionService.setMetadata(context, dspaceCollection, "license", collection.getLicense());
+            collectionService.setMetadataSingleValue(context, dspaceCollection,
+                    MD_LICENSE, collection.getLicense(), null);
             // dspaceCollection.setLogo(collection.getLogo()); // TODO Add this option.
-            collectionService.setMetadata(context, dspaceCollection, "name", collection.getName());
-            collectionService.setMetadata(context, dspaceCollection, org.dspace.content.Collection.COPYRIGHT_TEXT,
-                                          collection.getCopyrightText());
-            collectionService.setMetadata(context, dspaceCollection, org.dspace.content.Collection.INTRODUCTORY_TEXT,
-                                          collection.getIntroductoryText());
-            collectionService.setMetadata(context, dspaceCollection, org.dspace.content.Collection.SHORT_DESCRIPTION,
-                                          collection.getShortDescription());
-            collectionService.setMetadata(context, dspaceCollection, org.dspace.content.Collection.SIDEBAR_TEXT,
-                                          collection.getSidebarText());
+            collectionService.setMetadataSingleValue(context, dspaceCollection,
+                    MD_NAME, collection.getName(), null);
+            collectionService.setMetadataSingleValue(context, dspaceCollection,
+                    MD_COPYRIGHT_TEXT, collection.getCopyrightText(), null);
+            collectionService.setMetadataSingleValue(context, dspaceCollection,
+                    MD_INTRODUCTORY_TEXT, collection.getIntroductoryText(), null);
+            collectionService.setMetadataSingleValue(context, dspaceCollection,
+                    MD_SHORT_DESCRIPTION, collection.getShortDescription(), null);
+            collectionService.setMetadataSingleValue(context, dspaceCollection,
+                    MD_SIDEBAR_TEXT, collection.getSidebarText(), null);
             collectionService.update(context, dspaceCollection);
             communityService.update(context, dspaceCommunity);
             retCollection = new Collection(dspaceCollection, servletContext, "", context, 100, 0);
@@ -638,15 +648,16 @@ public class CommunitiesResource extends Resource {
 
             org.dspace.content.Community dspaceCommunity = communityService
                 .createSubcommunity(context, dspaceParentCommunity);
-            communityService.setMetadata(context, dspaceCommunity, "name", community.getName());
-            communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.COPYRIGHT_TEXT,
-                                         community.getCopyrightText());
-            communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.INTRODUCTORY_TEXT,
-                                         community.getIntroductoryText());
-            communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.SHORT_DESCRIPTION,
-                                         community.getShortDescription());
-            communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.SIDEBAR_TEXT,
-                                         community.getSidebarText());
+            communityService.setMetadataSingleValue(context, dspaceCommunity,
+                    MD_NAME, community.getName(), null);
+            communityService.setMetadataSingleValue(context, dspaceCommunity,
+                    MD_COPYRIGHT_TEXT, community.getCopyrightText(), null);
+            communityService.setMetadataSingleValue(context, dspaceCommunity,
+                    MD_INTRODUCTORY_TEXT, community.getIntroductoryText(), null);
+            communityService.setMetadataSingleValue(context, dspaceCommunity,
+                    MD_SHORT_DESCRIPTION, community.getShortDescription(), null);
+            communityService.setMetadataSingleValue(context, dspaceCommunity,
+                    MD_SIDEBAR_TEXT,  community.getSidebarText(), null);
             communityService.update(context, dspaceCommunity);
             communityService.update(context, dspaceParentCommunity);
 
@@ -718,15 +729,16 @@ public class CommunitiesResource extends Resource {
                        headers, request, context);
 
             // dspaceCommunity.setLogo(arg0); // TODO Add this option.
-            communityService.setMetadata(context, dspaceCommunity, "name", community.getName());
-            communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.COPYRIGHT_TEXT,
-                                         community.getCopyrightText());
-            communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.INTRODUCTORY_TEXT,
-                                         community.getIntroductoryText());
-            communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.SHORT_DESCRIPTION,
-                                         community.getShortDescription());
-            communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.SIDEBAR_TEXT,
-                                         community.getSidebarText());
+            communityService.setMetadataSingleValue(context, dspaceCommunity,
+                    MD_NAME, community.getName(), null);
+            communityService.setMetadataSingleValue(context, dspaceCommunity,
+                    MD_COPYRIGHT_TEXT, community.getCopyrightText(), null);
+            communityService.setMetadataSingleValue(context, dspaceCommunity,
+                    MD_INTRODUCTORY_TEXT, community.getIntroductoryText(), null);
+            communityService.setMetadataSingleValue(context, dspaceCommunity,
+                    MD_SHORT_DESCRIPTION, community.getShortDescription(), null);
+            communityService.setMetadataSingleValue(context, dspaceCommunity,
+                    MD_SIDEBAR_TEXT, community.getSidebarText(), null);
             communityService.update(context, dspaceCommunity);
             context.complete();
 

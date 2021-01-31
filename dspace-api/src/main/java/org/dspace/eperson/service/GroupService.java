@@ -22,7 +22,7 @@ import org.dspace.eperson.Group;
 /**
  * Service interface class for the Group object.
  * The implementation of this class is responsible for all business logic calls for the Group object and is autowired
- * by spring
+ * by Spring.
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -112,15 +112,17 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
     /**
      * Check to see if parentGroup is a direct or in-direct parent of a childGroup.
      *
+     * @param context current DSpace session.
      * @param parentGroup parent group
      * @param childGroup  child group
      * @return true or false
+     * @throws java.sql.SQLException
      */
     public boolean isParentOf(Context context, Group parentGroup, Group childGroup) throws SQLException;
 
     /**
-     * fast check to see if an eperson is a member called with eperson id, does
-     * database lookup without instantiating all of the epeople objects and is
+     * fast check to see if an eperson is a member called with eperson id. Does
+     * database lookup without instantiating all of the eperson objects and is
      * thus a static method
      *
      * @param context context
@@ -131,10 +133,10 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
     public boolean isMember(Context context, Group group) throws SQLException;
 
     /**
-     * fast check to see if an eperson is a member called with eperson id, does
-     * database lookup without instantiating all of the epeople objects and is
+     * fast check to see if an eperson is a member called with eperson id. Does
+     * database lookup without instantiating all of the eperson objects and is
      * thus a static method. This method uses context.getCurrentUser() as
-     * eperson whos membership should be checked.
+     * eperson whose membership should be checked.
      *
      * @param context   context
      * @param groupName the name of the group to check
@@ -144,12 +146,13 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
     public boolean isMember(Context context, String groupName) throws SQLException;
 
     /**
-     * fast check to see if an eperson is a member called with eperson id, does
-     * database lookup without instantiating all of the epeople objects and is
-     * thus a static method. The eperson whos membership should be checked must
+     * fast check to see if an eperson is a member called with eperson id. Does
+     * database lookup without instantiating all of the eperson objects and is
+     * thus a static method. The eperson whose membership should be checked must
      * be defined as method attribute.
      *
      * @param context   context
+     * @param epersonToCheck is this EPerson a member of the group?
      * @param groupName the name of the group to check
      * @return true or false
      * @throws SQLException if database error
@@ -157,12 +160,12 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
     public boolean isMember(Context context, EPerson epersonToCheck, String groupName) throws SQLException;
 
     /**
-     * fast check to see if an eperson is a member called with eperson id, does
-     * database lookup without instantiating all of the epeople objects and is
-     * thus a static method
+     * fast check to see if an eperson is a member called with eperson id. Does
+     * database lookup without instantiating all of the eperson objects and is
+     * thus a static method.
      *
      * @param context DSpace context object.
-     * @param eperson EPerson whos membership should be checked.
+     * @param eperson EPerson whose membership should be checked.
      * @param group   The group to check against.
      * @return true or false
      * @throws SQLException if database error
@@ -172,7 +175,7 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
     /**
      * Get all of the groups that an eperson is a member of.
      *
-     * @param context DSpace contenxt
+     * @param context DSpace context
      * @param ePerson ePerson object
      * @return list of Group objects
      * @throws SQLException if database error
@@ -224,6 +227,7 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
      * @deprecated Please use {@code findAll(Context context, List<MetadataField> metadataFieldsSort, int pageSize,
      * int offset)} instead
      */
+    @Deprecated
     public List<Group> findAll(Context context, List<MetadataField> metadataSortFields) throws SQLException;
 
     /**

@@ -37,9 +37,9 @@ import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.MultiFormatDateParser;
 import org.dspace.utils.DSpace;
 
@@ -81,7 +81,8 @@ public abstract class MappingMetadata {
         InputStream is = null;
         itemService = ContentServiceFactory.getInstance().getItemService();
 
-        String googleConfigFile = ConfigurationManager.getProperty(configuration);
+        String googleConfigFile = DSpaceServicesFactory.getInstance().getConfigurationService()
+                .getProperty(configuration);
         log.info("Using [" + googleConfigFile + "] for configuration");
 
         loadedFile = new File(googleConfigFile);

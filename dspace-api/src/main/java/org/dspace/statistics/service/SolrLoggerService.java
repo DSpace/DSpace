@@ -34,13 +34,14 @@ import org.dspace.usage.UsageWorkflowEvent;
 public interface SolrLoggerService {
 
     /**
-     * Old post method, use the new postview method instead !
+     * Old post method, use the new {@link #postView} method instead !
      *
      * @param dspaceObject the object used.
      * @param request      the current request context.
      * @param currentUser  the current session's user.
      * @deprecated
      */
+    @Deprecated
     public void post(DSpaceObject dspaceObject, HttpServletRequest request,
                      EPerson currentUser);
 

@@ -32,7 +32,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.XMLUtils;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -46,6 +47,8 @@ public class PubmedEuropeService {
     private static final Logger log = Logger.getLogger(PubmedEuropeService.class);
 
     private int timeout = 1000;
+
+    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     public void setTimeout(int timeout) {
         this.timeout = timeout;
@@ -101,9 +104,9 @@ public class PubmedEuropeService {
 
     public List<Record> search(String query) throws IOException, HttpException {
         List<Record> PMCEuropeResults = new ArrayList<>();
-        String proxyHost = ConfigurationManager.getProperty("http.proxy.host");
-        String proxyPort = ConfigurationManager.getProperty("http.proxy.port");
-        if (!ConfigurationManager.getBooleanProperty(SubmissionLookupService.CFG_MODULE, "remoteservice.demo")) {
+        String proxyHost = configurationService.getProperty("http.proxy.host");
+        String proxyPort = configurationService.getProperty("http.proxy.port");
+        if (!configurationService.getBooleanProperty(SubmissionLookupService.CFG_MODULE + ".remoteservice.demo")) {
             HttpGet method = null;
             HttpHost proxy = null;
             try {
@@ -181,7 +184,7 @@ public class PubmedEuropeService {
             InputStream stream = null;
             try {
                 File file = new File(
-                        ConfigurationManager.getProperty("dspace.dir")
+                        configurationService.getProperty("dspace.dir")
                                 + "/config/crosswalks/demo/pubmedeurope-search.xml");
                 stream = new FileInputStream(file);
                 DocumentBuilderFactory factory = DocumentBuilderFactory
