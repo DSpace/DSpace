@@ -3,7 +3,7 @@
 
 <item-submission>
   <submission-map>
-    <name-map collection-handle="default" submission-name="product" />
+    <name-map collection-handle="default" submission-name="publication" />
   </submission-map>
   <step-definitions>
     <step-definition id="collection" mandatory="true">
@@ -156,7 +156,6 @@
       <step id="license" />
     </submission-process>
     <submission-process name="project-edit">
-      <step id="collection" />
       <step id="project" />
       <step id="detect-duplicate" />
       <step id="upload" />
