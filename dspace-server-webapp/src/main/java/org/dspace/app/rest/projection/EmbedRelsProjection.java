@@ -36,6 +36,17 @@ public class EmbedRelsProjection extends AbstractProjection {
      */
     private Map<String, Integer> embedSizes;
 
+    /**
+     * The EmbedRelsProjection will take a set of embed relations and embed sizes as a parameter that will be added to
+     * the projection.
+     * The set of embedRels contains strings representing the embedded relation.
+     * The set of embedSizes contains a string containing the embedded relation followed by a "=" and the size of the
+     * embedded relation.
+     * Example: embed=collections&embed.size=collections=5 - These parameters will ensure that the embedded collections
+     * size will be limited to 5
+     * @param embedRels     The embedded relations
+     * @param embedSizes    The sizes of the embedded relations defined as {relation}={size}
+     */
     public EmbedRelsProjection(Set<String> embedRels, Set<String> embedSizes) {
         this.embedRels = embedRels;
         this.embedSizes = embedSizes.stream()
