@@ -3,9 +3,9 @@
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
  *
- * http://www.dspace.org/license/
+ *  http://www.dspace.org/license/
  */
-package org.dspace.importer.external.crossref;
+package org.dspace.importer.external.service;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
  *
  * @author Corrado Lombardi (corrado.lombardi at 4science.it)
  */
-public class CrossRefDoiCheck {
+public class DoiCheck {
 
     private static final List<String> DOI_PREFIXES = Arrays.asList("http://dx.doi.org/", "https://dx.doi.org/");
 
@@ -31,7 +31,7 @@ public class CrossRefDoiCheck {
                                                            Pattern.CASE_INSENSITIVE);
 
 
-    private CrossRefDoiCheck() {
+    private DoiCheck() {
     }
 
     public static boolean isDoi(final String value) {

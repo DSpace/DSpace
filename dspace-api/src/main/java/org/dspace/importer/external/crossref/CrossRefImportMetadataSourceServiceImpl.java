@@ -30,6 +30,7 @@ import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
+import org.dspace.importer.external.service.DoiCheck;
 import org.dspace.importer.external.service.components.QuerySource;
 
 
@@ -64,7 +65,7 @@ public class CrossRefImportMetadataSourceServiceImpl
     @Override
     public int getRecordsCount(String query) throws MetadataSourceException {
         //TODO if a doi check if exists
-        if (CrossRefDoiCheck.isDoi(query)) {
+        if (DoiCheck.isDoi(query)) {
             return retry(new DoiCheckCallable(query));
         }
         return retry(new CountByQueryCallable(query));
@@ -84,7 +85,7 @@ public class CrossRefImportMetadataSourceServiceImpl
     @Override
     public Collection<ImportRecord> getRecords(String query, int start, int count) throws MetadataSourceException {
         //TODO if a doi call SearchByIdCallable
-        if (CrossRefDoiCheck.isDoi(query)) {
+        if (DoiCheck.isDoi(query)) {
             return retry(new SearchByIdCallable(query));
         }
         return retry(new SearchByQueryCallable(query, count, start));
@@ -126,7 +127,7 @@ public class CrossRefImportMetadataSourceServiceImpl
                        .filter(c -> !c.isEmpty())
                        .map(c -> c.iterator().next())
                        .map(o -> (String) o)
-                       .filter(value -> CrossRefDoiCheck.isDoi(value))
+                       .filter(value -> DoiCheck.isDoi(value))
                        .isPresent();
     }
 
