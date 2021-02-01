@@ -479,14 +479,14 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
         WorkspaceItem workspaceItem = workspaceItemService.create(context, getCollection(), false);
 
+        Item item = workspaceItem.getItem();
+        addMetadata(item, entityRow, false);
+
         if (useWorkflow) {
             workflowService.start(context, workspaceItem);
         } else {
             installItemService.installItem(context, workspaceItem);
         }
-
-        Item item = workspaceItem.getItem();
-        addMetadata(item, entityRow, false);
 
         handler.logInfo("Row " + entityRow.getRow() + " - Item created successfully - ID: " + item.getID());
         return item;
