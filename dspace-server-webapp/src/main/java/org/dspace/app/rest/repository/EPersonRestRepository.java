@@ -22,6 +22,8 @@ import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.authorization.AuthorizationFeatureService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.EPersonNameNotProvidedException;
+import org.dspace.app.rest.exception.RESTEmptyWorkflowGroupException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.MetadataRest;
@@ -34,6 +36,7 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.EmptyWorkflowGroupException;
 import org.dspace.eperson.RegistrationData;
 import org.dspace.eperson.service.AccountService;
 import org.dspace.eperson.service.EPersonService;
@@ -199,8 +202,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             List<MetadataValueRest> epersonLastName = metadataRest.getMap().get("eperson.lastname");
             if (epersonFirstName == null || epersonLastName == null ||
                 epersonFirstName.isEmpty() || epersonLastName.isEmpty()) {
-                throw new UnprocessableEntityException("The eperson.firstname and eperson.lastname values need to be " +
-                                                    "filled in");
+                throw new EPersonNameNotProvidedException();
             }
         }
         String password = epersonRest.getPassword();
@@ -313,8 +315,10 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             es.delete(context, eperson);
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
+        } catch (EmptyWorkflowGroupException e) {
+            throw new RESTEmptyWorkflowGroupException(e);
         } catch (IllegalStateException e) {
-            throw  new UnprocessableEntityException(e.getMessage(), e);
+            throw new UnprocessableEntityException(e.getMessage(), e);
         }
     }
 

@@ -12,6 +12,8 @@ import java.util.LinkedList;
 import org.dspace.app.rest.ExternalSourcesRestController;
 import org.dspace.app.rest.link.HalLinkFactory;
 import org.dspace.app.rest.model.hateoas.ExternalSourceResource;
+import org.dspace.services.ConfigurationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
@@ -21,14 +23,18 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ExternalSourceHalLinkFactory extends
-                                          HalLinkFactory<ExternalSourceResource, ExternalSourcesRestController> {
+        HalLinkFactory<ExternalSourceResource, ExternalSourcesRestController> {
+    @Autowired
+    ConfigurationService configurationService;
 
     @Override
     protected void addLinks(ExternalSourceResource halResource, Pageable pageable, LinkedList<Link> list)
-        throws Exception {
+            throws Exception {
 
-        list.add(buildLink("entries", getMethodOn()
-            .getExternalSourceEntries(halResource.getContent().getName(), "", null, null, null)));
+        String dspaceServerUrl = configurationService.getProperty("dspace.server.url");
+        list.add(
+                buildLink("entries", dspaceServerUrl + "/api/integration/externalsources/" +
+                        halResource.getContent().getName() + "/entries"));
 
     }
 
