@@ -8,6 +8,7 @@
 package org.dspace.authorize.factory;
 
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.authorize.service.AuthorizeSolrService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -22,6 +23,8 @@ public abstract class AuthorizeServiceFactory {
     public abstract AuthorizeService getAuthorizeService();
 
     public abstract ResourcePolicyService getResourcePolicyService();
+
+    public abstract AuthorizeSolrService getAuthorizeSolrService();
 
     public static AuthorizeServiceFactory getInstance() {
         return DSpaceServicesFactory.getInstance().getServiceManager()
