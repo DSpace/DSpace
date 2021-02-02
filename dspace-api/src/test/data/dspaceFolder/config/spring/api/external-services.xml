@@ -22,5 +22,6 @@
     <bean id="orcidRestConnector" class="org.dspace.external.OrcidRestConnector">
         <constructor-arg value="${orcid.api.url}"/>
     </bean>
-</beans>
 
+    <bean class="org.dspace.app.suggestion.MockSuggestionExternalDataSource" />
+</beans>

@@ -44,4 +44,12 @@
           class="org.dspace.statistics.MockSolrLoggerServiceImpl"
           lazy-init="true"/>
 
+    <!-- nb events -->
+    <bean class="org.dspace.app.nbevent.MockNBEventService"
+          id="org.dspace.app.nbevent.service.NBEventService" />
+
+    <!-- suggestion service for solr providers -->
+    <bean id="org.dspace.app.suggestion.SolrSuggestionStorageService"
+          class="org.dspace.app.suggestion.MockSolrSuggestionStorageService" />
+
 </beans>
