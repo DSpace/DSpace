@@ -86,6 +86,7 @@ public abstract class IndexFactoryImpl<T extends IndexableObject, S> implements 
             throws IOException, SolrServerException {
         final SolrClient solr = solrSearchCore.getSolr();
         if (solr != null) {
+            // If full text stream(s) were passed in, we'll index them as part of the SolrInputDocument
             if (streams != null && !streams.isEmpty()) {
                 // limit full text indexing to first 100,000 characters unless configured otherwise
                 final int charLimit = DSpaceServicesFactory.getInstance().getConfigurationService()
@@ -110,7 +111,7 @@ public abstract class IndexFactoryImpl<T extends IndexableObject, S> implements 
                     if (saxe.getMessage().contains("limit has been reached")) {
                         // log that we only indexed up to that configured limit
                         log.info("Full text is larger than the configured limit (discovery.solr.fulltext.charLimit)."
-                                     + " Only the first " + charLimit + " characters were indexed.");
+                                     + " Only the first {} characters were indexed.", charLimit);
                     } else {
                         throw new IOException("Tika parsing error. Could not index full text.", saxe);
                     }
@@ -128,13 +129,10 @@ public abstract class IndexFactoryImpl<T extends IndexableObject, S> implements 
 
                 // Save (parsed) full text to "fulltext" field
                 doc.addField("fulltext", tikaHandler.toString());
-
-                // Add document & commit immediately
-                solr.add(doc);
-                solr.commit(true, true);
-            } else {
-                solr.add(doc);
             }
+
+            // Add document to index
+            solr.add(doc);
         }
     }
 

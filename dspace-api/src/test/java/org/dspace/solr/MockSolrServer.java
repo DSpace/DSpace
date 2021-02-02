@@ -7,7 +7,6 @@
  */
 package org.dspace.solr;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -115,7 +114,7 @@ public class MockSolrServer {
             }
 
             loadedCores.put(coreName, server);
-            log.info("SOLR Server for core " + coreName + " initialized");
+            log.info("SOLR Server for core {} initialized", coreName);
         }
         return server;
     }
@@ -145,7 +144,7 @@ public class MockSolrServer {
                 solrServer.close();
                 usersPerCore.remove(coreName);
                 loadedCores.remove(coreName);
-                log.info("SOLR Server for core " + coreName + " destroyed");
+                log.info("SOLR Server for core {} destroyed", coreName);
             }
 
             if (usersPerCore.isEmpty()) {
@@ -160,8 +159,8 @@ public class MockSolrServer {
      */
     private static synchronized void initSolrContainer() {
         if (container == null) {
-            Path solrDir = Paths.get(AbstractDSpaceIntegrationTest.getDspaceDir() + File.separator + "solr");
-            log.info("Initializing SOLR CoreContainer with directory " + solrDir.toAbsolutePath().toString());
+            Path solrDir = Paths.get(AbstractDSpaceIntegrationTest.getDspaceDir(), "solr");
+            log.info("Initializing SOLR CoreContainer with directory {}", solrDir.toAbsolutePath().toString());
             container = new CoreContainer(solrDir, new Properties());
             container.load();
             log.info("SOLR CoreContainer initialized");
