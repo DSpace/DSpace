@@ -190,4 +190,18 @@
           class="org.dspace.importer.external.wos.service.WOSFieldMapping">
     </bean>
 
+    <bean id="openaireImportServiceByAuthor"
+          class="org.dspace.importer.external.openaire.service.OpenAireImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="openaireMetadataFieldMapping"/>
+        <property name="queryParam" value="author"/>
+    </bean>
+    <bean id="openaireImportServiceByTitle"
+          class="org.dspace.importer.external.openaire.service.OpenAireImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="openaireMetadataFieldMapping"/>
+        <property name="queryParam" value="title"/>
+    </bean>
+    <bean id="openaireMetadataFieldMapping"
+          class="org.dspace.importer.external.openaire.service.metadatamapping.OpenAireFieldMapping">
+    </bean>
+
 </beans>

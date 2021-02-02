@@ -27,8 +27,6 @@ import org.dspace.authority.filler.AuthorityImportFillerService;
 import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.authority.service.ItemSearchService;
 import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
@@ -36,8 +34,10 @@ import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.core.CrisConstants;
@@ -84,6 +84,10 @@ public class CrisConsumer implements Consumer {
 
     private InstallItemService installItemService;
 
+    private CollectionService collectionService;
+
+    private RelationshipService relationshipService;
+
     private ConfigurationService configurationService;
 
     private AuthorityImportFillerService authorityImportFillerService;
@@ -97,10 +101,12 @@ public class CrisConsumer implements Consumer {
         itemService = ContentServiceFactory.getInstance().getItemService();
         workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
         installItemService = ContentServiceFactory.getInstance().getInstallItemService();
+        collectionService = ContentServiceFactory.getInstance().getCollectionService();
         configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
         authorityImportFillerService = AuthorityServiceFactory.getInstance().getAuthorityImportFillerService();
         itemSearchService = new DSpace().getSingletonService(ItemSearchService.class);
+        relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
     }
 
     @Override
@@ -168,8 +174,8 @@ public class CrisConsumer implements Consumer {
             }
 
             if (!relatedItemAlreadyPresent) {
-
-                Collection collection = retrieveCollectionByRelationshipType(item, relationshipType);
+                Collection collection = collectionService.retrieveCollectionByRelationshipType(context, item,
+                        relationshipType);
                 if (collection == null) {
                     log.warn(NO_COLLECTION_FOUND_MSG, relationshipType, item.getID());
                     continue;
@@ -214,22 +220,13 @@ public class CrisConsumer implements Consumer {
         return metadata.getMetadataField().toString('_');
     }
 
-    private boolean hasRelationshipTypeMetadataEqualsTo(DSpaceObject dsObject, String relationshipType) {
-        return dsObject.getMetadata().stream().anyMatch(metadataValue -> {
-            return "relationship.type".equals(metadataValue.getMetadataField().toString('.')) &&
-                    relationshipType.equals(metadataValue.getValue());
-        });
-    }
-
     private Item buildRelatedItem(Context context, Item item, Collection collection, MetadataValue metadata,
             String relationshipType, String crisSourceId) throws Exception {
 
         WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
         Item relatedItem = workspaceItem.getItem();
-        relatedItem.setOwningCollection(collection);
-        relatedItem.setSubmitter(item.getSubmitter());
         itemService.addMetadata(context, relatedItem, CRIS.getName(), "sourceId", null, null, crisSourceId);
-        if (!hasRelationshipTypeMetadataEqualsTo(relatedItem, relationshipType)) {
+        if (!relationshipService.hasRelationshipType(relatedItem, relationshipType)) {
             log.error("Inconstent configuration the related item " + relatedItem.getID().toString() + ", created from "
                     + item.getID().toString() + " (" + metadata.getMetadataField().toString('.') + ")"
                     + " hasn't the expected [" + relationshipType + "] relationshipType");
@@ -241,49 +238,6 @@ public class CrisConsumer implements Consumer {
             workflowService.start(context, workspaceItem).getItem();
         }
         return relatedItem;
-    }
-
-    private Collection retrieveCollectionByRelationshipType(Item item, String relationshipType) throws SQLException {
-        Collection ownCollection = item.getOwningCollection();
-        return retrieveCollectionByRelationshipType(ownCollection.getCommunities(), relationshipType);
-    }
-
-    private Collection retrieveCollectionByRelationshipType(List<Community> communities, String relationshipType) {
-
-        for (Community community : communities) {
-            Collection collection = retriveCollectionByRelationshipType(community, relationshipType);
-            if (collection != null) {
-                return collection;
-            }
-        }
-
-        for (Community community : communities) {
-            List<Community> parentCommunities = community.getParentCommunities();
-            Collection collection = retrieveCollectionByRelationshipType(parentCommunities, relationshipType);
-            if (collection != null) {
-                return collection;
-            }
-        }
-
-        return null;
-    }
-
-    private Collection retriveCollectionByRelationshipType(Community community, String relationshipType) {
-
-        for (Collection collection : community.getCollections()) {
-            if (hasRelationshipTypeMetadataEqualsTo(collection, relationshipType)) {
-                return collection;
-            }
-        }
-
-        for (Community subCommunity : community.getSubcommunities()) {
-            Collection collection = retriveCollectionByRelationshipType(subCommunity, relationshipType);
-            if (collection != null) {
-                return collection;
-            }
-        }
-
-        return null;
     }
 
     private String generateCrisSourceId(MetadataValue metadata) {

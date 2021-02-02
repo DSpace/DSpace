@@ -61,5 +61,7 @@
             </list>
         </property>
     </bean>
+
+    <bean class="org.dspace.app.suggestion.MockSuggestionExternalDataSource" />
 </beans>
 

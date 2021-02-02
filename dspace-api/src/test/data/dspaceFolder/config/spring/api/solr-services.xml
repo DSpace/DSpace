@@ -49,4 +49,13 @@
     
     <!-- audit -->
     <bean id="org.dspace.app.audit.AuditService" class="org.dspace.app.audit.MockAuditService"/>
+
+    <!-- nb events -->
+    <bean class="org.dspace.app.nbevent.MockNBEventService"
+          id="org.dspace.app.nbevent.service.NBEventService" />
+          
+    <!-- suggestion service for solr providers -->  
+    <bean id="org.dspace.app.suggestion.SolrSuggestionStorageService" 
+          class="org.dspace.app.suggestion.MockSolrSuggestionStorageService" />
+
 </beans>

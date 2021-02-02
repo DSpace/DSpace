@@ -48,4 +48,14 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.CollectionExport"/>
     </bean>
 
+    <bean id="import-nbevents" class="org.dspace.app.nbevent.NBEventsScriptConfiguration" primary="true">
+        <property name="description" value="Import new openAIRE notification broker events"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.nbevent.NBEventsRunnable"/>
+     </bean>
+
+    <bean id="import-oaire-suggestions" class="org.dspace.app.suggestion.OAIREPublicationLoaderScriptConfiguration" primary="true">
+        <property name="description" value="Import and store locally metadata from OpenAIRE"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.suggestion.OAIREPublicationLoaderRunnable"/>
+    </bean>
+
 </beans>

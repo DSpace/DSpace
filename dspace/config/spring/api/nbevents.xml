@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+    <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
+
+    <bean id="nbEventsDao" class="org.dspace.app.nbevent.dao.impl.NBEventsDaoImpl" />
+
+    <!-- This is defined in the solr-services.xml
+	<bean id="org.dspace.app.nbevent.service.NBEventService" 
+	   class="org.dspace.app.nbevent.service.impl.NBEventServiceImpl" /> -->
+ 
+     <bean id="org.dspace.app.nbevent.NBEventActionService" class="org.dspace.app.nbevent.NBEventActionServiceImpl">
+        <property name="topicsToActions">
+            <map>
+	<!--The key are the TOPIC, the value must be a valid implementation of the 
+		org.dspace.app.nbevent.NBEventAction interface -->
+               <entry key="ENRICH/MORE/PROJECT" value-ref="ProjectLinkedEntityAction" />
+               <entry key="ENRICH/MISSING/PROJECT" value-ref="ProjectLinkedEntityAction" />
+               <entry key="ENRICH/MISSING/ABSTRACT" value-ref="AbstractMetadataAction" />
+               <entry key="ENRICH/MORE/PID" value-ref="PIDMetadataAction" />
+               <entry key="ENRICH/MISSING/PID" value-ref="PIDMetadataAction" />
+            </map>   
+        </property>
+     </bean>
+     
+     <bean id="ProjectLinkedEntityAction" class="org.dspace.app.nbevent.NBEntityMetadataAction">
+        <!-- which metadata will hold the relation between the publication and the project -->
+        <property name="metadata" value="dc.relation.funding" />
+        <!-- the type of local entity used to store the project details -->
+        <property name="entityType" value="Funding" />
+        <property name="entityMetadata">
+            <map>
+	<!--The key are the json path of nb message, the value is the metadata in 
+		the linked entity where the information should be stored -->
+               <entry key="acronym" value="oairecerif.acronym" />
+               <entry key="code" value="oairecerif.internalid" />
+               <entry key="funder" value="oairecerif.funder" />
+	           <entry key="title" value="dc.title" />
+	           <entry key="fundingProgram" value="oairecerif.fundingProgram" />
+	           <entry key="openaireId" value="oairecerif.funding.identifier" />
+            </map>
+        </property>    
+     </bean>
+     <bean id="AbstractMetadataAction" class="org.dspace.app.nbevent.NBSimpleMetadataAction">
+        <property name="metadata" value="dc.description.abstract" />
+     </bean>
+     <bean id="PIDMetadataAction" class="org.dspace.app.nbevent.NBMetadataMapAction">
+	     <property name="types">
+	         <map>
+	<!--The key are the type of identifier (or subject) reported in the message, the value is the metadata in 
+        the linked entity where the information should be stored -->
+               <entry key="default" value="dc.identifier" />
+               <entry key="doi" value="dc.identifier.doi" />
+               <entry key="pmid" value="dc.identifier.pmid" />
+	         </map>
+	     </property>    
+     </bean>
+     
+ </beans>

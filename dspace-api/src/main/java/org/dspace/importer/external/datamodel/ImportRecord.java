@@ -102,4 +102,5 @@ public class ImportRecord {
     public void addValue(MetadatumDTO value) {
         this.valueList.add(value);
     }
+
 }

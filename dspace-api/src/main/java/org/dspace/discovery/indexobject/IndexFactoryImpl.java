@@ -28,6 +28,7 @@ import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.SolrSearchCore;
 import org.dspace.discovery.SolrServiceIndexPlugin;
 import org.dspace.discovery.indexobject.factory.IndexFactory;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.SolrUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,8 @@ public abstract class IndexFactoryImpl<T extends IndexableObject, S> implements 
     protected List<SolrServiceIndexPlugin> solrServiceIndexPlugins;
     @Autowired
     protected SolrSearchCore solrSearchCore;
+    @Autowired
+    protected ConfigurationService ConfigurationService;
 
     @Override
     public SolrInputDocument buildDocument(Context context, T indexableObject) throws SQLException, IOException {
@@ -81,7 +84,8 @@ public abstract class IndexFactoryImpl<T extends IndexableObject, S> implements 
             throws IOException, SolrServerException {
         final SolrClient solr = solrSearchCore.getSolr();
         if (solr != null) {
-            if (streams != null && !streams.isEmpty()) {
+            if (!ConfigurationService.getBooleanProperty("discovery.ignore-fulltext", false) && streams != null
+                    && !streams.isEmpty()) {
                 ContentStreamUpdateRequest req = new ContentStreamUpdateRequest("/update/extract");
                 req.addContentStream(streams);
 

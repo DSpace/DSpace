@@ -37,6 +37,7 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -119,6 +120,9 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Autowired(required = true)
     protected ConfigurationService configurationService;
+
+    @Autowired(required = true)
+    protected RelationshipService relationshipService;
 
     protected CollectionServiceImpl() {
         super();
@@ -1004,4 +1008,58 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         DiscoverResult resp = searchService.search(context, discoverQuery);
         return resp;
     }
+
+    @Override
+    public Collection retrieveCollectionByRelationshipType(Context context, Item item, String relationshipType)
+            throws SQLException {
+        Collection ownCollection = item.getOwningCollection();
+        return retrieveCollectionByRelationshipType(context, ownCollection.getCommunities(), relationshipType);
+    }
+
+    private Collection retrieveCollectionByRelationshipType(Context context, List<Community> communities,
+            String relationshipType) {
+
+        for (Community community : communities) {
+            Collection collection = retriveCollectionByRelationshipType(context, community, relationshipType);
+            if (collection != null) {
+                return collection;
+            }
+        }
+
+        for (Community community : communities) {
+            List<Community> parentCommunities = community.getParentCommunities();
+            Collection collection = retrieveCollectionByRelationshipType(context, parentCommunities, relationshipType);
+            if (collection != null) {
+                return collection;
+            }
+        }
+
+        return retriveCollectionByRelationshipType(context, null, relationshipType);
+    }
+
+    @Override
+    public Collection retriveCollectionByRelationshipType(Context context, Community community,
+            String relationshipType) {
+        context.turnOffAuthorisationSystem();
+        List<Collection> collections;
+        try {
+            collections = findCollectionsWithSubmit(null, context, community, relationshipType, 0, 1);
+        } catch (SQLException | SearchServiceException e) {
+            throw new RuntimeException(e);
+        }
+        context.restoreAuthSystemState();
+        if (collections != null && collections.size() > 0) {
+            return collections.get(0);
+        }
+        if (community != null) {
+            for (Community subCommunity : community.getSubcommunities()) {
+                Collection collection = retriveCollectionByRelationshipType(context, subCommunity, relationshipType);
+                if (collection != null) {
+                    return collection;
+                }
+            }
+        }
+        return null;
+    }
+
 }
