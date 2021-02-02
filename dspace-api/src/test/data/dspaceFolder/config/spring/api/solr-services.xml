@@ -47,5 +47,9 @@
     <bean id="org.dspace.statistics.SolrStatisticsCore"
           class="org.dspace.statistics.MockSolrStatisticsCore"
           autowire-candidate="true"/>
+          
+    <!-- nb events -->
+    <bean class="org.dspace.app.nbevent.MockNBEventService"
+          id="org.dspace.app.nbevent.service.NBEventService" />
 
 </beans>
