@@ -8,6 +8,7 @@
 package org.dspace.authorize.factory;
 
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.authorize.service.AuthorizeSolrService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -23,6 +24,8 @@ public class AuthorizeServiceFactoryImpl extends AuthorizeServiceFactory {
     private AuthorizeService authorizeService;
     @Autowired(required = true)
     private ResourcePolicyService resourcePolicyService;
+    @Autowired(required = true)
+    private AuthorizeSolrService authorizeSolrService;
 
     @Override
     public AuthorizeService getAuthorizeService() {
@@ -32,5 +35,10 @@ public class AuthorizeServiceFactoryImpl extends AuthorizeServiceFactory {
     @Override
     public ResourcePolicyService getResourcePolicyService() {
         return resourcePolicyService;
+    }
+
+    @Override
+    public AuthorizeSolrService getAuthorizeSolrService() {
+        return authorizeSolrService;
     }
 }

@@ -115,6 +115,7 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                                 fieldValue = "e" + resourcePolicy.getEPerson().getID();
                             }
                             document.addField("read", fieldValue);
+                            document.addField("admin", fieldValue);
 
                             // remove the policy from the cache to save memory
                             context.uncacheEntity(resourcePolicy);

@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
@@ -33,6 +34,7 @@ import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.utils.CommunityRestEqualityUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.authorize.service.AuthorizeSolrService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Community;
 import org.dspace.content.service.BitstreamService;
@@ -82,6 +84,9 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
     AuthorizeService authorizeService;
 
     private CommunityService cs;
+
+    @Autowired
+    private AuthorizeSolrService authorizeSolrService;
 
     public CommunityRestRepository(CommunityService dsoService) {
         super(dsoService);
@@ -199,6 +204,21 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
             List<Community> communities = cs.findAllTop(obtainContext());
             return converter.toRestPage(communities, pageable, utils.obtainProjection());
         } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @SearchRestMethod(name = "findAdminAuthorized")
+    public Page<CommunityRest> findAdminAuthorized (
+        Pageable pageable, @Parameter(value = "query") String query) {
+        try {
+            Context context = obtainContext();
+            List<Community> communities = authorizeSolrService.findAdminAuthorizedCommunity(context, query,
+                Math.toIntExact(pageable.getOffset()),
+                Math.toIntExact(pageable.getPageSize()));
+            int tot = authorizeSolrService.countAdminAuthorizedCommunity(context, query);
+            return converter.toRestPage(communities, pageable, tot , utils.obtainProjection());
+        } catch (SearchServiceException | SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
