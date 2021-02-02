@@ -503,7 +503,8 @@
                 <relation-field>
                     <relationship-type>isJournalOfVolume</relationship-type>
                     <search-configuration>journal</search-configuration>
-                    <filter>creativework.publisher:somepublishername</filter>
+                    <!-- example of filtering Discovery search for Journal by a specific publisher -->
+                    <!--<filter>creativework.publisher:somepublishername</filter>-->
                     <label>Journal</label>
                     <hint>Select the journal related to this volume.</hint>
                     <externalsources>sherpaJournal</externalsources>
@@ -520,7 +521,7 @@
             </row>
             <row>
                 <field>
-                    <dc-schema>publicationVolume</dc-schema>
+                    <dc-schema>publicationvolume</dc-schema>
                     <dc-element>volumeNumber</dc-element>
                     <label>Volume</label>
                     <input-type>onebox</input-type>
@@ -548,6 +549,14 @@
         </form>
 
         <form name="journalIssueStep">
+            <row>
+                <relation-field>
+                    <relationship-type>isJournalVolumeOfIssue</relationship-type>
+                    <search-configuration>journalvolume</search-configuration>
+                    <label>Journal Volume</label>
+                    <hint>Select the journal volume related to this issue.</hint>
+                </relation-field>
+            </row>
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
