@@ -169,13 +169,6 @@
             <artifactId>dspace-api</artifactId>
         </dependency>
 
-        <!-- Solr (Datasource) -->
-        <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-solrj</artifactId>
-            <version>${solr.client.version}</version>
-        </dependency>
-
         <!-- Web API -->
         <dependency>
             <groupId>javax.servlet</groupId>
