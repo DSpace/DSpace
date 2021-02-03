@@ -22,6 +22,7 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * Builder to construct WorkspaceItem objects
@@ -110,6 +111,13 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
             workspaceItem = c.reloadEntity(workspaceItem);
             if (workspaceItem != null) {
                 delete(c, workspaceItem);
+            } else {
+                item = c.reloadEntity(item);
+                // check if the wsi has been pushed to the workflow
+                XmlWorkflowItem wfi = workflowItemService.findByItem(c, item);
+                if (wfi != null) {
+                    workflowItemService.delete(c, wfi);
+                }
             }
             item = c.reloadEntity(item);
             if (item != null) {

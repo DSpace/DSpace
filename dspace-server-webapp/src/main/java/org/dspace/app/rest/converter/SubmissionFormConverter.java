@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.ScopeEnum;
 import org.dspace.app.rest.model.SubmissionFormFieldRest;
@@ -174,6 +175,9 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
         selectableRelationship.setFilter(dcinput.getFilter());
         selectableRelationship.setSearchConfiguration(dcinput.getSearchConfiguration());
         selectableRelationship.setNameVariants(String.valueOf(dcinput.areNameVariantsAllowed()));
+        if (CollectionUtils.isNotEmpty(dcinput.getExternalSources())) {
+            selectableRelationship.setExternalSources(dcinput.getExternalSources());
+        }
         return selectableRelationship;
     }
 

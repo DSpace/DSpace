@@ -11,6 +11,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -589,6 +590,47 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                             "Inserisci titolo principale di questo item", "dc.title"))));
 
         resetLocalesConfiguration();
+    }
+
+    @Test
+    public void multipleExternalSourcesTest() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/config/submissionforms/traditionalpageone"))
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //We expect the content type to be "application/hal+json;charset=UTF-8"
+                .andExpect(content().contentType(contentType))
+                //Check that the JSON root matches the expected "traditionalpageone" input forms
+                .andExpect(jsonPath("$.id", is("traditionalpageone")))
+                .andExpect(jsonPath("$.name", is("traditionalpageone")))
+                .andExpect(jsonPath("$.type", is("submissionform")))
+                .andExpect(jsonPath("$._links.self.href", Matchers
+                        .startsWith(REST_SERVER_URL + "config/submissionforms/traditionalpageone")))
+                // check the external sources of the first field in the first row
+                .andExpect(jsonPath("$.rows[0].fields[0].selectableRelationship.externalSources",
+                        contains(is("orcid"), is("my_staff_db"))))
+        ;
+    }
+
+    @Test
+    public void noExternalSourcesTest() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/config/submissionforms/journalVolumeStep"))
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //We expect the content type to be "application/hal+json;charset=UTF-8"
+                .andExpect(content().contentType(contentType))
+                //Check that the JSON root matches the expected "journalVolumeStep" input forms
+                .andExpect(jsonPath("$.id", is("journalVolumeStep")))
+                .andExpect(jsonPath("$.name", is("journalVolumeStep")))
+                .andExpect(jsonPath("$.type", is("submissionform")))
+                .andExpect(jsonPath("$._links.self.href", Matchers
+                        .startsWith(REST_SERVER_URL + "config/submissionforms/journalVolumeStep")))
+                // check the external sources of the first field in the first row
+                .andExpect(jsonPath("$.rows[0].fields[0].selectableRelationship.externalSources", nullValue()))
+        ;
     }
 
     private void resetLocalesConfiguration() throws DCInputsReaderException {

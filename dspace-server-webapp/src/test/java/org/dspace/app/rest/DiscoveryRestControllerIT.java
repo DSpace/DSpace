@@ -2370,7 +2370,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     }
 
     @Test
-    public void discoverSearchObjectsWithQueryOperatorContains() throws Exception {
+    public void discoverSearchObjectsWithQueryOperatorContains_query() throws Exception {
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
 
@@ -2445,7 +2445,83 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     }
 
     @Test
-    public void discoverSearchObjectsWithQueryOperatorNotContains() throws Exception {
+    public void discoverSearchObjectsWithQueryOperatorContains() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Test 2")
+                                      .withIssueDate("1990-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
+                                      .withSubject("TestingForMore").withSubject("ExtraEntry")
+                                      .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 2")
+                                      .withIssueDate("2010-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test")
+                                      .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
+                                      .withSubject("AnotherTest").withSubject("TestingForMore")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        context.restoreAuthSystemState();
+
+        UUID scope = col2.getID();
+        //** WHEN **
+        //An anonymous user browses this endpoint to find the the objects in the system
+        //With the given search filter
+        getClient().perform(get("/api/discover/search/objects")
+            .param("f.title", "test,contains"))
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //The type has to be 'discover'
+                   .andExpect(jsonPath("$.type", is("discover")))
+                   //The page object needs to look like this
+                   .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                       PageMatcher.pageEntry(0, 20)
+                                                                          )))
+                   //The search results have to contain the items that match the searchFilter
+                   .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                       SearchResultMatcher.matchOnItemName("item", "items", "Test"),
+                       SearchResultMatcher.matchOnItemName("item", "items", "Test 2")
+                                                                                                                )))
+                   //These facets have to show up in the embedded.facets section as well with the given hasMore property
+                   // because we don't exceed their default limit for a hasMore true (the default is 10)
+                   .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                       FacetEntryMatcher.authorFacet(false),
+                       FacetEntryMatcher.entityTypeFacet(false),
+                       FacetEntryMatcher.subjectFacet(false),
+                       FacetEntryMatcher.dateIssuedFacet(false),
+                       FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                                                                                        )))
+                   //There always needs to be a self link available
+                   .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+        ;
+
+    }
+
+    @Test
+    public void discoverSearchObjectsWithQueryOperatorNotContains_query() throws Exception {
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
 
@@ -2514,6 +2590,81 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+        ;
+
+    }
+
+    @Test
+    public void discoverSearchObjectsWithQueryOperatorNotContains() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Test 2")
+                                      .withIssueDate("1990-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
+                                      .withSubject("TestingForMore").withSubject("ExtraEntry")
+                                      .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 2")
+                                      .withIssueDate("2010-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test")
+                                      .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
+                                      .withSubject("AnotherTest").withSubject("TestingForMore")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        context.restoreAuthSystemState();
+
+        UUID scope = col2.getID();
+        //** WHEN **
+        //An anonymous user browses this endpoint to find the the objects in the system
+        //With the given search filter
+        getClient().perform(get("/api/discover/search/objects")
+            .param("f.title", "test,notcontains"))
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //The type has to be 'discover'
+                   .andExpect(jsonPath("$.type", is("discover")))
+                   //The page object needs to look like this
+                   .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                       PageMatcher.pageEntry(0, 20)
+                                                                          )))
+                   //The search results have to contain the items that match the searchFilter
+                   .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItem(
+                       SearchResultMatcher.matchOnItemName("item", "items", "Public item 2")
+                                                                                                     )))
+                   //These facets have to show up in the embedded.facets section as well with the given hasMore property
+                   // because we don't exceed their default limit for a hasMore true (the default is 10)
+                   .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                       FacetEntryMatcher.authorFacet(false),
+                       FacetEntryMatcher.entityTypeFacet(false),
+                       FacetEntryMatcher.subjectFacet(false),
+                       FacetEntryMatcher.dateIssuedFacet(false),
+                       FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                                                                                        )))
+                   //There always needs to be a self link available
+                   .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
         ;
 
     }
@@ -2673,7 +2824,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     }
 
     @Test
-    public void discoverSearchObjectsWithQueryOperatorEquals() throws Exception {
+    public void discoverSearchObjectsWithQueryOperatorEquals_query() throws Exception {
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
 
@@ -2747,7 +2898,82 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     }
 
     @Test
-    public void discoverSearchObjectsWithQueryOperatorNotEquals() throws Exception {
+    public void discoverSearchObjectsWithQueryOperatorEquals() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Test 2")
+                                      .withIssueDate("1990-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
+                                      .withSubject("TestingForMore").withSubject("ExtraEntry")
+                                      .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 2")
+                                      .withIssueDate("2010-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test")
+                                      .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
+                                      .withSubject("AnotherTest").withSubject("TestingForMore")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        context.restoreAuthSystemState();
+
+        UUID scope = col2.getID();
+        //** WHEN **
+        //An anonymous user browses this endpoint to find the the objects in the system
+        //With the given search filter
+        getClient().perform(get("/api/discover/search/objects")
+            .param("f.title", "Test,equals"))
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //The type has to be 'discover'
+                   .andExpect(jsonPath("$.type", is("discover")))
+                   //The page object needs to look like this
+                   .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                       PageMatcher.pageEntry(0, 20)
+                                                                          )))
+                   //The search results have to contain the items that match the searchFilter
+                   .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                       SearchResultMatcher.matchOnItemName("item", "items", "Test")
+                                                                                                                )))
+                   //These facets have to show up in the embedded.facets section as well with the given hasMore property
+                   // because we don't exceed their default limit for a hasMore true (the default is 10)
+                   .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                       FacetEntryMatcher.authorFacet(false),
+                       FacetEntryMatcher.entityTypeFacet(false),
+                       FacetEntryMatcher.subjectFacet(false),
+                       FacetEntryMatcher.dateIssuedFacet(false),
+                       FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                                                                                        )))
+                   //There always needs to be a self link available
+                   .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+        ;
+
+    }
+
+    @Test
+    public void discoverSearchObjectsWithQueryOperatorNotEquals_query() throws Exception {
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
 
@@ -2822,7 +3048,83 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     }
 
     @Test
-    public void discoverSearchObjectsWithQueryOperatorNotAuthority() throws Exception {
+    public void discoverSearchObjectsWithQueryOperatorNotEquals() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Test 2")
+                                      .withIssueDate("1990-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
+                                      .withSubject("TestingForMore").withSubject("ExtraEntry")
+                                      .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 2")
+                                      .withIssueDate("2010-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test")
+                                      .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
+                                      .withSubject("AnotherTest").withSubject("TestingForMore")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        context.restoreAuthSystemState();
+
+        UUID scope = col2.getID();
+        //** WHEN **
+        //An anonymous user browses this endpoint to find the the objects in the system
+        //With the given search filter
+        getClient().perform(get("/api/discover/search/objects")
+            .param("f.title", "Test,notequals"))
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //The type has to be 'discover'
+                   .andExpect(jsonPath("$.type", is("discover")))
+                   //The page object needs to look like this
+                   .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                       PageMatcher.pageEntry(0, 20)
+                                                                          )))
+                   //The search results have to contain the items that match the searchFilter
+                   .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItems(
+                       SearchResultMatcher.matchOnItemName("item", "items", "Test 2"),
+                       SearchResultMatcher.matchOnItemName("item", "items", "Public item 2")
+                                                                                                      )))
+                   //These facets have to show up in the embedded.facets section as well with the given hasMore property
+                   // because we don't exceed their default limit for a hasMore true (the default is 10)
+                   .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                       FacetEntryMatcher.authorFacet(false),
+                       FacetEntryMatcher.entityTypeFacet(false),
+                       FacetEntryMatcher.subjectFacet(false),
+                       FacetEntryMatcher.dateIssuedFacet(false),
+                       FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                                                                                        )))
+                   //There always needs to be a self link available
+                   .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+        ;
+
+    }
+
+    @Test
+    public void discoverSearchObjectsWithQueryOperatorNotAuthority_query() throws Exception {
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
 
@@ -2893,6 +3195,108 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
         ;
 
+    }
+
+    @Test
+    public void discoverSearchObjectsWithQueryOperatorNotAuthority() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Test 2")
+                                      .withIssueDate("1990-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
+                                      .withSubject("TestingForMore").withSubject("ExtraEntry")
+                                      .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 2")
+                                      .withIssueDate("2010-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test")
+                                      .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
+                                      .withSubject("AnotherTest").withSubject("TestingForMore")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        context.restoreAuthSystemState();
+
+        UUID scope = col2.getID();
+        //** WHEN **
+        //An anonymous user browses this endpoint to find the the objects in the system
+        //With the given search filter
+        getClient().perform(get("/api/discover/search/objects")
+            .param("f.title", "test,notauthority"))
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //The type has to be 'discover'
+                   .andExpect(jsonPath("$.type", is("discover")))
+                   //The page object needs to look like this
+                   .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                       PageMatcher.pageEntry(0, 20)
+                                                                          )))
+                   //The search results have to contain the items that match the searchFilter
+                   .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItem(
+                       SearchResultMatcher.matchOnItemName("item", "items", "Public item 2")
+                                                                                                     )))
+                   //These facets have to show up in the embedded.facets section as well with the given hasMore property
+                   // because we don't exceed their default limit for a hasMore true (the default is 10)
+                   .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                       FacetEntryMatcher.authorFacet(false),
+                       FacetEntryMatcher.entityTypeFacet(false),
+                       FacetEntryMatcher.subjectFacet(false),
+                       FacetEntryMatcher.dateIssuedFacet(false),
+                       FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                                                                                        )))
+                   //There always needs to be a self link available
+                   .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+        ;
+
+    }
+
+    @Test
+    public void discoverSearchObjectsWithMissingQueryOperator() throws Exception {
+        //** WHEN **
+        // An anonymous user browses this endpoint to find the the objects in the system
+        // With the given search filter where there is the filter operator missing in the value (must be of form
+        // <:filter-value>,<:filter-operator>)
+        getClient().perform(get("/api/discover/search/objects")
+            .param("f.title", "test"))
+                   //** THEN **
+                   //Will result in 422 status because of missing filter operator
+                   .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void discoverSearchObjectsWithNotValidQueryOperator() throws Exception {
+        //** WHEN **
+        // An anonymous user browses this endpoint to find the the objects in the system
+        // With the given search filter where there is a non-valid filter operator given (must be of form
+        // <:filter-value>,<:filter-operator> where the filter operator is one of: “contains”, “notcontains”, "equals"
+        // “notequals”, “authority”, “notauthority”, "query”); see enum RestSearchOperator
+        getClient().perform(get("/api/discover/search/objects")
+            .param("f.title", "test,operator"))
+                   //** THEN **
+                   //Will result in 422 status because of non-valid filter operator
+                   .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
@@ -4478,7 +4882,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .perform(get("/api/discover/search/objects")
                         .param("configuration", "administrativeView")
                         .param("query", "Test")
-                        .param("f.withdrawn", "true")
+                        .param("f.withdrawn", "true,contains")
                 )
 
                 .andExpect(status().isOk())
@@ -4497,7 +4901,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .perform(get("/api/discover/search/objects")
                         .param("configuration", "administrativeView")
                         .param("query", "Test")
-                        .param("f.withdrawn", "false")
+                        .param("f.withdrawn", "false,contains")
                 )
 
                 .andExpect(status().isOk())
@@ -4517,7 +4921,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .perform(get("/api/discover/search/objects")
                         .param("configuration", "administrativeView")
                         .param("query", "Test")
-                        .param("f.discoverable", "true")
+                        .param("f.discoverable", "true,contains")
                 )
 
                 .andExpect(status().isOk())
@@ -4537,7 +4941,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .perform(get("/api/discover/search/objects")
                         .param("configuration", "administrativeView")
                         .param("query", "Test")
-                        .param("f.discoverable", "false")
+                        .param("f.discoverable", "false,contains")
                 )
 
                 .andExpect(status().isOk())
