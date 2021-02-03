@@ -2,6 +2,7 @@ version: '3.7'
 networks:
   dspacenet:
 services:
+  # DSpace (backend) webapp container
   dspace:
     container_name: dspace
     image: "${DOCKER_OWNER:-dspace}/dspace:${DSPACE_VER:-dspace-7_x-test}"
@@ -33,10 +34,12 @@ services:
       while (!</dev/tcp/dspacedb/5432) > /dev/null 2>&1; do sleep 1; done;
       /dspace/bin/dspace database migrate
       catalina.sh run
+  # DSpace database container
   dspacedb:
     container_name: dspacedb
     environment:
       PGDATA: /pgdata
+    # Uses a custom Postgres image with pgcrypto installed
     image: dspace/dspace-postgres-pgcrypto
     networks:
       dspacenet:
@@ -47,9 +50,11 @@ services:
     tty: true
     volumes:
     - pgdata:/pgdata
+  # DSpace Solr container
   dspacesolr:
     container_name: dspacesolr
-    image: dspace/dspace-solr
+    # Uses official Solr image at https://hub.docker.com/_/solr/
+    image: solr:8.7
     networks:
       dspacenet:
     ports:
@@ -57,15 +62,27 @@ services:
       target: 8983
     stdin_open: true
     tty: true
+    working_dir: /var/solr/data
     volumes:
-    - solr_authority:/var/solr/data/authority/data
-    - solr_oai:/var/solr/data/oai/data
-    - solr_search:/var/solr/data/search/data
-    - solr_statistics:/var/solr/data/statistics/data
+    # Mount our local Solr core configs so that they are available as Solr configsets on container
+    - ./dspace/solr/authority:/opt/solr/server/solr/configsets/authority
+    - ./dspace/solr/oai:/opt/solr/server/solr/configsets/oai
+    - ./dspace/solr/search:/opt/solr/server/solr/configsets/search
+    - ./dspace/solr/statistics:/opt/solr/server/solr/configsets/statistics
+    # Keep Solr data directory between reboots
+    - solr_data:/var/solr/data
+    # Initialize all DSpace Solr cores using the mounted local configsets (see above), then start Solr
+    entrypoint:
+    - /bin/bash
+    - '-c'
+    - |
+      init-var-solr
+      precreate-core authority /opt/solr/server/solr/configsets/authority
+      precreate-core oai /opt/solr/server/solr/configsets/oai
+      precreate-core search /opt/solr/server/solr/configsets/search
+      precreate-core statistics /opt/solr/server/solr/configsets/statistics
+      exec solr -f
 volumes:
   assetstore:
   pgdata:
-  solr_authority:
-  solr_oai:
-  solr_search:
-  solr_statistics:
+  solr_data:

@@ -106,32 +106,6 @@ Admins to our DockerHub repo can publish with the following command.
 docker push dspace/dspace-postgres-pgcrypto:loadsql
 ```
 
-## dspace/src/main/docker/solr/Dockerfile
-
-This is a standalone Solr image containing DSpace Solr cores & schemas required by DSpace 7.
-
-**WARNING:** Rebuilding this image first **requires** rebuilding `dspace-7_x` (i.e. `Dockerfile` listed above),
-as this Solr image copies the latest DSpace-specific Solr schemas & settings from that other image.
-
-```
-# First, rebuild dspace-7_x to grab the latest Solr configs
-cd [src]
-docker build -t dspace/dspace:dspace-7_x -f Dockerfile .
-
-# Then, rebuild dspace-solr based on that build of DSpace 7.
-cd dspace/src/main/docker/solr
-docker build -t dspace/dspace-solr .
-```
-
-**This image is built manually.**  It should be rebuilt when Solr schemas change or as new releases of Solr are incorporated.
-
-This file was introduced for DSpace 7.
-
-Admins to our DockerHub repo can publish with the following command.
-```
-docker push dspace/dspace-solr
-```
-
 ## dspace/src/main/docker/dspace-shibboleth/Dockerfile
 
 This is a test / demo image which provides an Apache HTTPD proxy (in front of Tomcat)
