@@ -212,7 +212,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             List<Collection> collections = authorizeSolrService.findAdminAuthorizedCollection(context, query,
                 Math.toIntExact(pageable.getOffset()),
                 Math.toIntExact(pageable.getPageSize()));
-            int tot = authorizeSolrService.countAdminAuthorizedCollection(context, query);
+            Long tot = authorizeSolrService.countAdminAuthorizedCollection(context, query);
             return converter.toRestPage(collections, pageable, tot , utils.obtainProjection());
         } catch (SearchServiceException | SQLException e) {
             throw new RuntimeException(e.getMessage(), e);

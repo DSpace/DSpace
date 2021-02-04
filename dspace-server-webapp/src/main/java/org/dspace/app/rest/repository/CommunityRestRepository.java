@@ -216,7 +216,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
             List<Community> communities = authorizeSolrService.findAdminAuthorizedCommunity(context, query,
                 Math.toIntExact(pageable.getOffset()),
                 Math.toIntExact(pageable.getPageSize()));
-            int tot = authorizeSolrService.countAdminAuthorizedCommunity(context, query);
+            Long tot = authorizeSolrService.countAdminAuthorizedCommunity(context, query);
             return converter.toRestPage(communities, pageable, tot , utils.obtainProjection());
         } catch (SearchServiceException | SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
