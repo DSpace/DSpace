@@ -115,12 +115,12 @@ public class AuthorizeSolrServiceImpl implements AuthorizeSolrService {
      * @throws SearchServiceException
      */
     @Override
-    public int countAdminAuthorizedCommunity(Context context, String query)
+    public Long countAdminAuthorizedCommunity(Context context, String query)
         throws SearchServiceException, SQLException {
         query = formatCustomQuery(query);
         DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:Community",
             null, null);
-        return (int)discoverResult.getTotalSearchResults();
+        return discoverResult.getTotalSearchResults();
     }
 
     /**
@@ -160,12 +160,12 @@ public class AuthorizeSolrServiceImpl implements AuthorizeSolrService {
      * @throws SearchServiceException
      */
     @Override
-    public int countAdminAuthorizedCollection(Context context, String query)
+    public Long countAdminAuthorizedCollection(Context context, String query)
         throws SearchServiceException, SQLException {
         query = formatCustomQuery(query);
         DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:Collection",
             null, null);
-        return (int)discoverResult.getTotalSearchResults();
+        return discoverResult.getTotalSearchResults();
     }
 
     private boolean performCheck(Context context, String query) throws SQLException {

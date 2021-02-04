@@ -70,7 +70,7 @@ public interface AuthorizeSolrService {
      * @throws SearchServiceException
      * @throws SQLException
      */
-    int countAdminAuthorizedCommunity(Context context, String query)
+    Long countAdminAuthorizedCommunity(Context context, String query)
         throws SearchServiceException, SQLException;
 
     /**
@@ -96,6 +96,6 @@ public interface AuthorizeSolrService {
      * @throws SearchServiceException
      * @throws SQLException
      */
-    int countAdminAuthorizedCollection(Context context, String query)
+    Long countAdminAuthorizedCollection(Context context, String query)
         throws SearchServiceException, SQLException;
 }
