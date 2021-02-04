@@ -8,6 +8,7 @@
 package org.dspace.discovery.indexobject;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
@@ -100,9 +101,9 @@ public abstract class IndexFactoryImpl<T extends IndexableObject, S> implements 
                 Metadata tikaMetadata = new Metadata();
                 ParseContext tikaContext = new ParseContext();
 
-                // Use Apache Tika to parse the full text stream
-                try {
-                    tikaParser.parse(streams.getStream(), tikaHandler, tikaMetadata, tikaContext);
+                // Use Apache Tika to parse the full text stream(s)
+                try (InputStream fullTextStreams = streams.getStream()) {
+                    tikaParser.parse(fullTextStreams, tikaHandler, tikaMetadata, tikaContext);
                 } catch (SAXException saxe) {
                     // Check if this SAXException is just a notice that this file was longer than the character limit.
                     // Unfortunately there is not a unique, public exception type to catch here. This error is thrown
