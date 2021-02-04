@@ -9,6 +9,8 @@ package org.dspace.eperson.service;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
 import javax.mail.MessagingException;
 
 import org.dspace.authorize.AuthorizeException;
@@ -31,7 +33,7 @@ import org.dspace.eperson.EPerson;
  */
 public interface AccountService {
 
-    public void sendRegistrationInfo(Context context, String email)
+    public void sendRegistrationInfo(Context context, String email, List<UUID> groups)
         throws SQLException, IOException, MessagingException, AuthorizeException;
 
     public void sendForgotPasswordInfo(Context context, String email)
