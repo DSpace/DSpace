@@ -1,0 +1,87 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+package org.dspace.app.rest.security;
+
+import static org.dspace.app.rest.security.DSpaceRestPermission.DELETE;
+import static org.dspace.app.rest.security.DSpaceRestPermission.READ;
+import static org.dspace.app.rest.security.DSpaceRestPermission.WRITE;
+
+import java.io.Serializable;
+import java.util.UUID;
+
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.model.SuggestionRest;
+import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.content.service.ItemService;
+import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.services.RequestService;
+import org.dspace.services.model.Request;
+import org.dspace.util.UUIDUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Component;
+
+/**
+ *
+ * An authenticated user is allowed to view a suggestion for the data that his
+ * own. This {@link RestPermissionEvaluatorPlugin} implements that requirement.
+ *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ *
+ */
+@Component
+public class SuggestionRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
+
+    @Autowired
+    private RequestService requestService;
+
+    @Autowired
+    private ItemService itemService;
+
+    @Override
+    public boolean hasDSpacePermission(Authentication authentication, Serializable targetId, String targetType,
+            DSpaceRestPermission restPermission) {
+
+        if (!READ.equals(restPermission) && !WRITE.equals(restPermission) && !DELETE.equals(restPermission)) {
+            return false;
+        }
+
+        if (!StringUtils.equalsIgnoreCase(targetType, SuggestionRest.NAME)
+                && !StringUtils.startsWithIgnoreCase(targetType, SuggestionRest.NAME)) {
+            return false;
+        }
+
+        Request request = requestService.getCurrentRequest();
+        Context context = ContextUtil.obtainContext(request.getServletRequest());
+
+        EPerson currentUser = context.getCurrentUser();
+        if (currentUser == null) {
+            return false;
+        }
+
+        try {
+            String id = targetId.toString();
+            UUID uuid = null;
+            if (id.contains(":")) {
+                uuid = UUIDUtils.fromString(id.split(":", 3)[1]);
+            } else {
+                uuid = UUIDUtils.fromString(id);
+            }
+            if (uuid == null) {
+                return false;
+            }
+            //TODO check if this person item is linked to the current user
+        } catch (Exception ex) {
+            return false;
+        }
+
+        return false;
+    }
+
+}

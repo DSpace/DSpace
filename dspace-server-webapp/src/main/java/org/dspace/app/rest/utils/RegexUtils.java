@@ -29,7 +29,7 @@ public class RegexUtils {
      */
     public static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG = "/{id:^(?!^\\d+$)" +
         "(?!^[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}$)"
-        + "[\\w+\\-\\.:]+$+}";
+        + "[\\w+\\-\\.:!]+$+}";
 
     /**
      * Regular expression in the request mapping to accept number as identifier

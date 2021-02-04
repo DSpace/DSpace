@@ -26,9 +26,10 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
                             .andExpect(status().isOk())
                             .andExpect(jsonPath("$._embedded.externalsources", Matchers.hasItems(
                                 ExternalSourceMatcher.matchExternalSource("mock", "mock", false),
-                                ExternalSourceMatcher.matchExternalSource("orcid", "orcid", false)
+                                ExternalSourceMatcher.matchExternalSource("orcid", "orcid", false),
+                                ExternalSourceMatcher.matchExternalSource("suggestion", "suggestion", false)
                             )))
-                            .andExpect(jsonPath("$.page.totalElements", Matchers.is(2)));
+                            .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
     }
 
     @Test

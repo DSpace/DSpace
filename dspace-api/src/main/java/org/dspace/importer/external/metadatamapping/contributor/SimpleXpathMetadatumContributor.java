@@ -31,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Roeland Dillen (roeland at atmire dot com)
  */
 public class SimpleXpathMetadatumContributor implements MetadataContributor<OMElement> {
-    private MetadataFieldConfig field;
+    protected MetadataFieldConfig field;
 
     private static final Logger log = LoggerFactory.getLogger(SimpleXpathMetadatumContributor.class);
 
@@ -44,7 +44,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
         return prefixToNamespaceMapping;
     }
 
-    private MetadataFieldMapping<OMElement, MetadataContributor<OMElement>> metadataFieldMapping;
+    protected MetadataFieldMapping<OMElement, MetadataContributor<OMElement>> metadataFieldMapping;
 
     /**
      * Return metadataFieldMapping
@@ -76,7 +76,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
         this.prefixToNamespaceMapping = prefixToNamespaceMapping;
     }
 
-    private Map<String, String> prefixToNamespaceMapping;
+    protected Map<String, String> prefixToNamespaceMapping;
 
     /**
      * Initialize SimpleXpathMetadatumContributor with a query, prefixToNamespaceMapping and MetadataFieldConfig
@@ -100,7 +100,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
 
     }
 
-    private String query;
+    protected String query;
 
     /**
      * Return the MetadataFieldConfig used while retrieving MetadatumDTO
