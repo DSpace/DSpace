@@ -38,6 +38,10 @@ public class DiscoverResultConverter {
 
     @Autowired
     private List<IndexableObjectConverter> converters;
+
+    @Autowired
+    protected ConverterService converter;
+
     @Autowired
     private DiscoverFacetsConverter facetConverter;
     @Autowired
@@ -93,12 +97,7 @@ public class DiscoverResultConverter {
 
     private RestAddressableModel convertDSpaceObject(final IndexableObject indexableObject,
                                                      final Projection projection) {
-        for (IndexableObjectConverter<Object, RestAddressableModel> converter : converters) {
-            if (converter.supportsModel(indexableObject)) {
-                return converter.convert(indexableObject.getIndexedObject(), projection);
-            }
-        }
-        return null;
+        return converter.toRest(indexableObject.getIndexedObject(), projection);
     }
 
     private void setRequestInformation(final Context context, final String query, final List<String> dsoTypes,
