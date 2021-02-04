@@ -1946,7 +1946,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$.type", is("discover")))
                 //The page object needs to look like this
                 .andExpect(jsonPath("$._embedded.searchResult.page", is(
-                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 6)
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 5)
                 )))
                 //These are the items that aren't set to private
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItems(
