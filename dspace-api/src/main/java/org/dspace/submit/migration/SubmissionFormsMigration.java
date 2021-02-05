@@ -51,8 +51,10 @@ public class SubmissionFormsMigration extends DSpaceRunnable<SubmissionFormsMigr
     private static final String PATH_XSL_ITEM_SUBMISSION =
         PATH_OUT_CONFIG + File.separator + "migration" + File.separator + "item-submissions.xsl";
 
-    private static final String PATH_OUT_INPUT_FORMS = PATH_OUT_CONFIG + File.separator + "submission-forms.xml";
-    private static final String PATH_OUT_ITEM_SUBMISSION = PATH_OUT_CONFIG + File.separator + "item-submission.xml";
+    private static final String PATH_OUT_INPUT_FORMS =
+        PATH_OUT_CONFIG + File.separator + "submission-forms.xml.migrated";
+    private static final String PATH_OUT_ITEM_SUBMISSION =
+        PATH_OUT_CONFIG + File.separator + "item-submission.xml.migrated";
 
     private static final String NAME_DTD_INPUT_FORMS = "input-forms.dtd";
     private static final String NAME_DTD_ITEM_SUBMISSION = "item-submission.dtd";
@@ -98,7 +100,7 @@ public class SubmissionFormsMigration extends DSpaceRunnable<SubmissionFormsMigr
         Source xsltSource = new StreamSource(new File(xsltFilePath));
         Result result = new StreamResult(new File(outputPath));
 
-        // create an instance of TransformerFactory
+        // Create an instance of TransformerFactory
         TransformerFactory transformerFactory = TransformerFactory.newInstance(
             TRANSFORMER_FACTORY_CLASS, null);
 
@@ -128,16 +130,23 @@ public class SubmissionFormsMigration extends DSpaceRunnable<SubmissionFormsMigr
         if (commandLine.hasOption('f')) {
             inputFormsFilePath = commandLine.getOptionValue('f');
             checkIfValidXMLFile(inputFormsFilePath);
+            inputFormsFilePath = getAbsolutePath(inputFormsFilePath);
         }
         if (commandLine.hasOption('s')) {
             itemSubmissionsFilePath = commandLine.getOptionValue('s');
             checkIfValidXMLFile(itemSubmissionsFilePath);
+            itemSubmissionsFilePath = getAbsolutePath(itemSubmissionsFilePath);
         }
         if (!commandLine.hasOption('s') || !commandLine.hasOption('f')) {
             this.throwParseException("Please fill in both -f <source-input-forms-path> and -s " +
                                      "<source-item-submissions-path>");
         }
         createDTDFileDummiesIfNotPresent();
+    }
+
+    private String getAbsolutePath(String relativePath) {
+        File file = new File(relativePath);
+        return file.getAbsolutePath();
     }
 
     private void createDTDFileDummiesIfNotPresent() {

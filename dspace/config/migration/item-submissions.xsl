@@ -1,4 +1,6 @@
 <?xml version="1.0"?>
+<!-- This XSLT is used by `./dspace submission-forms-migrate` to transform a DSpace 6.x (or below) item-submission.xml
+configuration file into a DSpace 7.x (or above) item-submission.xml -->
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsm="http://www.w3.org/1999/XSL/Transform">
   <xsl:output method="xml" doctype-system="item-submission.dtd" indent="yes"/>
