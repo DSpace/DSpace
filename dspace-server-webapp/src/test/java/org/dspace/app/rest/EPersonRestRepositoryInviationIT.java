@@ -12,6 +12,7 @@ import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -35,6 +36,7 @@ import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.GroupBuilder;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.RegistrationData;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.RegistrationDataService;
@@ -121,10 +123,173 @@ public class EPersonRestRepositoryInviationIT extends AbstractControllerIntegrat
             EPerson createdEPerson = ePersonService.find(context, UUID.fromString(epersonUuid));
             group = context.reloadEntity(group);
             group2 = context.reloadEntity(group2);
-            boolean f = groupService.isMember(context, createdEPerson, group);
-            boolean s = groupService.isMember(context, createdEPerson, group2);
-            assertTrue(f);
-            assertTrue(s);
+            assertTrue(groupService.isMember(context, createdEPerson, group));
+            assertTrue(groupService.isMember(context, createdEPerson, group2));
+            assertTrue(ePersonService.checkPassword(context, createdEPerson, "somePassword"));
+            assertNull(registrationDataService.findByToken(context, newRegisterToken));
+
+        } finally {
+            context.turnOffAuthorisationSystem();
+            registrationDataService.deleteByToken(context, newRegisterToken);
+            context.restoreAuthSystemState();
+            EPersonBuilder.deleteEPerson(idRef.get());
+        }
+    }
+
+    @Test
+    public void simpleUserInvitedEPersonToGroupsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Group group = GroupBuilder.createGroup(context)
+                                  .withName("Test group 1").build();
+
+        Group group2 = GroupBuilder.createGroup(context)
+                                   .withName("Test group 2").build();
+        context.restoreAuthSystemState();
+        ObjectMapper mapper = new ObjectMapper();
+
+        String newRegisterEmail = "new-register@fake-email.com";
+
+        List<UUID> groups = new ArrayList<UUID>();
+        groups.add(group.getID());
+        groups.add(group2.getID());
+
+        RegistrationRest registrationRest = new RegistrationRest();
+        registrationRest.setEmail(newRegisterEmail);
+        registrationRest.setGroups(groups);
+
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEPerson).perform(post("/api/eperson/registrations")
+                               .contentType(MediaType.APPLICATION_JSON)
+                               .content(mapper.writeValueAsBytes(registrationRest)))
+                               .andExpect(status().isForbidden());
+
+    }
+
+    @Test
+    public void anonymousUserInvitedEPersonToGroupsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Group group = GroupBuilder.createGroup(context)
+                                  .withName("Test group 1").build();
+
+        Group group2 = GroupBuilder.createGroup(context)
+                                   .withName("Test group 2").build();
+        context.restoreAuthSystemState();
+        ObjectMapper mapper = new ObjectMapper();
+
+        String newRegisterEmail = "new-register@fake-email.com";
+
+        List<UUID> groups = new ArrayList<UUID>();
+        groups.add(group.getID());
+        groups.add(group2.getID());
+
+        RegistrationRest registrationRest = new RegistrationRest();
+        registrationRest.setEmail(newRegisterEmail);
+        registrationRest.setGroups(groups);
+
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEPerson).perform(post("/api/eperson/registrations")
+                               .contentType(MediaType.APPLICATION_JSON)
+                               .content(mapper.writeValueAsBytes(registrationRest)))
+                               .andExpect(status().isForbidden());
+
+    }
+
+    @Test
+    public void adminInvitedEPersonToGroupNotExistTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Group group = GroupBuilder.createGroup(context)
+                                  .withName("Test group 1").build();
+
+        context.restoreAuthSystemState();
+        ObjectMapper mapper = new ObjectMapper();
+
+        String newRegisterEmail = "new-register@fake-email.com";
+
+        List<UUID> groups = new ArrayList<UUID>();
+        groups.add(group.getID());
+        groups.add(UUID.randomUUID());
+
+        RegistrationRest registrationRest = new RegistrationRest();
+        registrationRest.setEmail(newRegisterEmail);
+        registrationRest.setGroups(groups);
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(post("/api/eperson/registrations")
+                               .contentType(MediaType.APPLICATION_JSON)
+                               .content(mapper.writeValueAsBytes(registrationRest)))
+                               .andExpect(status().isUnprocessableEntity());
+
+    }
+
+    @Test
+    public void test() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Group group = GroupBuilder.createGroup(context)
+                                  .withName("Test group 1").build();
+
+        Group group2 = GroupBuilder.createGroup(context)
+                                   .withName("Test group 2").build();
+        context.restoreAuthSystemState();
+        ObjectMapper mapper = new ObjectMapper();
+
+        String newRegisterEmail = "new-register@fake-email.com";
+
+        List<UUID> groups = new ArrayList<UUID>();
+        groups.add(group.getID());
+        groups.add(group2.getID());
+
+        RegistrationRest registrationRest = new RegistrationRest();
+        registrationRest.setEmail(newRegisterEmail);
+        registrationRest.setGroups(groups);
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(post("/api/eperson/registrations")
+                             .contentType(MediaType.APPLICATION_JSON)
+                             .content(mapper.writeValueAsBytes(registrationRest)))
+                             .andExpect(status().isCreated());
+
+        String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
+        RegistrationData registrationData = registrationDataService.findByEmail(context, newRegisterEmail);
+        registrationData.getGroups().remove(group);
+
+        EPersonRest ePersonRest = new EPersonRest();
+        MetadataRest metadataRest = new MetadataRest();
+        ePersonRest.setEmail(newRegisterEmail);
+        ePersonRest.setCanLogIn(true);
+        MetadataValueRest surname = new MetadataValueRest();
+        surname.setValue("Doe");
+        metadataRest.put("eperson.lastname", surname);
+        MetadataValueRest firstname = new MetadataValueRest();
+        firstname.setValue("John");
+        metadataRest.put("eperson.firstname", firstname);
+        ePersonRest.setMetadata(metadataRest);
+        ePersonRest.setPassword("somePassword");
+        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
+
+        mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
+        try {
+            getClient().perform(post("/api/eperson/epersons")
+                       .param("token", newRegisterToken)
+                       .content(mapper.writeValueAsBytes(ePersonRest))
+                       .contentType(MediaType.APPLICATION_JSON))
+                       .andExpect(status().isCreated())
+                       .andExpect(jsonPath("$", Matchers.allOf(
+                               hasJsonPath("$.uuid", not(empty())),
+                               hasJsonPath("$.email", is(newRegisterEmail)),
+                               hasJsonPath("$.type", is("eperson")),
+                               hasJsonPath("$._links.self.href", not(empty())),
+                               hasJsonPath("$.metadata", Matchers.allOf(
+                                           matchMetadata("eperson.firstname", "John"),
+                                           matchMetadata("eperson.lastname", "Doe")
+                                           ))))).andDo(result -> idRef
+                       .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
+
+            String epersonUuid = String.valueOf(idRef.get());
+            EPerson createdEPerson = ePersonService.find(context, UUID.fromString(epersonUuid));
+            group = context.reloadEntity(group);
+            group2 = context.reloadEntity(group2);
+            assertFalse(groupService.isMember(context, createdEPerson, group));
+            assertTrue(groupService.isMember(context, createdEPerson, group2));
             assertTrue(ePersonService.checkPassword(context, createdEPerson, "somePassword"));
             assertNull(registrationDataService.findByToken(context, newRegisterToken));
 
