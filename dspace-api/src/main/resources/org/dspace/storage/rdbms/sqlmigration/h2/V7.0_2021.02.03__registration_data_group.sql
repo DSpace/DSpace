@@ -20,5 +20,5 @@
 CREATE TABLE RegistrationData2Group
 (
   registrationdata_id INTEGER REFERENCES RegistrationData(registrationdata_id),
-  group_id UUID REFERENCES epersongroup (uuid)
+  group_id UUID REFERENCES epersongroup (uuid) ON DELETE CASCADE
 );

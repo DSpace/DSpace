@@ -36,7 +36,6 @@ import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.GroupBuilder;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.eperson.RegistrationData;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.RegistrationDataService;
@@ -222,7 +221,7 @@ public class EPersonRestRepositoryInviationIT extends AbstractControllerIntegrat
     }
 
     @Test
-    public void test() throws Exception {
+    public void removeOneGroupTest() throws Exception {
         context.turnOffAuthorisationSystem();
         Group group = GroupBuilder.createGroup(context)
                                   .withName("Test group 1").build();
@@ -249,8 +248,8 @@ public class EPersonRestRepositoryInviationIT extends AbstractControllerIntegrat
                              .andExpect(status().isCreated());
 
         String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
-        RegistrationData registrationData = registrationDataService.findByEmail(context, newRegisterEmail);
-        registrationData.getGroups().remove(group);
+
+        groupService.delete(context, group);
 
         EPersonRest ePersonRest = new EPersonRest();
         MetadataRest metadataRest = new MetadataRest();
