@@ -27,6 +27,7 @@ import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.indexobject.IndexableCollection;
 import org.dspace.discovery.indexobject.IndexableCommunity;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -40,6 +41,8 @@ public class AuthorizeSolrServiceImpl implements AuthorizeSolrService {
     private SearchService searchService;
     @Autowired
     private AuthorizeService authorizeService;
+    @Autowired
+    private GroupService groupService;
 
     protected AuthorizeSolrServiceImpl() {
 
@@ -188,14 +191,12 @@ public class AuthorizeSolrServiceImpl implements AuthorizeSolrService {
 
     private DiscoverResult getDiscoverResult(Context context, String query, Integer offset, Integer limit)
         throws SearchServiceException, SQLException {
-        StringBuilder groupQuery = new StringBuilder();
-        List<Group> groups = context.getCurrentUser().getGroups();
-        addGroupToQuery(groupQuery, groups);
+        String groupQuery = getGroupToQuery(groupService.allMemberGroups(context, context.getCurrentUser()));
 
         DiscoverQuery discoverQuery = new DiscoverQuery();
         if (!authorizeService.isAdmin(context)) {
             query = query + " AND (" +
-                "admin:e" + context.getCurrentUser().getID() + groupQuery.toString() + ")";
+                "admin:e" + context.getCurrentUser().getID() + groupQuery + ")";
         }
         discoverQuery.setQuery(query);
         if (offset != null) {
@@ -209,17 +210,17 @@ public class AuthorizeSolrServiceImpl implements AuthorizeSolrService {
         return searchService.search(context, discoverQuery);
     }
 
-    private void addGroupToQuery(StringBuilder groupQuery, List<Group> groups) {
-        if (groups == null) {
-            return;
+    private String getGroupToQuery(List<Group> groups) {
+        StringBuilder groupQuery = new StringBuilder();
+
+        if (groups != null) {
+            for (Group group: groups) {
+                groupQuery.append(" OR admin:g");
+                groupQuery.append(group.getID());
+            }
         }
 
-        for (Group group: groups) {
-            groupQuery.append(" OR admin:g");
-            groupQuery.append(group.getID());
-
-            addGroupToQuery(groupQuery, group.getParentGroups());
-        }
+        return groupQuery.toString();
     }
 
     private String formatCustomQuery(String query) {
