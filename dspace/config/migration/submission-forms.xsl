@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-
+<!-- This XSLT is used by `./dspace submission-forms-migrate` to transform a DSpace 6.x (or below) input-forms.xml
+configuration file into a DSpace 7.x (or above) submission-forms.xml -->
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <xsl:output method="xml" doctype-system="submission-forms.dtd"/>
