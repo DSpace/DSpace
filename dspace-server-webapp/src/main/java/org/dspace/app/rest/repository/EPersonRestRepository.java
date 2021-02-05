@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
@@ -101,17 +100,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         // If a token is available, we'll swap to the execution that is token based
         if (StringUtils.isNotBlank(token)) {
             try {
-                RegistrationData rd = registrationDataService.findByEmail(context, epersonRest.getEmail());
-                if (Objects.nonNull(rd)) {
-                    List<Group> groups = rd.getGroups();
-                    epersonRest = createAndReturn(context, epersonRest, token);
-                    if (Objects.nonNull(epersonRest)) {
-                        addEPersonToGroups(context, es.findByEmail(context, epersonRest.getEmail()), groups);
-                    }
-                } else {
-                    epersonRest = createAndReturn(context, epersonRest, token);
-                }
-                return epersonRest;
+                return createAndReturn(context, epersonRest, token);
             } catch (SQLException e) {
                 log.error("Something went wrong in the creation of an EPerson with token: " + token, e);
                 throw new RuntimeException("Something went wrong in the creation of an EPerson with token: " + token);
@@ -123,11 +112,9 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     }
 
     private void addEPersonToGroups(Context context, EPerson eperson, List<Group> groups) {
-        if (Objects.nonNull(eperson)) {
-            if (CollectionUtils.isNotEmpty(groups)) {
-                for (Group group : groups) {
-                    groupService.addMember(context, group, eperson);
-                }
+        if (CollectionUtils.isNotEmpty(groups)) {
+            for (Group group : groups) {
+                groupService.addMember(context, group, eperson);
             }
         }
     }
@@ -201,6 +188,8 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         // We'll turn off authorisation system because this call isn't admin based as it's token based
         context.turnOffAuthorisationSystem();
         EPerson ePerson = createEPersonFromRestObject(context, epersonRest);
+        List<Group> groups = registrationData.getGroups();
+        addEPersonToGroups(context, ePerson, groups);
         context.restoreAuthSystemState();
         // Restoring authorisation state right after the creation call
         accountService.deleteToken(context, token);

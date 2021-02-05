@@ -15,7 +15,6 @@ import java.util.UUID;
 import javax.mail.MessagingException;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.ForbiddenException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -101,7 +100,7 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
                 if (Objects.isNull(context.getCurrentUser())
                     || (!authorizeService.isAdmin(context)
                         & !hasPermission(context, registrationRest.getGroups()))) {
-                    throw new ForbiddenException("");
+                    throw new AccessDeniedException("");
                 }
             } catch (SQLException e) {
                 log.error(e.getMessage(), e);
@@ -147,6 +146,8 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
                 if (!authorizeService.isAdmin(context, obj)) {
                     return false;
                 }
+            } else {
+                throw new UnprocessableEntityException("Group uuid " + groupUuid.toString() + " not valid!");
             }
         }
         return true;
