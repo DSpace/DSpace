@@ -336,7 +336,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 } else {
                     dns = configurationService.getProperty("anonymize_statistics.dns_mask", "anonymized");
                 }
-                doc1.addField("dns", dns.toLowerCase());
+                doc1.addField("dns", dns.toLowerCase(Locale.ROOT));
             } catch (UnknownHostException e) {
                 log.info("Failed DNS Lookup for IP:  {}", ip);
                 log.debug(e.getMessage(), e);
@@ -422,7 +422,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             } else {
                 dns = configurationService.getProperty("anonymize_statistics.dns_mask", "anonymized");
             }
-            doc1.addField("dns", dns.toLowerCase());
+            doc1.addField("dns", dns.toLowerCase(Locale.ROOT));
         } catch (UnknownHostException e) {
             log.info("Failed DNS Lookup for IP:  {}", ip);
             log.debug(e.getMessage(), e);
