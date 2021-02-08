@@ -413,6 +413,7 @@
                         <exclude>**/readme*</exclude>
                         <exclude>**/.gitignore</exclude>
                         <exclude>**/*.cfg</exclude>
+                        <exclude>**/*.conf</exclude>
                     </excludes>
                     <mapping>
                         <!-- Custom DSpace file extensions which are not recognized by license-maven-plugin:
@@ -1245,7 +1246,7 @@
             <dependency>
                 <groupId>org.apache.ant</groupId>
                 <artifactId>ant</artifactId>
-                <version>1.9.15</version>
+                <version>1.10.9</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.jena</groupId>

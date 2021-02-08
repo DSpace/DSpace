@@ -60,6 +60,7 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
     private XMLtoBio converter;
 
     public static final String ORCID_ID_SYNTAX = "\\d{4}-\\d{4}-\\d{4}-(\\d{3}X|\\d{4})";
+    private static final int MAX_INDEX = 10000;
 
     @Override
     public String getSourceIdentifier() {
@@ -79,8 +80,8 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
         if (StringUtils.isNotBlank(clientSecret) && StringUtils.isNotBlank(clientId)
             && StringUtils.isNotBlank(OAUTHUrl)) {
             String authenticationParameters = "?client_id=" + clientId +
-                "&client_secret=" + clientSecret +
-                "&scope=/read-public&grant_type=client_credentials";
+                    "&client_secret=" + clientSecret +
+                    "&scope=/read-public&grant_type=client_credentials";
             HttpPost httpPost = new HttpPost(OAUTHUrl + authenticationParameters);
             httpPost.addHeader("Accept", "application/json");
             httpPost.addHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -118,33 +119,39 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
 
     protected ExternalDataObject convertToExternalDataObject(Person person) {
         ExternalDataObject externalDataObject = new ExternalDataObject(sourceIdentifier);
-        String lastName = "";
-        String firstName = "";
-        if (person.getName().getFamilyName() != null) {
-            lastName = person.getName().getFamilyName().getContent();
-            externalDataObject.addMetadata(new MetadataValueDTO("person", "familyName", null, null,
-                                                                lastName));
-        }
-        if (person.getName().getGivenNames() != null) {
-            firstName = person.getName().getGivenNames().getContent();
-            externalDataObject.addMetadata(new MetadataValueDTO("person", "givenName", null, null,
-                                                                firstName));
+        if (person.getName() != null) {
+            String lastName = "";
+            String firstName = "";
+            if (person.getName().getFamilyName() != null) {
+                lastName = person.getName().getFamilyName().getContent();
+                externalDataObject.addMetadata(new MetadataValueDTO("person", "familyName", null, null,
+                                                                    lastName));
+            }
+            if (person.getName().getGivenNames() != null) {
+                firstName = person.getName().getGivenNames().getContent();
+                externalDataObject.addMetadata(new MetadataValueDTO("person", "givenName", null, null,
+                                                                    firstName));
 
-        }
-        externalDataObject.setId(person.getName().getPath());
-        externalDataObject
-            .addMetadata(new MetadataValueDTO("person", "identifier", "orcid", null, person.getName().getPath()));
-        externalDataObject
-            .addMetadata(new MetadataValueDTO("dc", "identifier", "uri", null, orcidUrl + person.getName().getPath()));
-        if (!StringUtils.isBlank(lastName) && !StringUtils.isBlank(firstName)) {
-            externalDataObject.setDisplayValue(lastName + ", " + firstName);
-            externalDataObject.setValue(lastName + ", " + firstName);
-        } else if (StringUtils.isBlank(firstName)) {
-            externalDataObject.setDisplayValue(lastName);
-            externalDataObject.setValue(lastName);
-        } else if (StringUtils.isBlank(lastName)) {
-            externalDataObject.setDisplayValue(firstName);
-            externalDataObject.setValue(firstName);
+            }
+            externalDataObject.setId(person.getName().getPath());
+            externalDataObject
+                    .addMetadata(
+                            new MetadataValueDTO("person", "identifier", "orcid", null, person.getName().getPath()));
+            externalDataObject
+                    .addMetadata(new MetadataValueDTO("dc", "identifier", "uri", null,
+                                                      orcidUrl + person.getName().getPath()));
+            if (!StringUtils.isBlank(lastName) && !StringUtils.isBlank(firstName)) {
+                externalDataObject.setDisplayValue(lastName + ", " + firstName);
+                externalDataObject.setValue(lastName + ", " + firstName);
+            } else if (StringUtils.isBlank(firstName)) {
+                externalDataObject.setDisplayValue(lastName);
+                externalDataObject.setValue(lastName);
+            } else if (StringUtils.isBlank(lastName)) {
+                externalDataObject.setDisplayValue(firstName);
+                externalDataObject.setValue(firstName);
+            }
+        } else if (person.getPath() != null ) {
+            externalDataObject.setId(StringUtils.substringBetween(person.getPath(),"/","/person"));
         }
         return externalDataObject;
     }
@@ -182,6 +189,9 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
     public List<ExternalDataObject> searchExternalDataObjects(String query, int start, int limit) {
         if (limit > 100) {
             throw new IllegalArgumentException("The maximum number of results to retrieve cannot exceed 100.");
+        }
+        if (start > MAX_INDEX) {
+            throw new IllegalArgumentException("The starting number of results to retrieve cannot exceed 10000.");
         }
 
         String searchPath = "search?q=" + URLEncoder.encode(query, StandardCharsets.UTF_8)
@@ -226,7 +236,7 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
                 + "&rows=" + 0;
         log.debug("queryBio searchPath=" + searchPath + " accessToken=" + accessToken);
         InputStream bioDocument = orcidRestConnector.get(searchPath, accessToken);
-        return converter.getNumberOfResultsFromXml(bioDocument);
+        return Math.min(converter.getNumberOfResultsFromXml(bioDocument), MAX_INDEX);
     }
 
 
