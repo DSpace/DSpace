@@ -13,6 +13,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
+import org.dspace.app.rest.model.query.RestSearchOperator;
 import org.dspace.app.rest.parameter.SearchFilter;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -29,13 +31,15 @@ public class SearchFilterResolver implements HandlerMethodArgumentResolver {
     public static final String SEARCH_FILTER_PREFIX = "f.";
     public static final String FILTER_OPERATOR_SEPARATOR = ",";
 
+    public static final List<String> ALLOWED_SEARCH_OPERATORS =
+        RestSearchOperator.getListOfAllowedSearchOperatorStrings();
+
     public boolean supportsParameter(final MethodParameter parameter) {
         return parameter.getParameterType().equals(SearchFilter.class) || isSearchFilterList(parameter);
     }
 
     public Object resolveArgument(final MethodParameter parameter, final ModelAndViewContainer mavContainer,
-                                  final NativeWebRequest webRequest, final WebDataBinderFactory binderFactory)
-        throws Exception {
+                                  final NativeWebRequest webRequest, final WebDataBinderFactory binderFactory) {
         List<SearchFilter> result = new LinkedList<>();
 
         Iterator<String> parameterNames = webRequest.getParameterNames();
@@ -48,7 +52,7 @@ public class SearchFilterResolver implements HandlerMethodArgumentResolver {
                 for (String value : webRequest.getParameterValues(parameterName)) {
                     String filterValue = StringUtils.substringBeforeLast(value, FILTER_OPERATOR_SEPARATOR);
                     String filterOperator = StringUtils.substringAfterLast(value, FILTER_OPERATOR_SEPARATOR);
-
+                    this.checkIfValidOperator(filterOperator);
                     result.add(new SearchFilter(filterName, filterOperator, filterValue));
                 }
             }
@@ -58,6 +62,19 @@ public class SearchFilterResolver implements HandlerMethodArgumentResolver {
             return result.isEmpty() ? null : result.get(0);
         } else {
             return result;
+        }
+    }
+
+    private void checkIfValidOperator(String filterOperator) {
+        if (StringUtils.isNotBlank(filterOperator)) {
+            if (!ALLOWED_SEARCH_OPERATORS.contains(filterOperator.trim())) {
+                throw new UnprocessableEntityException(
+                    "The operator can't be \"" + filterOperator + "\", must be the of one of: " +
+                    String.join(", ", ALLOWED_SEARCH_OPERATORS));
+            }
+        } else {
+            throw new UnprocessableEntityException(
+                "The operator can't be empty, must be the one of: " + String.join(", ", ALLOWED_SEARCH_OPERATORS));
         }
     }
 

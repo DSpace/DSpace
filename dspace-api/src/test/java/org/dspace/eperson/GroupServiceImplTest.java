@@ -21,9 +21,9 @@ import org.junit.Test;
  *
  * @author mwood
  */
-public class GroupServiceImplIT
+public class GroupServiceImplTest
     extends AbstractUnitTest {
-    public GroupServiceImplIT() {
+    public GroupServiceImplTest() {
         super();
     }
 

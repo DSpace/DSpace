@@ -20,7 +20,7 @@ import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ScriptService;
 import org.junit.Test;
 
-public class CurationTest extends AbstractIntegrationTestWithDatabase {
+public class CurationIT extends AbstractIntegrationTestWithDatabase {
 
     @Test(expected = ParseException.class)
     public void curationWithoutEPersonParameterTest() throws Exception {
