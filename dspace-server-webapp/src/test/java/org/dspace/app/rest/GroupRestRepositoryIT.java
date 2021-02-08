@@ -9,8 +9,11 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -27,11 +30,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.dspace.app.rest.exception.GroupNameNotProvidedException;
 import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.matcher.GroupMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
@@ -54,6 +59,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
+import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -194,10 +200,49 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
-                .perform(post("/api/eperson/groups")
-                        .content(mapper.writeValueAsBytes(groupRest))
-                        .contentType(contentType))
-                .andExpect(status().isUnprocessableEntity());
+            .perform(
+                post("/api/eperson/groups").content("").contentType(contentType)
+            )
+            .andExpect(status().isUnprocessableEntity())
+            .andExpect(status().reason(containsString("Unprocessable")));
+    }
+
+    @Test
+    public void createWithoutNameTest() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        GroupRest groupRest = new GroupRest(); // no name set
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        // enable Polish locale
+        configurationService.setProperty("webui.supported.locales", "en, pl");
+
+        // make request using Polish locale
+        getClient(authToken)
+            .perform(
+                post("/api/eperson/groups")
+                    .header("Accept-Language", "pl") // request Polish response
+                    .content(mapper.writeValueAsBytes(groupRest))
+                    .contentType(contentType)
+            )
+            .andExpect(status().isUnprocessableEntity())
+            .andExpect(status().reason(is(
+                I18nUtil.getMessage(GroupNameNotProvidedException.MESSAGE_KEY, new Locale("pl"))
+            )))
+            .andExpect(status().reason(startsWith("[PL]"))); // verify it did not fall back to default locale
+
+        // make request using default locale
+        getClient(authToken)
+            .perform(
+                post("/api/eperson/groups")
+                    .content(mapper.writeValueAsBytes(groupRest))
+                    .contentType(contentType)
+            )
+            .andExpect(status().isUnprocessableEntity())
+            .andExpect(status().reason(is(
+                I18nUtil.getMessage(GroupNameNotProvidedException.MESSAGE_KEY)
+            )))
+            .andExpect(status().reason(not(startsWith("[PL]"))));
     }
 
     @Test
