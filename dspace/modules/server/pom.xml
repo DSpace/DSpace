@@ -298,6 +298,12 @@ just adding new jar in the classloader</description>
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <version>${spring-security.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path-assert</artifactId>
             <version>${json-path.version}</version>
