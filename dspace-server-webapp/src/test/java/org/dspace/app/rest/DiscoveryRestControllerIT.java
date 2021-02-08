@@ -1924,7 +1924,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .build();
 
         Item publicItem3 = ItemBuilder.createItem(context, col2)
-                .withTitle("Public item 2")
+                .withTitle("Embargoed item 2")
                 .withIssueDate("2010-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test")
                 .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
@@ -1946,7 +1946,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$.type", is("discover")))
                 //The page object needs to look like this
                 .andExpect(jsonPath("$._embedded.searchResult.page", is(
-                        PageMatcher.pageEntry(0, 20)
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 5)
                 )))
                 //These are the items that aren't set to private
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItems(
@@ -1955,12 +1955,16 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                         //Collections are specified like this because they don't have any special properties
                         SearchResultMatcher.match(),
                         SearchResultMatcher.match(),
-                        SearchResultMatcher.matchOnItemName("item", "items", "Test"),
-                        SearchResultMatcher.matchOnItemName("item", "items", "Public item 2")
+                        SearchResultMatcher.matchOnItemName("item", "items", "Test")
                 )))
                 //This is a private item, this shouldn't show up in the result
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",
-                        Matchers.not(SearchResultMatcher.matchOnItemName("item", "items", "Test 2"))))
+                        Matchers.not(
+                                Matchers.anyOf(
+                                SearchResultMatcher.matchOnItemName("item", "items", "Test 2"),
+                                SearchResultMatcher.matchOnItemName("item", "items", "Embargoed item 2")
+                                )
+                        )))
                 //These facets have to show up in the embedded.facets section as well with the given hasMore
                 // property because we don't exceed their default limit for a hasMore true (the default is 10)
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
