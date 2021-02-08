@@ -254,10 +254,14 @@ public class GenerateSitemaps {
 
                 String url;
                 if (CollectionUtils.isNotEmpty(discoverResult.getIndexableObjects())
-                    && CollectionUtils.isNotEmpty(discoverResult.getSearchDocument(discoverResult.getIndexableObjects().get(0)).get(0).getSearchFieldValues("entityType"))
-                    && StringUtils.isNotBlank(discoverResult.getSearchDocument(discoverResult.getIndexableObjects().get(0)).get(0).getSearchFieldValues("entityType").get(0)))
-                {
-                    url = uiURLStem + "/entities/" + StringUtils.lowerCase(discoverResult.getSearchDocument(discoverResult.getIndexableObjects().get(0)).get(0).getSearchFieldValues("entityType").get(0)) + "/" + i.getID();
+                    && CollectionUtils.isNotEmpty(discoverResult.getSearchDocument(
+                        discoverResult.getIndexableObjects().get(0)).get(0).getSearchFieldValues("entityType"))
+                    && StringUtils.isNotBlank(discoverResult.getSearchDocument(
+                        discoverResult.getIndexableObjects().get(0)).get(0).getSearchFieldValues("entityType").get(0))
+                ) {
+                    url = uiURLStem + "/entities/" + StringUtils.lowerCase(discoverResult.getSearchDocument(
+                            discoverResult.getIndexableObjects().get(0))
+                        .get(0).getSearchFieldValues("entityType").get(0)) + "/" + i.getID();
                 } else {
                     url = uiURLStem + "/items/" + i.getID();
                 }
