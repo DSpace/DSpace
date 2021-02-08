@@ -142,7 +142,7 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport {
         return getMembers().contains(e);
     }
 
-    public List<Group> getParentGroups() {
+    List<Group> getParentGroups() {
         return parentGroups;
     }
 
