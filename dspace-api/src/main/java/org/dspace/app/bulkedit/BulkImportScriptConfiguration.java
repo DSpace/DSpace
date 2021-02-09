@@ -52,10 +52,6 @@ public class BulkImportScriptConfiguration<T extends BulkImport> extends ScriptC
             options.getOption("f").setType(InputStream.class);
             options.getOption("f").setRequired(true);
 
-            options.addOption("w", "workflow", false, "when adding new items, use collection workflow");
-            options.getOption("w").setType(boolean.class);
-            options.getOption("w").setRequired(false);
-
             options.addOption("e", "concludeOnError", false, "conclude the import at the first error");
             options.getOption("e").setType(boolean.class);
             options.getOption("e").setRequired(false);
