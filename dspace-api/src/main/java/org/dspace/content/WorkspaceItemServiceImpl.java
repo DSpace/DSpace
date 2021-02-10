@@ -225,19 +225,11 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     @Override
     public void deleteAll(Context context, WorkspaceItem workspaceItem)
         throws SQLException, AuthorizeException, IOException {
-        /*
-         * Authorisation is a special case. The submitter won't have REMOVE
-         * permission on the collection, so our policy is this: Only the
-         * original submitter or an administrator can delete a workspace item.
 
-         */
         Item item = workspaceItem.getItem();
-        if (!authorizeService.isAdmin(context)
-            && (item.getSubmitter() == null || (context.getCurrentUser() == null)
-                || (context.getCurrentUser().getID() != item.getSubmitter().getID()))) {
+        if (isNotAuthorizedToDelete(context, item)) {
             // Not an admit, not the submitter
-            throw new AuthorizeException("Must be an administrator or the "
-                                             + "original submitter to delete a workspace item");
+            throw new AuthorizeException("Must be an administrator or the submitter to delete a workspace item");
         }
 
         log.info(LogManager.getHeader(context, "delete_workspace_item",
@@ -326,6 +318,14 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
             authorizeService.addPolicy(context, item, actionId, submitters, ResourcePolicy.TYPE_SUBMISSION);
         }
 
+    }
+
+    private boolean isNotAuthorizedToDelete(Context context, Item item) throws SQLException {
+        EPerson submitter = item.getSubmitter();
+        EPerson currentUser = context.getCurrentUser();
+        return !authorizeService.isAdmin(context)
+            && (submitter == null || (currentUser == null) || (!submitter.getID().equals(currentUser.getID())))
+            && !authorizeService.authorizeActionBoolean(context, item, Constants.DELETE);
     }
 
 }

@@ -164,13 +164,13 @@ public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndex
                                             DSpaceServicesFactory
                                                 .getInstance()
                                                 .getConfigurationService()
-                                                .getPropertyAsType("discovery.browse.authority.ignore-prefered."
+                                                .getPropertyAsType("discovery.browse.authority.ignore-preferred."
                                                                        + bi.getName(),
                                                                    DSpaceServicesFactory
                                                                        .getInstance()
                                                                        .getConfigurationService()
                                                                        .getPropertyAsType(
-                                                                           "discovery.browse.authority.ignore-prefered",
+                                                                           "discovery.browse.authority.ignore-preferred",
                                                                            Boolean.FALSE),
                                                                    true);
                                         if (!ignorePrefered) {

@@ -367,12 +367,12 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                                 DSpaceServicesFactory
                                         .getInstance()
                                         .getConfigurationService()
-                                        .getPropertyAsType("discovery.index.authority.ignore-prefered." + field,
+                                        .getPropertyAsType("discovery.index.authority.ignore-preferred." + field,
                                                 DSpaceServicesFactory
                                                         .getInstance()
                                                         .getConfigurationService()
                                                         .getPropertyAsType(
-                                                                "discovery.index.authority.ignore-prefered",
+                                                                "discovery.index.authority.ignore-preferred",
                                                                 Boolean.FALSE),
                                                 true);
                         if (!ignorePrefered) {
