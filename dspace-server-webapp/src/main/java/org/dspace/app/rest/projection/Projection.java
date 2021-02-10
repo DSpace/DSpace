@@ -141,7 +141,10 @@ public interface Projection {
     /**
      * This method will return the {@link PageRequest} object for a specific given rel
      * @param rel   The rel for which the {@link PageRequest} object will be made
+     * @param resource the resource from which the embed may or may not be made.
+     * @param oldLinks    The previously traversed links
      * @return      The {@link PageRequest} object for the given rel
      */
-    PageRequest getPagingOptions(String rel);
+    PageRequest getPagingOptions(String rel, HALResource<? extends RestAddressableModel> resource,
+                                 Link... oldLinks);
 }

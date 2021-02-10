@@ -2885,6 +2885,246 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         .andExpect(jsonPath("$._embedded.bundles.page.totalElements", is(10)));
 }
 
+    @Test
+    public void findOneTestWithMultiLevelEmbedsWithNoPageSize() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Collection")
+                                                 .build();
+
+        Item item = ItemBuilder.createItem(context, collection).withTitle("Item").build();
+
+        Bundle bundle0 = BundleBuilder.createBundle(context, item).withName("Bundle 0").build();
+
+        String bitstreamContent = "ThisIsSomeDummyText";
+
+        Bitstream bitstream0;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream0 = BitstreamBuilder.createBitstream(context, bundle0, is)
+                                         .withName("Bitstream0")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+        Bitstream bitstream1;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, bundle0, is)
+                                         .withName("Bitstream1")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+        Bitstream bitstream2;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream2 = BitstreamBuilder.createBitstream(context, bundle0, is)
+                                         .withName("Bitstream2")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+        Bitstream bitstream3;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream3 = BitstreamBuilder.createBitstream(context, bundle0, is)
+                                         .withName("Bitstream3")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+        Bitstream bitstream4;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream4 = BitstreamBuilder.createBitstream(context, bundle0, is)
+                                         .withName("Bitstream4")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+        Bitstream bitstream5;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream5 = BitstreamBuilder.createBitstream(context, bundle0, is)
+                                         .withName("Bitstream5")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+        Bitstream bitstream6;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream6 = BitstreamBuilder.createBitstream(context, bundle0, is)
+                                         .withName("Bitstream6")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+        Bitstream bitstream7;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream7 = BitstreamBuilder.createBitstream(context, bundle0, is)
+                                         .withName("Bitstream7")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+        Bitstream bitstream8;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream8 = BitstreamBuilder.createBitstream(context, bundle0, is)
+                                         .withName("Bitstream8")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+        Bitstream bitstream9;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream9 = BitstreamBuilder.createBitstream(context, bundle0, is)
+                                         .withName("Bitstream9")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/items/" + item.getID())
+                                    .param("embed", "bundles/bitstreams"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
+                   .andExpect(jsonPath("$._embedded.bundles._embedded.bundles", Matchers.containsInAnyOrder(
+                           BundleMatcher.matchProperties(bundle0.getName(), bundle0.getID(), bundle0.getHandle(),
+                                                         bundle0.getType())
+                   )))
+                   .andExpect(jsonPath("$._embedded.bundles._embedded.bundles[0]._embedded.bitstreams" +
+                                               "._embedded.bitstreams",
+                                    Matchers.containsInAnyOrder(
+                                            BitstreamMatcher.matchProperties(bitstream0),
+                                            BitstreamMatcher.matchProperties(bitstream1),
+                                            BitstreamMatcher.matchProperties(bitstream2),
+                                            BitstreamMatcher.matchProperties(bitstream3),
+                                            BitstreamMatcher.matchProperties(bitstream4),
+                                            BitstreamMatcher.matchProperties(bitstream5),
+                                            BitstreamMatcher.matchProperties(bitstream6),
+                                            BitstreamMatcher.matchProperties(bitstream7),
+                                            BitstreamMatcher.matchProperties(bitstream8),
+                                            BitstreamMatcher.matchProperties(bitstream9)
+                                    )))
+                   .andExpect(
+                           jsonPath("$._links.self.href", Matchers.containsString("/api/core/items/" + item.getID())))
+                   .andExpect(jsonPath("$._embedded.bundles._embedded.bundles[0]." +
+                                               "_embedded.bitstreams.page.size", is(20)))
+                   .andExpect(jsonPath("$._embedded.bundles._embedded.bundles[0]" +
+                                               "._embedded.bitstreams.page.totalElements",
+                                       is(10)));
+    }
+
+    @Test
+    public void findOneTestWithMultiLevelEmbedsWithPageSize() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Collection")
+                                                 .build();
+
+        Item item = ItemBuilder.createItem(context, collection).withTitle("Item").build();
+
+        Bundle bundle0 = BundleBuilder.createBundle(context, item).withName("Bundle 0").build();
+
+        String bitstreamContent = "ThisIsSomeDummyText";
+
+        Bitstream bitstream0;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream0 = BitstreamBuilder.createBitstream(context, bundle0, is)
+                                         .withName("Bitstream0")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+        Bitstream bitstream1;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, bundle0, is)
+                                         .withName("Bitstream1")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+        Bitstream bitstream2;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream2 = BitstreamBuilder.createBitstream(context, bundle0, is)
+                                         .withName("Bitstream2")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+        Bitstream bitstream3;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream3 = BitstreamBuilder.createBitstream(context, bundle0, is)
+                                         .withName("Bitstream3")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+        Bitstream bitstream4;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream4 = BitstreamBuilder.createBitstream(context, bundle0, is)
+                                         .withName("Bitstream4")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+        Bitstream bitstream5;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream5 = BitstreamBuilder.createBitstream(context, bundle0, is)
+                                         .withName("Bitstream5")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+        Bitstream bitstream6;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream6 = BitstreamBuilder.createBitstream(context, bundle0, is)
+                                         .withName("Bitstream6")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+        Bitstream bitstream7;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream7 = BitstreamBuilder.createBitstream(context, bundle0, is)
+                                         .withName("Bitstream7")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+        Bitstream bitstream8;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream8 = BitstreamBuilder.createBitstream(context, bundle0, is)
+                                         .withName("Bitstream8")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+        Bitstream bitstream9;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream9 = BitstreamBuilder.createBitstream(context, bundle0, is)
+                                         .withName("Bitstream9")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/items/" + item.getID())
+                                    .param("embed", "bundles/bitstreams")
+                                    .param("embed.size", "bundles/bitstreams=5"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
+                   .andExpect(jsonPath("$._embedded.bundles._embedded.bundles", Matchers.containsInAnyOrder(
+                           BundleMatcher.matchProperties(bundle0.getName(), bundle0.getID(), bundle0.getHandle(),
+                                                         bundle0.getType())
+                   )))
+                   .andExpect(jsonPath("$._embedded.bundles._embedded.bundles[0]._embedded.bitstreams" +
+                                               "._embedded.bitstreams",
+                                    Matchers.containsInAnyOrder(
+                                            BitstreamMatcher.matchProperties(bitstream0),
+                                            BitstreamMatcher.matchProperties(bitstream1),
+                                            BitstreamMatcher.matchProperties(bitstream2),
+                                            BitstreamMatcher.matchProperties(bitstream3),
+                                            BitstreamMatcher.matchProperties(bitstream4)
+                                    )))
+                   .andExpect(
+                           jsonPath("$._links.self.href", Matchers.containsString("/api/core/items/" + item.getID())))
+                   .andExpect(jsonPath("$._embedded.bundles._embedded.bundles[0]" +
+                                               "._embedded.bitstreams.page.size", is(5)))
+                   .andExpect(jsonPath("$._embedded.bundles._embedded.bundles[0]" +
+                                               "._embedded.bitstreams.page.totalElements",
+                                       is(10)));
+    }
+
+
+
 
 
 }

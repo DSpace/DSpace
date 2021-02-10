@@ -48,7 +48,8 @@ public abstract class AbstractProjection implements Projection {
     }
 
     @Override
-    public PageRequest getPagingOptions(String rel) {
+    public PageRequest getPagingOptions(String rel, HALResource<? extends RestAddressableModel> resource,
+                                        Link... oldLinks) {
         return null;
     }
 
