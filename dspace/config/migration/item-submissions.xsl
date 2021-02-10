@@ -34,7 +34,7 @@ configuration file into a DSpace 7.x (or above) item-submission.xml -->
 
   <xsl:template name="transformSteps">
     <xsl:for-each select="/item-submission/step-definitions/step">
-      <step>
+      <step-definition>
         <xsl:attribute name="id">
           <xsl:value-of select="@id"/>
         </xsl:attribute>
@@ -62,14 +62,14 @@ configuration file into a DSpace 7.x (or above) item-submission.xml -->
             <scope visibilityOutside="read-only">submission</scope>
           </xsl:when>
         </xsl:choose>
-      </step>
+      </step-definition>
     </xsl:for-each>
   </xsl:template>
 
   <xsl:template name="addFormPageSteps">
     <xsl:for-each select="$inputForms/input-forms/form-definitions/form/page">
       <xsl:variable name="formName" select="../@name"/>
-      <step mandatory="true">
+      <step-definition mandatory="true">
         <xsl:attribute name="id">
           <xsl:value-of select="concat($formName,'page',@number)"/>
         </xsl:attribute>
@@ -78,22 +78,22 @@ configuration file into a DSpace 7.x (or above) item-submission.xml -->
         </heading>
         <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
         <type>submission-form</type>
-      </step>
+      </step-definition>
     </xsl:for-each>
   </xsl:template>
 
   <xsl:template name="addStaticSteps">
-    <step id="upload">
+    <step-definition id="upload">
       <heading>submit.progressbar.upload</heading>
       <processing-class>org.dspace.app.rest.submit.step.UploadStep</processing-class>
       <type>upload</type>
-    </step>
-    <step id="license">
+    </step-definition>
+    <step-definition id="license">
       <heading>submit.progressbar.license</heading>
       <processing-class>org.dspace.app.rest.submit.step.LicenseStep</processing-class>
       <type>license</type>
       <scope visibilityOutside="read-only">submission</scope>
-    </step>
+    </step-definition>
   </xsl:template>
 
   <xsl:template name="transformInputFormsToSubmissions">
