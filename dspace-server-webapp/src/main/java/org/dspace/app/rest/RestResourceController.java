@@ -1021,7 +1021,7 @@ public class RestResourceController implements InitializingBean {
 
     /**
      * Internal method to convert the parameters provided as a MultivalueMap as a string to use in the self-link.
-     * This function will exclude all "embed" parameters
+     * This function will exclude all "embed" parameters and parameters starting with "embed."
      * @param parameters
      * @return encoded uriString containing request parameters without embed parameter
      */
@@ -1030,7 +1030,7 @@ public class RestResourceController implements InitializingBean {
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance();
 
         for (String key : parameters.keySet()) {
-            if (!StringUtils.equals(key, "embed")) {
+            if (!StringUtils.equals(key, "embed") && !StringUtils.startsWith(key, "embed.")) {
                 uriComponentsBuilder.queryParam(key, parameters.get(key));
             }
         }
