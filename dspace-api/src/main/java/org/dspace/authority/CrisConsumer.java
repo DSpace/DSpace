@@ -273,7 +273,7 @@ public class CrisConsumer implements Consumer {
         AuthorityImportFiller filler = authorityImportFillerService.getAuthorityImportFillerByMetadata(metadata);
         if (filler != null && (!alreadyPresent || filler.allowsUpdate(context, metadata, relatedItem))) {
             filler.fillItem(context, metadata, relatedItem);
-        } else if (filler == null || (filler != null && !alreadyPresent)) {
+        } else if (filler == null && !alreadyPresent) {
             itemService.addMetadata(context, relatedItem, "dc", "title", null, null, metadata.getValue());
         }
 
