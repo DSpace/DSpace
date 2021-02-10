@@ -258,6 +258,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     }
 
     @SearchRestMethod(name = "findAdministered")
+    @PreAuthorize("isAuthenticated()")
     public Page<CollectionRest> findAdministered(@Parameter(value = "query") String query,
         Pageable pageable) throws SearchServiceException {
         try {
