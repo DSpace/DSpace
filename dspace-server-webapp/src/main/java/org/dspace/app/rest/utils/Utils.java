@@ -678,8 +678,8 @@ public class Utils {
             Method method = requireMethod(linkRepository.getClass(), linkRest.method());
             Object contentId = getContentIdForLinkMethod(resource.getContent(), method);
             try {
-                Object linkedObject = method
-                        .invoke(linkRepository, null, contentId, projection.getPagingOptions(rel), projection);
+                Object linkedObject = method.invoke(linkRepository, null, contentId,
+                                                    projection.getPagingOptions(rel, resource, oldLinks), projection);
                 resource.embedResource(rel, wrapForEmbedding(resource, linkedObject, link, oldLinks));
             } catch (InvocationTargetException e) {
                 // This will be thrown from the LinkRepository if a Resource has been requested that'll try to embed

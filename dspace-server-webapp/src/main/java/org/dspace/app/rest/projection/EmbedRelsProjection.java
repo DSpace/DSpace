@@ -93,10 +93,29 @@ public class EmbedRelsProjection extends AbstractProjection {
     }
 
     @Override
-    public PageRequest getPagingOptions(String rel) {
-        Integer size = embedSizes.get(rel);
+    public PageRequest getPagingOptions(String rel, HALResource<? extends RestAddressableModel> resource,
+                                        Link... oldLinks) {
+        Integer size = getPaginationSize(rel, resource, oldLinks);
         if (size != null && size > 0) {
             return PageRequest.of(0, size);
+        }
+        return null;
+    }
+
+    private Integer getPaginationSize(String rel, HALResource<? extends RestAddressableModel> resource,
+                                      Link... oldLinks) {
+        if (resource.getContent().getEmbedLevel() == 0 && embedSizes.containsKey(rel)) {
+            return embedSizes.get(rel);
+        }
+        StringBuilder fullName = new StringBuilder();
+        for (Link oldLink : oldLinks) {
+            fullName.append(oldLink.getRel().value()).append("/");
+        }
+        fullName.append(rel);
+
+        // If the full name matches, the link can be embedded (e.g. mappedItems/owningCollection on a collection page)
+        if (embedSizes.containsKey(fullName.toString())) {
+            return embedSizes.get(fullName.toString());
         }
         return null;
     }
