@@ -20,7 +20,7 @@ import org.springframework.hateoas.Link;
 /**
  * A projection for use in tests.
  */
-public class MockProjection implements Projection {
+public class MockProjection extends AbstractProjection {
 
     public static final String NAME = "mock";
 
