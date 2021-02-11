@@ -257,6 +257,24 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         }
     }
 
+    @SearchRestMethod(name = "findAdministered")
+    @PreAuthorize("isAuthenticated()")
+    public Page<CollectionRest> findAdministered(@Parameter(value = "query") String query,
+        Pageable pageable) throws SearchServiceException {
+        try {
+            Context context = obtainContext();
+
+            List<Collection> collections = cs.findCollectionsAdministered(query, context,
+                Math.toIntExact(pageable.getOffset()),
+                Math.toIntExact(pageable.getPageSize()));
+
+            int tot = cs.countCollectionsAdministered(query, context);
+            return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
     @Override
     @PreAuthorize("hasPermission(#id, 'COLLECTION', 'WRITE')")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID id,

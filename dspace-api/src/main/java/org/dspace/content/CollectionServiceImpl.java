@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -1060,6 +1061,50 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             }
         }
         return null;
+    }
+
+    @Override
+    public List<Collection> findCollectionsAdministered(String query, Context context, int offset, int limit)
+        throws SQLException, SearchServiceException {
+
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
+        discoverQuery.setStart(offset);
+        discoverQuery.setMaxResults(limit);
+
+        return retrieveCollectionsAdministered(context, discoverQuery, query).getIndexableObjects().stream()
+            .map(indexableObject -> ((IndexableCollection) indexableObject).getIndexedObject())
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public int countCollectionsAdministered(String query, Context context) throws SQLException, SearchServiceException {
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.setMaxResults(0);
+        discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
+        return (int) retrieveCollectionsAdministered(context, discoverQuery, query).getTotalSearchResults();
+    }
+
+    private DiscoverResult retrieveCollectionsAdministered(Context context, DiscoverQuery discoverQuery, String query)
+        throws SQLException, SearchServiceException {
+
+        if (!authorizeService.isAdmin(context)) {
+
+            String filterQuery = groupService.allMemberGroupsSet(context, context.getCurrentUser()).stream()
+                .map(group -> "g" + group.getID())
+                .collect(Collectors.joining(" OR ", "admin:(", ")"));
+
+            discoverQuery.addFilterQueries(filterQuery);
+        }
+
+        if (StringUtils.isNotBlank(query)) {
+            StringBuilder buildQuery = new StringBuilder();
+            String escapedQuery = ClientUtils.escapeQueryChars(query);
+            buildQuery.append(escapedQuery).append(" OR ").append(escapedQuery).append("*");
+            discoverQuery.setQuery(buildQuery.toString());
+        }
+
+        return searchService.search(context, discoverQuery);
     }
 
 }
