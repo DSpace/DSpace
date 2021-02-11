@@ -4640,42 +4640,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.sections.upload.files[0].accessConditions", empty()));
     }
 
-    // The REST endpoint doesn't seem to support uploading a bitstream with the access conditions
-    @Test
-    @Ignore
-    public void uploadBitstreamWithAccessConditionOpenAccess() throws Exception {
-        context.turnOffAuthorisationSystem();
-        Community community = CommunityBuilder.createCommunity(context).withName("Com").build();
-        Collection collection = CollectionBuilder.createCollection(context, community).withName("Col").build();
-        WorkspaceItem wItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection).build();
-        context.restoreAuthSystemState();
-
-        // prepare dummy bitstream
-        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
-        final MockMultipartFile pdfFile = new MockMultipartFile("file", "/local/path/simple-article.pdf",
-            "application/pdf", pdf);
-
-        // auth
-        String authToken = getAuthToken(eperson.getEmail(), password);
-
-        // upload file and verify response
-        getClient(authToken)
-            .perform(fileUpload("/api/submission/workspaceitems/" + wItem.getID())
-                .file(pdfFile)
-                // TODO: send access conditions with request
-            )
-            .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].name", is("openaccess")));
-
-        // verify that access conditions have been persisted
-        getClient(authToken)
-            .perform(get("/api/submission/workspaceitems/" + wItem.getID()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].name", is("openaccess")));
-    }
-
-    // TODO: all cases in 74236 that start with "upload a new bitstream"
-
     @Test
     public void patchBitstreamWithAccessConditionOpenAccess() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -4950,7 +4914,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
-    public void patchBitstreamWithAccessConditionLease() throws Exception {
+    public void patchBitstreamWithAccessConditionLeaseMissingDate() throws Exception {
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).withName("Com").build();
         Collection collection = CollectionBuilder.createCollection(context, community).withName("Col").build();
