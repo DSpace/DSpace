@@ -13,6 +13,7 @@ import static java.util.stream.StreamSupport.stream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Spliterators;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -95,5 +96,11 @@ public final class WorkbookUtils {
         Cell cell = row.createCell(column);
         cell.setCellValue(value);
         return cell;
+    }
+
+    public static List<String> getAllHeaders(Sheet sheet) {
+        return getCells(sheet.getRow(0))
+            .map(cell -> getCellValue(cell))
+            .collect(Collectors.toList());
     }
 }
