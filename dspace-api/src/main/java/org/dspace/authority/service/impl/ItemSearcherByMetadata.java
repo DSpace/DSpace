@@ -31,6 +31,7 @@ import org.dspace.discovery.DiscoverResultIterator;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
+import org.dspace.discovery.indexobject.IndexableInProgressSubmission;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.discovery.indexobject.IndexableWorkflowItem;
 import org.dspace.discovery.indexobject.IndexableWorkspaceItem;
@@ -95,7 +96,9 @@ public class ItemSearcherByMetadata implements ItemSearcher, ItemReferenceResolv
     private Item performSearchByMetadata(Context context, String searchParam) throws SearchServiceException {
         String query = metadata + ":" + searchParam;
         DiscoverQuery discoverQuery = new DiscoverQuery();
-        discoverQuery.setDSpaceObjectFilter(IndexableItem.TYPE);
+        discoverQuery.addDSpaceObjectFilter(IndexableItem.TYPE);
+        discoverQuery.addDSpaceObjectFilter(IndexableWorkspaceItem.TYPE);
+        discoverQuery.addDSpaceObjectFilter(IndexableWorkflowItem.TYPE);
         discoverQuery.addFilterQueries(query);
 
         DiscoverResult discoverResult = searchService.search(context, discoverQuery);
@@ -105,11 +108,12 @@ public class ItemSearcherByMetadata implements ItemSearcher, ItemReferenceResolv
             return null;
         }
 
-        if (indexableObjects.size() > 1) {
-            throw new SearchServiceException("Multiple item found for search param " + query);
+        IndexableObject indexableObject = indexableObjects.get(0);
+        if (indexableObject instanceof IndexableItem) {
+            return ((IndexableItem) indexableObject).getIndexedObject();
+        } else {
+            return ((IndexableInProgressSubmission) indexableObject).getIndexedObject().getItem();
         }
-
-        return (Item) indexableObjects.get(0).getIndexedObject();
     }
 
     private void resolveReferences(Context context, List<MetadataValue> metadataValues, Item item)
