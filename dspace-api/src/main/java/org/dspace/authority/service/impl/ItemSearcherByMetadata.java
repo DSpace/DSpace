@@ -7,11 +7,11 @@
  */
 package org.dspace.authority.service.impl;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -20,11 +20,13 @@ import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.authority.service.ItemReferenceResolver;
 import org.dspace.authority.service.ItemSearcher;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.DiscoverResultIterator;
@@ -126,10 +128,10 @@ public class ItemSearcherByMetadata implements ItemSearcher, ItemReferenceResolv
             .map(value -> AuthorityValueService.REFERENCE + authorityPrefix + "::" + value)
             .collect(Collectors.toList());
 
-        Iterator<Item> itemIterator = findItemsToResolve(context, authorities, relationshipType);
+        Iterator<ReloadableEntity<?>> entityIterator = findItemsToResolve(context, authorities, relationshipType);
 
-        while (itemIterator.hasNext()) {
-            Item itemWithReference = itemIterator.next();
+        while (entityIterator.hasNext()) {
+            Item itemWithReference = getNextItem(entityIterator.next());
 
             itemWithReference.getMetadata().stream()
                 .filter(metadataValue -> authorities.contains(metadataValue.getAuthority()))
@@ -139,7 +141,8 @@ public class ItemSearcherByMetadata implements ItemSearcher, ItemReferenceResolv
         }
     }
 
-    private Iterator<Item> findItemsToResolve(Context context, List<String> authorities, String relationshipType) {
+    private Iterator<ReloadableEntity<?>> findItemsToResolve(Context context, List<String> authorities,
+        String relationshipType) {
 
         String query = choiceAuthorityService.getAuthorityControlledFieldsByRelationshipType(relationshipType).stream()
             .map(field -> getFieldFilter(field, authorities))
@@ -155,8 +158,16 @@ public class ItemSearcherByMetadata implements ItemSearcher, ItemReferenceResolv
         discoverQuery.addDSpaceObjectFilter(IndexableWorkflowItem.TYPE);
         discoverQuery.addFilterQueries(query);
 
-        return new DiscoverResultIterator<Item, UUID>(context, discoverQuery, false);
+        return new DiscoverResultIterator<ReloadableEntity<?>, Serializable>(context, discoverQuery, false);
 
+    }
+
+    @SuppressWarnings("unchecked")
+    private Item getNextItem(ReloadableEntity<?> nextEntity) {
+        if (nextEntity instanceof Item) {
+            return (Item) nextEntity;
+        }
+        return ((InProgressSubmission<Integer>) nextEntity).getItem();
     }
 
     private String getFieldFilter(String field, List<String> authorities) {

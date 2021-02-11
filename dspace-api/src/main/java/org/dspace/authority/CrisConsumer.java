@@ -169,7 +169,6 @@ public class CrisConsumer implements Consumer {
 
             if (!relatedItemAlreadyPresent && isNotBlank(authority) && isReferenceAuthority(authority)) {
                 log.warn(NO_ITEM_FOUND_BY_AUTHORITY_MSG, metadata.getAuthority());
-                metadata.setConfidence(Choices.CF_UNSET);
                 continue;
             }
 
