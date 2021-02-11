@@ -109,9 +109,11 @@ HAL.Http.Client.prototype.get = function(url) {
                 headers: jqXHR.getAllResponseHeaders()
             });
         },
-        error: function() {
-            self.vent.trigger('fail-response', { jqxhr: jqxhr });
-            var contentTypeResponseHeader = jqxhr.getResponseHeader("content-type");
+        error: function(jqXHR, textStatus, errorThrown) {
+            // Also check for updated token during errors. E.g. when a login failure occurs, token may be changed.
+            checkForUpdatedCSRFTokenInResponse(jqXHR);
+            self.vent.trigger('fail-response', { jqxhr: jqXHR });
+            var contentTypeResponseHeader = jqXHR.getResponseHeader("content-type");
             if (contentTypeResponseHeader != undefined
                     && !contentTypeResponseHeader.startsWith("application/hal")
                     && !contentTypeResponseHeader.startsWith("application/json")) {
@@ -135,6 +137,11 @@ HAL.Http.Client.prototype.request = function(opts) {
     // Also check response to see if CSRF Token has been updated
     opts.success = function(resource, textStatus, jqXHR) {
         checkForUpdatedCSRFTokenInResponse(jqXHR);
+    };
+
+    // Also check error responses to see if CSRF Token has been updated
+    opts.error = function(jqXHR, textStatus, errorThrown) {
+         checkForUpdatedCSRFTokenInResponse(jqXHR);
     };
 
     self.vent.trigger('location-change', { url: opts.url });
