@@ -73,11 +73,8 @@
         var successHandler = function(result, status, xhr) {
             // look for Authorization header & save to a MyHalBrowserToken cookie
             document.cookie = "MyHalBrowserToken=" + xhr.getResponseHeader('Authorization').split(" ")[1];
-            // look for DSpace-XSRF-TOKEN header & save to a MyHalBrowserCsrfToken cookie (if found)
-            var csrfToken = xhr.getResponseHeader('DSPACE-XSRF-TOKEN');
-            if (csrfToken!=null) {
-                document.cookie = "MyHalBrowserCsrfToken=" + csrfToken;
-            }
+            // Check for an update to the CSRF Token & save to a MyHalBrowserCsrfToken cookie (if found)
+            checkForUpdatedCSRFTokenInResponse(xhr);
             toastr.success('You are now logged in. Please wait while we redirect you...', 'Login Successful');
             setTimeout(function() {
                 window.location.href = window.location.pathname.replace("login.html", "");
@@ -112,9 +109,13 @@
                }
           },
           success : successHandler,
-          error : function(result, status, xhr) {
-              if (result.status === 401) {
-                  var authenticate = result.getResponseHeader("WWW-Authenticate");
+          error : function(xhr, textStatus, errorThrown) {
+              // Check for an update to the CSRF Token & save to a MyHalBrowserCsrfToken cookie (if found)
+              checkForUpdatedCSRFTokenInResponse(xhr);
+
+              // If 401 Unauthorized, check WWW-Authenticate for authentication options
+              if (xhr.status === 401) {
+                  var authenticate = xhr.getResponseHeader("WWW-Authenticate");
                   var element = $('div.other-login-methods');
                   if(authenticate !== null) {
                       var realms = authenticate.match(/(\w+ (\w+=((".*?")|[^,]*)(, )?)*)/g);
@@ -144,6 +145,18 @@
 
         function capitalizeFirstLetter(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+       /**
+        * Check current response headers to see if the CSRF Token has changed. If a new value is found in headers,
+        * save the new value into our "MyHalBrowserCsrfToken" cookie.
+        **/
+        function checkForUpdatedCSRFTokenInResponse(jqxhr) {
+            // look for DSpace-XSRF-TOKEN header & save to our MyHalBrowserCsrfToken cookie (if found)
+            var updatedCsrfToken = jqxhr.getResponseHeader('DSPACE-XSRF-TOKEN');
+            if (updatedCsrfToken != null) {
+               document.cookie = "MyHalBrowserCsrfToken=" + updatedCsrfToken;
+            }
         }
 
        /**
