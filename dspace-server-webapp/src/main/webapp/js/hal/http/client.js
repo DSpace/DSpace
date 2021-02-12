@@ -92,7 +92,7 @@ function downloadFile(url) {
 HAL.Http.Client.prototype.get = function(url) {
     var self = this;
     this.vent.trigger('location-change', { url: url });
-    var jqxhr = $.ajax({
+    $.ajax({
         url: url,
         dataType: 'json',
         xhrFields: {
@@ -119,7 +119,8 @@ HAL.Http.Client.prototype.get = function(url) {
                     && !contentTypeResponseHeader.startsWith("application/json")) {
                 downloadFile(url);
             }
-        }});
+        }
+    });
 };
 
 HAL.Http.Client.prototype.request = function(opts) {
