@@ -5,9 +5,9 @@
     detailed in the LICENSE and NOTICE files at the root of the source
     tree and available online at
 
-	Developed by Paulo Graça <paulo.graca@fccn.pt>
-	
-	> https://www.openaire.eu/schema/repo-lit/4.0/openaire.xsd
+    Developed by Paulo Graça <paulo.graca@fccn.pt>
+    
+    > https://www.openaire.eu/schema/repo-lit/4.0/openaire.xsd
 
  -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -480,83 +480,95 @@
     <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_relatedidentifier.html -->
     <xsl:template match="doc:element[@name='dc']/doc:element[@name='identifier']" mode="datacite">
         <datacite:relatedIdentifiers>
-            <xsl:for-each select="./doc:element">
-                <xsl:apply-templates select="." mode="datacite_ids"/>
-            </xsl:for-each>
+            <xsl:apply-templates select="./doc:element" mode="datacite_ids"/>
         </datacite:relatedIdentifiers>
     </xsl:template>
         
    <!-- datacite:relatedIdentifier -->
    <!-- handle: dc.identifier.issn -->
     <xsl:template match="doc:element[@name='issn']" mode="datacite_ids">
-        <xsl:call-template name="relatedIdentifierTemplate">
-            <xsl:with-param name="value" select="./doc:element/doc:field[@name='value']/text()"/>
-            <xsl:with-param name="relatedIdentifierType" select="'ISSN'"/>
-            <xsl:with-param name="relationType" select="'IsPartOf'"/>
-        </xsl:call-template>
+        <xsl:for-each select=".//doc:field[@name='value']">
+            <xsl:call-template name="relatedIdentifierTemplate">
+                <xsl:with-param name="value" select="text()"/>
+                <xsl:with-param name="relatedIdentifierType" select="'ISSN'"/>
+                <xsl:with-param name="relationType" select="'IsPartOf'"/>
+            </xsl:call-template>
+        </xsl:for-each>
     </xsl:template>
 
-	<!-- handle: dc.identifier.ismn -->
+    <!-- handle: dc.identifier.ismn -->
     <xsl:template match="doc:element[@name='ismn']" mode="datacite_ids">
-        <xsl:call-template name="relatedIdentifierTemplate">
-            <xsl:with-param name="value"
-                select="concat('ISMN:',normalize-space(./doc:element/doc:field[@name='value']/text()))"/>
-            <xsl:with-param name="relatedIdentifierType" select="'URN'"/>
-            <xsl:with-param name="relationType" select="'IsPartOf'"/>
-        </xsl:call-template>
+        <xsl:for-each select=".//doc:field[@name='value']">
+            <xsl:call-template name="relatedIdentifierTemplate">
+                <xsl:with-param name="value"
+                    select="concat('ISMN:',normalize-space(text()))"/>
+                <xsl:with-param name="relatedIdentifierType" select="'URN'"/>
+                <xsl:with-param name="relationType" select="'IsPartOf'"/>
+            </xsl:call-template>
+        </xsl:for-each>
     </xsl:template>
 
-	<!-- handle: dc.identifier.govdoc -->
+    <!-- handle: dc.identifier.govdoc -->
     <xsl:template match="doc:element[@name='govdoc']" mode="datacite_ids">
-        <xsl:call-template name="relatedIdentifierTemplate">
-            <xsl:with-param name="value"
-                select="concat('govdoc:',normalize-space(./doc:element/doc:field[@name='value']/text()))"/>
-            <xsl:with-param name="relatedIdentifierType" select="'URN'"/>
-            <xsl:with-param name="relationType" select="'IsPartOf'"/>
-        </xsl:call-template>
+        <xsl:for-each select=".//doc:field[@name='value']">
+            <xsl:call-template name="relatedIdentifierTemplate">
+                <xsl:with-param name="value"
+                    select="concat('govdoc:',normalize-space(text()))"/>
+                <xsl:with-param name="relatedIdentifierType" select="'URN'"/>
+                <xsl:with-param name="relationType" select="'IsPartOf'"/>
+            </xsl:call-template>
+        </xsl:for-each>
     </xsl:template>
 
-	<!-- handle: dc.identifier.isbn -->
+    <!-- handle: dc.identifier.isbn -->
     <xsl:template match="doc:element[@name='isbn']" mode="datacite_ids">
-        <xsl:call-template name="relatedIdentifierTemplate">
-            <xsl:with-param name="value" select="./doc:element/doc:field[@name='value']/text()"/>
-            <xsl:with-param name="relatedIdentifierType" select="'ISBN'"/>
-            <xsl:with-param name="relationType" select="'IsPartOf'"/>
-        </xsl:call-template>
+        <xsl:for-each select=".//doc:field[@name='value']">
+            <xsl:call-template name="relatedIdentifierTemplate">
+                <xsl:with-param name="value" select="text()"/>
+                <xsl:with-param name="relatedIdentifierType" select="'ISBN'"/>
+                <xsl:with-param name="relationType" select="'IsPartOf'"/>
+            </xsl:call-template>
+        </xsl:for-each>
     </xsl:template>
 
-	<!-- handle: dc.identifier.sici -->
+    <!-- handle: dc.identifier.sici -->
     <xsl:template match="doc:element[@name='sici']" mode="datacite_ids">
-        <xsl:call-template name="relatedIdentifierTemplate">
-            <xsl:with-param name="value"
-                select="concat('sici:',normalize-space(./doc:element/doc:field[@name='value']/text()))"/>
-            <xsl:with-param name="relatedIdentifierType" select="'URN'"/>
-            <xsl:with-param name="relationType" select="'IsPartOf'"/>
-        </xsl:call-template>
+        <xsl:for-each select=".//doc:field[@name='value']">
+            <xsl:call-template name="relatedIdentifierTemplate">
+                <xsl:with-param name="value"
+                    select="concat('sici:',normalize-space(text()))"/>
+                <xsl:with-param name="relatedIdentifierType" select="'URN'"/>
+                <xsl:with-param name="relationType" select="'IsPartOf'"/>
+            </xsl:call-template>
+        </xsl:for-each>
     </xsl:template>
 
-	<!-- handle: dc.identifier.other -->
+    <!-- handle: dc.identifier.other -->
     <xsl:template match="doc:element[@name='other']" mode="datacite_ids">
-        <xsl:call-template name="relatedIdentifierTemplate">
-            <xsl:with-param name="value" select="./doc:element/doc:field[@name='value']/text()"/>
-            <xsl:with-param name="relatedIdentifierType" select="'URN'"/>
-            <xsl:with-param name="relationType" select="'IsPartOf'"/>
-        </xsl:call-template>
-    </xsl:template>	
+        <xsl:for-each select=".//doc:field[@name='value']">
+            <xsl:call-template name="relatedIdentifierTemplate">
+                <xsl:with-param name="value" select="text()"/>
+                <xsl:with-param name="relatedIdentifierType" select="'URN'"/>
+                <xsl:with-param name="relationType" select="'IsPartOf'"/>
+            </xsl:call-template>
+        </xsl:for-each>
+    </xsl:template>    
 
-	<!-- handle: dc.identifier.doi -->
+    <!-- handle: dc.identifier.doi -->
     <xsl:template match="doc:element[@name='doi']" mode="datacite_ids">
-        <xsl:call-template name="relatedIdentifierTemplate">
-            <xsl:with-param name="value" select="./doc:element/doc:field[@name='value']/text()"/>
-            <xsl:with-param name="relatedIdentifierType" select="'DOI'"/>
-            <xsl:with-param name="relationType" select="'IsPartOf'"/>
-        </xsl:call-template>
+        <xsl:for-each select=".//doc:field[@name='value']">
+            <xsl:call-template name="relatedIdentifierTemplate">
+                <xsl:with-param name="value" select="text()"/>
+                <xsl:with-param name="relatedIdentifierType" select="'DOI'"/>
+                <xsl:with-param name="relationType" select="'IsPartOf'"/>
+            </xsl:call-template>
+        </xsl:for-each>
     </xsl:template>
 
     <!-- handle: dc.identifier.* -->
     <xsl:template match="doc:element" mode="datacite_ids"/>
-	
-	<!-- template for all relatedIdentifier -->
+    
+    <!-- template for all relatedIdentifier -->
     <xsl:template name="relatedIdentifierTemplate">
         <xsl:param name="value"/>
         <xsl:param name="relatedIdentifierType"/>
