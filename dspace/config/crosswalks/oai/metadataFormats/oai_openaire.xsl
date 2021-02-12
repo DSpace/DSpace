@@ -525,8 +525,8 @@
 
    <!-- datacite:rights -->
    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_accessrights.html -->
-    <xsl:template match="doc:element[@name='dc']/doc:element[@name='rights']/doc:element" mode="datacite">
-        <xsl:variable name="rightsValue" select="doc:field[@name='value']/text()"/>
+    <xsl:template match="doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:field[@name='value']" mode="datacite">
+        <xsl:variable name="rightsValue" select="text()"/>
         <xsl:variable name="rightsURI">
             <xsl:call-template name="resolveRightsURI">
                 <xsl:with-param name="field" select="$rightsValue"/>
@@ -537,9 +537,9 @@
                 <xsl:with-param name="value" select="$rightsValue"/>
             </xsl:call-template>
         </xsl:variable>
-        <!-- this conditions ensures what is referred in issue: #3097 -->
-        <!-- it's a solution to ensure that only values ended with "access" -->
-        <!-- can be used as datacite:rights -->
+		<!-- We are checking to ensure that only values ending in "access" can be used as datacite:rights. 
+		This is a valid solution as we pre-normalize dc.rights values in openaire4.xsl to end in the term 
+		"access" according to COAR Controlled Vocabulary -->
         <xsl:if test="ends-with($lc_rightsValue,'access')">
             <datacite:rights>
                 <xsl:if test="$rightsURI">
