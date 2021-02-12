@@ -648,6 +648,11 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                 if (authority != null) {
                     doc.addField(field + "_authority", authority);
                 }
+
+                if (meta.getAuthority() != null) {
+                    doc.addField(field + "_allauthority", meta.getAuthority());
+                }
+
                 if (toProjectionFields.contains(field) || toProjectionFields
                         .contains(unqualifiedField + "." + Item.ANY)) {
                     StringBuffer variantsToStore = new StringBuffer();

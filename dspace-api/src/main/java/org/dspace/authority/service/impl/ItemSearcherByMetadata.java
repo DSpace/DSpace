@@ -172,7 +172,7 @@ public class ItemSearcherByMetadata implements ItemSearcher, ItemReferenceResolv
 
     private String getFieldFilter(String field, List<String> authorities) {
         return authorities.stream()
-            .map(authority -> field.replaceAll("_", ".") + "_authority: \"" + authority + "\"")
+            .map(authority -> field.replaceAll("_", ".") + "_allauthority: \"" + authority + "\"")
             .collect(Collectors.joining(" OR "));
     }
 
