@@ -52,7 +52,7 @@ public class RootConverterTest {
         assertEquals("dspaceurl", rootRest.getDspaceUI());
         assertEquals("dspacename", rootRest.getDspaceName());
         assertEquals(restUrl, rootRest.getDspaceServer());
-        assertEquals(Util.getSourceVersion(), rootRest.getDspaceVersion());
+        assertEquals("DSpace " + Util.getSourceVersion(), rootRest.getDspaceVersion());
     }
 
     @Test
