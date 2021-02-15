@@ -17,7 +17,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.security.RestAuthenticationService;
+import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.Context;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -26,6 +28,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.web.csrf.InvalidCsrfTokenException;
+import org.springframework.security.web.csrf.MissingCsrfTokenException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -35,13 +39,15 @@ import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 /**
- * This Controller advice will handle all exceptions thrown by the DSpace API module
+ * This Controller advice will handle default exceptions thrown by the DSpace REST API module.
+ * <P>
+ * Keep in mind some specialized handlers exist for specific message types, e.g. DSpaceAccessDeniedHandler
  *
  * @author Tom Desair (tom dot desair at atmire dot com)
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
- * 
+ * @see DSpaceAccessDeniedHandler
  */
 @ControllerAdvice
 public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionHandler {
@@ -58,6 +64,15 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         } else {
             sendErrorResponse(request, response, ex, "Authentication is required", HttpServletResponse.SC_UNAUTHORIZED);
         }
+    }
+
+    // NOTE: DSpaceAccessDeniedHandler does some preprocessing of InvalidCsrfTokenException errors (to reset the
+    // CSRF token) before sending error handling to this method.
+    @ExceptionHandler({InvalidCsrfTokenException.class, MissingCsrfTokenException.class})
+    protected void csrfTokenException(HttpServletRequest request, HttpServletResponse response, Exception ex)
+        throws IOException {
+        sendErrorResponse(request, response, ex, "Access is denied. Invalid CSRF token.",
+                          HttpServletResponse.SC_FORBIDDEN);
     }
 
     @ExceptionHandler({IllegalArgumentException.class, MultipartException.class})
@@ -96,6 +111,24 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         sendErrorResponse(request, response, null,
                 "Unprocessable or invalid entity",
                 HttpStatus.UNPROCESSABLE_ENTITY.value());
+    }
+
+    /**
+     * Add user-friendly error messages to the response body for selected errors.
+     * Since the error messages will be exposed to the API user, the exception classes are expected to implement
+     * {@link TranslatableException} such that the error messages can be translated.
+     */
+    @ExceptionHandler({
+        RESTEmptyWorkflowGroupException.class,
+        EPersonNameNotProvidedException.class,
+        GroupNameNotProvidedException.class,
+    })
+    protected void handleCustomUnprocessableEntityException(HttpServletRequest request, HttpServletResponse response,
+                                                            TranslatableException ex) throws IOException {
+        Context context = ContextUtil.obtainContext(request);
+        sendErrorResponse(
+            request, response, null, ex.getLocalizedMessage(context), HttpStatus.UNPROCESSABLE_ENTITY.value()
+        );
     }
 
     @ExceptionHandler(QueryMethodParameterConversionException.class)
@@ -146,7 +179,15 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
 
     }
 
-
+    /**
+     * Send the error to the response. Some errors may also be logged.
+     * @param request current request
+     * @param response current response
+     * @param ex Exception thrown
+     * @param message message to log or send in response
+     * @param statusCode status code to send in response
+     * @throws IOException
+     */
     private void sendErrorResponse(final HttpServletRequest request, final HttpServletResponse response,
                                    final Exception ex, final String message, final int statusCode) throws IOException {
         //Make sure Spring picks up this exception
