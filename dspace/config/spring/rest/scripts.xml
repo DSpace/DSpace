@@ -22,4 +22,10 @@
         <property name="description" value="Curation tasks"/>
         <property name="dspaceRunnableClass" value="org.dspace.curate.Curation"/>
     </bean>
+
+    <!-- Not runnable from REST -->
+    <bean id="submission-forms-migrate" class="org.dspace.submit.migration.SubmissionFormsMigrationScriptConfiguration">
+        <property name="description" value="Script for migrating submission forms to DSpace 7"/>
+        <property name="dspaceRunnableClass" value="org.dspace.submit.migration.SubmissionFormsMigration"/>
+    </bean>
 </beans>

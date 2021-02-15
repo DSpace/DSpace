@@ -71,7 +71,13 @@
 <script>
     $(document).ready(function() {
         var successHandler = function(result, status, xhr) {
+            // look for Authorization header & save to a MyHalBrowserToken cookie
             document.cookie = "MyHalBrowserToken=" + xhr.getResponseHeader('Authorization').split(" ")[1];
+            // look for DSpace-XSRF-TOKEN header & save to a MyHalBrowserCsrfToken cookie (if found)
+            var csrfToken = xhr.getResponseHeader('DSPACE-XSRF-TOKEN');
+            if (csrfToken!=null) {
+                document.cookie = "MyHalBrowserCsrfToken=" + csrfToken;
+            }
             toastr.success('You are now logged in. Please wait while we redirect you...', 'Login Successful');
             setTimeout(function() {
                 window.location.href = window.location.pathname.replace("login.html", "");
@@ -98,6 +104,13 @@
         $.ajax({
           url : window.location.href.replace("login.html", "") + 'api/authn/login',
           type : 'POST',
+          beforeSend: function (xhr, settings) {
+               // If CSRF token found in cookie, send it back as X-XSRF-Token header
+               var csrfToken = getCSRFToken();
+               if (csrfToken != null) {
+                   xhr.setRequestHeader('X-XSRF-Token', csrfToken);
+               }
+          },
           success : successHandler,
           error : function(result, status, xhr) {
               if (result.status === 401) {
@@ -108,12 +121,11 @@
                       if (realms.length == 1){
                           var loc = /location="([^,]*)"/.exec(authenticate);
                           if (loc !== null && loc.length === 2) {
-                          document.location = loc[1];
+                              document.location = loc[1];
                           }
                       } else if (realms.length > 1){
                           for (var i = 0; i < realms.length; i++){
                               addLocationButton(realms[i], element);
-
                           }
                       }
                   }
@@ -134,6 +146,19 @@
             return string.charAt(0).toUpperCase() + string.slice(1);
         }
 
+       /**
+        * Get CSRF Token by parsing it out of the "MyHalBrowserCsrfToken" cookie.
+        * This cookie is set in login.html after a successful login occurs.
+        **/
+        function getCSRFToken() {
+            var cookie = document.cookie.match('(^|;)\\s*' + 'MyHalBrowserCsrfToken' + '\\s*=\\s*([^;]+)');
+            if (cookie != null) {
+                return cookie.pop();
+            } else {
+                return null;
+            }
+        }
+
         $("#login-form").submit(function(event) {
             event.preventDefault();
             $.ajax({
@@ -144,6 +169,13 @@
                 data: {
                     user: $("#username").val(),
                     password: $("#password").val()
+                },
+                beforeSend: function (xhr, settings) {
+                    // If CSRF token found in cookie, send it back as X-XSRF-Token header
+                    var csrfToken = getCSRFToken();
+                    if (csrfToken != null) {
+                       xhr.setRequestHeader('X-XSRF-Token', csrfToken);
+                    }
                 },
                 success : successHandler,
                 error : function() {

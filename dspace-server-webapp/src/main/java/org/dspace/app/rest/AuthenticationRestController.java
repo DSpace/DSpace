@@ -85,6 +85,16 @@ public class AuthenticationRestController implements InitializingBean {
         return converter.toResource(authnRest);
     }
 
+    /**
+     * Check the current user's authentication status (i.e. whether they are authenticated or not)
+     * <P>
+     * If the user is NOT currently authenticated, a list of all currently enabled DSpace authentication endpoints
+     * is returned in the WWW-Authenticate header.
+     * @param request current request
+     * @param response response
+     * @return AuthenticationStatusResource
+     * @throws SQLException
+     */
     @RequestMapping(value = "/status", method = RequestMethod.GET)
     public AuthenticationStatusResource status(HttpServletRequest request, HttpServletResponse response)
             throws SQLException {
@@ -96,8 +106,7 @@ public class AuthenticationRestController implements InitializingBean {
         }
 
         AuthenticationStatusRest authenticationStatusRest = new AuthenticationStatusRest(ePersonRest);
-        // Whether authentication status is false add WWW-Authenticate so client can retrieve the available
-        // authentication methods
+        // When not authenticated add WWW-Authenticate so client can retrieve all available authentication methods
         if (!authenticationStatusRest.isAuthenticated()) {
             String authenticateHeaderValue = restAuthenticationService
                     .getWwwAuthenticateHeaderValue(request, response);
@@ -110,13 +119,23 @@ public class AuthenticationRestController implements InitializingBean {
         return authenticationStatusResource;
     }
 
+    /**
+     * Check whether the login has succeeded or not. The actual login is performed by one of the enabled login filters
+     * (e.g. {@link org.dspace.app.rest.security.StatelessLoginFilter}).
+     * See {@link org.dspace.app.rest.security.WebSecurityConfiguration} for enabled login filters.
+     *
+     * @param request current request
+     * @param user user
+     * @param password password
+     * @return ResponseEntity with information about whether login was successful or failed
+     */
     @RequestMapping(value = "/login", method = {RequestMethod.POST})
     public ResponseEntity login(HttpServletRequest request, @RequestParam(name = "user", required = false) String user,
                                 @RequestParam(name = "password", required = false) String password) {
         //If you can get here, you should be authenticated, the actual login is handled by spring security
-        //see org.dspace.app.rest.security.StatelessLoginFilter
 
-        //If we don't have an EPerson here, this means authentication failed and we should return an error message.
+        // Build our response. This will check if we have an EPerson.
+        // If not, that means the authentication failed and we should return the error message
         return getLoginResponse(request,
                                 "Authentication failed. The credentials you provided are not valid.");
     }
@@ -145,18 +164,49 @@ public class AuthenticationRestController implements InitializingBean {
         return converter.toResource(authenticationTokenRest);
     }
 
+    /**
+     * Disables GET/PUT/PATCH on the /login endpoint. You must use POST (see above method)
+     * @return ResponseEntity
+     */
     @RequestMapping(value = "/login", method = { RequestMethod.GET, RequestMethod.PUT, RequestMethod.PATCH,
             RequestMethod.DELETE })
     public ResponseEntity login() {
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("Only POST is allowed for login requests.");
     }
 
-    @RequestMapping(value = "/logout", method = {RequestMethod.GET, RequestMethod.POST})
+    /**
+     * Returns a successful "204 No Content" response for a logout request.
+     * Actual logout is performed by our {@link org.dspace.app.rest.security.CustomLogoutHandler}
+     * <P>
+     * For logout we *require* POST requests. HEAD is also supported for endpoint visibility in HAL Browser, etc.
+     * @return ResponseEntity (204 No Content)
+     */
+    @RequestMapping(value = "/logout", method = {RequestMethod.HEAD, RequestMethod.POST})
     public ResponseEntity logout() {
-        //This is handled by org.dspace.app.rest.security.CustomLogoutHandler
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Disables GET/PUT/PATCH on the /logout endpoint. You must use POST (see above method)
+     * @return ResponseEntity
+     */
+    @RequestMapping(value = "/logout", method = { RequestMethod.GET, RequestMethod.PUT, RequestMethod.PATCH,
+        RequestMethod.DELETE })
+    public ResponseEntity logoutMethodNotAllowed() {
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("Only POST is allowed for logout requests.");
+    }
+
+    /**
+     * Check the request to see if the login succeeded or failed.
+     * If the request includes a valid EPerson, then it was successful.
+     * If the request does not include a valid EPerson, then return the failedMessage.
+     * <P>
+     * NOTE: This method assumes that a login filter (e.g. {@link org.dspace.app.rest.security.StatelessLoginFilter})
+     * has already attempted the authentication and, if successful, added EPerson data to the current request.
+     * @param request current request
+     * @param failedMessage message to send if no EPerson found
+     * @return ResponseEntity
+     */
     protected ResponseEntity getLoginResponse(HttpServletRequest request, String failedMessage) {
         //Get the context and check if we have an authenticated eperson
         org.dspace.core.Context context = null;
