@@ -70,9 +70,12 @@ public class DiscoverResultIterator<T extends ReloadableEntity, PK extends Seria
     }
     @Override
     public T next() {
-        T nextElement = (T) currentSlotIterator.next().getIndexedObject();
+        return (T) getNextIndexableObject().getIndexedObject();
+    }
+
+    protected IndexableObject getNextIndexableObject() {
         iteratorCounter++;
-        return nextElement;
+        return currentSlotIterator.next();
     }
 
     public long getTotalSearchResults() {

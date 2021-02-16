@@ -33,7 +33,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverFilterQuery;
 import org.dspace.discovery.DiscoverQuery;
-import org.dspace.discovery.DiscoverResultIterator;
+import org.dspace.discovery.DiscoverResultItemIterator;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
@@ -47,6 +47,8 @@ import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.dspace.discovery.indexobject.IndexableCollection;
 import org.dspace.discovery.indexobject.IndexableCommunity;
 import org.dspace.discovery.indexobject.IndexableItem;
+import org.dspace.discovery.indexobject.IndexableWorkflowItem;
+import org.dspace.discovery.indexobject.IndexableWorkspaceItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.kernel.ServiceManager;
@@ -140,7 +142,7 @@ public class BulkItemExport extends DSpaceRunnable<BulkItemExportScriptConfigura
         }
 
         try {
-            DiscoverResultIterator<Item, UUID> itemsIterator = searchItemsToExport();
+            DiscoverResultItemIterator itemsIterator = searchItemsToExport();
             handler.logInfo("Found " + itemsIterator.getTotalSearchResults() + " items to export");
 
             performExport(itemsIterator, streamDisseminationCrosswalk);
@@ -169,7 +171,7 @@ public class BulkItemExport extends DSpaceRunnable<BulkItemExportScriptConfigura
         handler.logInfo("Items exported successfully into file named " + name);
     }
 
-    private DiscoverResultIterator<Item, UUID> searchItemsToExport() throws SearchServiceException, SQLException {
+    private DiscoverResultItemIterator searchItemsToExport() throws SearchServiceException, SQLException {
         IndexableObject<?, ?> scopeObject = resolveScope();
         DiscoveryConfiguration discoveryConfiguration = discoveryConfigurationService
             .getDiscoveryConfigurationByNameOrDso(configuration, scopeObject);
@@ -180,9 +182,9 @@ public class BulkItemExport extends DSpaceRunnable<BulkItemExportScriptConfigura
         DiscoverQuery discoverQuery = buildDiscoveryQuery(discoveryConfiguration, scopeObject);
 
         if (isRelatedItem) {
-            return new DiscoverResultIterator<Item, UUID>(context, discoverQuery);
+            return new DiscoverResultItemIterator(context, discoverQuery);
         } else {
-            return new DiscoverResultIterator<Item, UUID>(context, scopeObject, discoverQuery);
+            return new DiscoverResultItemIterator(context, scopeObject, discoverQuery);
         }
     }
 
@@ -219,11 +221,13 @@ public class BulkItemExport extends DSpaceRunnable<BulkItemExportScriptConfigura
         IndexableObject<?, ?> scope) throws SQLException {
 
         DiscoverQuery discoverQuery = buildBaseQuery(discoveryConfiguration, scope);
-        discoverQuery.setDSpaceObjectFilter(IndexableItem.TYPE);
+        discoverQuery.addDSpaceObjectFilter(IndexableItem.TYPE);
+        discoverQuery.addDSpaceObjectFilter(IndexableWorkspaceItem.TYPE);
+        discoverQuery.addDSpaceObjectFilter(IndexableWorkflowItem.TYPE);
         discoverQuery.setQuery(query);
         discoverQuery.setMaxResults(QUERY_PAGINATION_SIZE);
         discoverQuery.addFilterQueries(getFilterQueries(discoveryConfiguration));
-        discoverQuery.addFilterQueries("entityType:" + entityType);
+        discoverQuery.addFilterQueries("search.entitytype:" + entityType);
         configureSorting(discoverQuery, discoveryConfiguration);
 
         return discoverQuery;
@@ -240,9 +244,11 @@ public class BulkItemExport extends DSpaceRunnable<BulkItemExportScriptConfigura
 
         List<String> filterQueries = discoveryConfiguration.getDefaultFilterQueries();
 
-        if (scope != null && discoveryConfiguration instanceof DiscoveryRelatedItemConfiguration) {
-            for (String filterQuery : filterQueries) {
+        for (String filterQuery : filterQueries) {
+            if (discoveryConfiguration instanceof DiscoveryRelatedItemConfiguration) {
                 discoverQuery.addFilterQueries(MessageFormat.format(filterQuery, scope.getID()));
+            } else {
+                discoverQuery.addFilterQueries(filterQuery);
             }
         }
 

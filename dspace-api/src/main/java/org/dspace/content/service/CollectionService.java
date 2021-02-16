@@ -456,4 +456,16 @@ public interface CollectionService
      * @throws SearchServiceException if search error
      */
     int countCollectionsAdministered(String query, Context context) throws SQLException, SearchServiceException;
+
+    /**
+     * Returns the collection related to the given item. If the item is archived,
+     * this method returns the own collection of that item, otherwise returns the
+     * collection related to the current InProgressSubmission related to that item.
+     *
+     * @param  context      the DSpace context
+     * @param  item         the item from where the search start
+     * @return              the collection related to the given item
+     * @throws SQLException if an SQL error occurs
+     */
+    public Collection findByItem(Context context, Item item) throws SQLException;
 }
