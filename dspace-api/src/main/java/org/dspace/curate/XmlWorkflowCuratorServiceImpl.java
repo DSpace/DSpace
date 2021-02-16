@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
+
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
@@ -26,6 +27,9 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.workflow.CurationTaskConfig;
+import org.dspace.workflow.FlowStep;
+import org.dspace.workflow.Task;
+import org.dspace.workflow.TaskSet;
 import org.dspace.xmlworkflow.RoleMembers;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
@@ -77,6 +81,9 @@ public class XmlWorkflowCuratorServiceImpl
     @Autowired(required = true)
     protected ClaimedTaskService claimedTaskService;
 
+    @Autowired(required = true)
+    protected CurationTaskConfig curationTaskConfig;
+
     protected XmlWorkflowService workflowService;
     protected XmlWorkflowItemService workflowItemService;
 
@@ -125,12 +132,13 @@ public class XmlWorkflowCuratorServiceImpl
     public boolean curate(Curator curator, Context c, XmlWorkflowItem wfi)
             throws AuthorizeException, IOException, SQLException
     {
-        CurationTaskConfig.FlowStep step = getFlowStep(c, wfi);
+        FlowStep step = getFlowStep(c, wfi);
+
         if (step != null) {
             // assign collection to item in case task needs it
             Item item = wfi.getItem();
             item.setOwningCollection(wfi.getCollection());
-            for (CurationTaskConfig.Task task : step.tasks) {
+            for (Task task : step.tasks) {
                 curator.addTask(task.name);
                 curator.curate(item);
                 int status = curator.getStatus(task.name);
@@ -186,18 +194,18 @@ public class XmlWorkflowCuratorServiceImpl
      * @throws SQLException
      * @throws IOException
      */
-    protected CurationTaskConfig.FlowStep getFlowStep(Context c, XmlWorkflowItem wfi)
+    protected FlowStep getFlowStep(Context c, XmlWorkflowItem wfi)
             throws SQLException, IOException
     {
         Collection coll = wfi.getCollection();
-        String key = CurationTaskConfig.containsKey(coll.getHandle()) ? coll.getHandle() : "default";
+        String key = curationTaskConfig.containsKey(coll.getHandle()) ? coll.getHandle() : "default";
 
         ClaimedTask claimedTask
                 = claimedTaskService.findByWorkflowIdAndEPerson(c, wfi, c.getCurrentUser());
-        CurationTaskConfig.TaskSet ts = CurationTaskConfig.findTaskSet(key);
+        TaskSet ts = curationTaskConfig.findTaskSet(key);
         if (ts != null)
         {
-            for (CurationTaskConfig.FlowStep fstep : ts.steps)
+            for (FlowStep fstep : ts.steps)
             {
                 if (fstep.step.equals(claimedTask.getStepID()))
                 {
@@ -222,7 +230,7 @@ public class XmlWorkflowCuratorServiceImpl
      * @throws SQLException passed through.
      */
     protected void notifyContacts(Context c, XmlWorkflowItem wfi,
-            CurationTaskConfig.Task task,
+            Task task,
             String status, String action, String message)
             throws AuthorizeException, IOException, SQLException
     {
