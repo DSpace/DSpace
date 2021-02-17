@@ -108,6 +108,7 @@
 	<xsd:sequence>
 	    <xsd:element name='flowstep'
                          type='flowstep-type'
+                         minOccurs='0'
 			 maxOccurs='unbounded'/>
 	</xsd:sequence>
 	<xsd:attribute name='name'
