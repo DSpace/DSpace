@@ -98,7 +98,7 @@ public class CurationTaskConfigTest {
 
         assertTrue(TASK1 + " should have 'reject' action",
                 foundTask.powers.contains(ACTION_REJECT));
-        
+
         List<String> contacts = foundTask.contacts.get(CONDITION_FAIL);
         assertNotNull(TASK1 + " should have contacts for condition " + CONDITION_FAIL,
                 contacts);

@@ -326,8 +326,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             HttpServletRequest request, int workflowItemId, Workflow workflow,
             WorkflowActionConfig currentActionConfig)
             throws SQLException, AuthorizeException, IOException,
-            MessagingException, WorkflowException
-    {
+            MessagingException, WorkflowException {
         try {
             XmlWorkflowItem wi = xmlWorkflowItemService.find(c, workflowItemId);
             Step currentStep = currentActionConfig.getStep();
@@ -643,10 +642,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     @Override
     public void notifyOfCuration(Context c, XmlWorkflowItem wi,
             List<EPerson> ePeople, String taskName, String action, String message)
-            throws SQLException, IOException
-    {
-        try
-        {
+            throws SQLException, IOException {
+        try {
             // Get the item title
             String title = getItemTitle(wi);
 
@@ -656,8 +653,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             // Get the collection
             Collection coll = wi.getCollection();
 
-            for (EPerson epa : ePeople)
-            {
+            for (EPerson epa : ePeople) {
                 Locale supportedLocale = I18nUtil.getEPersonLocale(epa);
                 Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "flowtask_notify"));
                 email.addArgument(title);
@@ -669,33 +665,26 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                 email.addRecipient(epa.getEmail());
                 email.send();
             }
-        }
-        catch (MessagingException e)
-        {
+        } catch (MessagingException e) {
             log.warn(LogManager.getHeader(c, "notifyOfCuration",
                     "cannot email users of workflow_item_id " + wi.getID()
                             + ":  " + e.getMessage()));
         }
     }
 
-    protected String getItemTitle(XmlWorkflowItem wi) throws SQLException
-    {
+    protected String getItemTitle(XmlWorkflowItem wi) throws SQLException {
         Item myitem = wi.getItem();
         String title = myitem.getName();
 
         // only return the first element, or "Untitled"
-        if (StringUtils.isNotBlank(title))
-        {
+        if (StringUtils.isNotBlank(title)) {
             return title;
-        }
-        else
-        {
+        } else {
             return I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled ");
         }
     }
 
-    protected String getSubmitterName(XmlWorkflowItem wi) throws SQLException
-    {
+    protected String getSubmitterName(XmlWorkflowItem wi) throws SQLException {
         EPerson e = wi.getSubmitter();
 
         return getEPersonName(e);

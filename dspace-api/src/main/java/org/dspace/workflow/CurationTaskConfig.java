@@ -59,10 +59,11 @@ public class CurationTaskConfig {
      *          {@code null} if there is no default either.
      */
     public TaskSet findTaskSet(@NotNull String setName) {
-        if (collectionTasksetMap.containsKey(setName))
+        if (collectionTasksetMap.containsKey(setName)) {
             return collectionTasksetMap.get(setName);
-        else
+        } else {
             return collectionTasksetMap.get("default");
+        }
     }
 
     /**

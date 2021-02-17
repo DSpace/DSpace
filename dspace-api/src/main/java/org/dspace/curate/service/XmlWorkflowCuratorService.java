@@ -7,14 +7,12 @@
  */
 package org.dspace.curate.service;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.curate.Curator;
-import org.dspace.workflowbasic.BasicWorkflowItem;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
@@ -22,12 +20,11 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  * Specifically, it is invoked in XmlWorkflowService to allow the
  * performance of curation tasks during workflow.
  *
- * Copied from {@link WorkflowCurator} with minor refactoring.
+ * Copied from {@link WorkflowCuratorService} with minor refactoring.
  *
  * @author mwood
  */
-public interface XmlWorkflowCuratorService
-{
+public interface XmlWorkflowCuratorService {
     /**
      * Does this workflow item need curation now?
      *
