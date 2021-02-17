@@ -389,6 +389,98 @@ public class ItemReferenceResolverConsumerIT extends AbstractControllerIntegrati
     }
 
     @Test
+    public void testItemReferenceResolverConsumerWithManyReferenceToResolve() throws SQLException {
+
+        context.turnOffAuthorisationSystem();
+
+        Item firstPublication = ItemBuilder.createItem(context, publicationCollection)
+            .withTitle("First publication")
+            .withAuthor("Author A", formatWillBeReferencedAuthority("ORCID", "0000-0000-0000-0001"))
+            .withAuthor("Author B", formatWillBeReferencedAuthority("ORCID", "0000-0000-0000-0002"))
+            .withAuthor("Author C", formatWillBeReferencedAuthority("ORCID", "0000-0000-0000-0003"))
+            .build();
+
+        Item secondPublication = ItemBuilder.createItem(context, publicationCollection)
+            .withTitle("Second Item")
+            .withAuthor("Author B", formatWillBeReferencedAuthority("ORCID", "0000-0000-0000-0002"))
+            .withAuthor("Author D", formatWillBeReferencedAuthority("RID", "RID-01"))
+            .build();
+
+        Item thirdPublication = ItemBuilder.createItem(context, publicationCollection)
+            .withTitle("Second Item")
+            .withAuthor("Author E", formatWillBeReferencedAuthority("RID", "RID-02"))
+            .withAuthor("Author F", formatWillBeReferencedAuthority("ORCID", "0000-0000-0000-0004"))
+            .build();
+
+        context.commit();
+        context.restoreAuthSystemState();
+
+        firstPublication = context.reloadEntity(firstPublication);
+        assertThat(firstPublication.getMetadata(), hasItem(with("dc.contributor.author", "Author A", null,
+            formatWillBeReferencedAuthority("ORCID", "0000-0000-0000-0001"), 0, 600)));
+        assertThat(firstPublication.getMetadata(), hasItem(with("dc.contributor.author", "Author B", null,
+            formatWillBeReferencedAuthority("ORCID", "0000-0000-0000-0002"), 1, 600)));
+        assertThat(firstPublication.getMetadata(), hasItem(with("dc.contributor.author", "Author C", null,
+            formatWillBeReferencedAuthority("ORCID", "0000-0000-0000-0003"), 2, 600)));
+
+        secondPublication = context.reloadEntity(secondPublication);
+        assertThat(secondPublication.getMetadata(), hasItem(with("dc.contributor.author", "Author B", null,
+            formatWillBeReferencedAuthority("ORCID", "0000-0000-0000-0002"), 0, 600)));
+        assertThat(secondPublication.getMetadata(), hasItem(with("dc.contributor.author", "Author D", null,
+            formatWillBeReferencedAuthority("RID", "RID-01"), 1, 600)));
+
+        thirdPublication = context.reloadEntity(thirdPublication);
+        assertThat(thirdPublication.getMetadata(), hasItem(with("dc.contributor.author", "Author E", null,
+            formatWillBeReferencedAuthority("RID", "RID-02"), 0, 600)));
+        assertThat(thirdPublication.getMetadata(), hasItem(with("dc.contributor.author", "Author F", null,
+            formatWillBeReferencedAuthority("ORCID", "0000-0000-0000-0004"), 1, 600)));
+
+        context.turnOffAuthorisationSystem();
+
+        Item authorA = ItemBuilder.createItem(context, personCollection)
+            .withTitle("Author A")
+            .withRelationshipType("Person")
+            .withOrcidIdentifier("0000-0000-0000-0001")
+            .build();
+
+        Item authorB = ItemBuilder.createItem(context, personCollection)
+            .withTitle("Author B")
+            .withRelationshipType("Person")
+            .withOrcidIdentifier("0000-0000-0000-0002")
+            .build();
+
+        Item authorD = ItemBuilder.createItem(context, personCollection)
+            .withTitle("Author D")
+            .withRelationshipType("Person")
+            .withResearcherIdentifier("RID-01")
+            .build();
+
+        context.commit();
+        context.restoreAuthSystemState();
+
+        firstPublication = context.reloadEntity(firstPublication);
+        assertThat(firstPublication.getMetadata(), hasItem(with("dc.contributor.author", "Author A", null,
+            authorA.getID().toString(), 0, 600)));
+        assertThat(firstPublication.getMetadata(), hasItem(with("dc.contributor.author", "Author B", null,
+            authorB.getID().toString(), 1, 600)));
+        assertThat(firstPublication.getMetadata(), hasItem(with("dc.contributor.author", "Author C", null,
+            formatWillBeReferencedAuthority("ORCID", "0000-0000-0000-0003"), 2, 600)));
+
+        secondPublication = context.reloadEntity(secondPublication);
+        assertThat(secondPublication.getMetadata(), hasItem(with("dc.contributor.author", "Author B", null,
+            authorB.getID().toString(), 0, 600)));
+        assertThat(secondPublication.getMetadata(), hasItem(with("dc.contributor.author", "Author D", null,
+            authorD.getID().toString(), 1, 600)));
+
+        thirdPublication = context.reloadEntity(thirdPublication);
+        assertThat(thirdPublication.getMetadata(), hasItem(with("dc.contributor.author", "Author E", null,
+            formatWillBeReferencedAuthority("RID", "RID-02"), 0, 600)));
+        assertThat(thirdPublication.getMetadata(), hasItem(with("dc.contributor.author", "Author F", null,
+            formatWillBeReferencedAuthority("ORCID", "0000-0000-0000-0004"), 1, 600)));
+
+    }
+
+    @Test
     public void testItemReferenceResolverConsumerViaRest() throws Exception {
 
         context.turnOffAuthorisationSystem();
