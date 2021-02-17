@@ -55,8 +55,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class XmlWorkflowCuratorServiceImpl
-        implements XmlWorkflowCuratorService
-{
+        implements XmlWorkflowCuratorService {
     private static final Logger LOG
             = LoggerFactory.getLogger(XmlWorkflowCuratorServiceImpl.class);
 
@@ -95,30 +94,26 @@ public class XmlWorkflowCuratorServiceImpl
      */
     @PostConstruct
     public void init()
-            throws Exception
-    {
+            throws Exception {
         workflowService = workflowServiceFactory.getXmlWorkflowService();
         workflowItemService = workflowServiceFactory.getXmlWorkflowItemService();
     }
 
     @Override
-    public boolean needsCuration(XmlWorkflowItem wfi)
-    {
+    public boolean needsCuration(XmlWorkflowItem wfi) {
         throw new UnsupportedOperationException("Not supported yet."); // TODO
     }
 
     @Override
     public boolean doCuration(Context c, XmlWorkflowItem wfi)
-            throws AuthorizeException, IOException, SQLException
-    {
+            throws AuthorizeException, IOException, SQLException {
         Curator curator = new Curator();
         return curate(curator, c, wfi);
     }
 
     @Override
     public boolean curate(Curator curator, Context c, String wfId)
-            throws AuthorizeException, IOException, SQLException
-    {
+            throws AuthorizeException, IOException, SQLException {
         XmlWorkflowItem wfi = workflowItemService.find(c, Integer.parseInt(wfId));
         if (wfi != null) {
             return curate(curator, c, wfi);
@@ -130,8 +125,7 @@ public class XmlWorkflowCuratorServiceImpl
 
     @Override
     public boolean curate(Curator curator, Context c, XmlWorkflowItem wfi)
-            throws AuthorizeException, IOException, SQLException
-    {
+            throws AuthorizeException, IOException, SQLException {
         FlowStep step = getFlowStep(c, wfi);
 
         if (step != null) {
@@ -144,41 +138,36 @@ public class XmlWorkflowCuratorServiceImpl
                 int status = curator.getStatus(task.name);
                 String result = curator.getResult(task.name);
                 String action = "none";
-                switch (status)
-                {
-                case Curator.CURATE_FAIL:
-                    // task failed - notify any contacts the task has assigned
-                    if (task.powers.contains("reject"))
-                    {
-                        action = "reject";
-                    }
-                    notifyContacts(c, wfi, task, "fail", action, result);
-                    // if task so empowered, reject submission and terminate
-                    if ("reject".equals(action))
-                    {
-                        workflowService.sendWorkflowItemBackSubmission(c, wfi,
-                                c.getCurrentUser(), null,
-                                task.name + ": " + result);
-                        return false;
-                    }
-                    break;
-                case Curator.CURATE_SUCCESS:
-                    if (task.powers.contains("approve"))
-                    {
-                        action = "approve";
-                    }
-                    notifyContacts(c, wfi, task, "success", action, result);
-                    if ("approve".equals(action))
-                    {
-                        // cease further task processing and advance submission
-                        return true;
-                    }
-                    break;
-                case Curator.CURATE_ERROR:
-                    notifyContacts(c, wfi, task, "error", action, result);
-                    break;
-                default:
-                    break;
+                switch (status) {
+                    case Curator.CURATE_FAIL:
+                        // task failed - notify any contacts the task has assigned
+                        if (task.powers.contains("reject")) {
+                            action = "reject";
+                        }
+                        notifyContacts(c, wfi, task, "fail", action, result);
+                        // if task so empowered, reject submission and terminate
+                        if ("reject".equals(action)) {
+                            workflowService.sendWorkflowItemBackSubmission(c, wfi,
+                                    c.getCurrentUser(), null,
+                                    task.name + ": " + result);
+                            return false;
+                        }
+                        break;
+                    case Curator.CURATE_SUCCESS:
+                        if (task.powers.contains("approve")) {
+                            action = "approve";
+                        }
+                        notifyContacts(c, wfi, task, "success", action, result);
+                        if ("approve".equals(action)) {
+                            // cease further task processing and advance submission
+                            return true;
+                        }
+                        break;
+                    case Curator.CURATE_ERROR:
+                        notifyContacts(c, wfi, task, "error", action, result);
+                        break;
+                    default:
+                        break;
                 }
                 curator.clear();
             }
@@ -195,20 +184,16 @@ public class XmlWorkflowCuratorServiceImpl
      * @throws IOException
      */
     protected FlowStep getFlowStep(Context c, XmlWorkflowItem wfi)
-            throws SQLException, IOException
-    {
+            throws SQLException, IOException {
         Collection coll = wfi.getCollection();
         String key = curationTaskConfig.containsKey(coll.getHandle()) ? coll.getHandle() : "default";
 
         ClaimedTask claimedTask
                 = claimedTaskService.findByWorkflowIdAndEPerson(c, wfi, c.getCurrentUser());
         TaskSet ts = curationTaskConfig.findTaskSet(key);
-        if (ts != null)
-        {
-            for (FlowStep fstep : ts.steps)
-            {
-                if (fstep.step.equals(claimedTask.getStepID()))
-                {
+        if (ts != null) {
+            for (FlowStep fstep : ts.steps) {
+                if (fstep.step.equals(claimedTask.getStepID())) {
                     return fstep;
                 }
             }
@@ -232,8 +217,7 @@ public class XmlWorkflowCuratorServiceImpl
     protected void notifyContacts(Context c, XmlWorkflowItem wfi,
             Task task,
             String status, String action, String message)
-            throws AuthorizeException, IOException, SQLException
-    {
+            throws AuthorizeException, IOException, SQLException {
         List<EPerson> epa = resolveContacts(c, task.getContacts(status), wfi);
         if (epa.size() > 0) {
             workflowService.notifyOfCuration(c, wfi, epa, task.name, action, message);
@@ -253,8 +237,7 @@ public class XmlWorkflowCuratorServiceImpl
      */
     protected List<EPerson> resolveContacts(Context c, List<String> contacts,
                                              XmlWorkflowItem wfi)
-                    throws AuthorizeException, IOException, SQLException
-    {
+                    throws AuthorizeException, IOException, SQLException {
         List<EPerson> epList = new ArrayList<>();
         for (String contact : contacts) {
             // decode contacts
@@ -272,10 +255,12 @@ public class XmlWorkflowCuratorServiceImpl
                     return epList;
                 }
                 RoleMembers roleMembers = step.getRole().getMembers(c, wfi);
-                for (EPerson ep : roleMembers.getEPersons())
+                for (EPerson ep : roleMembers.getEPersons()) {
                     epList.add(ep);
-                for (Group group : roleMembers.getGroups())
+                }
+                for (Group group : roleMembers.getGroups()) {
                     epList.addAll(group.getMembers());
+                }
             } else if ("$colladmin".equals(contact)) {
                 Group adGroup = wfi.getCollection().getAdministrators();
                 if (adGroup != null) {
