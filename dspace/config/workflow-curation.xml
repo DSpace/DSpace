@@ -61,6 +61,9 @@
        </task>
      </flowstep>
    </taskset>
+
+    <!-- We require an empty taskset to match "none" mappings -->
+    <taskset name='none'/>
    
  </tasksets>
  
