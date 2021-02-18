@@ -1,0 +1,652 @@
+{
+  "items" : [
+    {
+      "url" : "http://www.thelancet.com/journals/lancet/issue/current",
+      "issns" : [
+        {
+          "issn" : "0140-6736",
+          "type_phrases" : [
+            {
+              "phrase" : "Print",
+              "language" : "en",
+              "value" : "print"
+            }
+          ],
+          "type" : "print"
+        },
+        {
+          "issn" : "1474-547X",
+          "type_phrases" : [
+            {
+              "language" : "en",
+              "phrase" : "Electronic",
+              "value" : "electronic"
+            }
+          ],
+          "type" : "electronic"
+        }
+      ],
+      "id" : 23803,
+      "publishers" : [
+        {
+          "relationship_type_phrases" : [
+            {
+              "value" : "commercial_publisher",
+              "language" : "en",
+              "phrase" : "Commercial Publisher"
+            }
+          ],
+          "publisher" : {
+            "imprints_id" : [
+              7920,
+              131,
+              26532,
+              31689,
+              22233,
+              265,
+              28437,
+              34765,
+              29029,
+              23104,
+              5264,
+              36376,
+              985
+            ],
+            "country_phrases" : [
+              {
+                "value" : "us",
+                "phrase" : "United States of America",
+                "language" : "en"
+              }
+            ],
+            "uri" : "http://v2.sherpa.ac.uk/id/publisher/30",
+            "id" : 30,
+            "name" : [
+              {
+                "language" : "en",
+                "language_phrases" : [
+                  {
+                    "value" : "en",
+                    "language" : "en",
+                    "phrase" : "English"
+                  }
+                ],
+                "preferred" : "name",
+                "preferred_phrases" : [
+                  {
+                    "language" : "en",
+                    "phrase" : "Name",
+                    "value" : "name"
+                  }
+                ],
+                "name" : "Elsevier"
+              }
+            ],
+            "country" : "us",
+            "publication_count" : 2801,
+            "url" : "http://www.elsevier.com/"
+          },
+          "relationship_type" : "commercial_publisher"
+        }
+      ],
+      "listed_in_doaj" : "no",
+      "system_metadata" : {
+        "id" : 23803,
+        "publicly_visible_phrases" : [
+          {
+            "phrase" : "Yes",
+            "language" : "en",
+            "value" : "yes"
+          }
+        ],
+        "uri" : "http://v2.sherpa.ac.uk/id/publication/23803",
+        "date_modified" : "2020-03-06 11:25:54",
+        "date_created" : "2012-11-20 14:51:52",
+        "publicly_visible" : "yes"
+      },
+      "type_phrases" : [
+        {
+          "language" : "en",
+          "phrase" : "Journal",
+          "value" : "journal"
+        }
+      ],
+      "publisher_policy" : [
+        {
+          "publication_count" : 12,
+          "id" : 1274,
+          "permitted_oa" : [
+            {
+              "additional_oa_fee_phrases" : [
+                {
+                  "language" : "en",
+                  "phrase" : "No",
+                  "value" : "no"
+                }
+              ],
+              "article_version" : [
+                "submitted"
+              ],
+              "conditions" : [
+                "Upon publication publisher copyright and source must be acknowledged",
+                "Upon publication must link to publisher version"
+              ],
+              "article_version_phrases" : [
+                {
+                  "value" : "submitted",
+                  "language" : "en",
+                  "phrase" : "Submitted"
+                }
+              ],
+              "location" : {
+                "location_phrases" : [
+                  {
+                    "value" : "authors_homepage",
+                    "language" : "en",
+                    "phrase" : "Author's Homepage"
+                  },
+                  {
+                    "value" : "preprint_repository",
+                    "phrase" : "Preprint Repository",
+                    "language" : "en"
+                  }
+                ],
+                "location" : [
+                  "authors_homepage",
+                  "preprint_repository"
+                ]
+              },
+              "additional_oa_fee" : "no"
+            },
+            {
+              "additional_oa_fee_phrases" : [
+                {
+                  "language" : "en",
+                  "phrase" : "No",
+                  "value" : "no"
+                }
+              ],
+              "article_version" : [
+                "accepted"
+              ],
+              "conditions" : [
+                "Publisher copyright and source must be acknowledged",
+                "Must link to publisher version"
+              ],
+              "article_version_phrases" : [
+                {
+                  "phrase" : "Accepted",
+                  "language" : "en",
+                  "value" : "accepted"
+                }
+              ],
+              "license" : [
+                {
+                  "license_phrases" : [
+                    {
+                      "language" : "en",
+                      "phrase" : "CC BY-NC-ND",
+                      "value" : "cc_by_nc_nd"
+                    }
+                  ],
+                  "license" : "cc_by_nc_nd"
+                }
+              ],
+              "location" : {
+                "location" : [
+                  "authors_homepage",
+                  "institutional_website"
+                ],
+                "location_phrases" : [
+                  {
+                    "value" : "authors_homepage",
+                    "phrase" : "Author's Homepage",
+                    "language" : "en"
+                  },
+                  {
+                    "value" : "institutional_website",
+                    "language" : "en",
+                    "phrase" : "Institutional Website"
+                  }
+                ]
+              },
+              "additional_oa_fee" : "no"
+            },
+            {
+              "article_version" : [
+                "accepted"
+              ],
+              "embargo" : {
+                "amount" : 6,
+                "units_phrases" : [
+                  {
+                    "value" : "months",
+                    "phrase" : "Months",
+                    "language" : "en"
+                  }
+                ],
+                "units" : "months"
+              },
+              "location" : {
+                "location_phrases" : [
+                  {
+                    "value" : "non_commercial_repository",
+                    "phrase" : "Non-Commercial Repository",
+                    "language" : "en"
+                  }
+                ],
+                "location" : [
+                  "non_commercial_repository"
+                ]
+              },
+              "article_version_phrases" : [
+                {
+                  "phrase" : "Accepted",
+                  "language" : "en",
+                  "value" : "accepted"
+                }
+              ],
+              "conditions" : [
+                "Publisher copyright and source must be acknowledged",
+                "Must link to publisher version"
+              ],
+              "additional_oa_fee_phrases" : [
+                {
+                  "phrase" : "No",
+                  "language" : "en",
+                  "value" : "no"
+                }
+              ],
+              "prerequisites" : {
+                "prerequisites" : [
+                  "when_required_by_funder"
+                ],
+                "prerequisites_phrases" : [
+                  {
+                    "value" : "when_required_by_funder",
+                    "phrase" : "If Required by Funder",
+                    "language" : "en"
+                  }
+                ]
+              },
+              "additional_oa_fee" : "no",
+              "license" : [
+                {
+                  "license" : "cc_by_nc_nd",
+                  "license_phrases" : [
+                    {
+                      "value" : "cc_by_nc_nd",
+                      "language" : "en",
+                      "phrase" : "CC BY-NC-ND"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "additional_oa_fee" : "no",
+              "additional_oa_fee_phrases" : [
+                {
+                  "language" : "en",
+                  "phrase" : "No",
+                  "value" : "no"
+                }
+              ],
+              "prerequisites" : {
+                "prerequisite_funders" : [
+                  {
+                    "funder_metadata" : {
+                      "id" : 9,
+                      "identifiers" : [
+                        {
+                          "type_phrases" : [
+                            {
+                              "value" : "fundref",
+                              "phrase" : "FundRef DOI",
+                              "language" : "en"
+                            }
+                          ],
+                          "type" : "fundref",
+                          "identifier" : "http://dx.doi.org/10.13039/100000002"
+                        }
+                      ],
+                      "name" : [
+                        {
+                          "preferred" : "name",
+                          "preferred_phrases" : [
+                            {
+                              "value" : "name",
+                              "language" : "en",
+                              "phrase" : "Name"
+                            }
+                          ],
+                          "name" : "National Institutes of Health",
+                          "language" : "en",
+                          "language_phrases" : [
+                            {
+                              "phrase" : "English",
+                              "language" : "en",
+                              "value" : "en"
+                            }
+                          ],
+                          "acronym" : "NIH"
+                        }
+                      ],
+                      "country" : "us",
+                      "country_phrases" : [
+                        {
+                          "value" : "us",
+                          "phrase" : "United States of America",
+                          "language" : "en"
+                        }
+                      ],
+                      "url" : [
+                        {
+                          "language" : "en",
+                          "language_phrases" : [
+                            {
+                              "value" : "en",
+                              "phrase" : "English",
+                              "language" : "en"
+                            }
+                          ],
+                          "url" : "http://www.nih.gov/"
+                        }
+                      ]
+                    },
+                    "system_metadata" : {
+                      "id" : 9,
+                      "uri" : "http://v2.sherpa.ac.uk/id/funder/9"
+                    }
+                  }
+                ]
+              },
+              "article_version_phrases" : [
+                {
+                  "phrase" : "Accepted",
+                  "language" : "en",
+                  "value" : "accepted"
+                }
+              ],
+              "conditions" : [
+                "Publisher copyright and source must be acknowledged",
+                "Must link to publisher version"
+              ],
+              "location" : {
+                "location_phrases" : [
+                  {
+                    "value" : "non_commercial_repository",
+                    "phrase" : "Non-Commercial Repository",
+                    "language" : "en"
+                  }
+                ],
+                "location" : [
+                  "non_commercial_repository"
+                ]
+              },
+              "embargo" : {
+                "units" : "months",
+                "units_phrases" : [
+                  {
+                    "value" : "months",
+                    "language" : "en",
+                    "phrase" : "Months"
+                  }
+                ],
+                "amount" : 12
+              },
+              "article_version" : [
+                "accepted"
+              ]
+            }
+          ],
+          "uri" : "http://v2.sherpa.ac.uk/id/publisher_policy/1274",
+          "urls" : [
+            {
+              "description" : "Guidelines for Authors",
+              "url" : "http://download.thelancet.com/flatcontentassets/authors/lancet-information-for-authors.pdf"
+            },
+            {
+              "description" : "Disclosure of results before publication",
+              "url" : "http://www.thelancet.com/lancet/information-for-authors/disclosure-of-results"
+            },
+            {
+              "description" : "The Lancet journals welcome a new open access policy",
+              "url" : "http://www.thelancet.com/journals/lancet/article/PIIS0140-6736%2813%2960720-5/fulltext"
+            },
+            {
+              "url" : "http://www.thelancet.com/lancet-information-for-authors/after-publication",
+              "description" : "What happens after publication?"
+            },
+            {
+              "url" : "https://www.elsevier.com/__data/assets/pdf_file/0005/78476/external-embargo-list.pdf",
+              "description" : "Journal Embargo Period List"
+            },
+            {
+              "description" : "Journal Embargo List for UK Authors",
+              "url" : "https://www.elsevier.com/__data/assets/pdf_file/0011/78473/UK-Embargo-Periods.pdf"
+            }
+          ],
+          "open_access_prohibited_phrases" : [
+            {
+              "value" : "no",
+              "phrase" : "No",
+              "language" : "en"
+            }
+          ],
+          "internal_moniker" : "Lancet",
+          "open_access_prohibited" : "no"
+        },
+        {
+          "open_access_prohibited_phrases" : [
+            {
+              "value" : "no",
+              "language" : "en",
+              "phrase" : "No"
+            }
+          ],
+          "internal_moniker" : "Open access option",
+          "open_access_prohibited" : "no",
+          "permitted_oa" : [
+            {
+              "additional_oa_fee_phrases" : [
+                {
+                  "value" : "yes",
+                  "language" : "en",
+                  "phrase" : "Yes"
+                }
+              ],
+              "article_version" : [
+                "published"
+              ],
+              "conditions" : [
+                "Published source must be acknowledged with citation"
+              ],
+              "article_version_phrases" : [
+                {
+                  "value" : "published",
+                  "language" : "en",
+                  "phrase" : "Published"
+                }
+              ],
+              "license" : [
+                {
+                  "license" : "cc_by_nc_nd",
+                  "license_phrases" : [
+                    {
+                      "value" : "cc_by_nc_nd",
+                      "phrase" : "CC BY-NC-ND",
+                      "language" : "en"
+                    }
+                  ],
+                  "version" : "4.0"
+                }
+              ],
+              "location" : {
+                "named_repository" : [
+                  "PubMed Central",
+                  "Research for Development Repository",
+                  "ESRC Research Catalogue"
+                ],
+                "location" : [
+                  "named_repository",
+                  "non_commercial_repository",
+                  "this_journal"
+                ],
+                "location_phrases" : [
+                  {
+                    "language" : "en",
+                    "phrase" : "Named Repository",
+                    "value" : "named_repository"
+                  },
+                  {
+                    "phrase" : "Non-Commercial Repository",
+                    "language" : "en",
+                    "value" : "non_commercial_repository"
+                  },
+                  {
+                    "value" : "this_journal",
+                    "language" : "en",
+                    "phrase" : "This Journal"
+                  }
+                ]
+              },
+              "additional_oa_fee" : "yes"
+            },
+            {
+              "location" : {
+                "named_repository" : [
+                  "PubMed Central",
+                  "Research for Development Repository",
+                  "ESRC Research Catalogue"
+                ],
+                "location" : [
+                  "institutional_repository",
+                  "named_repository",
+                  "subject_repository",
+                  "this_journal"
+                ],
+                "location_phrases" : [
+                  {
+                    "value" : "institutional_repository",
+                    "phrase" : "Institutional Repository",
+                    "language" : "en"
+                  },
+                  {
+                    "value" : "named_repository",
+                    "language" : "en",
+                    "phrase" : "Named Repository"
+                  },
+                  {
+                    "value" : "subject_repository",
+                    "phrase" : "Subject Repository",
+                    "language" : "en"
+                  },
+                  {
+                    "language" : "en",
+                    "phrase" : "This Journal",
+                    "value" : "this_journal"
+                  }
+                ]
+              },
+              "additional_oa_fee" : "yes",
+              "license" : [
+                {
+                  "license" : "cc_by",
+                  "license_phrases" : [
+                    {
+                      "language" : "en",
+                      "phrase" : "CC BY",
+                      "value" : "cc_by"
+                    }
+                  ]
+                }
+              ],
+              "article_version_phrases" : [
+                {
+                  "language" : "en",
+                  "phrase" : "Published",
+                  "value" : "published"
+                }
+              ],
+              "article_version" : [
+                "published"
+              ],
+              "conditions" : [
+                "Published source must be acknowledged with citation"
+              ],
+              "additional_oa_fee_phrases" : [
+                {
+                  "language" : "en",
+                  "phrase" : "Yes",
+                  "value" : "yes"
+                }
+              ]
+            }
+          ],
+          "urls" : [
+            {
+              "url" : "https://www.elsevier.com/about/open-science/open-access",
+              "description" : "Open access"
+            },
+            {
+              "description" : "Open access licenses",
+              "url" : "https://www.elsevier.com/about/policies/open-access-licenses"
+            }
+          ],
+          "uri" : "http://v2.sherpa.ac.uk/id/publisher_policy/3323",
+          "id" : 3323,
+          "publication_count" : 2102
+        }
+      ],
+      "type" : "journal",
+      "title" : [
+        {
+          "preferred_phrases" : [
+            {
+              "language" : "en",
+              "phrase" : "Title",
+              "value" : "name"
+            }
+          ],
+          "preferred" : "name",
+          "title" : "The Lancet",
+          "language_phrases" : [
+            {
+              "phrase" : "English",
+              "language" : "en",
+              "value" : "en"
+            }
+          ],
+          "language" : "en"
+        },
+        {
+          "language" : "en",
+          "language_phrases" : [
+            {
+              "language" : "en",
+              "phrase" : "English",
+              "value" : "en"
+            }
+          ],
+          "title" : "Lancet",
+          "preferred" : "name",
+          "preferred_phrases" : [
+            {
+              "value" : "name",
+              "language" : "en",
+              "phrase" : "Title"
+            }
+          ]
+        }
+      ],
+      "listed_in_doaj_phrases" : [
+        {
+          "language" : "en",
+          "phrase" : "No",
+          "value" : "no"
+        }
+      ]
+    }
+  ]
+}
