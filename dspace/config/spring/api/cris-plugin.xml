@@ -90,30 +90,10 @@
 				<entry key="UUID">
 					<bean class="org.dspace.authority.service.impl.ItemSearcherById"></bean>
 				</entry>
-				<entry key="ORCID">
-					<bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata">
-						<constructor-arg ref="org.dspace.discovery.SearchService"></constructor-arg>
-						<constructor-arg value="person.identifier.orcid"></constructor-arg>
-					</bean>
-				</entry>
-				<entry key="RID">
-					<bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata">
-						<constructor-arg ref="org.dspace.discovery.SearchService"></constructor-arg>
-						<constructor-arg value="person.identifier.rid"></constructor-arg>
-					</bean>
-				</entry>
-				<entry key="ISNI">
-					<bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata">
-						<constructor-arg ref="org.dspace.discovery.SearchService"></constructor-arg>
-						<constructor-arg value="person.identifier.isni"></constructor-arg>
-					</bean>
-				</entry>
-				<entry key="DOI">
-					<bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata">
-						<constructor-arg ref="org.dspace.discovery.SearchService"></constructor-arg>
-						<constructor-arg value="dc.identifier.doi"></constructor-arg>
-					</bean>
-				</entry>
+				<entry key="ORCID" value-ref="itemSearcherByORCID"/>
+				<entry key="RID" value-ref="itemSearcherByRID"/>
+				<entry key="ISNI" value-ref="itemSearcherByISNI"/>
+				<entry key="DOI" value-ref="itemSearcherByDOI"/>
 			</map>
 		</constructor-arg>
 		<constructor-arg index="1">
@@ -121,6 +101,27 @@
 		</constructor-arg>
 	</bean>
 	
+	<bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata" name="itemSearcherByORCID">
+		<constructor-arg value="person.identifier.orcid"></constructor-arg>
+		<constructor-arg value="ORCID"></constructor-arg>
+	</bean>
+	
+	<bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata" name="itemSearcherByRID">
+		<constructor-arg value="person.identifier.rid"></constructor-arg>
+		<constructor-arg value="RID"></constructor-arg>
+	</bean>
+	
+	<bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata" name="itemSearcherByDOI">
+		<constructor-arg value="dc.identifier.doi"></constructor-arg>
+		<constructor-arg value="DOI"></constructor-arg>
+	</bean>
+	
+	<bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata" name="itemSearcherByISNI">
+		<constructor-arg value="person.identifier.isni"></constructor-arg>
+		<constructor-arg value="ISNI"></constructor-arg>
+	</bean>
+	
 	<bean class="org.dspace.authority.service.impl.ItemSearchServiceImpl" name="org.dspace.authority.service.ItemSearchService"/>
+	<bean class="org.dspace.authority.service.impl.ItemReferenceResolverServiceImpl" name="org.dspace.authority.service.ItemReferenceResolverService"/>
 	
 </beans>

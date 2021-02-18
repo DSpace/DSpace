@@ -40,17 +40,29 @@ public class DiscoverResultIterator<T extends ReloadableEntity, PK extends Seria
 
     private Iterator<IndexableObject> currentSlotIterator;
 
+    private boolean uncacheEntitites;
+
     public DiscoverResultIterator(Context context, DiscoverQuery discoverQuery) {
-        this(context, null, discoverQuery);
+        this(context, null, discoverQuery, true);
+    }
+
+    public DiscoverResultIterator(Context context, DiscoverQuery discoverQuery, boolean uncacheEntities) {
+        this(context, null, discoverQuery, uncacheEntities);
     }
 
     public DiscoverResultIterator(Context context, IndexableObject<?, ?> scopeObject, DiscoverQuery discoverQuery) {
+        this(context, scopeObject, discoverQuery, true);
+    }
+
+    public DiscoverResultIterator(Context context, IndexableObject<?, ?> scopeObject, DiscoverQuery discoverQuery,
+        boolean uncacheEntities) {
 
         this.context = context;
         this.scopeObject = scopeObject;
         this.discoverQuery = discoverQuery;
         this.iteratorCounter = discoverQuery.getStart();
         this.searchService = SearchUtils.getSearchService();
+        this.uncacheEntitites = uncacheEntities;
 
         updateCurrentSlotIterator();
     }
@@ -63,7 +75,10 @@ public class DiscoverResultIterator<T extends ReloadableEntity, PK extends Seria
 
         this.discoverQuery.setStart(iteratorCounter);
 
-        uncacheEntitites();
+        if (uncacheEntitites) {
+            uncacheEntitites();
+        }
+
         updateCurrentSlotIterator();
 
         return currentSlotIterator.hasNext();

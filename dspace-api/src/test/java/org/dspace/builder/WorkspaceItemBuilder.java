@@ -138,14 +138,20 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
         return workspaceItemService;
     }
 
-    protected WorkspaceItemBuilder addMetadataValue(final String schema,
-            final String element, final String qualifier, final String value) {
+    protected WorkspaceItemBuilder addMetadataValue(String schema, String element, String qualifier, String value) {
+        return addMetadataValue(schema, element, qualifier, null, value, null, -1);
+    }
+
+    protected WorkspaceItemBuilder addMetadataValue(String schema, String element, String qualifier, String language,
+        String value, String authority, int confidence) {
+
         try {
-            itemService.addMetadata(context, workspaceItem.getItem(), schema, element, qualifier, null,
-                    value, null, -1);
+            itemService.addMetadata(context, workspaceItem.getItem(), schema, element, qualifier, language,
+                value, authority, confidence);
         } catch (Exception e) {
             return handleException(e);
         }
+
         return this;
     }
 
@@ -182,6 +188,11 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
         return addMetadataValue(MetadataSchemaEnum.DC.getName(), "contributor", "author", authorName);
     }
 
+    public WorkspaceItemBuilder withAuthor(String authorName, String authority) {
+        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "contributor", "author", null, authorName, authority,
+            600);
+    }
+
     public WorkspaceItemBuilder withAuthorAffilitation(final String affilation) {
         return addMetadataValue(MetadataSchemaEnum.OAIRECERIF.getName(), "author", "affiliation", affilation);
     }
@@ -216,6 +227,10 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
 
     public WorkspaceItemBuilder withIsniIdentifier(String isni) {
         return addMetadataValue("person", "identifier", "isni", isni);
+    }
+
+    public WorkspaceItemBuilder withOrcidIdentifier(String orcid) {
+        return addMetadataValue("person", "identifier", "orcid", orcid);
     }
 
     public WorkspaceItemBuilder withPatentNo(String patentNo) {
