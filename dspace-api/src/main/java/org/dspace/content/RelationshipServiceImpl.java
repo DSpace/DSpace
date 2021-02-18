@@ -347,21 +347,43 @@ public class RelationshipServiceImpl implements RelationshipService {
         if (isRelationshipValidToDelete(context, relationship) &&
             copyToItemPermissionCheck(context, relationship, copyToLeftItem, copyToRightItem)) {
             // To delete a relationship, a user must have WRITE permissions on one of the related Items
-            copyMetadataValues(context, relationship, copyToLeftItem, copyToRightItem);
-            if (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
-                authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
-                relationshipDAO.delete(context, relationship);
-                updatePlaceInRelationship(context, relationship);
-                updateItemsInRelationship(context, relationship);
-            } else {
-                throw new AuthorizeException(
-                    "You do not have write rights on this relationship's items");
-            }
+            deleteRelationshipAndCopyToItem(context, relationship, copyToLeftItem, copyToRightItem);
 
         } else {
             throw new IllegalArgumentException("The relationship given was not valid");
         }
     }
+
+    @Override
+    public void forceDelete(Context context, Relationship relationship, boolean copyToLeftItem, boolean copyToRightItem)
+        throws SQLException, AuthorizeException {
+        log.info(org.dspace.core.LogManager.getHeader(context, "delete_relationship",
+                                                      "relationship_id=" + relationship.getID() + "&" +
+                                                          "copyMetadataValuesToLeftItem=" + copyToLeftItem + "&" +
+                                                          "copyMetadataValuesToRightItem=" + copyToRightItem));
+        if (copyToItemPermissionCheck(context, relationship, copyToLeftItem, copyToRightItem)) {
+            // To delete a relationship, a user must have WRITE permissions on one of the related Items
+            deleteRelationshipAndCopyToItem(context, relationship, copyToLeftItem, copyToRightItem);
+
+        } else {
+            throw new IllegalArgumentException("The relationship given was not valid");
+        }
+    }
+
+    private void deleteRelationshipAndCopyToItem(Context context, Relationship relationship, boolean copyToLeftItem,
+                                                 boolean copyToRightItem) throws SQLException, AuthorizeException {
+        copyMetadataValues(context, relationship, copyToLeftItem, copyToRightItem);
+        if (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
+            authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
+            relationshipDAO.delete(context, relationship);
+            updatePlaceInRelationship(context, relationship);
+            updateItemsInRelationship(context, relationship);
+        } else {
+            throw new AuthorizeException(
+                "You do not have write rights on this relationship's items");
+        }
+    }
+
 
 
     /**

@@ -49,13 +49,19 @@ import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.RelationshipBuilder;
+import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.EntityType;
 import org.dspace.content.Item;
+import org.dspace.content.Relationship;
+import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -1575,7 +1581,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     /**
      * Test the creation of workspaceitems POSTing to the resource collection endpoint a bibtex file
      * contains more than one entry.
-     * 
+     *
      * @throws Exception
      */
     public void createSingleWorkspaceItemsFromSingleFileWithMultipleEntriesTest() throws Exception {
@@ -1620,7 +1626,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     /**
      * Test the creation of workspaceitems POSTing to the resource collection endpoint a pubmed XML
      * file.
-     * 
+     *
      * @throws Exception
      */
     public void createPubmedWorkspaceItemFromFileTest() throws Exception {
@@ -4664,6 +4670,81 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                           .param("projection", "full"))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$._embedded.collection._embedded.adminGroup").doesNotExist());
+
+    }
+
+    @Test
+    public void deleteWorkspaceItemWithMinRelationshipsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community with one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder
+            .createCollection(context, parentCommunity).withName("Collection 1").build();
+
+        Item author1 = ItemBuilder.createItem(context, col1)
+                                  .withTitle("Author1")
+                                  .withIssueDate("2017-10-17")
+                                  .withAuthor("Smith, Donald")
+                                  .withPersonIdentifierLastName("Smith")
+                                  .withPersonIdentifierFirstName("Donald")
+                                  .withRelationshipType("Person")
+                                  .build();
+
+        Item author2 = ItemBuilder.createItem(context, col1)
+                                  .withTitle("Author2")
+                                  .withIssueDate("2016-02-13")
+                                  .withAuthor("Smith, Maria")
+                                  .withRelationshipType("Person")
+                                  .build();
+
+        //2. One workspace item.
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                          .withRelationshipType("Publication")
+                                                          .build();
+
+        EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType person = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+
+        RelationshipType isAuthorOfPublication = RelationshipTypeBuilder
+            .createRelationshipTypeBuilder(context, publication, person, "isAuthorOfPublication",
+                                           "isPublicationOfAuthor", 2, null, 0,
+                                           null).withCopyToLeft(false).withCopyToRight(true).build();
+
+        Relationship relationship1 = RelationshipBuilder
+            .createRelationshipBuilder(context, workspaceItem.getItem(), author1, isAuthorOfPublication).build();
+        Relationship relationship2 = RelationshipBuilder
+            .createRelationshipBuilder(context, workspaceItem.getItem(), author2, isAuthorOfPublication).build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/relationships/" + relationship1.getID()))
+                .andExpect(status().is(200));
+        getClient(token).perform(delete("/api/core/relationships/" + relationship1.getID()))
+                        .andExpect(status().is(400));
+        //Both relationships still exist
+        getClient(token).perform(get("/api/core/relationships/" + relationship1.getID()))
+                .andExpect(status().is(200));
+        getClient(token).perform(get("/api/core/relationships/" + relationship2.getID()))
+                .andExpect(status().is(200));
+
+        //Delete the workspaceitem
+        getClient(token).perform(delete("/api/submission/workspaceitems/" + workspaceItem.getID()))
+                        .andExpect(status().is(204));
+        //The workspaceitem has been deleted
+        getClient(token).perform(get("/api/submission/workspaceitems/" + workspaceItem.getID()))
+                        .andExpect(status().is(404));
+        //The relationships have been deleted
+        getClient(token).perform(get("/api/core/relationships/" + relationship1.getID()))
+                .andExpect(status().is(404));
+        getClient(token).perform(get("/api/core/relationships/" + relationship2.getID()))
+                .andExpect(status().is(404));
 
     }
 }
