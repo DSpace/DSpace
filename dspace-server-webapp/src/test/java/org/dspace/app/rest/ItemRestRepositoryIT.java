@@ -24,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,7 @@ import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
+import org.dspace.app.rest.repository.ItemRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
 import org.dspace.builder.BitstreamBuilder;
@@ -51,15 +53,21 @@ import org.dspace.builder.BundleBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.RelationshipBuilder;
+import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.builder.ResourcePolicyBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.EntityType;
 import org.dspace.content.Item;
+import org.dspace.content.Relationship;
+import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.CollectionService;
 import org.dspace.eperson.EPerson;
@@ -74,6 +82,13 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private CollectionService collectionService;
+
+    private Item publication1;
+    private Item author1;
+    private Item author2;
+    RelationshipType isAuthorOfPublication;
+    private Relationship relationship1;
+    private Relationship relationship2;
 
     @Test
     public void findAllTest() throws Exception {
@@ -3123,8 +3138,265 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                        is(10)));
     }
 
+    @Test
+    public void deleteItemWithMinRelationshipsTest() throws Exception {
+        initPublicationAuthorsRelationships();
 
+        String token = getAuthToken(admin.getEmail(), password);
 
+        getClient(token).perform(get("/api/core/relationships/" + relationship1.getID()))
+                        .andExpect(status().is(200));
+        getClient(token).perform(delete("/api/core/relationships/" + relationship1.getID()))
+                        .andExpect(status().is(400));
+        //Both relationships still exist
+        getClient(token).perform(get("/api/core/relationships/" + relationship1.getID()))
+                .andExpect(status().is(200));
+        getClient(token).perform(get("/api/core/relationships/" + relationship2.getID()))
+                .andExpect(status().is(200));
 
+        //Delete public item
+        getClient(token).perform(delete("/api/core/items/" + publication1.getID()))
+                        .andExpect(status().is(204));
+        //The item has been deleted
+        getClient(token).perform(get("/api/core/items/" + publication1.getID()))
+                        .andExpect(status().is(404));
+        //The relationships have been deleted
+        getClient(token).perform(get("/api/core/relationships/" + relationship1.getID()))
+                .andExpect(status().is(404));
+        getClient(token).perform(get("/api/core/relationships/" + relationship2.getID()))
+                .andExpect(status().is(404));
+
+    }
+
+    @Test
+    public void deleteItemWithMinRelationshipsTest_copyVirtualMetadata_null() throws Exception {
+        initPublicationAuthorsRelationships();
+        String token = getAuthToken(admin.getEmail(), password);
+
+        //Delete public item with copyVirtualMetadata null
+        getClient(token).perform(delete("/api/core/items/" + publication1.getID()))
+                        .andExpect(status().is(204));
+        // The non-deleted item of the relationships the delete item had (other sides) doesn't still have the
+        // relationship Metadata
+        getClient(token).perform(get("/api/core/items/" + author1.getID()))
+                        .andExpect(status().is(200))
+                        .andExpect(jsonPath("$.metadata['relation.isPublicationOfAuthor']").doesNotExist());
+        getClient(token).perform(get("/api/core/items/" + author2.getID()))
+                        .andExpect(status().is(200))
+                        .andExpect(jsonPath("$.metadata['relation.isPublicationOfAuthor']").doesNotExist());
+    }
+
+    @Test
+    public void deleteItemWithMinRelationshipsTest_copyVirtualMetadata_relationshiptypeid_isAuthorOfPublication()
+        throws Exception {
+        initPublicationAuthorsRelationships();
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // Delete public item with copyVirtualMetadata isAuthorOfPublication relationship id
+        getClient(token).perform(delete("/api/core/items/" + publication1.getID())
+            .param(ItemRestRepository.REQUESTPARAMETER_COPYVIRTUALMETADATA,
+                String.valueOf(isAuthorOfPublication.getID())))
+                        .andExpect(status().is(204));
+        // The non-deleted item of the relationships the delete item had (other sides) still has the
+        // relationship Metadata
+        getClient(token).perform(get("/api/core/items/" + author1.getID()))
+                        .andExpect(status().is(200))
+                        .andExpect(jsonPath("$.metadata['relation.isPublicationOfAuthor']" +
+                                            "[0].value", is(String.valueOf(publication1.getID()))));
+        getClient(token).perform(get("/api/core/items/" + author2.getID()))
+                        .andExpect(status().is(200))
+                        .andExpect(jsonPath("$.metadata['relation.isPublicationOfAuthor']" +
+                                            "[0].value", is(String.valueOf(publication1.getID()))));
+    }
+
+    @Test
+    public void deleteItemWithMinRelationshipsTest_copyVirtualMetadata_relationshiptypeid_other() throws Exception {
+        initPublicationAuthorsRelationships();
+        String token = getAuthToken(admin.getEmail(), password);
+        context.turnOffAuthorisationSystem();
+
+        EntityType journalIssueEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "JournalIssue").build();
+        EntityType journalVolumeEntityType =
+            EntityTypeBuilder.createEntityTypeBuilder(context, "JournalVolume").build();
+
+        RelationshipType isJournalVolumeOfIssueRelationshipType =
+            RelationshipTypeBuilder.createRelationshipTypeBuilder(context, journalIssueEntityType,
+                journalVolumeEntityType, "isIssueOfJournalVolume", "isJournalVolumeOfIssue", 2, null, 0,
+                null).withCopyToLeft(false).withCopyToRight(true).build();
+        context.restoreAuthSystemState();
+
+        // Delete public item with copyVirtualMetadata id of relationship neither item has
+        getClient(token).perform(delete("/api/core/items/" + publication1.getID())
+            .param(ItemRestRepository.REQUESTPARAMETER_COPYVIRTUALMETADATA,
+                String.valueOf(isJournalVolumeOfIssueRelationshipType.getID())))
+                        .andExpect(status().is(204));
+        // The non-deleted item of the relationships the delete item had (other sides) doesn't still have the
+        // relationship Metadata
+        getClient(token).perform(get("/api/core/items/" + author1.getID()))
+                        .andExpect(status().is(200))
+                        .andExpect(jsonPath("$.metadata['relation.isPublicationOfAuthor']").doesNotExist());
+        getClient(token).perform(get("/api/core/items/" + author2.getID()))
+                        .andExpect(status().is(200))
+                        .andExpect(jsonPath("$.metadata['relation.isPublicationOfAuthor']").doesNotExist());
+    }
+
+    @Test
+    public void deleteItemWithMinRelationshipsTest_copyVirtualMetadata_all() throws Exception {
+        initPublicationAuthorsRelationships();
+        String token = getAuthToken(admin.getEmail(), password);
+
+        //Delete public item with copyVirtualMetadata = all
+        getClient(token).perform(delete("/api/core/items/" + publication1.getID())
+            .param(ItemRestRepository.REQUESTPARAMETER_COPYVIRTUALMETADATA, ItemRestRepository.COPYVIRTUAL_ALL))
+                        .andExpect(status().is(204));
+        // The non-deleted item of the relationships the delete item had (other sides) now still has the
+        // relationship Metadata
+        getClient(token).perform(get("/api/core/items/" + author1.getID()))
+                        .andExpect(status().is(200))
+                        .andExpect(jsonPath("$.metadata['relation.isPublicationOfAuthor']" +
+                                            "[0].value", is(String.valueOf(publication1.getID()))));
+        getClient(token).perform(get("/api/core/items/" + author2.getID()))
+                        .andExpect(status().is(200))
+                        .andExpect(jsonPath("$.metadata['relation.isPublicationOfAuthor']" +
+                                            "[0].value", is(String.valueOf(publication1.getID()))));
+    }
+
+    @Test
+    public void deleteItemWithMinRelationshipsTest_copyVirtualMetadata_configured_withCopyToRightTrueConfigured()
+        throws Exception {
+        initPublicationAuthorsRelationships();
+        String token = getAuthToken(admin.getEmail(), password);
+
+        //Delete public item with copyVirtualMetadata = configured
+        getClient(token).perform(delete("/api/core/items/" + publication1.getID())
+            .param(ItemRestRepository.REQUESTPARAMETER_COPYVIRTUALMETADATA, ItemRestRepository.COPYVIRTUAL_CONFIGURED))
+                        .andExpect(status().is(204));
+        // The non-deleted item of the relationships the delete item had (other sides) now still has the
+        // relationship Metadata
+        getClient(token).perform(get("/api/core/items/" + author1.getID()))
+                        .andExpect(status().is(200))
+                        .andExpect(jsonPath("$.metadata['relation.isPublicationOfAuthor']" +
+                                            "[0].value", is(String.valueOf(publication1.getID()))));
+        getClient(token).perform(get("/api/core/items/" + author2.getID()))
+                        .andExpect(status().is(200))
+                        .andExpect(jsonPath("$.metadata['relation.isPublicationOfAuthor']" +
+                                            "[0].value", is(String.valueOf(publication1.getID()))));
+    }
+
+    @Test
+    public void deleteItemWithMinRelationshipsTest_copyVirtualMetadata_configured_withCopyToRightFalseConfigured()
+        throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community with one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder
+            .createCollection(context, parentCommunity).withName("Collection 1").build();
+
+        author1 = ItemBuilder.createItem(context, col1)
+                             .withTitle("Author1")
+                             .withIssueDate("2017-10-17")
+                             .withAuthor("Smith, Donald")
+                             .withPersonIdentifierLastName("Smith")
+                             .withPersonIdentifierFirstName("Donald")
+                             .withRelationshipType("Person")
+                             .build();
+
+        author2 = ItemBuilder.createItem(context, col1)
+                             .withTitle("Author2")
+                             .withIssueDate("2016-02-13")
+                             .withAuthor("Smith, Maria")
+                             .withRelationshipType("Person")
+                             .build();
+
+        publication1 = ItemBuilder.createItem(context, col1)
+                                  .withTitle("Publication1")
+                                  .withAuthor("Testy, TEst")
+                                  .withIssueDate("2015-01-01")
+                                  .withRelationshipType("Publication")
+                                  .build();
+
+        EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType person = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+        isAuthorOfPublication = RelationshipTypeBuilder
+            .createRelationshipTypeBuilder(context, publication, person, "isAuthorOfPublication",
+                "isPublicationOfAuthor", 2, null, 0,
+                null).withCopyToLeft(false).withCopyToRight(false).build();
+
+        relationship1 = RelationshipBuilder
+            .createRelationshipBuilder(context, publication1, author1, isAuthorOfPublication).build();
+        relationship2 = RelationshipBuilder
+            .createRelationshipBuilder(context, publication1, author2, isAuthorOfPublication).build();
+
+        context.restoreAuthSystemState();
+        String token = getAuthToken(admin.getEmail(), password);
+
+        //Delete public item with copyVirtualMetadata = configured
+        getClient(token).perform(delete("/api/core/items/" + publication1.getID())
+            .param(ItemRestRepository.REQUESTPARAMETER_COPYVIRTUALMETADATA, ItemRestRepository.COPYVIRTUAL_CONFIGURED))
+                        .andExpect(status().is(204));
+        // The non-deleted item of the relationships the delete item had (other sides) now still has the
+        // relationship Metadata
+        getClient(token).perform(get("/api/core/items/" + author1.getID()))
+                        .andExpect(status().is(200))
+                        .andExpect(jsonPath("$.metadata['relation.isPublicationOfAuthor']").doesNotExist());
+        getClient(token).perform(get("/api/core/items/" + author2.getID()))
+                        .andExpect(status().is(200))
+                        .andExpect(jsonPath("$.metadata['relation.isPublicationOfAuthor']").doesNotExist());
+    }
+
+    private void initPublicationAuthorsRelationships() throws SQLException {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community with one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder
+            .createCollection(context, parentCommunity).withName("Collection 1").build();
+
+        author1 = ItemBuilder.createItem(context, col1)
+                             .withTitle("Author1")
+                             .withIssueDate("2017-10-17")
+                             .withAuthor("Smith, Donald")
+                             .withPersonIdentifierLastName("Smith")
+                             .withPersonIdentifierFirstName("Donald")
+                             .withRelationshipType("Person")
+                             .build();
+
+        author2 = ItemBuilder.createItem(context, col1)
+                             .withTitle("Author2")
+                             .withIssueDate("2016-02-13")
+                             .withAuthor("Smith, Maria")
+                             .withRelationshipType("Person")
+                             .build();
+
+        publication1 = ItemBuilder.createItem(context, col1)
+                                  .withTitle("Publication1")
+                                  .withAuthor("Testy, TEst")
+                                  .withIssueDate("2015-01-01")
+                                  .withRelationshipType("Publication")
+                                  .build();
+
+        EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType person = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+        isAuthorOfPublication = RelationshipTypeBuilder
+            .createRelationshipTypeBuilder(context, publication, person, "isAuthorOfPublication",
+                "isPublicationOfAuthor", 2, null, 0,
+                null).withCopyToLeft(false).withCopyToRight(true).build();
+
+        relationship1 = RelationshipBuilder
+            .createRelationshipBuilder(context, publication1, author1, isAuthorOfPublication).build();
+        relationship2 = RelationshipBuilder
+            .createRelationshipBuilder(context, publication1, author2, isAuthorOfPublication).build();
+
+        context.restoreAuthSystemState();
+    }
 
 }
