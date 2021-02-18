@@ -75,7 +75,19 @@
 					<xsl:when test="contains(./text(),'hdl.handle.net')">
 						<xsl:call-template name="printAlternativeIdentifier">
 							<xsl:with-param name="type">hdl</xsl:with-param>
-							<xsl:with-param name="value"><xsl:value-of select="substring-after(./text(),'http://hdl.handle.net/')"/></xsl:with-param>
+							<xsl:with-param name="value"><xsl:value-of select="substring-after(./text(),'hdl.handle.net/')"/></xsl:with-param>
+						</xsl:call-template>
+					</xsl:when>
+					<xsl:when test="contains(./text(),'hdl:')">
+						<xsl:call-template name="printAlternativeIdentifier">
+							<xsl:with-param name="type">hdl</xsl:with-param>
+							<xsl:with-param name="value"><xsl:value-of select="substring-after(./text(),'hdl:')"/></xsl:with-param>
+						</xsl:call-template>
+					</xsl:when>
+					<xsl:when test="contains(./text(),'handle/')">
+						<xsl:call-template name="printAlternativeIdentifier">
+							<xsl:with-param name="type">hdl</xsl:with-param>
+							<xsl:with-param name="value"><xsl:value-of select="substring-after(./text(),'handle/')"/></xsl:with-param>
 						</xsl:call-template>
 					</xsl:when>
 				</xsl:choose>
