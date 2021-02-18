@@ -52,10 +52,18 @@
 			</xsl:if>
 
 			<!-- Ver "Idenficadores alternativos" en SNRD v.2015 -->
-			<!--  sedici.identifier.doi, sedici.identifier.handle, sedici.identifier.isbn -->
-			<xsl:for-each select="doc:element[@name='sedici']/doc:element[@name='identifier']/doc:element[@name='doi' or @name='handle' or @name='isbn']/doc:element/doc:field">
+			<!--  sedici.identifier.doi, sedici.identifier.isbn -->
+			<xsl:for-each select="doc:element[@name='sedici']/doc:element[@name='identifier']/doc:element[@name='doi' or @name='isbn']/doc:element/doc:field">
 				<xsl:call-template name="printAlternativeIdentifier">
 					<xsl:with-param name="type"><xsl:value-of select="../../@name"/></xsl:with-param>
+					<xsl:with-param name="value"><xsl:value-of select="./text()"/></xsl:with-param>
+				</xsl:call-template>
+			</xsl:for-each>
+
+			<!-- sedici.identifier.handle -->
+			<xsl:for-each select="doc:element[@name='sedici']/doc:element[@name='identifier']/doc:element[@name='handle']/doc:element/doc:field">
+				<xsl:call-template name="printAlternativeIdentifier">
+					<xsl:with-param name="type">hdl</xsl:with-param>
 					<xsl:with-param name="value"><xsl:value-of select="./text()"/></xsl:with-param>
 				</xsl:call-template>
 			</xsl:for-each>
@@ -90,6 +98,38 @@
 							<xsl:with-param name="value"><xsl:value-of select="substring-after(./text(),'handle/')"/></xsl:with-param>
 						</xsl:call-template>
 					</xsl:when>
+					<xsl:when test="contains(./text(),'hdl:')">
+						<xsl:call-template name="printAlternativeIdentifier">
+							<xsl:with-param name="type">hdl</xsl:with-param>
+							<xsl:with-param name="value"><xsl:value-of select="substring-after(./text(),'hdl:')"/></xsl:with-param>
+						</xsl:call-template>
+					</xsl:when>
+				</xsl:choose>
+			</xsl:for-each>
+
+			<!-- sedici.relation.isRelatedWith -->
+			<xsl:for-each select="doc:element[@name='sedici']/doc:element[@name='relation']/doc:element[@name='isRelatedWith']/doc:element/doc:field">
+				<xsl:choose>
+					<xsl:when test="java:ar.edu.unlp.sedici.dspace.utils.Utils.isDoi(./text())">
+						<xsl:variable name="doiStartIndex"
+							select="string-length(substring-before(./text(),'10.'))+1" />
+						<xsl:call-template name="printRelatedPublication">
+							<xsl:with-param name="type">doi</xsl:with-param>
+							<xsl:with-param name="value"><xsl:value-of select="substring(./text(),$doiStartIndex)" /></xsl:with-param>
+						</xsl:call-template>
+					</xsl:when>
+					<xsl:when test="contains(./text(),'http://sedici.unlp.edu.ar/handle/')">
+						<xsl:call-template name="printRelatedPublication">
+							<xsl:with-param name="type">hdl</xsl:with-param>
+							<xsl:with-param name="value"><xsl:value-of select="substring-after(./text(),'http://sedici.unlp.edu.ar/handle/')"/></xsl:with-param>
+						</xsl:call-template>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:call-template name="printRelatedPublication">
+							<xsl:with-param name="type">url</xsl:with-param>
+							<xsl:with-param name="value"><xsl:value-of select="normalize-space(./text())"/></xsl:with-param>
+						</xsl:call-template>
+					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:for-each>
 			
@@ -284,5 +324,19 @@
 			</doc:element>
 		
 	</xsl:template>
-	
+
+	<xsl:template name="printRelatedPublication">
+		<xsl:param name="type"/>
+		<xsl:param name="value"/>
+		<doc:element name="sedici">
+			<doc:element name="relation">
+				<doc:element name="isRelatedWith">
+					<doc:field name="value">
+						<xsl:value-of select="concat('info:eu-repo/semantics/reference/',$type,'/', $value)"/>
+					</doc:field>
+				</doc:element>
+			</doc:element>
+		</doc:element>
+	</xsl:template>
+
 </xsl:stylesheet>

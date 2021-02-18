@@ -98,6 +98,11 @@
 			<xsl:for-each select="doc:metadata/doc:element[@name='snrd']/doc:element[@name='alternativeIdentifier']/doc:field[@name='value']">
 				<dc:relation><xsl:value-of select="."/></dc:relation>
 			</xsl:for-each>
+
+			<!-- sedici.relation.isRelatedWith -->
+			<xsl:for-each select="doc:metadata/doc:element[@name='sedici']/doc:element[@name='relation']/doc:element[@name='isRelatedWith']/doc:field[@name='value']">
+				<dc:relation><xsl:value-of select="."/></dc:relation>
+			</xsl:for-each>
 			
 			<!--sedici.contributor.compiler = creator -->
 			<xsl:for-each select="doc:metadata/doc:element[@name='sedici']/doc:element[@name='contributor']/doc:element[@name='compiler']/doc:element/doc:field[@name='value']">
@@ -243,18 +248,19 @@
  			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='format']/doc:element[@name='medium']/doc:element/doc:field[@name='value']">
 				<dc:format><xsl:value-of select="." /></dc:format>
 			</xsl:for-each>
-			
+
+<!--  Comento los mapeos a dc relation desde mods y desde sedici.relation porque son incorrectos de acuerdo a SNRD -->
 			<!-- mods.location=dc.relation -->
-			<xsl:for-each select="doc:metadata/doc:element[@name='mods']/doc:element[@name='location']/doc:element/doc:field[@name='value']">
-				<dc:relation>
-					<xsl:value-of select="." />
-				</dc:relation>
-			</xsl:for-each>
+<!-- 			<xsl:for-each select="doc:metadata/doc:element[@name='mods']/doc:element[@name='location']/doc:element/doc:field[@name='value']"> -->
+<!-- 				<dc:relation> -->
+<!-- 					<xsl:value-of select="." /> -->
+<!-- 				</dc:relation> -->
+<!-- 			</xsl:for-each> -->
 			
 			<!--sedici.relation.(event|journalTitle|journalVolumeAndIssue|dossier) = relation -->
-			<xsl:for-each select="doc:metadata/doc:element[@name='sedici']/doc:element[@name='relation']/doc:element/doc:element/doc:field[@name='value']">
-				<dc:relation><xsl:value-of select="." /></dc:relation>
-			</xsl:for-each>
+<!-- 			<xsl:for-each select="doc:metadata/doc:element[@name='sedici']/doc:element[@name='relation']/doc:element/doc:element/doc:field[@name='value']"> -->
+<!-- 				<dc:relation><xsl:value-of select="." /></dc:relation> -->
+<!-- 			</xsl:for-each> -->
 			
 			<!--mods.recordInfo.recordContentSource = source -->
 			<xsl:for-each select="doc:metadata/doc:element[@name='mods']/doc:element[@name='recordInfo']/doc:element[@name='recordContentSource']/doc:element/doc:field[@name='value']">
