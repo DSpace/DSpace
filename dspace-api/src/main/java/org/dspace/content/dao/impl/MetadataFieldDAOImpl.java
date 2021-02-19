@@ -42,6 +42,10 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
      */
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataFieldDAOImpl.class);
 
+    /**
+     * Cache for improvement the performance of searching metadata fields
+     * This cache only stores IDs, the actual MetadataField is retrieved from hibernate
+     */
     private static Map<String, Integer> cachedFields = new HashMap();
 
     protected MetadataFieldDAOImpl() {
