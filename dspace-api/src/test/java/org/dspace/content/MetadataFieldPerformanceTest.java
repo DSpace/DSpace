@@ -43,7 +43,7 @@ public class MetadataFieldPerformanceTest extends AbstractUnitTest {
 
         long duration = (endTime - startTime);
 
-        double maxDurationPerCall = 0.02;
+        double maxDurationPerCall = 0.01;
         double maxDuration = maxDurationPerCall * amount;
         //Duration is 0.05798 without performance improvements
         //Duration is 0.0022 with performance improvements
@@ -74,7 +74,7 @@ public class MetadataFieldPerformanceTest extends AbstractUnitTest {
 
         long duration = (endTime - startTime);
 
-        double maxDurationPerCall = 1;
+        double maxDurationPerCall = .3;
         double maxDuration = maxDurationPerCall * amount;
         //Duration is 1.542 without performance improvements
         //Duration is 0.0538 with performance improvements
