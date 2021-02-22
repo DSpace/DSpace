@@ -95,7 +95,8 @@ public class GroupRestController {
         for (Group childGroup : childGroups) {
             groupService.addMember(context, parentGroup, childGroup);
         }
-
+        // this is required to trigger the rebuild of the group2group cache
+        groupService.update(context, parentGroup);
         context.complete();
 
         response.setStatus(SC_NO_CONTENT);
@@ -203,7 +204,8 @@ public class GroupRestController {
         }
 
         groupService.removeMember(context, parentGroup, childGroup);
-
+        // this is required to trigger the rebuild of the group2group cache
+        groupService.update(context, parentGroup);
         context.complete();
 
         response.setStatus(SC_NO_CONTENT);

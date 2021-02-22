@@ -91,6 +91,20 @@ public class RestResourceControllerIT extends AbstractControllerIntegrationTest 
                                        endsWith("/api/core/metadatafields/search/byFieldName")));
     }
 
+    @Test
+    public void selfLinkContainsRequestParametersAndEmbedsWhenProvided() throws Exception {
+        // When we call a search endpoint with additional parameters and an embed parameter
+        getClient().perform(get("/api/core/metadatafields/search/byFieldName?schema=dc&offset=0&embed=schema"))
+                   // The self link should contain those same parameters
+                   .andExpect(jsonPath("$._links.self.href", endsWith(
+                           "/api/core/metadatafields/search/byFieldName?schema=dc&offset=0")));
+
+        getClient().perform(get("/api/core/metadatafields/search/byFieldName?schema=dc&offset=0&embed.size=schema=5"))
+                   // The self link should contain those same parameters
+                   .andExpect(jsonPath("$._links.self.href", endsWith(
+                           "/api/core/metadatafields/search/byFieldName?schema=dc&offset=0")));
+    }
+
 
 
 }

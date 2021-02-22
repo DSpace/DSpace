@@ -317,4 +317,17 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      */
     void delete(Context context, Relationship relationship, boolean copyToLeftItem, boolean copyToRightItem)
         throws SQLException, AuthorizeException;
+    /**
+     * This method is used to delete a Relationship whilst given the possibility to copy the Virtual Metadata created
+     * by this relationship to the left and/or right item.
+     * This method will bypass the cardinality checks on the {@link RelationshipType} for the given {@link Relationship}
+     * This should only be used during the deletion of items so that the min cardinality check can't disallow items
+     * to be deleted
+     * @param context           The relevant DSpace context
+     * @param relationship      The relationship to be deleted
+     * @param copyToLeftItem    A boolean indicating whether we should copy metadata to the left item or not
+     * @param copyToRightItem   A boolean indicating whether we should copy metadata to the right item or not
+     */
+    void forceDelete(Context context, Relationship relationship, boolean copyToLeftItem, boolean copyToRightItem)
+        throws SQLException, AuthorizeException;
 }
