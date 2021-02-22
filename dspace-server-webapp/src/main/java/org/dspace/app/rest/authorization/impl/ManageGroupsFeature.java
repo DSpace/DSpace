@@ -46,17 +46,18 @@ public class ManageGroupsFeature implements AuthorizationFeature {
                 return true;
             }
 
-            if (authorizeSolrService.isCommunityAdmin(context) &&
-                (AuthorizeConfiguration.canCommunityAdminManagePolicies() ||
-                    AuthorizeConfiguration.canCommunityAdminManageAdminGroup())) {
+            if ((AuthorizeConfiguration.canCommunityAdminManagePolicies() ||
+                AuthorizeConfiguration.canCommunityAdminManageAdminGroup()) &&
+                authorizeSolrService.isCommunityAdmin(context)) {
                 return true;
             }
 
-            if ((authorizeSolrService.isCollectionAdmin(context) &&
+            if (
                 (AuthorizeConfiguration.canCommunityAdminManageCollectionPolicies() ||
                     AuthorizeConfiguration.canCommunityAdminManageCollectionSubmitters() ||
                     AuthorizeConfiguration.canCommunityAdminManageCollectionWorkflows() ||
-                    AuthorizeConfiguration.canCommunityAdminManageCollectionAdminGroup()))) {
+                    AuthorizeConfiguration.canCommunityAdminManageCollectionAdminGroup())
+                    && authorizeSolrService.isCollectionAdmin(context)) {
                 return true;
             }
         }
