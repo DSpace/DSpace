@@ -2441,16 +2441,6 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         collectionC = CollectionBuilder.createCollection(context, communityC)
             .withName("the last collection is collectionC")
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
-            .withDspaceObject(collectionA)
-            .withAction(Constants.ADMIN)
-            .withUser(admin)
-            .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
-            .withDspaceObject(collectionB)
-            .withAction(Constants.ADMIN)
-            .withUser(admin)
-            .build();
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 

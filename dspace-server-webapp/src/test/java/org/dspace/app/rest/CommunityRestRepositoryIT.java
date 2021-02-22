@@ -2010,11 +2010,6 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         setUpAuthorizedSearch();
 
         context.turnOffAuthorisationSystem();
-        ResourcePolicyBuilder.createResourcePolicy(context)
-            .withDspaceObject(topLevelCommunityA)
-            .withAction(Constants.ADMIN)
-            .withUser(admin)
-            .build();
         communityB = CommunityBuilder.createCommunity(context)
             .withName("topLevelCommunityB is a very original name")
             .withAdminGroup(admin)
