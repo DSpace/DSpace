@@ -22,7 +22,7 @@ import org.springframework.hateoas.Link;
  * the constructor. Embedding will be allowed if any of the given projections allow them. Linking will
  * be allowed if all of the given projections allow them.
  */
-public class CompositeProjection implements Projection {
+public class CompositeProjection extends AbstractProjection {
 
     public final static String NAME = "composite";
 

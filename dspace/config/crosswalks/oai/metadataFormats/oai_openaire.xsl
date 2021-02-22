@@ -525,20 +525,31 @@
 
    <!-- datacite:rights -->
    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_accessrights.html -->
-    <xsl:template match="doc:element[@name='dc']/doc:element[@name='rights']/doc:element" mode="datacite">
+    <xsl:template match="doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:field[@name='value']" mode="datacite">
+        <xsl:variable name="rightsValue" select="text()"/>
         <xsl:variable name="rightsURI">
             <xsl:call-template name="resolveRightsURI">
-                <xsl:with-param name="field" select="doc:field[@name='value']/text()"/>
+                <xsl:with-param name="field" select="$rightsValue"/>
             </xsl:call-template>
         </xsl:variable>
-        <datacite:rights>
-            <xsl:if test="$rightsURI">
-                <xsl:attribute name="rightsURI">
-                <xsl:value-of select="$rightsURI"/>
-            </xsl:attribute>
-            </xsl:if>
-            <xsl:value-of select="doc:field[@name='value']/text()"/>
-        </datacite:rights>
+        <xsl:variable name="lc_rightsValue">
+            <xsl:call-template name="lowercase">
+                <xsl:with-param name="value" select="$rightsValue"/>
+            </xsl:call-template>
+        </xsl:variable>
+		<!-- We are checking to ensure that only values ending in "access" can be used as datacite:rights. 
+		This is a valid solution as we pre-normalize dc.rights values in openaire4.xsl to end in the term 
+		"access" according to COAR Controlled Vocabulary -->
+        <xsl:if test="ends-with($lc_rightsValue,'access')">
+            <datacite:rights>
+                <xsl:if test="$rightsURI">
+                    <xsl:attribute name="rightsURI">
+                    <xsl:value-of select="$rightsURI"/>
+                </xsl:attribute>
+                </xsl:if>
+                <xsl:value-of select="$rightsValue"/>
+            </datacite:rights>
+        </xsl:if>
     </xsl:template>
 
 
@@ -1008,7 +1019,7 @@
     <xsl:template name="getRightsURI">
         <xsl:call-template name="resolveRightsURI">
             <xsl:with-param name="field"
-                select="//doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:field[@name='value']/text()"/>
+                select="//doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:field[@name='value'and ends-with(translate(text(), $uppercase, $smallcase),'access')]/text()"/>
         </xsl:call-template>
     </xsl:template>
 
@@ -1113,7 +1124,7 @@
    <!-- Other Auxiliary templates -->
    <!--  -->
     <xsl:param name="smallcase" select="'abcdefghijklmnopqrstuvwxyzàèìòùáéíóúýâêîôûãñõäëïöüÿåæœçðø'"/>
-    <xsl:param name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZÀÈÌÒÙÁÉÍÓÚÝÂÊÎÔÛÃÑÕÄËÏÖÜŸÅÆŒÇÐØ'"/>    
+    <xsl:param name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZÀÈÌÒÙÁÉÍÓÚÝÂÊÎÔÛÃÑÕÄËÏÖÜŸÅÆŒÇÐØ'"/>
 
    <!-- to retrieve a string in uppercase -->
     <xsl:template name="uppercase">

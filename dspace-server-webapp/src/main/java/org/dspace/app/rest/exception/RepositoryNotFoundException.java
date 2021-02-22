@@ -25,4 +25,8 @@ public class RepositoryNotFoundException extends RuntimeException {
         this.model = model;
     }
 
+    @Override
+    public String getMessage() {
+        return String.format("The repository type %s.%s was not found", apiCategory, model);
+    }
 }
