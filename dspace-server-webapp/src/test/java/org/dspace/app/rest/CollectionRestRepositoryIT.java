@@ -2378,6 +2378,13 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
     private void setUpAuthorizedSearch() throws Exception {
         super.setUp();
 
+        /**
+         * The common Community/Collection structure for the AuthorizedSearch tests:
+         *
+         * topLevelCommunityA
+         * └── subCommunityA
+         *     └── collectionA
+         */
         context.turnOffAuthorisationSystem();
 
         topLevelCommunityAAdmin = EPersonBuilder.createEPerson(context)
@@ -2466,6 +2473,17 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
     public void testCommunityAdminAuthorizedSearch() throws Exception {
         setUpAuthorizedSearch();
 
+        /**
+         * The Community/Collection structure for this test:
+         *
+         * topLevelCommunityA
+         * ├── subCommunityA
+         * |   └── collectionA
+         * └── collectionB
+         * communityB
+         * communityC
+         * └── collectionC
+         */
         context.turnOffAuthorisationSystem();
         communityB = CommunityBuilder.createCommunity(context)
             .withName("topLevelCommunityB is a very original name")

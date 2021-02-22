@@ -2088,6 +2088,15 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
     public void testSubCommunityAdminAuthorizedSearch() throws Exception {
         setUpAuthorizedSearch();
 
+        /**
+         * The Community/Collection structure for this test:
+         *
+         * topLevelCommunityA
+         * ├── subCommunityA
+         * |   └── collectionA
+         * ├── communityB
+         * └── communityC
+         */
         context.turnOffAuthorisationSystem();
         communityB = CommunityBuilder.createCommunity(context)
             .withName("topLevelCommunityB is a very original name")
