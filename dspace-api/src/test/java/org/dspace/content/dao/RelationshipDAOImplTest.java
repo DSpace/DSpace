@@ -33,12 +33,14 @@ import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * Created by: Andrew Wood
  * Date: 20 Sep 2019
  */
+@Ignore
 public class RelationshipDAOImplTest extends AbstractIntegrationTest {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(RelationshipDAOImplTest.class);

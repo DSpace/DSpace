@@ -35,7 +35,7 @@ public class UsageReportMatcher {
      * @param reportType ReportType to match if of json of UsageReport
      * @return The matcher
      */
-    private static Matcher<? super Object> matchUsageReport(String id, String reportType) {
+    public static Matcher<? super Object> matchUsageReport(String id, String reportType) {
         return allOf(
             hasJsonPath("$.id", is(id)),
             hasJsonPath("$.report-type", is(reportType)));
@@ -58,4 +58,5 @@ public class UsageReportMatcher {
                     .matchUsageReportPoint(point.getId(), point.getType(), point.getValues().get("views")))
                       .collect(Collectors.toList()))));
     }
+
 }

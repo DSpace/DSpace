@@ -60,6 +60,7 @@ import org.dspace.app.rest.model.PropertyRest;
 import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
+import org.dspace.app.rest.model.UsageReportCategoryRest;
 import org.dspace.app.rest.model.VersionHistoryRest;
 import org.dspace.app.rest.model.VocabularyRest;
 import org.dspace.app.rest.model.hateoas.EmbeddedPage;
@@ -310,6 +311,9 @@ public class Utils {
         }
         if (StringUtils.equals(modelPlural, "metrics")) {
             return CrisMetricsRest.NAME;
+        }
+        if (StringUtils.equals(modelPlural, "categories")) {
+            return UsageReportCategoryRest.NAME;
         }
         return modelPlural.replaceAll("s$", "");
     }

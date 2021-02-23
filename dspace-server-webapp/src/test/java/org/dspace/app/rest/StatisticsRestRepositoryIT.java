@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.matcher.UsageReportMatcher;
 import org.dspace.app.rest.model.UsageReportPointCityRest;
 import org.dspace.app.rest.model.UsageReportPointCountryRest;
@@ -596,7 +597,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
     public void TotalDownloadsReport_NotSupportedDSO_Collection() throws Exception {
         getClient()
             .perform(get("/api/statistics/usagereports/" + collectionVisited.getID() + "_" + TOTAL_DOWNLOADS_REPORT_ID))
-            .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
+            .andExpect(status().isNotFound());
     }
 
     /**
@@ -800,7 +801,9 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
     public void usagereportsSearch_NonExistentUUID_Exception() throws Exception {
         getClient().perform(get("/api/statistics/usagereports/search/object?uri=http://localhost:8080/server/api/core" +
                                 "/items/" + UUID.randomUUID()))
-                   .andExpect(status().is(HttpStatus.NOT_FOUND.value()));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page",
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 0, 0)));
     }
 
     @Test
