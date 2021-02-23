@@ -14,11 +14,11 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
-import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.RoleMembers;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.state.actions.Action;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
@@ -38,7 +38,7 @@ public abstract class UserSelectionAction extends Action {
 
     protected Logger log = org.apache.logging.log4j.LogManager.getLogger(UserSelectionAction.class);
 
-    public abstract boolean isFinished(WorkflowItem wfi);
+    public abstract boolean isFinished(XmlWorkflowItem wfi);
 
     @Autowired(required = true)
     protected ClaimedTaskService claimedTaskService;
@@ -48,7 +48,7 @@ public abstract class UserSelectionAction extends Action {
     protected WorkflowItemRoleService workflowItemRoleService;
 
     @Override
-    public boolean isAuthorized(Context context, HttpServletRequest request, WorkflowItem wfi)
+    public boolean isAuthorized(Context context, HttpServletRequest request, XmlWorkflowItem wfi)
         throws SQLException, AuthorizeException, IOException, WorkflowConfigurationException {
         PoolTask task = null;
         if (context.getCurrentUser() != null) {
@@ -72,7 +72,7 @@ public abstract class UserSelectionAction extends Action {
      * @throws SQLException       An exception that provides information on a database access error or other errors.
      * @throws IOException        A general class of exceptions produced by failed or interrupted I/O operations.
      */
-    public abstract void regenerateTasks(Context c, WorkflowItem wfi, RoleMembers roleMembers)
+    public abstract void regenerateTasks(Context c, XmlWorkflowItem wfi, RoleMembers roleMembers)
         throws SQLException, AuthorizeException, IOException;
 
     /**
@@ -87,7 +87,7 @@ public abstract class UserSelectionAction extends Action {
      * @throws SQLException                   An exception that provides information on a database access error or
      *                                        other errors.
      */
-    public abstract boolean isValidUserSelection(Context context, WorkflowItem wfi, boolean hasUI)
+    public abstract boolean isValidUserSelection(Context context, XmlWorkflowItem wfi, boolean hasUI)
         throws WorkflowConfigurationException, SQLException;
 
     /**

@@ -20,14 +20,14 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.WorkflowService;
-import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.Role;
 import org.dspace.xmlworkflow.RoleMembers;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * Processing class for an action where x number of users
@@ -43,14 +43,14 @@ public class ClaimAction extends UserSelectionAction {
             = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     @Override
-    public void activate(Context context, WorkflowItem wfItem) throws SQLException, IOException, AuthorizeException {
+    public void activate(Context context, XmlWorkflowItem wfItem) throws SQLException, IOException, AuthorizeException {
         Step owningStep = getParent().getStep();
 
         RoleMembers allroleMembers = getParent().getStep().getRole().getMembers(context, wfItem);
         // Create pooled tasks for each member of our group
         if (allroleMembers != null && (allroleMembers.getGroups().size() > 0 || allroleMembers.getEPersons()
                                                                                               .size() > 0)) {
-            WorkflowServiceFactory.getInstance().getWorkflowService()
+            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
                                      .createPoolTasks(context, wfItem, allroleMembers, owningStep, getParent());
             alertUsersOnActivation(context, wfItem, allroleMembers);
         } else {
@@ -63,10 +63,10 @@ public class ClaimAction extends UserSelectionAction {
     }
 
     @Override
-    public ActionResult execute(Context c, WorkflowItem wfi, Step step, HttpServletRequest request)
+    public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
             throws SQLException, AuthorizeException, IOException {
         // accept task, or accepting multiple tasks
-        WorkflowServiceFactory.getInstance().getWorkflowRequirementsService().addClaimedUser(c, wfi, step,
+        XmlWorkflowServiceFactory.getInstance().getWorkflowRequirementsService().addClaimedUser(c, wfi, step,
                 c.getCurrentUser());
         return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
     }
@@ -77,7 +77,7 @@ public class ClaimAction extends UserSelectionAction {
     }
 
     @Override
-    public void alertUsersOnActivation(Context c, WorkflowItem wfi, RoleMembers roleMembers)
+    public void alertUsersOnActivation(Context c, XmlWorkflowItem wfi, RoleMembers roleMembers)
         throws IOException, SQLException {
         try {
             EPerson ep = wfi.getSubmitter();
@@ -85,15 +85,15 @@ public class ClaimAction extends UserSelectionAction {
             if (ep != null) {
                 submitterName = ep.getFullName();
             }
-            WorkflowService workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
-            workflowService.alertUsersOnTaskActivation(c, wfi, "submit_task", roleMembers.getAllUniqueMembers(c),
+            XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
+            xmlWorkflowService.alertUsersOnTaskActivation(c, wfi, "submit_task", roleMembers.getAllUniqueMembers(c),
                     //The arguments
                     wfi.getItem().getName(),
                     wfi.getCollection().getName(),
                     submitterName,
                     //TODO: message
                     "New task available.",
-                    workflowService.getMyDSpaceLink()
+                    xmlWorkflowService.getMyDSpaceLink()
             );
         } catch (MessagingException e) {
             log.info(LogManager.getHeader(c, "error emailing user(s) for claimed task",
@@ -102,11 +102,11 @@ public class ClaimAction extends UserSelectionAction {
     }
 
     @Override
-    public void regenerateTasks(Context c, WorkflowItem wfi, RoleMembers roleMembers)
+    public void regenerateTasks(Context c, XmlWorkflowItem wfi, RoleMembers roleMembers)
         throws SQLException, AuthorizeException, IOException {
         if (roleMembers != null && (roleMembers.getEPersons().size() > 0 || roleMembers.getGroups().size() > 0)) {
             //Create task for the users left
-            WorkflowServiceFactory.getInstance().getWorkflowService()
+            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
                                      .createPoolTasks(c, wfi, roleMembers, getParent().getStep(), getParent());
             if (configurationService.getBooleanProperty("workflow.notify.returned.tasks", true)) {
                 alertUsersOnActivation(c, wfi, roleMembers);
@@ -121,12 +121,12 @@ public class ClaimAction extends UserSelectionAction {
     }
 
     @Override
-    public boolean isFinished(WorkflowItem wfi) {
+    public boolean isFinished(XmlWorkflowItem wfi) {
         return false;
     }
 
     @Override
-    public boolean isValidUserSelection(Context context, WorkflowItem wfi, boolean hasUI)
+    public boolean isValidUserSelection(Context context, XmlWorkflowItem wfi, boolean hasUI)
         throws WorkflowConfigurationException, SQLException {
         //A user claim action always needs to have a UI, since somebody needs to be able to claim it
         if (hasUI) {

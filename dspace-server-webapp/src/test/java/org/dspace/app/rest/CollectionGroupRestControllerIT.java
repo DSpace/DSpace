@@ -33,7 +33,7 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
-import org.dspace.workflow.WorkflowService;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +51,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     private AuthorizeService authorizeService;
 
     @Autowired
-    private WorkflowService workflowService;
+    private XmlWorkflowService workflowService;
 
     Collection collection;
 

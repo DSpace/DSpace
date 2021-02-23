@@ -15,10 +15,10 @@ import javax.servlet.http.HttpServletRequest;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
-import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * This action will allow multiple users to rate a certain item
@@ -35,12 +35,12 @@ public class ScoreReviewAction extends ProcessingAction {
     private static final String SUBMIT_SCORE = "submit_score";
 
     @Override
-    public void activate(Context c, WorkflowItem wf) {
+    public void activate(Context c, XmlWorkflowItem wf) {
 
     }
 
     @Override
-    public ActionResult execute(Context c, WorkflowItem wfi, Step step, HttpServletRequest request)
+    public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
             throws SQLException, AuthorizeException {
         if (request.getParameter(SUBMIT_SCORE) != null) {
             int score = Util.getIntParameter(request, "score");

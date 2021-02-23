@@ -23,9 +23,9 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.WorkflowService;
-import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * A utility class that will send all the worklfow items
@@ -114,11 +114,11 @@ public class RestartWorkflow {
             System.out.println("Sending all workflow items back to the workspace");
 
 
-            WorkflowServiceFactory workflowServiceFactory = WorkflowServiceFactory.getInstance();
-            List<WorkflowItem> workflowItems = workflowServiceFactory.getWorkflowItemService().findAll(context);
-            WorkflowService workflowService = workflowServiceFactory.getWorkflowService();
+            XmlWorkflowServiceFactory workflowServiceFactory = XmlWorkflowServiceFactory.getInstance();
+            List<XmlWorkflowItem> workflowItems = workflowServiceFactory.getXmlWorkflowItemService().findAll(context);
+            XmlWorkflowService workflowService = workflowServiceFactory.getXmlWorkflowService();
             int i = 0;
-            for (WorkflowItem workflowItem : workflowItems) {
+            for (XmlWorkflowItem workflowItem : workflowItems) {
                 System.out.println("Processing workflow item " + i + " of " + workflowItems.size());
                 System.out.println("Removing pooled tasks");
 

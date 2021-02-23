@@ -13,9 +13,9 @@ import java.sql.SQLException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.state.Step;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * A class that contains utililty methods related to the workflow
@@ -46,10 +46,10 @@ public interface WorkflowRequirementsService {
      * @throws AuthorizeException ...
      * @throws IOException        ...
      */
-    public void addClaimedUser(Context context, WorkflowItem wfi, Step step, EPerson user)
+    public void addClaimedUser(Context context, XmlWorkflowItem wfi, Step step, EPerson user)
         throws SQLException, AuthorizeException, IOException;
 
-    public void removeClaimedUser(Context context, WorkflowItem wfi, EPerson user, String stepID)
+    public void removeClaimedUser(Context context, XmlWorkflowItem wfi, EPerson user, String stepID)
         throws SQLException, IOException, WorkflowConfigurationException, AuthorizeException;
 
     /**
@@ -62,8 +62,8 @@ public interface WorkflowRequirementsService {
      * @throws AuthorizeException ...
      * @throws SQLException       ...
      */
-    public void addFinishedUser(Context context, WorkflowItem wfi, EPerson user)
+    public void addFinishedUser(Context context, XmlWorkflowItem wfi, EPerson user)
         throws AuthorizeException, SQLException;
 
-    public void clearInProgressUsers(Context context, WorkflowItem wfi) throws AuthorizeException, SQLException;
+    public void clearInProgressUsers(Context context, XmlWorkflowItem wfi) throws AuthorizeException, SQLException;
 }

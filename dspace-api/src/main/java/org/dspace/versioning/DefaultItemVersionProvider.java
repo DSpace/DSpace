@@ -22,7 +22,7 @@ import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
-import org.dspace.workflow.WorkflowItemService;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -37,7 +37,7 @@ public class DefaultItemVersionProvider extends AbstractVersionProvider implemen
     @Autowired(required = true)
     protected WorkspaceItemService workspaceItemService;
     @Autowired(required = true)
-    protected WorkflowItemService workflowItemService;
+    protected XmlWorkflowItemService workflowItemService;
     @Autowired(required = true)
     protected VersionHistoryService versionHistoryService;
     @Autowired(required = true)

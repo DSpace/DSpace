@@ -13,8 +13,8 @@ import java.util.List;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 import org.dspace.eperson.EPerson;
-import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.InProgressUser;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * Database Access Object interface class for the InProgressUser object.
@@ -26,14 +26,14 @@ import org.dspace.xmlworkflow.storedcomponents.InProgressUser;
  */
 public interface InProgressUserDAO extends GenericDAO<InProgressUser> {
 
-    public InProgressUser findByWorkflowItemAndEPerson(Context context, WorkflowItem workflowItem, EPerson ePerson)
+    public InProgressUser findByWorkflowItemAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson)
         throws SQLException;
 
     public List<InProgressUser> findByEperson(Context context, EPerson ePerson) throws SQLException;
 
-    public List<InProgressUser> findByWorkflowItem(Context context, WorkflowItem workflowItem) throws SQLException;
+    public List<InProgressUser> findByWorkflowItem(Context context, XmlWorkflowItem workflowItem) throws SQLException;
 
-    public int countInProgressUsers(Context context, WorkflowItem workflowItem) throws SQLException;
+    public int countInProgressUsers(Context context, XmlWorkflowItem workflowItem) throws SQLException;
 
-    public int countFinishedUsers(Context context, WorkflowItem workflowItem) throws SQLException;
+    public int countFinishedUsers(Context context, XmlWorkflowItem workflowItem) throws SQLException;
 }

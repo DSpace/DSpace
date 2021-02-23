@@ -17,10 +17,10 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.core.Context;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * Processing class of an action that allows users to
@@ -36,17 +36,17 @@ public class FinalEditAction extends ProcessingAction {
     private static final String SUBMIT_APPROVE = "submit_approve";
 
     @Override
-    public void activate(Context c, WorkflowItem wf) {
+    public void activate(Context c, XmlWorkflowItem wf) {
 
     }
 
     @Override
-    public ActionResult execute(Context c, WorkflowItem wfi, Step step, HttpServletRequest request)
+    public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
             throws SQLException, AuthorizeException {
         return processMainPage(c, wfi, request);
     }
 
-    public ActionResult processMainPage(Context c, WorkflowItem wfi, HttpServletRequest request)
+    public ActionResult processMainPage(Context c, XmlWorkflowItem wfi, HttpServletRequest request)
             throws SQLException, AuthorizeException {
         if (super.isOptionInParam(request)) {
             switch (Util.getSubmitButton(request, SUBMIT_CANCEL)) {
@@ -70,12 +70,12 @@ public class FinalEditAction extends ProcessingAction {
         return options;
     }
 
-    private void addApprovedProvenance(Context c, WorkflowItem wfi) throws SQLException, AuthorizeException {
+    private void addApprovedProvenance(Context c, XmlWorkflowItem wfi) throws SQLException, AuthorizeException {
         //Add the provenance for the accept
         String now = DCDate.getCurrent().toString();
 
         // Get user's name + email address
-        String usersName = WorkflowServiceFactory.getInstance().getWorkflowService()
+        String usersName = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
                 .getEPersonName(c.getCurrentUser());
 
         String provDescription = getProvenanceStartId() + " Approved for entry into archive by "

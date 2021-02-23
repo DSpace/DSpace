@@ -18,10 +18,10 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.core.Context;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * Processing class of an action where a single user has
@@ -46,12 +46,12 @@ public class SingleUserReviewAction extends ProcessingAction {
     protected static final String SUBMIT_DECLINE_TASK = "submit_decline_task";
 
     @Override
-    public void activate(Context c, WorkflowItem wfItem) {
+    public void activate(Context c, XmlWorkflowItem wfItem) {
 
     }
 
     @Override
-    public ActionResult execute(Context c, WorkflowItem wfi, Step step, HttpServletRequest request)
+    public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
         throws SQLException, AuthorizeException, IOException {
         int page = Util.getIntParameter(request, "page");
 
@@ -76,7 +76,7 @@ public class SingleUserReviewAction extends ProcessingAction {
         return options;
     }
 
-    public ActionResult processMainPage(Context c, WorkflowItem wfi, Step step, HttpServletRequest request)
+    public ActionResult processMainPage(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
         throws SQLException, AuthorizeException {
         if (request.getParameter(SUBMIT_APPROVE) != null) {
             //Delete the tasks
@@ -101,12 +101,12 @@ public class SingleUserReviewAction extends ProcessingAction {
         }
     }
 
-    private void addApprovedProvenance(Context c, WorkflowItem wfi) throws SQLException, AuthorizeException {
+    private void addApprovedProvenance(Context c, XmlWorkflowItem wfi) throws SQLException, AuthorizeException {
         //Add the provenance for the accept
         String now = DCDate.getCurrent().toString();
 
         // Get user's name + email address
-        String usersName = WorkflowServiceFactory.getInstance().getWorkflowService()
+        String usersName = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
                                                     .getEPersonName(c.getCurrentUser());
 
         String provDescription = getProvenanceStartId() + " Approved for entry into archive by "
@@ -118,7 +118,7 @@ public class SingleUserReviewAction extends ProcessingAction {
         itemService.update(c, wfi.getItem());
     }
 
-    public ActionResult processRejectPage(Context c, WorkflowItem wfi, Step step, HttpServletRequest request)
+    public ActionResult processRejectPage(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
         throws SQLException, AuthorizeException, IOException {
         if (request.getParameter("submit_reject") != null) {
             String reason = request.getParameter("reason");
@@ -129,7 +129,7 @@ public class SingleUserReviewAction extends ProcessingAction {
             }
 
             //We have pressed reject, so remove the task the user has & put it back to a workspace item
-            WorkflowServiceFactory.getInstance().getWorkflowService()
+            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
                                      .sendWorkflowItemBackSubmission(c, wfi, c.getCurrentUser(),
                                                                      this.getProvenanceStartId(), reason);
 
@@ -143,10 +143,10 @@ public class SingleUserReviewAction extends ProcessingAction {
         }
     }
 
-    public ActionResult processSubmitterIsDeletedPage(Context c, WorkflowItem wfi, HttpServletRequest request)
+    public ActionResult processSubmitterIsDeletedPage(Context c, XmlWorkflowItem wfi, HttpServletRequest request)
         throws SQLException, AuthorizeException, IOException {
         if (request.getParameter("submit_delete") != null) {
-            WorkflowServiceFactory.getInstance().getWorkflowService()
+            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
                     .deleteWorkflowByWorkflowItem(c, wfi, c.getCurrentUser());
             // Delete and send user back to myDspace page
             return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);

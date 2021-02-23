@@ -36,16 +36,16 @@ import org.dspace.discovery.indexobject.IndexableWorkspaceItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.WorkflowException;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.WorkflowService;
-import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -58,12 +58,12 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
     protected SearchService searchService = SearchUtils.getSearchService();
 
-    WorkflowService workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
+    XmlWorkflowService workflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
 
-    WorkflowRequirementsService workflowRequirementsService = WorkflowServiceFactory.getInstance().
+    WorkflowRequirementsService workflowRequirementsService = XmlWorkflowServiceFactory.getInstance().
             getWorkflowRequirementsService();
 
-    ClaimedTaskService claimedTaskService = WorkflowServiceFactory.getInstance().getClaimedTaskService();
+    ClaimedTaskService claimedTaskService = XmlWorkflowServiceFactory.getInstance().getClaimedTaskService();
 
     ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
@@ -138,7 +138,7 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         Collection collection = CollectionBuilder.createCollection(context, community)
                                                  .withWorkflowGroup(1, admin)
                                                  .build();
-        Workflow workflow = WorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
+        Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
 
         ClaimedTask taskToApprove = ClaimedTaskBuilder.createClaimedTask(context, collection, admin)
                                                 .withTitle("Test workflow item to approve")
@@ -160,7 +160,7 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
                 .withIssueDate("2019-03-06")
                 .withSubject("ExtraEntry")
                 .build();
-        WorkflowItem wfiToDelete = WorkflowItemBuilder.createWorkflowItem(context, collection)
+        XmlWorkflowItem wfiToDelete = WorkflowItemBuilder.createWorkflowItem(context, collection)
                 .withTitle("Test workflow item to return")
                 .withIssueDate("2019-03-06")
                 .withSubject("ExtraEntry")
@@ -253,7 +253,7 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
             throws SQLException, AuthorizeException, IOException, WorkflowException, SearchServiceException {
         context.turnOffAuthorisationSystem();
         workspaceItem = context.reloadEntity(workspaceItem);
-        WorkflowItem workflowItem = workflowService.startWithoutNotify(context, workspaceItem);
+        XmlWorkflowItem workflowItem = workflowService.startWithoutNotify(context, workspaceItem);
         context.commit();
         indexer.commit();
         context.restoreAuthSystemState();
@@ -269,7 +269,7 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
     }
 
-    private void deleteWorkflowItem(WorkflowItem workflowItem)
+    private void deleteWorkflowItem(XmlWorkflowItem workflowItem)
             throws SQLException, AuthorizeException, IOException, SearchServiceException {
         context.turnOffAuthorisationSystem();
         workflowItem = context.reloadEntity(workflowItem);
@@ -284,7 +284,7 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         final EPerson previousUser = context.getCurrentUser();
         taskToUnclaim = context.reloadEntity(taskToUnclaim);
         context.setCurrentUser(taskToUnclaim.getOwner());
-        WorkflowItem workflowItem = taskToUnclaim.getWorkflowItem();
+        XmlWorkflowItem workflowItem = taskToUnclaim.getWorkflowItem();
         workflowService.deleteClaimedTask(context, workflowItem, taskToUnclaim);
         workflowRequirementsService.removeClaimedUser(context, workflowItem, taskToUnclaim.getOwner(),
                 taskToUnclaim.getStepID());
@@ -318,7 +318,7 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         context.setCurrentUser(previousUser);
     }
 
-    private void abort(WorkflowItem workflowItem)
+    private void abort(XmlWorkflowItem workflowItem)
             throws SQLException, AuthorizeException, IOException, SearchServiceException {
         final EPerson previousUser = context.getCurrentUser();
         workflowItem = context.reloadEntity(workflowItem);

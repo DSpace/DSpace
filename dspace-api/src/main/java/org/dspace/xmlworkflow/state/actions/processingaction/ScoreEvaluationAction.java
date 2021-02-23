@@ -18,11 +18,11 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * Processing class for the score evaluation action
@@ -40,12 +40,12 @@ public class ScoreEvaluationAction extends ProcessingAction {
     private int minimumAcceptanceScore;
 
     @Override
-    public void activate(Context c, WorkflowItem wf) {
+    public void activate(Context c, XmlWorkflowItem wf) {
 
     }
 
     @Override
-    public ActionResult execute(Context c, WorkflowItem wfi, Step step, HttpServletRequest request)
+    public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
         throws SQLException, AuthorizeException, IOException {
         boolean hasPassed = false;
         //Retrieve all our scores from the metadata & add em up
@@ -73,7 +73,7 @@ public class ScoreEvaluationAction extends ProcessingAction {
             return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
         } else {
             //We haven't passed, reject our item
-            WorkflowServiceFactory.getInstance().getWorkflowService()
+            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
                                      .sendWorkflowItemBackSubmission(c, wfi, c.getCurrentUser(),
                                                                      this.getProvenanceStartId(),
                                                                      "The item was reject due to a bad review score.");

@@ -49,9 +49,9 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.dspace.workflow.WorkflowException;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.WorkflowItemService;
-import org.dspace.workflow.WorkflowService;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.init.UncategorizedScriptException;
 import org.springframework.stereotype.Component;
@@ -75,9 +75,9 @@ public class SubmissionService {
     @Autowired
     protected WorkspaceItemService workspaceItemService;
     @Autowired
-    protected WorkflowItemService workflowItemService;
+    protected XmlWorkflowItemService workflowItemService;
     @Autowired
-    protected WorkflowService workflowService;
+    protected XmlWorkflowService workflowService;
     @Autowired
     protected CreativeCommonsService creativeCommonsService;
     @Autowired
@@ -215,9 +215,9 @@ public class SubmissionService {
      * @throws AuthorizeException
      * @throws WorkflowException
      */
-    public WorkflowItem createWorkflowItem(Context context, String requestUriListString)
+    public XmlWorkflowItem createWorkflowItem(Context context, String requestUriListString)
             throws SQLException, AuthorizeException, WorkflowException {
-        WorkflowItem wi = null;
+        XmlWorkflowItem wi = null;
         if (StringUtils.isBlank(requestUriListString)) {
             throw new UnprocessableEntityException("Malformed body..." + requestUriListString);
         }
@@ -271,7 +271,7 @@ public class SubmissionService {
         return accessCondition;
     }
 
-    public void saveWorkflowItem(Context context, WorkflowItem source) throws SQLException, AuthorizeException {
+    public void saveWorkflowItem(Context context, XmlWorkflowItem source) throws SQLException, AuthorizeException {
         workflowItemService.update(context, source);
     }
 

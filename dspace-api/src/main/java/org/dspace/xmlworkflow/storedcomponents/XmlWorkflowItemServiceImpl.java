@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.workflow;
+package org.dspace.xmlworkflow.storedcomponents;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -21,24 +21,24 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
-import org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole;
-import org.dspace.xmlworkflow.storedcomponents.dao.WorkflowItemDAO;
+import org.dspace.xmlworkflow.storedcomponents.dao.XmlWorkflowItemDAO;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Service implementation for the WorkflowItem object.
- * This class is responsible for all business logic calls for the WorkflowItem object and is autowired by spring.
+ * Service implementation for the XmlWorkflowItem object.
+ * This class is responsible for all business logic calls for the XmlWorkflowItem object and is autowired by spring.
  * This class should never be accessed directly.
  *
  * @author kevinvandevelde at atmire.com
  */
-public class WorkflowItemServiceImpl implements WorkflowItemService {
+public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
 
     @Autowired(required = true)
-    protected WorkflowItemDAO workflowItemDAO;
+    protected XmlWorkflowItemDAO xmlWorkflowItemDAO;
 
 
     @Autowired(required = true)
@@ -55,25 +55,25 @@ public class WorkflowItemServiceImpl implements WorkflowItemService {
     /*
      * The current step in the workflow system in which this workflow item is present
      */
-    private Logger log = org.apache.logging.log4j.LogManager.getLogger(WorkflowItemServiceImpl.class);
+    private Logger log = org.apache.logging.log4j.LogManager.getLogger(XmlWorkflowItemServiceImpl.class);
 
 
-    protected WorkflowItemServiceImpl() {
+    protected XmlWorkflowItemServiceImpl() {
 
     }
 
     @Override
-    public WorkflowItem create(Context context, Item item, Collection collection)
+    public XmlWorkflowItem create(Context context, Item item, Collection collection)
         throws SQLException, AuthorizeException {
-        WorkflowItem workflowItem = workflowItemDAO.create(context, new WorkflowItem());
-        workflowItem.setItem(item);
-        workflowItem.setCollection(collection);
-        return workflowItem;
+        XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemDAO.create(context, new XmlWorkflowItem());
+        xmlWorkflowItem.setItem(item);
+        xmlWorkflowItem.setCollection(collection);
+        return xmlWorkflowItem;
     }
 
     @Override
-    public WorkflowItem find(Context context, int id) throws SQLException {
-        WorkflowItem workflowItem = workflowItemDAO.findByID(context, WorkflowItem.class, id);
+    public XmlWorkflowItem find(Context context, int id) throws SQLException {
+        XmlWorkflowItem workflowItem = xmlWorkflowItemDAO.findByID(context, XmlWorkflowItem.class, id);
 
         if (workflowItem == null) {
             if (log.isDebugEnabled()) {
@@ -90,69 +90,69 @@ public class WorkflowItemServiceImpl implements WorkflowItemService {
     }
 
     @Override
-    public List<WorkflowItem> findAll(Context context) throws SQLException {
-        return workflowItemDAO.findAll(context, WorkflowItem.class);
+    public List<XmlWorkflowItem> findAll(Context context) throws SQLException {
+        return xmlWorkflowItemDAO.findAll(context, XmlWorkflowItem.class);
     }
 
     @Override
-    public List<WorkflowItem> findAll(Context context, Integer page, Integer pagesize) throws SQLException {
+    public List<XmlWorkflowItem> findAll(Context context, Integer page, Integer pagesize) throws SQLException {
         return findAllInCollection(context, page, pagesize, null);
     }
 
     @Override
-    public List<WorkflowItem> findAllInCollection(Context context, Integer page, Integer pagesize,
-                                                  Collection collection) throws SQLException {
+    public List<XmlWorkflowItem> findAllInCollection(Context context, Integer page, Integer pagesize,
+                                                     Collection collection) throws SQLException {
         Integer offset = null;
         if (page != null && pagesize != null) {
             offset = page * pagesize;
         }
-        return workflowItemDAO.findAllInCollection(context, offset, pagesize, collection);
+        return xmlWorkflowItemDAO.findAllInCollection(context, offset, pagesize, collection);
     }
 
     @Override
     public int countAll(Context context) throws SQLException {
-        return workflowItemDAO.countAll(context);
+        return xmlWorkflowItemDAO.countAll(context);
     }
 
     @Override
     public int countAllInCollection(Context context, Collection collection) throws SQLException {
-        return workflowItemDAO.countAllInCollection(context, collection);
+        return xmlWorkflowItemDAO.countAllInCollection(context, collection);
     }
 
     @Override
-    public List<WorkflowItem> findBySubmitter(Context context, EPerson ep) throws SQLException {
-        return workflowItemDAO.findBySubmitter(context, ep);
+    public List<XmlWorkflowItem> findBySubmitter(Context context, EPerson ep) throws SQLException {
+        return xmlWorkflowItemDAO.findBySubmitter(context, ep);
     }
 
     @Override
-    public List<WorkflowItem> findBySubmitter(Context context, EPerson ep, Integer pageNumber, Integer pageSize)
+    public List<XmlWorkflowItem> findBySubmitter(Context context, EPerson ep, Integer pageNumber, Integer pageSize)
             throws SQLException {
         Integer offset = null;
         if (pageNumber != null && pageSize != null) {
             offset = pageNumber * pageSize;
         }
-        return workflowItemDAO.findBySubmitter(context, ep, pageNumber, pageSize);
+        return xmlWorkflowItemDAO.findBySubmitter(context, ep, pageNumber, pageSize);
     }
 
     @Override
     public int countBySubmitter(Context context, EPerson ep) throws SQLException {
-        return workflowItemDAO.countBySubmitter(context, ep);
+        return xmlWorkflowItemDAO.countBySubmitter(context, ep);
     }
 
     @Override
     public void deleteByCollection(Context context, Collection collection)
         throws SQLException, IOException, AuthorizeException {
-        List<WorkflowItem> workflowItems = findByCollection(context, collection);
-        Iterator<WorkflowItem> iterator = workflowItems.iterator();
+        List<XmlWorkflowItem> xmlWorkflowItems = findByCollection(context, collection);
+        Iterator<XmlWorkflowItem> iterator = xmlWorkflowItems.iterator();
         while (iterator.hasNext()) {
-            WorkflowItem workflowItem = iterator.next();
+            XmlWorkflowItem workflowItem = iterator.next();
             iterator.remove();
             delete(context, workflowItem);
         }
     }
 
     @Override
-    public void delete(Context context, WorkflowItem workflowItem)
+    public void delete(Context context, XmlWorkflowItem workflowItem)
         throws SQLException, AuthorizeException, IOException {
         Item item = workflowItem.getItem();
         // Need to delete the workspaceitem row first since it refers
@@ -164,17 +164,17 @@ public class WorkflowItemServiceImpl implements WorkflowItemService {
     }
 
     @Override
-    public List<WorkflowItem> findByCollection(Context context, Collection collection) throws SQLException {
-        return workflowItemDAO.findByCollection(context, collection);
+    public List<XmlWorkflowItem> findByCollection(Context context, Collection collection) throws SQLException {
+        return xmlWorkflowItemDAO.findByCollection(context, collection);
     }
 
     @Override
-    public WorkflowItem findByItem(Context context, Item item) throws SQLException {
-        return workflowItemDAO.findByItem(context, item);
+    public XmlWorkflowItem findByItem(Context context, Item item) throws SQLException {
+        return xmlWorkflowItemDAO.findByItem(context, item);
     }
 
     @Override
-    public void update(Context context, WorkflowItem workflowItem) throws SQLException, AuthorizeException {
+    public void update(Context context, XmlWorkflowItem workflowItem) throws SQLException, AuthorizeException {
         // FIXME check auth
         log.info(LogManager.getHeader(context, "update_workflow_item",
                                       "workflowitem_id=" + workflowItem.getID()));
@@ -182,11 +182,11 @@ public class WorkflowItemServiceImpl implements WorkflowItemService {
         // Update the item
         itemService.update(context, workflowItem.getItem());
 
-        workflowItemDAO.save(context, workflowItem);
+        xmlWorkflowItemDAO.save(context, workflowItem);
     }
 
     @Override
-    public void deleteWrapper(Context context, WorkflowItem workflowItem) throws SQLException, AuthorizeException {
+    public void deleteWrapper(Context context, XmlWorkflowItem workflowItem) throws SQLException, AuthorizeException {
         List<WorkflowItemRole> roles = workflowItemRoleService.findByWorkflowItem(context, workflowItem);
         Iterator<WorkflowItemRole> workflowItemRoleIterator = roles.iterator();
         while (workflowItemRoleIterator.hasNext()) {
@@ -200,12 +200,12 @@ public class WorkflowItemServiceImpl implements WorkflowItemService {
         claimedTaskService.deleteByWorkflowItem(context, workflowItem);
 
         // FIXME - auth?
-        workflowItemDAO.delete(context, workflowItem);
+        xmlWorkflowItemDAO.delete(context, workflowItem);
     }
 
 
     @Override
-    public void move(Context context, WorkflowItem inProgressSubmission, Collection fromCollection,
+    public void move(Context context, XmlWorkflowItem inProgressSubmission, Collection fromCollection,
                      Collection toCollection) {
         // TODO not implemented yet
     }

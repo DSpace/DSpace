@@ -13,8 +13,8 @@ import java.util.List;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 import org.dspace.eperson.EPerson;
-import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * Database Access Object interface class for the WorkflowItemRole object.
@@ -26,10 +26,10 @@ import org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole;
  */
 public interface WorkflowItemRoleDAO extends GenericDAO<WorkflowItemRole> {
 
-    public List<WorkflowItemRole> findByWorkflowItemAndRole(Context context, WorkflowItem workflowItem, String role)
+    public List<WorkflowItemRole> findByWorkflowItemAndRole(Context context, XmlWorkflowItem workflowItem, String role)
         throws SQLException;
 
-    public List<WorkflowItemRole> findByWorkflowItem(Context context, WorkflowItem workflowItem) throws SQLException;
+    public List<WorkflowItemRole> findByWorkflowItem(Context context, XmlWorkflowItem workflowItem) throws SQLException;
 
     public List<WorkflowItemRole> findByEPerson(Context context, EPerson ePerson) throws SQLException;
 }

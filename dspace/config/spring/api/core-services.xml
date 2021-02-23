@@ -110,8 +110,8 @@
     <bean class="org.dspace.xmlworkflow.storedcomponents.InProgressUserServiceImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.PoolTaskServiceImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.WorkflowItemRoleServiceImpl"/>
-    <bean class="org.dspace.workflow.WorkflowItemServiceImpl"/>
-    <bean class="org.dspace.xmlworkflow.WorkflowServiceImpl"/>
+    <bean class="org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItemServiceImpl"/>
+    <bean class="org.dspace.xmlworkflow.XmlWorkflowServiceImpl"/>
     <bean class="org.dspace.xmlworkflow.WorkflowRequirementsServiceImpl"/>
 
     <!-- Discovery indexable object services -->

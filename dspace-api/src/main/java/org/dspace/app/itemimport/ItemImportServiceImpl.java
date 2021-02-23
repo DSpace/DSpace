@@ -97,8 +97,8 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.WorkflowService;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
@@ -156,7 +156,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     @Autowired(required = true)
     protected WorkspaceItemService workspaceItemService;
     @Autowired(required = true)
-    protected WorkflowService workflowService;
+    protected XmlWorkflowService workflowService;
     @Autowired(required = true)
     protected ConfigurationService configurationService;
 
@@ -498,7 +498,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         // create workspace item
         Item myitem = null;
         WorkspaceItem wi = null;
-        WorkflowItem wfi = null;
+        XmlWorkflowItem wfi = null;
 
         if (!isTest) {
             wi = workspaceItemService.create(c, mycollections.iterator().next(), template);

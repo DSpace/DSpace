@@ -16,8 +16,8 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.service.DSpaceCRUDService;
-import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * Service interface class for the PoolTask object.
@@ -33,12 +33,12 @@ public interface PoolTaskService extends DSpaceCRUDService<PoolTask> {
     public List<PoolTask> findByEperson(Context context, EPerson ePerson)
         throws SQLException, AuthorizeException, IOException;
 
-    public List<PoolTask> find(Context context, WorkflowItem workflowItem) throws SQLException;
+    public List<PoolTask> find(Context context, XmlWorkflowItem workflowItem) throws SQLException;
 
-    public PoolTask findByWorkflowIdAndEPerson(Context context, WorkflowItem workflowItem, EPerson ePerson)
+    public PoolTask findByWorkflowIdAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson)
         throws SQLException, AuthorizeException, IOException;
 
-    public void deleteByWorkflowItem(Context context, WorkflowItem workflowItem)
+    public void deleteByWorkflowItem(Context context, XmlWorkflowItem xmlWorkflowItem)
         throws SQLException, AuthorizeException;
 
     public void deleteByEperson(Context context, EPerson ePerson) throws SQLException, AuthorizeException, IOException;

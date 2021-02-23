@@ -21,7 +21,6 @@ import javax.persistence.Table;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
-import org.dspace.workflow.WorkflowItem;
 
 /**
  * Claimed task representing the database representation of an action claimed by an eperson
@@ -43,7 +42,7 @@ public class ClaimedTask implements ReloadableEntity<Integer> {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workflowitem_id")
-    private WorkflowItem workflowItem;
+    private XmlWorkflowItem workflowItem;
 
     //    @Column(name = "workflow_id")
 //    @Lob
@@ -84,11 +83,11 @@ public class ClaimedTask implements ReloadableEntity<Integer> {
         return owner;
     }
 
-    public void setWorkflowItem(WorkflowItem workflowItem) {
+    public void setWorkflowItem(XmlWorkflowItem workflowItem) {
         this.workflowItem = workflowItem;
     }
 
-    public WorkflowItem getWorkflowItem() {
+    public XmlWorkflowItem getWorkflowItem() {
         return workflowItem;
     }
 

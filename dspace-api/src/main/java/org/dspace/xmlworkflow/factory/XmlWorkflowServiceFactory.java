@@ -5,32 +5,31 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.workflow.factory;
+package org.dspace.xmlworkflow.factory;
 
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.workflow.WorkflowItemService;
-import org.dspace.workflow.WorkflowService;
-import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
 import org.dspace.xmlworkflow.storedcomponents.service.InProgressUserService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 
 /**
- * Abstract factory to get services for the workflow package, use WorkflowServiceFactory.getInstance() to retrieve an
- * implementation
+ * Abstract factory to get services for the xmlworkflow package, use XmlWorkflowServiceFactory.getInstance() to
+ * retrieve an implementation
  *
  * @author kevinvandevelde at atmire.com
  */
-public abstract class WorkflowServiceFactory {
+public abstract class XmlWorkflowServiceFactory {
 
     public abstract XmlWorkflowFactory getWorkflowFactory();
 
     public abstract WorkflowRequirementsService getWorkflowRequirementsService();
 
-    public abstract WorkflowService getWorkflowService();
+    public abstract XmlWorkflowService getXmlWorkflowService();
 
     public abstract ClaimedTaskService getClaimedTaskService();
 
@@ -42,10 +41,10 @@ public abstract class WorkflowServiceFactory {
 
     public abstract WorkflowItemRoleService getWorkflowItemRoleService();
 
-    public abstract WorkflowItemService getWorkflowItemService();
+    public abstract XmlWorkflowItemService getXmlWorkflowItemService();
 
-    public static WorkflowServiceFactory getInstance() {
+    public static XmlWorkflowServiceFactory getInstance() {
         return DSpaceServicesFactory.getInstance().getServiceManager()
-                                    .getServiceByName("workflowServiceFactory", WorkflowServiceFactory.class);
+                                    .getServiceByName("workflowServiceFactory", XmlWorkflowServiceFactory.class);
     }
 }

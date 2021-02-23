@@ -23,7 +23,6 @@ import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.workflow.WorkflowItem;
 
 /**
  * Represents a workflow assignments database representation.
@@ -52,7 +51,7 @@ public class WorkflowItemRole implements ReloadableEntity<Integer> {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workflowitem_id")
-    private WorkflowItem workflowItem;
+    private XmlWorkflowItem workflowItem;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "eperson_id")
@@ -83,11 +82,11 @@ public class WorkflowItemRole implements ReloadableEntity<Integer> {
         return this.roleId;
     }
 
-    public void setWorkflowItem(WorkflowItem workflowItem) {
-        this.workflowItem = workflowItem;
+    public void setWorkflowItem(XmlWorkflowItem xmlWorkflowItem) {
+        this.workflowItem = xmlWorkflowItem;
     }
 
-    public WorkflowItem getWorkflowItem() {
+    public XmlWorkflowItem getWorkflowItem() {
         return workflowItem;
     }
 

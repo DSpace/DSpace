@@ -44,13 +44,13 @@ import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
-import org.dspace.workflow.WorkflowItemService;
-import org.dspace.workflow.WorkflowService;
-import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.InProgressUserService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 
 /**
  * Abstract builder class that holds references to all available services
@@ -66,8 +66,8 @@ public abstract class AbstractBuilder<T, S> {
     static ItemService itemService;
     static InstallItemService installItemService;
     static WorkspaceItemService workspaceItemService;
-    static WorkflowItemService workflowItemService;
-    static WorkflowService workflowService;
+    static XmlWorkflowItemService workflowItemService;
+    static XmlWorkflowService workflowService;
     static EPersonService ePersonService;
     static GroupService groupService;
     static BundleService bundleService;
@@ -115,8 +115,8 @@ public abstract class AbstractBuilder<T, S> {
         itemService = ContentServiceFactory.getInstance().getItemService();
         installItemService = ContentServiceFactory.getInstance().getInstallItemService();
         workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-        workflowItemService = WorkflowServiceFactory.getInstance().getWorkflowItemService();
-        workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
+        workflowItemService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService();
+        workflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
         ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
         groupService = EPersonServiceFactory.getInstance().getGroupService();
         bundleService = ContentServiceFactory.getInstance().getBundleService();
@@ -138,10 +138,10 @@ public abstract class AbstractBuilder<T, S> {
         processService = ScriptServiceFactory.getInstance().getProcessService();
 
         // Temporarily disabled
-        claimedTaskService = WorkflowServiceFactory.getInstance().getClaimedTaskService();
-        inProgressUserService = WorkflowServiceFactory.getInstance().getInProgressUserService();
-        poolTaskService = WorkflowServiceFactory.getInstance().getPoolTaskService();
-        workflowItemRoleService = WorkflowServiceFactory.getInstance().getWorkflowItemRoleService();
+        claimedTaskService = XmlWorkflowServiceFactory.getInstance().getClaimedTaskService();
+        inProgressUserService = XmlWorkflowServiceFactory.getInstance().getInProgressUserService();
+        poolTaskService = XmlWorkflowServiceFactory.getInstance().getPoolTaskService();
+        workflowItemRoleService = XmlWorkflowServiceFactory.getInstance().getWorkflowItemRoleService();
     }
 
 

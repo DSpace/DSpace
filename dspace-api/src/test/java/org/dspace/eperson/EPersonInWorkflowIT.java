@@ -36,11 +36,11 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.WorkflowService;
-import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
 import org.junit.Before;
 import org.junit.Test;
@@ -68,10 +68,10 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance()
-            .getWorkspaceItemService();
-    protected WorkflowService workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
-    protected CollectionRoleService collectionRoleService = WorkflowServiceFactory.getInstance()
-            .getCollectionRoleService();
+                                                                               .getWorkspaceItemService();
+    protected XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
+    protected CollectionRoleService collectionRoleService = XmlWorkflowServiceFactory.getInstance()
+                                                                                     .getCollectionRoleService();
 
 
     private EPerson workflowUserA;
@@ -140,21 +140,21 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                .withWorkflowGroup(1, workflowUserB)
-                .withWorkflowGroup(2, workflowUserC)
-                .withWorkflowGroup(3, workflowUserB)
-                .build();
+                                                 .withWorkflowGroup(1, workflowUserB)
+                                                 .withWorkflowGroup(2, workflowUserC)
+                                                 .withWorkflowGroup(3, workflowUserB)
+                                                 .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
-                .withSubmitter(workflowUserA)
-                .withTitle("Test item full workflow")
-                .withIssueDate("2019-03-06")
-                .withSubject("ExtraEntry")
-                .build();
+                                                .withSubmitter(workflowUserA)
+                                                .withTitle("Test item full workflow")
+                                                .withIssueDate("2019-03-06")
+                                                .withSubject("ExtraEntry")
+                                                .build();
 
-        Workflow workflow = WorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
+        Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
 
-        WorkflowItem workflowItem = workflowService.startWithoutNotify(context, wsi);
+        XmlWorkflowItem workflowItem = xmlWorkflowService.startWithoutNotify(context, wsi);
         MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
         httpServletRequest.setParameter("submit_approve", "submit_approve");
 
@@ -213,21 +213,21 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                .withWorkflowGroup(1, workflowUserB)
-                .withWorkflowGroup(2, workflowUserC)
-                .withWorkflowGroup(3, workflowUserB)
-                .build();
+                                                 .withWorkflowGroup(1, workflowUserB)
+                                                 .withWorkflowGroup(2, workflowUserC)
+                                                 .withWorkflowGroup(3, workflowUserB)
+                                                 .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
-                .withSubmitter(workflowUserA)
-                .withTitle("Test item full workflow")
-                .withIssueDate("2019-03-06")
-                .withSubject("ExtraEntry")
-                .build();
+                                                .withSubmitter(workflowUserA)
+                                                .withTitle("Test item full workflow")
+                                                .withIssueDate("2019-03-06")
+                                                .withSubject("ExtraEntry")
+                                                .build();
 
-        Workflow workflow = WorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
+        Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
 
-        WorkflowItem workflowItem = workflowService.startWithoutNotify(context, wsi);
+        XmlWorkflowItem workflowItem = xmlWorkflowService.startWithoutNotify(context, wsi);
         MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
         httpServletRequest.setParameter("submit_approve", "submit_approve");
 
@@ -282,21 +282,21 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                .withWorkflowGroup(1, workflowUserB)
-                .withWorkflowGroup(2, workflowUserC)
-                .withWorkflowGroup(3, workflowUserB)
-                .build();
+                                                 .withWorkflowGroup(1, workflowUserB)
+                                                 .withWorkflowGroup(2, workflowUserC)
+                                                 .withWorkflowGroup(3, workflowUserB)
+                                                 .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
-                .withSubmitter(workflowUserA)
-                .withTitle("Test item full workflow")
-                .withIssueDate("2019-03-06")
-                .withSubject("ExtraEntry")
-                .build();
+                                                .withSubmitter(workflowUserA)
+                                                .withTitle("Test item full workflow")
+                                                .withIssueDate("2019-03-06")
+                                                .withSubject("ExtraEntry")
+                                                .build();
 
-        Workflow workflow = WorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
+        Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
 
-        WorkflowItem workflowItem = workflowService.startWithoutNotify(context, wsi);
+        XmlWorkflowItem workflowItem = xmlWorkflowService.startWithoutNotify(context, wsi);
         MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
         httpServletRequest.setParameter("submit_approve", "submit_approve");
 
@@ -310,9 +310,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
         executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, REVIEW_STEP, REVIEW_ACTION);
 
         executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, FINAL_EDIT_STEP,
-                CLAIM_ACTION);
+                              CLAIM_ACTION);
         executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, FINAL_EDIT_STEP,
-                FINAL_EDIT_ACTION);
+                              FINAL_EDIT_ACTION);
 
         assertTrue(workflowItem.getItem().isArchived());
 
@@ -354,21 +354,21 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                .withWorkflowGroup(1, workflowUserB)
-                .withWorkflowGroup(2, workflowUserC)
-                .withWorkflowGroup(3, workflowUserB)
-                .build();
+                                                 .withWorkflowGroup(1, workflowUserB)
+                                                 .withWorkflowGroup(2, workflowUserC)
+                                                 .withWorkflowGroup(3, workflowUserB)
+                                                 .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
-                .withSubmitter(workflowUserA)
-                .withTitle("Test item full workflow")
-                .withIssueDate("2019-03-06")
-                .withSubject("ExtraEntry")
-                .build();
+                                                .withSubmitter(workflowUserA)
+                                                .withTitle("Test item full workflow")
+                                                .withIssueDate("2019-03-06")
+                                                .withSubject("ExtraEntry")
+                                                .build();
 
-        Workflow workflow = WorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
+        Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
 
-        WorkflowItem workflowItem = workflowService.startWithoutNotify(context, wsi);
+        XmlWorkflowItem workflowItem = xmlWorkflowService.startWithoutNotify(context, wsi);
         MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
         httpServletRequest.setParameter("submit_approve", "submit_approve");
 
@@ -376,15 +376,14 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
         executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, REVIEW_STEP, REVIEW_ACTION);
         executeWorkflowAction(httpServletRequest, workflowUserC, workflow, workflowItem, EDIT_STEP, CLAIM_ACTION);
         executeWorkflowAction(httpServletRequest, workflowUserC, workflow, workflowItem, EDIT_STEP, EDIT_ACTION);
-        executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, FINAL_EDIT_STEP,
-                CLAIM_ACTION);
+        executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, FINAL_EDIT_STEP, CLAIM_ACTION);
 
         assertDeletionOfEperson(workflowUserB, false);
         assertRemovalOfEpersonFromWorkflowGroup(workflowUserB, collection, REVIEW_ROLE, true);
         assertRemovalOfEpersonFromWorkflowGroup(workflowUserB, collection, FINAL_EDIT_ROLE, false);
 
         executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, FINAL_EDIT_STEP,
-                FINAL_EDIT_ACTION);
+                              FINAL_EDIT_ACTION);
 
         assertRemovalOfEpersonFromWorkflowGroup(workflowUserB, collection, FINAL_EDIT_ROLE, true);
         assertDeletionOfEperson(workflowUserB, true);
@@ -398,7 +397,7 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
      * tasks currently assigned to it. This test verifies a user can't be removed from a workflow step they have claimed
      * items for that task. This test also verifies that this verification is using both the step and the collection
      * to determine whether the user can be removed from a workflow group. This test also verifies that after user has
-     * been removed from the workflow group and the task has been passed, the EPerson can be removed.
+     *  been removed from the workflow group and the task has been passed, the EPerson can be removed.
      *
      * @throws Exception
      */
@@ -434,25 +433,25 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collectionA = CollectionBuilder.createCollection(context, parent)
-                .withWorkflowGroup(1, workflowUserB)
-                .withWorkflowGroup(2, workflowUserC)
-                .withWorkflowGroup(3, workflowUserB)
-                .build();
+                                                  .withWorkflowGroup(1, workflowUserB)
+                                                  .withWorkflowGroup(2, workflowUserC)
+                                                  .withWorkflowGroup(3, workflowUserB)
+                                                  .build();
 
         Collection collectionB = CollectionBuilder.createCollection(context, parent)
-                .withWorkflowGroup(1, workflowUserB)
-                .build();
+                                                  .withWorkflowGroup(1, workflowUserB)
+                                                  .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collectionA)
-                .withSubmitter(workflowUserA)
-                .withTitle("Test item full workflow")
-                .withIssueDate("2019-03-06")
-                .withSubject("ExtraEntry")
-                .build();
+                                                .withSubmitter(workflowUserA)
+                                                .withTitle("Test item full workflow")
+                                                .withIssueDate("2019-03-06")
+                                                .withSubject("ExtraEntry")
+                                                .build();
 
-        Workflow workflow = WorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collectionA);
+        Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collectionA);
 
-        WorkflowItem workflowItem = workflowService.startWithoutNotify(context, wsi);
+        XmlWorkflowItem workflowItem = xmlWorkflowService.startWithoutNotify(context, wsi);
         MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
         httpServletRequest.setParameter("submit_approve", "submit_approve");
 
@@ -504,21 +503,21 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                .withWorkflowGroup(1, workflowUserB)
-                .withWorkflowGroup(2, workflowUserC)
-                .withWorkflowGroup(3, workflowUserB)
-                .build();
+                                                 .withWorkflowGroup(1, workflowUserB)
+                                                 .withWorkflowGroup(2, workflowUserC)
+                                                 .withWorkflowGroup(3, workflowUserB)
+                                                 .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
-                .withSubmitter(workflowUserA)
-                .withTitle("Test item full workflow")
-                .withIssueDate("2019-03-06")
-                .withSubject("ExtraEntry")
-                .build();
+                                                .withSubmitter(workflowUserA)
+                                                .withTitle("Test item full workflow")
+                                                .withIssueDate("2019-03-06")
+                                                .withSubject("ExtraEntry")
+                                                .build();
 
-        Workflow workflow = WorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
+        Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
 
-        WorkflowItem workflowItem = workflowService.startWithoutNotify(context, wsi);
+        XmlWorkflowItem workflowItem = xmlWorkflowService.startWithoutNotify(context, wsi);
         MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
         httpServletRequest.setParameter("submit_approve", "submit_approve");
 
@@ -530,10 +529,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
         executeWorkflowAction(httpServletRequest, workflowUserC, workflow, workflowItem, EDIT_STEP, CLAIM_ACTION);
         executeWorkflowAction(httpServletRequest, workflowUserC, workflow, workflowItem, EDIT_STEP, EDIT_ACTION);
 
+        executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, FINAL_EDIT_STEP, CLAIM_ACTION);
         executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, FINAL_EDIT_STEP,
-                CLAIM_ACTION);
-        executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, FINAL_EDIT_STEP,
-                FINAL_EDIT_ACTION);
+                              FINAL_EDIT_ACTION);
 
         assertTrue(workflowItem.getItem().isArchived());
 
@@ -544,8 +542,8 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
      * tasks currently assigned to it. This test also verifies the user can't be removed from a step with a pooled
      * task if they are the only member. This test also verifies the user can be removed from a step with no tasks
      * even if they are the only member. This test also verifies that after the task has been passed and the user has
-     * been removed from the workflow, the EPerson can be removed. This test also verifies that an item is correctly
-     * arhived if the last step has no members left.
+     *  been removed from the workflow, the EPerson can be removed. This test also verifies that an item is correctly
+     *  arhived if the last step has no members left.
      *
      * @throws Exception
      */
@@ -577,21 +575,21 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                .withWorkflowGroup(1, workflowUserB)
-                .withWorkflowGroup(2, workflowUserC)
-                .withWorkflowGroup(3, workflowUserB)
-                .build();
+                                                 .withWorkflowGroup(1, workflowUserB)
+                                                 .withWorkflowGroup(2, workflowUserC)
+                                                 .withWorkflowGroup(3, workflowUserB)
+                                                 .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
-                .withSubmitter(workflowUserA)
-                .withTitle("Test item full workflow")
-                .withIssueDate("2019-03-06")
-                .withSubject("ExtraEntry")
-                .build();
+                                                .withSubmitter(workflowUserA)
+                                                .withTitle("Test item full workflow")
+                                                .withIssueDate("2019-03-06")
+                                                .withSubject("ExtraEntry")
+                                                .build();
 
-        Workflow workflow = WorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
+        Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
 
-        WorkflowItem workflowItem = workflowService.startWithoutNotify(context, wsi);
+        XmlWorkflowItem workflowItem = xmlWorkflowService.startWithoutNotify(context, wsi);
         MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
         httpServletRequest.setParameter("submit_approve", "submit_approve");
 
@@ -649,21 +647,21 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                .withWorkflowGroup(1, workflowUserB)
-                .withWorkflowGroup(2, workflowUserC)
-                .withWorkflowGroup(3, workflowUserB)
-                .build();
+                                                 .withWorkflowGroup(1, workflowUserB)
+                                                 .withWorkflowGroup(2, workflowUserC)
+                                                 .withWorkflowGroup(3, workflowUserB)
+                                                 .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
-                .withSubmitter(workflowUserA)
-                .withTitle("Test item full workflow")
-                .withIssueDate("2019-03-06")
-                .withSubject("ExtraEntry")
-                .build();
+                                                .withSubmitter(workflowUserA)
+                                                .withTitle("Test item full workflow")
+                                                .withIssueDate("2019-03-06")
+                                                .withSubject("ExtraEntry")
+                                                .build();
 
-        Workflow workflow = WorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
+        Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
 
-        WorkflowItem workflowItem = workflowService.startWithoutNotify(context, wsi);
+        XmlWorkflowItem workflowItem = xmlWorkflowService.startWithoutNotify(context, wsi);
         MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
         httpServletRequest.setParameter("submit_approve", "submit_approve");
 
@@ -682,10 +680,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         assertDeletionOfEperson(workflowUserB, true);
 
+        executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, FINAL_EDIT_STEP, CLAIM_ACTION);
         executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, FINAL_EDIT_STEP,
-                CLAIM_ACTION);
-        executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, FINAL_EDIT_STEP,
-                FINAL_EDIT_ACTION);
+                              FINAL_EDIT_ACTION);
 
         assertTrue(workflowItem.getItem().isArchived());
 
@@ -726,21 +723,21 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                .withWorkflowGroup(1, workflowUserB)
-                .withWorkflowGroup(2, workflowUserC)
-                .withWorkflowGroup(3, workflowUserB)
-                .build();
+                                                 .withWorkflowGroup(1, workflowUserB)
+                                                 .withWorkflowGroup(2, workflowUserC)
+                                                 .withWorkflowGroup(3, workflowUserB)
+                                                 .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
-                .withSubmitter(workflowUserA)
-                .withTitle("Test item full workflow")
-                .withIssueDate("2019-03-06")
-                .withSubject("ExtraEntry")
-                .build();
+                                                .withSubmitter(workflowUserA)
+                                                .withTitle("Test item full workflow")
+                                                .withIssueDate("2019-03-06")
+                                                .withSubject("ExtraEntry")
+                                                .build();
 
-        Workflow workflow = WorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
+        Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
 
-        WorkflowItem workflowItem = workflowService.startWithoutNotify(context, wsi);
+        XmlWorkflowItem workflowItem = xmlWorkflowService.startWithoutNotify(context, wsi);
         MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
         httpServletRequest.setParameter("submit_approve", "submit_approve");
 
@@ -756,10 +753,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
         executeWorkflowAction(httpServletRequest, workflowUserC, workflow, workflowItem, EDIT_STEP, CLAIM_ACTION);
         executeWorkflowAction(httpServletRequest, workflowUserC, workflow, workflowItem, EDIT_STEP, EDIT_ACTION);
 
+        executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, FINAL_EDIT_STEP, CLAIM_ACTION);
         executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, FINAL_EDIT_STEP,
-                CLAIM_ACTION);
-        executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, FINAL_EDIT_STEP,
-                FINAL_EDIT_ACTION);
+                              FINAL_EDIT_ACTION);
 
         assertTrue(workflowItem.getItem().isArchived());
 
@@ -800,21 +796,21 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                .withWorkflowGroup(1, workflowUserB)
-                .withWorkflowGroup(2, workflowUserC)
-                .withWorkflowGroup(3, workflowUserB)
-                .build();
+                                                 .withWorkflowGroup(1, workflowUserB)
+                                                 .withWorkflowGroup(2, workflowUserC)
+                                                 .withWorkflowGroup(3, workflowUserB)
+                                                 .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
-                .withSubmitter(workflowUserA)
-                .withTitle("Test item full workflow")
-                .withIssueDate("2019-03-06")
-                .withSubject("ExtraEntry")
-                .build();
+                                                .withSubmitter(workflowUserA)
+                                                .withTitle("Test item full workflow")
+                                                .withIssueDate("2019-03-06")
+                                                .withSubject("ExtraEntry")
+                                                .build();
 
-        Workflow workflow = WorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
+        Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
 
-        WorkflowItem workflowItem = workflowService.startWithoutNotify(context, wsi);
+        XmlWorkflowItem workflowItem = xmlWorkflowService.startWithoutNotify(context, wsi);
         MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
         httpServletRequest.setParameter("submit_approve", "submit_approve");
 
@@ -829,10 +825,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
         executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, EDIT_STEP, CLAIM_ACTION);
         executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, EDIT_STEP, EDIT_ACTION);
 
+        executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, FINAL_EDIT_STEP, CLAIM_ACTION);
         executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, FINAL_EDIT_STEP,
-                CLAIM_ACTION);
-        executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, FINAL_EDIT_STEP,
-                FINAL_EDIT_ACTION);
+                              FINAL_EDIT_ACTION);
 
         assertTrue(workflowItem.getItem().isArchived());
 
@@ -878,21 +873,21 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                .withWorkflowGroup(1, workflowUserB)
-                .withWorkflowGroup(2, workflowUserC)
-                .withWorkflowGroup(3, workflowUserB)
-                .build();
+                                                 .withWorkflowGroup(1, workflowUserB)
+                                                 .withWorkflowGroup(2, workflowUserC)
+                                                 .withWorkflowGroup(3, workflowUserB)
+                                                 .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
-                .withSubmitter(workflowUserA)
-                .withTitle("Test item full workflow")
-                .withIssueDate("2019-03-06")
-                .withSubject("ExtraEntry")
-                .build();
+                                                .withSubmitter(workflowUserA)
+                                                .withTitle("Test item full workflow")
+                                                .withIssueDate("2019-03-06")
+                                                .withSubject("ExtraEntry")
+                                                .build();
 
-        Workflow workflow = WorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
+        Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
 
-        WorkflowItem workflowItem = workflowService.startWithoutNotify(context, wsi);
+        XmlWorkflowItem workflowItem = xmlWorkflowService.startWithoutNotify(context, wsi);
         MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
         httpServletRequest.setParameter("submit_approve", "submit_approve");
 
@@ -910,10 +905,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
         executeWorkflowAction(httpServletRequest, workflowUserC, workflow, workflowItem, EDIT_STEP, CLAIM_ACTION);
         executeWorkflowAction(httpServletRequest, workflowUserC, workflow, workflowItem, EDIT_STEP, EDIT_ACTION);
 
+        executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, FINAL_EDIT_STEP, CLAIM_ACTION);
         executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, FINAL_EDIT_STEP,
-                CLAIM_ACTION);
-        executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, FINAL_EDIT_STEP,
-                FINAL_EDIT_ACTION);
+                              FINAL_EDIT_ACTION);
 
         assertTrue(workflowItem.getItem().isArchived());
 
@@ -957,21 +951,21 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                .withWorkflowGroup(1, workflowUserB)
-                .withWorkflowGroup(2, workflowUserC)
-                .withWorkflowGroup(3, workflowUserB)
-                .build();
+                                                 .withWorkflowGroup(1, workflowUserB)
+                                                 .withWorkflowGroup(2, workflowUserC)
+                                                 .withWorkflowGroup(3, workflowUserB)
+                                                 .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
-                .withSubmitter(workflowUserA)
-                .withTitle("Test item full workflow")
-                .withIssueDate("2019-03-06")
-                .withSubject("ExtraEntry")
-                .build();
+                                                .withSubmitter(workflowUserA)
+                                                .withTitle("Test item full workflow")
+                                                .withIssueDate("2019-03-06")
+                                                .withSubject("ExtraEntry")
+                                                .build();
 
-        Workflow workflow = WorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
+        Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
 
-        WorkflowItem workflowItem = workflowService.startWithoutNotify(context, wsi);
+        XmlWorkflowItem workflowItem = xmlWorkflowService.startWithoutNotify(context, wsi);
         MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
         httpServletRequest.setParameter("submit_approve", "submit_approve");
 
@@ -987,10 +981,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
         executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, EDIT_STEP, CLAIM_ACTION);
         executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, EDIT_STEP, EDIT_ACTION);
 
+        executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, FINAL_EDIT_STEP, CLAIM_ACTION);
         executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, FINAL_EDIT_STEP,
-                CLAIM_ACTION);
-        executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, FINAL_EDIT_STEP,
-                FINAL_EDIT_ACTION);
+                              FINAL_EDIT_ACTION);
 
         assertTrue(workflowItem.getItem().isArchived());
 
@@ -1034,21 +1027,21 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                .withWorkflowGroup(1, workflowUserB)
-                .withWorkflowGroup(2, workflowUserC)
-                .withWorkflowGroup(3, workflowUserB)
-                .build();
+                                                 .withWorkflowGroup(1, workflowUserB)
+                                                 .withWorkflowGroup(2, workflowUserC)
+                                                 .withWorkflowGroup(3, workflowUserB)
+                                                 .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
-                .withSubmitter(workflowUserA)
-                .withTitle("Test item full workflow")
-                .withIssueDate("2019-03-06")
-                .withSubject("ExtraEntry")
-                .build();
+                                                .withSubmitter(workflowUserA)
+                                                .withTitle("Test item full workflow")
+                                                .withIssueDate("2019-03-06")
+                                                .withSubject("ExtraEntry")
+                                                .build();
 
-        Workflow workflow = WorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
+        Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
 
-        WorkflowItem workflowItem = workflowService.startWithoutNotify(context, wsi);
+        XmlWorkflowItem workflowItem = xmlWorkflowService.startWithoutNotify(context, wsi);
         MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
         httpServletRequest.setParameter("submit_approve", "submit_approve");
 
@@ -1064,10 +1057,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
         assertDeletionOfEperson(workflowUserB, true);
 
 
+        executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, FINAL_EDIT_STEP, CLAIM_ACTION);
         executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, FINAL_EDIT_STEP,
-                CLAIM_ACTION);
-        executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, FINAL_EDIT_STEP,
-                FINAL_EDIT_ACTION);
+                              FINAL_EDIT_ACTION);
 
         assertTrue(workflowItem.getItem().isArchived());
 
@@ -1102,21 +1094,21 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                .withWorkflowGroup(1, workflowUserB, workflowUserD)
-                .withWorkflowGroup(2, workflowUserC, workflowUserD)
-                .withWorkflowGroup(3, workflowUserB, workflowUserD)
-                .build();
+                                                 .withWorkflowGroup(1, workflowUserB, workflowUserD)
+                                                 .withWorkflowGroup(2, workflowUserC, workflowUserD)
+                                                 .withWorkflowGroup(3, workflowUserB, workflowUserD)
+                                                 .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
-                .withSubmitter(workflowUserA)
-                .withTitle("Test item full workflow")
-                .withIssueDate("2019-03-06")
-                .withSubject("ExtraEntry")
-                .build();
+                                                .withSubmitter(workflowUserA)
+                                                .withTitle("Test item full workflow")
+                                                .withIssueDate("2019-03-06")
+                                                .withSubject("ExtraEntry")
+                                                .build();
 
-        Workflow workflow = WorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
+        Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
 
-        WorkflowItem workflowItem = workflowService.startWithoutNotify(context, wsi);
+        XmlWorkflowItem workflowItem = xmlWorkflowService.startWithoutNotify(context, wsi);
         MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
         httpServletRequest.setParameter("submit_approve", "submit_approve");
 
@@ -1128,10 +1120,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         assertDeletionOfEperson(workflowUserB, true);
 
+        executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, FINAL_EDIT_STEP, CLAIM_ACTION);
         executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, FINAL_EDIT_STEP,
-                CLAIM_ACTION);
-        executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, FINAL_EDIT_STEP,
-                FINAL_EDIT_ACTION);
+                              FINAL_EDIT_ACTION);
 
         assertTrue(workflowItem.getItem().isArchived());
 
@@ -1168,21 +1159,21 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                .withWorkflowGroup(1, workflowUserB, workflowUserD)
-                .withWorkflowGroup(2, workflowUserC, workflowUserD)
-                .withWorkflowGroup(3, workflowUserB, workflowUserD)
-                .build();
+                                                 .withWorkflowGroup(1, workflowUserB, workflowUserD)
+                                                 .withWorkflowGroup(2, workflowUserC, workflowUserD)
+                                                 .withWorkflowGroup(3, workflowUserB, workflowUserD)
+                                                 .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
-                .withSubmitter(workflowUserA)
-                .withTitle("Test item full workflow")
-                .withIssueDate("2019-03-06")
-                .withSubject("ExtraEntry")
-                .build();
+                                                .withSubmitter(workflowUserA)
+                                                .withTitle("Test item full workflow")
+                                                .withIssueDate("2019-03-06")
+                                                .withSubject("ExtraEntry")
+                                                .build();
 
-        Workflow workflow = WorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
+        Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
 
-        WorkflowItem workflowItem = workflowService.startWithoutNotify(context, wsi);
+        XmlWorkflowItem workflowItem = xmlWorkflowService.startWithoutNotify(context, wsi);
         MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
         httpServletRequest.setParameter("submit_approve", "submit_approve");
 
@@ -1195,10 +1186,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
         executeWorkflowAction(httpServletRequest, workflowUserC, workflow, workflowItem, EDIT_STEP, EDIT_ACTION);
 
 
+        executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, FINAL_EDIT_STEP, CLAIM_ACTION);
         executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, FINAL_EDIT_STEP,
-                CLAIM_ACTION);
-        executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, FINAL_EDIT_STEP,
-                FINAL_EDIT_ACTION);
+                              FINAL_EDIT_ACTION);
 
         assertTrue(workflowItem.getItem().isArchived());
 
@@ -1234,21 +1224,21 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                .withWorkflowGroup(1, workflowUserB, workflowUserD)
-                .withWorkflowGroup(2, workflowUserC, workflowUserD)
-                .withWorkflowGroup(3, workflowUserB, workflowUserD)
-                .build();
+                                                 .withWorkflowGroup(1, workflowUserB, workflowUserD)
+                                                 .withWorkflowGroup(2, workflowUserC, workflowUserD)
+                                                 .withWorkflowGroup(3, workflowUserB, workflowUserD)
+                                                 .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
-                .withSubmitter(workflowUserA)
-                .withTitle("Test item full workflow")
-                .withIssueDate("2019-03-06")
-                .withSubject("ExtraEntry")
-                .build();
+                                                .withSubmitter(workflowUserA)
+                                                .withTitle("Test item full workflow")
+                                                .withIssueDate("2019-03-06")
+                                                .withSubject("ExtraEntry")
+                                                .build();
 
-        Workflow workflow = WorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
+        Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
 
-        WorkflowItem workflowItem = workflowService.startWithoutNotify(context, wsi);
+        XmlWorkflowItem workflowItem = xmlWorkflowService.startWithoutNotify(context, wsi);
         MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
         httpServletRequest.setParameter("submit_approve", "submit_approve");
 
@@ -1261,10 +1251,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
         executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, EDIT_STEP, EDIT_ACTION);
 
 
+        executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, FINAL_EDIT_STEP, CLAIM_ACTION);
         executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, FINAL_EDIT_STEP,
-                CLAIM_ACTION);
-        executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, FINAL_EDIT_STEP,
-                FINAL_EDIT_ACTION);
+                              FINAL_EDIT_ACTION);
 
         assertTrue(workflowItem.getItem().isArchived());
 
@@ -1303,21 +1292,21 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                .withWorkflowGroup(1, workflowUserB, workflowUserD)
-                .withWorkflowGroup(2, workflowUserC, workflowUserD)
-                .withWorkflowGroup(3, workflowUserB, workflowUserD)
-                .build();
+                                                 .withWorkflowGroup(1, workflowUserB, workflowUserD)
+                                                 .withWorkflowGroup(2, workflowUserC, workflowUserD)
+                                                 .withWorkflowGroup(3, workflowUserB, workflowUserD)
+                                                 .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
-                .withSubmitter(workflowUserA)
-                .withTitle("Test item full workflow")
-                .withIssueDate("2019-03-06")
-                .withSubject("ExtraEntry")
-                .build();
+                                                .withSubmitter(workflowUserA)
+                                                .withTitle("Test item full workflow")
+                                                .withIssueDate("2019-03-06")
+                                                .withSubject("ExtraEntry")
+                                                .build();
 
-        Workflow workflow = WorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
+        Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
 
-        WorkflowItem workflowItem = workflowService.startWithoutNotify(context, wsi);
+        XmlWorkflowItem workflowItem = xmlWorkflowService.startWithoutNotify(context, wsi);
         MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
         httpServletRequest.setParameter("submit_approve", "submit_approve");
 
@@ -1332,10 +1321,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
         executeWorkflowAction(httpServletRequest, workflowUserC, workflow, workflowItem, EDIT_STEP, EDIT_ACTION);
 
 
+        executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, FINAL_EDIT_STEP, CLAIM_ACTION);
         executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, FINAL_EDIT_STEP,
-                CLAIM_ACTION);
-        executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, FINAL_EDIT_STEP,
-                FINAL_EDIT_ACTION);
+                              FINAL_EDIT_ACTION);
 
         assertTrue(workflowItem.getItem().isArchived());
 
@@ -1374,21 +1362,21 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                .withWorkflowGroup(1, workflowUserB, workflowUserD)
-                .withWorkflowGroup(2, workflowUserC, workflowUserD)
-                .withWorkflowGroup(3, workflowUserB, workflowUserD)
-                .build();
+                                                 .withWorkflowGroup(1, workflowUserB, workflowUserD)
+                                                 .withWorkflowGroup(2, workflowUserC, workflowUserD)
+                                                 .withWorkflowGroup(3, workflowUserB, workflowUserD)
+                                                 .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
-                .withSubmitter(workflowUserA)
-                .withTitle("Test item full workflow")
-                .withIssueDate("2019-03-06")
-                .withSubject("ExtraEntry")
-                .build();
+                                                .withSubmitter(workflowUserA)
+                                                .withTitle("Test item full workflow")
+                                                .withIssueDate("2019-03-06")
+                                                .withSubject("ExtraEntry")
+                                                .build();
 
-        Workflow workflow = WorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
+        Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
 
-        WorkflowItem workflowItem = workflowService.startWithoutNotify(context, wsi);
+        XmlWorkflowItem workflowItem = xmlWorkflowService.startWithoutNotify(context, wsi);
         MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
         httpServletRequest.setParameter("submit_approve", "submit_approve");
 
@@ -1402,10 +1390,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
         executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, EDIT_STEP, EDIT_ACTION);
 
 
+        executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, FINAL_EDIT_STEP, CLAIM_ACTION);
         executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, FINAL_EDIT_STEP,
-                CLAIM_ACTION);
-        executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, FINAL_EDIT_STEP,
-                FINAL_EDIT_ACTION);
+                              FINAL_EDIT_ACTION);
 
         assertTrue(workflowItem.getItem().isArchived());
 
@@ -1444,21 +1431,21 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                .withWorkflowGroup(1, workflowUserB, workflowUserD)
-                .withWorkflowGroup(2, workflowUserC, workflowUserD)
-                .withWorkflowGroup(3, workflowUserB, workflowUserD)
-                .build();
+                                                 .withWorkflowGroup(1, workflowUserB, workflowUserD)
+                                                 .withWorkflowGroup(2, workflowUserC, workflowUserD)
+                                                 .withWorkflowGroup(3, workflowUserB, workflowUserD)
+                                                 .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
-                .withSubmitter(workflowUserA)
-                .withTitle("Test item full workflow")
-                .withIssueDate("2019-03-06")
-                .withSubject("ExtraEntry")
-                .build();
+                                                .withSubmitter(workflowUserA)
+                                                .withTitle("Test item full workflow")
+                                                .withIssueDate("2019-03-06")
+                                                .withSubject("ExtraEntry")
+                                                .build();
 
-        Workflow workflow = WorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
+        Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
 
-        WorkflowItem workflowItem = workflowService.startWithoutNotify(context, wsi);
+        XmlWorkflowItem workflowItem = xmlWorkflowService.startWithoutNotify(context, wsi);
         MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
         httpServletRequest.setParameter("submit_approve", "submit_approve");
 
@@ -1470,14 +1457,12 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
         executeWorkflowAction(httpServletRequest, workflowUserC, workflow, workflowItem, EDIT_STEP, EDIT_ACTION);
 
 
-        executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, FINAL_EDIT_STEP,
-                CLAIM_ACTION);
+        executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, FINAL_EDIT_STEP, CLAIM_ACTION);
         assertDeletionOfEperson(workflowUserB, true);
 
+        executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, FINAL_EDIT_STEP, CLAIM_ACTION);
         executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, FINAL_EDIT_STEP,
-                CLAIM_ACTION);
-        executeWorkflowAction(httpServletRequest, workflowUserD, workflow, workflowItem, FINAL_EDIT_STEP,
-                FINAL_EDIT_ACTION);
+                              FINAL_EDIT_ACTION);
 
         assertTrue(workflowItem.getItem().isArchived());
 
@@ -1496,12 +1481,11 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
     }
 
     private void executeWorkflowAction(HttpServletRequest httpServletRequest, EPerson user,
-                                       Workflow workflow, WorkflowItem workflowItem, String stepId,
-                                       String actionId)
+                                       Workflow workflow, XmlWorkflowItem workflowItem, String stepId, String actionId)
             throws Exception {
         context.setCurrentUser(user);
-        workflowService.doState(context, user, httpServletRequest, workflowItem.getID(), workflow,
-                workflow.getStep(stepId).getActionConfig(actionId));
+        xmlWorkflowService.doState(context, user, httpServletRequest, workflowItem.getID(), workflow,
+                                   workflow.getStep(stepId).getActionConfig(actionId));
         context.setCurrentUser(null);
     }
 
@@ -1527,7 +1511,7 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
                 deleteSuccess = false;
                 log.error("Caught an Exception while deleting an EPerson. " + ex.getClass().getName() + ": ", ex);
                 fail("Caught an Exception while deleting an EPerson. " + ex.getClass().getName() +
-                        ": " + ex.getMessage());
+                             ": " + ex.getMessage());
             }
         }
         if (shouldSucceed) {
@@ -1553,7 +1537,7 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
                 deleteSuccess = false;
                 log.error("Caught an Exception while deleting an EPerson. " + ex.getClass().getName() + ": ", ex);
                 fail("Caught an Exception while deleting an EPerson. " + ex.getClass().getName() +
-                        ": " + ex.getMessage());
+                             ": " + ex.getMessage());
             }
         }
 

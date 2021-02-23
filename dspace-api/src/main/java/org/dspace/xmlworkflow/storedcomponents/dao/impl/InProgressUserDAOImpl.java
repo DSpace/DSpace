@@ -16,9 +16,9 @@ import javax.persistence.criteria.Root;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.InProgressUser;
 import org.dspace.xmlworkflow.storedcomponents.InProgressUser_;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.dao.InProgressUserDAO;
 
 /**
@@ -34,7 +34,7 @@ public class InProgressUserDAOImpl extends AbstractHibernateDAO<InProgressUser> 
     }
 
     @Override
-    public InProgressUser findByWorkflowItemAndEPerson(Context context, WorkflowItem workflowItem, EPerson ePerson)
+    public InProgressUser findByWorkflowItemAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson)
         throws SQLException {
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
@@ -61,7 +61,7 @@ public class InProgressUserDAOImpl extends AbstractHibernateDAO<InProgressUser> 
     }
 
     @Override
-    public List<InProgressUser> findByWorkflowItem(Context context, WorkflowItem workflowItem) throws SQLException {
+    public List<InProgressUser> findByWorkflowItem(Context context, XmlWorkflowItem workflowItem) throws SQLException {
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, InProgressUser.class);
@@ -72,7 +72,7 @@ public class InProgressUserDAOImpl extends AbstractHibernateDAO<InProgressUser> 
     }
 
     @Override
-    public int countInProgressUsers(Context context, WorkflowItem workflowItem) throws SQLException {
+    public int countInProgressUsers(Context context, XmlWorkflowItem workflowItem) throws SQLException {
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
@@ -88,7 +88,7 @@ public class InProgressUserDAOImpl extends AbstractHibernateDAO<InProgressUser> 
     }
 
     @Override
-    public int countFinishedUsers(Context context, WorkflowItem workflowItem) throws SQLException {
+    public int countFinishedUsers(Context context, XmlWorkflowItem workflowItem) throws SQLException {
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);

@@ -16,7 +16,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.dao.ClaimedTaskDAO;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,12 +71,12 @@ public class ClaimedTaskServiceImpl implements ClaimedTaskService {
     }
 
     @Override
-    public List<ClaimedTask> findByWorkflowItem(Context context, WorkflowItem workflowItem) throws SQLException {
+    public List<ClaimedTask> findByWorkflowItem(Context context, XmlWorkflowItem workflowItem) throws SQLException {
         return claimedTaskDAO.findByWorkflowItem(context, workflowItem);
     }
 
     @Override
-    public ClaimedTask findByWorkflowIdAndEPerson(Context context, WorkflowItem workflowItem, EPerson ePerson)
+    public ClaimedTask findByWorkflowIdAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson)
         throws SQLException {
         return claimedTaskDAO.findByWorkflowItemAndEPerson(context, workflowItem, ePerson);
     }
@@ -88,25 +87,25 @@ public class ClaimedTaskServiceImpl implements ClaimedTaskService {
     }
 
     @Override
-    public List<ClaimedTask> find(Context context, WorkflowItem workflowItem, String stepID) throws SQLException {
+    public List<ClaimedTask> find(Context context, XmlWorkflowItem workflowItem, String stepID) throws SQLException {
         return claimedTaskDAO.findByWorkflowItemAndStepId(context, workflowItem, stepID);
     }
 
     @Override
-    public ClaimedTask find(Context context, EPerson ePerson, WorkflowItem workflowItem, String stepID,
+    public ClaimedTask find(Context context, EPerson ePerson, XmlWorkflowItem workflowItem, String stepID,
                             String actionID) throws SQLException {
         return claimedTaskDAO
             .findByEPersonAndWorkflowItemAndStepIdAndActionId(context, ePerson, workflowItem, stepID, actionID);
     }
 
     @Override
-    public List<ClaimedTask> find(Context context, WorkflowItem workflowItem, String stepID, String actionID)
+    public List<ClaimedTask> find(Context context, XmlWorkflowItem workflowItem, String stepID, String actionID)
         throws SQLException {
         return claimedTaskDAO.findByWorkflowItemAndStepIdAndActionId(context, workflowItem, stepID, actionID);
     }
 
     @Override
-    public List<ClaimedTask> find(Context context, WorkflowItem workflowItem) throws SQLException {
+    public List<ClaimedTask> find(Context context, XmlWorkflowItem workflowItem) throws SQLException {
         return claimedTaskDAO.findByWorkflowItem(context, workflowItem);
     }
 
@@ -116,7 +115,7 @@ public class ClaimedTaskServiceImpl implements ClaimedTaskService {
     }
 
     @Override
-    public void deleteByWorkflowItem(Context context, WorkflowItem workflowItem)
+    public void deleteByWorkflowItem(Context context, XmlWorkflowItem workflowItem)
         throws SQLException, AuthorizeException {
         List<ClaimedTask> claimedTasks = findByWorkflowItem(context, workflowItem);
         //Use an iterator to remove the tasks !

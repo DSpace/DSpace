@@ -52,8 +52,8 @@ import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.license.service.CreativeCommonsService;
 import org.dspace.workflow.WorkflowException;
-import org.dspace.workflow.WorkflowService;
-import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
 
 /**
  * Container class for code that is useful to many packagers.
@@ -520,7 +520,7 @@ public class PackageUtils {
         } else if (params.workflowEnabled()) {
             // if we are treating package as a SIP, and we are told to respect workflows
 
-            WorkflowService workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
+            XmlWorkflowService workflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
             // Start an item workflow
             // (NOTICE: The specified handle is ignored, as Workflows *always* end in a new handle being assigned)
             return workflowService.startWithoutNotify(context, wsi).getItem();

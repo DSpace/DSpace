@@ -11,7 +11,7 @@ import org.dspace.app.rest.model.WorkflowItemRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.discovery.IndexableObject;
-import org.dspace.workflow.WorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,14 +23,14 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class WorkflowItemConverter
-    extends AInprogressItemConverter<WorkflowItem, org.dspace.app.rest.model.WorkflowItemRest> {
+    extends AInprogressItemConverter<XmlWorkflowItem, org.dspace.app.rest.model.WorkflowItemRest> {
 
     public WorkflowItemConverter() throws SubmissionConfigReaderException {
         super();
     }
 
     @Override
-    public WorkflowItemRest convert(WorkflowItem obj, Projection projection) {
+    public WorkflowItemRest convert(XmlWorkflowItem obj, Projection projection) {
         WorkflowItemRest witem = new WorkflowItemRest();
         witem.setProjection(projection);
         fillFromModel(obj, witem, projection);
@@ -38,12 +38,12 @@ public class WorkflowItemConverter
     }
 
     @Override
-    public Class<WorkflowItem> getModelClass() {
-        return WorkflowItem.class;
+    public Class<XmlWorkflowItem> getModelClass() {
+        return XmlWorkflowItem.class;
     }
 
     @Override
     public boolean supportsModel(IndexableObject object) {
-        return object.getIndexedObject() instanceof WorkflowItem;
+        return object.getIndexedObject() instanceof XmlWorkflowItem;
     }
 }

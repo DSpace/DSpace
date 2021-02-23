@@ -33,7 +33,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
-import org.dspace.workflow.WorkflowItemService;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -63,7 +63,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     @Autowired(required = true)
     protected WorkspaceItemService workspaceItemService;
     @Autowired(required = true)
-    protected WorkflowItemService workflowItemService;
+    protected XmlWorkflowItemService workflowItemService;
 
     protected AuthorizeServiceImpl() {
 

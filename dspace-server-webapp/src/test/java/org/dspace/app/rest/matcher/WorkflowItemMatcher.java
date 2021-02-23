@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
 
-import org.dspace.workflow.WorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matcher;
 
 /**
@@ -38,8 +38,8 @@ public class WorkflowItemMatcher {
      *            the dc.date.issued
      * @return
      */
-    public static Matcher matchItemWithTitleAndDateIssued(WorkflowItem witem, String title,
-                                                          String dateIssued) {
+    public static Matcher matchItemWithTitleAndDateIssued(XmlWorkflowItem witem, String title,
+            String dateIssued) {
         return allOf(
                 // Check workflowitem properties
                 matchProperties(witem),
@@ -64,9 +64,9 @@ public class WorkflowItemMatcher {
      * 
      * @return
      */
-    public static Matcher matchItemWithTitleAndDateIssuedAndSubject(WorkflowItem witem, String title,
-                                                                    String dateIssued,
-                                                                    String subject) {
+    public static Matcher matchItemWithTitleAndDateIssuedAndSubject(XmlWorkflowItem witem, String title,
+            String dateIssued,
+            String subject) {
         return allOf(
                 // Check workspaceitem properties
                 matchProperties(witem),
@@ -88,7 +88,7 @@ public class WorkflowItemMatcher {
      *            the workflowitem
      * @return
      */
-    public static Matcher<? super Object> matchProperties(WorkflowItem witem) {
+    public static Matcher<? super Object> matchProperties(XmlWorkflowItem witem) {
         return allOf(
                 witem != null ? hasJsonPath("$.id", is(witem.getID())) : hasJsonPath("$.id"),
                 hasJsonPath("$.type", is("workflowitem"))
@@ -102,7 +102,7 @@ public class WorkflowItemMatcher {
      *            the workflowitem
      * @return
      */
-    public static Matcher<? super Object> matchLinks(WorkflowItem witem) {
+    public static Matcher<? super Object> matchLinks(XmlWorkflowItem witem) {
         return allOf(
                 witem != null
                         ? hasJsonPath("$._links.self.href",

@@ -7,17 +7,17 @@
  */
 package org.dspace.discovery.indexobject;
 
-import org.dspace.workflow.WorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * Workflow item implementation for the IndexableObject
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public class IndexableWorkflowItem extends IndexableInProgressSubmission<WorkflowItem> {
+public class IndexableWorkflowItem extends IndexableInProgressSubmission<XmlWorkflowItem> {
 
-    public static final String TYPE = WorkflowItem.class.getSimpleName();
+    public static final String TYPE = XmlWorkflowItem.class.getSimpleName();
 
-    public IndexableWorkflowItem(WorkflowItem inProgressSubmission) {
+    public IndexableWorkflowItem(XmlWorkflowItem inProgressSubmission) {
         super(inProgressSubmission);
     }
 

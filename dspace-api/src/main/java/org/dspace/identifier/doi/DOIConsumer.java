@@ -19,7 +19,7 @@ import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.utils.DSpace;
-import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 
 /**
  * @author Pascal-Nicolas Becker (p dot becker at tu hyphen berlin dot de)
@@ -64,7 +64,7 @@ public class DOIConsumer implements Consumer {
         Item item = (Item) dso;
 
         if (ContentServiceFactory.getInstance().getWorkspaceItemService().findByItem(ctx, item) != null
-            || WorkflowServiceFactory.getInstance().getWorkflowItemService().findByItem(ctx, item) != null) {
+            || XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService().findByItem(ctx, item) != null) {
             // ignore workflow and workspace items, DOI will be minted when item is installed
             return;
         }

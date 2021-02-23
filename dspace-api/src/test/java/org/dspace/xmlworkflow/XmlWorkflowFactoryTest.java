@@ -23,15 +23,15 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.utils.DSpace;
-import org.dspace.workflow.factory.WorkflowServiceFactoryImpl;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactoryImpl;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Tests that check that the spring bean {@link WorkflowServiceFactoryImpl}
+ * Tests that check that the spring bean {@link XmlWorkflowServiceFactoryImpl}
  * in workflow.xml gets created correctly
  *
  * @author Maria Verdonck (Atmire) on 19/12/2019

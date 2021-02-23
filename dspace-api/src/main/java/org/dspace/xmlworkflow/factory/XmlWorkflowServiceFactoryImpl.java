@@ -5,17 +5,16 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.workflow.factory;
+package org.dspace.xmlworkflow.factory;
 
-import org.dspace.workflow.WorkflowItemService;
-import org.dspace.workflow.WorkflowService;
-import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
 import org.dspace.xmlworkflow.storedcomponents.service.InProgressUserService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -24,14 +23,14 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class WorkflowServiceFactoryImpl extends WorkflowServiceFactory {
+public class XmlWorkflowServiceFactoryImpl extends XmlWorkflowServiceFactory {
 
     @Autowired(required = true)
     private XmlWorkflowFactory workflowFactory;
     @Autowired(required = true)
     private WorkflowRequirementsService workflowRequirementsService;
     @Autowired(required = true)
-    private WorkflowService workflowService;
+    private XmlWorkflowService xmlWorkflowService;
     @Autowired(required = true)
     private ClaimedTaskService claimedTaskService;
     @Autowired(required = true)
@@ -43,7 +42,7 @@ public class WorkflowServiceFactoryImpl extends WorkflowServiceFactory {
     @Autowired(required = true)
     private WorkflowItemRoleService workflowItemRoleService;
     @Autowired(required = true)
-    private WorkflowItemService workflowItemService;
+    private XmlWorkflowItemService xmlWorkflowItemService;
 
     @Override
     public XmlWorkflowFactory getWorkflowFactory() {
@@ -56,8 +55,8 @@ public class WorkflowServiceFactoryImpl extends WorkflowServiceFactory {
     }
 
     @Override
-    public WorkflowService getWorkflowService() {
-        return workflowService;
+    public XmlWorkflowService getXmlWorkflowService() {
+        return xmlWorkflowService;
     }
 
     @Override
@@ -86,7 +85,7 @@ public class WorkflowServiceFactoryImpl extends WorkflowServiceFactory {
     }
 
     @Override
-    public WorkflowItemService getWorkflowItemService() {
-        return workflowItemService;
+    public XmlWorkflowItemService getXmlWorkflowItemService() {
+        return xmlWorkflowItemService;
     }
 }

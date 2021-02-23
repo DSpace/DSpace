@@ -33,8 +33,8 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
-import org.dspace.workflow.WorkflowItemService;
-import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 
 /**
  * @author LINDAT/CLARIN dev team
@@ -48,8 +48,8 @@ public class ItemCheck extends Check {
     private MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     private WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-    private WorkflowItemService workflowItemService =
-            WorkflowServiceFactory.getInstance().getWorkflowItemService();
+    private XmlWorkflowItemService workflowItemService =
+            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService();
     private HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
     private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     private GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
