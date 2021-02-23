@@ -20,10 +20,10 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.WorkflowItemService;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +45,7 @@ public class WorkflowRestPermissionEvaluatorPlugin extends RestObjectPermissionE
     private RequestService requestService;
 
     @Autowired
-    private WorkflowItemService workflowItemService;
+    private XmlWorkflowItemService workflowItemService;
 
     @Autowired
     private PoolTaskService poolTaskService;
@@ -76,7 +76,7 @@ public class WorkflowRestPermissionEvaluatorPlugin extends RestObjectPermissionE
                 return false;
             }
             Integer dsoId = Integer.parseInt(targetId.toString());
-            WorkflowItem workflowItem = workflowItemService.find(context, dsoId);
+            XmlWorkflowItem workflowItem = workflowItemService.find(context, dsoId);
             // submitter can see their inprogress submission
             if (ePerson.equals(workflowItem.getSubmitter())) {
                 return true;

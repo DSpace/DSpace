@@ -16,9 +16,9 @@ import javax.persistence.criteria.Root;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole;
 import org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole_;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.dao.WorkflowItemRoleDAO;
 
 /**
@@ -36,7 +36,7 @@ public class WorkflowItemRoleDAOImpl extends AbstractHibernateDAO<WorkflowItemRo
 
     @Override
     public List<WorkflowItemRole> findByWorkflowItemAndRole(Context context,
-                                                            WorkflowItem workflowItem,
+                                                            XmlWorkflowItem workflowItem,
                                                             String role) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkflowItemRole.class);
@@ -55,7 +55,7 @@ public class WorkflowItemRoleDAOImpl extends AbstractHibernateDAO<WorkflowItemRo
 
     @Override
     public List<WorkflowItemRole> findByWorkflowItem(Context context,
-                                                     WorkflowItem workflowItem) throws SQLException {
+                                                     XmlWorkflowItem workflowItem) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkflowItemRole.class);
         Root<WorkflowItemRole> workflowItemRoleRoot = criteriaQuery.from(WorkflowItemRole.class);

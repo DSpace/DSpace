@@ -28,8 +28,8 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.event.Event;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.WorkflowService;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -53,7 +53,7 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     @Autowired(required = true)
     protected ItemService itemService;
     @Autowired(required = true)
-    protected WorkflowService workflowService;
+    protected XmlWorkflowService workflowService;
 
 
     protected WorkspaceItemServiceImpl() {
@@ -138,7 +138,7 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     }
 
     @Override
-    public WorkspaceItem create(Context c, WorkflowItem workflowItem) throws SQLException, AuthorizeException {
+    public WorkspaceItem create(Context c, XmlWorkflowItem workflowItem) throws SQLException, AuthorizeException {
         WorkspaceItem workspaceItem = workspaceItemDAO.create(c, new WorkspaceItem());
         workspaceItem.setItem(workflowItem.getItem());
         workspaceItem.setCollection(workflowItem.getCollection());

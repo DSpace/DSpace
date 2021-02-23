@@ -14,8 +14,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.service.DSpaceCRUDService;
-import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * Service interface class for the ClaimedTask object.
@@ -26,26 +26,26 @@ import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
  */
 public interface ClaimedTaskService extends DSpaceCRUDService<ClaimedTask> {
 
-    public List<ClaimedTask> findByWorkflowItem(Context context, WorkflowItem workflowItem) throws SQLException;
+    public List<ClaimedTask> findByWorkflowItem(Context context, XmlWorkflowItem workflowItem) throws SQLException;
 
-    public ClaimedTask findByWorkflowIdAndEPerson(Context context, WorkflowItem workflowItem, EPerson ePerson)
+    public ClaimedTask findByWorkflowIdAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson)
         throws SQLException;
 
     public List<ClaimedTask> findByEperson(Context context, EPerson ePerson) throws SQLException;
 
-    public List<ClaimedTask> find(Context context, WorkflowItem workflowItem, String stepID) throws SQLException;
+    public List<ClaimedTask> find(Context context, XmlWorkflowItem workflowItem, String stepID) throws SQLException;
 
-    public ClaimedTask find(Context context, EPerson ePerson, WorkflowItem workflowItem, String stepID,
+    public ClaimedTask find(Context context, EPerson ePerson, XmlWorkflowItem workflowItem, String stepID,
                             String actionID) throws SQLException;
 
-    public List<ClaimedTask> find(Context context, WorkflowItem workflowItem, String stepID, String actionID)
+    public List<ClaimedTask> find(Context context, XmlWorkflowItem workflowItem, String stepID, String actionID)
         throws SQLException;
 
-    public List<ClaimedTask> find(Context context, WorkflowItem workflowItem) throws SQLException;
+    public List<ClaimedTask> find(Context context, XmlWorkflowItem workflowItem) throws SQLException;
 
     public List<ClaimedTask> findAllInStep(Context context, String stepID) throws SQLException;
 
-    public void deleteByWorkflowItem(Context context, WorkflowItem workflowItem)
+    public void deleteByWorkflowItem(Context context, XmlWorkflowItem workflowItem)
         throws SQLException, AuthorizeException;
 
     List<ClaimedTask> findAll(Context context) throws SQLException;

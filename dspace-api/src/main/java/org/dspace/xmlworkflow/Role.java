@@ -14,9 +14,9 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
-import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
 import org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
 import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
 import org.springframework.beans.factory.BeanNameAware;
@@ -79,7 +79,7 @@ public class Role implements BeanNameAware {
         return scope;
     }
 
-    public RoleMembers getMembers(Context context, WorkflowItem wfi) throws SQLException {
+    public RoleMembers getMembers(Context context, XmlWorkflowItem wfi) throws SQLException {
         if (scope == Scope.REPOSITORY) {
             Group group = groupService.findByName(context, name);
             if (group == null) {

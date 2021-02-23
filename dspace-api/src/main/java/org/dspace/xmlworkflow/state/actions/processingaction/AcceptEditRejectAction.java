@@ -18,10 +18,10 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.core.Context;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * Processing class of an action that allows users to
@@ -41,12 +41,12 @@ public class AcceptEditRejectAction extends ProcessingAction {
     //TODO: rename to AcceptAndEditMetadataAction
 
     @Override
-    public void activate(Context c, WorkflowItem wf) {
+    public void activate(Context c, XmlWorkflowItem wf) {
 
     }
 
     @Override
-    public ActionResult execute(Context c, WorkflowItem wfi, Step step, HttpServletRequest request)
+    public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
             throws SQLException, AuthorizeException, IOException {
         if (super.isOptionInParam(request)) {
             switch (Util.getSubmitButton(request, SUBMIT_CANCEL)) {
@@ -72,7 +72,7 @@ public class AcceptEditRejectAction extends ProcessingAction {
         return options;
     }
 
-    public ActionResult processAccept(Context c, WorkflowItem wfi)
+    public ActionResult processAccept(Context c, XmlWorkflowItem wfi)
             throws SQLException, AuthorizeException {
         //Delete the tasks
         addApprovedProvenance(c, wfi);
@@ -80,7 +80,7 @@ public class AcceptEditRejectAction extends ProcessingAction {
         return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
     }
 
-    public ActionResult processRejectPage(Context c, WorkflowItem wfi, HttpServletRequest request)
+    public ActionResult processRejectPage(Context c, XmlWorkflowItem wfi, HttpServletRequest request)
             throws SQLException, AuthorizeException, IOException {
         String reason = request.getParameter("reason");
         if (reason == null || 0 == reason.trim().length()) {
@@ -90,16 +90,16 @@ public class AcceptEditRejectAction extends ProcessingAction {
 
         // We have pressed reject, so remove the task the user has & put it back
         // to a workspace item
-        WorkflowServiceFactory.getInstance().getWorkflowService().sendWorkflowItemBackSubmission(c, wfi,
+        XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService().sendWorkflowItemBackSubmission(c, wfi,
                 c.getCurrentUser(), this.getProvenanceStartId(), reason);
 
         return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
     }
 
-    public ActionResult processSubmitterIsDeletedPage(Context c, WorkflowItem wfi, HttpServletRequest request)
+    public ActionResult processSubmitterIsDeletedPage(Context c, XmlWorkflowItem wfi, HttpServletRequest request)
             throws SQLException, AuthorizeException, IOException {
         if (request.getParameter("submit_delete") != null) {
-            WorkflowServiceFactory.getInstance().getWorkflowService()
+            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
                                      .deleteWorkflowByWorkflowItem(c, wfi, c.getCurrentUser());
             // Delete and send user back to myDspace page
             return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
@@ -112,12 +112,12 @@ public class AcceptEditRejectAction extends ProcessingAction {
         }
     }
 
-    private void addApprovedProvenance(Context c, WorkflowItem wfi) throws SQLException, AuthorizeException {
+    private void addApprovedProvenance(Context c, XmlWorkflowItem wfi) throws SQLException, AuthorizeException {
         //Add the provenance for the accept
         String now = DCDate.getCurrent().toString();
 
         // Get user's name + email address
-        String usersName = WorkflowServiceFactory.getInstance().getWorkflowService()
+        String usersName = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
                 .getEPersonName(c.getCurrentUser());
 
         String provDescription = getProvenanceStartId() + " Approved for entry into archive by "

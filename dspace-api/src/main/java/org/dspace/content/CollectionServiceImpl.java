@@ -57,9 +57,9 @@ import org.dspace.harvest.service.HarvestedCollectionService;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
 import org.dspace.services.ConfigurationService;
-import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
 import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
@@ -748,8 +748,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         }
 
 
-        WorkflowServiceFactory.getInstance().getWorkflowService().deleteCollection(context, collection);
-        WorkflowServiceFactory.getInstance().getWorkflowItemService().deleteByCollection(context, collection);
+        XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService().deleteCollection(context, collection);
+        XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService().deleteByCollection(context, collection);
 
         //  get rid of the content count cache if it exists
         // Remove any Handle

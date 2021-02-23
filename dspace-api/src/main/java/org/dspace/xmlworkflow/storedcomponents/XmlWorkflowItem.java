@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.workflow;
+package org.dspace.xmlworkflow.storedcomponents;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,6 +24,7 @@ import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 
 /**
  * Class representing an item going through the workflow process in DSpace
@@ -35,7 +36,7 @@ import org.dspace.eperson.EPerson;
  */
 @Entity
 @Table(name = "cwf_workflowitem")
-public class WorkflowItem implements InProgressSubmission {
+public class XmlWorkflowItem implements InProgressSubmission {
 
     @Id
     @Column(name = "workflowitem_id")
@@ -62,9 +63,9 @@ public class WorkflowItem implements InProgressSubmission {
 
     /**
      * Protected constructor, create object using:
-     * {@link WorkflowItemService#create(Context, Item, Collection)}
+     * {@link XmlWorkflowItemService#create(Context, Item, Collection)}
      */
-    protected WorkflowItem() {
+    protected XmlWorkflowItem() {
 
     }
 

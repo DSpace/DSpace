@@ -34,7 +34,7 @@ import org.dspace.content.service.SiteService;
 import org.dspace.content.service.SupervisedItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 
 /**
  * Abstract factory to get services for the content package, use ContentServiceFactory.getInstance() to retrieve an
@@ -109,7 +109,7 @@ public abstract class ContentServiceFactory {
         if (inProgressSubmission instanceof WorkspaceItem) {
             return getWorkspaceItemService();
         } else {
-            return WorkflowServiceFactory.getInstance().getWorkflowItemService();
+            return XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService();
         }
     }
 

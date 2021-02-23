@@ -54,11 +54,9 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageWorkflowEvent;
 import org.dspace.workflow.WorkflowException;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.WorkflowItemService;
-import org.dspace.workflow.WorkflowService;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.state.actions.Action;
@@ -66,10 +64,12 @@ import org.dspace.xmlworkflow.state.actions.ActionResult;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -83,12 +83,12 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Ben Bosman (ben at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  */
-public class WorkflowServiceImpl implements WorkflowService {
+public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
     /* support for 'no notification' */
     protected Map<UUID, Boolean> noEMail = new HashMap<>();
 
-    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(WorkflowServiceImpl.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(XmlWorkflowServiceImpl.class);
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
@@ -113,7 +113,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Autowired(required = true)
     protected WorkspaceItemService workspaceItemService;
     @Autowired(required = true)
-    protected WorkflowItemService workflowItemService;
+    protected XmlWorkflowItemService xmlWorkflowItemService;
     @Autowired(required = true)
     protected GroupService groupService;
     @Autowired(required = true)
@@ -125,7 +125,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Autowired(required = true)
     protected ConfigurationService configurationService;
 
-    protected WorkflowServiceImpl() {
+    protected XmlWorkflowServiceImpl() {
 
     }
 
@@ -133,7 +133,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     public void deleteCollection(Context context, Collection collection)
         throws SQLException, IOException, AuthorizeException {
-        workflowItemService.deleteByCollection(context, collection);
+        xmlWorkflowItemService.deleteByCollection(context, collection);
         collectionRoleService.deleteByCollection(context, collection);
     }
 
@@ -194,18 +194,18 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    public WorkflowItem start(Context context, WorkspaceItem wsi)
+    public XmlWorkflowItem start(Context context, WorkspaceItem wsi)
         throws SQLException, AuthorizeException, IOException, WorkflowException {
         try {
             Item myitem = wsi.getItem();
             Collection collection = wsi.getCollection();
             Workflow wf = xmlWorkflowFactory.getWorkflow(collection);
 
-            WorkflowItem wfi = workflowItemService.create(context, myitem, collection);
+            XmlWorkflowItem wfi = xmlWorkflowItemService.create(context, myitem, collection);
             wfi.setMultipleFiles(wsi.hasMultipleFiles());
             wfi.setMultipleTitles(wsi.hasMultipleTitles());
             wfi.setPublishedBefore(wsi.isPublishedBefore());
-            workflowItemService.update(context, wfi);
+            xmlWorkflowItemService.update(context, wfi);
             removeUserItemPolicies(context, myitem, myitem.getSubmitter());
             grantSubmitterReadPolicies(context, myitem);
 
@@ -244,7 +244,7 @@ public class WorkflowServiceImpl implements WorkflowService {
      * @param wsi the submitted Item entering workflow.
      */
     @Override
-    public WorkflowItem startWithoutNotify(Context context, WorkspaceItem wsi)
+    public XmlWorkflowItem startWithoutNotify(Context context, WorkspaceItem wsi)
         throws SQLException, AuthorizeException, IOException, WorkflowException {
         // make a hash table entry with item ID for no notify
         // notify code checks no notify hash for item id
@@ -254,7 +254,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    public void alertUsersOnTaskActivation(Context c, WorkflowItem wfi, String emailTemplate, List<EPerson> epa,
+    public void alertUsersOnTaskActivation(Context c, XmlWorkflowItem wfi, String emailTemplate, List<EPerson> epa,
                                            String... arguments) throws IOException, SQLException, MessagingException {
         if (noEMail.containsKey(wfi.getItem().getID())) {
             // suppress email, and delete key
@@ -292,7 +292,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
 
-    protected void activateFirstStep(Context context, Workflow wf, Step firstStep, WorkflowItem wfi)
+    protected void activateFirstStep(Context context, Workflow wf, Step firstStep, XmlWorkflowItem wfi)
         throws AuthorizeException, IOException, SQLException, WorkflowException, WorkflowConfigurationException {
         WorkflowActionConfig firstActionConfig = firstStep.getUserSelectionMethod();
         firstActionConfig.getProcessingAction().activate(context, wfi);
@@ -322,7 +322,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                                         Workflow workflow, WorkflowActionConfig currentActionConfig)
         throws SQLException, AuthorizeException, IOException, WorkflowException {
         try {
-            WorkflowItem wi = workflowItemService.find(c, workflowItemId);
+            XmlWorkflowItem wi = xmlWorkflowItemService.find(c, workflowItemId);
             Step currentStep = currentActionConfig.getStep();
             if (currentActionConfig.getProcessingAction().isAuthorized(c, request, wi)) {
                 ActionResult outcome = currentActionConfig.getProcessingAction().execute(c, wi, currentStep, request);
@@ -349,7 +349,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     public WorkflowActionConfig processOutcome(Context c, EPerson user, Workflow workflow, Step currentStep,
                                                WorkflowActionConfig currentActionConfig, ActionResult currentOutcome,
-                                               WorkflowItem wfi, boolean enteredNewStep)
+                                               XmlWorkflowItem wfi, boolean enteredNewStep)
         throws IOException, AuthorizeException, SQLException, WorkflowException {
         if (currentOutcome.getType() == ActionResult.TYPE.TYPE_PAGE || currentOutcome
             .getType() == ActionResult.TYPE.TYPE_ERROR) {
@@ -460,7 +460,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     protected void logWorkflowEvent(Context c, String workflowId, String previousStepId, String previousActionConfigId,
-                                    WorkflowItem wfi, EPerson actor, Step newStep,
+                                    XmlWorkflowItem wfi, EPerson actor, Step newStep,
                                     WorkflowActionConfig newActionConfig) throws SQLException {
         try {
             //Fire an event so we can log our action !
@@ -510,7 +510,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     protected WorkflowActionConfig processNextStep(Context c, EPerson user, Workflow workflow,
-                                                   ActionResult currentOutcome, WorkflowItem wfi, Step nextStep)
+                                                   ActionResult currentOutcome, XmlWorkflowItem wfi, Step nextStep)
         throws SQLException, IOException, AuthorizeException, WorkflowException, WorkflowConfigurationException {
         WorkflowActionConfig nextActionConfig;
         if (nextStep != null) {
@@ -552,7 +552,7 @@ public class WorkflowServiceImpl implements WorkflowService {
      * @throws AuthorizeException Exception indicating the current user of the context does not have permission
      *                            to perform a particular action.
      */
-    protected Item archive(Context context, WorkflowItem wfi)
+    protected Item archive(Context context, XmlWorkflowItem wfi)
         throws SQLException, IOException, AuthorizeException {
         // FIXME: Check auth
         Item item = wfi.getItem();
@@ -644,7 +644,7 @@ public class WorkflowServiceImpl implements WorkflowService {
      *                            to perform a particular action.
      */
     @Override
-    public void deleteAllTasks(Context context, WorkflowItem wi) throws SQLException, AuthorizeException {
+    public void deleteAllTasks(Context context, XmlWorkflowItem wi) throws SQLException, AuthorizeException {
         deleteAllPooledTasks(context, wi);
 
         Iterator<ClaimedTask> allClaimedTasks = claimedTaskService.findByWorkflowItem(context, wi).iterator();
@@ -656,7 +656,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    public void deleteAllPooledTasks(Context context, WorkflowItem wi) throws SQLException, AuthorizeException {
+    public void deleteAllPooledTasks(Context context, XmlWorkflowItem wi) throws SQLException, AuthorizeException {
         Iterator<PoolTask> allPooledTasks = poolTaskService.find(context, wi).iterator();
         while (allPooledTasks.hasNext()) {
             PoolTask poolTask = allPooledTasks.next();
@@ -669,7 +669,7 @@ public class WorkflowServiceImpl implements WorkflowService {
      * Deletes an eperson from the taskpool of a step
      */
     @Override
-    public void deletePooledTask(Context context, WorkflowItem wi, PoolTask task)
+    public void deletePooledTask(Context context, XmlWorkflowItem wi, PoolTask task)
         throws SQLException, AuthorizeException {
         if (task != null) {
             if (task.getEperson() != null) {
@@ -682,7 +682,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    public void deleteClaimedTask(Context c, WorkflowItem wi, ClaimedTask task)
+    public void deleteClaimedTask(Context c, XmlWorkflowItem wi, ClaimedTask task)
         throws SQLException, AuthorizeException {
         if (task != null) {
             removeUserItemPolicies(c, wi.getItem(), task.getOwner());
@@ -696,7 +696,7 @@ public class WorkflowServiceImpl implements WorkflowService {
      * Creates a task pool for a given step
      */
     @Override
-    public void createPoolTasks(Context context, WorkflowItem wi, RoleMembers assignees, Step step,
+    public void createPoolTasks(Context context, XmlWorkflowItem wi, RoleMembers assignees, Step step,
                                 WorkflowActionConfig action)
         throws SQLException, AuthorizeException {
         // create a tasklist entry for each eperson
@@ -728,7 +728,7 @@ public class WorkflowServiceImpl implements WorkflowService {
      * Claims an action for a given eperson
      */
     @Override
-    public void createOwnedTask(Context context, WorkflowItem wi, Step step, WorkflowActionConfig action, EPerson e)
+    public void createOwnedTask(Context context, XmlWorkflowItem wi, Step step, WorkflowActionConfig action, EPerson e)
         throws SQLException, AuthorizeException {
         ClaimedTask task = claimedTaskService.create(context);
         task.setWorkflowItem(wi);
@@ -875,7 +875,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    public void deleteWorkflowByWorkflowItem(Context context, WorkflowItem wi, EPerson e)
+    public void deleteWorkflowByWorkflowItem(Context context, XmlWorkflowItem wi, EPerson e)
             throws SQLException, AuthorizeException, IOException {
         Item myitem = wi.getItem();
         UUID itemID = myitem.getID();
@@ -889,7 +889,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         // Remove (if any) the workflowItemroles for this item
         workflowItemRoleService.deleteForWorkflowItem(context, wi);
         // Now remove the workflow object manually from the database
-        workflowItemService.deleteWrapper(context, wi);
+        xmlWorkflowItemService.deleteWrapper(context, wi);
         // Now delete the item
         itemService.delete(context, myitem);
         log.info(LogManager.getHeader(context, "delete_workflow", "workflow_item_id="
@@ -900,9 +900,9 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-   public WorkspaceItem sendWorkflowItemBackSubmission(Context context, WorkflowItem wi, EPerson e,
-                                                       String provenance,
-                                                       String rejection_message)
+   public WorkspaceItem sendWorkflowItemBackSubmission(Context context, XmlWorkflowItem wi, EPerson e,
+                                                        String provenance,
+                                                        String rejection_message)
         throws SQLException, AuthorizeException,
         IOException {
 
@@ -962,7 +962,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    public WorkspaceItem abort(Context c, WorkflowItem wi, EPerson e)
+    public WorkspaceItem abort(Context c, XmlWorkflowItem wi, EPerson e)
         throws AuthorizeException, SQLException, IOException {
         if (!authorizeService.isAdmin(c)) {
             throw new AuthorizeException(
@@ -991,13 +991,13 @@ public class WorkflowServiceImpl implements WorkflowService {
      * item is removed, and a workspace item created.
      *
      * @param c   Context
-     * @param wfi workflow item to be 'dismantled'
+     * @param wfi WorkflowItem to be 'dismantled'
      * @return the workspace item
      * @throws java.io.IOException                     ...
      * @throws java.sql.SQLException                   ...
      * @throws org.dspace.authorize.AuthorizeException ...
      */
-    protected WorkspaceItem returnToWorkspace(Context c, WorkflowItem wfi)
+    protected WorkspaceItem returnToWorkspace(Context c, XmlWorkflowItem wfi)
         throws SQLException, IOException, AuthorizeException {
         // authorize a DSpaceActions.REJECT
         // stop workflow
@@ -1030,7 +1030,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                                           + workspaceItem.getID()));
 
         // Now remove the workflow object manually from the database
-        workflowItemService.deleteWrapper(c, wfi);
+        xmlWorkflowItemService.deleteWrapper(c, wfi);
         return workspaceItem;
     }
 
@@ -1072,7 +1072,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         itemService.update(context, myitem);
     }
 
-    protected void notifyOfReject(Context c, WorkflowItem wi, EPerson e,
+    protected void notifyOfReject(Context c, XmlWorkflowItem wi, EPerson e,
                                   String reason) {
         try {
             // send the notification only if the person was not deleted in the

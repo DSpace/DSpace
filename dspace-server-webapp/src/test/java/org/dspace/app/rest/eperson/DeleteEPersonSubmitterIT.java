@@ -50,10 +50,10 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersioningService;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.WorkflowItemService;
-import org.dspace.workflow.WorkflowService;
-import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -68,9 +68,9 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
     protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance()
                                                                                .getWorkspaceItemService();
-    protected WorkflowService workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
-    protected WorkflowItemService workflowItemService = WorkflowServiceFactory.getInstance()
-                                                                                       .getWorkflowItemService();
+    protected XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
+    protected XmlWorkflowItemService xmlWorkflowItemService = XmlWorkflowServiceFactory.getInstance()
+                                                                                       .getXmlWorkflowItemService();
     protected VersioningService versioningService = VersionServiceFactory.getInstance().getVersionService();
 
     protected RequestItemAuthorExtractor requestItemAuthorExtractor =
@@ -315,7 +315,7 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
                                                  .withWorkflowGroup(1, workflowUser)
                                                  .build();
 
-        WorkflowItem workflowItem = WorkflowItemBuilder.createWorkflowItem(context, collection)
+        XmlWorkflowItem workflowItem = WorkflowItemBuilder.createWorkflowItem(context, collection)
                                                    .withSubmitter(submitter)
                                                    .withTitle("Test Item")
                                                    .withIssueDate("2019-03-06")

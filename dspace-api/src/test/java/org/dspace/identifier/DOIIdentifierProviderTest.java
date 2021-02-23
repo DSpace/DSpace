@@ -45,8 +45,8 @@ import org.dspace.identifier.service.DOIService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.WorkflowException;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -166,7 +166,7 @@ public class DOIIdentifierProviderTest
 
         WorkspaceItem wsItem = workspaceItemService.create(context, collection, false);
 
-        WorkflowItem wfItem = WorkflowServiceFactory.getInstance().getWorkflowService().start(context, wsItem);
+        XmlWorkflowItem wfItem = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService().start(context, wsItem);
 
         Item item = wfItem.getItem();
         itemService.addMetadata(context, item, "dc", "contributor", "author", null, "Author, A. N.");

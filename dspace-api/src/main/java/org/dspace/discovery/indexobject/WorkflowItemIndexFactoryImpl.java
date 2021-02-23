@@ -23,12 +23,12 @@ import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.indexobject.factory.WorkflowItemIndexFactory;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.WorkflowItemService;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -36,11 +36,11 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
 public class WorkflowItemIndexFactoryImpl
-        extends InprogressSubmissionIndexFactoryImpl<IndexableWorkflowItem, WorkflowItem>
+        extends InprogressSubmissionIndexFactoryImpl<IndexableWorkflowItem, XmlWorkflowItem>
         implements WorkflowItemIndexFactory {
 
     @Autowired
-    protected WorkflowItemService workflowItemService;
+    protected XmlWorkflowItemService workflowItemService;
     @Autowired
     protected ClaimedTaskService claimedTaskService;
     @Autowired
@@ -48,7 +48,7 @@ public class WorkflowItemIndexFactoryImpl
 
     @Override
     public Iterator<IndexableWorkflowItem> findAll(Context context) throws SQLException {
-        final Iterator<WorkflowItem> workflowItems = workflowItemService.findAll(context).iterator();
+        final Iterator<XmlWorkflowItem> workflowItems = workflowItemService.findAll(context).iterator();
 
         return new Iterator<IndexableWorkflowItem>() {
             @Override
@@ -73,7 +73,7 @@ public class WorkflowItemIndexFactoryImpl
             throws SQLException, IOException {
         // Add the ID's, types and call the SolrServiceIndexPlugins
         final SolrInputDocument doc = super.buildDocument(context, indexableObject);
-        final WorkflowItem workflowItem = indexableObject.getIndexedObject();
+        final XmlWorkflowItem workflowItem = indexableObject.getIndexedObject();
         final Item item = workflowItem.getItem();
         // Add the item metadata as configured
         List<DiscoveryConfiguration> discoveryConfigurations = SearchUtils
@@ -92,11 +92,11 @@ public class WorkflowItemIndexFactoryImpl
 
     @Override
     public boolean supports(Object object) {
-        return object instanceof WorkflowItem;
+        return object instanceof XmlWorkflowItem;
     }
 
     @Override
-    public List getIndexableObjects(Context context, WorkflowItem object) throws SQLException {
+    public List getIndexableObjects(Context context, XmlWorkflowItem object) throws SQLException {
         List<IndexableObject> results = new ArrayList<>();
         results.add(new IndexableWorkflowItem(object));
 
@@ -115,7 +115,7 @@ public class WorkflowItemIndexFactoryImpl
 
     @Override
     public Optional<IndexableWorkflowItem> findIndexableObject(Context context, String id) throws SQLException {
-        final WorkflowItem workflowItem = workflowItemService.find(context, Integer.parseInt(id));
-        return workflowItem == null ? Optional.empty() : Optional.of(new IndexableWorkflowItem(workflowItem));
+        final XmlWorkflowItem xmlWorkflowItem = workflowItemService.find(context, Integer.parseInt(id));
+        return xmlWorkflowItem == null ? Optional.empty() : Optional.of(new IndexableWorkflowItem(xmlWorkflowItem));
     }
 }

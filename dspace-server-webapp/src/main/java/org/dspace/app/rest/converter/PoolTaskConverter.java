@@ -10,8 +10,8 @@ package org.dspace.app.rest.converter;
 import org.dspace.app.rest.model.PoolTaskRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.discovery.IndexableObject;
-import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -33,7 +33,7 @@ public class PoolTaskConverter
         PoolTaskRest taskRest = new PoolTaskRest();
         taskRest.setProjection(projection);
 
-        WorkflowItem witem = obj.getWorkflowItem();
+        XmlWorkflowItem witem = obj.getWorkflowItem();
         taskRest.setId(obj.getID());
         taskRest.setWorkflowitem(converter.toRest(witem, projection));
         if (obj.getEperson() != null) {

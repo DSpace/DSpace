@@ -16,10 +16,10 @@ import javax.servlet.http.HttpServletRequest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.workflow.WorkflowException;
-import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.RoleMembers;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.state.Step;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * This abstract class represents an api action
@@ -38,10 +38,10 @@ public abstract class Action {
     private WorkflowActionConfig parent;
     private static final String ERROR_FIELDS_ATTRIBUTE = "dspace.workflow.error_fields";
 
-    public abstract void activate(Context c, WorkflowItem wf)
+    public abstract void activate(Context c, XmlWorkflowItem wf)
         throws SQLException, IOException, AuthorizeException, WorkflowException;
 
-    public abstract ActionResult execute(Context c, WorkflowItem wfi, Step step, HttpServletRequest request)
+    public abstract ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
         throws SQLException, AuthorizeException, IOException, WorkflowException;
 
     /**
@@ -76,12 +76,12 @@ public abstract class Action {
         return "Step: " + getParent().getStep().getId() + " - action:" + getParent().getId();
     }
 
-    public void alertUsersOnActivation(Context c, WorkflowItem wfi, RoleMembers members)
+    public void alertUsersOnActivation(Context c, XmlWorkflowItem wfi, RoleMembers members)
         throws SQLException, IOException {
 
     }
 
-    public abstract boolean isAuthorized(Context context, HttpServletRequest request, WorkflowItem wfi)
+    public abstract boolean isAuthorized(Context context, HttpServletRequest request, XmlWorkflowItem wfi)
         throws SQLException, AuthorizeException, IOException, WorkflowConfigurationException;
 
 

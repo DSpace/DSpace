@@ -49,11 +49,10 @@ import org.dspace.versioning.dao.VersionDAO;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
-import org.dspace.workflow.WorkflowItemService;
-import org.dspace.workflow.WorkflowService;
-import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
@@ -321,19 +320,17 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
                         }
                     } else if (StringUtils.equals(tableName, "cwf_claimtask")) {
                          // Unclaim all XmlWorkflow tasks
-                        WorkflowItemService workflowItemService = WorkflowServiceFactory
-                                                                        .getInstance().getWorkflowItemService();
-                        ClaimedTaskService claimedTaskService = WorkflowServiceFactory
+                        ClaimedTaskService claimedTaskService = XmlWorkflowServiceFactory
                                                                 .getInstance().getClaimedTaskService();
-                        WorkflowService workflowService = WorkflowServiceFactory
-                                                                .getInstance().getWorkflowService();
-                        WorkflowRequirementsService workflowRequirementsService = WorkflowServiceFactory
+                        XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory
+                                                                .getInstance().getXmlWorkflowService();
+                        WorkflowRequirementsService workflowRequirementsService = XmlWorkflowServiceFactory
                                                                        .getInstance().getWorkflowRequirementsService();
 
                         List<ClaimedTask> claimedTasks = claimedTaskService.findByEperson(context, ePerson);
 
                         for (ClaimedTask task : claimedTasks) {
-                            workflowService.deleteClaimedTask(context, task.getWorkflowItem(), task);
+                            xmlWorkflowService.deleteClaimedTask(context, task.getWorkflowItem(), task);
 
                             try {
                                 workflowRequirementsService.removeClaimedUser(context, task.getWorkflowItem(),
@@ -349,10 +346,10 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
                         // we delete the EPerson, it won't need any rights anymore.
                         authorizeService.removeAllEPersonPolicies(context, ePerson);
                     } else if (StringUtils.equals(tableName, "cwf_pooltask")) {
-                        PoolTaskService poolTaskService = WorkflowServiceFactory.getInstance().getPoolTaskService();
+                        PoolTaskService poolTaskService = XmlWorkflowServiceFactory.getInstance().getPoolTaskService();
                         poolTaskService.deleteByEperson(context, ePerson);
                     } else if (StringUtils.equals(tableName, "cwf_workflowitemrole")) {
-                        WorkflowItemRoleService workflowItemRoleService = WorkflowServiceFactory.getInstance()
+                        WorkflowItemRoleService workflowItemRoleService = XmlWorkflowServiceFactory.getInstance()
                                 .getWorkflowItemRoleService();
                         workflowItemRoleService.deleteByEPerson(context, ePerson);
                     } else {
@@ -521,7 +518,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
             tableList.add("resourcepolicy");
         }
 
-        WorkflowService workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
+        XmlWorkflowService workflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
         List<String> workflowConstraints = workflowService.getEPersonDeleteConstraints(context, ePerson);
         tableList.addAll(workflowConstraints);
 

@@ -54,10 +54,10 @@ import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
-import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -112,17 +112,17 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
 
         //2. Three workflow items in two different collections
-        WorkflowItem workflowItem1 = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        XmlWorkflowItem workflowItem1 = WorkflowItemBuilder.createWorkflowItem(context, col1)
                                       .withTitle("Workflow Item 1")
                                       .withIssueDate("2017-10-17")
                                       .build();
 
-        WorkflowItem workflowItem2 = WorkflowItemBuilder.createWorkflowItem(context, col2)
+        XmlWorkflowItem workflowItem2 = WorkflowItemBuilder.createWorkflowItem(context, col2)
                                       .withTitle("Workflow Item 2")
                                       .withIssueDate("2016-02-13")
                                       .build();
 
-        WorkflowItem workflowItem3 = WorkflowItemBuilder.createWorkflowItem(context, col2)
+        XmlWorkflowItem workflowItem3 = WorkflowItemBuilder.createWorkflowItem(context, col2)
                                       .withTitle("Workflow Item 3")
                                       .withIssueDate("2016-02-13")
                                       .build();
@@ -167,17 +167,17 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                 .withWorkflowGroup(1, admin).build();
 
         //2. Three workflow items in two different collections
-        WorkflowItem workflowItem1 = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        XmlWorkflowItem workflowItem1 = WorkflowItemBuilder.createWorkflowItem(context, col1)
                                       .withTitle("Workflow Item 1")
                                       .withIssueDate("2017-10-17")
                                       .build();
 
-        WorkflowItem workflowItem2 = WorkflowItemBuilder.createWorkflowItem(context, col2)
+        XmlWorkflowItem workflowItem2 = WorkflowItemBuilder.createWorkflowItem(context, col2)
                                       .withTitle("Workflow Item 2")
                                       .withIssueDate("2016-02-13")
                                       .build();
 
-        WorkflowItem workflowItem3 = WorkflowItemBuilder.createWorkflowItem(context, col2)
+        XmlWorkflowItem workflowItem3 = WorkflowItemBuilder.createWorkflowItem(context, col2)
                                       .withTitle("Workflow Item 3")
                                       .withIssueDate("2016-02-13")
                                       .build();
@@ -237,18 +237,18 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
 
         //2. Three workflow items in two different collections
-        WorkflowItem workflowItem1 = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        XmlWorkflowItem workflowItem1 = WorkflowItemBuilder.createWorkflowItem(context, col1)
                                       .withTitle("Workflow Item 1")
                                       .withIssueDate("2017-10-17")
                                       .build();
 
         // these two items will be visible individually to the user
-        WorkflowItem workflowItem2 = WorkflowItemBuilder.createWorkflowItem(context, col2)
+        XmlWorkflowItem workflowItem2 = WorkflowItemBuilder.createWorkflowItem(context, col2)
                                       .withTitle("Workflow Item 2")
                                       .withIssueDate("2016-02-13")
                                       .build();
 
-        WorkflowItem workflowItem3 = WorkflowItemBuilder.createWorkflowItem(context, col2)
+        XmlWorkflowItem workflowItem3 = WorkflowItemBuilder.createWorkflowItem(context, col2)
                                       .withTitle("Workflow Item 3")
                                       .withIssueDate("2016-02-13")
                                       .build();
@@ -286,7 +286,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                 .withWorkflowGroup(1, admin).build();
 
         //2. a workflow item
-        WorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
                 .withTitle("Workflow Item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
@@ -340,30 +340,30 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                 .withWorkflowGroup(3, reviewer3).build();
 
         //2. three workflow items in the three collections (this will lead to pool task)
-        WorkflowItem witem1 = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        XmlWorkflowItem witem1 = WorkflowItemBuilder.createWorkflowItem(context, col1)
                 .withTitle("Workflow Item 1")
                 .build();
 
-        WorkflowItem witem2 = WorkflowItemBuilder.createWorkflowItem(context, col2)
+        XmlWorkflowItem witem2 = WorkflowItemBuilder.createWorkflowItem(context, col2)
                 .withTitle("Workflow Item 2")
                 .build();
 
-        WorkflowItem witem3 = WorkflowItemBuilder.createWorkflowItem(context, col3)
+        XmlWorkflowItem witem3 = WorkflowItemBuilder.createWorkflowItem(context, col3)
                 .withTitle("Workflow Item 3")
                 .build();
 
         //3. Three claimed tasks (and corresponding workflowitems)
         ClaimedTask claimed1 = ClaimedTaskBuilder.createClaimedTask(context, col1, reviewer1).withTitle("Pool 1")
                 .build();
-        WorkflowItem wClaimed1 = claimed1.getWorkflowItem();
+        XmlWorkflowItem wClaimed1 = claimed1.getWorkflowItem();
 
         ClaimedTask claimed2 = ClaimedTaskBuilder.createClaimedTask(context, col2, reviewer2).withTitle("Pool 2")
                 .build();
-        WorkflowItem wClaimed2 = claimed2.getWorkflowItem();
+        XmlWorkflowItem wClaimed2 = claimed2.getWorkflowItem();
 
         ClaimedTask claimed3 = ClaimedTaskBuilder.createClaimedTask(context, col3, reviewer3).withTitle("Pool 3")
                 .build();
-        WorkflowItem wClaimed3 = claimed3.getWorkflowItem();
+        XmlWorkflowItem wClaimed3 = claimed3.getWorkflowItem();
 
         context.restoreAuthSystemState();
 
@@ -457,7 +457,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                 .withWorkflowGroup(1, admin).build();
 
         //2. a workflow item
-        WorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
                 .withTitle("Workflow Item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
@@ -536,19 +536,19 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
 
         //3. Two workflow items in two different collections
-        WorkflowItem workspaceItem1 = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        XmlWorkflowItem workspaceItem1 = WorkflowItemBuilder.createWorkflowItem(context, col1)
                                       .withTitle("Workflow Item 1")
                                       .withIssueDate("2017-10-17")
                                       .build();
 
-        WorkflowItem workspaceItem2 = WorkflowItemBuilder.createWorkflowItem(context, col2)
+        XmlWorkflowItem workspaceItem2 = WorkflowItemBuilder.createWorkflowItem(context, col2)
                                       .withTitle("Workflow Item 2")
                                       .withIssueDate("2016-02-13")
                                       .build();
 
         //4. A workflowitem for the second submitter
         context.setCurrentUser(submitter2);
-        WorkflowItem workspaceItem3 = WorkflowItemBuilder.createWorkflowItem(context, col2)
+        XmlWorkflowItem workspaceItem3 = WorkflowItemBuilder.createWorkflowItem(context, col2)
                                       .withTitle("Workflow Item 3")
                                       .withIssueDate("2016-02-13")
                                       .build();
@@ -634,7 +634,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
         context.setCurrentUser(submitter);
 
         //3. a workflow item
-        WorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
                 .withTitle("Workflow Item 1")
                 .withIssueDate("2017-10-17")
                 .build();
@@ -864,13 +864,13 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
         context.setCurrentUser(submitter);
 
         //3. a workflow item will all the required fields
-        WorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
                 .withTitle("Workflow Item 1")
                 .withIssueDate("2017-10-17")
                 .build();
 
         //4. a workflow item without the dateissued required field
-        WorkflowItem witemMissingFields = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        XmlWorkflowItem witemMissingFields = WorkflowItemBuilder.createWorkflowItem(context, col1)
                 .withTitle("Workflow Item 1")
                 .build();
 
@@ -927,7 +927,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             .build();
         claimedTask.setStepID("editstep");
         claimedTask.setActionID("editaction");
-        WorkflowItem witem = claimedTask.getWorkflowItem();
+        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
 
         context.restoreAuthSystemState();
 
@@ -988,7 +988,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
         context.setCurrentUser(submitter);
 
         //3. a workflow item
-        WorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
                 .withTitle("Workflow Item 1")
                 .withIssueDate("2017-10-17")
                 .withSubject("ExtraEntry")
@@ -1054,7 +1054,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             .build();
         claimedTask.setStepID("editstep");
         claimedTask.setActionID("editaction");
-        WorkflowItem witem = claimedTask.getWorkflowItem();
+        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
 
         context.restoreAuthSystemState();
 
@@ -1123,7 +1123,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             .build();
         claimedTask.setStepID("editstep");
         claimedTask.setActionID("editaction");
-        WorkflowItem witem = claimedTask.getWorkflowItem();
+        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
 
         ClaimedTask claimedTask2 = ClaimedTaskBuilder.createClaimedTask(context, col1, eperson)
             .withTitle("Workflow Item 2")
@@ -1135,7 +1135,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             .build();
         claimedTask2.setStepID("editstep");
         claimedTask2.setActionID("editaction");
-        WorkflowItem witemMultipleSubjects  = claimedTask2.getWorkflowItem();
+        XmlWorkflowItem witemMultipleSubjects  = claimedTask2.getWorkflowItem();
 
         ClaimedTask claimedTask3 = ClaimedTaskBuilder.createClaimedTask(context, col1, eperson)
             .withTitle("Workflow Item 3")
@@ -1147,7 +1147,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             .build();
         claimedTask3.setStepID("editstep");
         claimedTask3.setActionID("editaction");
-        WorkflowItem witemWithTitleDateAndSubjects = claimedTask3.getWorkflowItem();
+        XmlWorkflowItem witemWithTitleDateAndSubjects = claimedTask3.getWorkflowItem();
 
         context.restoreAuthSystemState();
 
@@ -1321,7 +1321,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             .build();
         claimedTask.setStepID("editstep");
         claimedTask.setActionID("editaction");
-        WorkflowItem witem = claimedTask.getWorkflowItem();
+        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
 
         context.restoreAuthSystemState();
 
@@ -1391,7 +1391,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             .build();
         claimedTask.setStepID("editstep");
         claimedTask.setActionID("editaction");
-        WorkflowItem witem = claimedTask.getWorkflowItem();
+        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
 
         context.restoreAuthSystemState();
 
@@ -1586,7 +1586,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                            .withWorkflowGroup(1, admin).build();
 
         //2. a workflow item
-        WorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
                                                    .withTitle("Workflow Item 1")
                                                    .withIssueDate("2017-10-17")
                                                    .withAuthor("Smith, Donald").withAuthor("Doe, John")
@@ -1646,7 +1646,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
         Item item = ItemBuilder.createItem(context, col1).build();
         //2. a workspace item
-        WorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
                                                    .withTitle("Workflow Item 1")
                                                    .withIssueDate("2017-10-17")
                                                    .withAuthor("Smith, Donald").withAuthor("Doe, John")
@@ -1676,7 +1676,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                            .withWorkflowGroup(1, admin).build();
 
 
-        WorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
                                                    .withTitle("Workflow Item 1")
                                                    .withIssueDate("2017-10-17")
                                                    .withAuthor("Smith, Donald").withAuthor("Doe, John")
@@ -1707,7 +1707,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                            .withWorkflowGroup(1, admin).build();
 
 
-        WorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
                                                    .withTitle("Workflow Item 1")
                                                    .withIssueDate("2017-10-17")
                                                    .withAuthor("Smith, Donald").withAuthor("Doe, John")
@@ -1753,17 +1753,17 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                            .withWorkflowGroup(3, reviewer3).build();
 
         //2. three workflow items in the three collections (this will lead to pool task)
-        WorkflowItem witem1 = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        XmlWorkflowItem witem1 = WorkflowItemBuilder.createWorkflowItem(context, col1)
                                                     .withTitle("Workflow Item 1")
                                                     .withIssueDate("2016-02-13")
                                                     .build();
 
-        WorkflowItem witem2 = WorkflowItemBuilder.createWorkflowItem(context, col2)
+        XmlWorkflowItem witem2 = WorkflowItemBuilder.createWorkflowItem(context, col2)
                                                     .withTitle("Workflow Item 2")
                                                     .withIssueDate("2016-02-13")
                                                     .build();
 
-        WorkflowItem witem3 = WorkflowItemBuilder.createWorkflowItem(context, col3)
+        XmlWorkflowItem witem3 = WorkflowItemBuilder.createWorkflowItem(context, col3)
                                                     .withTitle("Workflow Item 3")
                                                     .withIssueDate("2016-02-13")
                                                     .build();
@@ -1835,7 +1835,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                            .withWorkflowGroup(1, admin).build();
 
         //2. a workflow item
-        WorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
                                                    .withTitle("Workflow Item 1")
                                                    .withIssueDate("2017-10-17")
                                                    .withAuthor("Smith, Donald").withAuthor("Doe, John")

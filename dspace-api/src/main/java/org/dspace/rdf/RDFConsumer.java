@@ -33,8 +33,8 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
-import org.dspace.workflow.WorkflowItemService;
-import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 
 /**
  * @author Pascal-Nicolas Becker (dspace -at- pascal -hyphen- becker -dot- de)
@@ -49,7 +49,7 @@ public class RDFConsumer implements Consumer {
     protected BundleService bundleService;
     protected SiteService siteService;
     protected WorkspaceItemService workspaceItemService;
-    protected WorkflowItemService workflowItemService;
+    protected XmlWorkflowItemService workflowItemService;
 
     @Override
     public void initialize() throws Exception {
@@ -57,7 +57,7 @@ public class RDFConsumer implements Consumer {
         bundleService = ContentServiceFactory.getInstance().getBundleService();
         siteService = ContentServiceFactory.getInstance().getSiteService();
         workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-        workflowItemService = WorkflowServiceFactory.getInstance().getWorkflowItemService();
+        workflowItemService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService();
     }
 
     @Override

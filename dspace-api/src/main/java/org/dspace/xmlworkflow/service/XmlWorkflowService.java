@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.workflow;
+package org.dspace.xmlworkflow.service;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -20,6 +20,7 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.workflow.WorkflowException;
 import org.dspace.xmlworkflow.RoleMembers;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.state.Step;
@@ -28,6 +29,7 @@ import org.dspace.xmlworkflow.state.actions.ActionResult;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * When an item is submitted and is somewhere in a workflow, it has a row in the
@@ -40,7 +42,7 @@ import org.dspace.xmlworkflow.storedcomponents.PoolTask;
  * @author Ben Bosman (ben at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  */
-public interface WorkflowService {
+public interface XmlWorkflowService {
     /**
      * startWorkflow() begins a workflow - in a single transaction do away with
      * the PersonalWorkspace entry and turn it into a WorkflowItem.
@@ -54,7 +56,7 @@ public interface WorkflowService {
      * @throws IOException        A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws WorkflowException  if workflow error
      */
-    public WorkflowItem start(Context context, WorkspaceItem wsi)
+    public XmlWorkflowItem start(Context context, WorkspaceItem wsi)
             throws SQLException, AuthorizeException, IOException, WorkflowException;
 
     /**
@@ -71,7 +73,7 @@ public interface WorkflowService {
      * @throws IOException        A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws WorkflowException  if workflow error
      */
-    public WorkflowItem startWithoutNotify(Context c, WorkspaceItem wsi)
+    public XmlWorkflowItem startWithoutNotify(Context c, WorkspaceItem wsi)
             throws SQLException, AuthorizeException, IOException, WorkflowException;
 
     /**
@@ -88,7 +90,7 @@ public interface WorkflowService {
      *         to perform a particular action.
      * @throws IOException        A general class of exceptions produced by failed or interrupted I/O operations.
      */
-    public WorkspaceItem abort(Context c, WorkflowItem wi, EPerson e)
+    public WorkspaceItem abort(Context c, XmlWorkflowItem wi, EPerson e)
             throws SQLException, AuthorizeException, IOException;
 
     /**
@@ -102,10 +104,10 @@ public interface WorkflowService {
      *         to perform a particular action.
      * @throws IOException        A general class of exceptions produced by failed or interrupted I/O operations.
      */
-    public void deleteWorkflowByWorkflowItem(Context c, WorkflowItem wi, EPerson e)
+    public void deleteWorkflowByWorkflowItem(Context c, XmlWorkflowItem wi, EPerson e)
             throws SQLException, AuthorizeException, IOException;
 
-    public WorkspaceItem sendWorkflowItemBackSubmission(Context c, WorkflowItem workflowItem, EPerson e,
+    public WorkspaceItem sendWorkflowItemBackSubmission(Context c, XmlWorkflowItem workflowItem, EPerson e,
                                                         String provenance,
                                                         String rejection_message)
             throws SQLException, AuthorizeException, IOException;
@@ -136,37 +138,37 @@ public interface WorkflowService {
 
     public List<String> getFlywayMigrationLocations();
 
-    public void alertUsersOnTaskActivation(Context c, WorkflowItem wfi, String emailTemplate, List<EPerson> epa,
+    public void alertUsersOnTaskActivation(Context c, XmlWorkflowItem wfi, String emailTemplate, List<EPerson> epa,
                                            String... arguments) throws IOException, SQLException, MessagingException;
 
     public WorkflowActionConfig doState(Context c, EPerson user, HttpServletRequest request, int workflowItemId,
                                         Workflow workflow, WorkflowActionConfig currentActionConfig)
-            throws SQLException, AuthorizeException, IOException, MessagingException, WorkflowException;
+        throws SQLException, AuthorizeException, IOException, MessagingException, WorkflowException;
 
     public WorkflowActionConfig processOutcome(Context c, EPerson user, Workflow workflow, Step currentStep,
                                                WorkflowActionConfig currentActionConfig, ActionResult currentOutcome,
-                                               WorkflowItem wfi, boolean enteredNewStep)
-            throws IOException, AuthorizeException, SQLException, WorkflowException;
+                                               XmlWorkflowItem wfi, boolean enteredNewStep)
+        throws IOException, AuthorizeException, SQLException, WorkflowException;
 
-    public void deleteAllTasks(Context context, WorkflowItem wi) throws SQLException, AuthorizeException;
+    public void deleteAllTasks(Context context, XmlWorkflowItem wi) throws SQLException, AuthorizeException;
 
-    public void deleteAllPooledTasks(Context c, WorkflowItem wi) throws SQLException, AuthorizeException;
+    public void deleteAllPooledTasks(Context c, XmlWorkflowItem wi) throws SQLException, AuthorizeException;
 
-    public void deletePooledTask(Context context, WorkflowItem wi, PoolTask task)
-            throws SQLException, AuthorizeException;
+    public void deletePooledTask(Context context, XmlWorkflowItem wi, PoolTask task)
+        throws SQLException, AuthorizeException;
 
-    public void deleteClaimedTask(Context c, WorkflowItem wi, ClaimedTask task)
-            throws SQLException, AuthorizeException;
+    public void deleteClaimedTask(Context c, XmlWorkflowItem wi, ClaimedTask task)
+        throws SQLException, AuthorizeException;
 
-    public void createPoolTasks(Context context, WorkflowItem wi, RoleMembers assignees, Step step,
+    public void createPoolTasks(Context context, XmlWorkflowItem wi, RoleMembers assignees, Step step,
                                 WorkflowActionConfig action)
-            throws SQLException, AuthorizeException;
+        throws SQLException, AuthorizeException;
 
-    public void createOwnedTask(Context context, WorkflowItem wi, Step step, WorkflowActionConfig action, EPerson e)
-            throws SQLException, AuthorizeException;
+    public void createOwnedTask(Context context, XmlWorkflowItem wi, Step step, WorkflowActionConfig action, EPerson e)
+        throws SQLException, AuthorizeException;
 
     public void grantUserAllItemPolicies(Context context, Item item, EPerson epa, String actionType)
-            throws AuthorizeException, SQLException;
+        throws AuthorizeException, SQLException;
 
     public void removeUserItemPolicies(Context context, Item item, EPerson e) throws SQLException, AuthorizeException;
 

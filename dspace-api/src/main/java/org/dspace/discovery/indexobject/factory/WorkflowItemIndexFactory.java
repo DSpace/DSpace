@@ -8,7 +8,7 @@
 package org.dspace.discovery.indexobject.factory;
 
 import org.dspace.discovery.indexobject.IndexableWorkflowItem;
-import org.dspace.workflow.WorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * Factory interface for indexing/retrieving workflow items objects in the search core
@@ -16,5 +16,5 @@ import org.dspace.workflow.WorkflowItem;
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
 public interface WorkflowItemIndexFactory
-        extends InprogressSubmissionIndexFactory<IndexableWorkflowItem, WorkflowItem> {
+        extends InprogressSubmissionIndexFactory<IndexableWorkflowItem, XmlWorkflowItem> {
 }

@@ -23,7 +23,6 @@ import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.workflow.WorkflowItem;
 
 /**
  * Pool task representing the database representation of a pool task for a step and an eperson
@@ -45,7 +44,7 @@ public class PoolTask implements ReloadableEntity<Integer> {
 
     @OneToOne
     @JoinColumn(name = "workflowitem_id")
-    private WorkflowItem workflowItem;
+    private XmlWorkflowItem workflowItem;
 
     //    @Column(name = "workflow_id")
 //    @Lob
@@ -107,11 +106,11 @@ public class PoolTask implements ReloadableEntity<Integer> {
         return workflowId;
     }
 
-    public void setWorkflowItem(WorkflowItem workflowItem) {
-        this.workflowItem = workflowItem;
+    public void setWorkflowItem(XmlWorkflowItem xmlWorkflowItem) {
+        this.workflowItem = xmlWorkflowItem;
     }
 
-    public WorkflowItem getWorkflowItem() {
+    public XmlWorkflowItem getWorkflowItem() {
         return this.workflowItem;
     }
 

@@ -30,7 +30,7 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.services.ConfigurationService;
-import org.dspace.workflow.WorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -240,7 +240,7 @@ public class WithdrawFeatureRestIT extends AbstractControllerIntegrationTest {
                 .build();
         WorkspaceItem wsItem = WorkspaceItemBuilder.createWorkspaceItem(context, col).withTitle("A workspace item")
                 .build();
-        WorkflowItem wfItem = WorkflowItemBuilder.createWorkflowItem(context, col).withTitle("A workflow item").build();
+        XmlWorkflowItem wfItem = WorkflowItemBuilder.createWorkflowItem(context, col).withTitle("A workflow item").build();
         context.restoreAuthSystemState();
 
         ItemRest withdrawnItemRest = itemConverter.convert(withdrawnItem, Projection.DEFAULT);

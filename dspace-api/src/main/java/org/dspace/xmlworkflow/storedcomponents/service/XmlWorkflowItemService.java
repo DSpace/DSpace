@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.workflow;
+package org.dspace.xmlworkflow.storedcomponents.service;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -17,18 +17,18 @@ import org.dspace.content.Item;
 import org.dspace.content.service.InProgressSubmissionService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
- * Service interface class for the Workflow items.
- * All WorkflowItem service classes should implement this class since it offers some basic methods which all
- * WorkflowItems
- * are required to have.
+ * Service interface class for the XmlWorkflowItem object.
+ * The implementation of this class is responsible for all business logic calls for the XmlWorkflowItem object and is
+ * autowired by spring
  *
  * @author kevinvandevelde at atmire.com
  */
-public interface WorkflowItemService extends InProgressSubmissionService<WorkflowItem> {
+public interface XmlWorkflowItemService extends InProgressSubmissionService<XmlWorkflowItem> {
 
-    public WorkflowItem create(Context context, Item item, Collection collection) throws SQLException,
+    public XmlWorkflowItem create(Context context, Item item, Collection collection) throws SQLException,
             AuthorizeException;
 
     /**
@@ -39,7 +39,7 @@ public interface WorkflowItemService extends InProgressSubmissionService<Workflo
      * @return the workflow item, or null if the ID is invalid.
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public WorkflowItem find(Context context, int id) throws SQLException;
+    public XmlWorkflowItem find(Context context, int id) throws SQLException;
 
     /**
      * return all workflowitems
@@ -48,7 +48,7 @@ public interface WorkflowItemService extends InProgressSubmissionService<Workflo
      * @return List of all workflowItems in system
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public List<WorkflowItem> findAll(Context context) throws SQLException;
+    public List<XmlWorkflowItem> findAll(Context context) throws SQLException;
 
     /**
      * Get all workflow items for a particular collection.
@@ -58,7 +58,7 @@ public interface WorkflowItemService extends InProgressSubmissionService<Workflo
      * @return array of the corresponding workflow items
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public List<WorkflowItem> findByCollection(Context context, Collection collection) throws SQLException;
+    public List<XmlWorkflowItem> findByCollection(Context context, Collection collection) throws SQLException;
 
     /**
      * Check to see if a particular item is currently under Workflow.
@@ -69,7 +69,7 @@ public interface WorkflowItemService extends InProgressSubmissionService<Workflo
      * @return workflow item corresponding to the item, or null
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public WorkflowItem findByItem(Context context, Item item) throws SQLException;
+    public XmlWorkflowItem findByItem(Context context, Item item) throws SQLException;
 
     /**
      * Get all workflow items that were original submissions by a particular
@@ -80,7 +80,7 @@ public interface WorkflowItemService extends InProgressSubmissionService<Workflo
      * @return the corresponding workflow items
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public List<WorkflowItem> findBySubmitter(Context context, EPerson ep) throws SQLException;
+    public List<XmlWorkflowItem> findBySubmitter(Context context, EPerson ep) throws SQLException;
 
     /**
      * Delete all workflow items present in the specified collection.
@@ -105,7 +105,7 @@ public interface WorkflowItemService extends InProgressSubmissionService<Workflo
      * @throws AuthorizeException Exception indicating the current user of the context does not have permission
      *                            to perform a particular action.
      */
-    public void delete(Context context, WorkflowItem workflowItem)
+    public void delete(Context context, XmlWorkflowItem workflowItem)
             throws SQLException, AuthorizeException, IOException;
 
     /**
@@ -117,7 +117,7 @@ public interface WorkflowItemService extends InProgressSubmissionService<Workflo
      * @return WorkflowItem list of all the workflow items in system
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public List<WorkflowItem> findAll(Context context, Integer page, Integer pagesize) throws SQLException;
+    public List<XmlWorkflowItem> findAll(Context context, Integer page, Integer pagesize) throws SQLException;
 
     /**
      * return all workflowitems for a certain page with a certain collection
@@ -129,7 +129,7 @@ public interface WorkflowItemService extends InProgressSubmissionService<Workflo
      * @return WorkflowItem list of all the workflow items in system
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public List<WorkflowItem> findAllInCollection(Context context, Integer page, Integer pagesize,
+    public List<XmlWorkflowItem> findAllInCollection(Context context, Integer page, Integer pagesize,
                                                      Collection collection) throws SQLException;
 
     /**
@@ -165,7 +165,7 @@ public interface WorkflowItemService extends InProgressSubmissionService<Workflo
      * @return
      * @throws SQLException
      */
-    public List<WorkflowItem> findBySubmitter(Context context, EPerson ep, Integer pageNumber, Integer pageSize)
+    public List<XmlWorkflowItem> findBySubmitter(Context context, EPerson ep, Integer pageNumber, Integer pageSize)
             throws SQLException;
 
     /**

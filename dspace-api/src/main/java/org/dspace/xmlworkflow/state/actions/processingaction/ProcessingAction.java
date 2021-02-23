@@ -12,9 +12,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.state.actions.Action;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -38,7 +38,7 @@ public abstract class ProcessingAction extends Action {
     public static final String SUBMIT_CANCEL = "submit_cancel";
 
     @Override
-    public boolean isAuthorized(Context context, HttpServletRequest request, WorkflowItem wfi) throws SQLException {
+    public boolean isAuthorized(Context context, HttpServletRequest request, XmlWorkflowItem wfi) throws SQLException {
         ClaimedTask task = null;
         if (context.getCurrentUser() != null) {
             task = claimedTaskService.findByWorkflowIdAndEPerson(context, wfi, context.getCurrentUser());

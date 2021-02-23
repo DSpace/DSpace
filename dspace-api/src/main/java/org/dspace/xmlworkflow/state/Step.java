@@ -14,11 +14,11 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.core.Context;
-import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.Role;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.state.actions.UserSelectionActionConfig;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.InProgressUserService;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,7 +87,7 @@ public class Step implements BeanNameAware {
     }
 
 
-    public boolean isValidStep(Context context, WorkflowItem wfi)
+    public boolean isValidStep(Context context, XmlWorkflowItem wfi)
         throws WorkflowConfigurationException, SQLException {
         //Check if our next step has a UI, if not then the step is valid, no need for a group
         return !(getUserSelectionMethod() == null || getUserSelectionMethod()
@@ -125,7 +125,7 @@ public class Step implements BeanNameAware {
      * @return if enough users have finished this task
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public boolean isFinished(Context c, WorkflowItem wfi) throws SQLException {
+    public boolean isFinished(Context c, XmlWorkflowItem wfi) throws SQLException {
         return inProgressUserService.getNumberOfFinishedUsers(c, wfi) == requiredUsers;
     }
 

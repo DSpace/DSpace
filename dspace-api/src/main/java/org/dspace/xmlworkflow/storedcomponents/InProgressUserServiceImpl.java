@@ -15,7 +15,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.dao.InProgressUserDAO;
 import org.dspace.xmlworkflow.storedcomponents.service.InProgressUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +36,7 @@ public class InProgressUserServiceImpl implements InProgressUserService {
     }
 
     @Override
-    public InProgressUser findByWorkflowItemAndEPerson(Context context, WorkflowItem workflowItem, EPerson ePerson)
+    public InProgressUser findByWorkflowItemAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson)
         throws SQLException {
         return inProgressUserDAO.findByWorkflowItemAndEPerson(context, workflowItem, ePerson);
     }
@@ -48,17 +47,17 @@ public class InProgressUserServiceImpl implements InProgressUserService {
     }
 
     @Override
-    public List<InProgressUser> findByWorkflowItem(Context context, WorkflowItem workflowItem) throws SQLException {
+    public List<InProgressUser> findByWorkflowItem(Context context, XmlWorkflowItem workflowItem) throws SQLException {
         return inProgressUserDAO.findByWorkflowItem(context, workflowItem);
     }
 
     @Override
-    public int getNumberOfInProgressUsers(Context context, WorkflowItem workflowItem) throws SQLException {
+    public int getNumberOfInProgressUsers(Context context, XmlWorkflowItem workflowItem) throws SQLException {
         return inProgressUserDAO.countInProgressUsers(context, workflowItem);
     }
 
     @Override
-    public int getNumberOfFinishedUsers(Context context, WorkflowItem workflowItem) throws SQLException {
+    public int getNumberOfFinishedUsers(Context context, XmlWorkflowItem workflowItem) throws SQLException {
         return inProgressUserDAO.countFinishedUsers(context, workflowItem);
     }
 

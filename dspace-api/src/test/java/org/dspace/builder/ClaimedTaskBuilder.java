@@ -20,13 +20,13 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.event.Event;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 
 /**
@@ -37,7 +37,7 @@ public class ClaimedTaskBuilder extends AbstractBuilder<ClaimedTask, ClaimedTask
 
     private WorkspaceItem workspaceItem;
 
-    private WorkflowItem workflowItem;
+    private XmlWorkflowItem workflowItem;
 
     private ClaimedTask claimedTask;
 
@@ -88,7 +88,7 @@ public class ClaimedTaskBuilder extends AbstractBuilder<ClaimedTask, ClaimedTask
             // temporary switch to the wf user
             EPerson submitter = context.getCurrentUser();
             context.setCurrentUser(user);
-            WorkflowServiceFactory factory = WorkflowServiceFactory.getInstance();
+            XmlWorkflowServiceFactory factory = XmlWorkflowServiceFactory.getInstance();
             Workflow workflow = factory.getWorkflowFactory().getWorkflow(task.getWorkflowItem().getCollection());
             Step step = workflow.getStep(task.getStepID());
             WorkflowActionConfig currentActionConfig = step.getActionConfig(task.getActionID());
@@ -138,7 +138,7 @@ public class ClaimedTaskBuilder extends AbstractBuilder<ClaimedTask, ClaimedTask
             if (workflowItem != null) {
             // to delete the claimedtask keeping the system in a consistent state you need to delete the underline
             // workflowitem
-                WorkflowItemBuilder.deleteWorkflowItem(workflowItem.getID());
+            WorkflowItemBuilder.deleteWorkflowItem(workflowItem.getID());
             }
         }
     }
