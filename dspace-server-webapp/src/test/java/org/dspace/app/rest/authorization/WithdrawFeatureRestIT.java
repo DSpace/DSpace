@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.authorization;
 
+import static org.dspace.builder.WorkflowItemBuilder.createWorkflowItem;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -23,7 +24,6 @@ import org.dspace.app.rest.utils.Utils;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
-import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -240,7 +240,7 @@ public class WithdrawFeatureRestIT extends AbstractControllerIntegrationTest {
                 .build();
         WorkspaceItem wsItem = WorkspaceItemBuilder.createWorkspaceItem(context, col).withTitle("A workspace item")
                 .build();
-        XmlWorkflowItem wfItem = WorkflowItemBuilder.createWorkflowItem(context, col).withTitle("A workflow item").build();
+        XmlWorkflowItem wfItem = createWorkflowItem(context, col).withTitle("A workflow item").build();
         context.restoreAuthSystemState();
 
         ItemRest withdrawnItemRest = itemConverter.convert(withdrawnItem, Projection.DEFAULT);

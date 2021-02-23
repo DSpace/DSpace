@@ -1138,7 +1138,8 @@ prevent the generation of resource policy entry values with null dspace_object a
                                                                    .findByItem(context,
                                                                                item);
             if (inprogress == null) {
-                inprogress = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService().findByItem(context, item);
+                inprogress
+                        = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService().findByItem(context, item);
             }
 
             if (inprogress != null) {
