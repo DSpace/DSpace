@@ -50,16 +50,24 @@ import org.junit.Test;
  */
 public class EPersonTest extends AbstractUnitTest {
 
-    protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-    protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
-    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-    protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
-    protected XmlWorkflowItemService workflowItemService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService();
-    protected XmlWorkflowService workflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
-    protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance()
-                                                          .getWorkspaceItemService();
+    protected EPersonService ePersonService
+            = EPersonServiceFactory.getInstance().getEPersonService();
+    protected GroupService groupService
+            = EPersonServiceFactory.getInstance().getGroupService();
+    protected CommunityService communityService
+            = ContentServiceFactory.getInstance().getCommunityService();
+    protected CollectionService collectionService
+            = ContentServiceFactory.getInstance().getCollectionService();
+    protected ItemService itemService
+            = ContentServiceFactory.getInstance().getItemService();
+    protected InstallItemService installItemService
+            = ContentServiceFactory.getInstance().getInstallItemService();
+    protected XmlWorkflowItemService workflowItemService
+            = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService();
+    protected XmlWorkflowService workflowService
+            = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
+    protected WorkspaceItemService workspaceItemService
+            = ContentServiceFactory.getInstance().getWorkspaceItemService();
 
     private Community community = null;
     private Collection collection = null;

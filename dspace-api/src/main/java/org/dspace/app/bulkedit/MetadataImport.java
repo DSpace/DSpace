@@ -570,7 +570,8 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
 
                     // Should the workflow be used?
                     if (useWorkflow) {
-                        XmlWorkflowService workflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
+                        XmlWorkflowService workflowService
+                                = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
                         if (workflowNotify) {
                             wfItem = workflowService.start(c, wsItem);
                         } else {

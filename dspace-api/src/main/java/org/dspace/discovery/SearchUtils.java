@@ -140,7 +140,8 @@ public class SearchUtils {
      * @return a list of discovery configuration
      * @throws SQLException
      */
-    public static List<DiscoveryConfiguration> getAllDiscoveryConfigurations(XmlWorkflowItem witem) throws SQLException {
+    public static List<DiscoveryConfiguration> getAllDiscoveryConfigurations(XmlWorkflowItem witem)
+            throws SQLException {
         List<Collection> collections = new ArrayList<Collection>();
         collections.add(witem.getCollection());
         return getAllDiscoveryConfigurations("workflow", collections, witem.getItem());
