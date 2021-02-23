@@ -14,6 +14,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.authorize.AuthorizeException;
@@ -233,12 +234,36 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
     public void testDeleteAuthorRelationshipCopyToBothItems() throws Exception {
         initPublicationAuthor();
         context.turnOffAuthorisationSystem();
+        //verify the dc.contributor.author virtual metadata
+        List<MetadataValue> authorList = itemService.getMetadata(leftItem, "dc", "contributor", "author", Item.ANY);
+        assertThat(authorList.size(), equalTo(1));
+
+        //verify the dc.contributor.author actual metadata
+        List<MetadataValue> plainMetadataAuthorList = leftItem.getMetadata().stream()
+                .filter(metadataValue -> metadataValue.getMetadataField().getQualifier() != null &&
+                                         metadataValue.getMetadataField().getQualifier().equals("author"))
+                .collect(Collectors.toList());
+        assertThat(plainMetadataAuthorList.size(), equalTo(0));
+
+        //verify there's no relation.isAuthorOfPublication actual metadata
+        List<MetadataValue> plainRelationshipMetadataList = leftItem.getMetadata().stream()
+                .filter(metadataValue -> metadataValue.getMetadataField().getElement().equals("isAuthorOfPublication"))
+                .collect(Collectors.toList());
+        assertThat(plainRelationshipMetadataList.size(), equalTo(0));
+
         //delete the relationship, copying the virtual metadata to actual metadata on the both items
         relationshipService.delete(context, relationship, true, true);
         context.restoreAuthSystemState();
 
         //verify the dc.contributor.author actual metadata
-        List<MetadataValue> authorList = itemService.getMetadata(leftItem, "dc", "contributor", "author", Item.ANY);
+        plainMetadataAuthorList = leftItem.getMetadata().stream()
+                .filter(metadataValue -> metadataValue.getMetadataField().getQualifier() != null &&
+                                         metadataValue.getMetadataField().getQualifier().equals("author"))
+                .collect(Collectors.toList());
+        assertThat(plainMetadataAuthorList.size(), equalTo(1));
+
+        //verify the dc.contributor.author actual metadata
+        authorList = itemService.getMetadata(leftItem, "dc", "contributor", "author", Item.ANY);
         assertThat(authorList.size(), equalTo(1));
         assertThat(authorList.get(0).getValue(), equalTo("familyName, firstName"));
         assertThat(authorList.get(0).getMetadataField().getMetadataSchema().getName(), equalTo("dc"));
@@ -246,10 +271,15 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
         assertThat(authorList.get(0).getMetadataField().getQualifier(), equalTo("author"));
         assertNull(authorList.get(0).getAuthority());
 
-        //verify there's no relation.isAuthorOfPublication actual metadata
+        //verify there's relation.isAuthorOfPublication actual metadata
+        plainRelationshipMetadataList = leftItem.getMetadata().stream()
+                .filter(metadataValue -> metadataValue.getMetadataField().getElement().equals("isAuthorOfPublication"))
+                .collect(Collectors.toList());
+        assertThat(plainRelationshipMetadataList.size(), equalTo(1));
+        //verify there's relation.isAuthorOfPublication actual metadata
         List<MetadataValue> relationshipMetadataList = itemService
             .getMetadata(leftItem, MetadataSchemaEnum.RELATION.getName(), "isAuthorOfPublication", null, Item.ANY);
-        assertThat(relationshipMetadataList.size(), equalTo(0));
+        assertThat(relationshipMetadataList.size(), equalTo(1));
     }
 
     @Test
