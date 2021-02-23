@@ -160,19 +160,14 @@ public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndex
                                         distValuesForAC.add(values.get(x).getValue());
 
                                         String preferedLabel = null;
-                                        boolean ignorePrefered =
-                                            DSpaceServicesFactory
-                                                .getInstance()
-                                                .getConfigurationService()
-                                                .getPropertyAsType("discovery.browse.authority.ignore-preferred."
-                                                                       + bi.getName(),
-                                                                   DSpaceServicesFactory
-                                                                       .getInstance()
-                                                                       .getConfigurationService()
-                                                                       .getPropertyAsType(
-                                                                           "discovery.browse.authority.ignore-preferred",
-                                                                           Boolean.FALSE),
-                                                                   true);
+                                        Boolean generalSetting = DSpaceServicesFactory.getInstance()
+                                                .getConfigurationService().getPropertyAsType(
+                                                        "discovery.browse.authority.ignore-preferred",
+                                                        Boolean.FALSE);
+                                        boolean ignorePrefered = DSpaceServicesFactory.getInstance()
+                                                .getConfigurationService().getPropertyAsType(
+                                                        "discovery.browse.authority.ignore-preferred." + bi.getName(),
+                                                        generalSetting, true);
                                         if (!ignorePrefered) {
                                             preferedLabel = choiceAuthorityService
                                                 .getLabel(values.get(x), collection, values.get(x).getLanguage());
