@@ -19,7 +19,8 @@ import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.StatisticsSupportRest;
-import org.dspace.app.rest.model.UsageReportRest;
+import org.dspace.app.rest.model.UsageReportCategoryRest;
+import org.dspace.app.rest.statistics.StatisticsReportsConfiguration;
 import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.app.rest.utils.UsageReportUtils;
 import org.dspace.content.DSpaceObject;
@@ -30,8 +31,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-@Component(StatisticsSupportRest.CATEGORY + "." + UsageReportRest.NAME)
-public class StatisticsRestRepository extends DSpaceRestRepository<UsageReportRest, String> {
+@Component(StatisticsSupportRest.CATEGORY + "." + UsageReportCategoryRest.NAME)
+public class StatisticsCategoryRestRepository extends DSpaceRestRepository<UsageReportCategoryRest, String> {
 
     @Autowired
     private DSpaceObjectUtils dspaceObjectUtil;
@@ -39,60 +40,52 @@ public class StatisticsRestRepository extends DSpaceRestRepository<UsageReportRe
     @Autowired
     private UsageReportUtils usageReportUtils;
 
+    @Autowired
+    private StatisticsReportsConfiguration statsConfiguration;
+
     public StatisticsSupportRest getStatisticsSupport() {
         return new StatisticsSupportRest();
     }
 
     @Override
-    @PreAuthorize("hasPermission(#uuidObjectReportId, 'usagereport', 'READ')")
-    public UsageReportRest findOne(Context context, String uuidObjectReportId) {
-        UUID uuidObject = UUID.fromString(StringUtils.substringBefore(uuidObjectReportId, "_"));
-        String reportId = StringUtils.substringAfter(uuidObjectReportId, "_");
-
-        UsageReportRest usageReportRest = null;
-        try {
-            DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, uuidObject);
-            if (dso == null) {
-                return null;
-            }
-            usageReportRest = usageReportUtils.createUsageReport(context, dso, reportId);
-
-        } catch (ParseException | SolrServerException | IOException | SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+    @PreAuthorize("permitAll()")
+    public UsageReportCategoryRest findOne(Context context, String categoryId) {
+        UsageReportCategoryRest usageReportCategoryRest = statsConfiguration.getCategory(categoryId);
+        if (usageReportCategoryRest != null) {
+            return converter.toRest(usageReportCategoryRest, utils.obtainProjection());
+        } else {
+            return null;
         }
-        return converter.toRest(usageReportRest, utils.obtainProjection());
     }
 
-    @PreAuthorize("hasPermission(#uri, 'usagereportsearch', 'READ')")
+    @PreAuthorize("hasPermission(#uri, 'usagereportcategorysearch', 'READ')")
     @SearchRestMethod(name = "object")
-    public Page<UsageReportRest> findByObject(@Parameter(value = "uri", required = true) String uri,
-            @Parameter(value = "category") String category, Pageable pageable) {
+    public Page<UsageReportCategoryRest> findByObject(@Parameter(value = "uri", required = true) String uri,
+                                              Pageable pageable) {
         UUID uuid = UUID.fromString(StringUtils.substringAfterLast(uri, "/"));
-        List<UsageReportRest> usageReportsOfItem = null;
+        List<UsageReportCategoryRest> usageReportsCategoriesOfItem = null;
         try {
             Context context = obtainContext();
             DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, uuid);
             if (dso == null) {
-                return null;
+                throw new IllegalArgumentException("No DSO found with uuid: " + uuid);
             }
-            if (category != null && !usageReportUtils.categoryExists(dso, category)) {
-                throw new IllegalArgumentException("The specified category doesn't exists: " + category);
-            }
-            usageReportsOfItem = usageReportUtils.getUsageReportsOfDSO(context, dso, category);
+            usageReportsCategoriesOfItem = usageReportUtils.getUsageReportsCategoriesOfDSO(context, dso);
         } catch (SQLException | ParseException | SolrServerException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
 
-        return converter.toRestPage(usageReportsOfItem, pageable, usageReportsOfItem.size(), utils.obtainProjection());
+        return converter.toRestPage(usageReportsCategoriesOfItem, pageable, usageReportsCategoriesOfItem.size(),
+                utils.obtainProjection());
     }
 
     @Override
-    public Page<UsageReportRest> findAll(Context context, Pageable pageable) {
+    public Page<UsageReportCategoryRest> findAll(Context context, Pageable pageable) {
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "findAll");
     }
 
     @Override
-    public Class<UsageReportRest> getDomainClass() {
-        return UsageReportRest.class;
+    public Class<UsageReportCategoryRest> getDomainClass() {
+        return UsageReportCategoryRest.class;
     }
 }

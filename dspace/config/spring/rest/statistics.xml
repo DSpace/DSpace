@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                  http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                  http://www.springframework.org/schema/context
+                  http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+    <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
+
+	<bean id="topCitiesGenerator" class="org.dspace.app.rest.statistics.TopCitiesGenerator" />
+	<bean id="topCountriesGenerator" class="org.dspace.app.rest.statistics.TopCountriesGenerator" />
+	<bean id="topItemsGenerator" class="org.dspace.app.rest.statistics.TopItemsGenerator" />
+	<bean id="totalDownloadsGenerator" class="org.dspace.app.rest.statistics.TotalDownloadsGenerator" />
+	<bean id="totalVisitGenerator" class="org.dspace.app.rest.statistics.TotalVisitGenerator" />
+    <bean id="totalVisitPerPeriodGenerator" class="org.dspace.app.rest.statistics.TotalVisitPerPeriodGenerator" />
+
+	<bean id="person-mainReports" class="org.dspace.app.rest.model.UsageReportCategoryRest">
+	    <property name="categoryType" value="mainReports" />
+	    <property name="reports">
+	       <map>
+	           <entry key="TotalVisits" value-ref="totalVisitGenerator" />
+	           <entry key="TotalVisitsPerMonth" value-ref="totalVisitPerPeriodGenerator" />
+	           <entry key="TopCountries" value-ref="topCountriesGenerator" />
+	           <entry key="TopCities" value-ref="topCitiesGenerator" />
+	       </map>
+	    </property>
+	</bean>
+	
+    <bean id="person-publicationsReports" class="org.dspace.app.rest.model.UsageReportCategoryRest">
+        <property name="categoryType" value="publicationsReports" />
+        <property name="reports">
+           <map>
+               <entry key="TotalVisits" value-ref="totalVisitGenerator" />
+           </map>
+        </property>
+    </bean>
+
+    <bean id="person-projectsReports" class="org.dspace.app.rest.model.UsageReportCategoryRest">
+        <property name="categoryType" value="projectsReports" />
+        <property name="reports">
+           <map>
+               <entry key="TotalVisits" value-ref="totalVisitGenerator" />
+           </map>
+        </property>
+    </bean>
+
+    <bean id="project-mainReports" class="org.dspace.app.rest.model.UsageReportCategoryRest">
+        <property name="categoryType" value="mainReports" />
+        <property name="reports">
+           <map>
+               <entry key="TotalVisits" value-ref="totalVisitGenerator" />
+               <entry key="TotalVisitsPerMonth" value-ref="totalVisitPerPeriodGenerator" />
+               <entry key="TopCountries" value-ref="topCountriesGenerator" />
+               <entry key="TopCities" value-ref="topCitiesGenerator" />
+               <entry key="TotalDownloads" value-ref="totalDownloadsGenerator" />
+           </map>
+        </property>
+    </bean>
+    
+    <bean id="project-publicationsReports" class="org.dspace.app.rest.model.UsageReportCategoryRest">
+        <property name="categoryType" value="publicationsReports" />
+        <property name="reports">
+           <map>
+               <entry key="TotalVisits" value-ref="totalVisitGenerator" />
+           </map>
+        </property>
+    </bean>
+
+    <bean id="publication-mainReports" class="org.dspace.app.rest.model.UsageReportCategoryRest">
+        <property name="categoryType" value="mainReports" />
+        <property name="reports">
+           <map>
+               <entry key="TotalVisits" value-ref="totalVisitGenerator" />
+               <entry key="TotalVisitsPerMonth" value-ref="totalVisitPerPeriodGenerator" />
+               <entry key="TopCountries" value-ref="topCountriesGenerator" />
+               <entry key="TopCities" value-ref="topCitiesGenerator" />
+               <entry key="TotalDownloads" value-ref="totalDownloadsGenerator" />
+           </map>
+        </property>
+    </bean>
+
+    <bean id="bitstream-mainReports" class="org.dspace.app.rest.model.UsageReportCategoryRest">
+        <property name="categoryType" value="mainReports" />
+        <property name="reports">
+           <map>
+               <entry key="TotalVisits" value-ref="totalVisitGenerator" />
+               <entry key="TotalDownloads" value-ref="totalDownloadsGenerator" />
+               <entry key="TotalVisitsPerMonth" value-ref="totalVisitPerPeriodGenerator" />
+               <entry key="TopCountries" value-ref="topCountriesGenerator" />
+               <entry key="TopCities" value-ref="topCitiesGenerator" />
+           </map>
+        </property>
+    </bean>
+
+    <bean id="item-mainReports" class="org.dspace.app.rest.model.UsageReportCategoryRest">
+        <property name="categoryType" value="mainReports" />
+        <property name="reports">
+           <map>
+               <entry key="TotalVisits" value-ref="totalVisitGenerator" />
+               <entry key="TotalVisitsPerMonth" value-ref="totalVisitPerPeriodGenerator" />
+               <entry key="TopCountries" value-ref="topCountriesGenerator" />
+               <entry key="TopCities" value-ref="topCitiesGenerator" />
+               <entry key="TotalDownloads" value-ref="totalDownloadsGenerator" />
+           </map>
+        </property>
+    </bean>
+
+    <bean id="collection-mainReports" class="org.dspace.app.rest.model.UsageReportCategoryRest">
+        <property name="categoryType" value="mainReports" />
+        <property name="reports">
+           <map>
+               <entry key="TotalVisits" value-ref="totalVisitGenerator" />
+               <entry key="TotalVisitsPerMonth" value-ref="totalVisitPerPeriodGenerator" />
+               <entry key="TopCountries" value-ref="topCountriesGenerator" />
+               <entry key="TopCities" value-ref="topCitiesGenerator" />
+           </map>
+        </property>
+    </bean>
+
+    <bean id="community-mainReports" class="org.dspace.app.rest.model.UsageReportCategoryRest">
+        <property name="categoryType" value="mainReports" />
+        <property name="reports">
+           <map>
+               <entry key="TotalVisits" value-ref="totalVisitGenerator" />
+               <entry key="TotalVisitsPerMonth" value-ref="totalVisitPerPeriodGenerator" />
+               <entry key="TopCountries" value-ref="topCountriesGenerator" />
+               <entry key="TopCities" value-ref="topCitiesGenerator" />
+           </map>
+        </property>
+    </bean>
+
+    <bean id="site-mainReports" class="org.dspace.app.rest.model.UsageReportCategoryRest">
+        <property name="categoryType" value="mainReports" />
+        <property name="reports">
+           <map>
+               <entry key="TotalVisits" value-ref="topItemsGenerator" />
+           </map>
+        </property>
+    </bean>
+
+    <bean class="org.dspace.app.rest.statistics.StatisticsReportsConfiguration">
+        <property name="mapping">
+            <map>
+		        <entry key="site">
+		            <list>
+		                <ref bean="site-mainReports"/>
+		            </list>
+		        </entry>
+		        <entry key="community">
+                    <list>
+                        <ref bean="community-mainReports"/>
+                    </list>
+                </entry>
+                <entry key="collection">
+                    <list>
+                        <ref bean="collection-mainReports"/>
+                    </list>
+                </entry>
+		        <entry key="item">
+		            <list>
+		                <ref bean="item-mainReports"/>
+		            </list>
+		        </entry>
+		        <entry key="item-Publication">
+		            <list>
+		                <ref bean="publication-mainReports"/>
+		            </list>
+		        </entry>
+		        <entry key="item-Project">
+		            <list>
+		                <ref bean="project-mainReports"/>
+		                <ref bean="project-publicationsReports"/>
+		            </list>
+		        </entry>
+		        <entry key="item-Person">
+		            <list>
+		                <ref bean="person-mainReports"/>
+		                <ref bean="person-publicationsReports"/>
+		                <ref bean="person-projectsReports"/>
+		            </list>
+		        </entry>
+		        <entry key="bitstream">
+                    <list>
+                        <ref bean="bitstream-mainReports"/>
+                    </list>
+                </entry>
+            </map>
+        </property>
+    </bean>
+</beans>

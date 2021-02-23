@@ -23,7 +23,6 @@ import org.dspace.services.model.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -79,7 +78,8 @@ public class UsageReportRestPermissionEvaluatorPlugin extends RestObjectPermissi
             try {
                 DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, uuidObject);
                 if (dso == null) {
-                    throw new ResourceNotFoundException("No DSO found with this UUID: " + uuidObject);
+                    // allow to return a proper response code
+                    return true;
                 }
                 return authorizeService.authorizeActionBoolean(context, dso, restPermission.getDspaceApiActionId());
             } catch (SQLException e) {
