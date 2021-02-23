@@ -159,6 +159,8 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
                 }
                 curator.curate(context, entry.getObjectId());
             } else {
+                // TODO: Remove this exception once curation tasks are supported by configurable workflow
+                // e.g. see https://github.com/DSpace/DSpace/pull/3157
                 throw new IllegalArgumentException("curation for workflow items is no longer supported");
             }
         }
