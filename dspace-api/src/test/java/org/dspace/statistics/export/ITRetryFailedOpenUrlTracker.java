@@ -24,11 +24,13 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.export.factory.OpenURLTrackerLoggerServiceFactory;
 import org.dspace.statistics.export.service.FailedOpenURLTrackerService;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * Class to test the RetryFailedOpenUrlTracker
  */
+@Ignore
 public class ITRetryFailedOpenUrlTracker extends AbstractIntegrationTest {
 
     private static Logger log = Logger.getLogger(ITRetryFailedOpenUrlTracker.class);
