@@ -100,7 +100,7 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
                 if (Objects.isNull(context.getCurrentUser())
                     || (!authorizeService.isAdmin(context)
                         & !hasPermission(context, registrationRest.getGroups()))) {
-                    throw new AccessDeniedException("");
+                    throw new AccessDeniedException("Only admin users can invite new users to join groups");
                 }
             } catch (SQLException e) {
                 log.error(e.getMessage(), e);
