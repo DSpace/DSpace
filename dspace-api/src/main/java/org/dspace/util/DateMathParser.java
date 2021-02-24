@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.utils;
+package org.dspace.util;
 
 import java.text.ParseException;
 import java.time.Instant;
