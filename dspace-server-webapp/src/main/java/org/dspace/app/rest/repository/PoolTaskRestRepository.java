@@ -135,7 +135,7 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
             if (task == null) {
                 throw new ResourceNotFoundException("PoolTask ID " + id + " not found");
             }
-            XmlWorkflowServiceFactory factory = (XmlWorkflowServiceFactory) XmlWorkflowServiceFactory.getInstance();
+            XmlWorkflowServiceFactory factory = XmlWorkflowServiceFactory.getInstance();
             Workflow workflow = factory.getWorkflowFactory().getWorkflow(task.getWorkflowItem().getCollection());
             Step step = workflow.getStep(task.getStepID());
             WorkflowActionConfig currentActionConfig = step.getActionConfig(task.getActionID());

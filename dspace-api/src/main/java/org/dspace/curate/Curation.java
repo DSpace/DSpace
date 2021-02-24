@@ -29,7 +29,6 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
-import org.dspace.curate.factory.CurateServiceFactory;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
@@ -160,13 +159,9 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
                 }
                 curator.curate(context, entry.getObjectId());
             } else {
-                // make eperson who queued task the effective user
-                EPerson agent = ePersonService.findByEmail(context, entry.getEpersonId());
-                if (agent != null) {
-                    context.setCurrentUser(agent);
-                }
-                CurateServiceFactory.getInstance().getWorkflowCuratorService()
-                                    .curate(curator, context, entry.getObjectId());
+                // TODO: Remove this exception once curation tasks are supported by configurable workflow
+                // e.g. see https://github.com/DSpace/DSpace/pull/3157
+                throw new IllegalArgumentException("curation for workflow items is no longer supported");
             }
         }
         queue.release(this.queue, ticket, true);
