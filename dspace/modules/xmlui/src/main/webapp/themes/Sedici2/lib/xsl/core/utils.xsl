@@ -507,6 +507,7 @@
 			<div>
 				<xsl:attribute name="class"><xsl:value-of select="./@class"/></xsl:attribute>	
 				<!-- Seguimos parseando el string y lo convertimos en otro conjunto de nodos -->
+				<xsl:variable name="elementsCount" select="count(exslt:node-set(.)/*)" />
 				<xsl:for-each select="exslt:node-set(.)/*">
 					<xsl:choose>
 	           			<xsl:when test="./@class='value'">
@@ -525,6 +526,10 @@
            							</xsl:choose>
            						</xsl:for-each>
 	           				</span>
+				            <!-- Agrego ; si no es el ultimo elemento -->
+				            <xsl:if test="$elementsCount != position()">
+				               <xsl:text>; </xsl:text>
+				            </xsl:if>
 	           			</xsl:when>
 	           			<xsl:otherwise>
 	           				<xsl:copy-of select="."/>
