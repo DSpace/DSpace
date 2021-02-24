@@ -19,20 +19,20 @@ import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.WorkflowException;
-import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
-import org.dspace.xmlworkflow.service.XmlWorkflowService;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
-import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowItemService;
+import org.dspace.workflow.WorkflowService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 public class WorkflowTools {
     protected WorkspaceItemService workspaceItemService =
         ContentServiceFactory.getInstance().getWorkspaceItemService();
 
-    protected XmlWorkflowItemService workflowItemService =
-        XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService();
+    protected WorkflowItemService workflowItemService =
+        WorkflowServiceFactory.getInstance().getWorkflowItemService();
 
-    protected XmlWorkflowService workflowService =
-        XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
+    protected WorkflowService workflowService =
+        WorkflowServiceFactory.getInstance().getWorkflowService();
 
     protected ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
@@ -88,7 +88,7 @@ public class WorkflowTools {
      * @return workflow item
      * @throws DSpaceSwordException can be thrown by the internals of the DSpace SWORD implementation
      */
-    public XmlWorkflowItem getWorkflowItem(Context context, Item item)
+    public WorkflowItem getWorkflowItem(Context context, Item item)
         throws DSpaceSwordException {
         try {
             return workflowItemService.findByItem(context, item);
@@ -154,7 +154,7 @@ public class WorkflowTools {
         throws DSpaceSwordException {
         try {
             // find the item in the workflow if it exists
-            XmlWorkflowItem wfi = this.getWorkflowItem(context, item);
+            WorkflowItem wfi = this.getWorkflowItem(context, item);
 
             // abort the workflow
             if (wfi != null) {

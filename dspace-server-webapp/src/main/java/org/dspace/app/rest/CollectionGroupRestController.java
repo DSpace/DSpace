@@ -31,8 +31,8 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
+import org.dspace.workflow.WorkflowService;
 import org.dspace.xmlworkflow.WorkflowUtils;
-import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -69,7 +69,7 @@ public class CollectionGroupRestController {
     private AuthorizeService authorizeService;
 
     @Autowired
-    private XmlWorkflowService workflowService;
+    private WorkflowService workflowService;
 
     /**
      * This method creates and returns an AdminGroup object for the given collection

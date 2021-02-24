@@ -49,9 +49,9 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.dspace.workflow.WorkflowException;
-import org.dspace.xmlworkflow.service.XmlWorkflowService;
+import org.dspace.workflow.WorkflowItemService;
+import org.dspace.workflow.WorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
-import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.init.UncategorizedScriptException;
 import org.springframework.stereotype.Component;
@@ -75,9 +75,9 @@ public class SubmissionService {
     @Autowired
     protected WorkspaceItemService workspaceItemService;
     @Autowired
-    protected XmlWorkflowItemService workflowItemService;
+    protected WorkflowItemService<XmlWorkflowItem> workflowItemService;
     @Autowired
-    protected XmlWorkflowService workflowService;
+    protected WorkflowService<XmlWorkflowItem> workflowService;
     @Autowired
     protected CreativeCommonsService creativeCommonsService;
     @Autowired

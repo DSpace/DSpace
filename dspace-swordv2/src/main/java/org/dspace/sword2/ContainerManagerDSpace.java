@@ -25,9 +25,9 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
-import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowItemService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.swordapp.server.AuthCredentials;
 import org.swordapp.server.ContainerManager;
 import org.swordapp.server.Deposit;
@@ -44,8 +44,8 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
     protected AuthorizeService authorizeService =
         AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
-    protected XmlWorkflowItemService workflowItemService =
-        XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService();
+    protected WorkflowItemService workflowItemService =
+        WorkflowServiceFactory.getInstance().getWorkflowItemService();
 
     protected WorkspaceItemService workspaceItemService =
         ContentServiceFactory.getInstance().getWorkspaceItemService();
@@ -757,7 +757,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
                 WorkspaceItem wsi = wft.getWorkspaceItem(context, item);
                 workspaceItemService.deleteAll(context, wsi);
             } else if (wft.isItemInWorkflow(context, item)) {
-                XmlWorkflowItem wfi = wft.getWorkflowItem(context, item);
+                WorkflowItem wfi = wft.getWorkflowItem(context, item);
                 workflowItemService.deleteWrapper(context, wfi);
             }
 

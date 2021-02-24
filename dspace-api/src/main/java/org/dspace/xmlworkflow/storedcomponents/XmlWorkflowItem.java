@@ -20,10 +20,10 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.dspace.content.Collection;
-import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 
 /**
@@ -36,7 +36,7 @@ import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
  */
 @Entity
 @Table(name = "cwf_workflowitem")
-public class XmlWorkflowItem implements InProgressSubmission {
+public class XmlWorkflowItem implements WorkflowItem {
 
     @Id
     @Column(name = "workflowitem_id")

@@ -7,6 +7,8 @@
  */
 package org.dspace.xmlworkflow.factory;
 
+import org.dspace.workflow.WorkflowItemService;
+import org.dspace.workflow.WorkflowService;
 import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
@@ -87,5 +89,15 @@ public class XmlWorkflowServiceFactoryImpl extends XmlWorkflowServiceFactory {
     @Override
     public XmlWorkflowItemService getXmlWorkflowItemService() {
         return xmlWorkflowItemService;
+    }
+
+    @Override
+    public WorkflowService getWorkflowService() {
+        return getXmlWorkflowService();
+    }
+
+    @Override
+    public WorkflowItemService getWorkflowItemService() {
+        return getXmlWorkflowItemService();
     }
 }

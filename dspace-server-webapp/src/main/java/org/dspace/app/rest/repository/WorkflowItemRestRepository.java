@@ -45,9 +45,9 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.EPersonServiceImpl;
 import org.dspace.services.ConfigurationService;
 import org.dspace.workflow.WorkflowException;
+import org.dspace.workflow.WorkflowService;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
-import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
@@ -99,7 +99,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
     EPersonServiceImpl epersonService;
 
     @Autowired
-    XmlWorkflowService wfs;
+    WorkflowService<XmlWorkflowItem> wfs;
 
     @Autowired
     AuthorizeService authorizeService;

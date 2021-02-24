@@ -49,7 +49,7 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.WorkflowException;
-import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.jdom.Element;
 
 /**
@@ -628,7 +628,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
                 //We are probably dealing with an item that isn't archived yet
                 InProgressSubmission inProgressSubmission = workspaceItemService.findByItem(context, item);
                 if (inProgressSubmission == null) {
-                    inProgressSubmission = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService()
+                    inProgressSubmission = WorkflowServiceFactory.getInstance().getWorkflowItemService()
                                                                  .findByItem(context, item);
                 }
                 owningCollection = inProgressSubmission.getCollection();
