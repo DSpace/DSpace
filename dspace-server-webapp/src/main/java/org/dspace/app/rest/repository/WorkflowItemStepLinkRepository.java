@@ -47,14 +47,14 @@ public class WorkflowItemStepLinkRepository extends AbstractDSpaceRestRepository
     private XmlWorkflowFactory xmlWorkflowFactory;
 
     /**
-     * This method will retrieve the {@link WorkflowStepRest} object for the {@link XmlWorkflowItem}
+     * This method will retrieve the {@link WorkflowStepRest} object for the {@link org.dspace.workflow.WorkflowItem}
      * with the given id
      * @param request           The current request
      * @param workflowItemId    The id for the WorkflowItem to be used
      * @param optionalPageable  The pageable if relevant
      * @param projection        The Projection
      * @return                  The {@link WorkflowStepRest} object related to the
-     *                          {@link XmlWorkflowItem} specified by the given ID
+     *                          {@link org.dspace.workflow.WorkflowItem} specified by the given ID
      */
     public WorkflowStepRest getStep(@Nullable HttpServletRequest request,
                                     Integer workflowItemId,

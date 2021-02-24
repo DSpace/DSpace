@@ -28,7 +28,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.workflow.WorkflowItem;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 /**
@@ -90,7 +90,7 @@ public class WorkspaceItem
      * Protected constructor, create object using:
      * {@link org.dspace.content.service.WorkspaceItemService#create(Context, Collection, boolean)}
      * or
-     * {@link org.dspace.content.service.WorkspaceItemService#create(Context, XmlWorkflowItem)}
+     * {@link org.dspace.content.service.WorkspaceItemService#create(Context, WorkflowItem)}
      */
     protected WorkspaceItem() {
 

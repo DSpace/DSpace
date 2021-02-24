@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.authorization;
 
-import static org.dspace.builder.WorkflowItemBuilder.createWorkflowItem;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -24,13 +23,14 @@ import org.dspace.app.rest.utils.Utils;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.services.ConfigurationService;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.workflow.WorkflowItem;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -239,7 +239,7 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
         Item archivedItem = ItemBuilder.createItem(context, col).withTitle("Item already in archive").build();
         WorkspaceItem wsItem = WorkspaceItemBuilder.createWorkspaceItem(context, col).withTitle("A workspace item")
                 .build();
-        XmlWorkflowItem wfItem = createWorkflowItem(context, col).withTitle("A workflow item").build();
+        WorkflowItem wfItem = WorkflowItemBuilder.createWorkflowItem(context, col).withTitle("A workflow item").build();
         context.restoreAuthSystemState();
 
         ItemRest archivedItemRest = itemConverter.convert(archivedItem, Projection.DEFAULT);

@@ -995,7 +995,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
             // ** THEN **
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.usagereports", not(empty())))
-            .andExpect(jsonPath("$._embedded.usagereports", Matchers.hasItems(
+            .andExpect(jsonPath("$._embedded.usagereports", Matchers.containsInAnyOrder(
                 UsageReportMatcher
                     .matchUsageReport(collectionNotVisited.getID() + "_" + TOTAL_VISITS_REPORT_ID,
                         TOTAL_VISITS_REPORT_ID,
@@ -1007,8 +1007,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                 UsageReportMatcher.matchUsageReport(collectionNotVisited.getID() + "_" + TOP_CITIES_REPORT_ID,
                     TOP_CITIES_REPORT_ID, new ArrayList<>()),
                 UsageReportMatcher.matchUsageReport(collectionNotVisited.getID() + "_" + TOP_COUNTRIES_REPORT_ID,
-                    TOP_COUNTRIES_REPORT_ID, new ArrayList<>())
-            )));
+                    TOP_COUNTRIES_REPORT_ID, new ArrayList<>()))));
     }
 
     @Test

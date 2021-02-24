@@ -64,9 +64,9 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 import org.dspace.workflow.WorkflowException;
-import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
-import org.dspace.xmlworkflow.service.XmlWorkflowService;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 /**
  * Metadata importer to allow the batch import of metadata from a file
@@ -370,7 +370,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             }
 
             WorkspaceItem wsItem = null;
-            XmlWorkflowItem wfItem = null;
+            WorkflowItem wfItem = null;
             Item item = null;
 
             // Is this an existing item?
@@ -570,8 +570,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
 
                     // Should the workflow be used?
                     if (useWorkflow) {
-                        XmlWorkflowService workflowService
-                                = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
+                        WorkflowService workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
                         if (workflowNotify) {
                             wfItem = workflowService.start(c, wsItem);
                         } else {

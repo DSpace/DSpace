@@ -49,6 +49,8 @@ import org.dspace.versioning.dao.VersionDAO;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
+import org.dspace.workflow.WorkflowService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
@@ -350,7 +352,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
                         poolTaskService.deleteByEperson(context, ePerson);
                     } else if (StringUtils.equals(tableName, "cwf_workflowitemrole")) {
                         WorkflowItemRoleService workflowItemRoleService = XmlWorkflowServiceFactory.getInstance()
-                                .getWorkflowItemRoleService();
+                                                                          .getWorkflowItemRoleService();
                         workflowItemRoleService.deleteByEPerson(context, ePerson);
                     } else {
                         log.warn("EPerson is referenced in table '" + tableName
@@ -518,7 +520,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
             tableList.add("resourcepolicy");
         }
 
-        XmlWorkflowService workflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
+        WorkflowService workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
         List<String> workflowConstraints = workflowService.getEPersonDeleteConstraints(context, ePerson);
         tableList.addAll(workflowConstraints);
 

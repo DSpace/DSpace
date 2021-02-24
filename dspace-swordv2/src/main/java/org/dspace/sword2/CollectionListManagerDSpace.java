@@ -24,9 +24,9 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
-import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowItemService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.swordapp.server.AuthCredentials;
 import org.swordapp.server.CollectionListManager;
 import org.swordapp.server.SwordAuthException;
@@ -39,8 +39,8 @@ public class CollectionListManagerDSpace extends DSpaceSwordAPI
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory
         .getInstance().getWorkspaceItemService();
 
-    protected XmlWorkflowItemService workflowItemService = XmlWorkflowServiceFactory
-        .getInstance().getXmlWorkflowItemService();
+    protected WorkflowItemService workflowItemService = WorkflowServiceFactory
+        .getInstance().getWorkflowItemService();
 
     @Override
     public Feed listCollectionContents(IRI colIRI,
@@ -144,8 +144,8 @@ public class CollectionListManagerDSpace extends DSpaceSwordAPI
             List wfis = workflowItemService.findBySubmitter(sc.getContext(),
                                                             person);
             for (Object found : wfis) {
-                if (found instanceof XmlWorkflowItem) {
-                    XmlWorkflowItem wfi = (XmlWorkflowItem) found;
+                if (found instanceof WorkflowItem) {
+                    WorkflowItem wfi = (WorkflowItem) found;
                     Item item = wfi.getItem();
 
                     // check for the wfi collection

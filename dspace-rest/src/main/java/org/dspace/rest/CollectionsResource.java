@@ -51,8 +51,8 @@ import org.dspace.rest.common.Item;
 import org.dspace.rest.common.MetadataEntry;
 import org.dspace.rest.exceptions.ContextException;
 import org.dspace.usage.UsageEvent;
-import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
-import org.dspace.xmlworkflow.service.XmlWorkflowService;
+import org.dspace.workflow.WorkflowService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 /**
  * This class provides all CRUD operation over collections.
@@ -65,7 +65,7 @@ public class CollectionsResource extends Resource {
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-    protected XmlWorkflowService workflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
+    protected WorkflowService workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CollectionsResource.class);
 

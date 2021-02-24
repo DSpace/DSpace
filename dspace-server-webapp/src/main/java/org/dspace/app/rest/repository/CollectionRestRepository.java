@@ -57,9 +57,9 @@ import org.dspace.discovery.indexobject.IndexableCollection;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.workflow.WorkflowException;
+import org.dspace.workflow.WorkflowService;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.WorkflowUtils;
-import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
 import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
@@ -104,7 +104,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     private AuthorizeService authorizeService;
 
     @Autowired
-    private XmlWorkflowService workflowService;
+    private WorkflowService workflowService;
 
     @Autowired
     private PoolTaskService poolTaskService;

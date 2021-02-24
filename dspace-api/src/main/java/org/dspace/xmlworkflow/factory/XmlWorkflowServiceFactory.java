@@ -8,6 +8,7 @@
 package org.dspace.xmlworkflow.factory;
 
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
@@ -23,7 +24,7 @@ import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
  *
  * @author kevinvandevelde at atmire.com
  */
-public abstract class XmlWorkflowServiceFactory {
+public abstract class XmlWorkflowServiceFactory extends WorkflowServiceFactory {
 
     public abstract XmlWorkflowFactory getWorkflowFactory();
 

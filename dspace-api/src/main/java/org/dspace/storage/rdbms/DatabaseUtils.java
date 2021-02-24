@@ -32,7 +32,7 @@ import org.dspace.discovery.IndexingService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
 import org.flywaydb.core.api.MigrationInfo;
@@ -557,8 +557,8 @@ public class DatabaseUtils {
             scriptLocations.add("classpath:org/dspace/storage/rdbms/migration");
 
             //Add all potential workflow migration paths
-            List<String> workflowFlywayMigrationLocations = XmlWorkflowServiceFactory.getInstance()
-                                                                                  .getXmlWorkflowService()
+            List<String> workflowFlywayMigrationLocations = WorkflowServiceFactory.getInstance()
+                                                                                  .getWorkflowService()
                                                                                   .getFlywayMigrationLocations();
             scriptLocations.addAll(workflowFlywayMigrationLocations);
 

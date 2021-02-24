@@ -55,8 +55,8 @@ import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.service.VersioningService;
-import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
-import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
+import org.dspace.workflow.WorkflowItemService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -106,7 +106,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Autowired(required = true)
     protected WorkspaceItemService workspaceItemService;
     @Autowired(required = true)
-    protected XmlWorkflowItemService workflowItemService;
+    protected WorkflowItemService workflowItemService;
 
     @Autowired(required = true)
     protected RelationshipService relationshipService;
@@ -1138,8 +1138,7 @@ prevent the generation of resource policy entry values with null dspace_object a
                                                                    .findByItem(context,
                                                                                item);
             if (inprogress == null) {
-                inprogress
-                        = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService().findByItem(context, item);
+                inprogress = WorkflowServiceFactory.getInstance().getWorkflowItemService().findByItem(context, item);
             }
 
             if (inprogress != null) {

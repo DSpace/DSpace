@@ -18,7 +18,7 @@ import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.workflow.WorkflowItem;
 
 /**
  * Service interface class for the WorkspaceItem object.
@@ -55,7 +55,7 @@ public interface WorkspaceItemService extends InProgressSubmissionService<Worksp
     public WorkspaceItem create(Context context, Collection collection, boolean template)
         throws AuthorizeException, SQLException;
 
-    public WorkspaceItem create(Context c, XmlWorkflowItem wfi) throws SQLException, AuthorizeException;
+    public WorkspaceItem create(Context c, WorkflowItem wfi) throws SQLException, AuthorizeException;
 
 
     /**

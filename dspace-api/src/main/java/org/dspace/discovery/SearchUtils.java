@@ -22,7 +22,7 @@ import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationService;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.workflow.WorkflowItem;
 
 /**
  * Util methods used by discovery
@@ -140,8 +140,7 @@ public class SearchUtils {
      * @return a list of discovery configuration
      * @throws SQLException
      */
-    public static List<DiscoveryConfiguration> getAllDiscoveryConfigurations(XmlWorkflowItem witem)
-            throws SQLException {
+    public static List<DiscoveryConfiguration> getAllDiscoveryConfigurations(WorkflowItem witem) throws SQLException {
         List<Collection> collections = new ArrayList<Collection>();
         collections.add(witem.getCollection());
         return getAllDiscoveryConfigurations("workflow", collections, witem.getItem());

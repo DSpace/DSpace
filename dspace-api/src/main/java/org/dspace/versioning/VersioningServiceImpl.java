@@ -21,8 +21,8 @@ import org.dspace.core.Context;
 import org.dspace.versioning.dao.VersionDAO;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
-import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -42,7 +42,7 @@ public class VersioningServiceImpl implements VersioningService {
     @Autowired(required = true)
     private WorkspaceItemService workspaceItemService;
     @Autowired(required = true)
-    protected XmlWorkflowItemService workflowItemService;
+    protected WorkflowItemService workflowItemService;
 
     private DefaultItemVersionProvider provider;
 
@@ -139,7 +139,7 @@ public class VersioningServiceImpl implements VersioningService {
                     if (wsi != null) {
                         workspaceItemService.deleteAll(c, wsi);
                     } else {
-                        XmlWorkflowItem wfi = workflowItemService.findByItem(c, item);
+                        WorkflowItem wfi = workflowItemService.findByItem(c, item);
                         if (wfi != null) {
                             workflowItemService.delete(c, wfi);
                         }

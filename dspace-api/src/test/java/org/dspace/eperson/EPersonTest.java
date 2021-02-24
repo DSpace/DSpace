@@ -38,10 +38,10 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.workflow.WorkflowException;
-import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
-import org.dspace.xmlworkflow.service.XmlWorkflowService;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
-import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowItemService;
+import org.dspace.workflow.WorkflowService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -50,24 +50,16 @@ import org.junit.Test;
  */
 public class EPersonTest extends AbstractUnitTest {
 
-    protected EPersonService ePersonService
-            = EPersonServiceFactory.getInstance().getEPersonService();
-    protected GroupService groupService
-            = EPersonServiceFactory.getInstance().getGroupService();
-    protected CommunityService communityService
-            = ContentServiceFactory.getInstance().getCommunityService();
-    protected CollectionService collectionService
-            = ContentServiceFactory.getInstance().getCollectionService();
-    protected ItemService itemService
-            = ContentServiceFactory.getInstance().getItemService();
-    protected InstallItemService installItemService
-            = ContentServiceFactory.getInstance().getInstallItemService();
-    protected XmlWorkflowItemService workflowItemService
-            = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService();
-    protected XmlWorkflowService workflowService
-            = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
-    protected WorkspaceItemService workspaceItemService
-            = ContentServiceFactory.getInstance().getWorkspaceItemService();
+    protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
+    protected WorkflowItemService workflowItemService = WorkflowServiceFactory.getInstance().getWorkflowItemService();
+    protected WorkflowService workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
+    protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance()
+                                                          .getWorkspaceItemService();
 
     private Community community = null;
     private Collection collection = null;
@@ -1034,7 +1026,7 @@ public class EPersonTest extends AbstractUnitTest {
         context.turnOffAuthorisationSystem();
 
         // check whether the workflow item still exists.
-        XmlWorkflowItem wfi = workflowItemService.find(context, wfiID);
+        WorkflowItem wfi = workflowItemService.find(context, wfiID);
         assertNotNull("Could not load WorkflowItem after cascading deletion of the submitter.", wfi);
         assertNull("Cascading deletion of an EPerson did not set the submitter of an submitted WorkflowItem null.",
                 wfi.getSubmitter());

@@ -95,7 +95,7 @@ public class ItemCheck extends Check {
 
             ret += String.format(
                 "\tWaiting for approval (workflow items): %d\n",
-                    workflowItemService.countAll(context));
+                workflowItemService.countAll(context));
 
         } catch (SQLException e) {
             error(e);
@@ -132,7 +132,7 @@ public class ItemCheck extends Check {
         sb.append(String.format("Count %-14s: %s\n", "Group",
                                 String.valueOf(groupService.countTotal(context))));
         sb.append(String.format("Count %-14s: %s\n", "BasicWorkflowItem",
-                String.valueOf(workflowItemService.countAll(context))));
+                                String.valueOf(workflowItemService.countAll(context))));
         sb.append(String.format("Count %-14s: %s\n", "WorkspaceItem",
                                 String.valueOf(workspaceItemService.countTotal(context))));
         return sb.toString();
