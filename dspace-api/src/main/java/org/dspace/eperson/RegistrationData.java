@@ -7,12 +7,19 @@
  */
 package org.dspace.eperson;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -45,6 +52,14 @@ public class RegistrationData implements ReloadableEntity<Integer> {
     @Column(name = "expires")
     @Temporal(TemporalType.TIMESTAMP)
     private Date expires;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
+    @JoinTable(
+         name = "registrationdata2group",
+         joinColumns = {@JoinColumn(name = "registrationdata_id")},
+         inverseJoinColumns = {@JoinColumn(name = "group_id")}
+    )
+    private final List<Group> groups = new ArrayList<Group>();
 
     /**
      * Protected constructor, create object using:
@@ -80,5 +95,13 @@ public class RegistrationData implements ReloadableEntity<Integer> {
 
     void setExpires(Date expires) {
         this.expires = expires;
+    }
+
+    public List<Group> getGroups() {
+        return groups;
+    }
+
+    public void addGroup(Group group) {
+        this.groups.add(group);
     }
 }

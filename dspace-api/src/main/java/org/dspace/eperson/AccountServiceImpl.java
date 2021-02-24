@@ -9,9 +9,14 @@ package org.dspace.eperson;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
+import java.util.UUID;
 import javax.mail.MessagingException;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,6 +27,7 @@ import org.dspace.core.I18nUtil;
 import org.dspace.core.Utils;
 import org.dspace.eperson.service.AccountService;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.RegistrationDataService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +58,9 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     private ConfigurationService configurationService;
 
+    @Autowired
+    private GroupService groupService;
+
     protected AccountServiceImpl() {
 
     }
@@ -74,13 +83,13 @@ public class AccountServiceImpl implements AccountService {
      * @throws org.dspace.authorize.AuthorizeException passed through.
      */
     @Override
-    public void sendRegistrationInfo(Context context, String email)
+    public void sendRegistrationInfo(Context context, String email, List<UUID> groups)
         throws SQLException, IOException, MessagingException,
         AuthorizeException {
         if (!configurationService.getBooleanProperty("user.registration", true)) {
             throw new IllegalStateException("The user.registration parameter was set to false");
         }
-        sendInfo(context, email, true, true);
+        sendInfo(context, email, groups, true, true);
     }
 
     /**
@@ -106,7 +115,7 @@ public class AccountServiceImpl implements AccountService {
     public void sendForgotPasswordInfo(Context context, String email)
         throws SQLException, IOException, MessagingException,
         AuthorizeException {
-        sendInfo(context, email, false, true);
+        sendInfo(context, email, Collections.emptyList(), false, true);
     }
 
     /**
@@ -207,7 +216,7 @@ public class AccountServiceImpl implements AccountService {
      * @throws IOException        Error reading email template
      * @throws AuthorizeException Authorization error
      */
-    protected RegistrationData sendInfo(Context context, String email,
+    protected RegistrationData sendInfo(Context context, String email, List<UUID> groups,
                                         boolean isRegister, boolean send) throws SQLException, IOException,
         MessagingException, AuthorizeException {
         // See if a registration token already exists for this user
@@ -235,6 +244,14 @@ public class AccountServiceImpl implements AccountService {
             }
         }
 
+        if (CollectionUtils.isNotEmpty(groups)) {
+            for (UUID groupUuid : groups) {
+                Group group = groupService.find(context, groupUuid);
+                if (Objects.nonNull(group)) {
+                    rd.addGroup(group);
+                }
+            }
+        }
         if (send) {
             sendEmail(context, email, isRegister, rd);
         }

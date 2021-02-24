@@ -9,6 +9,9 @@ package org.dspace.app.rest.repository;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import javax.mail.MessagingException;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -24,11 +27,15 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RegistrationRest;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.eperson.RegistrationData;
 import org.dspace.eperson.service.AccountService;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.RegistrationDataService;
 import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +65,12 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
     @Autowired
     private RegistrationDataService registrationDataService;
 
+    @Autowired
+    private AuthorizeService authorizeService;
+
+    @Autowired
+    private GroupService groupService;
+
     @Override
     public RegistrationRest findOne(Context context, Integer integer) {
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
@@ -82,6 +95,17 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
         if (StringUtils.isBlank(registrationRest.getEmail())) {
             throw new UnprocessableEntityException("The email cannot be omitted from the Registration endpoint");
         }
+        if (Objects.nonNull(registrationRest.getGroups())) {
+            try {
+                if (Objects.isNull(context.getCurrentUser())
+                    || (!authorizeService.isAdmin(context)
+                        & !hasPermission(context, registrationRest.getGroups()))) {
+                    throw new AccessDeniedException("");
+                }
+            } catch (SQLException e) {
+                log.error(e.getMessage(), e);
+            }
+        }
         EPerson eperson = null;
         try {
             eperson = ePersonService.findByEmail(context, registrationRest.getEmail());
@@ -91,27 +115,42 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
         if (eperson != null) {
             try {
                 if (!AuthorizeUtil.authorizeUpdatePassword(context, eperson.getEmail())) {
-                    throw new DSpaceBadRequestException("Password cannot be updated for the given EPerson with email: "
-                                                            + eperson.getEmail());
+                    throw new DSpaceBadRequestException(
+                            "Password cannot be updated for the given EPerson with email: " + eperson.getEmail());
                 }
                 accountService.sendForgotPasswordInfo(context, registrationRest.getEmail());
             } catch (SQLException | IOException | MessagingException | AuthorizeException e) {
                 log.error("Something went wrong with sending forgot password info for email: "
-                              + registrationRest.getEmail(), e);
+                        + registrationRest.getEmail(), e);
             }
         } else {
             try {
                 if (!AuthorizeUtil.authorizeNewAccountRegistration(context, request)) {
                     throw new AccessDeniedException(
-                        "Registration is disabled, you are not authorized to create a new Authorization");
+                            "Registration is disabled, you are not authorized to create a new Authorization");
                 }
-                accountService.sendRegistrationInfo(context, registrationRest.getEmail());
+                accountService.sendRegistrationInfo(context, registrationRest.getEmail(), registrationRest.getGroups());
             } catch (SQLException | IOException | MessagingException | AuthorizeException e) {
                 log.error("Something with wrong with sending registration info for email: "
-                              + registrationRest.getEmail());
+                        + registrationRest.getEmail());
             }
         }
         return null;
+    }
+
+    private boolean hasPermission(Context context, List<UUID> groups) throws SQLException {
+        for (UUID groupUuid : groups) {
+            Group group = groupService.find(context, groupUuid);
+            if (Objects.nonNull(group)) {
+                DSpaceObject obj = groupService.getParentObject(context, group);
+                if (!authorizeService.isAdmin(context, obj)) {
+                    return false;
+                }
+            } else {
+                throw new UnprocessableEntityException("Group uuid " + groupUuid.toString() + " not valid!");
+            }
+        }
+        return true;
     }
 
     @Override

@@ -15,12 +15,12 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.authorization.AuthorizationFeatureService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.EPersonRest;
@@ -31,12 +31,13 @@ import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.service.SiteService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.eperson.RegistrationData;
 import org.dspace.eperson.service.AccountService;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.RegistrationDataService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,13 +71,10 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     private AccountService accountService;
 
     @Autowired
-    private AuthorizationFeatureService authorizationFeatureService;
-
-    @Autowired
-    private SiteService siteService;
-
-    @Autowired
     private RegistrationDataService registrationDataService;
+
+    @Autowired
+    private GroupService groupService;
 
     private final EPersonService es;
 
@@ -110,8 +108,15 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         }
         // If no token is present, we simply do the admin execution
         EPerson eperson = createEPersonFromRestObject(context, epersonRest);
-
         return converter.toRest(eperson, utils.obtainProjection());
+    }
+
+    private void addEPersonToGroups(Context context, EPerson eperson, List<Group> groups) {
+        if (CollectionUtils.isNotEmpty(groups)) {
+            for (Group group : groups) {
+                groupService.addMember(context, group, eperson);
+            }
+        }
     }
 
     private EPerson createEPersonFromRestObject(Context context, EPersonRest epersonRest) throws AuthorizeException {
@@ -183,6 +188,8 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         // We'll turn off authorisation system because this call isn't admin based as it's token based
         context.turnOffAuthorisationSystem();
         EPerson ePerson = createEPersonFromRestObject(context, epersonRest);
+        List<Group> groups = registrationData.getGroups();
+        addEPersonToGroups(context, ePerson, groups);
         context.restoreAuthSystemState();
         // Restoring authorisation state right after the creation call
         accountService.deleteToken(context, token);
