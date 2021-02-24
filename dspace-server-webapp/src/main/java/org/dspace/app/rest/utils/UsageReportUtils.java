@@ -62,7 +62,8 @@ public class UsageReportUtils {
         for (UsageReportCategoryRest cat : categories) {
             if (category == null || StringUtils.equals(cat.getId(), category)) {
                 for (Entry<String, UsageReportGenerator> entry : cat.getReports().entrySet()) {
-                    if (!reports.contains(entry.getKey())) {
+                    if (!reportIds.contains(entry.getKey())) {
+                        reportIds.add(entry.getKey());
                         reports.add(createUsageReport(context, dso, entry.getKey()));
                     }
                 }
