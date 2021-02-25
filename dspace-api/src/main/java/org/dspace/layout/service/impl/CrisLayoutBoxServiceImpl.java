@@ -282,6 +282,9 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
     }
 
     protected boolean hasMetricsBoxContent(Context context, CrisLayoutBox box, UUID itemUuid) {
+        if (context.getCurrentUser() == null) {
+            return false;
+        }
         if (box.getMetric2box().isEmpty()) {
             return false;
         }
