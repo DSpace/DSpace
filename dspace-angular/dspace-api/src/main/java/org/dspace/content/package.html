@@ -1,0 +1,160 @@
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<!--
+  Author:   Robert Tansley
+  Version:  $Revision$
+  Date:     $Date$
+-->
+</head>
+<body bgcolor="white">
+Provides an API for reading and manipulating content in the DSpace system.
+
+<h2>The DSpace Data Model</h2>
+
+Data in DSpace is stored in the model below.  Multiple inclusion is permitted
+at every level; the documentation for each class describes the system's
+behaviour for coping with this.
+
+<table border="0" cellspacing=5>
+  <tr>
+    <td><strong>Community</strong></td>
+    <td>Communities correspond to organisational units within an
+    institution.</td>
+  </tr>
+  <tr>
+    <td><strong>Collection</strong></td>
+    <td>Collections are groupings of related content.  Each collection may
+    have an associated <em>workflow</em>; this is the review process that
+    submissions go through before being included in the archive.</td>
+  </tr>
+  <tr>
+    <td><strong>Item</strong></td>
+    <td>Items are the basic archival units.  An item corresponds to a single
+    logical piece of content and associated metadata.</td>
+  </tr>
+  <tr>
+    <td><strong>Bundle</strong></td>
+    <td>Bundles are groupings of Bitstreams that make no sense in isolation;
+    for example, the files making up an HTML document would all go in one
+    Bundle.  A PDF version of the same Item, or a dataset stored with the Item,
+    would go in a separate Bundle.</td>
+  </tr>
+  <tr>
+    <td><strong>Bitstream</strong></td>
+    <td>Bitstreams are sequences of bits, typically files, that make up the
+    raw content of Items.</td>
+  </tr>
+</table>
+
+Additionally, each Bitstream is associated with one <strong>Bitstream
+Format</strong>; this describes information about the format and encoding of
+the Bitstream, including a name (for example "Adobe PDF"), a MIME type and a
+support level.
+<P>
+
+Submissions are created as <strong>Workspace Items</strong>.  A Workspace Item
+is an Item in progress.  Once item assembly is complete, one of two things may
+happen:</P>
+
+<ul>
+  <li>If the Collection being submitted to has an associated workflow, it is
+  started.  At this point the Workspace Item becomes a <strong>Workflow
+  Item</strong>.</li>
+  <li>If the Collection has no associated workflow, the Workspace Item is
+  removed and the assembled Item is included in the Collection.</li>
+</ul>
+
+Workspace Items and Workflow Items may both be manipulated as In Progress
+Submissions.
+
+
+<h2>Using the Content Management API</h2>
+
+The general paradigm for using DSpace is to create a <em>Context</em>; this is
+akin to opening a connection to a database (which, coincidentally, is one of the
+things that happens.)
+<P>
+The classes in this package are then used to create in-memory snapshots that
+represent the corresponding logical objects stored in the system.  When the
+reading or manipulating is done, the Context may either be <em>aborted</em>, in
+which case any changes made are discarded, or <em>completed</em>, in which case
+any changes made are committed to main DSpace storage.
+</P>
+<P>
+If any error occurs if you are making changes, you should <em>abort</em> the
+current context, since the in-memory snapshots might be in an inconsistent
+state.
+</P>
+<P>
+Typically, when changing a particular object in the system, the changes will
+not be written to main DSpace storage unless <code>update</code> is called on
+the object prior to Context completion.  Where this is not the case, it is
+stated in the method documentation.
+</P>
+<P>
+Instances of the classes in this package are tied to that Context; when the
+Context has been finished with the objects essentially become invalid.
+</P>
+<P>
+An example use of the Content Management API is shown below:
+</P>
+
+<pre>
+try
+{
+    // Create a DSpace context
+    context = new org.dspace.core.Context();
+
+    // Set the current user
+    context.setCurrentUser(authenticatedUser)
+
+    // Create my new collection
+    Collection c = Collection.create(context);
+    c.setMetadata("name", "My New Collection");
+    c.update();   // Updates the metadata within the context
+
+    // Find an item
+    item = Item.find(context, 1234);
+    
+    // Remove it from its old collections
+    Collection[] colls = item.getCollections();
+    colls[0].removeItem(item);
+    
+    // Add it to my new collection
+    c.addItem(item);
+   
+    // All went well; complete the context so changes are written
+    context.complete();
+}
+catch (SQLException se)
+{
+    // Something went wrong with the database; abort the context so
+    // no changes are written
+    context.abort();
+}
+catch (AuthorizeException ae)
+{
+    // authenticatedUser does not have permission to perform one of the
+    // above actions, so no changes should be made at all.
+    context.abort();
+}
+
+// The context will have been completed or aborted here, so it may
+// no longer be used, nor any objects that were created with it (e.g. item)
+</pre>
+
+@see org.dspace.authorize
+@see org.dspace.core.Context
+
+</body>
+</html>

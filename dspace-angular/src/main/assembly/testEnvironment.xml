@@ -1,0 +1,94 @@
+<?xml version='1.0'?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<assembly
+    xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+    <!--
+        Package DSpace's common testing environment (configuration, etc.)
+        into a "testEnvironment.zip". This essentially creates a zipped up, test
+        version of a DSpace installation directory, complete with bin, configs,
+        even a dummy assetstore, etc.
+	-->
+    <id>testEnvironment</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+
+    <!-- NOTE: first file in wins when using maven-assembly-plugin. So, overridden
+         files have to be included first. -->
+    <moduleSets>
+        <!-- FIRST, search for a 'src/test/data/dspaceFolder' data directory in
+             ANY of our modules. If found, copy its contents into the same "dspace"
+             subdirectory in the final ZIP file, as this is data to be used in testing.
+             NOTE: This *might* overwrite/overlay default files copied below. -->
+        <moduleSet>
+            <!-- Enable access to all projects in the current multimodule build! -->
+            <useAllReactorProjects>true</useAllReactorProjects>
+            <includes>
+                <include>org.dspace:*</include>
+            </includes>
+            <sources>
+                <outputDirectoryMapping>dspace</outputDirectoryMapping>
+                <fileSets>
+                    <!-- First, copy over custom/overridden configs -->
+                    <fileSet>
+                        <directory>src/test/data/dspaceFolder/config</directory>
+                        <outputDirectory>config</outputDirectory>
+                    </fileSet>
+                    <!-- Then copy over everything else (EXCEPT configs) -->
+                    <fileSet>
+                        <directory>src/test/data/dspaceFolder</directory>
+                        <excludes>
+                            <exclude>config/**</exclude>
+                        </excludes>
+                    </fileSet>
+                </fileSets>
+            </sources>
+        </moduleSet>
+        <!-- NEXT, we add in the default configuration/settings from the
+             DSpace Assembly module. -->
+        <moduleSet>
+            <includes>
+                <include>org.dspace:dspace</include>
+            </includes>
+            <sources>
+                <outputDirectoryMapping>dspace</outputDirectoryMapping>
+                <fileSets>
+                    <!-- First add in the config directory, filtering all config files  -->
+                    <fileSet>
+                        <!-- Include the config directory and all subdirectories
+                             (without this explicit include, the "modules"
+                              subdirectory is strangely excluded) -->
+                        <includes>
+                            <include>config/**</include>
+                        </includes>
+                    </fileSet>
+                    <!-- Then add in other necessary directories -->
+                    <fileSet>
+                        <directory>bin</directory>
+                        <outputDirectory>bin</outputDirectory>
+                    </fileSet>
+                    <fileSet>
+                        <directory>etc</directory>
+                        <outputDirectory>etc</outputDirectory>
+                    </fileSet>
+                    <fileSet>
+                        <directory>solr</directory>
+                        <outputDirectory>solr</outputDirectory>
+                    </fileSet>
+                </fileSets>
+            </sources>
+        </moduleSet>
+    </moduleSets>
+
+</assembly>

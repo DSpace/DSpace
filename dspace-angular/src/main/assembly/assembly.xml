@@ -1,0 +1,129 @@
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<!--
+    DSpace Directory Assembly
+    This assembly creates the 'target/dspace-installer/' which can
+    then be installed via Apache Ant.
+-->
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+   <id>installer</id>
+   <formats>
+      <format>dir</format>
+   </formats>
+   <includeBaseDirectory>false</includeBaseDirectory>
+
+   <fileSets>
+      <!-- Copy src/main/config/build.xml to resulting directory -->
+      <fileSet>
+         <directory>src/main/config</directory>
+         <outputDirectory>.</outputDirectory>
+         <includes>
+            <include>build.xml</include>
+         </includes>
+      </fileSet>
+      <!-- Copy README and LICENSE files to resulting directory -->
+      <fileSet>
+         <directory>..</directory>
+         <outputDirectory>.</outputDirectory>
+         <includes>
+            <include>LICENSE*</include>
+            <include>README</include>
+         </includes>
+         <excludes>
+            <exclude>LICENSE_HEADER</exclude>
+         </excludes>
+      </fileSet>
+      <!-- If local.cfg is in the root folder, copy it to config folder -->
+      <fileSet>
+         <directory>..</directory>
+         <outputDirectory>config</outputDirectory>
+         <includes>
+            <include>local.cfg</include>
+         </includes>
+         <filtered>true</filtered>
+      </fileSet>
+      <!-- Copy necessary subdirectories to resulting directory -->
+      <!-- First, copy over our configurations -->
+      <fileSet>
+         <directory>config</directory>
+         <outputDirectory>config</outputDirectory>
+      </fileSet>
+      <!-- Then, copy over all other necessary directories -->
+      <fileSet>
+         <directory>bin</directory>
+         <outputDirectory>bin</outputDirectory>
+      </fileSet>
+      <fileSet>
+         <directory>etc</directory>
+         <outputDirectory>etc</outputDirectory>
+      </fileSet>
+      <fileSet>
+         <directory>solr</directory>
+         <outputDirectory>solr</outputDirectory>
+      </fileSet>
+   </fileSets>
+
+   <!--
+   Copy ALL JAR dependencies specified in [src]/dspace/pom.xml
+   into the DSpace 'lib' directory.
+   -->
+   <dependencySets>
+      <dependencySet>
+         <includes>
+            <include>*:jar:*</include>
+         </includes>
+         <outputDirectory>lib</outputDirectory>
+         <useProjectArtifact>false</useProjectArtifact>
+      </dependencySet>
+   </dependencySets>
+
+   <moduleSets>
+      <!--
+      Take all JAR modules (and their dependencies) under
+      [src]/dspace/modules/ dir and add them into 'lib' directory
+      -->
+      <moduleSet>
+         <includes>
+            <include>org.dspace.modules:*:jar:*</include>
+         </includes>
+        <binaries>
+            <includeDependencies>true</includeDependencies>
+            <outputDirectory>lib</outputDirectory>
+            <unpack>false</unpack>
+            <!-- Include any dependency JARs as well -->
+            <dependencySets>
+               <dependencySet>
+                  <includes>
+                     <include>*:jar:*</include>
+                  </includes>
+               </dependencySet>
+            </dependencySets>
+         </binaries>
+      </moduleSet>
+
+      <!--
+      Take all WAR modules (in [src]/dspace/modules/) and unpack them into
+      'webapps' directory
+      -->
+      <moduleSet>
+         <includes>
+            <include>org.dspace.modules:*:war:*</include>
+         </includes>
+         <binaries>
+            <includeDependencies>false</includeDependencies>
+            <outputDirectory>webapps/${module.artifactId}</outputDirectory>
+            <unpack>true</unpack>
+         </binaries>
+      </moduleSet>
+   </moduleSets>
+
+</assembly>

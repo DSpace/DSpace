@@ -1,0 +1,58 @@
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<html>
+<head>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+
+    <!-- sortable.js can be obtained at http://www.kryogenix.org/code/browser/sorttable/ -->
+    <!-- <script src="sorttable.js"></script> -->
+
+    <script src="restReport.js"></script>
+    <script type="text/javascript">
+    var AuthReport = function() {
+        Report.call(this);
+        this.makeAuthLink = function(){return false;};
+    }
+    $(document).ready(function(){
+        var myReport=new AuthReport();
+        $("#authenticate").on("click",function(){
+          myReport.init();  
+        });
+        $("#logout").on("click",function(){
+          myReport.myAuth.logout();            
+        });
+    });
+    </script>
+    <script src="spin.js"></script>
+    <link rel="stylesheet" type="text/css" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.css"></link>
+    <link rel="stylesheet" type="text/css" href="restClient.css"></link>
+    <title>Authenticate for the REST Report Tools</title>
+</head>
+<body>
+<h2>Login for an Authenticated Report View</h2>
+<div>This is intended for sites with Password Authentication Enabled</div>
+<span id="currentUser"></span>
+<div id="password">
+  <div>
+  <label for="restemail">Email</label>
+  <input id="restemail" type="text" value="" size="30"/>
+  </div>
+  <div>
+  <label for="restpass">Password</label>
+  <input id="restpass" type="password" value=""/>
+  </div>
+  <div>
+  <button id="authenticate">Authenticate</button>
+  <button id="logout">Logout</button>
+  </div>
+</div>
+</body>
+</html>

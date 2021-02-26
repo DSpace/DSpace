@@ -1,0 +1,68 @@
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<!--
+  Author:   dstuve
+  Version:  $Id$
+  Date:     $Date$
+-->
+</head>
+<body bgcolor="white">
+<p>Handles permissions for DSpace content.
+</p>
+
+<p><strong>Philosophy</strong><br>
+DSpace's authorization system follows the classical "police state"
+philosophy of security - the user can do nothing, unless it is
+specifically allowed.  Those permissions are spelled out with
+ResourcePolicy objects, stored in the resourcepolicy table in the
+database.
+</p>
+
+<h2>Policies are attached to Content</h2>
+<p><strong>Policies are attached to Content</strong><br>
+Resource Policies get assigned to all of the content objects in
+DSpace - collections, communities, items, bundles, and bitstreams.
+(Currently they are not attached to non-content objects such as EPerson
+or Group.  But they could be, hence the name ResourcePolicy instead of
+ContentPolicy.)
+</p>
+
+<h2>Policies are tuples</h2>
+Authorization is based on evaluating the tuple of (object, action, who),
+such as (ITEM, READ, EPerson John Smith) to check if the EPerson "John Smith"
+can read an item.  ResourcePolicy objects are pretty simple, describing a single instance of
+(object, action, who).  If multiple who's are desired, such as Groups 10, 11, and
+12 are allowed to READ Item 13, you simply create a ResourcePolicy for each
+group.
+</p>
+
+<h2>Special Groups</h2>
+The install process should create two special groups - group 0, for
+anonymous/public access, and group 1 for administrators.
+Group 0 (public/anonymous) allows anyone access, even if they are not
+authenticated.  Group 1's (admin) members have super-user rights, and
+are allowed to do any action to any object. 
+</p>
+
+<h2>Unused ResourcePolicy attributes </h2>
+ResourcePolicies have a few attributes that are currently unused,
+but are included with the intent that they will be used someday.
+One is start and end dates, for when policies will be active, so that
+permissions for content can change over time. The other is the EPerson -
+policies could apply to only a single EPerson, but for ease of
+administration currently a Group is the recommended unit to use to
+describe 'who'.
+</p>
+
+</body>
+</html>

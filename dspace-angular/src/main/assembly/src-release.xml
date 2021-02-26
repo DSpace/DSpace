@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<!--
+    DSpace "Source" Release Package Assembly
+    This assembly creates the full source code 'zip/tarball' distribution
+    of DSpace which can be made available via SourceForge or similar.
+-->
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+   <id>src-release</id>
+   <formats>
+      <format>zip</format>
+      <format>tar.gz</format>
+      <format>tar.bz2</format>
+   </formats>
+   <baseDirectory>${finalName}-src-release</baseDirectory>
+   <includeBaseDirectory>true</includeBaseDirectory>
+   <fileSets>
+      <fileSet>
+         <!-- Select files from the parent directory (i.e. [dspace-src])-->
+         <directory>..</directory>
+         <useDefaultExcludes>true</useDefaultExcludes>
+         <!-- Include all files except target directories, dot files,
+	      binaries -->
+         <excludes>
+            <exclude>**/target/**</exclude>
+            <exclude>.*</exclude>
+	    <exclude>**/*.bmp</exclude>
+	    <exclude>**/*.eot</exclude>
+	    <exclude>**/*.gif</exclude>
+	    <exclude>**/*.ico</exclude>
+	    <exclude>**/*.jpg</exclude>
+	    <exclude>**/*.pdf</exclude>
+	    <exclude>**/*.png</exclude>
+	    <exclude>**/*.psd</exclude>
+	    <exclude>**/*.ttf</exclude>
+	    <exclude>**/*.woff</exclude>
+            <exclude>**/*.zip</exclude>
+         </excludes>
+         <!-- Ensure line endings in all text files are Unix (LF) line
+	      endings-->
+         <lineEnding>unix</lineEnding>
+      </fileSet>
+      <!-- Do not destroy binary files by changing "line" endings!
+           (e.g. SWORD's example.zip) -->
+      <fileSet>
+         <directory>..</directory>
+         <useDefaultExcludes>true</useDefaultExcludes>
+         <includes>
+	    <include>**/*.bmp</include>
+	    <include>**/*.eot</include>
+	    <include>**/*.gif</include>
+	    <include>**/*.ico</include>
+	    <include>**/*.jpg</include>
+	    <include>**/*.pdf</include>
+	    <include>**/*.png</include>
+	    <include>**/*.psd</include>
+	    <include>**/*.ttf</include>
+	    <include>**/*.woff</include>
+            <include>**/*.zip</include>
+         </includes>
+         <excludes>
+            <exclude>**/target/**</exclude>
+         </excludes>
+	 <lineEnding>keep</lineEnding>
+      </fileSet>
+      <!-- Ensure the presence of "empty" overlay directories for build
+           steps that need them.
+           By default our ".gitignore" files are excluded by
+           "useDefaultExcludes=true". -->
+      <fileSet>
+         <directory>..</directory>
+         <useDefaultExcludes>false</useDefaultExcludes>
+         <includes>
+            <include>dspace/modules/**/.gitignore</include>
+         </includes>
+         <excludes>
+            <exclude>**/target/**</exclude>
+         </excludes>
+         <lineEnding>unix</lineEnding>
+      </fileSet>
+   </fileSets>
+
+</assembly>

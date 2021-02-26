@@ -1,0 +1,27 @@
+# This image will be published as dspace/dspace-dependencies
+# The purpose of this image is to make the build for dspace/dspace run faster
+#
+# This version is JDK11 compatible
+# - maven:3-jdk-11
+
+# Step 1 - Run Maven Build
+FROM maven:3-jdk-11 as build
+ARG TARGET_DIR=dspace-installer
+WORKDIR /app
+
+RUN useradd dspace \
+    && mkdir /home/dspace \
+    && chown -Rv dspace: /home/dspace
+USER dspace
+
+# Copy the DSpace source code into the workdir (excluding .dockerignore contents)
+ADD --chown=dspace . /app/
+COPY dspace/src/main/docker/local.cfg /app/local.cfg
+
+# Trigger the installation of all maven dependencies
+RUN mvn package
+
+# Clear the contents of the /app directory (including all maven builds), so no artifacts remain.
+# This ensures when dspace:dspace is built, it will just the Maven local cache (.m2) for dependencies
+USER root
+RUN rm -rf /app/*

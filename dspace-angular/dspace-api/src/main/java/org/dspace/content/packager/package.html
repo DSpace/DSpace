@@ -1,0 +1,47 @@
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<!--
+  Author:   Richard Rodgers
+  Version:  $Revision$
+  Date:     $Date$
+-->
+</head>
+<body bgcolor="white">
+<p>
+Provides an API and implementations of content packages, used in the context of ingest (SIP), or dissemination (DIP)</p>
+
+<h2>Packaging Interfaces</h2>
+
+The principle interfaces are for ingesters and disseminators.
+The PackageIngester interface consists of the method: 
+
+<p>
+<code>WorkspaceItem ingest(Context context, Collection collection, InputStream in,
+                         PackageParameters params, String license)</code></p>
+
+There is also a 'replace' method, but this is not implemented consistently.
+
+<p>The PackageDisseminator interface consists of the method:</p>
+
+<p><code>void disseminate(Context context, DSpaceObject object,
+                     PackageParameters params, OutputStream out)</code></p>
+
+<h2>Packaging Implementations</h2>
+<p>Ingester and disseminator implementations exist for METs and PDF packages, and the
+classes are designed to be extended for different profiles.<p>
+
+@see org.dspace.content.packager.AbstractMETSIngester
+@see org.dspace.content.packager.AbstractMETSDisseminator
+
+</body>
+</html>

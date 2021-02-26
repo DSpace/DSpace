@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<!--
+    DSpace "Binary" Release Package Assembly
+    This assembly creates the binary (no source code) 'zip/tarball' distribution
+    of DSpace which can be made available via SourceForge or similar.
+-->
+<assembly xmlns="http://maven.apache.org/POM/4.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/assembly-1.1.0-SNAPSHOT.xsd">
+   <id>release</id>
+   <formats>
+      <format>zip</format>
+      <format>tar.gz</format>
+      <format>tar.bz2</format>
+   </formats>
+   <baseDirectory>${finalName}-release</baseDirectory>
+   <includeBaseDirectory>true</includeBaseDirectory>
+   <fileSets>
+      <fileSet>
+         <!-- Select files from the parent directory (i.e. [dspace-src])-->
+         <directory>..</directory>
+         <useDefaultExcludes>true</useDefaultExcludes>
+         <!-- Include the "[src]/dspace/" folder & main README/build files -->
+         <includes>
+            <include>dspace/**</include>
+            <include>LICENSE*</include>
+            <include>NOTICE</include>
+            <include>README.md</include>
+            <include>pom.xml</include>
+         </includes>
+         <!-- Exclude any target directories or dot files -->
+         <excludes>
+            <exclude>**/target/**</exclude>
+            <exclude>.*</exclude>
+         </excludes>
+         <!-- Ensure line endings in all files are Unix (LF) line endings-->
+         <lineEnding>unix</lineEnding>
+      </fileSet>
+      <!-- Ensure the presence of "empty" overlay directories for build
+           steps that need them.
+           By default our ".gitignore" files are excluded by
+           "useDefaultExcludes=true". -->
+      <fileSet>
+         <directory>..</directory>
+         <useDefaultExcludes>false</useDefaultExcludes>
+         <includes>
+            <include>dspace/modules/**/.gitignore</include>
+         </includes>
+         <excludes>
+            <exclude>**/target/**</exclude>
+         </excludes>
+         <lineEnding>unix</lineEnding>
+      </fileSet>
+   </fileSets>
+
+</assembly>
