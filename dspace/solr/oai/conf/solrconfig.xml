@@ -39,7 +39,8 @@
         <ramBufferSizeMB>32</ramBufferSizeMB>
         <maxBufferedDocs>1000</maxBufferedDocs>
         <lockType>${solr.lock.type:native}</lockType>
-        <infoStream>true</infoStream>
+        <!-- Set to true to "write detailed debug information from the indexing process as Solr log messages" -->
+        <infoStream>false</infoStream>
     </indexConfig>
 
     <!-- Settings for how updates are done internally -->
@@ -127,8 +128,4 @@
             <str name="stream.contentType">application/json</str>
         </lst>
     </requestHandler>
-
-    <queryResponseWriter name="json" class="solr.JSONResponseWriter">
-        <str name="content-type">text/plain; charset=UTF-8</str>
-    </queryResponseWriter>
 </config>
