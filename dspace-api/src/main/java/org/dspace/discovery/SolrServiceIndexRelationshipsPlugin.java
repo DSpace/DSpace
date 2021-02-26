@@ -17,9 +17,11 @@ import java.util.stream.IntStream;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.content.Item;
 import org.dspace.content.Relationship;
+import org.dspace.content.RelationshipType;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Context;
 import org.dspace.discovery.indexobject.IndexableItem;
+import org.dspace.util.UUIDUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,8 +58,7 @@ public class SolrServiceIndexRelationshipsPlugin implements SolrServiceIndexPlug
 
         try {
 
-            List<Relationship> relationships = relationshipService.findByItem(context, item);
-            for (Relationship relationship : relationships) {
+            for (Relationship relationship : relationshipService.findByItem(context, item)) {
                 updateDocument(context, document, relationship, item.getID());
             }
 
@@ -71,11 +72,13 @@ public class SolrServiceIndexRelationshipsPlugin implements SolrServiceIndexPlug
                                 UUID itemId) throws SQLException {
 
         boolean isLeftwardRelationship = relationship.getLeftItem().getID().equals(itemId);
-        String label = isLeftwardRelationship ? relationship.getLeftwardValue() : relationship.getRightwardValue();
+        RelationshipType relationshipType = relationship.getRelationshipType();
+        String label =
+            isLeftwardRelationship ? relationshipType.getLeftwardType() : relationshipType.getRightwardType();
         Item otherItem = isLeftwardRelationship ? relationship.getRightItem() : relationship.getLeftItem();
 
         String field = String.format(RELATION_PREFIX, label);
-        document.addField(field, otherItem.getID());
+        document.addField(field, UUIDUtils.toString(otherItem.getID()));
 
         //update priorities (find same relations involving other item)
         List<Relationship> relationshipsInvolvingOtherItem =
@@ -83,7 +86,7 @@ public class SolrServiceIndexRelationshipsPlugin implements SolrServiceIndexPlug
         int relationshipPlace = isLeftwardRelationship ? relationship.getLeftPlace() : relationship.getRightPlace();
 
         IntStream.range(relationshipPlace, relationshipsInvolvingOtherItem.size())
-            .forEach(ignored -> document.addField(field, otherItem.getID()));
+            .forEach(ignored -> document.addField(field, UUIDUtils.toString(otherItem.getID())));
     }
 
     private List<Relationship> otherRelationships(Context context, Relationship relationship,
