@@ -24,7 +24,7 @@
 -->
 
 <config>
-    <luceneMatchVersion>8.7.0</luceneMatchVersion>
+    <luceneMatchVersion>8.8.1</luceneMatchVersion>
 
     <directoryFactory name="DirectoryFactory"
                       class="${solr.directoryFactory:solr.StandardDirectoryFactory}"/>

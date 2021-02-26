@@ -23,7 +23,7 @@
      this file, see http://wiki.apache.org/solr/SolrConfigXml.
 -->
 <config>
-    <luceneMatchVersion>8.7.0</luceneMatchVersion>
+    <luceneMatchVersion>8.8.1</luceneMatchVersion>
 
     <!-- Include contributed libraries that we use in DSpace. -->
     <lib dir='${solr.install.dir}/contrib/analysis-extras/lib/'
