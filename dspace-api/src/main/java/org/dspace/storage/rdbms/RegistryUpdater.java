@@ -21,8 +21,6 @@ import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.workflow.factory.WorkflowServiceFactory;
-import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.flywaydb.core.api.callback.Callback;
 import org.flywaydb.core.api.callback.Event;
 import org.slf4j.Logger;
@@ -49,11 +47,11 @@ import org.xml.sax.SAXException;
  *
  * @author Tim Donohue
  */
-public class DatabaseRegistryUpdater implements Callback {
+public class RegistryUpdater implements Callback {
     /**
      * logging category
      */
-    private static final Logger log = LoggerFactory.getLogger(DatabaseRegistryUpdater.class);
+    private static final Logger log = LoggerFactory.getLogger(RegistryUpdater.class);
 
     /**
      * Method to actually update our registries from latest configuration files.
@@ -80,13 +78,9 @@ public class DatabaseRegistryUpdater implements Callback {
                 MetadataImporter.loadRegistry(base + namespaceFile, true);
             }
 
-            // Check if XML Workflow is enabled in workflow.cfg
-            if (WorkflowServiceFactory.getInstance().getWorkflowService() instanceof XmlWorkflowService) {
-                // If so, load in the workflow metadata types as well
-                String workflowTypes = "workflow-types.xml";
-                log.info("Reading {}", workflowTypes);
-                MetadataImporter.loadRegistry(base + workflowTypes, true);
-            }
+            String workflowTypes = "workflow-types.xml";
+            log.info("Reading {}", workflowTypes);
+            MetadataImporter.loadRegistry(base + workflowTypes, true);
 
             context.restoreAuthSystemState();
             // Commit changes and close context

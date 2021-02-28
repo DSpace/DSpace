@@ -74,9 +74,6 @@
 		</property>
 	</bean>
 
-    <!-- Ensure WorkflowCuratorService is initialized properly via init() method -->
-    <bean class="org.dspace.curate.WorkflowCuratorServiceImpl" init-method="init"/>
-
     <bean class="org.dspace.disseminate.CitationDocumentServiceImpl"/>
 
     <!-- Ensure EmbargoService is initialized properly via init() method -->
