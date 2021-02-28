@@ -161,49 +161,4 @@
         </dependency>
 
     </dependencies>
-
-    <developers>
-        <developer>
-            <id>azeckoski</id>
-            <name>Aaron Zeckoski</name>
-            <email>azeckoski@gmail.com</email>
-            <url>http://wiki.sakaiproject.org/confluence/display/~aaronz
-            </url>
-            <organization>CARET, University of Cambridge</organization>
-            <organizationUrl>http://caret.cam.ac.uk/
-            </organizationUrl>
-            <roles>
-                <role>architect</role>
-                <role>committer</role>
-            </roles>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>mdiggory</id>
-            <name>Mark Diggory</name>
-            <email>mdiggory@atmire.com</email>
-            <roles>
-                <role>architect</role>
-                <role>committer</role>
-            </roles>
-            <organization>@mire</organization>
-            <organizationUrl>http://www.atmire.com</organizationUrl>
-            <timezone>-8</timezone>
-        </developer>
-    </developers>
-
-    <contributors>
-        <contributor>
-            <name>Add Your Name Here and submit a patch!</name>
-            <email>contributor at myu.edu</email>
-            <url>http://www.myu.edu/me</url>
-            <organization>My University</organization>
-            <organizationUrl>http://www.myu.edu</organizationUrl>
-            <roles>
-                <role>developer</role>
-            </roles>
-            <timezone>0</timezone>
-        </contributor>
-    </contributors>
-
 </project>

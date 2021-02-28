@@ -36,8 +36,6 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
-import org.dspace.workflow.WorkflowService;
-import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.state.Workflow;
@@ -69,7 +67,6 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
-    protected WorkflowService workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance()
                                                                                .getWorkspaceItemService();
     protected XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();

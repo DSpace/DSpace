@@ -8,11 +8,13 @@
 
 package org.dspace.xoai.filter;
 
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.transform;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.base.Function;
-import com.lyncode.builder.ListBuilder;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.ParameterList;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.ParameterValue;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.SimpleType;
@@ -52,14 +54,14 @@ public class DSpaceAtLeastOneMetadataFilter extends DSpaceFilter {
                 values = new ArrayList<>();
                 values.add(((SimpleType) parameterValue).asString());
             } else if (parameterValue instanceof ParameterList) {
-                values = new ListBuilder<ParameterValue>()
-                    .add(parameterValue.asParameterList().getValues())
-                    .build(new Function<ParameterValue, String>() {
+                // transform list of ParameterValues into list of Strings
+                values = newArrayList(transform(parameterValue.asParameterList().getValues(),
+                                                new Function<ParameterValue, String>() {
                         @Override
                         public String apply(ParameterValue elem) {
                             return elem.asSimpleType().asString();
                         }
-                    });
+                    }));
             } else {
                 values = new ArrayList<>();
             }

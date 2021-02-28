@@ -262,12 +262,6 @@ public class SubmissionService {
         accessCondition.setDescription(rp.getRpDescription());
         accessCondition.setStartDate(rp.getStartDate());
         accessCondition.setEndDate(rp.getEndDate());
-        if (rp.getGroup() != null) {
-            accessCondition.setGroupUUID(rp.getGroup().getID());
-        }
-        if (rp.getEPerson() != null) {
-            accessCondition.setEpersonUUID(rp.getEPerson().getID());
-        }
         return accessCondition;
     }
 
