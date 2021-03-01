@@ -50,16 +50,24 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.services.ConfigurationService;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest {
+    @Autowired
+    ConfigurationService configurationService;
+
+    @Autowired
+    MetadataAuthorityService metadataAuthorityService;
 
 
     @Test
@@ -175,6 +183,94 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                         FacetValueMatcher.entryAuthor("Doe, Jane"),
                         FacetValueMatcher.entryAuthor("Smith, Maria")
                 )))
+        ;
+    }
+
+    @Test
+    public void discoverFacetsAuthorWithAuthorityWithSizeParameter() throws Exception {
+        configurationService.setProperty("choices.plugin.dc.subject",
+                                         "SolrSubjectAuthority");
+        configurationService.setProperty("authority.controlled.dc.subject",
+                                         "true");
+
+        metadataAuthorityService.clearCache();
+
+        //Turn off the authorization system, otherwise we can't make the objects
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. Three public items that are readable by Anonymous with different subjects and authors
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withAuthor("Doe, John")
+                                      .withSubject("ExtraEntry", "authority_1", 600)
+                                      .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 2")
+                                      .withIssueDate("2016-02-13")
+                                      .withAuthor("Smith, Maria")
+                                      .withAuthor("Doe, Jane")
+                                      .withSubject("TestingForMore", "authority_2", 600)
+                                      .withSubject("ExtraEntry", "authority_1", 600)
+                                      .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 2")
+                                      .withIssueDate("2016-02-13")
+                                      .withAuthor("Smith, Maria")
+                                      .withAuthor("Doe, Jane")
+                                      .withAuthor("test, test")
+                                      .withAuthor("test2, test2")
+                                      .withAuthor("Maybe, Maybe")
+                                      .withSubject("AnotherTest", "authority_3", 600)
+                                      .withSubject("TestingForMore", "authority_2", 600)
+                                      .withSubject("ExtraEntry", "authority_1", 600)
+                                      .build();
+
+        context.restoreAuthSystemState();
+
+        //** WHEN **
+        //An anonymous user browses this endpoint to find the objects in the system and enters a size of 2
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("size", "2"))
+
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //The type needs to be 'discover'
+                   .andExpect(jsonPath("$.type", is("discover")))
+                   //The name of the facet needs to be seubject, because that's what we called
+                   .andExpect(jsonPath("$.name", is("subject")))
+                   //Because we've constructed such a structure so that we have more than 2 (size) subjects, there
+                   // needs to be a next link
+                   .andExpect(jsonPath("$._links.next.href", containsString("api/discover/facets/subject?page")))
+                   //There always needs to be a self link
+                   .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets/subject")))
+                   //Because there are more subjects than is represented (because of the size param), hasMore has to
+                   // be true
+                   //The page object needs to be present and just like specified in the matcher
+                   .andExpect(jsonPath("$.page",
+                                       is(PageMatcher.pageEntry(0, 2))))
+                   //These subjecs need to be in the response because it's sorted on how many times the author comes
+                   // up in different items
+                   //These subjects are the most used ones. Only two show up because of the size.
+                   .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                       FacetValueMatcher.entrySubject("ExtraEntry", 3),
+                       FacetValueMatcher.entrySubject("TestingForMore", 2)
+                   )))
         ;
     }
 
