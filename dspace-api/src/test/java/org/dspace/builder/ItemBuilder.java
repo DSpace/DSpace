@@ -86,6 +86,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "subject", null, subject);
     }
 
+    public ItemBuilder withSubject(final String subject, final String authority, final int confidence) {
+        return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "subject", null, null, subject, authority, confidence);
+    }
+
     public ItemBuilder withRelationshipType(final String relationshipType) {
         return addMetadataValue(item, "relationship", "type", null, relationshipType);
     }
