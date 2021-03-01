@@ -28,6 +28,16 @@ public class FacetValueMatcher {
         );
     }
 
+    public static Matcher<? super Object> entrySubject(String label, int count) {
+        return allOf(
+            hasJsonPath("$.label", is(label)),
+            hasJsonPath("$.type", is("discover")),
+            hasJsonPath("$.count", is(count)),
+            hasJsonPath("$._links.search.href", containsString("api/discover/search/objects")),
+            hasJsonPath("$._links.search.href", containsString("f.subject=" + label + ",equals"))
+        );
+    }
+
     public static Matcher<? super Object> entryDateIssued() {
         return allOf(
             hasJsonPath("$.label", Matchers.notNullValue()),
