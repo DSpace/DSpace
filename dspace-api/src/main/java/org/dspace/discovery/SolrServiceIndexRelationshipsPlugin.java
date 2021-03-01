@@ -8,9 +8,12 @@
 package org.dspace.discovery;
 
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -31,12 +34,10 @@ import org.springframework.beans.factory.annotation.Autowired;
  * to solr document.
  *
  * @author Corrado Lombardi (corrado.lombardi at 4science.it)
- *
  */
 public class SolrServiceIndexRelationshipsPlugin implements SolrServiceIndexPlugin {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SolrServiceIndexRelationshipsPlugin.class);
-    public static final String RELATION_PREFIX = "relation.%s";
 
     private final RelationshipService relationshipService;
 
@@ -48,56 +49,168 @@ public class SolrServiceIndexRelationshipsPlugin implements SolrServiceIndexPlug
     @Override
     public void additionalIndex(Context context, IndexableObject indexableObject, SolrInputDocument document) {
 
+
+        Optional<Item> item = item(indexableObject);
+
+        item.ifPresent(i -> {
+            try {
+
+                tryToUpdateDocument(context, document, i);
+
+            } catch (SQLException e) {
+                LOGGER.error("An error occurred during relations indexing", e);
+            }
+        });
+
+
+    }
+
+    private Optional<Item> item(IndexableObject indexableObject) {
         if (!(indexableObject instanceof IndexableItem)) {
-            return;
+            return Optional.empty();
         }
-        Item item = ((IndexableItem) indexableObject).getIndexedObject();
-        if (Objects.isNull(item)) {
-            return;
+        return Optional.ofNullable(((IndexableItem) indexableObject).getIndexedObject());
+    }
+
+    private void tryToUpdateDocument(Context context, SolrInputDocument document, Item item) throws SQLException {
+
+        for (Relationship relationship : relationshipService.findByItem(context, item)) {
+
+            DirectionalRelationship directionalRelationship = DirectionalRelationship.from(relationship, item);
+
+            directionalRelationship.addFields(context, document, relationshipService);
+        }
+    }
+
+    private static class DirectionalRelationship {
+
+        private final Relationship relationship;
+        private final Direction direction;
+        private final Item sourceItem;
+
+        private DirectionalRelationship(Relationship relationship,
+                                        Direction direction,
+                                        Item sourceItem) {
+            this.relationship = relationship;
+            this.direction = direction;
+            this.sourceItem = sourceItem;
         }
 
-        try {
+        static DirectionalRelationship from(Relationship relationship, Item item) {
+            return new DirectionalRelationship(relationship,
+                Direction.from(relationship, item), item);
+        }
 
-            for (Relationship relationship : relationshipService.findByItem(context, item)) {
-                updateDocument(context, document, relationship, item.getID());
+        void addFields(Context context, SolrInputDocument document,
+                       RelationshipService relationshipService) throws SQLException {
+            addField(document);
+            fillPositions(context, document, relationshipService);
+        }
+
+        private void fillPositions(Context context, SolrInputDocument document, RelationshipService relationshipService)
+            throws SQLException {
+
+            int relationshipPlace = this.direction.place(this.relationship);
+
+            int otherRelationsWithTargetItem = targetItemRelationships(context, relationship, relationshipService)
+                .size();
+            String targetItemId = UUIDUtils.toString(targetItem().getID());
+
+            IntStream.range(relationshipPlace, otherRelationsWithTargetItem)
+                .forEach(ignored -> document.addField(fieldName(), targetItemId));
+        }
+
+        private void addField(SolrInputDocument document) {
+
+            String value = UUIDUtils.toString(targetItem().getID());
+            document.addField(fieldName(), value);
+        }
+
+        private Item targetItem() {
+            return direction.targetItem(this.relationship);
+        }
+
+        private String fieldName() {
+            return String.format("relation.%s", direction.label(this.relationship));
+        }
+
+        private List<Relationship> targetItemRelationships(Context context, Relationship relationship,
+                                                           RelationshipService relationshipService)
+            throws SQLException {
+
+            Predicate<Relationship> notLeftSource = r -> !r.getLeftItem().getID().equals(sourceItem.getID());
+            Predicate<Relationship> notRightSource = r -> !r.getRightItem().getID().equals(sourceItem.getID());
+            Predicate<Relationship> notInvolvingSourceItem = notLeftSource.and(notRightSource);
+
+            return direction.findRelationsWithSameTargetItem(context, relationship, relationshipService)
+                .stream()
+                .filter(notInvolvingSourceItem)
+                .collect(Collectors.toList());
+        }
+
+        private enum Direction {
+            LEFT(Relationship::getLeftItem,
+                RelationshipType::getLeftwardType,
+                Relationship::getRightItem,
+                Relationship::getLeftPlace),
+
+            RIGHT(Relationship::getRightItem,
+                RelationshipType::getRightwardType,
+                Relationship::getLeftItem,
+                Relationship::getRightPlace);
+
+            private final Function<Relationship, Item> sourceItem;
+            private final Function<RelationshipType, String> type;
+            private final Function<Relationship, Item> targetItem;
+            private final Function<Relationship, Integer> place;
+
+            Direction(
+                Function<Relationship, Item> sourceItem,
+                Function<RelationshipType, String> type,
+                Function<Relationship, Item> targetItem,
+                Function<Relationship, Integer> place) {
+                this.sourceItem = sourceItem;
+                this.type = type;
+                this.targetItem = targetItem;
+                this.place = place;
             }
 
-        } catch (SQLException e) {
-            LOGGER.error("An error occurred during relations indexing", e);
+            static Direction from(Relationship relationship, Item item) {
+                return Arrays.stream(values())
+                    .filter(direction -> direction.appliesTo(relationship, item))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("Provided item is not part of the relationship"));
+            }
+
+            String label(Relationship relationship) {
+                return type.apply(relationship.getRelationshipType());
+            }
+
+            Item targetItem(Relationship relationship) {
+                return targetItem.apply(relationship);
+            }
+
+            int place(Relationship relationship) {
+                return place.apply(relationship);
+            }
+
+
+            Collection<Relationship> findRelationsWithSameTargetItem(Context context,
+                                                                     Relationship relationship,
+                                                                     RelationshipService relationshipService)
+                throws SQLException {
+                return relationshipService
+                    .findByItemAndRelationshipType(context,
+                        targetItem(relationship),
+                        relationship.getRelationshipType(),
+                        RIGHT.equals(this));
+            }
+
+            private boolean appliesTo(Relationship relationship, Item item) {
+                return sourceItem.apply(relationship).getID().equals(item.getID());
+            }
         }
 
-    }
-
-    private void updateDocument(Context context, SolrInputDocument document, Relationship relationship,
-                                UUID itemId) throws SQLException {
-
-        boolean isLeftwardRelationship = relationship.getLeftItem().getID().equals(itemId);
-        RelationshipType relationshipType = relationship.getRelationshipType();
-        String label =
-            isLeftwardRelationship ? relationshipType.getLeftwardType() : relationshipType.getRightwardType();
-        Item otherItem = isLeftwardRelationship ? relationship.getRightItem() : relationship.getLeftItem();
-
-        String field = String.format(RELATION_PREFIX, label);
-        document.addField(field, UUIDUtils.toString(otherItem.getID()));
-
-        //update priorities (find same relations involving other item)
-        List<Relationship> relationshipsInvolvingOtherItem =
-            otherRelationships(context, relationship, isLeftwardRelationship, itemId);
-        int relationshipPlace = isLeftwardRelationship ? relationship.getLeftPlace() : relationship.getRightPlace();
-
-        IntStream.range(relationshipPlace, relationshipsInvolvingOtherItem.size())
-            .forEach(ignored -> document.addField(field, UUIDUtils.toString(otherItem.getID())));
-    }
-
-    private List<Relationship> otherRelationships(Context context, Relationship relationship,
-                                                  boolean isLeftwardRelationship,
-                                                  UUID itemId) throws SQLException {
-        Item item = isLeftwardRelationship ? relationship.getRightItem() : relationship.getLeftItem();
-
-        return relationshipService
-            .findByItemAndRelationshipType(context, item, relationship.getRelationshipType(), !isLeftwardRelationship)
-            .stream().filter(r -> !(r.getLeftItem().getID().equals(itemId) || r.getRightItem().getID().equals(itemId)))
-            .collect(Collectors.toList());
     }
 
 }
