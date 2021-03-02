@@ -2779,9 +2779,19 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
             .build();
         context.restoreAuthSystemState();
 
-        String token = getAuthToken(eperson.getEmail(), password);
+        String ePersonToken = getAuthToken(eperson.getEmail(), password);
+        getClient(ePersonToken).perform(get("/api/core/items/" + item.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
+            .andExpect(jsonPath("$.entityType", is("Person")));
 
-        getClient(token).perform(get("/api/core/items/" + item.getID()))
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/core/items/" + item.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
+            .andExpect(jsonPath("$.entityType", is("Person")));
+
+        getClient().perform(get("/api/core/items/" + item.getID()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
             .andExpect(jsonPath("$.entityType", is("Person")));
@@ -2803,60 +2813,22 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
             .build();
         context.restoreAuthSystemState();
 
-        String token = getAuthToken(eperson.getEmail(), password);
-
-        getClient(token).perform(get("/api/core/items/" + item.getID()))
+        String ePersonToken = getAuthToken(eperson.getEmail(), password);
+        getClient(ePersonToken).perform(get("/api/core/items/" + item.getID()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
             .andExpect(jsonPath("$.entityType", is("Publication")));
-    }
 
-    @Test
-    public void testEntityTypeOrgUnit() throws Exception {
-        context.turnOffAuthorisationSystem();
-        EntityType orgUnit = EntityTypeBuilder.createEntityTypeBuilder(context, "OrgUnit").build();
-        Community community = CommunityBuilder.createCommunity(context)
-            .withName("Parent Community")
-            .build();
-        Collection collection = CollectionBuilder.createCollection(context, community).withName("Collection").build();
-        Item item = ItemBuilder.createItem(context, collection)
-            .withTitle("OrgUnit1")
-            .withAuthor("Testy, TEst")
-            .withIssueDate("2015-01-01")
-            .withRelationshipType("OrgUnit")
-            .build();
-        context.restoreAuthSystemState();
-
-        String token = getAuthToken(eperson.getEmail(), password);
-
-        getClient(token).perform(get("/api/core/items/" + item.getID()))
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(ePersonToken).perform(get("/api/core/items/" + item.getID()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
-            .andExpect(jsonPath("$.entityType", is("OrgUnit")));
-    }
+            .andExpect(jsonPath("$.entityType", is("Publication")));
 
-    @Test
-    public void testEntityTypeProject() throws Exception {
-        context.turnOffAuthorisationSystem();
-        EntityType project = EntityTypeBuilder.createEntityTypeBuilder(context, "Project").build();
-        Community community = CommunityBuilder.createCommunity(context)
-            .withName("Parent Community")
-            .build();
-        Collection collection = CollectionBuilder.createCollection(context, community).withName("Collection").build();
-        Item item = ItemBuilder.createItem(context, collection)
-            .withTitle("Project1")
-            .withAuthor("Testy, TEst")
-            .withIssueDate("2015-01-01")
-            .withRelationshipType("Project")
-            .build();
-        context.restoreAuthSystemState();
-
-        String token = getAuthToken(eperson.getEmail(), password);
-
-        getClient(token).perform(get("/api/core/items/" + item.getID()))
+        getClient().perform(get("/api/core/items/" + item.getID()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
-            .andExpect(jsonPath("$.entityType", is("Project")));
+            .andExpect(jsonPath("$.entityType", is("Publication")));
     }
 
     @Test
@@ -2873,9 +2845,19 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
             .build();
         context.restoreAuthSystemState();
 
-        String token = getAuthToken(eperson.getEmail(), password);
+        String ePersonToken = getAuthToken(eperson.getEmail(), password);
+        getClient(ePersonToken).perform(get("/api/core/items/" + item.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
+            .andExpect(jsonPath("$.entityType", is(emptyOrNullString())));
 
-        getClient(token).perform(get("/api/core/items/" + item.getID()))
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/core/items/" + item.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
+            .andExpect(jsonPath("$.entityType", is(emptyOrNullString())));
+
+        getClient().perform(get("/api/core/items/" + item.getID()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
             .andExpect(jsonPath("$.entityType", is(emptyOrNullString())));
