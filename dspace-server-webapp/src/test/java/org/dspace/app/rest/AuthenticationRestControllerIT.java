@@ -309,7 +309,10 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         // Verify logout via GET does NOT work (throws a 405)
         getClient(token).perform(get("/api/authn/logout"))
-                        .andExpect(status().isMethodNotAllowed());
+                        .andExpect(status().isMethodNotAllowed())
+                        // Verify CSRF token has NOT been changed (as neither the cookie nor header are sent back)
+                        .andExpect(cookie().doesNotExist("DSPACE-XSRF-COOKIE"))
+                        .andExpect(header().doesNotExist("DSPACE-XSRF-TOKEN"));
 
         // Verify we are still logged in
         getClient(token).perform(get("/api/authn/status"))
@@ -320,7 +323,10 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         // Verify logout via POST works
         getClient(token).perform(post("/api/authn/logout"))
-                        .andExpect(status().isNoContent());
+                        .andExpect(status().isNoContent())
+                        // New/updated CSRF token should be returned (as both a cookie and header)
+                        .andExpect(cookie().exists("DSPACE-XSRF-COOKIE"))
+                        .andExpect(header().exists("DSPACE-XSRF-TOKEN"));
 
         // Verify we are now logged out (authenticated=false)
         getClient(token).perform(get("/api/authn/status"))
@@ -368,6 +374,10 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         String newToken = getClient(token).perform(post("/api/authn/login"))
                                           .andExpect(status().isOk())
+                                          // An auth token refresh should also refresh the CSRF token
+                                          // (which should be returned in both a cookie & header).
+                                          .andExpect(cookie().exists("DSPACE-XSRF-COOKIE"))
+                                          .andExpect(header().exists("DSPACE-XSRF-TOKEN"))
                                           .andReturn().getResponse().getHeader("Authorization");
 
         assertNotEquals(token, newToken);
@@ -407,6 +417,23 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                    // This is handled by DSpaceAccessDeniedHandler
                    .andExpect(cookie().exists("DSPACE-XSRF-COOKIE"))
                    .andExpect(header().exists("DSPACE-XSRF-TOKEN"));
+
+        //Logout
+        getClient(token).perform(post("/api/authn/logout"))
+                        .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void testLoginChangesCSRFToken() throws Exception {
+        // Login via POST, checking the response for a new CSRF Token
+        String token = getClient().perform(post("/api/authn/login")
+                                          .param("user", eperson.getEmail())
+                                          .param("password", password))
+                                      // Verify that the CSRF token has been changed
+                                      // (as both cookie and header should be sent back)
+                                      .andExpect(cookie().exists("DSPACE-XSRF-COOKIE"))
+                                      .andExpect(header().exists("DSPACE-XSRF-TOKEN"))
+                                      .andReturn().getResponse().getHeader("Authorization");
 
         //Logout
         getClient(token).perform(post("/api/authn/logout"))
@@ -949,10 +976,28 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         getClient(token).perform(post("/api/authn/shortlivedtokens"))
             .andExpect(jsonPath("$.token", notNullValue()))
             .andExpect(jsonPath("$.type", is("shortlivedtoken")))
-            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/authn/shortlivedtokens")));
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/authn/shortlivedtokens")))
+            // Verify generating short-lived token doesn't change our CSRF token
+            // (so, neither the CSRF cookie nor header are sent back)
+            .andExpect(cookie().doesNotExist("DSPACE-XSRF-COOKIE"))
+            .andExpect(header().doesNotExist("DSPACE-XSRF-TOKEN"));
 
         assertEquals(salt, eperson.getSessionSalt());
     }
+
+    @Test
+    public void testShortLivedTokenWithCSRFSentViaParam() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        // Same request as prior method, but this time we are sending the CSRF token as a querystring param.
+        // NOTE: getClient() method defaults to sending CSRF tokens as Headers, so we are overriding its behavior here
+        getClient(token).perform(post("/api/authn/shortlivedtokens").with(csrf()))
+            // BECAUSE we sent the CSRF token on querystring, it should be regenerated & a new token
+            // is sent back (in cookie and header).
+            .andExpect(cookie().exists("DSPACE-XSRF-COOKIE"))
+            .andExpect(header().exists("DSPACE-XSRF-TOKEN"));
+    }
+
 
     @Test
     public void testShortLivedTokenNotAuthenticated() throws Exception {
