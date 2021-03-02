@@ -14,6 +14,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import java.util.List;
 
 import org.apache.commons.collections4.MultiValuedMap;
+import org.dspace.content.vo.MetadataValueVO;
 
 /**
  * Class that model a row of the first sheet of the Bulk import excel.

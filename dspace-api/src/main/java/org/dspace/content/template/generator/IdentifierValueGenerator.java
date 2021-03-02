@@ -8,6 +8,7 @@
 package org.dspace.content.template.generator;
 
 import org.dspace.content.Item;
+import org.dspace.content.vo.MetadataValueVO;
 import org.dspace.core.Context;
 
 /**
@@ -16,10 +17,9 @@ import org.dspace.core.Context;
  * @author Corrado Lombardi (corrado.lombardi at 4science.it)
  */
 public class IdentifierValueGenerator implements TemplateValueGenerator {
-    @Override
-    public String generator(final Context context, final Item targetItem, final Item templateItem,
-                            final String extraParams) {
 
-        return targetItem.getID().toString();
+    @Override
+    public MetadataValueVO generator(Context context, Item targetItem, Item templateItem, String extraParams) {
+        return new MetadataValueVO(targetItem.getID().toString());
     }
 }
