@@ -9,6 +9,7 @@ package org.dspace.app.util;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -115,6 +116,10 @@ public class DCInputSet {
      * @return true if the current set has the named field
      */
     public boolean isFieldPresent(String fieldName) {
+        return getField(fieldName).isPresent();
+    }
+
+    public Optional<DCInput> getField(String fieldName) {
         for (int i = 0; i < inputs.length; i++) {
             for (int j = 0; j < inputs[i].length; j++) {
                 DCInput field = inputs[i][j];
@@ -125,16 +130,17 @@ public class DCInputSet {
                         String qualifier = pairs.get(k + 1);
                         String fullName = Utils.standardize(field.getSchema(), field.getElement(), qualifier, ".");
                         if (fullName.equals(fieldName)) {
-                            return true;
+                            return Optional.of(field);
                         }
                     }
                 } else if (StringUtils.equalsAny(field.getInputType(), "group", "inline-group")) {
                     String formName = getFormName() + "-" + Utils.standardize(field.getSchema(),
-                                                          field.getElement(), field.getQualifier(), "-");
+                        field.getElement(), field.getQualifier(), "-");
                     try {
                         DCInputSet inputConfig = inputReader.getInputsByFormName(formName);
-                        if (inputConfig.isFieldPresent(fieldName)) {
-                            return true;
+                        Optional<DCInput> f = inputConfig.getField(fieldName);
+                        if (f.isPresent()) {
+                            return f;
                         }
                     } catch (DCInputsReaderException e) {
                         log.error(e.getMessage(), e);
@@ -142,12 +148,12 @@ public class DCInputSet {
                 } else {
                     String fullName = field.getFieldName();
                     if (fullName.equals(fieldName)) {
-                        return true;
+                        return Optional.of(field);
                     }
                 }
             }
         }
-        return false;
+        return Optional.empty();
     }
 
     /**

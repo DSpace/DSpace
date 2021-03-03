@@ -9,6 +9,7 @@ package org.dspace.app.rest.submit.step;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -140,13 +141,22 @@ public class DescribeStep extends org.dspace.submit.step.DescribeStep implements
             PatchOperation<MetadataValueRest> patchOperation = new PatchOperationFactory()
                         .instanceOf(DESCRIBE_STEP_METADATA_OPERATION_ENTRY, op.getOp());
             String[] split = patchOperation.getAbsolutePath(op.getPath()).split("/");
-            if (inputConfig.isFieldPresent(split[0])) {
+            String fieldName = split[0];
+            Optional<DCInput> field = inputConfig.getField(fieldName);
+            if (field.isPresent()) {
+                if (isFromVocabulary(field.get())) {
+                    currentRequest.setAttribute("store_authority_" + fieldName, true);
+                }
                 patchOperation.perform(context, currentRequest, source, op);
             } else {
                 throw new UnprocessableEntityException("The field " + split[0] + " is not present in section "
                                                                                    + inputConfig.getFormName());
             }
         }
+    }
+
+    private boolean isFromVocabulary(DCInput dcInput) {
+        return StringUtils.isNotBlank(dcInput.getVocabulary());
     }
 
     private List<String> getInputFieldsName(DCInputSet inputConfig, String configId) throws DCInputsReaderException {

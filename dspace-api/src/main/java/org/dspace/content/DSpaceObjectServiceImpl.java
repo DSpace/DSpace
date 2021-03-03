@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.StringTokenizer;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -34,6 +35,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.service.IdentifierService;
+import org.dspace.services.RequestService;
 import org.dspace.utils.DSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -65,6 +67,8 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     protected MetadataAuthorityService metadataAuthorityService;
     @Autowired(required = true)
     protected RelationshipService relationshipService;
+    @Autowired
+    private RequestService requestService;
 
     public DSpaceObjectServiceImpl() {
 
@@ -238,7 +242,11 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     public List<MetadataValue> addMetadata(Context context, T dso, MetadataField metadataField, String lang,
                                            List<String> values, List<String> authorities, List<Integer> confidences)
         throws SQLException {
-        boolean authorityControlled = metadataAuthorityService.isAuthorityControlled(metadataField);
+        boolean storeAuthoritySetForMetadata = Optional.ofNullable(requestService.getCurrentRequest())
+            .map(r -> (Boolean) r.getAttribute("store_authority_" + metadataField.toString('.')))
+            .orElse(false);
+        boolean authorityControlled = storeAuthoritySetForMetadata
+            || metadataAuthorityService.isAuthorityControlled(metadataField);
         boolean authorityRequired = metadataAuthorityService.isAuthorityRequired(metadataField);
         List<MetadataValue> newMetadata = new ArrayList<>(values.size());
         // We will not verify that they are valid entries in the registry
