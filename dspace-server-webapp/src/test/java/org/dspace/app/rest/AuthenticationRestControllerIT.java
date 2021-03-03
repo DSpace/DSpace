@@ -451,7 +451,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
-    // This test is verifying that Spring Security's CORS settings are working as we expect
+    // This test (and next) is verifying that Spring Security's CORS settings are working as we expect
     public void testCannotReuseTokenFromUntrustedOrigin() throws Exception {
         // First, get a valid login token
         String token = getAuthToken(eperson.getEmail(), password);
@@ -473,6 +473,17 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         //Logout
         getClient(token).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
+    }
+
+    @Test
+    // This test (and previous) is verifying that Spring Security's CORS settings are working as we expect
+    public void testCannotAuthenticateFromUntrustedOrigin() throws Exception {
+        // Post a valid username & password from an *untrusted* Origin
+        getClient().perform(post("/api/authn/login").header("Origin", "https://example.org")
+                                .param("user", eperson.getEmail())
+                                .param("password", password))
+                   // should result in a 403 error as Spring Security returns that for untrusted origins
+                   .andExpect(status().isForbidden());
     }
 
     @Test
