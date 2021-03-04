@@ -26,7 +26,7 @@
 <config>
     <abortOnConfigurationError>${solr.abortOnConfigurationError:true}</abortOnConfigurationError>
 
-    <luceneMatchVersion>7.2.1</luceneMatchVersion>
+    <luceneMatchVersion>8.7.0</luceneMatchVersion>
 
     <directoryFactory name="DirectoryFactory"
                       class="${solr.directoryFactory:solr.StandardDirectoryFactory}"/>
@@ -96,7 +96,7 @@
   </query>
 
   <requestDispatcher handleSelect="true" >
-    <requestParsers enableRemoteStreaming="true" multipartUploadLimitInKB="2048000" />
+    <requestParsers enableRemoteStreaming="true" multipartUploadLimitInKB="-1" />
 
     <httpCaching lastModifiedFrom="openTime"
                  etagSeed="Solr">

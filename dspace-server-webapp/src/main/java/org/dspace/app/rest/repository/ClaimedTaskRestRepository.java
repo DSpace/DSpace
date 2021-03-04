@@ -139,7 +139,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
         if (task == null) {
             throw new ResourceNotFoundException("ClaimedTask ID " + id + " not found");
         }
-        XmlWorkflowServiceFactory factory = (XmlWorkflowServiceFactory) XmlWorkflowServiceFactory.getInstance();
+        XmlWorkflowServiceFactory factory = XmlWorkflowServiceFactory.getInstance();
         Workflow workflow;
         try {
             workflow = factory.getWorkflowFactory().getWorkflow(task.getWorkflowItem().getCollection());

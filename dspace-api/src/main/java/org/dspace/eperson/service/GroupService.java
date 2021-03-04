@@ -60,7 +60,9 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
     public void addMember(Context context, Group group, EPerson e);
 
     /**
-     * add group to this group
+     * add group to this group. Be sure to call the {@link #update(Context, Group)}
+     * method once that all the membership are set to trigger the rebuild of the
+     * group2group cache table
      *
      * @param context     DSpace context object
      * @param groupParent parent group
@@ -80,7 +82,9 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
 
 
     /**
-     * remove group from this group
+     * remove group from this group. Be sure to call the {@link #update(Context, Group)}
+     * method once that all the membership are set to trigger the rebuild of the
+     * group2group cache table
      *
      * @param context     DSpace context object
      * @param groupParent parent group

@@ -9,8 +9,11 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -27,11 +30,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.dspace.app.rest.exception.GroupNameNotProvidedException;
 import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.matcher.GroupMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
@@ -54,6 +59,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
+import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -194,10 +200,49 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
-                .perform(post("/api/eperson/groups")
-                        .content(mapper.writeValueAsBytes(groupRest))
-                        .contentType(contentType))
-                .andExpect(status().isUnprocessableEntity());
+            .perform(
+                post("/api/eperson/groups").content("").contentType(contentType)
+            )
+            .andExpect(status().isUnprocessableEntity())
+            .andExpect(status().reason(containsString("Unprocessable")));
+    }
+
+    @Test
+    public void createWithoutNameTest() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        GroupRest groupRest = new GroupRest(); // no name set
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        // enable Polish locale
+        configurationService.setProperty("webui.supported.locales", "en, pl");
+
+        // make request using Polish locale
+        getClient(authToken)
+            .perform(
+                post("/api/eperson/groups")
+                    .header("Accept-Language", "pl") // request Polish response
+                    .content(mapper.writeValueAsBytes(groupRest))
+                    .contentType(contentType)
+            )
+            .andExpect(status().isUnprocessableEntity())
+            .andExpect(status().reason(is(
+                I18nUtil.getMessage(GroupNameNotProvidedException.MESSAGE_KEY, new Locale("pl"))
+            )))
+            .andExpect(status().reason(startsWith("[PL]"))); // verify it did not fall back to default locale
+
+        // make request using default locale
+        getClient(authToken)
+            .perform(
+                post("/api/eperson/groups")
+                    .content(mapper.writeValueAsBytes(groupRest))
+                    .contentType(contentType)
+            )
+            .andExpect(status().isUnprocessableEntity())
+            .andExpect(status().reason(is(
+                I18nUtil.getMessage(GroupNameNotProvidedException.MESSAGE_KEY)
+            )))
+            .andExpect(status().reason(not(startsWith("[PL]"))));
     }
 
     @Test
@@ -584,57 +629,67 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void addChildGroupTest() throws Exception {
 
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+        context.turnOffAuthorisationSystem();
+        EPerson member = EPersonBuilder.createEPerson(context).build();
+        Group parentGroup = GroupBuilder.createGroup(context).build();
+        Group parentGroupWithPreviousSubgroup = GroupBuilder.createGroup(context).build();
+        Group subGroup = GroupBuilder.createGroup(context).withParent(parentGroupWithPreviousSubgroup)
+                .addMember(eperson).build();
+        Group childGroup1 = GroupBuilder.createGroup(context).addMember(member).build();
+        Group childGroup2 = GroupBuilder.createGroup(context).build();
+        context.restoreAuthSystemState();
 
-        Group parentGroup = null;
-        Group childGroup1 = null;
-        Group childGroup2 = null;
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(
+                post("/api/eperson/groups/" + parentGroup.getID() + "/subgroups")
+                        .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                        .content(REST_SERVER_URL + "eperson/groups/" + childGroup1.getID() + "/\n"
+                                + REST_SERVER_URL + "eperson/groups/" + childGroup2.getID()
+                        )
+        ).andExpect(status().isNoContent());
+        getClient(authToken).perform(
+                post("/api/eperson/groups/" + parentGroupWithPreviousSubgroup.getID() + "/subgroups")
+                        .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                        .content(REST_SERVER_URL + "eperson/groups/" + childGroup1.getID() + "/\n"
+                                + REST_SERVER_URL + "eperson/groups/" + childGroup2.getID()
+                        )
+        ).andExpect(status().isNoContent());
 
-        try {
-            context.turnOffAuthorisationSystem();
+        parentGroup = context.reloadEntity(parentGroup);
+        parentGroupWithPreviousSubgroup = context.reloadEntity(parentGroupWithPreviousSubgroup);
+        subGroup = context.reloadEntity(subGroup);
+        childGroup1 = context.reloadEntity(childGroup1);
+        childGroup2 = context.reloadEntity(childGroup2);
 
-            parentGroup = groupService.create(context);
-            childGroup1 = groupService.create(context);
-            childGroup2 = groupService.create(context);
+        assertTrue(
+                groupService.isMember(parentGroup, childGroup1)
+        );
+        assertTrue(
+                groupService.isMember(parentGroup, childGroup2)
+        );
+        // member of the added groups should be member of the group now
+        assertTrue(
+                groupService.isMember(context, member, parentGroup)
+        );
 
-            context.commit();
+        // verify that the previous subGroup is still here
+        assertTrue(
+                groupService.isMember(parentGroupWithPreviousSubgroup, childGroup1)
+        );
+        assertTrue(
+                groupService.isMember(parentGroupWithPreviousSubgroup, childGroup2)
+        );
+        assertTrue(
+                groupService.isMember(parentGroupWithPreviousSubgroup, subGroup)
+        );
+        // and that both the member of the added groups than existing ones are still member
+        assertTrue(
+                groupService.isMember(context, member, parentGroupWithPreviousSubgroup)
+        );
+        assertTrue(
+                groupService.isMember(context, eperson, parentGroupWithPreviousSubgroup)
+        );
 
-            parentGroup = context.reloadEntity(parentGroup);
-            childGroup1 = context.reloadEntity(childGroup1);
-            childGroup2 = context.reloadEntity(childGroup2);
-
-            context.restoreAuthSystemState();
-            String authToken = getAuthToken(admin.getEmail(), password);
-            getClient(authToken).perform(
-                    post("/api/eperson/groups/" + parentGroup.getID() + "/subgroups")
-                            .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
-                            .content(REST_SERVER_URL + "eperson/groups/" + childGroup1.getID() + "/\n"
-                                    + REST_SERVER_URL + "eperson/groups/" + childGroup2.getID()
-                            )
-            ).andExpect(status().isNoContent());
-
-            parentGroup = context.reloadEntity(parentGroup);
-            childGroup1 = context.reloadEntity(childGroup1);
-            childGroup2 = context.reloadEntity(childGroup2);
-
-            assertTrue(
-                    groupService.isMember(parentGroup, childGroup1)
-            );
-
-            assertTrue(
-                    groupService.isMember(parentGroup, childGroup2)
-            );
-
-        } finally {
-            if (parentGroup != null) {
-                GroupBuilder.deleteGroup(parentGroup.getID());
-            }
-            if (childGroup1 != null) {
-                GroupBuilder.deleteGroup(childGroup1.getID());
-            }
-            if (childGroup2 != null) {
-                GroupBuilder.deleteGroup(childGroup2.getID());
-            }
-        }
     }
 
     @Test
@@ -897,60 +952,64 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void addMemberTest() throws Exception {
-
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-        EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+        context.turnOffAuthorisationSystem();
+        Group parentGroup = GroupBuilder.createGroup(context).build();
+        Group parentGroupWithPreviousMember = GroupBuilder.createGroup(context).addMember(eperson).build();
+        Group groupWithSubgroup = GroupBuilder.createGroup(context).build();
+        Group subGroup = GroupBuilder.createGroup(context).withParent(groupWithSubgroup).build();
+        EPerson member1 = EPersonBuilder.createEPerson(context).build();
+        EPerson member2 = EPersonBuilder.createEPerson(context).build();
+        context.restoreAuthSystemState();
 
-        Group parentGroup = null;
-        EPerson member1 = null;
-        EPerson member2 = null;
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(
+                post("/api/eperson/groups/" + parentGroup.getID() + "/epersons")
+                        .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                        .content(REST_SERVER_URL + "eperson/groups/" + member1.getID() + "/\n"
+                                + REST_SERVER_URL + "eperson/groups/" + member2.getID()
+                        )
+        ).andExpect(status().isNoContent());
+        getClient(authToken).perform(
+                post("/api/eperson/groups/" + parentGroupWithPreviousMember.getID() + "/epersons")
+                        .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                        .content(REST_SERVER_URL + "eperson/groups/" + member1.getID() + "/\n"
+                                + REST_SERVER_URL + "eperson/groups/" + member2.getID()
+                        )
+        ).andExpect(status().isNoContent());
+        getClient(authToken).perform(
+                post("/api/eperson/groups/" + subGroup.getID() + "/epersons")
+                        .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                        .content(REST_SERVER_URL + "eperson/groups/" + member1.getID()
+                        )
+        ).andExpect(status().isNoContent());
+        parentGroup = context.reloadEntity(parentGroup);
+        parentGroupWithPreviousMember = context.reloadEntity(parentGroupWithPreviousMember);
+        groupWithSubgroup = context.reloadEntity(groupWithSubgroup);
+        member1 = context.reloadEntity(member1);
+        member2 = context.reloadEntity(member2);
+        eperson = context.reloadEntity(eperson);
 
-        try {
-            context.turnOffAuthorisationSystem();
+        assertTrue(
+                groupService.isMember(context, member1, parentGroup)
+        );
+        assertTrue(
+                groupService.isMember(context, member2, parentGroup)
+        );
 
-            parentGroup = groupService.create(context);
-            member1 = ePersonService.create(context);
-            member2 = ePersonService.create(context);
+        assertTrue(
+                groupService.isMember(context, member1, parentGroupWithPreviousMember)
+        );
+        assertTrue(
+                groupService.isMember(context, member2, parentGroupWithPreviousMember)
+        );
+        assertTrue(
+                groupService.isMember(context, eperson, parentGroupWithPreviousMember)
+        );
 
-            context.commit();
-
-            parentGroup = context.reloadEntity(parentGroup);
-            member1 = context.reloadEntity(member1);
-            member2 = context.reloadEntity(member2);
-
-            context.restoreAuthSystemState();
-            String authToken = getAuthToken(admin.getEmail(), password);
-            getClient(authToken).perform(
-                    post("/api/eperson/groups/" + parentGroup.getID() + "/epersons")
-                            .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
-                            .content(REST_SERVER_URL + "eperson/groups/" + member1.getID() + "/\n"
-                                    + REST_SERVER_URL + "eperson/groups/" + member2.getID()
-                            )
-            ).andExpect(status().isNoContent());
-
-            parentGroup = context.reloadEntity(parentGroup);
-            member1 = context.reloadEntity(member1);
-            member2 = context.reloadEntity(member2);
-
-            assertTrue(
-                    groupService.isMember(context, member1, parentGroup)
-            );
-
-            assertTrue(
-                    groupService.isMember(context, member2, parentGroup)
-            );
-
-        } finally {
-            if (parentGroup != null) {
-                GroupBuilder.deleteGroup(parentGroup.getID());
-            }
-            if (member1 != null) {
-                EPersonBuilder.deleteEPerson(member1.getID());
-            }
-            if (member2 != null) {
-                EPersonBuilder.deleteEPerson(member2.getID());
-            }
-        }
+        assertTrue(
+                groupService.isMember(context, member1, groupWithSubgroup)
+        );
     }
 
     @Test
@@ -1208,43 +1267,47 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void removeChildGroupTest() throws Exception {
 
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+        context.turnOffAuthorisationSystem();
+        Group parentGroup = GroupBuilder.createGroup(context).build();
+        Group childGroup = GroupBuilder.createGroup(context).withParent(parentGroup).build();
+        Group childGroupWithMember = GroupBuilder.createGroup(context).addMember(eperson).withParent(parentGroup)
+                .build();
+        context.restoreAuthSystemState();
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(
+                delete("/api/eperson/groups/" + parentGroup.getID() + "/subgroups/" + childGroup.getID())
+        ).andExpect(status().isNoContent());
 
-        Group parentGroup = null;
-        Group childGroup = null;
+        parentGroup = context.reloadEntity(parentGroup);
+        childGroup = context.reloadEntity(childGroup);
+        childGroupWithMember = context.reloadEntity(childGroupWithMember);
+        eperson = context.reloadEntity(eperson);
 
-        try {
-            context.turnOffAuthorisationSystem();
+        assertFalse(
+                groupService.isMember(parentGroup, childGroup)
+        );
+        assertTrue(
+                groupService.isMember(parentGroup, childGroupWithMember)
+        );
+        assertTrue(
+                groupService.isMember(context, eperson, parentGroup)
+        );
 
-            parentGroup = groupService.create(context);
-            childGroup = groupService.create(context);
-            groupService.addMember(context, parentGroup, childGroup);
+        getClient(authToken).perform(
+                delete("/api/eperson/groups/" + parentGroup.getID() + "/subgroups/" + childGroupWithMember.getID())
+        ).andExpect(status().isNoContent());
 
-            context.commit();
+        parentGroup = context.reloadEntity(parentGroup);
+        childGroup = context.reloadEntity(childGroup);
+        childGroupWithMember = context.reloadEntity(childGroupWithMember);
+        eperson = context.reloadEntity(eperson);
+        assertFalse(
+                groupService.isMember(parentGroup, childGroupWithMember)
+        );
+        assertFalse(
+                groupService.isMember(context, eperson, parentGroup)
+        );
 
-            parentGroup = context.reloadEntity(parentGroup);
-            childGroup = context.reloadEntity(childGroup);
-
-            context.restoreAuthSystemState();
-            String authToken = getAuthToken(admin.getEmail(), password);
-            getClient(authToken).perform(
-                    delete("/api/eperson/groups/" + parentGroup.getID() + "/subgroups/" + childGroup.getID())
-            ).andExpect(status().isNoContent());
-
-            parentGroup = context.reloadEntity(parentGroup);
-            childGroup = context.reloadEntity(childGroup);
-
-            assertFalse(
-                    groupService.isMember(parentGroup, childGroup)
-            );
-
-        } finally {
-            if (parentGroup != null) {
-                GroupBuilder.deleteGroup(parentGroup.getID());
-            }
-            if (childGroup != null) {
-                GroupBuilder.deleteGroup(childGroup.getID());
-            }
-        }
     }
 
     @Test
@@ -1448,45 +1511,38 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void removeMemberTest() throws Exception {
 
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-        EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+        context.turnOffAuthorisationSystem();
+        EPerson member = EPersonBuilder.createEPerson(context).build();
+        EPerson member2 = EPersonBuilder.createEPerson(context).build();
+        Group parentGroup = GroupBuilder.createGroup(context).addMember(member).build();
+        Group childGroup = GroupBuilder.createGroup(context).withParent(parentGroup).addMember(member2).build();
+        context.restoreAuthSystemState();
 
-        Group parentGroup = null;
-        EPerson member = null;
+        assertTrue(
+                groupService.isMember(context, member, parentGroup)
+        );
+        // member2 is member of the parentGroup via the childGroup
+        assertTrue(
+                groupService.isMember(context, member2, parentGroup)
+        );
 
-        try {
-            context.turnOffAuthorisationSystem();
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(
+                delete("/api/eperson/groups/" + parentGroup.getID() + "/epersons/" + member.getID())
+        ).andExpect(status().isNoContent());
+        // remove the member2 from the children group
+        getClient(authToken).perform(
+                delete("/api/eperson/groups/" + childGroup.getID() + "/epersons/" + member2.getID())
+        ).andExpect(status().isNoContent());
+        parentGroup = context.reloadEntity(parentGroup);
+        member = context.reloadEntity(member);
 
-            parentGroup = groupService.create(context);
-            member = ePersonService.create(context);
-            groupService.addMember(context, parentGroup, member);
-            assertTrue(groupService.isMember(context, member, parentGroup));
-
-            context.commit();
-
-            parentGroup = context.reloadEntity(parentGroup);
-            member = context.reloadEntity(member);
-
-            context.restoreAuthSystemState();
-            String authToken = getAuthToken(admin.getEmail(), password);
-            getClient(authToken).perform(
-                    delete("/api/eperson/groups/" + parentGroup.getID() + "/epersons/" + member.getID())
-            ).andExpect(status().isNoContent());
-
-            parentGroup = context.reloadEntity(parentGroup);
-            member = context.reloadEntity(member);
-
-            assertFalse(
-                    groupService.isMember(context, member, parentGroup)
-            );
-
-        } finally {
-            if (parentGroup != null) {
-                GroupBuilder.deleteGroup(parentGroup.getID());
-            }
-            if (member != null) {
-                EPersonBuilder.deleteEPerson(member.getID());
-            }
-        }
+        assertFalse(
+                groupService.isMember(context, member, parentGroup)
+        );
+        assertFalse(
+                groupService.isMember(context, member2, parentGroup)
+        );
     }
 
     @Test

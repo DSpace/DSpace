@@ -75,7 +75,12 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
     @PreAuthorize("permitAll()")
     public RelationshipRest findOne(Context context, Integer integer) {
         try {
-            return converter.toRest(relationshipService.find(context, integer), utils.obtainProjection());
+            Relationship relationship = relationshipService.find(context, integer);
+
+            if (relationship == null) {
+                return null;
+            }
+            return converter.toRest(relationship, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

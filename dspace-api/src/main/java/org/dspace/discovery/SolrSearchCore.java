@@ -39,9 +39,28 @@ public class SolrSearchCore {
      */
     protected SolrClient solr = null;
 
+    /**
+     * Default HTTP method to use for all Solr Requests (we prefer POST).
+     * This REQUEST_METHOD should be used in all Solr queries, e.g.
+     *   solSearchCore.getSolr().query(myQuery, solrSearchCore.REQUEST_METHOD);
+     */
+    public SolrRequest.METHOD REQUEST_METHOD = SolrRequest.METHOD.POST;
+
+    /**
+     * Get access to current SolrClient. If no current SolrClient exists, a new one is initialized, see initSolr().
+     * @return SolrClient Solr client
+     */
     public SolrClient getSolr() {
         if (solr == null) {
             initSolr();
+        }
+
+        // If we are running Integration Tests using the EmbeddedSolrServer, we MUST override our default HTTP request
+        // method to use GET instead of POST (the latter is what we prefer).  Unfortunately, EmbeddedSolrServer does not
+        // current work well with POST requests (see https://issues.apache.org/jira/browse/SOLR-12858). When that bug is
+        // fixed, we should remove this 'if' statement so that tests also use POST.
+        if (solr.getClass().getSimpleName().equals("EmbeddedSolrServer")) {
+            REQUEST_METHOD = SolrRequest.METHOD.GET;
         }
         return solr;
     }
@@ -69,7 +88,7 @@ public class SolrSearchCore {
                                 " AND " + SearchUtils.RESOURCE_ID_FIELD + ":1");
                     // Only return obj identifier fields in result doc
                     solrQuery.setFields(SearchUtils.RESOURCE_TYPE_FIELD, SearchUtils.RESOURCE_ID_FIELD);
-                    solrServer.query(solrQuery, SolrRequest.METHOD.POST);
+                    solrServer.query(solrQuery, REQUEST_METHOD);
 
                     // As long as Solr initialized, check with DatabaseUtils to see
                     // if a reindex is in order. If so, reindex everything
