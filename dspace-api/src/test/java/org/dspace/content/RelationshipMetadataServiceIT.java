@@ -84,7 +84,7 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
      * Common function to convert leftItem to a publication item, convert rightItem to an author item,
      * and relating them to each other stored in the relationship field
      */
-    private void initPublicationAuthor() {
+    protected void initPublicationAuthor() throws Exception {
         context.turnOffAuthorisationSystem();
         EntityType publicationEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         EntityType authorEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Author").build();
@@ -152,7 +152,7 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
     }
 
     @Test
-    public void testGetAuthorRelationshipMetadata() {
+    public void testGetAuthorRelationshipMetadata() throws Exception {
         initPublicationAuthor();
         //leftItem is the publication
         //verify the dc.contributor.author virtual metadata
