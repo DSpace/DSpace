@@ -161,25 +161,42 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
         assertThat(authorList.get(0).getValue(), equalTo("familyName, firstName"));
 
         //verify the relation.isAuthorOfPublication virtual metadata
-        List<MetadataValue> relationshipMetadataList = itemService
+        List<MetadataValue> leftRelationshipMetadataList = itemService
             .getMetadata(leftItem, MetadataSchemaEnum.RELATION.getName(), "isAuthorOfPublication", null, Item.ANY);
-        assertThat(relationshipMetadataList.size(), equalTo(1));
-        assertThat(relationshipMetadataList.get(0).getValue(), equalTo(String.valueOf(rightItem.getID())));
+        assertThat(leftRelationshipMetadataList.size(), equalTo(1));
+        assertThat(leftRelationshipMetadataList.get(0).getValue(), equalTo(String.valueOf(rightItem.getID())));
 
         //request the virtual metadata of the publication only
-        List<RelationshipMetadataValue> list = relationshipMetadataService.getRelationshipMetadata(leftItem, true);
-        assertThat(list.size(), equalTo(2));
-        assertThat(list.get(0).getValue(), equalTo("familyName, firstName"));
-        assertThat(list.get(0).getMetadataField().getMetadataSchema().getName(), equalTo("dc"));
-        assertThat(list.get(0).getMetadataField().getElement(), equalTo("contributor"));
-        assertThat(list.get(0).getMetadataField().getQualifier(), equalTo("author"));
-        assertThat(list.get(0).getAuthority(), equalTo("virtual::" + relationship.getID()));
+        List<RelationshipMetadataValue> leftList = relationshipMetadataService
+            .getRelationshipMetadata(leftItem, true);
+        assertThat(leftList.size(), equalTo(2));
+        assertThat(leftList.get(0).getValue(), equalTo("familyName, firstName"));
+        assertThat(leftList.get(0).getMetadataField().getMetadataSchema().getName(), equalTo("dc"));
+        assertThat(leftList.get(0).getMetadataField().getElement(), equalTo("contributor"));
+        assertThat(leftList.get(0).getMetadataField().getQualifier(), equalTo("author"));
+        assertThat(leftList.get(0).getAuthority(), equalTo("virtual::" + relationship.getID()));
 
-        assertThat(list.get(1).getValue(), equalTo(String.valueOf(rightItem.getID())));
-        assertThat(list.get(1).getMetadataField().getMetadataSchema().getName(),
+        assertThat(leftList.get(1).getValue(), equalTo(String.valueOf(rightItem.getID())));
+        assertThat(leftList.get(1).getMetadataField().getMetadataSchema().getName(),
             equalTo(MetadataSchemaEnum.RELATION.getName()));
-        assertThat(list.get(1).getMetadataField().getElement(), equalTo("isAuthorOfPublication"));
-        assertThat(list.get(1).getAuthority(), equalTo("virtual::" + relationship.getID()));
+        assertThat(leftList.get(1).getMetadataField().getElement(), equalTo("isAuthorOfPublication"));
+        assertThat(leftList.get(1).getAuthority(), equalTo("virtual::" + relationship.getID()));
+
+        // rightItem is the author
+        List<MetadataValue> rightRelationshipMetadataList = itemService
+            .getMetadata(rightItem, MetadataSchemaEnum.RELATION.getName(), "isPublicationOfAuthor", null, Item.ANY);
+        assertThat(rightRelationshipMetadataList.size(), equalTo(1));
+        assertThat(rightRelationshipMetadataList.get(0).getValue(), equalTo(String.valueOf(leftItem.getID())));
+
+        //request the virtual metadata of the publication
+        List<RelationshipMetadataValue> rightList = relationshipMetadataService
+            .getRelationshipMetadata(rightItem, true);
+        assertThat(rightList.size(), equalTo(1));
+        assertThat(rightList.get(0).getValue(), equalTo(String.valueOf(leftItem.getID())));
+        assertThat(rightList.get(0).getMetadataField().getMetadataSchema().getName(),
+            equalTo(MetadataSchemaEnum.RELATION.getName()));
+        assertThat(rightList.get(0).getMetadataField().getElement(), equalTo("isPublicationOfAuthor"));
+        assertThat(rightList.get(0).getAuthority(), equalTo("virtual::" + relationship.getID()));
     }
 
     @Test
