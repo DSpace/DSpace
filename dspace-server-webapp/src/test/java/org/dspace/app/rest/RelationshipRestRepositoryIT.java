@@ -78,47 +78,47 @@ import org.springframework.test.web.servlet.MvcResult;
 public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest {
 
     @Autowired
-    private RelationshipTypeService relationshipTypeService;
+    protected RelationshipTypeService relationshipTypeService;
 
     @Autowired
-    private EntityTypeService entityTypeService;
+    protected EntityTypeService entityTypeService;
 
     @Autowired
-    private AuthorizeService authorizeService;
+    protected AuthorizeService authorizeService;
 
     @Autowired
-    private ItemService itemService;
+    protected ItemService itemService;
 
     @Autowired
-    private MetadataFieldService metadataFieldService;
+    protected MetadataFieldService metadataFieldService;
 
     @Autowired
-    private MetadataSchemaService metadataSchemaService;
+    protected MetadataSchemaService metadataSchemaService;
 
     @Autowired
     MockSolrSearchCore mockSolrSearchCore;
-    private Community parentCommunity;
-    private Community child1;
+    protected Community parentCommunity;
+    protected Community child1;
 
-    private Collection col1;
-    private Collection col2;
-    private Collection col3;
+    protected Collection col1;
+    protected Collection col2;
+    protected Collection col3;
 
-    private Item author1;
-    private Item author2;
-    private Item author3;
+    protected Item author1;
+    protected Item author2;
+    protected Item author3;
 
-    private Item orgUnit1;
-    private Item orgUnit2;
-    private Item orgUnit3;
-    private Item project1;
+    protected Item orgUnit1;
+    protected Item orgUnit2;
+    protected Item orgUnit3;
+    protected Item project1;
 
-    private Item publication1;
-    private Item publication2;
+    protected Item publication1;
+    protected Item publication2;
 
-    private RelationshipType isAuthorOfPublicationRelationshipType;
-    private RelationshipType isOrgUnitOfPersonRelationshipType;
-    private EPerson user1;
+    protected RelationshipType isAuthorOfPublicationRelationshipType;
+    protected RelationshipType isOrgUnitOfPersonRelationshipType;
+    protected EPerson user1;
 
     @Before
     public void setUp() throws Exception {
