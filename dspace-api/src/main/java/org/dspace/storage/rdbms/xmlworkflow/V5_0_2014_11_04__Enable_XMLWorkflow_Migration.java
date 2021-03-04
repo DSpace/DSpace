@@ -12,8 +12,6 @@ import java.sql.SQLException;
 
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.dspace.storage.rdbms.migration.MigrationUtils;
-import org.dspace.workflow.factory.WorkflowServiceFactory;
-import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.slf4j.Logger;
@@ -55,15 +53,12 @@ public class V5_0_2014_11_04__Enable_XMLWorkflow_Migration
     @Override
     public void migrate(Context context)
         throws IOException, SQLException {
-        // Make sure XML Workflow is enabled, shouldn't even be needed since this class is only loaded if the service
-        // is enabled.
-        if (WorkflowServiceFactory.getInstance().getWorkflowService() instanceof XmlWorkflowService
-            // If your database was upgraded to DSpace 6 prior to enabling XML Workflow, we MUST skip this 5.x
-            // migration, as it is incompatible
-            // with a 6.x database. In that scenario the corresponding 6.x XML Workflow migration will create
-            // necessary tables.
-            && DatabaseUtils.getCurrentFlywayDSpaceState(context.getConnection()) < 6) {
-            // Now, check if the XMLWorkflow table (cwf_workflowitem) already exists in this database
+        // If your database was upgraded to DSpace 6 prior to enabling XML Workflow, we MUST skip this 5.x
+        // migration, as it is incompatible
+        // with a 6.x database. In that scenario the corresponding 6.x XML Workflow migration will create
+        // necessary tables.
+        if (DatabaseUtils.getCurrentFlywayDSpaceState(context.getConnection()) < 6) {
+            // Check if the XMLWorkflow table (cwf_workflowitem) already exists in this database
             // If XMLWorkflow Table does NOT exist in this database, then lets do the migration!
             // If XMLWorkflow Table ALREADY exists, then this migration is a noop, we assume you manually ran the sql
             // scripts
