@@ -250,24 +250,24 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                       .withTitle("Public item 1")
                                       .withIssueDate("2017-10-17")
                                       .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                                      .withSubject("ExtraEntry", "authority_1", 600)
+                                      .withSubject("History of religion", "VR110102", 600)
                                       .build();
 
         Item publicItem2 = ItemBuilder.createItem(context, col2)
                                       .withTitle("Public item 2")
                                       .withIssueDate("2016-02-13")
                                       .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("TestingForMore", "authority_2", 600)
-                                      .withSubject("ExtraEntry", "authority_1", 600)
+                                      .withSubject("Church studies", "VR110103", 600)
+                                      .withSubject("History of religion", "VR110102", 600)
                                       .build();
 
         Item publicItem3 = ItemBuilder.createItem(context, col2)
                                       .withTitle("Public item 2")
                                       .withIssueDate("2016-02-13")
                                       .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("AnotherTest", "authority_3", 600)
-                                      .withSubject("TestingForMore", "authority_2", 600)
-                                      .withSubject("ExtraEntry", "authority_1", 600)
+                                      .withSubject("Missionary studies", "VR110104", 600)
+                                      .withSubject("Church studies", "VR110103", 600)
+                                      .withSubject("History of religion", "VR110102", 600)
                                       .build();
 
         context.restoreAuthSystemState();
@@ -290,9 +290,9 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //Check that the subject matches as expected
                    //Verify that they're sorted alphabetically
                    .andExpect(jsonPath("$._embedded.entries",
-                                       contains(BrowseEntryResourceMatcher.matchBrowseEntry("AnotherTest", "authority_3", 1),
-                                                BrowseEntryResourceMatcher.matchBrowseEntry("ExtraEntry", "authority_1", 3),
-                                                BrowseEntryResourceMatcher.matchBrowseEntry("TestingForMore", "authority_2", 2)
+                                       containsInAnyOrder(BrowseEntryResourceMatcher.matchBrowseEntry("Missionary studies", "VR110104", 1),
+                                                BrowseEntryResourceMatcher.matchBrowseEntry("History of religion", "VR110102", 3),
+                                                BrowseEntryResourceMatcher.matchBrowseEntry("Church studies", "VR110103", 2)
                                        )));
 
         getClient().perform(get("/api/discover/browses/subject/entries")
@@ -311,9 +311,9 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //Check that the subject matches as expected
                    //Verify that they're sorted alphabetically
                    .andExpect(jsonPath("$._embedded.entries",
-                                       contains(BrowseEntryResourceMatcher.matchBrowseEntry("AnotherTest", "authority_3", 1),
-                                                BrowseEntryResourceMatcher.matchBrowseEntry("ExtraEntry", "authority_1", 3),
-                                                BrowseEntryResourceMatcher.matchBrowseEntry("TestingForMore", "authority_2", 2)
+                                       containsInAnyOrder(BrowseEntryResourceMatcher.matchBrowseEntry("Missionary studies", "VR110104", 1),
+                                                BrowseEntryResourceMatcher.matchBrowseEntry("History of religion", "VR110102", 3),
+                                                BrowseEntryResourceMatcher.matchBrowseEntry("Church studies", "VR110103", 2)
                                        )));
     }
 
