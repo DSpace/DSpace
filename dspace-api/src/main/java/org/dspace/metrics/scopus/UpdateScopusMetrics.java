@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -95,21 +96,37 @@ public class UpdateScopusMetrics implements MetricsExternalServices {
                 scopusMetrics.setLast(false);
                 crisMetricsService.update(context, scopusMetrics);
             }
-            createNewScopusMetrics(context,currentItem, scopusMetric);
+            Optional<CrisMetrics> metricLastWeek = crisMetricsService.getCrisMetricByPeriod(context,
+                                                   SCOPUS_CITATION, currentItem.getID(), new Date(), "week");
+            Optional<CrisMetrics> metricLastMonth = crisMetricsService.getCrisMetricByPeriod(context,
+                                                    SCOPUS_CITATION, currentItem.getID(), new Date(), "month");
+
+            Double deltaPeriod1 = getDeltaPeriod(scopusMetric, metricLastWeek);
+            Double deltaPeriod2 = getDeltaPeriod(scopusMetric, metricLastMonth);
+
+            createNewScopusMetrics(context,currentItem, scopusMetric, deltaPeriod1, deltaPeriod2);
         } catch (SQLException | AuthorizeException e) {
             log.error(e.getMessage(), e);
         }
         return true;
     }
 
-    private void createNewScopusMetrics(Context context, Item item, CrisMetricDTO scopusMetric)
-            throws SQLException, AuthorizeException {
+    private void createNewScopusMetrics(Context context, Item item, CrisMetricDTO scopusMetric,
+            Double deltaPeriod1, Double deltaPeriod2) throws SQLException, AuthorizeException {
         CrisMetrics newScopusMetrics = crisMetricsService.create(context, item);
         newScopusMetrics.setMetricType(SCOPUS_CITATION);
         newScopusMetrics.setLast(true);
         newScopusMetrics.setMetricCount(scopusMetric.getMetricCount());
         newScopusMetrics.setAcquisitionDate(new Date());
         newScopusMetrics.setRemark(scopusMetric.getRemark());
+        newScopusMetrics.setDeltaPeriod1(deltaPeriod1);
+        newScopusMetrics.setDeltaPeriod2(deltaPeriod2);
     }
 
+    private Double getDeltaPeriod(CrisMetricDTO currentMetric, Optional<CrisMetrics> metric) {
+        if (!metric.isEmpty()) {
+            return currentMetric.getMetricCount() - metric.get().getMetricCount();
+        }
+        return null;
+    }
 }
