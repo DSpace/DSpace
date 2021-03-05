@@ -79,10 +79,32 @@ public interface XmlWorkflowService extends WorkflowService<XmlWorkflowItem> {
     public void deleteClaimedTask(Context c, XmlWorkflowItem wi, ClaimedTask task)
         throws SQLException, AuthorizeException;
 
+    /**
+     * Create the task pool for a given item and workflow step.
+     *
+     * @param context
+     * @param wi Create tasks for this item.
+     * @param assignees Role members for this step.
+     * @param step Create tasks for this step.
+     * @param action
+     * @throws SQLException passed through.
+     * @throws AuthorizeException passed through.
+     */
     public void createPoolTasks(Context context, XmlWorkflowItem wi, RoleMembers assignees, Step step,
                                 WorkflowActionConfig action)
         throws SQLException, AuthorizeException;
 
+    /**
+     * Create a claim on a task action for a given EPerson.
+     *
+     * @param context
+     * @param wi Claim tasks of this item.
+     * @param step Claim tasks from this step.
+     * @param action
+     * @param e Claimant.
+     * @throws SQLException passed through.
+     * @throws AuthorizeException passed through.
+     */
     public void createOwnedTask(Context context, XmlWorkflowItem wi, Step step, WorkflowActionConfig action, EPerson e)
         throws SQLException, AuthorizeException;
 
