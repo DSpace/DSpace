@@ -69,18 +69,12 @@ public class TiltedRelationshipMetadataServiceIT extends RelationshipMetadataSer
         // rightItem is the author
         List<MetadataValue> rightRelationshipMetadataList = itemService
             .getMetadata(rightItem, MetadataSchemaEnum.RELATION.getName(), "isPublicationOfAuthor", null, Item.ANY);
-        assertThat(rightRelationshipMetadataList.size(), equalTo(1));
-        assertThat(rightRelationshipMetadataList.get(0).getValue(), equalTo(String.valueOf(leftItem.getID())));
+        assertThat(rightRelationshipMetadataList.size(), equalTo(0));
 
         //request the virtual metadata of the publication
         List<RelationshipMetadataValue> rightList = relationshipMetadataService
             .getRelationshipMetadata(rightItem, true);
-        assertThat(rightList.size(), equalTo(1));
-        assertThat(rightList.get(0).getValue(), equalTo(String.valueOf(leftItem.getID())));
-        assertThat(rightList.get(0).getMetadataField().getMetadataSchema().getName(),
-            equalTo(MetadataSchemaEnum.RELATION.getName()));
-        assertThat(rightList.get(0).getMetadataField().getElement(), equalTo("isPublicationOfAuthor"));
-        assertThat(rightList.get(0).getAuthority(), equalTo("virtual::" + relationship.getID()));
+        assertThat(rightList.size(), equalTo(0));
     }
 
 }
