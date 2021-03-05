@@ -215,7 +215,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                                       .withIssueDate("2017-10-17")
                                       .withAuthor("Smith, Donald")
                                       .withAuthor("Doe, John")
-                                      .withSubject("ExtraEntry", "authority_1", 600)
+                                      .withSubject("History of religion", "VR110102", 600)
                                       .build();
 
         Item publicItem2 = ItemBuilder.createItem(context, col2)
@@ -223,8 +223,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                                       .withIssueDate("2016-02-13")
                                       .withAuthor("Smith, Maria")
                                       .withAuthor("Doe, Jane")
-                                      .withSubject("TestingForMore", "authority_2", 600)
-                                      .withSubject("ExtraEntry", "authority_1", 600)
+                                      .withSubject("Church studies", "VR110103", 600)
+                                      .withSubject("History of religion", "VR110102", 600)
                                       .build();
 
         Item publicItem3 = ItemBuilder.createItem(context, col2)
@@ -235,9 +235,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                                       .withAuthor("test, test")
                                       .withAuthor("test2, test2")
                                       .withAuthor("Maybe, Maybe")
-                                      .withSubject("AnotherTest", "authority_3", 600)
-                                      .withSubject("TestingForMore", "authority_2", 600)
-                                      .withSubject("ExtraEntry", "authority_1", 600)
+                                      .withSubject("Missionary studies", "VR110104", 600)
+                                      .withSubject("Church studies", "VR110103", 600)
+                                      .withSubject("History of religion", "VR110102", 600)
                                       .build();
 
         context.restoreAuthSystemState();
@@ -268,8 +268,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                    // up in different items
                    //These subjects are the most used ones. Only two show up because of the size.
                    .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
-                       FacetValueMatcher.entrySubject("ExtraEntry", 3),
-                       FacetValueMatcher.entrySubject("TestingForMore", 2)
+                       FacetValueMatcher.entrySubject("History of religion", 3),
+                       FacetValueMatcher.entrySubject("Church studies", 2)
                    )))
         ;
     }
