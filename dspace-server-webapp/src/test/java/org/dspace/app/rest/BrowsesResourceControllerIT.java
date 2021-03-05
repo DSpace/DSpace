@@ -289,11 +289,15 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //Check the embedded resources and that they're sorted alphabetically
                    //Check that the subject matches as expected
                    //Verify that they're sorted alphabetically
-                   .andExpect(jsonPath("$._embedded.entries",
-                                       containsInAnyOrder(BrowseEntryResourceMatcher.matchBrowseEntry("Missionary studies", "VR110104", 1),
-                                                BrowseEntryResourceMatcher.matchBrowseEntry("History of religion", "VR110102", 3),
-                                                BrowseEntryResourceMatcher.matchBrowseEntry("Church studies", "VR110103", 2)
-                                       )));
+                   .andExpect(
+                       jsonPath("$._embedded.entries",
+                            containsInAnyOrder(
+                                BrowseEntryResourceMatcher.matchBrowseEntry("Missionary studies", "VR110104", 1),
+                                BrowseEntryResourceMatcher.matchBrowseEntry("History of religion", "VR110102", 3),
+                                BrowseEntryResourceMatcher.matchBrowseEntry("Church studies", "VR110103", 2)
+                            )
+                       )
+                   );
 
         getClient().perform(get("/api/discover/browses/subject/entries")
                                 .param("sort", "value,desc"))
@@ -310,11 +314,15 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //Check the embedded resources and that they're sorted alphabetically
                    //Check that the subject matches as expected
                    //Verify that they're sorted alphabetically
-                   .andExpect(jsonPath("$._embedded.entries",
-                                       containsInAnyOrder(BrowseEntryResourceMatcher.matchBrowseEntry("Missionary studies", "VR110104", 1),
-                                                BrowseEntryResourceMatcher.matchBrowseEntry("History of religion", "VR110102", 3),
-                                                BrowseEntryResourceMatcher.matchBrowseEntry("Church studies", "VR110103", 2)
-                                       )));
+                   .andExpect(
+                       jsonPath("$._embedded.entries",
+                           containsInAnyOrder(
+                               BrowseEntryResourceMatcher.matchBrowseEntry("Missionary studies", "VR110104", 1),
+                                BrowseEntryResourceMatcher.matchBrowseEntry("History of religion", "VR110102", 3),
+                                BrowseEntryResourceMatcher.matchBrowseEntry("Church studies", "VR110103", 2)
+                           )
+                       )
+                   );
     }
 
     @Test
