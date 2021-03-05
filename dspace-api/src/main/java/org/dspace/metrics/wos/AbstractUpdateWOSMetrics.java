@@ -9,6 +9,7 @@ package org.dspace.metrics.wos;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -50,7 +51,15 @@ public abstract class AbstractUpdateWOSMetrics implements MetricsExternalService
                 wosMetrics.setLast(false);
                 crisMetricsService.update(context, wosMetrics);
             }
-            createNewWosMetric(context, currentItem, metricDTO);
+            Optional<CrisMetrics> metricLastWeek = crisMetricsService.getCrisMetricByPeriod(context,
+                                                   metricDTO.getMetricType(), currentItem.getID(), new Date(), "week");
+            Optional<CrisMetrics> metricLastMonth = crisMetricsService.getCrisMetricByPeriod(context,
+                                                   metricDTO.getMetricType(), currentItem.getID(), new Date(), "month");
+
+            Double deltaPeriod1 = getDeltaPeriod(metricDTO, metricLastWeek);
+            Double deltaPeriod2 = getDeltaPeriod(metricDTO, metricLastMonth);
+
+            createNewWosMetric(context, currentItem, metricDTO, deltaPeriod1, deltaPeriod2);
         } catch (SQLException | AuthorizeException e) {
             log.error(e.getMessage(), e);
             throw new IllegalStateException("Failed to run metric update", e);
@@ -58,12 +67,22 @@ public abstract class AbstractUpdateWOSMetrics implements MetricsExternalService
         return true;
     }
 
-    private void createNewWosMetric(Context context, Item item, CrisMetricDTO metcitDTO)
-            throws SQLException, AuthorizeException {
+    private void createNewWosMetric(Context context, Item item, CrisMetricDTO metcitDTO,
+            Double deltaPeriod1, Double deltaPeriod2) throws SQLException, AuthorizeException {
         CrisMetrics newWosMetric = crisMetricsService.create(context, item);
         newWosMetric.setMetricType(metcitDTO.getMetricType());
         newWosMetric.setLast(true);
         newWosMetric.setMetricCount(metcitDTO.getMetricCount());
         newWosMetric.setAcquisitionDate(new Date());
+        newWosMetric.setDeltaPeriod1(deltaPeriod1);
+        newWosMetric.setDeltaPeriod2(deltaPeriod2);
     }
+
+    protected Double getDeltaPeriod(CrisMetricDTO currentMetric, Optional<CrisMetrics> metric) {
+        if (!metric.isEmpty()) {
+            return currentMetric.getMetricCount() - metric.get().getMetricCount();
+        }
+        return null;
+    }
+
 }
