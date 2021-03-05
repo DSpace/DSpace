@@ -7,11 +7,15 @@
  */
 package org.dspace.app.metrics.service;
 import java.sql.SQLException;
+import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.metrics.CrisMetrics;
 import org.dspace.app.metrics.dao.CrisMetricsDAO;
@@ -23,6 +27,9 @@ import org.dspace.core.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
+ * Service implementation for the CrisMetrics object.
+ * This class is responsible for all business logic calls for the CrisMetrics object and is autowired by spring.
+ * This class should never be accessed directly.
  * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
@@ -105,5 +112,41 @@ public class CrisMetricsServiceImpl implements CrisMetricsService {
 
     public CrisMetrics find(Context context, int id) throws SQLException {
         return crisMetricsDAO.findByID(context, CrisMetrics.class, id);
+    }
+
+    @Override
+    public Optional<CrisMetrics> getCrisMetricByPeriod(Context context, String metricType, UUID resourceId,
+            Date startDate,  String piriod) throws SQLException {
+
+        if (StringUtils.equals("week", piriod)) {
+            Calendar c = Calendar.getInstance();
+            c.setTime(startDate);
+            c.add(Calendar.DATE, -7);
+            return getPeriodStatus(context, metricType, resourceId, c.getTime());
+        }
+        if (StringUtils.equals("month", piriod)) {
+            Calendar c = Calendar.getInstance();
+            c.setTime(startDate);
+            c.add(Calendar.MONTH, -1);
+            return getPeriodStatus(context, metricType, resourceId, c.getTime());
+        }
+        return Optional.empty();
+    }
+
+    private Optional<CrisMetrics> getPeriodStatus(Context context, String metricType, UUID resourceId, Date date)
+            throws SQLException {
+        List<CrisMetrics> metrics = crisMetricsDAO.findMetricByResourceIdMetricTypeAndBetweenSomeDate(context,
+                                         metricType, resourceId, getDateByDelta(date, 0), getDateByDelta(date, +1));
+        return metrics.stream().max(Comparator.comparing(CrisMetrics::getAcquisitionDate));
+    }
+
+    private Date getDateByDelta (Date date, int delta) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DATE, delta);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        return calendar.getTime();
     }
 }
