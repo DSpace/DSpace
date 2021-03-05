@@ -225,6 +225,9 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
 
     @Test
     public void findBrowseBySubjectEntriesWithAuthority() throws Exception {
+        String ogDcSubjectChoices = configurationService.getProperty("choices.plugin.dc.subject");
+        String ogDcSubjectAuthorityControlled = configurationService.getProperty("authority.controlled.dc.subject");
+
         configurationService.setProperty("choices.plugin.dc.subject",
                                          "SolrSubjectAuthority");
         configurationService.setProperty("authority.controlled.dc.subject",
@@ -318,11 +321,19 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                        jsonPath("$._embedded.entries",
                            containsInAnyOrder(
                                BrowseEntryResourceMatcher.matchBrowseEntry("Missionary studies", "VR110104", 1),
-                                BrowseEntryResourceMatcher.matchBrowseEntry("History of religion", "VR110102", 3),
-                                BrowseEntryResourceMatcher.matchBrowseEntry("Church studies", "VR110103", 2)
+                               BrowseEntryResourceMatcher.matchBrowseEntry("History of religion", "VR110102", 3),
+                               BrowseEntryResourceMatcher.matchBrowseEntry("Church studies", "VR110103", 2)
                            )
                        )
                    );
+
+        // Clean up configuration for the following tests
+        configurationService.setProperty("choices.plugin.dc.subject",
+                                         ogDcSubjectChoices);
+        configurationService.setProperty("authority.controlled.dc.subject",
+                                         ogDcSubjectAuthorityControlled);
+
+        metadataAuthorityService.clearCache();
     }
 
     @Test
@@ -1231,6 +1242,4 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                              .andExpect(jsonPath("$._embedded.items[0]._embedded.owningCollection._embedded.adminGroup",
                                                  nullValue()));
     }
-
-
 }
