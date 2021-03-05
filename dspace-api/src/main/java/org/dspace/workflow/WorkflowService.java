@@ -32,8 +32,10 @@ public interface WorkflowService<T extends WorkflowItem> {
 
 
     /**
-     * startWorkflow() begins a workflow - in a single transaction do away with
-     * the PersonalWorkspace entry and turn it into a WorkflowItem.
+     * Move an Item from a submitter's workspace into a collection's workflow
+     * - in a single transaction do away with
+     * the WorkspaceItem and turn it into a WorkflowItem.
+     * The WorkspaceItem which wraps the submitted Item is deleted.
      *
      * @param context The relevant DSpace Context.
      * @param wsi     The WorkspaceItem to convert to a workflow item
