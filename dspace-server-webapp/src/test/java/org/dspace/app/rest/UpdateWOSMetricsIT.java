@@ -22,6 +22,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.FileInputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.Calendar;
+import java.util.Date;
 
 import com.amazonaws.util.StringInputStream;
 import org.apache.commons.io.IOUtils;
@@ -67,6 +69,8 @@ public class UpdateWOSMetricsIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private WOSPersonRestConnector wosPersonRestConnector;
+
+    private CrisMetrics crisMetrics = null;
 
     @Test
     public void updateCrisMetricsFromWosMockitoTest() throws Exception {
@@ -256,6 +260,32 @@ public class UpdateWOSMetricsIT extends AbstractControllerIntegrationTest {
                                                     .withMetricCount(22)
                                                     .isLast(true).build();
 
+            Calendar calendar2 = Calendar.getInstance();
+            calendar2.setTime( new Date());
+            calendar2.add(Calendar.DATE, -7);
+            calendar2.set(Calendar.HOUR_OF_DAY, 10);
+
+            Date oneWeekAgo = calendar2.getTime();
+
+            CrisMetrics metrics2 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
+                                                     .withAcquisitionDate(oneWeekAgo)
+                                                     .withMetricType(UpdateWOSPersonMetrics.WOS_PERSON_METRIC_TYPE)
+                                                     .withMetricCount(17)
+                                                     .isLast(false).build();
+
+            Calendar calendar3 = Calendar.getInstance();
+            calendar3.setTime( new Date());
+            calendar3.add(Calendar.MONTH, -1);
+            calendar3.set(Calendar.HOUR_OF_DAY, 21);
+
+            Date oneMonthAgo = calendar3.getTime();
+
+            CrisMetrics metrics3 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
+                                                     .withAcquisitionDate(oneMonthAgo)
+                                                     .withMetricType(UpdateWOSPersonMetrics.WOS_PERSON_METRIC_TYPE)
+                                                     .withMetricCount(10)
+                                                     .isLast(false).build();
+
             context.restoreAuthSystemState();
 
             String[] args = new String[] { "update-metrics", "-s", "wos-person" };
@@ -269,6 +299,8 @@ public class UpdateWOSMetricsIT extends AbstractControllerIntegrationTest {
             assertNotEquals(metric.getId(), wosMetric.getId());
             assertEquals(wosMetric.getMetricCount(), 280, 0);
             assertEquals(wosMetric.getMetricType(), UpdateWOSPersonMetrics.WOS_PERSON_METRIC_TYPE);
+            assertEquals(wosMetric.getMetricCount() - metrics2.getMetricCount(), wosMetric.getDeltaPeriod1(), 0);
+            assertEquals(wosMetric.getMetricCount() - metrics3.getMetricCount(), wosMetric.getDeltaPeriod2(), 0);
         } finally {
             CrisMetricsBuilder.deleteCrisMetrics(itemA);
             wosPersonRestConnector.setHttpClient(originalHttpClient);
@@ -372,6 +404,95 @@ public class UpdateWOSMetricsIT extends AbstractControllerIntegrationTest {
         } finally {
             CrisMetricsBuilder.deleteCrisMetrics(itemA);
             wosPersonRestConnector.setHttpClient(originalHttpClient);
+        }
+    }
+
+    @Test
+    public void updateCrisMetricsFromWosWithDeltaPeriodValuesTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        CloseableHttpClient originalHttpClient = wosRestConnector.getHttpClient();
+        CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
+        Item itemA = null;
+        try (FileInputStream file = new FileInputStream(testProps.get("test.wosResponceJSON").toString())) {
+
+            String xmlMetricsExample = IOUtils.toString(file, Charset.defaultCharset());
+            wosRestConnector.setHttpClient(httpClient);
+
+            CloseableHttpResponse response = mockResponse(xmlMetricsExample, 200, "OK");
+
+            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
+
+            parentCommunity = CommunityBuilder.createCommunity(context)
+                                              .withName("Parent Community").build();
+
+            Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                               .withRelationshipType("Publication")
+                                               .withName("Collection 1").build();
+
+            itemA = ItemBuilder.createItem(context, col1)
+                               .withTitle("Title item A")
+                               .withDoiIdentifier("10.1016/j.jinf.2020.06.024").build();
+
+            Calendar calendar = Calendar.getInstance();
+
+            calendar.set(Calendar.YEAR, 2021);
+            calendar.set(Calendar.MONTH, 2);
+            calendar.set(Calendar.DATE, 1);
+
+            Date date = calendar.getTime();
+
+            crisMetrics = CrisMetricsBuilder.createCrisMetrics(context, itemA)
+                                            .withAcquisitionDate(date)
+                                            .withMetricType(UpdateWOSMetrics.WOS_METRIC_TYPE)
+                                            .withMetricCount(23)
+                                            .isLast(true).build();
+
+            Calendar calendar2 = Calendar.getInstance();
+            calendar2.setTime( new Date());
+            calendar2.add(Calendar.DATE, -7);
+            calendar2.set(Calendar.HOUR_OF_DAY, 10);
+
+            Date oneWeekAgo = calendar2.getTime();
+
+            CrisMetrics metrics2 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
+                                                     .withAcquisitionDate(oneWeekAgo)
+                                                     .withMetricType(UpdateWOSMetrics.WOS_METRIC_TYPE)
+                                                     .withMetricCount(17)
+                                                     .isLast(false).build();
+
+            Calendar calendar3 = Calendar.getInstance();
+            calendar3.setTime( new Date());
+            calendar3.add(Calendar.MONTH, -1);
+            calendar3.set(Calendar.HOUR_OF_DAY, 21);
+
+            Date oneMonthAgo = calendar3.getTime();
+
+            CrisMetrics metrics3 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
+                                                     .withAcquisitionDate(oneMonthAgo)
+                                                     .withMetricType(UpdateWOSMetrics.WOS_METRIC_TYPE)
+                                                     .withMetricCount(4)
+                                                     .isLast(false).build();
+
+            context.restoreAuthSystemState();
+
+            String[] args = new String[] { "update-metrics", "-s", "wos" };
+            TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+
+            assertEquals(0, handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin));
+
+            CrisMetrics metric = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(context,
+                                     UpdateWOSMetrics.WOS_METRIC_TYPE, itemA.getID());
+
+            assertNotEquals(crisMetrics.getID(), metric.getID());
+            assertFalse(crisMetrics.getLast());
+            assertTrue(metric.getLast());
+            assertEquals(87, metric.getMetricCount(), 0);
+            assertEquals(metric.getMetricCount() - metrics2.getMetricCount(), metric.getDeltaPeriod1(), 0);
+            assertEquals(metric.getMetricCount() - metrics3.getMetricCount(), metric.getDeltaPeriod2(), 0);
+        } finally {
+            CrisMetricsBuilder.deleteCrisMetrics(itemA);
+            wosRestConnector.setHttpClient(originalHttpClient);
         }
     }
 
