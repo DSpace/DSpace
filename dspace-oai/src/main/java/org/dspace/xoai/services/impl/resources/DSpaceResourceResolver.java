@@ -18,14 +18,20 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 
 import com.lyncode.xoai.dataprovider.services.api.ResourceResolver;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 public class DSpaceResourceResolver implements ResourceResolver {
     private static final TransformerFactory transformerFactory = TransformerFactory
             .newInstance("net.sf.saxon.TransformerFactoryImpl", null);
 
-    private final String basePath = ConfigurationManager.getProperty("oai",
-                                                                     "config.dir");
+    private final String basePath;
+
+    public DSpaceResourceResolver() {
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        basePath = configurationService.getProperty("oai.config.dir");
+    }
 
     @Override
     public InputStream getResource(String path) throws IOException {

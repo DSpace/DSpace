@@ -84,17 +84,19 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
             try {
                 List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, dso, Constants.READ);
                 for (ResourcePolicy resourcePolicy : policies) {
-                    String fieldValue;
-                    if (resourcePolicy.getGroup() != null) {
-                        //We have a group add it to the value
-                        fieldValue = "g" + resourcePolicy.getGroup().getID();
-                    } else {
-                        //We have an eperson add it to the value
-                        fieldValue = "e" + resourcePolicy.getEPerson().getID();
+                    if (resourcePolicyService.isDateValid(resourcePolicy)) {
+                        String fieldValue;
+                        if (resourcePolicy.getGroup() != null) {
+                            //We have a group add it to the value
+                            fieldValue = "g" + resourcePolicy.getGroup().getID();
+                        } else {
+                            //We have an eperson add it to the value
+                            fieldValue = "e" + resourcePolicy.getEPerson().getID();
 
+                        }
+
+                        document.addField("read", fieldValue);
                     }
-
-                    document.addField("read", fieldValue);
 
                     //remove the policy from the cache to save memory
                     context.uncacheEntity(resourcePolicy);
@@ -106,15 +108,17 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                         List<ResourcePolicy> policiesAdmin = authorizeService
                                      .getPoliciesActionFilter(context, dso, Constants.ADMIN);
                         for (ResourcePolicy resourcePolicy : policiesAdmin) {
-                            String fieldValue;
-                            if (resourcePolicy.getGroup() != null) {
-                                // We have a group add it to the value
-                                fieldValue = "g" + resourcePolicy.getGroup().getID();
-                            } else {
-                                // We have an eperson add it to the value
-                                fieldValue = "e" + resourcePolicy.getEPerson().getID();
+                            if (resourcePolicyService.isDateValid(resourcePolicy)) {
+                                String fieldValue;
+                                if (resourcePolicy.getGroup() != null) {
+                                    // We have a group add it to the value
+                                    fieldValue = "g" + resourcePolicy.getGroup().getID();
+                                } else {
+                                    // We have an eperson add it to the value
+                                    fieldValue = "e" + resourcePolicy.getEPerson().getID();
+                                }
+                                document.addField("read", fieldValue);
                             }
-                            document.addField("read", fieldValue);
 
                             // remove the policy from the cache to save memory
                             context.uncacheEntity(resourcePolicy);

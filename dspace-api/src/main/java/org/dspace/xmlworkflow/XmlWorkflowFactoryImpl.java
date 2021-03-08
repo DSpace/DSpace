@@ -24,7 +24,6 @@ import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * The workflowfactory is responsible for parsing the workflow xml file and is used to retrieve info about the workflow:
@@ -44,7 +43,7 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
 
     public static final String LEGACY_WORKFLOW_NAME = "defaultWorkflow";
 
-    private Logger log = org.apache.logging.log4j.LogManager.getLogger(XmlWorkflowFactoryImpl.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(XmlWorkflowFactoryImpl.class);
 
     private Map<String, Workflow> workflowMapping;
 
@@ -70,7 +69,7 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
                 "Error while retrieving workflow for the following collection: " + collection.getHandle());
     }
 
-    @Required
+    @Autowired(required = true)
     public void setWorkflowMapping(Map<String, Workflow> workflowMapping) {
         this.workflowMapping = workflowMapping;
     }

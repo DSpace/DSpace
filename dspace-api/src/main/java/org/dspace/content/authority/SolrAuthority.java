@@ -7,6 +7,7 @@
  */
 package org.dspace.content.authority;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -14,8 +15,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -25,7 +28,6 @@ import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.SolrAuthorityInterface;
 import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authority.service.AuthorityValueService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.NameAwarePlugin;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -49,13 +51,16 @@ public class SolrAuthority implements ChoiceAuthority {
         DSpaceServicesFactory.getInstance().getServiceManager()
                              .getServiceByName("AuthoritySource", SolrAuthorityInterface.class);
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SolrAuthority.class);
+    private static final Logger log = LogManager.getLogger(SolrAuthority.class);
 
     protected boolean externalResults = false;
-    protected final AuthorityValueService authorityValueService = AuthorityServiceFactory.getInstance()
-                                                                                         .getAuthorityValueService();
-    protected final ConfigurationService configurationService = DSpaceServicesFactory.getInstance()
-            .getConfigurationService();
+
+    protected final AuthorityValueService authorityValueService
+            = AuthorityServiceFactory.getInstance().getAuthorityValueService();
+
+    protected final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
+
     public Choices getMatches(String text, int start, int limit, String locale,
                               boolean bestMatch) {
         if (limit == 0) {
@@ -91,7 +96,7 @@ public class SolrAuthority implements ChoiceAuthority {
         //We add one to our facet limit so that we know if there are more matches
         int maxNumberOfSolrResults = limit + 1;
         if (externalResults) {
-            maxNumberOfSolrResults = ConfigurationManager.getIntProperty("xmlui.lookup.select.size", 12);
+            maxNumberOfSolrResults = configurationService.getIntProperty("xmlui.lookup.select.size", 12);
         }
         queryArgs.set(CommonParams.ROWS, maxNumberOfSolrResults);
 
@@ -144,7 +149,7 @@ public class SolrAuthority implements ChoiceAuthority {
 
 
             int confidence;
-            if (choices.size() == 0) {
+            if (choices.isEmpty()) {
                 confidence = Choices.CF_NOTFOUND;
             } else if (choices.size() == 1) {
                 confidence = Choices.CF_UNCERTAIN;
@@ -154,7 +159,7 @@ public class SolrAuthority implements ChoiceAuthority {
 
             result = new Choices(choices.toArray(new Choice[choices.size()]), start,
                                  hasMore ? max : choices.size() + start, confidence, hasMore);
-        } catch (Exception e) {
+        } catch (IOException | SolrServerException e) {
             log.error("Error while retrieving authority values {field: " + field + ", prefix:" + text + "}", e);
             result = new Choices(true);
         }
@@ -269,7 +274,7 @@ public class SolrAuthority implements ChoiceAuthority {
                     return label;
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException | SolrServerException e) {
             log.error("error occurred while trying to get label for key " + key, e);
         }
 

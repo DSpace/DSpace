@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.test;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
@@ -103,10 +105,24 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
                              this.mappingJackson2HttpMessageConverter);
     }
 
+    /**
+     * Create a test web client without an authorization token (an anonymous
+     * session).
+     *
+     * @return the test client.
+     * @throws SQLException passed through.
+     */
     public MockMvc getClient() throws SQLException {
         return getClient(null);
     }
 
+    /**
+     * Create a test web client which uses a given authorization token.
+     *
+     * @param authToken a suitable Bearer token.
+     * @return the test client.
+     * @throws SQLException passed through.
+     */
     public MockMvc getClient(String authToken) throws SQLException {
         if (context != null && context.isValid()) {
             context.commit();
@@ -117,11 +133,17 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
             .alwaysDo(MockMvcResultHandlers.print())
             //Add all filter implementations
             .addFilters(new ErrorPageFilter())
-            .addFilters(requestFilters.toArray(new Filter[requestFilters.size()]));
+            .addFilters(requestFilters.toArray(new Filter[requestFilters.size()]))
+            // Enable/Integrate Spring Security with MockMVC
+            .apply(springSecurity());
 
+        // Make sure all MockMvc requests (in all tests) include a valid CSRF token (in header) by default.
+        // If an authToken was passed in, also make sure request sends the authToken in the "Authorization" header
         if (StringUtils.isNotBlank(authToken)) {
             mockMvcBuilder.defaultRequest(
-                get("/").header(AUTHORIZATION_HEADER, AUTHORIZATION_TYPE + authToken));
+                get("/").with(csrf().asHeader()).header(AUTHORIZATION_HEADER, AUTHORIZATION_TYPE + authToken));
+        } else {
+            mockMvcBuilder.defaultRequest(get("/").with(csrf().asHeader()));
         }
 
         return mockMvcBuilder

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -28,10 +29,11 @@ import org.dspace.license.service.CreativeCommonsService;
  * Export the object's Creative Commons license, text form.
  *
  * @author Larry Stone
- * @version $Revision: 1.0 $
- * @deprecated to make uniform JSPUI and XMLUI approach the bitstream with the license in the textual format it is no
+ * @deprecated to make uniform JSPUI and XMLUI approach the bitstream with the
+ * license in the textual format it is no
  * longer stored (see https://jira.duraspace.org/browse/DS-2604)
  */
+@Deprecated
 public class CreativeCommonsTextStreamDisseminationCrosswalk
     implements StreamDisseminationCrosswalk {
 
@@ -42,8 +44,8 @@ public class CreativeCommonsTextStreamDisseminationCrosswalk
     /**
      * log4j logger
      */
-    private static Logger log =
-            org.apache.logging.log4j.LogManager.getLogger(CreativeCommonsTextStreamDisseminationCrosswalk.class);
+    private static final Logger log =
+            LogManager.getLogger(CreativeCommonsTextStreamDisseminationCrosswalk.class);
 
     @Override
     public boolean canDisseminate(Context context, DSpaceObject dso) {

@@ -131,7 +131,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     @Override
     public List<MetadataValue> getMetadata(T dso, String schema, String element, String qualifier, String lang) {
         // Build up list of matching values
-        List<MetadataValue> values = new ArrayList<MetadataValue>();
+        List<MetadataValue> values = new ArrayList<>();
         for (MetadataValue dcv : dso.getMetadata()) {
             if (match(schema, element, qualifier, lang, dcv)) {
                 values.add(dcv);
@@ -298,7 +298,6 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                     }
                 }
                 metadataValue.setValue(String.valueOf(dcvalue));
-                ;
             } else {
                 metadataValue.setValue(null);
             }
@@ -337,8 +336,8 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                 .makeFieldKey(metadataField.getMetadataSchema().getName(), metadataField.getElement(),
                               metadataField.getQualifier());
             if (metadataAuthorityService.isAuthorityControlled(fieldKey)) {
-                List<String> authorities = new ArrayList<String>();
-                List<Integer> confidences = new ArrayList<Integer>();
+                List<String> authorities = new ArrayList<>();
+                List<Integer> confidences = new ArrayList<>();
                 for (int i = 0; i < values.size(); ++i) {
                     if (dso instanceof Item) {
                         getAuthoritiesAndConfidences(fieldKey, ((Item) dso).getOwningCollection(), values, authorities,
@@ -411,6 +410,24 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     }
 
     /**
+     * Retrieve first metadata field value
+     *
+     * @param dso       The DSpaceObject which we ask for metadata.
+     * @param field     {schema, element, qualifier} for the desired field.
+     * @param language  the language to match, or <code>Item.ANY</code>
+     * @return the first metadata field value
+     */
+    @Override
+    public String getMetadataFirstValue(T dso, MetadataFieldName field, String language) {
+        List<MetadataValue> metadataValues
+                = getMetadata(dso, field.SCHEMA, field.ELEMENT, field.QUALIFIER, language);
+        if (CollectionUtils.isNotEmpty(metadataValues)) {
+            return metadataValues.get(0).getValue();
+        }
+        return null;
+    }
+
+    /**
      * Set first metadata field value
      *
      * @throws SQLException if database error
@@ -421,6 +438,21 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         if (value != null) {
             clearMetadata(context, dso, schema, element, qualifier, language);
             addMetadata(context, dso, schema, element, qualifier, language, value);
+            dso.setMetadataModified();
+        }
+    }
+
+    @Override
+    public void setMetadataSingleValue(Context context, T dso, MetadataFieldName field,
+            String language, String value)
+            throws SQLException {
+        if (value != null) {
+            clearMetadata(context, dso, field.SCHEMA, field.ELEMENT, field.QUALIFIER,
+                    language);
+
+            String newValueLanguage = (Item.ANY.equals(language)) ? null : language;
+            addMetadata(context, dso, field.SCHEMA, field.ELEMENT, field.QUALIFIER,
+                    newValueLanguage, value);
             dso.setMetadataModified();
         }
     }
@@ -574,6 +606,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             //RelationshipMetadataValue instance.
             //This is done to ensure that the order is correct.
             metadataValues.sort(new Comparator<MetadataValue>() {
+                @Override
                 public int compare(MetadataValue o1, MetadataValue o2) {
                     int compare = o1.getPlace() - o2.getPlace();
                     if (compare == 0) {
@@ -744,7 +777,12 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     }
 
     /**
-     * Supports moving metadata by updating the place of the metadata value
+     * Supports moving metadata by updating the place of the metadata value.
+     *
+     * @param context current DSpace session.
+     * @param dso     unused.
+     * @param place   ordinal position of the value in the list of that field's values.
+     * @param rr      the value to be placed.
      */
     protected void moveSingleMetadataValue(Context context, T dso, int place, MetadataValue rr) {
         //just move the metadata

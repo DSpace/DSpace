@@ -35,7 +35,6 @@ import org.dspace.identifier.ezid.Transform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Provide service for DOIs through DataCite using the EZID service.
@@ -606,7 +605,7 @@ public class EZIDIdentifierProvider
      *
      * @param aCrosswalk map of metadata fields to EZID keys
      */
-    @Required
+    @Autowired(required = true)
     public void setCrosswalk(Map<String, String> aCrosswalk) {
         crosswalk = aCrosswalk;
     }
@@ -633,7 +632,7 @@ public class EZIDIdentifierProvider
         this.DATACITE_XML_CROSSWALK = DATACITE_XML_CROSSWALK;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setRequestFactory(EZIDRequestFactory aRequestFactory) {
         requestFactory = aRequestFactory;
     }

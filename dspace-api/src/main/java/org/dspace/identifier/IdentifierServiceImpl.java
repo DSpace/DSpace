@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
@@ -20,7 +21,6 @@ import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.service.IdentifierService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * The main service class used to reserve, register and resolve identifiers
@@ -36,7 +36,7 @@ public class IdentifierServiceImpl implements IdentifierService {
     /**
      * log4j category
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(IdentifierServiceImpl.class);
+    private static final Logger log = LogManager.getLogger(IdentifierServiceImpl.class);
 
     @Autowired(required = true)
     protected ContentServiceFactory contentServiceFactory;
@@ -47,8 +47,7 @@ public class IdentifierServiceImpl implements IdentifierService {
 
     }
 
-    @Autowired
-    @Required
+    @Autowired(required = true)
     public void setProviders(List<IdentifierProvider> providers) {
         this.providers = providers;
 

@@ -23,8 +23,16 @@
         <property name="dspaceRunnableClass" value="org.dspace.statistics.export.RetryFailedOpenUrlTracker"/>
     </bean>
 
-    <bean id="curate" class="org.dspace.curate.CurationCliScriptConfiguration">
-        <property name="description" value="Curation tasks"/>
-        <property name="dspaceRunnableClass" value="org.dspace.curate.CurationCli"/>
+    <bean id="curate"
+          class="org.dspace.curate.CurationCliScriptConfiguration">
+        <property name="description"
+                  value="Curation tasks"/>
+        <property name="dspaceRunnableClass"
+                  value="org.dspace.curate.CurationCli"/>
+    </bean>
+
+    <bean id="submission-forms-migrate" class="org.dspace.submit.migration.SubmissionFormsMigrationCliScriptConfiguration">
+        <property name="description" value="Script for migrating submission forms to DSpace 7"/>
+        <property name="dspaceRunnableClass" value="org.dspace.submit.migration.SubmissionFormsMigration"/>
     </bean>
 </beans>

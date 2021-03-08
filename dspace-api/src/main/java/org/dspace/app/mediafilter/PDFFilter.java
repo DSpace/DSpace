@@ -21,7 +21,8 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /*
  *
@@ -72,8 +73,10 @@ public class PDFFilter extends MediaFilter {
     @Override
     public InputStream getDestinationStream(Item currentItem, InputStream source, boolean verbose)
         throws Exception {
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
         try {
-            boolean useTemporaryFile = ConfigurationManager.getBooleanProperty("pdffilter.largepdfs", false);
+            boolean useTemporaryFile = configurationService.getBooleanProperty("pdffilter.largepdfs", false);
 
             // get input stream from bitstream
             // pass to filter, get string back
@@ -124,7 +127,7 @@ public class PDFFilter extends MediaFilter {
             }
         } catch (OutOfMemoryError oome) {
             log.error("Error parsing PDF document " + oome.getMessage(), oome);
-            if (!ConfigurationManager.getBooleanProperty("pdffilter.skiponmemoryexception", false)) {
+            if (!configurationService.getBooleanProperty("pdffilter.skiponmemoryexception", false)) {
                 throw oome;
             }
         }

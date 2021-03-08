@@ -23,10 +23,10 @@ import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -53,7 +53,7 @@ public class GenerateSitemaps {
     /**
      * Logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(GenerateSitemaps.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(GenerateSitemaps.class);
 
     private static final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     private static final CollectionService collectionService =
@@ -70,7 +70,7 @@ public class GenerateSitemaps {
     public static void main(String[] args) throws Exception {
         final String usage = GenerateSitemaps.class.getCanonicalName();
 
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
         HelpFormatter hf = new HelpFormatter();
 
         Options options = new Options();

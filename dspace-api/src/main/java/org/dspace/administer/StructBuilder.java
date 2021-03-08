@@ -7,6 +7,14 @@
  */
 package org.dspace.administer;
 
+import static org.dspace.content.service.DSpaceObjectService.MD_COPYRIGHT_TEXT;
+import static org.dspace.content.service.DSpaceObjectService.MD_INTRODUCTORY_TEXT;
+import static org.dspace.content.service.DSpaceObjectService.MD_LICENSE;
+import static org.dspace.content.service.DSpaceObjectService.MD_NAME;
+import static org.dspace.content.service.DSpaceObjectService.MD_PROVENANCE_DESCRIPTION;
+import static org.dspace.content.service.DSpaceObjectService.MD_SHORT_DESCRIPTION;
+import static org.dspace.content.service.DSpaceObjectService.MD_SIDEBAR_TEXT;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -35,6 +43,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataFieldName;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -88,12 +97,12 @@ public class StructBuilder {
     /**
      * A table to hold metadata for the collection being worked on.
      */
-    private static final Map<String, String> collectionMap = new HashMap<>();
+    private static final Map<String, MetadataFieldName> collectionMap = new HashMap<>();
 
     /**
      * A table to hold metadata for the community being worked on.
      */
-    private static final Map<String, String> communityMap = new HashMap<>();
+    private static final Map<String, MetadataFieldName> communityMap = new HashMap<>();
 
     protected static CommunityService communityService
             = ContentServiceFactory.getInstance().getCommunityService();
@@ -261,19 +270,19 @@ public class StructBuilder {
         }
 
         // load the mappings into the member variable hashmaps
-        communityMap.put("name", "name");
-        communityMap.put("description", "short_description");
-        communityMap.put("intro", "introductory_text");
-        communityMap.put("copyright", "copyright_text");
-        communityMap.put("sidebar", "side_bar_text");
+        communityMap.put("name", MD_NAME);
+        communityMap.put("description", MD_SHORT_DESCRIPTION);
+        communityMap.put("intro", MD_INTRODUCTORY_TEXT);
+        communityMap.put("copyright", MD_COPYRIGHT_TEXT);
+        communityMap.put("sidebar", MD_SIDEBAR_TEXT);
 
-        collectionMap.put("name", "name");
-        collectionMap.put("description", "short_description");
-        collectionMap.put("intro", "introductory_text");
-        collectionMap.put("copyright", "copyright_text");
-        collectionMap.put("sidebar", "side_bar_text");
-        collectionMap.put("license", "license");
-        collectionMap.put("provenance", "provenance_description");
+        collectionMap.put("name", MD_NAME);
+        collectionMap.put("description", MD_SHORT_DESCRIPTION);
+        collectionMap.put("intro", MD_INTRODUCTORY_TEXT);
+        collectionMap.put("copyright", MD_COPYRIGHT_TEXT);
+        collectionMap.put("sidebar", MD_SIDEBAR_TEXT);
+        collectionMap.put("license", MD_LICENSE);
+        collectionMap.put("provenance", MD_PROVENANCE_DESCRIPTION);
 
         Element[] elements = new Element[]{};
         try {
@@ -619,14 +628,16 @@ public class StructBuilder {
             }
 
             // default the short description to be an empty string
-            communityService.setMetadata(context, community, "short_description", " ");
+            communityService.setMetadataSingleValue(context, community,
+                    MD_SHORT_DESCRIPTION, null, " ");
 
             // now update the metadata
             Node tn = communities.item(i);
-            for (Map.Entry<String, String> entry : communityMap.entrySet()) {
+            for (Map.Entry<String, MetadataFieldName> entry : communityMap.entrySet()) {
                 NodeList nl = XPathAPI.selectNodeList(tn, entry.getKey());
                 if (nl.getLength() == 1) {
-                    communityService.setMetadata(context, community, entry.getValue(), getStringValue(nl.item(0)));
+                    communityService.setMetadataSingleValue(context, community,
+                            entry.getValue(), null, getStringValue(nl.item(0)));
                 }
             }
 
@@ -650,30 +661,41 @@ public class StructBuilder {
             element.setAttribute("identifier", community.getHandle());
 
             Element nameElement = new Element("name");
-            nameElement.setText(communityService.getMetadata(community, "name"));
+            nameElement.setText(communityService.getMetadataFirstValue(
+                    community, CommunityService.MD_NAME, Item.ANY));
             element.addContent(nameElement);
 
-            if (communityService.getMetadata(community, "short_description") != null) {
+            String fieldValue;
+
+            fieldValue = communityService.getMetadataFirstValue(community,
+                    CommunityService.MD_SHORT_DESCRIPTION, Item.ANY);
+            if (fieldValue != null) {
                 Element descriptionElement = new Element("description");
-                descriptionElement.setText(communityService.getMetadata(community, "short_description"));
+                descriptionElement.setText(fieldValue);
                 element.addContent(descriptionElement);
             }
 
-            if (communityService.getMetadata(community, "introductory_text") != null) {
+            fieldValue = communityService.getMetadataFirstValue(community,
+                    CommunityService.MD_INTRODUCTORY_TEXT, Item.ANY);
+            if (fieldValue != null) {
                 Element introElement = new Element("intro");
-                introElement.setText(communityService.getMetadata(community, "introductory_text"));
+                introElement.setText(fieldValue);
                 element.addContent(introElement);
             }
 
-            if (communityService.getMetadata(community, "copyright_text") != null) {
+            fieldValue = communityService.getMetadataFirstValue(community,
+                    CommunityService.MD_COPYRIGHT_TEXT, Item.ANY);
+            if (fieldValue != null) {
                 Element copyrightElement = new Element("copyright");
-                copyrightElement.setText(communityService.getMetadata(community, "copyright_text"));
+                copyrightElement.setText(fieldValue);
                 element.addContent(copyrightElement);
             }
 
-            if (communityService.getMetadata(community, "side_bar_text") != null) {
+            fieldValue = communityService.getMetadataFirstValue(community,
+                    CommunityService.MD_SIDEBAR_TEXT, Item.ANY);
+            if (fieldValue != null) {
                 Element sidebarElement = new Element("sidebar");
-                sidebarElement.setText(communityService.getMetadata(community, "side_bar_text"));
+                sidebarElement.setText(fieldValue);
                 element.addContent(sidebarElement);
             }
 
@@ -717,14 +739,16 @@ public class StructBuilder {
             Collection collection = collectionService.create(context, parent);
 
             // default the short description to the empty string
-            collectionService.setMetadata(context, collection, "short_description", " ");
+            collectionService.setMetadataSingleValue(context, collection,
+                    MD_SHORT_DESCRIPTION, Item.ANY, " ");
 
             // import the rest of the metadata
             Node tn = collections.item(i);
-            for (Map.Entry<String, String> entry : collectionMap.entrySet()) {
+            for (Map.Entry<String, MetadataFieldName> entry : collectionMap.entrySet()) {
                 NodeList nl = XPathAPI.selectNodeList(tn, entry.getKey());
                 if (nl.getLength() == 1) {
-                    collectionService.setMetadata(context, collection, entry.getValue(), getStringValue(nl.item(0)));
+                    collectionService.setMetadataSingleValue(context, collection,
+                            entry.getValue(), null, getStringValue(nl.item(0)));
                 }
             }
 
@@ -733,42 +757,57 @@ public class StructBuilder {
             element.setAttribute("identifier", collection.getHandle());
 
             Element nameElement = new Element("name");
-            nameElement.setText(collectionService.getMetadata(collection, "name"));
+            nameElement.setText(collectionService.getMetadataFirstValue(collection,
+                    CollectionService.MD_NAME, Item.ANY));
             element.addContent(nameElement);
 
-            if (collectionService.getMetadata(collection, "short_description") != null) {
+            String fieldValue;
+
+            fieldValue = collectionService.getMetadataFirstValue(collection,
+                    CollectionService.MD_SHORT_DESCRIPTION, Item.ANY);
+            if (fieldValue != null) {
                 Element descriptionElement = new Element("description");
-                descriptionElement.setText(collectionService.getMetadata(collection, "short_description"));
+                descriptionElement.setText(fieldValue);
                 element.addContent(descriptionElement);
             }
 
-            if (collectionService.getMetadata(collection, "introductory_text") != null) {
+            fieldValue = collectionService.getMetadataFirstValue(collection,
+                    CollectionService.MD_INTRODUCTORY_TEXT, Item.ANY);
+            if (fieldValue != null) {
                 Element introElement = new Element("intro");
-                introElement.setText(collectionService.getMetadata(collection, "introductory_text"));
+                introElement.setText(fieldValue);
                 element.addContent(introElement);
             }
 
-            if (collectionService.getMetadata(collection, "copyright_text") != null) {
+            fieldValue = collectionService.getMetadataFirstValue(collection,
+                    CollectionService.MD_COPYRIGHT_TEXT, Item.ANY);
+            if (fieldValue != null) {
                 Element copyrightElement = new Element("copyright");
-                copyrightElement.setText(collectionService.getMetadata(collection, "copyright_text"));
+                copyrightElement.setText(fieldValue);
                 element.addContent(copyrightElement);
             }
 
-            if (collectionService.getMetadata(collection, "side_bar_text") != null) {
+            fieldValue = collectionService.getMetadataFirstValue(collection,
+                    CollectionService.MD_SIDEBAR_TEXT, Item.ANY);
+            if (fieldValue != null) {
                 Element sidebarElement = new Element("sidebar");
-                sidebarElement.setText(collectionService.getMetadata(collection, "side_bar_text"));
+                sidebarElement.setText(fieldValue);
                 element.addContent(sidebarElement);
             }
 
-            if (collectionService.getMetadata(collection, "license") != null) {
+            fieldValue = collectionService.getMetadataFirstValue(collection,
+                    CollectionService.MD_LICENSE, Item.ANY);
+            if (fieldValue != null) {
                 Element sidebarElement = new Element("license");
-                sidebarElement.setText(collectionService.getMetadata(collection, "license"));
+                sidebarElement.setText(fieldValue);
                 element.addContent(sidebarElement);
             }
 
-            if (collectionService.getMetadata(collection, "provenance_description") != null) {
+            fieldValue = collectionService.getMetadataFirstValue(collection,
+                    CollectionService.MD_PROVENANCE_DESCRIPTION, Item.ANY);
+            if (fieldValue != null) {
                 Element sidebarElement = new Element("provenance");
-                sidebarElement.setText(collectionService.getMetadata(collection, "provenance_description"));
+                sidebarElement.setText(fieldValue);
                 element.addContent(sidebarElement);
             }
 
@@ -777,5 +816,4 @@ public class StructBuilder {
 
         return elements;
     }
-
 }

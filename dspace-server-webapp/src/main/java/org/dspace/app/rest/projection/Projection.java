@@ -15,6 +15,7 @@ import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.utils.Utils;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RestController;
@@ -136,4 +137,14 @@ public interface Projection {
      * @return true if allowed, false otherwise.
      */
     boolean allowLinking(HALResource halResource, LinkRest linkRest);
+
+    /**
+     * This method will return the {@link PageRequest} object for a specific given rel
+     * @param rel   The rel for which the {@link PageRequest} object will be made
+     * @param resource the resource from which the embed may or may not be made.
+     * @param oldLinks    The previously traversed links
+     * @return      The {@link PageRequest} object for the given rel
+     */
+    PageRequest getPagingOptions(String rel, HALResource<? extends RestAddressableModel> resource,
+                                 Link... oldLinks);
 }
