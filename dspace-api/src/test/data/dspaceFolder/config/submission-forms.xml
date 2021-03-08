@@ -63,6 +63,7 @@
                         <dc-qualifier>author</dc-qualifier>
                         <input-type>name</input-type>
                     </linked-metadata-field>
+                    <externalsources>orcid,my_staff_db</externalsources>
                     <required></required>
                 </relation-field>
             </row>
@@ -242,6 +243,7 @@ it, please enter the types and the actual numbers or codes.</hint>
          <filter>creativework.publisher:somepublishername</filter>
          <label>Journal</label>
          <hint>Select the journal related to this volume.</hint>
+         <externalsources></externalsources>
        </relation-field>
      </row>
      <row>

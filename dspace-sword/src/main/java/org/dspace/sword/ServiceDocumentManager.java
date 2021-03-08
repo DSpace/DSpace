@@ -16,8 +16,9 @@ import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.purl.sword.atom.Generator;
 import org.purl.sword.base.SWORDErrorException;
 import org.purl.sword.base.Service;
@@ -31,9 +32,12 @@ public class ServiceDocumentManager {
     protected CommunityService communityService = ContentServiceFactory
         .getInstance().getCommunityService();
 
-    private SWORDService swordService;
+    private final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-    private SWORDAuthenticator swordAuth;
+    private final SWORDService swordService;
+
+    private final SWORDAuthenticator swordAuth;
 
     public ServiceDocumentManager(SWORDService service) {
         this.swordService = service;
@@ -97,13 +101,13 @@ public class ServiceDocumentManager {
             // we are dealing with the default service document
 
             // set the title of the workspace as per the name of the DSpace installation
-            String ws = ConfigurationManager.getProperty("dspace.name");
+            String ws = configurationService.getProperty("dspace.name");
             Workspace workspace = new Workspace();
             workspace.setTitle(ws);
 
             // next thing to do is determine whether the default is communities or collections
-            boolean swordCommunities = ConfigurationManager.getBooleanProperty(
-                "sword-server", "expose-communities");
+            boolean swordCommunities = configurationService.getBooleanProperty(
+                "sword-server.expose-communities");
 
             if (swordCommunities) {
                 List<Community> comms = swordAuth.getAllowedCommunities(
@@ -132,7 +136,8 @@ public class ServiceDocumentManager {
                 Collection collection = (Collection) dso;
                 Workspace workspace = new Workspace();
                 workspace.setTitle(
-                    collectionService.getMetadata(collection, "name"));
+                    collectionService.getMetadataFirstValue(collection,
+                            CollectionService.MD_NAME, Item.ANY));
 
                 List<Item> items = swordAuth
                     .getAllowedItems(swordContext, collection);
@@ -147,7 +152,8 @@ public class ServiceDocumentManager {
                 Community community = (Community) dso;
                 Workspace workspace = new Workspace();
                 workspace.setTitle(
-                    communityService.getMetadata(community, "name"));
+                    communityService.getMetadataFirstValue(community,
+                            CommunityService.MD_NAME, null));
 
                 List<Collection> collections = swordAuth
                     .getAllowedCollections(swordContext, community);
@@ -178,8 +184,8 @@ public class ServiceDocumentManager {
      * @param service The service document to add the generator to
      */
     private void addGenerator(Service service) {
-        boolean identify = ConfigurationManager.getBooleanProperty(
-            "sword-server", "identify-version", false);
+        boolean identify = configurationService.getBooleanProperty(
+            "sword-server.identify-version", false);
         SWORDUrlManager urlManager = swordService.getUrlManager();
         String softwareUri = urlManager.getGeneratorUrl();
         if (identify) {

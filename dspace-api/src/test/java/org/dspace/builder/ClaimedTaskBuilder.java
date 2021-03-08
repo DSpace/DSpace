@@ -88,7 +88,7 @@ public class ClaimedTaskBuilder extends AbstractBuilder<ClaimedTask, ClaimedTask
             // temporary switch to the wf user
             EPerson submitter = context.getCurrentUser();
             context.setCurrentUser(user);
-            XmlWorkflowServiceFactory factory = (XmlWorkflowServiceFactory) XmlWorkflowServiceFactory.getInstance();
+            XmlWorkflowServiceFactory factory = XmlWorkflowServiceFactory.getInstance();
             Workflow workflow = factory.getWorkflowFactory().getWorkflow(task.getWorkflowItem().getCollection());
             Step step = workflow.getStep(task.getStepID());
             WorkflowActionConfig currentActionConfig = step.getActionConfig(task.getActionID());

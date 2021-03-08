@@ -44,7 +44,7 @@ public class DiscoveryConfigurationService {
     public DiscoveryConfiguration getDiscoveryConfiguration(IndexableObject dso) {
         String name;
         if (dso == null) {
-            name = "site";
+            name = "default";
         } else if (dso instanceof IndexableDSpaceObject) {
             name = ((IndexableDSpaceObject) dso).getIndexedObject().getHandle();
         } else {

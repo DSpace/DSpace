@@ -22,7 +22,8 @@ import java.io.InputStream;
 import javax.imageio.ImageIO;
 
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Filter image bitstreams, scaling the image to be within the bounds of
@@ -80,13 +81,15 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats 
     public InputStream getThumb(Item currentItem, BufferedImage buf, boolean verbose)
         throws Exception {
         // get config params
-        float xmax = (float) ConfigurationManager
+        final ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        float xmax = (float) configurationService
             .getIntProperty("thumbnail.maxwidth");
-        float ymax = (float) ConfigurationManager
+        float ymax = (float) configurationService
             .getIntProperty("thumbnail.maxheight");
-        boolean blurring = (boolean) ConfigurationManager
+        boolean blurring = (boolean) configurationService
             .getBooleanProperty("thumbnail.blurring");
-        boolean hqscaling = (boolean) ConfigurationManager
+        boolean hqscaling = (boolean) configurationService
             .getBooleanProperty("thumbnail.hqscaling");
 
         return getThumbDim(currentItem, buf, verbose, xmax, ymax, blurring, hqscaling, 0, 0, null);
@@ -169,9 +172,11 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats 
         g2d.drawImage(buf, 0, 0, (int) xsize, (int) ysize, null);
 
         if (brandHeight != 0) {
+            ConfigurationService configurationService
+                    = DSpaceServicesFactory.getInstance().getConfigurationService();
             Brand brand = new Brand((int) xsize, brandHeight, new Font(brandFont, Font.PLAIN, brandFontPoint), 5);
-            BufferedImage brandImage = brand.create(ConfigurationManager.getProperty("webui.preview.brand"),
-                                                    ConfigurationManager.getProperty("webui.preview.brand.abbrev"),
+            BufferedImage brandImage = brand.create(configurationService.getProperty("webui.preview.brand"),
+                                                    configurationService.getProperty("webui.preview.brand.abbrev"),
                                                     currentItem == null ? "" : "hdl:" + currentItem.getHandle());
 
             g2d.drawImage(brandImage, (int) 0, (int) ysize, (int) xsize, (int) 20, null);

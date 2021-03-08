@@ -30,9 +30,9 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
@@ -150,15 +150,16 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
     // field separator in result string
     protected String fieldSeparator = null;
     // optional XML namespace map
-    protected Map<String, String> nsMap = new HashMap<String, String>();
+    protected Map<String, String> nsMap = new HashMap<>();
     // optional HTTP headers
-    protected Map<String, String> headers = new HashMap<String, String>();
+    protected Map<String, String> headers = new HashMap<>();
 
     /**
      * Initializes task
      *
      * @param curator Curator object performing this task
      * @param taskId  the configured local name of the task
+     * @throws IOException if the parser could not be configured, or passed through.
      */
     @Override
     public void init(Curator curator, String taskId) throws IOException {
@@ -210,12 +211,6 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
         }
     }
 
-    /**
-     * Perform the curation task upon passed DSO
-     *
-     * @param dso the DSpace object
-     * @throws IOException if IO error
-     */
     @Override
     public int perform(DSpaceObject dso) throws IOException {
 
@@ -254,7 +249,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
     protected int callService(String value, Item item, StringBuilder resultSb) throws IOException {
 
         String callUrl = urlTemplate.replaceAll("\\{" + templateParam + "\\}", value);
-        HttpClient client = new DefaultHttpClient();
+        CloseableHttpClient client = HttpClientBuilder.create().build();
         HttpGet req = new HttpGet(callUrl);
         for (Map.Entry<String, String> entry : headers.entrySet()) {
             req.addHeader(entry.getKey(), entry.getValue());
@@ -289,7 +284,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
                 // When HttpClient instance is no longer needed,
                 // shut down the connection manager to ensure
                 // immediate deallocation of all system resources
-                client.getConnectionManager().shutdown();
+                client.close();
             } else {
                 log.error(" obtained no valid service response");
                 resultSb.append("no service response");
@@ -304,7 +299,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
     protected int processResponse(Document doc, Item item, StringBuilder resultSb) throws IOException {
         boolean update = false;
         int status = Curator.CURATE_ERROR;
-        List<String> values = new ArrayList<String>();
+        List<String> values = new ArrayList<>();
         checkNamespaces(doc);
         try {
             for (MetadataWebServiceDataInfo info : dataList) {
@@ -399,7 +394,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
     }
 
     protected String[] tokenize(String text) {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         Matcher m = ttPattern.matcher(text);
         while (m.find()) {
             if (m.group(1) != null) {
@@ -491,7 +486,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
             } else {
                 int next = expr.indexOf("/", i);
                 String token = (next > 0) ? expr.substring(i, next) : expr.substring(i);
-                if (!token.startsWith("@") && token.indexOf(":") < 0) {
+                if (!token.startsWith("@") && !token.contains(":")) {
                     sb.append(prefix).append(":");
                 }
                 sb.append(token);

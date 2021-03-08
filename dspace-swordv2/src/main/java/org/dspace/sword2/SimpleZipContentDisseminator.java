@@ -24,10 +24,11 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.swordapp.server.SwordError;
 import org.swordapp.server.SwordServerException;
 import org.swordapp.server.UriRegistry;
@@ -36,11 +37,15 @@ public class SimpleZipContentDisseminator implements SwordContentDisseminator {
     protected BitstreamService bitstreamService = ContentServiceFactory
         .getInstance().getBitstreamService();
 
+    protected ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    @Override
     public InputStream disseminate(Context context, Item item)
         throws DSpaceSwordException, SwordError, SwordServerException {
         try {
             // first write everything to a temp file
-            String tempDir = ConfigurationManager
+            String tempDir = configurationService
                 .getProperty("upload.temp.dir");
             String fn =
                 tempDir + File.separator + "SWORD." + item.getID() + "." +
@@ -71,28 +76,34 @@ public class SimpleZipContentDisseminator implements SwordContentDisseminator {
         }
     }
 
+    @Override
     public boolean disseminatesContentType(String contentType)
         throws DSpaceSwordException, SwordError, SwordServerException {
         return "application/zip".equals(contentType);
     }
 
+    @Override
     public boolean disseminatesPackage(String contentType)
         throws DSpaceSwordException, SwordError, SwordServerException {
         return UriRegistry.PACKAGE_SIMPLE_ZIP.equals(contentType);
     }
 
+    @Override
     public void setContentType(String contentType) {
         // this only does the one thing, so we can ignore this
     }
 
+    @Override
     public void setPackaging(String packaging) {
         // this only does the one thing, so we can ignore this
     }
 
+    @Override
     public String getContentType() {
         return "application/zip";
     }
 
+    @Override
     public String getPackaging() {
         return UriRegistry.PACKAGE_SIMPLE_ZIP;
     }

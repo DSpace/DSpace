@@ -21,8 +21,9 @@ import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 public class CrosswalkMetadataValidator {
 
@@ -32,21 +33,23 @@ public class CrosswalkMetadataValidator {
     private String schemaChoice;
     private String fieldChoice;
 
-    private Map<Triple<String, String, String>, MetadataField> validatedMetadataFields;
+    private final Map<Triple<String, String, String>, MetadataField> validatedMetadataFields;
 
     public CrosswalkMetadataValidator() {
         metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
         metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
 
         validatedMetadataFields = new HashMap<>();
 
         // The two options, with three possibilities each: add, ignore, fail
-        schemaChoice = ConfigurationManager.getProperty("oai", "harvester.unknownSchema");
+        schemaChoice = configurationService.getProperty("oai.harvester.unknownSchema");
         if (schemaChoice == null) {
             schemaChoice = "fail";
         }
 
-        fieldChoice = ConfigurationManager.getProperty("oai", "harvester.unknownField");
+        fieldChoice = configurationService.getProperty("oai.harvester.unknownField");
         if (fieldChoice == null) {
             fieldChoice = "fail";
         }
@@ -123,6 +126,6 @@ public class CrosswalkMetadataValidator {
 
     private ImmutableTriple<String, String, String> createKey(final String schema, final String element,
                                                               final String qualifier) {
-        return new ImmutableTriple<String, String, String>(schema, element, qualifier);
+        return new ImmutableTriple<>(schema, element, qualifier);
     }
 }

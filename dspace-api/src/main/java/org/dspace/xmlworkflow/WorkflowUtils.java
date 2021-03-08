@@ -15,20 +15,23 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Workflow;
@@ -47,13 +50,15 @@ public class WorkflowUtils extends Util {
     /**
      * log4j category
      */
-    public static Logger log = org.apache.logging.log4j.LogManager.getLogger(WorkflowUtils.class);
+    public static Logger log = LogManager.getLogger(WorkflowUtils.class);
 
     protected static final CollectionRoleService collectionRoleService =
         XmlWorkflowServiceFactory.getInstance().getCollectionRoleService();
     protected static final GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
     protected static final XmlWorkflowFactory xmlWorkflowFactory = XmlWorkflowServiceFactory.getInstance()
                                                                                             .getWorkflowFactory();
+    protected static final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
      * Default constructor
@@ -153,15 +158,13 @@ public class WorkflowUtils extends Util {
         Context c = (Context) request.getAttribute("dspace.context");
 
         try {
-            String recipient = ConfigurationManager
-                .getProperty("alert.recipient");
+            String recipient = configurationService.getProperty("alert.recipient");
 
             if (StringUtils.isNotBlank(recipient)) {
                 Email email = Email.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), "internal_error"));
 
                 email.addRecipient(recipient);
-                email.addArgument(ConfigurationManager
-                                      .getProperty("dspace.ui.url"));
+                email.addArgument(configurationService.getProperty("dspace.ui.url"));
                 email.addArgument(new Date());
                 email.addArgument(request.getSession().getId());
                 email.addArgument(logInfo);
@@ -181,7 +184,7 @@ public class WorkflowUtils extends Util {
                 email.addArgument(stackTrace);
                 email.send();
             }
-        } catch (Exception e) {
+        } catch (IOException | MessagingException e) {
             // Not much we can do here!
             log.warn("Unable to send email alert", e);
         }
@@ -239,7 +242,7 @@ public class WorkflowUtils extends Util {
     public static Map<String, Role> getCollectionRoles(Collection thisCollection)
         throws IOException, WorkflowConfigurationException, SQLException {
         Workflow workflow = xmlWorkflowFactory.getWorkflow(thisCollection);
-        LinkedHashMap<String, Role> result = new LinkedHashMap<String, Role>();
+        LinkedHashMap<String, Role> result = new LinkedHashMap<>();
         if (workflow != null) {
             //Make sure we find one
             Map<String, Role> allRoles = workflow.getRoles();
@@ -260,7 +263,7 @@ public class WorkflowUtils extends Util {
     public static Map<String, Role> getCollectionAndRepositoryRoles(Collection thisCollection)
         throws IOException, WorkflowConfigurationException, SQLException {
         Workflow workflow = xmlWorkflowFactory.getWorkflow(thisCollection);
-        LinkedHashMap<String, Role> result = new LinkedHashMap<String, Role>();
+        LinkedHashMap<String, Role> result = new LinkedHashMap<>();
         if (workflow != null) {
             //Make sure we find one
             Map<String, Role> allRoles = workflow.getRoles();
@@ -282,7 +285,7 @@ public class WorkflowUtils extends Util {
     public static Map<String, Role> getAllExternalRoles(Collection thisCollection)
         throws IOException, WorkflowConfigurationException, SQLException {
         Workflow workflow = xmlWorkflowFactory.getWorkflow(thisCollection);
-        LinkedHashMap<String, Role> result = new LinkedHashMap<String, Role>();
+        LinkedHashMap<String, Role> result = new LinkedHashMap<>();
         if (workflow != null) {
             //Make sure we find one
             Map<String, Role> allRoles = workflow.getRoles();

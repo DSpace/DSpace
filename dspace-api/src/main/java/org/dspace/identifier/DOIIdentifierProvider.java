@@ -12,8 +12,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -28,7 +28,6 @@ import org.dspace.identifier.service.DOIService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Provide service for DOIs using DataCite.
@@ -127,7 +126,7 @@ public class DOIIdentifierProvider
         return this.NAMESPACE_SEPARATOR;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setDOIConnector(DOIConnector connector) {
         this.connector = connector;
     }
@@ -358,11 +357,12 @@ public class DOIIdentifierProvider
             throw new DOIIdentifierException("Unable to find DOI.",
                                              DOIIdentifierException.DOI_DOES_NOT_EXIST);
         }
-        if (!ObjectUtils.equals(doiRow.getDSpaceObject(), dso)) {
+        if (!Objects.equals(doiRow.getDSpaceObject(), dso)) {
             log.error("Refuse to update metadata of DOI {} with the metadata of "
                           + " an object ({}/{}) the DOI is not dedicated to.",
-                      new String[] {doi, contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso), dso
-                          .getID().toString()});
+                      doi,
+                      contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso),
+                      dso.getID().toString());
             throw new DOIIdentifierException("Cannot update DOI metadata: "
                                                  + "DOI and DSpaceObject does not match!",
                                              DOIIdentifierException.MISMATCH);
@@ -526,7 +526,7 @@ public class DOIIdentifierProvider
 
         // check if DOI belongs to dso
         if (null != doiRow) {
-            if (!ObjectUtils.equals(dso, doiRow.getDSpaceObject())) {
+            if (!Objects.equals(dso, doiRow.getDSpaceObject())) {
                 throw new DOIIdentifierException("Trying to delete a DOI out of "
                                                      + "an object that is not addressed by the DOI.",
                                                  DOIIdentifierException.MISMATCH);
@@ -802,9 +802,7 @@ public class DOIIdentifierProvider
             .addMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, doiService.DOIToExternalForm(doi));
         try {
             itemService.update(context, item);
-        } catch (SQLException ex) {
-            throw ex;
-        } catch (AuthorizeException ex) {
+        } catch (SQLException | AuthorizeException ex) {
             throw ex;
         }
     }
@@ -830,7 +828,7 @@ public class DOIIdentifierProvider
         Item item = (Item) dso;
 
         List<MetadataValue> metadata = itemService.getMetadata(item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
-        List<String> remainder = new ArrayList<String>();
+        List<String> remainder = new ArrayList<>();
 
         for (MetadataValue id : metadata) {
             if (!id.getValue().equals(doiService.DOIToExternalForm(doi))) {

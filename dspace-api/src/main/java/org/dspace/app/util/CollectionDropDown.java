@@ -16,8 +16,9 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Utility class for lists of collections.
@@ -55,8 +56,11 @@ public class CollectionDropDown {
      * @return Full path to the collection (truncated)
      * @throws SQLException if database error
      */
-    public static String collectionPath(Context context, Collection col, int maxchars) throws SQLException {
-        String separator = ConfigurationManager.getProperty("subcommunity.separator");
+    public static String collectionPath(Context context, Collection col, int maxchars)
+            throws SQLException {
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        String separator = configurationService.getProperty("subcommunity.separator");
         if (separator == null) {
             separator = " > ";
         }

@@ -21,12 +21,11 @@
         <java.version>11</java.version>
         <spring.version>5.2.5.RELEASE</spring.version>
         <spring-boot.version>2.2.6.RELEASE</spring-boot.version>
+        <spring-security.version>5.2.2.RELEASE</spring-security.version> <!-- sync with version used by spring-boot-->
         <hibernate.version>5.4.10.Final</hibernate.version>
         <hibernate-validator.version>6.0.18.Final</hibernate-validator.version>
         <postgresql.driver.version>42.2.9</postgresql.driver.version>
-        <!-- PIN Solr to 7.3.x until SOLR-12858 is fixed. This bug affects all integration tests that use Solr
-             https://issues.apache.org/jira/browse/SOLR-12858 -->
-        <solr.client.version>7.3.1</solr.client.version>
+        <solr.client.version>8.7.0</solr.client.version>
 
         <axiom.version>1.2.22</axiom.version>
         <errorprone.version>2.3.4</errorprone.version>
@@ -35,8 +34,8 @@
         <javax-annotation.version>1.3.2</javax-annotation.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <jaxb-runtime.version>2.3.1</jaxb-runtime.version>
-        <!-- NOTE: Jetty needed for Handle Server & tests -->
-        <jetty.version>9.4.17.v20190418</jetty.version>
+        <!-- NOTE: Jetty needed for Solr, Handle Server & tests -->
+        <jetty.version>9.4.35.v20201120</jetty.version>
         <log4j.version>2.13.3</log4j.version>
         <pdfbox-version>2.0.15</pdfbox-version>
         <poi-version>3.17</poi-version>
@@ -413,6 +412,7 @@
                         <exclude>**/readme*</exclude>
                         <exclude>**/.gitignore</exclude>
                         <exclude>**/*.cfg</exclude>
+                        <exclude>**/*.conf</exclude>
                     </excludes>
                     <mapping>
                         <!-- Custom DSpace file extensions which are not recognized by license-maven-plugin:
@@ -1070,26 +1070,18 @@
 
             <!-- DSpace third Party Dependencies -->
 
-            <!-- Solr introduces multiple versions of zookeeper. So,
-                 we specify the version we want -->
-            <dependency>
-                <groupId>org.apache.zookeeper</groupId>
-                <artifactId>zookeeper</artifactId>
-                <version>3.4.14</version>
-            </dependency>
-
             <!-- solr-cell and axiom-api disagree on versions -->
             <dependency>
                 <groupId>org.apache.james</groupId>
                 <artifactId>apache-mime4j-core</artifactId>
-                <version>0.8.1</version>
+                <version>0.8.3</version>
             </dependency>
 
             <!-- solr-core, solr-cell disagree with nimbus-jose-jwt -->
             <dependency>
                 <groupId>org.ow2.asm</groupId>
                 <artifactId>asm</artifactId>
-                <version>7.1</version>
+                <version>8.0.1</version>
             </dependency>
 
             <dependency>
@@ -1221,6 +1213,12 @@
                 <artifactId>lucene-core</artifactId>
                 <version>${solr.client.version}</version>
             </dependency>
+            <!-- Used for full-text indexing with Solr. Should be synced with version of Tika in solr-cell -->
+            <dependency>
+                <groupId>org.apache.tika</groupId>
+                <artifactId>tika-core</artifactId>
+                <version>1.24.1</version>
+            </dependency>
             <!-- Reminder: Keep icu4j (in Parent POM) synced with version used by lucene-analyzers-icu below,
              otherwise ICUFoldingFilterFactory may throw errors in tests.  -->
             <dependency>
@@ -1242,10 +1240,11 @@
                 <scope>test</scope>
             </dependency>
 
+
             <dependency>
                 <groupId>org.apache.ant</groupId>
                 <artifactId>ant</artifactId>
-                <version>1.9.15</version>
+                <version>1.10.9</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.jena</groupId>
@@ -1256,6 +1255,11 @@
                     <exclusion>
                         <groupId>org.slf4j</groupId>
                         <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                    <!-- Newer version brought in by solr-cell -->
+                    <exclusion>
+                        <groupId>org.apache.commons</groupId>
+                        <artifactId>commons-csv</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -1461,11 +1465,30 @@
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi-ooxml</artifactId>
                 <version>${poi-version}</version>
+                <exclusions>
+                    <!-- Newer version brought in by solr-cell -->
+                    <exclusion>
+                        <groupId>com.github.virtuald</groupId>
+                        <artifactId>curvesapi</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi-ooxml-schemas</artifactId>
                 <version>${poi-version}</version>
+                <exclusions>
+                    <!-- Newer version pulled in below -->
+                    <exclusion>
+                        <groupId>org.apache.xmlbeans</groupId>
+                        <artifactId>xmlbeans</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.xmlbeans</groupId>
+                <artifactId>xmlbeans</artifactId>
+                <version>3.1.0</version>
             </dependency>
             <dependency>
                 <groupId>xalan</groupId>
@@ -1487,7 +1510,7 @@
             <dependency>
                 <groupId>com.ibm.icu</groupId>
                 <artifactId>icu4j</artifactId>
-                <version>59.1</version>
+                <version>62.1</version>
             </dependency>
             <dependency>
                 <groupId>com.oracle</groupId>
@@ -1649,12 +1672,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>19.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.lyncode</groupId>
-                <artifactId>builder-commons</artifactId>
-                <version>1.0.2</version>
+                <version>30.0-jre</version>
             </dependency>
             <dependency>
                 <groupId>xom</groupId>
@@ -1820,29 +1838,5 @@
             <id>handle.net</id>
             <url>https://handle.net/maven</url>
         </repository>
-        <!-- For Solr 7.x, as the solr-parent POM has an old URL for this maven-restlet repository.
-             The URL is corrected (to the below value) as of Solr 8.3.x, but has not yet been backported to 7.x.
-             Once we upgrade to Solr 8+, we should be able to remove this repository. -->
-        <!-- Only necessary if maven.restlet.org becomes unavailable again. Disabled for now, as that URL has been
-             redirected to the new .com location. Leaving this here temporarily in case it is ever needed again.
-        <repository>
-            <id>maven-restlet</id>
-            <name>Public online Restlet repository</name>
-            <url>https://maven.restlet.com</url>
-        </repository>
-        -->
     </repositories>
-
-    <dependencies>
-    	<dependency>
-    		<groupId>org.apache.poi</groupId>
-    		<artifactId>poi-ooxml</artifactId>
-    		<exclusions>
-    			<exclusion>
-    				<groupId>stax</groupId>
-    				<artifactId>stax-api</artifactId>
-    			</exclusion>
-    		</exclusions>
-    	</dependency>
-    </dependencies>
 </project>

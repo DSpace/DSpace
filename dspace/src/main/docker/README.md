@@ -106,32 +106,35 @@ Admins to our DockerHub repo can publish with the following command.
 docker push dspace/dspace-postgres-pgcrypto:loadsql
 ```
 
-## dspace/src/main/docker/solr/Dockerfile
+## dspace/src/main/docker/dspace-shibboleth/Dockerfile
 
-This is a standalone Solr image containing DSpace Solr cores & schemas required by DSpace 7.
+This is a test / demo image which provides an Apache HTTPD proxy (in front of Tomcat)
+with mod_shib & Shibboleth installed.  It is primarily for usage for
+testing DSpace's Shibboleth integration. It uses https://samltest.id/ as the Shibboleth IDP
 
-**WARNING:** Rebuilding this image first **requires** rebuilding `dspace-7_x` (i.e. `Dockerfile` listed above),
-as this Solr image copies the latest DSpace-specific Solr schemas & settings from that other image.
+**This image is built manually.**   It should be rebuilt as needed.
 
 ```
-# First, rebuild dspace-7_x to grab the latest Solr configs
-cd [src]
-docker build -t dspace/dspace:dspace-7_x -f Dockerfile .
+cd dspace/src/main/docker/dspace-shibboleth
+docker build -t dspace/dspace-shibboleth .
 
-# Then, rebuild dspace-solr based on that build of DSpace 7.
-cd dspace/src/main/docker/solr
-docker build -t dspace/dspace-solr .
+# Test running it manually
+docker run -i -t -d -p 80:80 -p 443:443 dspace/dspace-shibboleth
 ```
 
-**This image is built manually.**  It should be rebuilt when Solr schemas change or as new releases of Solr are incorporated.
+This image can also be rebuilt using the `../docker-compose/docker-compose-shibboleth.yml` script.
 
-This file was introduced for DSpace 7.
-
-Admins to our DockerHub repo can publish with the following command.
-```
-docker push dspace/dspace-solr
-```
 
 ## local.cfg and test/ folder
 
 These resources are bundled into the `dspace/dspace` image at build time.
+
+
+## Debugging Docker builds
+
+When updating or debugging Docker image builds, it can be useful to briefly
+spin up an "intermediate container".  Here's how to do that:
+```
+# First find the intermediate container/image ID in your commandline logs
+docker run -i -t [container-id] /bin/bash
+```
