@@ -9,6 +9,7 @@ package org.dspace.content.template.generator;
 
 import org.apache.commons.lang.StringUtils;
 import org.dspace.content.Item;
+import org.dspace.content.vo.MetadataValueVO;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
@@ -26,10 +27,12 @@ public class SubmitterValueGenerator implements TemplateValueGenerator {
     private EPersonService ePersonService;
 
     @Override
-    public String generator(final Context context, final Item targetItem, final Item templateItem,
-                            final String extraParams) {
-
+    public MetadataValueVO generator(Context context, Item targetItem, Item templateItem, String extraParams) {
         EPerson eperson = targetItem.getSubmitter();
+        return new MetadataValueVO(getValue(eperson, extraParams), eperson.getID().toString());
+    }
+
+    private String getValue(EPerson eperson, String extraParams) {
         if (StringUtils.equalsIgnoreCase(extraParams, "email")) {
             return eperson.getEmail();
         }
@@ -40,6 +43,5 @@ public class SubmitterValueGenerator implements TemplateValueGenerator {
             return eperson.getFullName();
         }
         return ePersonService.getMetadata(eperson, extraParams);
-
     }
 }

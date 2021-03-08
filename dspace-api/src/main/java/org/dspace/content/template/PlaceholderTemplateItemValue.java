@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.template.generator.TemplateValueGenerator;
+import org.dspace.content.vo.MetadataValueVO;
 import org.dspace.core.Context;
 
 /**
@@ -39,7 +40,7 @@ public class PlaceholderTemplateItemValue implements TemplateItemValue {
     }
 
     @Override
-    public String value(final Context context, final Item targetItem,
+    public MetadataValueVO value(final Context context, final Item targetItem,
                                final Item templateItem, final MetadataValue metadataValue) {
         if (!appliesTo(metadataValue.getValue())) {
             throw new IllegalArgumentException("Metadata value " + metadataValue.getValue() +
@@ -54,7 +55,7 @@ public class PlaceholderTemplateItemValue implements TemplateItemValue {
 
     }
 
-    private String generateValue(final Context context, final Item targetItem, final Item templateItem,
+    private MetadataValueVO generateValue(final Context context, final Item targetItem, final Item templateItem,
                                         final MetadataValue metadataValue, final String[] splitted,
                                         final TemplateValueGenerator gen) {
         String extraParams = null;
