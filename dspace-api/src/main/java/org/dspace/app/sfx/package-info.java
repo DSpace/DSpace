@@ -8,9 +8,7 @@
 
 /**
  * <p>SFX/OpenURL link server support.</p>
- * 
- * @see org.dspace.app.webui.jsptag.SFXLinkTag
- * @see org.dspace.app.xmlui.aspect.artifactbrowser.ItemViewer
+ *
  */
 
 package org.dspace.app.sfx;
