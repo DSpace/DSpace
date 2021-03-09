@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 
 /**
@@ -95,5 +96,21 @@ public class SubmissionCCLicenseUrlRepositoryIT extends AbstractControllerIntegr
                         "=license2-field0-enum1"))
                                .andExpect(status().isUnauthorized());
 
+    }
+
+    @Test
+    public void submissionCCLicenseUrlSerchMethodWithSingleModelTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/config/submissioncclicenseUrl/search"))
+                             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void submissionCCLicenseUrlSerchMethodWithPluralModelTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/config/submissioncclicenseUrls/search"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._links.rightsByQuestions.href", Matchers.allOf(Matchers
+                                 .containsString("/api/config/submissioncclicenseUrls/search/rightsByQuestions"))));
     }
 }

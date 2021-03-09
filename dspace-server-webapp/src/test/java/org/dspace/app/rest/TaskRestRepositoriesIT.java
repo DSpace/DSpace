@@ -3092,4 +3092,36 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         bibtex.close();
     }
 
+    @Test
+    public void poolTaskSerchMethodWithSingleModelTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/workflow/pooltask/search"))
+                             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void claimedtaskSerchMethodWithSingleModelTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/workflow/claimedtask/search"))
+                             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void poolTaskSerchMethodWithPluralModelTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/workflow/pooltasks/search"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._links.findByUser.href", Matchers.allOf(
+                                        Matchers.containsString("/api/workflow/pooltasks/search/findByUser"))));
+    }
+
+    @Test
+    public void claimedtaskSerchMethodWithPluralModelTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/workflow/claimedtasks/search"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._links.findByUser.href", Matchers.allOf(
+                                        Matchers.containsString("/api/workflow/claimedtasks/search/findByUser"))));
+    }
+
 }
