@@ -62,9 +62,8 @@ public class ClientInfoServiceImpl implements ClientInfoService {
             }
 
         } else if (StringUtils.isNotBlank(xForwardedForHeaderValue)) {
-            log.warn(
-                    "X-Forwarded-For header detected but useProxiesEnabled is not enabled. " +
-                            "If your dspace is behind a proxy set it to true");
+            log.warn("X-Forwarded-For header sent from client, but useProxies is not enabled. " +
+                         "To trust X-Forwarded-For headers, set useProxies=true.");
         }
 
         return ip;
@@ -126,7 +125,7 @@ public class ClientInfoServiceImpl implements ClientInfoService {
         }
 
         if (ipTable != null) {
-            log.info("Trusted proxy IP ranges/addresses: {}" + ipTable.toSet().toString());
+            log.info("Trusted proxies (configure via 'proxies.trusted.ipranges'): {}", ipTable.toSet().toString());
         }
 
         return ipTable;
