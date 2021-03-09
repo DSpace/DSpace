@@ -10,14 +10,17 @@ package org.dspace.service.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mockStatic;
 
 import org.dspace.AbstractDSpaceTest;
+import org.dspace.core.Utils;
 import org.dspace.service.ClientInfoService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.util.DummyHttpServletRequest;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.MockedStatic;
 
 /**
  * Unit test class for the {@link ClientInfoServiceImpl} class which implements
@@ -100,26 +103,42 @@ public class ClientInfoServiceImplTest extends AbstractDSpaceTest {
 
     @Test
     public void getClientIpWithoutTrustedProxies() {
+        // Ensure proxies are on, but no trusted proxies defined
         configurationService.setProperty("useProxies", true);
         configurationService.setProperty("proxies.trusted.ipranges", "");
 
-        clientInfoService = new ClientInfoServiceImpl(configurationService);
+        // Set a URL for our UI, and a fake IP address associated with that url
+        String fakeUI_URL = "https://mydspace.edu/";
+        String fakeUI_IP  = "1.2.3.4";
+        configurationService.setProperty("dspace.ui.url", fakeUI_URL);
 
-        String remoteIp = "127.0.0.1";
-        String xForwardedFor = "10.24.64.14";
+        try (MockedStatic<Utils> mockedUtils = mockStatic(Utils.class)) {
+            // Mock an IP address for mydspace.edu (have it return 1.2.3.4 as the IP address)
+            mockedUtils.when(() -> Utils.getIPAddresses(fakeUI_URL))
+                       .thenReturn(new String[]{fakeUI_IP});
 
-        assertEquals("10.24.64.14",
-                clientInfoService.getClientIp(remoteIp, xForwardedFor));
+            ClientInfoService clientInfoServiceMock = new ClientInfoServiceImpl(configurationService);
 
-        xForwardedFor = "127.0.0.1,10.24.64.14";
+            // Define a fake X-FORWARDED-FOR value returned by our UI
+            String xForwardedFor = "10.24.64.14";
 
-        assertEquals("10.24.64.14",
-                clientInfoService.getClientIp(remoteIp, xForwardedFor));
+            // Verify our UI is still a trusted proxy as its X-FORWARDED-FOR is accepted
+            assertEquals("10.24.64.14",
+                         clientInfoServiceMock.getClientIp(fakeUI_IP, xForwardedFor));
 
-        xForwardedFor = "10.24.64.14,127.0.0.1";
+            // Verify if multiple X-FORWARDED-FOR values, the one NOT matching UI's IP is returned
+            xForwardedFor = "1.2.3.4,10.24.64.14";
 
-        assertEquals("10.24.64.14",
-                clientInfoService.getClientIp(remoteIp, xForwardedFor));
+            assertEquals("10.24.64.14",
+                         clientInfoServiceMock.getClientIp(fakeUI_IP, xForwardedFor));
+
+            xForwardedFor = "10.24.64.14,1.2.3.4";
+
+            assertEquals("10.24.64.14",
+                         clientInfoServiceMock.getClientIp(fakeUI_IP, xForwardedFor));
+
+        }
+
     }
 
     @Test
