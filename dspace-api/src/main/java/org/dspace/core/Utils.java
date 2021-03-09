@@ -13,10 +13,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.rmi.dgc.VMID;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -452,6 +454,33 @@ public final class Utils {
             return null;
         }
     }
+
+    /**
+     * Retrieve the IP address(es) of a given URI string
+     * @param uriString URI string
+     * @return IP address(es) in a String array (or null if not found)
+     */
+    public static String[] getIPAddresses(String uriString) {
+        String[] ipAddresses = null;
+
+        // First, get the hostname
+        String hostname = getHostName(uriString);
+
+        if (StringUtils.isNotEmpty(hostname)) {
+            try {
+                // Then, get the list of all IPs for that hostname
+                InetAddress[] inetAddresses = InetAddress.getAllByName(hostname);
+
+                // Convert array of InetAddress objects to array of Strings by calling getHostAddress() for each
+                ipAddresses = Arrays.stream(inetAddresses).map(InetAddress::getHostAddress).toArray(String[]::new);
+            } catch (UnknownHostException ex) {
+                return null;
+            }
+        }
+
+        return ipAddresses;
+    }
+
 
     /**
      * Replaces configuration placeholders within a String with the corresponding value
