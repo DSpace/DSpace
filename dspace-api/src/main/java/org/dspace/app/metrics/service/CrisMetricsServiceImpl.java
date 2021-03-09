@@ -7,7 +7,6 @@
  */
 package org.dspace.app.metrics.service;
 import java.sql.SQLException;
-import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -16,6 +15,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.metrics.CrisMetrics;
 import org.dspace.app.metrics.dao.CrisMetricsDAO;
@@ -116,19 +116,13 @@ public class CrisMetricsServiceImpl implements CrisMetricsService {
 
     @Override
     public Optional<CrisMetrics> getCrisMetricByPeriod(Context context, String metricType, UUID resourceId,
-            Date startDate,  String piriod) throws SQLException {
+            Date startDate,  String period) throws SQLException {
 
-        if (StringUtils.equals("week", piriod)) {
-            Calendar c = Calendar.getInstance();
-            c.setTime(startDate);
-            c.add(Calendar.DATE, -7);
-            return getPeriodStatus(context, metricType, resourceId, c.getTime());
+        if (StringUtils.equals("week", period)) {
+            return getPeriodStatus(context, metricType, resourceId, DateUtils.addDays(startDate, -7));
         }
-        if (StringUtils.equals("month", piriod)) {
-            Calendar c = Calendar.getInstance();
-            c.setTime(startDate);
-            c.add(Calendar.MONTH, -1);
-            return getPeriodStatus(context, metricType, resourceId, c.getTime());
+        if (StringUtils.equals("month", period)) {
+            return getPeriodStatus(context, metricType, resourceId, DateUtils.addMonths(startDate, -1));
         }
         return Optional.empty();
     }
@@ -141,12 +135,6 @@ public class CrisMetricsServiceImpl implements CrisMetricsService {
     }
 
     private Date getDateByDelta (Date date, int delta) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.add(Calendar.DATE, delta);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        return calendar.getTime();
+        return DateUtils.setSeconds(DateUtils.setMinutes(DateUtils.setHours(DateUtils.addDays(date, delta), 0), 0), 0);
     }
 }

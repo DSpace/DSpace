@@ -104,6 +104,7 @@ public class CrisMetricsDAOImpl extends AbstractHibernateDAO<CrisMetrics> implem
     }
 
     /* Note *
+     * FIXME:
      * 
      * select * from cris_metrics order by now() - timestampcreated asc limit 1
      * maybe the data where not collected in this exact day, we could consider to use the data related to the closer day

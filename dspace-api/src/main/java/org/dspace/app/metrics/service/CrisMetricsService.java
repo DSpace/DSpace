@@ -19,8 +19,8 @@ import org.dspace.core.Context;
 
 /**
  * Service interface class for the CrisMetrics object.
- * The implementation of this class is responsible for all business logic calls for the CrisMetrics object
- * and is autowired by spring
+ * This interface defines the contract of the service that is responsible
+ * for all the business logic calls for the cris metrics object.
  * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
@@ -53,7 +53,7 @@ public interface CrisMetricsService {
     public CrisMetrics find(Context context, int id) throws SQLException;
 
     /**
-     * Search a CmrisMetric for a certain period like [week or month] from a certain startDate
+     * Search a CrisMetric for a certain period like [week or month] from a certain startDate
      * 
      * @param context         DSpace context object
      * @param metricType      the CrisMetric type
@@ -64,6 +64,6 @@ public interface CrisMetricsService {
      * @throws SQLException   if database error
      */
     public Optional<CrisMetrics> getCrisMetricByPeriod(Context context, String metricType, UUID resourceId,
-           Date startDate,  String piriod) throws SQLException;
+           Date startDate,  String period) throws SQLException;
 
 }
