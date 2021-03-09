@@ -211,8 +211,21 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                        "Public item 3", "2016-02-13")
                            )
                    )))
-                   .andExpect(jsonPath("$._links.self.href",
-                           Matchers.containsString("/api/core/items")))
+                   .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/items?"),
+                           Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/items?"), Matchers.containsString("size=2"))))
+                   .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/items?"),
+                           Matchers.containsString("page=1"), Matchers.containsString("size=2"))))
+                   .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/items?"),
+                           Matchers.containsString("page=1"), Matchers.containsString("size=2"))))
+                   .andExpect(jsonPath("$.page.size", is(2)))
+                   .andExpect(jsonPath("$.page.totalPages", is(2)))
+                   .andExpect(jsonPath("$.page.number", is(0)))
+                   .andExpect(jsonPath("$.page.totalElements", is(3)));
         ;
 
         getClient(token).perform(get("/api/core/items")
@@ -231,9 +244,21 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                    "Public item 2", "2016-02-13")
                        )
                    )))
-                   .andExpect(jsonPath("$._links.self.href",
-                           Matchers.containsString("/api/core/items")))
+                   .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/items?"),
+                           Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
+                   .andExpect(jsonPath("$._links.prev.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/items?"),
+                           Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/items?"),
+                           Matchers.containsString("page=1"), Matchers.containsString("size=2"))))
+                   .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/items?"),
+                           Matchers.containsString("page=1"), Matchers.containsString("size=2"))))
                    .andExpect(jsonPath("$.page.size", is(2)))
+                   .andExpect(jsonPath("$.page.number", is(1)))
+                   .andExpect(jsonPath("$.page.totalPages", is(2)))
                    .andExpect(jsonPath("$.page.totalElements", is(3)))
         ;
     }

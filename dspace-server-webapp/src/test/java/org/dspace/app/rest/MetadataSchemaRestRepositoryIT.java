@@ -268,4 +268,78 @@ public class MetadataSchemaRestRepositoryIT extends AbstractControllerIntegratio
                        .matchEntry(TEST_NAME, TEST_NAMESPACE)));
     }
 
+    @Test
+    public void findAllPaginationTest() throws Exception {
+
+        getClient().perform(get("/api/core/metadataschemas")
+                   .param("size", "6")
+                   .param("page", "0"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.metadataschemas", Matchers.hasItem(matchEntry())))
+                   .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadataschemas?"),
+                           Matchers.containsString("page=0"), Matchers.containsString("size=6"))))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadataschemas?"),
+                           Matchers.containsString("page=0"), Matchers.containsString("size=6"))))
+                   .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadataschemas?"),
+                           Matchers.containsString("page=1"), Matchers.containsString("size=6"))))
+                   .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadataschemas?"),
+                           Matchers.containsString("page=2"), Matchers.containsString("size=6"))))
+                   .andExpect(jsonPath("$.page.totalElements", is(16)))
+                   .andExpect(jsonPath("$.page.totalPages", is(3)))
+                   .andExpect(jsonPath("$.page.size", is(6)));
+
+        getClient().perform(get("/api/core/metadataschemas")
+                   .param("size", "6")
+                   .param("page", "1"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.metadataschemas", Matchers.hasItem(matchEntry())))
+                   .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadataschemas?"),
+                           Matchers.containsString("page=0"), Matchers.containsString("size=6"))))
+                   .andExpect(jsonPath("$._links.prev.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadataschemas?"),
+                           Matchers.containsString("page=0"), Matchers.containsString("size=6"))))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadataschemas?"),
+                           Matchers.containsString("page=1"), Matchers.containsString("size=6"))))
+                   .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadataschemas?"),
+                           Matchers.containsString("page=2"), Matchers.containsString("size=6"))))
+                   .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadataschemas?"),
+                           Matchers.containsString("page=2"), Matchers.containsString("size=6"))))
+                   .andExpect(jsonPath("$.page.totalElements", is(16)))
+                   .andExpect(jsonPath("$.page.totalPages", is(3)))
+                   .andExpect(jsonPath("$.page.size", is(6)));
+
+        getClient().perform(get("/api/core/metadataschemas")
+                   .param("size", "6")
+                   .param("page", "2"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.metadataschemas", Matchers.hasItem(matchEntry())))
+                   .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadataschemas?"),
+                           Matchers.containsString("page=0"), Matchers.containsString("size=6"))))
+                   .andExpect(jsonPath("$._links.prev.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadataschemas?"),
+                           Matchers.containsString("page=1"), Matchers.containsString("size=6"))))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadataschemas?"),
+                           Matchers.containsString("page=2"), Matchers.containsString("size=6"))))
+                   .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadataschemas?"),
+                           Matchers.containsString("page=2"), Matchers.containsString("size=6"))))
+                   .andExpect(jsonPath("$.page.totalElements", is(16)))
+                   .andExpect(jsonPath("$.page.totalPages", is(3)))
+                   .andExpect(jsonPath("$.page.size", is(6)));
+
+    }
+
 }
