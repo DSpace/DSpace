@@ -2574,4 +2574,24 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$.page.totalPages", is(4)))
                 .andExpect(jsonPath("$.page.totalElements", is(4)));
     }
+
+    @Test
+    public void resourcepolicySerchMethodWithSingleModelTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/authz/resourcepolicy/search"))
+                             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void resourcepolicySerchMethodWithPluralModelTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/authz/resourcepolicies/search"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._links.eperson.href", Matchers.allOf(
+                                        Matchers.containsString("/api/authz/resourcepolicies/search/eperson"))))
+                             .andExpect(jsonPath("$._links.group.href", Matchers.allOf(
+                                        Matchers.containsString("/api/authz/resourcepolicies/search/group"))))
+                             .andExpect(jsonPath("$._links.resource.href", Matchers.allOf(
+                                        Matchers.containsString("/api/authz/resourcepolicies/search/resource"))));
+    }
 }
