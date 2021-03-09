@@ -225,9 +225,6 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
 
     @Test
     public void findBrowseBySubjectEntriesWithAuthority() throws Exception {
-        String ogDcSubjectChoices = configurationService.getProperty("choices.plugin.dc.subject");
-        String ogDcSubjectAuthorityControlled = configurationService.getProperty("authority.controlled.dc.subject");
-
         configurationService.setProperty("choices.plugin.dc.subject",
                                          "SolrSubjectAuthority");
         configurationService.setProperty("authority.controlled.dc.subject",
@@ -326,14 +323,6 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                            )
                        )
                    );
-
-        // Clean up configuration for the following tests
-        configurationService.setProperty("choices.plugin.dc.subject",
-                                         ogDcSubjectChoices);
-        configurationService.setProperty("authority.controlled.dc.subject",
-                                         ogDcSubjectAuthorityControlled);
-
-        metadataAuthorityService.clearCache();
     }
 
     @Test
