@@ -226,7 +226,6 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
     @Override
     public void clearCache() {
         controlled.clear();
-        isAuthorityRequired.clear();
         minConfidence.clear();
 
         isAuthorityRequired = null;

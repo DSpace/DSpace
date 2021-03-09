@@ -19,6 +19,7 @@ import org.dspace.authority.MockAuthoritySolrServiceImpl;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.AbstractBuilder;
 import org.dspace.content.Community;
+import org.dspace.content.authority.MetadataAuthorityServiceImpl;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.discovery.MockSolrSearchCore;
@@ -197,6 +198,8 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
             // Reload our ConfigurationService (to reset configs to defaults again)
             DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
 
+            cleanupCache(serviceManager);
+
             AbstractBuilder.cleanupBuilderCache();
 
             // NOTE: we explicitly do NOT destroy our default eperson & admin as they
@@ -204,6 +207,16 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Clean up service caches after tests
+     * @param serviceManager
+     */
+    private void cleanupCache(ServiceManager serviceManager) {
+        MetadataAuthorityServiceImpl metadataAuthorityService = serviceManager
+            .getServiceByName(null, MetadataAuthorityServiceImpl.class);
+        metadataAuthorityService.clearCache();
     }
 
     /**

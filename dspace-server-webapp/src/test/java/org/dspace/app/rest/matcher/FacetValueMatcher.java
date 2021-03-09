@@ -38,6 +38,14 @@ public class FacetValueMatcher {
         );
     }
 
+
+    public static Matcher<? super Object> entrySubject(String label, String authority, int count) {
+        return allOf(
+            hasJsonPath("$.authorityKey", is(authority)),
+            entrySubject(label, count)
+        );
+    }
+
     public static Matcher<? super Object> entryDateIssued() {
         return allOf(
             hasJsonPath("$.label", Matchers.notNullValue()),

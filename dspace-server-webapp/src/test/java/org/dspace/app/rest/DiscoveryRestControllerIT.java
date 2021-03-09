@@ -188,9 +188,6 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
     @Test
     public void discoverFacetsAuthorWithAuthorityWithSizeParameter() throws Exception {
-        String ogDcSubjectChoices = configurationService.getProperty("choices.plugin.dc.subject");
-        String ogDcSubjectAuthorityControlled = configurationService.getProperty("authority.controlled.dc.subject");
-
         configurationService.setProperty("choices.plugin.dc.subject",
                                          "SolrSubjectAuthority");
         configurationService.setProperty("authority.controlled.dc.subject",
@@ -271,17 +268,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                    // up in different items
                    //These subjects are the most used ones. Only two show up because of the size.
                    .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
-                       FacetValueMatcher.entrySubject("History of religion", 3),
-                       FacetValueMatcher.entrySubject("Church studies", 2)
+                       FacetValueMatcher.entrySubject("History of religion", "VR110102", 3),
+                       FacetValueMatcher.entrySubject("Church studies", "VR110103", 2)
                    )));
-
-        // Clean up configuration for the following tests
-        configurationService.setProperty("choices.plugin.dc.subject",
-                                         ogDcSubjectChoices);
-        configurationService.setProperty("authority.controlled.dc.subject",
-                                         ogDcSubjectAuthorityControlled);
-
-        metadataAuthorityService.clearCache();
     }
 
     @Test
