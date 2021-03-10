@@ -2829,4 +2829,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         context.restoreAuthSystemState();
     }
+
+    @Test
+    public void findOneTestWrongUUID() throws Exception {
+        getClient().perform(get("/api/core/relationships/" + 1000))
+                .andExpect(status().isNotFound());
+    }
 }

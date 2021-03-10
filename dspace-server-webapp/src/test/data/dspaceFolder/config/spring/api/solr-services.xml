@@ -37,6 +37,9 @@
           class="org.dspace.statistics.MockSolrLoggerServiceImpl"
           lazy-init="true"/>
 
+    <bean id="org.dspace.statistics.SolrStatisticsCore"
+          class="org.dspace.statistics.MockSolrStatisticsCore" autowire-candidate="true"/>
+
     <!-- Dedup core -->
     <bean class="org.dspace.deduplication.MockSolrDedupCore" autowire-candidate="true"/>
 </beans>

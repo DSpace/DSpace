@@ -31,6 +31,7 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.MockSolrLoggerServiceImpl;
+import org.dspace.statistics.MockSolrStatisticsCore;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.dspace.validation.LogicalStatementValidator;
 import org.dspace.validation.MetadataValidator;
@@ -183,6 +184,10 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
             MockSolrSearchCore searchService = serviceManager
                     .getServiceByName(null, MockSolrSearchCore.class);
             searchService.reset();
+            // Clear the statistics core.
+            serviceManager
+                    .getServiceByName(null, MockSolrStatisticsCore.class)
+                    .reset();
 
             MockSolrLoggerServiceImpl statisticsService = serviceManager
                     .getServiceByName(null, MockSolrLoggerServiceImpl.class);

@@ -75,7 +75,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * When an item is submitted and is somewhere in a workflow, it has a row in the
- * WorkflowItem table pointing to it.
+ * cwf_workflowitem table pointing to it.
  *
  * Once the item has completed the workflow it will be archived
  *

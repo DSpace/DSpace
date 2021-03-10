@@ -25,7 +25,6 @@
     <bean id="contentServiceFactory" class="org.dspace.content.factory.ContentServiceFactoryImpl"/>
     <bean id="scriptServiceFactory" class="org.dspace.scripts.factory.impl.ScriptServiceFactoryImpl"/>
     <bean id="coreServiceFactory" class="org.dspace.core.factory.CoreServiceFactoryImpl"/>
-    <bean id="curateServiceFactory" class="org.dspace.curate.factory.CurateServiceFactoryImpl"/>
 
 
     <bean id="disseminateServiceFactory" class="org.dspace.disseminate.factory.DisseminateServiceFactoryImpl"/>

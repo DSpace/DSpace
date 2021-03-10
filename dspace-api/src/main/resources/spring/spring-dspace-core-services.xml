@@ -40,7 +40,7 @@
     <bean name="org.dspace.core.DBConnection" class="org.dspace.core.HibernateDBConnection" lazy-init="true"/>
 
     <!-- Register all our Flyway callback classes (which run before/after database migrations) -->
-    <bean class="org.dspace.storage.rdbms.DatabaseRegistryUpdater"/>
+    <bean class="org.dspace.storage.rdbms.RegistryUpdater"/>
     <bean class="org.dspace.storage.rdbms.GroupServiceInitializer"/>
     <bean class="org.dspace.storage.rdbms.PostgreSQLCryptoChecker"/>
     <bean class="org.dspace.storage.rdbms.SiteServiceInitializer"/>

@@ -75,7 +75,7 @@
         <tr>
             <td><strong><%= HAL.truncateIfUrl(rel) %></strong></td>
             <td><%= link.title || '' %></td>
-            <td><%= link.name ? 'name: ' + link.name : 'index: ' + i %></a></td>
+            <td><%= link.name ? 'name: ' + link.name : 'index: ' + i %></td>
             <td>
                 <% if (HAL.isUrl(rel)) { %>
                 <a class="dox" href="<%= HAL.normalizeUrl(HAL.buildUrl(rel)) %>"><i class="icon-book"></i></a>
@@ -180,10 +180,10 @@
         <h3>Make a non-GET request</h3>
     </div>
 
-    <form class="non-safe" action="<%= href %>">
+    <form class="non-safe" action="<%= _.escape(href) %>">
         <div class="modal-body">
             <p>Target URI</p>
-            <input name="url" type="text" class="url" value="<%= href %>" />
+            <input name="url" type="text" class="url" value="<%= _.escape(href) %>" />
             <p>Method:</p>
             <input name="method" type="text" class="method" value="POST" />
             <p>Headers:</p>
@@ -250,6 +250,7 @@ Content-Type: application/json
     </div>
 </script>
 
+<!-- Customized (to use WebJars) for DSpace -->
 <script src="webjars/jquery/dist/jquery.min.js"></script>
 <script src="browser/vendor/js/underscore.js"></script>
 <script src="browser/vendor/js/backbone.js"></script>
@@ -260,6 +261,7 @@ Content-Type: application/json
 <script src="browser/js/hal.js"></script>
 <script src="browser/js/hal/browser.js"></script>
 
+<!-- Customized for DSpace -->
 <script src="js/hal/http/client.js"></script>
 <script src="browser/js/hal/resource.js"></script>
 

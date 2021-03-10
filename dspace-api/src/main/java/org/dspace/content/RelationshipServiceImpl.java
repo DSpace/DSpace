@@ -276,6 +276,10 @@ public class RelationshipServiceImpl implements RelationshipService {
                                          Integer maxCardinality,
                                          RelationshipType relationshipType,
                                          boolean isLeft) throws SQLException {
+        if (maxCardinality == null) {
+            //no need to check the relationships
+            return true;
+        }
         List<Relationship> rightRelationships = findByItemAndRelationshipType(context, itemToProcess, relationshipType,
                                                                               isLeft);
         if (maxCardinality != null && rightRelationships.size() >= maxCardinality) {
@@ -285,7 +289,8 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     private boolean verifyEntityTypes(Item itemToProcess, EntityType entityTypeToProcess) {
-        List<MetadataValue> list = itemService.getMetadata(itemToProcess, "relationship", "type", null, Item.ANY);
+        List<MetadataValue> list = itemService.getMetadata(itemToProcess, "relationship", "type",
+                null, Item.ANY, false);
         if (list.isEmpty()) {
             return false;
         }
@@ -368,7 +373,11 @@ public class RelationshipServiceImpl implements RelationshipService {
     public void delete(Context context, Relationship relationship, boolean bypassValidation)
             throws SQLException, AuthorizeException {
         //TODO: retrieve default settings from configuration
-        delete(context, relationship, false, false, bypassValidation);
+        if (bypassValidation) {
+            forceDelete(context, relationship, false, false);
+        } else {
+            delete(context, relationship, false, false);
+        }
     }
 
     @Override
@@ -380,7 +389,8 @@ public class RelationshipServiceImpl implements RelationshipService {
                                                           "copyMetadataValuesToRightItem=" + copyToRightItem));
         if (isRelationshipValidToDelete(context, relationship) &&
             copyToItemPermissionCheck(context, relationship, copyToLeftItem, copyToRightItem)) {
-            deleteRelationship(context, relationship, copyToLeftItem, copyToRightItem);
+            // To delete a relationship, a user must have WRITE permissions on one of the related Items
+            deleteRelationshipAndCopyToItem(context, relationship, copyToLeftItem, copyToRightItem);
 
         } else {
             throw new IllegalArgumentException("The relationship given was not valid");
@@ -388,25 +398,23 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     @Override
-    public void delete(Context context, Relationship relationship, boolean copyToLeftItem, boolean copyToRightItem,
-            boolean bypassValidation) throws SQLException, AuthorizeException {
+    public void forceDelete(Context context, Relationship relationship, boolean copyToLeftItem, boolean copyToRightItem)
+        throws SQLException, AuthorizeException {
         log.info(org.dspace.core.LogManager.getHeader(context, "delete_relationship",
                                                       "relationship_id=" + relationship.getID() + "&" +
                                                           "copyMetadataValuesToLeftItem=" + copyToLeftItem + "&" +
                                                           "copyMetadataValuesToRightItem=" + copyToRightItem));
-        if ((isRelationshipValidToDelete(context, relationship) &&
-            copyToItemPermissionCheck(context, relationship, copyToLeftItem, copyToRightItem)) || bypassValidation) {
-            deleteRelationship(context, relationship, copyToLeftItem, copyToRightItem);
+        if (copyToItemPermissionCheck(context, relationship, copyToLeftItem, copyToRightItem)) {
+            // To delete a relationship, a user must have WRITE permissions on one of the related Items
+            deleteRelationshipAndCopyToItem(context, relationship, copyToLeftItem, copyToRightItem);
 
         } else {
             throw new IllegalArgumentException("The relationship given was not valid");
         }
     }
 
-    private void deleteRelationship(Context context, Relationship relationship, boolean copyToLeftItem,
-            boolean copyToRightItem) throws SQLException, AuthorizeException {
-
-        // To delete a relationship, a user must have WRITE permissions on one of the related Items
+    private void deleteRelationshipAndCopyToItem(Context context, Relationship relationship, boolean copyToLeftItem,
+                                                 boolean copyToRightItem) throws SQLException, AuthorizeException {
         copyMetadataValues(context, relationship, copyToLeftItem, copyToRightItem);
         if (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
             authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {

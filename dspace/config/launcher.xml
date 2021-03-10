@@ -373,5 +373,11 @@
             <class>org.dspace.app.util.InitializeEntityTypesOnly</class>
         </step>
     </command>
-    
+    <command>
+        <name>anonymize-statistics</name>
+        <description>Anonymize the ip values of the solr statistics</description>
+        <step>
+            <class>org.dspace.statistics.AnonymizeStatistics</class>
+        </step>
+    </command>
 </commands>
