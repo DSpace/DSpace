@@ -54,6 +54,15 @@ public class MetadataValueMatcher extends TypeSafeMatcher<MetadataValue> {
     }
 
     @Override
+    protected void describeMismatchSafely(MetadataValue item, Description mismatchDescription) {
+        mismatchDescription.appendText("was ")
+                .appendValue("MetadataValue [metadataField=").appendValue(item.getMetadataField().toString('.'))
+                .appendValue(", value=").appendValue(item.getValue()).appendValue(", language=").appendValue(language)
+                .appendValue(", place=").appendValue(item.getPlace()).appendValue(", authority=")
+                .appendValue(item.getAuthority()).appendValue(", confidence=").appendValue(item.getConfidence() + "]");
+    }
+
+    @Override
     protected boolean matchesSafely(MetadataValue metadataValue) {
         return Objects.equals(metadataValue.getValue(), value) &&
             Objects.equals(metadataValue.getMetadataField().toString('.'), field) &&
