@@ -1375,6 +1375,8 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
     private void resetConsumers(String[] consumers) {
         ConfigurationService configService = DSpaceServicesFactory.getInstance().getConfigurationService();
         configService.setProperty("event.dispatcher.default.consumers", consumers);
+        EventService eventService = EventServiceFactory.getInstance().getEventService();
+        eventService.reloadConfiguration();
     }
 
     private Item findItemByMetadata(String schema, String element, String qualifier, String value) throws Exception {

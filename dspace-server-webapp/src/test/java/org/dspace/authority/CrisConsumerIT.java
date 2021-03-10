@@ -123,6 +123,8 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
     public static void resetDefaultConsumers() {
         ConfigurationService configService = DSpaceServicesFactory.getInstance().getConfigurationService();
         configService.setProperty("event.dispatcher.default.consumers", consumers);
+        EventService eventService = EventServiceFactory.getInstance().getEventService();
+        eventService.reloadConfiguration();
     }
 
     @Override
