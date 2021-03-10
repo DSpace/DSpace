@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -456,7 +457,9 @@ public final class Utils {
     }
 
     /**
-     * Retrieve the IP address(es) of a given URI string
+     * Retrieve the IP address(es) of a given URI string.
+     * <P>
+     * At this time, DSpace only supports IPv4, so this method will only return IPv4 addresses.
      * @param uriString URI string
      * @return IP address(es) in a String array (or null if not found)
      */
@@ -471,8 +474,13 @@ public final class Utils {
                 // Then, get the list of all IPs for that hostname
                 InetAddress[] inetAddresses = InetAddress.getAllByName(hostname);
 
-                // Convert array of InetAddress objects to array of Strings by calling getHostAddress() for each
-                ipAddresses = Arrays.stream(inetAddresses).map(InetAddress::getHostAddress).toArray(String[]::new);
+                // Convert array of InetAddress objects to array of IP address Strings
+                ipAddresses = Arrays.stream(inetAddresses)
+                                    // Filter our array to ONLY include IPv4 addresses
+                                    .filter((address) -> address instanceof Inet4Address)
+                                    // Call getHostAddress() on each to get the IPv4 address as a string
+                                    .map((address) -> ((Inet4Address) address).getHostAddress())
+                                    .toArray(String[]::new);
             } catch (UnknownHostException ex) {
                 return null;
             }
