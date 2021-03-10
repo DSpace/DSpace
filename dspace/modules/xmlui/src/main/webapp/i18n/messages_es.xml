@@ -3145,7 +3145,7 @@ Cuando se usa QDC para los elementos de DSpace se recomienda el uso de crosswalk
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.CommercialQuestion">¿Quiere permitir usos comerciales de su obra?</message>
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.CommercialAnswerNo">No</message>
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.CommercialAnswerYes">Sí</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesQuestion">¿Quiere permitir modificaciones de su obra?</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesQuestion">¿Quiere permitir obras derivadas?</message>
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesAnswerNo">No</message>
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesAnswerYes">Si</message>
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesAnswerShareALike">Compartir Igual</message>

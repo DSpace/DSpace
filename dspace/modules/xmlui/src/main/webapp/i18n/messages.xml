@@ -2740,7 +2740,7 @@
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.CommercialQuestion">Do you want to allow commercial uses of your opus?</message>
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.CommercialAnswerNo">No</message>
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.CommercialAnswerYes">Yes</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesQuestion">¿Quiere permitir modificaciones de su obra?</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesQuestion">Do you want to allow derivative works?</message>
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesAnswerNo">No</message>
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesAnswerYes">Yes</message>
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesAnswerShareALike">Share alike</message>

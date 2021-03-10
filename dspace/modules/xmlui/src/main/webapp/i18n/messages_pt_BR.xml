@@ -2963,7 +2963,7 @@
 	<message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesAnswerNo">Não</message>
 	<message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesAnswerShareALike">Compartilhar Igual</message>
 	<message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesAnswerYes">Sim</message>
-	<message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesQuestion">Deseja permitir modificações no seu trabalho?</message>
+	<message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesQuestion">Deseja permitir trabalhos derivados?</message>
 	<message key="xmlui.Submission.workflow.DeleteTaskStep.info1">Tem certeza de que deseja excluir o item?</message>
 	<message key="xmlui.Submission.workflow.DeleteTaskStep.submit_delete">Confirme</message>
 	<message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview">Revisão</message>
