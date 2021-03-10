@@ -22,7 +22,7 @@ import org.dspace.app.sherpa.v2.SHERPAPublisherResponse;
 import org.dspace.app.sherpa.v2.SHERPAUtils;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.model.ExternalDataObject;
-import org.dspace.external.provider.ExternalDataProvider;
+import org.dspace.external.provider.AbstractExternalDataProvider;
 
 /**
  * This class is the implementation of the ExternalDataProvider interface that will deal with SHERPAPublisher External
@@ -33,7 +33,7 @@ import org.dspace.external.provider.ExternalDataProvider;
  *
  * @author Kim Shepherd
  */
-public class SHERPAv2PublisherDataProvider implements ExternalDataProvider {
+public class SHERPAv2PublisherDataProvider extends AbstractExternalDataProvider {
 
     // Logger
     private static final Logger log =
