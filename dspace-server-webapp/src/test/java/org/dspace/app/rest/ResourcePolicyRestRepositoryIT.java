@@ -2469,8 +2469,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                         .andExpect(jsonPath("$._links",Matchers.allOf(
                                 hasJsonPath("$.resourcepolicies.href",
                                          is("http://localhost/api/authz/resourcepolicies")),
-                                hasJsonPath("$.resourcepolicy-search.href",
-                                         is("http://localhost/api/authz/resourcepolicy/search"))
+                                hasJsonPath("$.resourcepolicies-search.href",
+                                         is("http://localhost/api/authz/resourcepolicies/search"))
                         )));
     }
 
