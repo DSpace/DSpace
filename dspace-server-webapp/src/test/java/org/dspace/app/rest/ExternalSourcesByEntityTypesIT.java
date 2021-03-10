@@ -22,7 +22,6 @@ import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.EntityType;
-import org.dspace.content.service.EntityTypeService;
 import org.dspace.external.provider.AbstractExternalDataProvider;
 import org.dspace.external.service.ExternalDataService;
 import org.hamcrest.Matchers;
@@ -30,8 +29,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class ExternalSourcesByEntityTypesIT extends AbstractControllerIntegrationTest {
-    @Autowired
-    private EntityTypeService entityTypeService;
     @Autowired
     private ExternalDataService externalDataService;
 

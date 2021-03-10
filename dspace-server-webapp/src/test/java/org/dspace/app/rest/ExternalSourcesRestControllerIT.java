@@ -48,7 +48,7 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
                                 ExternalSourceMatcher.matchExternalSource(
                                     "sherpaPublisher", "sherpaPublisher", false)
                             )))
-                            .andExpect(jsonPath("$.page.totalElements", Matchers.is(7)));
+                            .andExpect(jsonPath("$.page.totalElements", Matchers.is(10)));
     }
 
     @Test
