@@ -7,6 +7,7 @@
  */
 package org.dspace.app.metrics.dao;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -24,6 +25,10 @@ import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
 
 /**
+ * Hibernate implementation of the Database Access Object interface class for the CrisMetrics object.
+ * This class is responsible for all database calls for the CrisMetrics object and is autowired by spring
+ * This class should never be accessed directly.
+ * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
 public class CrisMetricsDAOImpl extends AbstractHibernateDAO<CrisMetrics> implements CrisMetricsDAO {
@@ -96,6 +101,29 @@ public class CrisMetricsDAOImpl extends AbstractHibernateDAO<CrisMetrics> implem
     public CrisMetrics uniqueLastMetricByResourceIdAndResourceTypeIdAndMetricsType(Context context, String metricType,
            UUID resource, boolean last) throws SQLException {
         return null;
+    }
+
+    /* Note *
+     * FIXME:
+     * 
+     * select * from cris_metrics order by now() - timestampcreated asc limit 1
+     * maybe the data where not collected in this exact day, we could consider to use the data related to the closer day
+     * with a query like that select * from cris_metrics where resource_id = ? and metrictype = ?
+     * and ($TARGETDATE - acquisitiondate <= $TOLLERANCE) order by $TARGETDATE - acquisitiondate asc limit 1
+     */
+    @Override
+    public List<CrisMetrics> findMetricByResourceIdMetricTypeAndBetweenSomeDate(Context context, String metricType,
+           UUID resourceUuid, Date before, Date after) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, CrisMetrics.class);
+        Root<CrisMetrics> crisMetricsRoot = criteriaQuery.from(CrisMetrics.class);
+        Join<CrisMetrics, Item> join = crisMetricsRoot.join(CrisMetrics_.resource);
+        criteriaQuery.where(criteriaBuilder.and(
+                       criteriaBuilder.equal(crisMetricsRoot.get(CrisMetrics_.metricType), metricType),
+                       criteriaBuilder.greaterThanOrEqualTo(crisMetricsRoot.get(CrisMetrics_.acquisitionDate), before),
+                       criteriaBuilder.lessThan(crisMetricsRoot.get(CrisMetrics_.acquisitionDate), after),
+                       criteriaBuilder.equal(join.get(Item_.id), resourceUuid)));
+        return list(context, criteriaQuery, false, CrisMetrics.class, -1, -1);
     }
 
 }

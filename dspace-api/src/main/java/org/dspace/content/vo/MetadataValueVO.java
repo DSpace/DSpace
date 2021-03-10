@@ -5,8 +5,16 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.bulkimport.model;
+package org.dspace.content.vo;
 
+import org.dspace.content.MetadataValue;
+
+/**
+ * A value object that contains a metadata value, authority and confidence.
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ */
 public class MetadataValueVO {
 
     private final String value;
@@ -15,11 +23,22 @@ public class MetadataValueVO {
 
     private final int confidence;
 
+    public MetadataValueVO(String value) {
+        this(value, null, -1);
+    }
+
+    public MetadataValueVO(String value, String authority) {
+        this(value, authority, 600);
+    }
+
     public MetadataValueVO(String value, String authority, int confidence) {
-        super();
         this.value = value;
         this.authority = authority;
         this.confidence = confidence;
+    }
+
+    public MetadataValueVO(MetadataValue metadataValue) {
+        this(metadataValue.getValue(), metadataValue.getAuthority(), metadataValue.getConfidence());
     }
 
     public String getValue() {

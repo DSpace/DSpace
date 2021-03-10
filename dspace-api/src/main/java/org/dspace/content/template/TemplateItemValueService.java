@@ -12,6 +12,7 @@ import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.vo.MetadataValueVO;
 import org.dspace.core.Context;
 
 /**
@@ -30,7 +31,7 @@ public class TemplateItemValueService {
         this.templateItemValues = templateItemValues;
     }
 
-    public String value(final Context context, final Item targetItem,
+    public MetadataValueVO value(final Context context, final Item targetItem,
                                final Item templateItem,
                                final MetadataValue metadataValue) {
         if (CollectionUtils.isEmpty(templateItemValues)) {
@@ -40,7 +41,7 @@ public class TemplateItemValueService {
         return templateItemValues.stream().filter(tiv -> tiv.appliesTo(metadataValue.getValue()))
                                  .findFirst()
                                  .map(tiv -> tiv.value(context, targetItem, templateItem, metadataValue))
-                                 .orElseGet(metadataValue::getValue);
+                                 .orElseGet(() -> new MetadataValueVO(metadataValue));
     }
 
 

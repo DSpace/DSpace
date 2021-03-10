@@ -7,7 +7,9 @@
  */
 package org.dspace.app.metrics.service;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.dspace.app.metrics.CrisMetrics;
@@ -16,6 +18,9 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 
 /**
+ * Service interface class for the CrisMetrics object.
+ * This interface defines the contract of the service that is responsible
+ * for all the business logic calls for the cris metrics object.
  * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
@@ -46,4 +51,19 @@ public interface CrisMetricsService {
     public void update(Context context, CrisMetrics crisMetrics) throws SQLException, AuthorizeException;
 
     public CrisMetrics find(Context context, int id) throws SQLException;
+
+    /**
+     * Search a CrisMetric for a certain period like [week or month] from a certain startDate
+     * 
+     * @param context         DSpace context object
+     * @param metricType      the CrisMetric type
+     * @param resourceId      the uuid of an DSpace resource
+     * @param startDate       date from which the period is to be extended
+     * @param piriod          period can be either a week or a month [week or month].
+     * @return
+     * @throws SQLException   if database error
+     */
+    public Optional<CrisMetrics> getCrisMetricByPeriod(Context context, String metricType, UUID resourceId,
+           Date startDate,  String period) throws SQLException;
+
 }

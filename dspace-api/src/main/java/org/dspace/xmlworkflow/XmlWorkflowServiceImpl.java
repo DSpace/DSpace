@@ -971,12 +971,13 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
         itemService.update(context, myitem);
 
-        // convert into personal workspace
-        WorkspaceItem wsi = returnToWorkspace(context, wi);
-
         // remove policy for controller
         removeUserItemPolicies(context, myitem, e);
         revokeReviewerPolicies(context, myitem);
+
+        // convert into personal workspace
+        WorkspaceItem wsi = returnToWorkspace(context, wi);
+
         // notify that it's been rejected
         notifyOfReject(context, wi, e, rejection_message);
         log.info(LogManager.getHeader(context, "reject_workflow", "workflow_item_id="

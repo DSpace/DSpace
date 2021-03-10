@@ -72,6 +72,9 @@
                 <entry key="eperson">
                     <bean class="org.dspace.content.template.generator.EPersonValueGenerator" />
                 </entry>
+                <entry key="currentuser">
+                    <bean class="org.dspace.content.template.generator.CurrentUserValueGenerator" />
+                </entry>
             </map>
         </constructor-arg>
     </bean>

@@ -9,6 +9,7 @@ package org.dspace.content.template;
 
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.vo.MetadataValueVO;
 import org.dspace.core.Context;
 
 /**
@@ -33,7 +34,7 @@ public interface TemplateItemValue {
      * @param metadataValue
      * @return
      */
-    String value(final Context context, final Item targetItem,
+    MetadataValueVO value(final Context context, final Item targetItem,
                         final Item templateItem, final MetadataValue metadataValue);
 
     /**

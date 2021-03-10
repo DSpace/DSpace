@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -66,7 +67,15 @@ public class UpdateScopusPersonMetrics implements MetricsExternalServices {
                     scopusMetrics.setLast(false);
                     crisMetricsService.update(context, scopusMetrics);
                 }
-                createNewMetric(context, item, metricDTO);
+                Optional<CrisMetrics> metricLastWeek = crisMetricsService.getCrisMetricByPeriod(context,
+                                                       metricDTO.getMetricType(), item.getID(), new Date(), "week");
+                Optional<CrisMetrics> metricLastMonth = crisMetricsService.getCrisMetricByPeriod(context,
+                                                        metricDTO.getMetricType(), item.getID(), new Date(), "month");
+
+                Double deltaPeriod1 = getDeltaPeriod(metricDTO, metricLastWeek);
+                Double deltaPeriod2 = getDeltaPeriod(metricDTO, metricLastMonth);
+
+                createNewMetric(context, item, metricDTO, deltaPeriod1, deltaPeriod2);
             } catch (SQLException | AuthorizeException e) {
                 log.error(e.getMessage(), e);
                 throw new IllegalStateException("Failed to run metric update", e);
@@ -75,13 +84,22 @@ public class UpdateScopusPersonMetrics implements MetricsExternalServices {
         return true;
     }
 
-    private void createNewMetric(Context context, Item item, CrisMetricDTO metricDTO)
-            throws SQLException, AuthorizeException {
+    private void createNewMetric(Context context, Item item, CrisMetricDTO metricDTO,
+            Double deltaPeriod1, Double deltaPeriod2) throws SQLException, AuthorizeException {
         CrisMetrics newMetric = crisMetricsService.create(context, item);
         newMetric.setMetricType(metricDTO.getMetricType());
         newMetric.setLast(true);
         newMetric.setMetricCount(metricDTO.getMetricCount());
         newMetric.setAcquisitionDate(new Date());
+        newMetric.setDeltaPeriod1(deltaPeriod1);
+        newMetric.setDeltaPeriod2(deltaPeriod2);
+    }
+
+    private Double getDeltaPeriod(CrisMetricDTO currentMetric, Optional<CrisMetrics> metric) {
+        if (!metric.isEmpty()) {
+            return currentMetric.getMetricCount() - metric.get().getMetricCount();
+        }
+        return null;
     }
 
 }

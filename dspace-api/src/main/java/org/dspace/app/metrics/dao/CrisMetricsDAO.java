@@ -7,6 +7,7 @@
  */
 package org.dspace.app.metrics.dao;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,6 +17,10 @@ import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 
 /**
+ * Database Access Object interface class for the CrisMetrics object.
+ * The implementation of this class is responsible for all database calls for the CrisMetrics object
+ * and is autowired by spring
+ * This class should only be accessed from a single service and should never be exposed outside of the API
  * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
@@ -38,5 +43,8 @@ public interface CrisMetricsDAO extends GenericDAO<CrisMetrics> {
 
     public CrisMetrics uniqueLastMetricByResourceIdAndResourceTypeIdAndMetricsType(Context context, String metricType,
             UUID resource, boolean last) throws SQLException;
+
+    public List<CrisMetrics> findMetricByResourceIdMetricTypeAndBetweenSomeDate(Context context, String metricType,
+           UUID resourceId, Date before, Date after) throws SQLException;
 
 }

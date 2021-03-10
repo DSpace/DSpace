@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.vo.MetadataValueVO;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
@@ -35,8 +36,7 @@ public class EPersonValueGenerator implements TemplateValueGenerator {
 
 
     @Override
-    public String generator(final Context context, final Item targetItem, final Item templateItem,
-                            final String extraParams) {
+    public MetadataValueVO generator(Context context, Item targetItem, Item templateItem, String extraParams) {
         String[] params = StringUtils.split(extraParams, "\\.");
         String prefix = params[0];
         String suffix = "";
@@ -62,12 +62,9 @@ public class EPersonValueGenerator implements TemplateValueGenerator {
         try {
             ePerson = ePersonService.findByEmail(context, value);
         } catch (SQLException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
         }
-        String result = "";
-        if (ePerson != null) {
-            result = "" + ePerson.getID();
-        }
-        return result;
+
+        return ePerson != null ? new MetadataValueVO(value, ePerson.getID().toString()) : new MetadataValueVO("");
     }
 }

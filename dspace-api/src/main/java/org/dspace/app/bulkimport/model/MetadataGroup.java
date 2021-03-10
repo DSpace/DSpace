@@ -12,6 +12,7 @@ import static org.apache.commons.collections4.multimap.UnmodifiableMultiValuedMa
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.content.vo.MetadataValueVO;
 
 public class MetadataGroup {
 

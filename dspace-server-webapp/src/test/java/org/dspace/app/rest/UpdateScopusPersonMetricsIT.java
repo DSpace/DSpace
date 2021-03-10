@@ -19,6 +19,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.FileInputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.Calendar;
+import java.util.Date;
 
 import com.amazonaws.util.StringInputStream;
 import org.apache.commons.io.IOUtils;
@@ -93,6 +95,32 @@ public class UpdateScopusPersonMetricsIT extends AbstractControllerIntegrationTe
                                                     .withMetricCount(12)
                                                     .isLast(true).build();
 
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime( new Date());
+            calendar.add(Calendar.DATE, -7);
+            calendar.set(Calendar.HOUR_OF_DAY, 10);
+
+            Date oneWeekAgo = calendar.getTime();
+
+            CrisMetrics metrics2 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
+                                                     .withAcquisitionDate(oneWeekAgo)
+                                                     .withMetricType(ScopusPersonMetric.H_INDEX.metricType())
+                                                     .withMetricCount(10)
+                                                     .isLast(false).build();
+
+            Calendar calendar3 = Calendar.getInstance();
+            calendar3.setTime( new Date());
+            calendar3.add(Calendar.MONTH, -1);
+            calendar3.set(Calendar.HOUR_OF_DAY, 21);
+
+            Date oneMonthAgo = calendar3.getTime();
+
+            CrisMetrics metrics3 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
+                                                     .withAcquisitionDate(oneMonthAgo)
+                                                     .withMetricType(ScopusPersonMetric.H_INDEX.metricType())
+                                                     .withMetricCount(7)
+                                                     .isLast(false).build();
+
             context.restoreAuthSystemState();
 
             String[] args = new String[] { "update-metrics", "-s", "scopus-person"};
@@ -104,6 +132,11 @@ public class UpdateScopusPersonMetricsIT extends AbstractControllerIntegrationTe
                                     ScopusPersonMetric.H_INDEX.metricType(), itemA.getID());
 
             assertNotEquals(newHIndexMetric.getID(), metric.getID());
+            assertEquals(newHIndexMetric.getMetricCount() - metrics2.getMetricCount(),
+                         newHIndexMetric.getDeltaPeriod1(), 0);
+            assertEquals(newHIndexMetric.getMetricCount() - metrics3.getMetricCount(),
+                         newHIndexMetric.getDeltaPeriod2(), 0);
+
             String restId = CrisMetricsBuilder.getRestStoredMetricId(newHIndexMetric.getID());
             String tokenAdmin = getAuthToken(admin.getEmail(), password);
             getClient(tokenAdmin).perform(get("/api/cris/metrics/" + restId))
@@ -153,6 +186,32 @@ public class UpdateScopusPersonMetricsIT extends AbstractControllerIntegrationTe
                                                     .withMetricCount(12000)
                                                     .isLast(true).build();
 
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime( new Date());
+            calendar.add(Calendar.DATE, -7);
+            calendar.set(Calendar.HOUR_OF_DAY, 10);
+
+            Date oneWeekAgo = calendar.getTime();
+
+            CrisMetrics metrics2 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
+                                                     .withAcquisitionDate(oneWeekAgo)
+                                                     .withMetricType(ScopusPersonMetric.CITED.metricType())
+                                                     .withMetricCount(8000)
+                                                     .isLast(false).build();
+
+            Calendar calendar3 = Calendar.getInstance();
+            calendar3.setTime( new Date());
+            calendar3.add(Calendar.MONTH, -1);
+            calendar3.set(Calendar.HOUR_OF_DAY, 21);
+
+            Date oneMonthAgo = calendar3.getTime();
+
+            CrisMetrics metrics3 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
+                                                     .withAcquisitionDate(oneMonthAgo)
+                                                     .withMetricType(ScopusPersonMetric.CITED.metricType())
+                                                     .withMetricCount(2000)
+                                                     .isLast(false).build();
+
             context.restoreAuthSystemState();
 
             String[] args = new String[] { "update-metrics", "-s", "scopus-person"};
@@ -164,6 +223,11 @@ public class UpdateScopusPersonMetricsIT extends AbstractControllerIntegrationTe
                     ScopusPersonMetric.CITED.metricType(), itemA.getID());
 
             assertNotEquals(newCitedMetric.getID(), metric1.getID());
+            assertEquals(newCitedMetric.getMetricCount() - metrics2.getMetricCount(),
+                         newCitedMetric.getDeltaPeriod1(), 0);
+            assertEquals(newCitedMetric.getMetricCount() - metrics3.getMetricCount(),
+                         newCitedMetric.getDeltaPeriod2(), 0);
+
             String restId = CrisMetricsBuilder.getRestStoredMetricId(newCitedMetric.getID());
             String tokenAdmin = getAuthToken(admin.getEmail(), password);
             getClient(tokenAdmin).perform(get("/api/cris/metrics/" + restId))
