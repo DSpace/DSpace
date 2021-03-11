@@ -96,7 +96,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     }
 
     public ItemBuilder withRelationshipType(final String relationshipType) {
-        return addMetadataValue(item, "relationship", "type", null, relationshipType);
+        return addMetadataValue(item, "dspace", "entity", "type", relationshipType);
     }
 
     public ItemBuilder withType(final String type) {
