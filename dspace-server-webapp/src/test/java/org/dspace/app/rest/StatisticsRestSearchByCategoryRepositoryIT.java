@@ -362,16 +362,16 @@ public class StatisticsRestSearchByCategoryRepositoryIT extends AbstractControll
             .andExpect(jsonPath("$._embedded.usagereports", Matchers.containsInAnyOrder(
                 UsageReportMatcher
                     .matchUsageReport(publicationItem.getID() + "_" + TOTAL_VISITS_REPORT_ID,
-                            TOTAL_VISITS_REPORT_ID, Arrays.asList(getPoint(publicationItem, 13))),
+                            TOTAL_VISITS_REPORT_ID, "table", Arrays.asList(getPoint(publicationItem, 13))),
                 UsageReportMatcher
                     .matchUsageReport(publicationItem.getID() + "_" + TOTAL_VISITS_PER_MONTH_REPORT_ID,
-                            TOTAL_VISITS_PER_MONTH_REPORT_ID),
+                            TOTAL_VISITS_PER_MONTH_REPORT_ID, "chart.line"),
                 UsageReportMatcher
                     .matchUsageReport(publicationItem.getID() + "_" + TOP_COUNTRIES_REPORT_ID,
                             TOP_COUNTRIES_REPORT_ID),
                 UsageReportMatcher
                     .matchUsageReport(publicationItem.getID() + "_" + TOP_CITIES_REPORT_ID,
-                            TOP_CITIES_REPORT_ID),
+                            TOP_CITIES_REPORT_ID, "chart.bar"),
                 UsageReportMatcher
                     .matchUsageReport(publicationItem.getID() + "_" + TOTAL_DOWNLOADS_REPORT_ID,
                             TOTAL_DOWNLOADS_REPORT_ID, Arrays.asList(getDownloadPoint(bitstreamVisited, 3)))

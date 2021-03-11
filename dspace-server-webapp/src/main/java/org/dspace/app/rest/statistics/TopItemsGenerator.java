@@ -32,7 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public class TopItemsGenerator implements UsageReportGenerator {
+public class TopItemsGenerator extends AbstractUsageReportGenerator {
 
     @Autowired
     private HandleService handleService;

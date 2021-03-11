@@ -32,4 +32,10 @@ public interface UsageReportGenerator {
      * @return the report type generated
      */
     public String getReportType();
+
+    /**
+     * 
+     * @return the suggested view mode to apply to the report
+     */
+    public String getViewMode();
 }

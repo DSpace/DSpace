@@ -28,7 +28,17 @@ import org.dspace.statistics.content.StatisticsTable;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public class TotalVisitPerPeriodGenerator implements UsageReportGenerator {
+public class TotalVisitPerPeriodGenerator extends AbstractUsageReportGenerator {
+    private String periodType = "month";
+    private int increment = 1;
+
+    public void setPeriodType(String periodType) {
+        this.periodType = periodType;
+    }
+
+    public void setIncrement(int increment) {
+        this.increment = increment;
+    }
 
     /**
      * Create a stat usage report for the amount of TotalVisitPerMonth on a DSO, containing one point for each month
@@ -42,8 +52,7 @@ public class TotalVisitPerPeriodGenerator implements UsageReportGenerator {
     public UsageReportRest createUsageReport(Context context, DSpaceObject dso) {
         StatisticsTable statisticsTable = new StatisticsTable(new StatisticsDataVisits(dso));
         DatasetTimeGenerator timeAxis = new DatasetTimeGenerator();
-        // TODO month start and end as request para?
-        timeAxis.setDateInterval("month", "-6", "+1");
+        timeAxis.setDateInterval(periodType, "-" + (increment * getMaxResults()), "+" + increment);
         statisticsTable.addDatasetGenerator(timeAxis);
         DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
         dsoAxis.addDsoChild(dso.getType(), 10, false, -1);

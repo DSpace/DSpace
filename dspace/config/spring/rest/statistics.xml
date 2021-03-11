@@ -9,12 +9,36 @@
 
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
-	<bean id="topCitiesGenerator" class="org.dspace.app.rest.statistics.TopCitiesGenerator" />
-	<bean id="topCountriesGenerator" class="org.dspace.app.rest.statistics.TopCountriesGenerator" />
-	<bean id="topItemsGenerator" class="org.dspace.app.rest.statistics.TopItemsGenerator" />
-	<bean id="totalDownloadsGenerator" class="org.dspace.app.rest.statistics.TotalDownloadsGenerator" />
-	<bean id="totalVisitGenerator" class="org.dspace.app.rest.statistics.TotalVisitGenerator" />
-    <bean id="totalVisitPerPeriodGenerator" class="org.dspace.app.rest.statistics.TotalVisitPerPeriodGenerator" />
+	<bean id="topCitiesGenerator" class="org.dspace.app.rest.statistics.TopCitiesGenerator">
+	   <property name="viewMode" value="table" />
+	   <property name="maxResults" value="10" />
+	</bean>
+
+	<bean id="topCountriesGenerator" class="org.dspace.app.rest.statistics.TopCountriesGenerator">
+	   <property name="viewMode" value="table" />
+       <property name="maxResults" value="10" />
+    </bean>
+
+	<bean id="topItemsGenerator" class="org.dspace.app.rest.statistics.TopItemsGenerator">
+	   <property name="viewMode" value="table" />
+       <property name="maxResults" value="50" />
+    </bean>
+
+	<bean id="totalDownloadsGenerator" class="org.dspace.app.rest.statistics.TotalDownloadsGenerator">
+	   <property name="viewMode" value="table" />
+       <property name="maxResults" value="100" />
+    </bean>
+
+	<bean id="totalVisitGenerator" class="org.dspace.app.rest.statistics.TotalVisitGenerator">
+	   <property name="viewMode" value="table" />
+    </bean>
+
+    <bean id="totalVisitPerPeriodGenerator" class="org.dspace.app.rest.statistics.TotalVisitPerPeriodGenerator">
+       <property name="viewMode" value="chart.line" />
+       <property name="maxResults" value="6" />
+       <property name="periodType" value="month" />
+       <property name="increment" value="1" />
+    </bean>
 
 	<bean id="person-mainReports" class="org.dspace.app.rest.model.UsageReportCategoryRest">
 	    <property name="categoryType" value="mainReports" />

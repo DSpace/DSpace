@@ -24,7 +24,7 @@ import org.dspace.statistics.content.StatisticsListing;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public abstract class AbstractTopSolrStatsFieldGenerator implements UsageReportGenerator {
+public abstract class AbstractTopSolrStatsFieldGenerator extends AbstractUsageReportGenerator {
     /**
      * Retrieves the stats dataset of a given dso, with a given axisType (example countryCode, city), which
      * corresponds to a solr field, and a given facetMinCount limit (usually either 0 or 1, 0 if we want a data point
@@ -42,8 +42,7 @@ public abstract class AbstractTopSolrStatsFieldGenerator implements UsageReportG
         StatisticsListing statListing = new StatisticsListing(new StatisticsDataVisits(dso));
         DatasetTypeGenerator typeAxis = new DatasetTypeGenerator();
         typeAxis.setType(typeAxisString);
-        // TODO make max nr of top countries/cities a request para? Must be set
-        typeAxis.setMax(100);
+        typeAxis.setMax(getMaxResults());
         statListing.addDatasetGenerator(typeAxis);
         return statListing.getDataset(context, facetMinCount);
     }

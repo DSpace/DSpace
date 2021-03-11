@@ -42,6 +42,21 @@ public class UsageReportMatcher {
     }
 
     /**
+     * Matcher for the usage report on just id and report-type
+     *
+     * @param id         Id to match if of json of UsageReport
+     * @param reportType ReportType to match if of json of UsageReport
+     * @param viewMode   the suggested view mode for the report
+     * @return The matcher
+     */
+    public static Matcher<? super Object> matchUsageReport(String id, String reportType, String viewMode) {
+        return allOf(
+            hasJsonPath("$.id", is(id)),
+            hasJsonPath("$.report-type", is(reportType)),
+            hasJsonPath("$.view-mode", is(viewMode)));
+    }
+
+    /**
      * Matcher for the usage report including the {@link UsageReportPointRest} points
      *
      * @param id         Id to match if of json of UsageReport
@@ -59,4 +74,22 @@ public class UsageReportMatcher {
                       .collect(Collectors.toList()))));
     }
 
+    /**
+     * Matcher for the usage report including the {@link UsageReportPointRest} points
+     *
+     * @param id         Id to match if of json of UsageReport
+     * @param reportType ReportType to match if of json of UsageReport
+     * @param viewMode   the suggested view mode for the report
+     * @param points     List of points to match to the json of UsageReport's list of points
+     * @return The matcher
+     */
+    public static Matcher<? super Object> matchUsageReport(String id, String reportType, String viewMode,
+                                                           List<UsageReportPointRest> points) {
+        return allOf(
+            matchUsageReport(id, reportType, viewMode),
+            hasJsonPath("$.points", Matchers.containsInAnyOrder(
+                points.stream().map(point -> UsageReportPointMatcher
+                    .matchUsageReportPoint(point.getId(), point.getType(), point.getValues().get("views")))
+                      .collect(Collectors.toList()))));
+    }
 }

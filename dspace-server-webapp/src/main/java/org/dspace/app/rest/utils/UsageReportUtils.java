@@ -117,6 +117,7 @@ public class UsageReportUtils {
             UsageReportRest usageReportRest = generator.createUsageReport(context, dso);
             usageReportRest.setId(dso.getID() + "_" + reportId);
             usageReportRest.setReportType(generator.getReportType());
+            usageReportRest.setViewMode(generator.getViewMode());
             return usageReportRest;
         } else {
             throw new ResourceNotFoundException("The given report id can't be resolved: " + reportId + "; "

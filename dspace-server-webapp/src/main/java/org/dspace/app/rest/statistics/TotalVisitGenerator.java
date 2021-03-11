@@ -28,7 +28,7 @@ import org.dspace.statistics.content.StatisticsListing;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public class TotalVisitGenerator implements UsageReportGenerator {
+public class TotalVisitGenerator extends AbstractUsageReportGenerator {
 
     /**
      * Create a stat usage report for the amount of TotalVisit on a DSO, containing one point with the amount of
