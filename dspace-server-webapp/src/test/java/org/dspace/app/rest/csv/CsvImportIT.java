@@ -178,7 +178,7 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
             .getHandle() + "," + "Article" + "," + "Publication" + "," +
             itemB.getID().toString() + "||" + itemC.getID().toString() + "||" + itemF
             .getID().toString();
-        String[] csv = {"id,collection,dc.title,relationship.type,relation." + "isAuthorOfPublication", csvLineString};
+        String[] csv = {"id,collection,dc.title,dspace.entity.type,relation." + "isAuthorOfPublication", csvLineString};
         performImportScript(csv);
     }
 
@@ -187,7 +187,7 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
         String csvLineString = itemE.getID().toString() + "," + owningCollection
             .getHandle() + "," + title + "," + "Person" + "," + itemB.getID().toString() + "||" + itemF.getID()
                                                                                                        .toString();
-        String[] csv = {"id,collection,dc.title,relationship.type,relation." + "isAuthorOfPublication", csvLineString};
+        String[] csv = {"id,collection,dc.title,dspace.entity.type,relation." + "isAuthorOfPublication", csvLineString};
         performImportScript(csv);
 
     }
@@ -200,7 +200,7 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
                                                                Integer rightPlaceToCheck) throws Exception {
         String csvLineString = "+," + col1.getHandle() + "," + itemTitle + "," + relationshipType + "," + relatedItem
             .getID().toString();
-        String[] csv = {"id,collection,dc.title,relationship.type,relation." + relationshipTypeLabel, csvLineString};
+        String[] csv = {"id,collection,dc.title,dspace.entity.type,relation." + relationshipTypeLabel, csvLineString};
         performImportScript(csv);
         Iterator<Item> itemIteratorItem = itemService.findByMetadataField(context, "dc", "title", null, itemTitle);
         Item item = itemIteratorItem.next();
@@ -232,7 +232,7 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
         idStringRelatedItems = idStringRelatedItems.substring(0, idStringRelatedItems.length() - 2);
         String csvLineString = "+," + col1
             .getHandle() + "," + itemTitle + "," + relationshipType + "," + idStringRelatedItems;
-        String[] csv = {"id,collection,dc.title,relationship.type,relation." + relationshipTypeLabel, csvLineString};
+        String[] csv = {"id,collection,dc.title,dspace.entity.type,relation." + relationshipTypeLabel, csvLineString};
         performImportScript(csv);
         Iterator<Item> itemIteratorItem = itemService.findByMetadataField(context, "dc", "title", null, itemTitle);
         Item item = itemIteratorItem.next();
@@ -299,7 +299,7 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
 
         String csvLineString = "+," + col1.getHandle() + ",TestItemB,Person," + article
             .getID().toString();
-        String[] csv = {"id,collection,dc.title,relationship.type,relation.isPublicationOfAuthor", csvLineString};
+        String[] csv = {"id,collection,dc.title,dspace.entity.type,relation.isPublicationOfAuthor", csvLineString};
 
         InputStream inputStream = new ByteArrayInputStream(String.join(System.lineSeparator(),
                                                                        Arrays.asList(csv))
