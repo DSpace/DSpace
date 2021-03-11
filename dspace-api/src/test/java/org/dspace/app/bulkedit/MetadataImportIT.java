@@ -113,7 +113,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
                                                               "isPublicationOfAuthor", 0, 10, 0, 10);
         context.restoreAuthSystemState();
 
-        String[] csv = {"id,collection,dc.title,relation.isPublicationOfAuthor,relationship.type",
+        String[] csv = {"id,collection,dc.title,relation.isPublicationOfAuthor,dspace.entity.type",
             "+," + collection.getHandle() + ",\"Test Import 1\"," + item.getID() + ",Person"};
         performImportScript(csv);
         Item importedItem = findItemByName("Test Import 1");

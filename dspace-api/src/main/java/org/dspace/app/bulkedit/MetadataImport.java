@@ -1487,7 +1487,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 }
             }
             //Populate entityTypeMap
-            if (key.equalsIgnoreCase("relationship.type") && line.get(key).size() > 0) {
+            if (key.equalsIgnoreCase("dspace.entity.type") && line.get(key).size() > 0) {
                 if (uuid == null) {
                     entityTypeMap.put(new UUID(0, rowCount), line.get(key).get(0));
                 } else {
@@ -1696,9 +1696,9 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                             if (itemService.find(c, UUID.fromString(targetUUID)) != null) {
                                 DSpaceCSVLine dSpaceCSVLine = this.csv.getCSVLines()
                                                                       .get(Integer.valueOf(originRow) - 1);
-                                List<String> relTypes = dSpaceCSVLine.get("relationship.type");
+                                List<String> relTypes = dSpaceCSVLine.get("dspace.entity.type");
                                 if (relTypes == null || relTypes.isEmpty()) {
-                                    dSpaceCSVLine.get("relationship.type[]");
+                                    dSpaceCSVLine.get("dspace.entity.type[]");
                                 }
 
                                 if (relTypes != null && relTypes.size() > 0) {
