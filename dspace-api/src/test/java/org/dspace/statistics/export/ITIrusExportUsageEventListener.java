@@ -263,8 +263,8 @@ public class ITIrusExportUsageEventListener extends AbstractIntegrationTestWithD
         when(usageEvent.getRequest()).thenReturn(request);
         when(usageEvent.getContext()).thenReturn(new Context());
 
-        itemService.clearMetadata(context, item, "relationship", "type", null, Item.ANY);
-        itemService.addMetadata(context, item, "relationship", "type", null, null, "OrgUnit");
+        itemService.clearMetadata(context, item, "dspace", "entity", "type", Item.ANY);
+        itemService.addMetadata(context, item, "dspace", "entity", "type", null, "OrgUnit");
         itemService.update(context, item);
 
         context.restoreAuthSystemState();
@@ -359,8 +359,8 @@ public class ITIrusExportUsageEventListener extends AbstractIntegrationTestWithD
         when(usageEvent.getRequest()).thenReturn(request);
         when(usageEvent.getContext()).thenReturn(new Context());
 
-        itemService.clearMetadata(context, item, "relationship", "type", null, Item.ANY);
-        itemService.addMetadata(context, item, "relationship", "type", null, null, "OrgUnit");
+        itemService.clearMetadata(context, item, "dspace", "entity", "type", Item.ANY);
+        itemService.addMetadata(context, item, "dspace", "entity", "type", null, "OrgUnit");
         itemService.update(context, item);
 
         context.restoreAuthSystemState();

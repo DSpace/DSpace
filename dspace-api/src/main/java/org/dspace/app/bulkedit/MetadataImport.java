@@ -890,10 +890,10 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         Entity relationEntity = getEntity(c, value);
         // Get relationship type of entity and item
         String relationEntityRelationshipType = itemService.getMetadata(relationEntity.getItem(),
-                                                                        "relationship", "type",
-                                                                        null, Item.ANY).get(0).getValue();
-        String itemRelationshipType = itemService.getMetadata(item, "relationship", "type",
-                                                              null, Item.ANY).get(0).getValue();
+                                                                        "dspace", "entity",
+                                                                        "type", Item.ANY).get(0).getValue();
+        String itemRelationshipType = itemService.getMetadata(item, "dspace", "entity",
+                                                              "type", Item.ANY).get(0).getValue();
 
         // Get the correct RelationshipType based on typeName
         List<RelationshipType> relType = relationshipTypeService.findByLeftwardOrRightwardTypeName(c, typeName);
@@ -1651,8 +1651,8 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                     if (itemService.find(c, UUID.fromString(targetUUID)) != null) {
                         targetItem = itemService.find(c, UUID.fromString(targetUUID));
                         List<MetadataValue> relTypes = itemService.
-                                                                      getMetadata(targetItem, "relationship", "type",
-                                                                                  null, Item.ANY);
+                                                                      getMetadata(targetItem, "dspace", "entity",
+                                                                                  "type", Item.ANY);
                         String relTypeValue = null;
                         if (relTypes.size() > 0) {
                             relTypeValue = relTypes.get(0).getValue();
@@ -1710,8 +1710,8 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                                     originItem = itemService.find(c, UUID.fromString(originRefererUUID));
                                     if (originItem != null) {
                                         List<MetadataValue> mdv = itemService.getMetadata(originItem,
-                                                                                          "relationship",
-                                                                                          "type", null,
+                                                                                          "dspace",
+                                                                                          "entity", "type",
                                                                                           Item.ANY);
                                         if (!mdv.isEmpty()) {
                                             String relTypeValue = mdv.get(0).getValue();

@@ -181,7 +181,7 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
     }
 
     public WorkspaceItemBuilder withRelationshipType(final String relationshipType) {
-        return addMetadataValue("relationship", "type", null, relationshipType);
+        return addMetadataValue("dspace", "entity", "type", relationshipType);
     }
 
     public WorkspaceItemBuilder grantLicense() {
