@@ -201,7 +201,7 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
                                                              Collection owningCollection, String title)
         throws Exception {
         String csvLineString = article2.getID().toString() + "," + owningCollection
-            .getHandle() + "," + title + "," + "Person" + "," + author1.getID().toString() + "||" + author3.getID()
+            .getHandle() + "," + title + "," + "Publication" + "," + author1.getID().toString() + "||" + author3.getID()
                                                                                                        .toString();
         String[] csv = {"id,collection,dc.title,dspace.entity.type,relation." + "isAuthorOfPublication", csvLineString};
         performImportScript(csv);
