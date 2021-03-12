@@ -3477,21 +3477,21 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                              .withAuthor("Smith, Donald")
                              .withPersonIdentifierLastName("Smith")
                              .withPersonIdentifierFirstName("Donald")
-                             .withRelationshipType("Person")
+                             .withEntityType("Person")
                              .build();
 
         author2 = ItemBuilder.createItem(context, col1)
                              .withTitle("Author2")
                              .withIssueDate("2016-02-13")
                              .withAuthor("Smith, Maria")
-                             .withRelationshipType("Person")
+                             .withEntityType("Person")
                              .build();
 
         publication1 = ItemBuilder.createItem(context, col1)
                                   .withTitle("Publication1")
                                   .withAuthor("Testy, TEst")
                                   .withIssueDate("2015-01-01")
-                                  .withRelationshipType("Publication")
+                                  .withEntityType("Publication")
                                   .build();
 
         EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
@@ -3541,21 +3541,21 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                              .withAuthor("Smith, Donald")
                              .withPersonIdentifierLastName("Smith")
                              .withPersonIdentifierFirstName("Donald")
-                             .withRelationshipType("Person")
+                             .withEntityType("Person")
                              .build();
 
         author2 = ItemBuilder.createItem(context, col1)
                              .withTitle("Author2")
                              .withIssueDate("2016-02-13")
                              .withAuthor("Smith, Maria")
-                             .withRelationshipType("Person")
+                             .withEntityType("Person")
                              .build();
 
         publication1 = ItemBuilder.createItem(context, col1)
                                   .withTitle("Publication1")
                                   .withAuthor("Testy, TEst")
                                   .withIssueDate("2015-01-01")
-                                  .withRelationshipType("Publication")
+                                  .withEntityType("Publication")
                                   .build();
 
         EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();

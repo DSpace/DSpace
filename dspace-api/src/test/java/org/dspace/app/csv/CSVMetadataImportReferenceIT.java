@@ -208,7 +208,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
                              .withAuthor("Smith, Donald")
                              .withPersonIdentifierLastName("Smith")
                              .withPersonIdentifierFirstName("Donald")
-                             .withRelationshipType("Person")
+                             .withEntityType("Person")
                              .build();
         context.restoreAuthSystemState();
         String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,rowName,dc.identifier.other",
@@ -230,7 +230,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
                                  .withAuthor("Smith, Donald")
                                  .withPersonIdentifierLastName("Smith")
                                  .withPersonIdentifierFirstName("Donald")
-                                 .withRelationshipType("Person")
+                                 .withEntityType("Person")
                                  .build();
         Item person2 = ItemBuilder.createItem(context, col1)
                                  .withTitle("Author2")
@@ -238,7 +238,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
                                  .withAuthor("Smith, John")
                                  .withPersonIdentifierLastName("Smith")
                                  .withPersonIdentifierFirstName("John")
-                                 .withRelationshipType("Person")
+                                 .withEntityType("Person")
                                  .build();
         String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,rowName,dc.identifier.other",
             "+,Publication," + person.getID().toString() + "||" + person2.getID().toString() + "," +
@@ -261,7 +261,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
                                  .withAuthor("Smith, Donald")
                                  .withPersonIdentifierLastName("Smith")
                                  .withPersonIdentifierFirstName("Donald")
-                                 .withRelationshipType("Person")
+                                 .withEntityType("Person")
                                  .build();
         String[] csv = {"id,dc.title,dspace.entity.type,relation.isAuthorOfPublication,collection,rowName," +
             "dc.identifier.other",
@@ -287,7 +287,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
                                  .withAuthor("Smith, Donald")
                                  .withPersonIdentifierLastName("Smith")
                                  .withPersonIdentifierFirstName("Donald")
-                                 .withRelationshipType("Person")
+                                 .withEntityType("Person")
                                  .build();
         Item person2 = ItemBuilder.createItem(context, col1)
                                  .withTitle("Person2")
@@ -295,7 +295,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
                                  .withAuthor("Smith, John")
                                  .withPersonIdentifierLastName("Smith")
                                  .withPersonIdentifierFirstName("John")
-                                 .withRelationshipType("Person")
+                                 .withEntityType("Person")
                                  .build();
 
         context.restoreAuthSystemState();
@@ -360,7 +360,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
                                  .withAuthor("Smith, Donald")
                                  .withPersonIdentifierLastName("Smith")
                                  .withPersonIdentifierFirstName("Donald")
-                                 .withRelationshipType("Person")
+                                 .withEntityType("Person")
                                  .withIdentifierOther("1")
                                  .build();
         Item person2 = ItemBuilder.createItem(context, col1)
@@ -369,7 +369,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
                                  .withAuthor("Smith, John")
                                  .withPersonIdentifierLastName("Smith")
                                  .withPersonIdentifierFirstName("John")
-                                 .withRelationshipType("Person")
+                                 .withEntityType("Person")
                                  .withIdentifierOther("1")
                                  .build();
 
@@ -391,7 +391,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
                                  .withAuthor("Smith, Donald")
                                  .withPersonIdentifierLastName("Smith")
                                  .withPersonIdentifierFirstName("Donald")
-                                 .withRelationshipType("Person")
+                                 .withEntityType("Person")
                                  .withIdentifierOther("1")
                                  .build();
         context.restoreAuthSystemState();
@@ -454,7 +454,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
         Item testItem = ItemBuilder.createItem(context, col1)
                                  .withTitle("OrgUnit")
                                  .withIssueDate("2017-10-17")
-                                 .withRelationshipType("OrgUnit")
+                                 .withEntityType("OrgUnit")
                                  .build();
         context.restoreAuthSystemState();
         String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,rowName",
@@ -472,7 +472,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
         Item testItem = ItemBuilder.createItem(context, col1)
                                    .withTitle("OrgUnit")
                                    .withIssueDate("2017-10-17")
-                                   .withRelationshipType("OrgUnit")
+                                   .withEntityType("OrgUnit")
                                    .build();
         context.restoreAuthSystemState();
         String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,rowName",
@@ -494,7 +494,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
                                  .withAuthor("Smith, Donald")
                                  .withPersonIdentifierLastName("Smith")
                                  .withPersonIdentifierFirstName("Donald")
-                                 .withRelationshipType("Person")
+                                 .withEntityType("Person")
                                  .withIdentifierOther("testItemOne")
                                  .build();
 
@@ -502,7 +502,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
         Item testItem2 = ItemBuilder.createItem(context, col1)
                                  .withTitle("Publication")
                                  .withIssueDate("2017-10-17")
-                                 .withRelationshipType("Publication")
+                                 .withEntityType("Publication")
                                  .withIdentifierOther("testItemTwo")
                                  .build();
 
@@ -510,7 +510,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
         Item testItem3 = ItemBuilder.createItem(context, col1)
                                  .withTitle("Project")
                                  .withIssueDate("2017-10-17")
-                                 .withRelationshipType("Project")
+                                 .withEntityType("Project")
                                  .withIdentifierOther("testItemThree")
                                  .build();
 
@@ -548,7 +548,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
                                    .withAuthor("Smith, Donald")
                                    .withPersonIdentifierLastName("Smith")
                                    .withPersonIdentifierFirstName("Donald")
-                                   .withRelationshipType("Person")
+                                   .withEntityType("Person")
                                    .withIdentifierOther("testItemOne")
                                    .build();
 
@@ -569,7 +569,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
         Item testItem = ItemBuilder.createItem(context, col1)
                                  .withTitle("Publication")
                                  .withIssueDate("2017-10-17")
-                                 .withRelationshipType("Publication")
+                                 .withEntityType("Publication")
                                  .build();
         context.restoreAuthSystemState();
         String[] csv = {"id,collection,dspace.entity.type,dc.title," +
