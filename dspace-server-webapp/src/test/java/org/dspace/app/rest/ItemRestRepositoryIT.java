@@ -2800,7 +2800,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
             .withAuthor("Smith, Donald")
             .withPersonIdentifierLastName("Smith")
             .withPersonIdentifierFirstName("Donald")
-            .withRelationshipType("Person")
+            .withEntityType("Person")
             .build();
         context.restoreAuthSystemState();
 
@@ -2834,7 +2834,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
             .withTitle("Publication1")
             .withAuthor("Testy, TEst")
             .withIssueDate("2015-01-01")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .build();
         context.restoreAuthSystemState();
 
@@ -2916,7 +2916,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         Map<String, String> value = new HashMap<>();
         value.put("value", "Publication");
         values.add(value);
-        AddOperation addOperation = new AddOperation("/metadata/relationship.type", values);
+        AddOperation addOperation = new AddOperation("/metadata/dspace.entity.type", values);
         ops.add(addOperation);
         String patchBody = getPatchContent(ops);
         getClient(token).perform(patch("/api/core/items/" + item.getID())
