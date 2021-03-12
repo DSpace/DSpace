@@ -929,5 +929,88 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
 
     }
 
+    @Test
+    public void findAllPaginationTest() throws Exception {
+        getClient().perform(get("/api/core/metadatafields")
+                   .param("size", "3")
+                   .param("page", "0"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItems(
+                              MetadataFieldMatcher.matchMetadataFieldByKeys("creativework","datePublished", null),
+                              MetadataFieldMatcher.matchMetadataFieldByKeys("creativework", "editor", null),
+                              MetadataFieldMatcher.matchMetadataFieldByKeys("creativework", "keywords", null)
+                              )))
+                   .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadatafields?"),
+                           Matchers.containsString("page=0"), Matchers.containsString("size=3"))))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadatafields?"),
+                           Matchers.containsString("page=0"), Matchers.containsString("size=3"))))
+                   .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadatafields?"),
+                           Matchers.containsString("page=1"), Matchers.containsString("size=3"))))
+                   .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadatafields?"),
+                           Matchers.containsString("page=63"), Matchers.containsString("size=3"))))
+                   .andExpect(jsonPath("$.page.totalElements", is(192)))
+                   .andExpect(jsonPath("$.page.totalPages", is(64)))
+                   .andExpect(jsonPath("$.page.size", is(3)));
+
+        getClient().perform(get("/api/core/metadatafields")
+                   .param("size", "3")
+                   .param("page", "1"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItems(
+                              MetadataFieldMatcher.matchMetadataFieldByKeys("creativework","publisher", null),
+                              MetadataFieldMatcher.matchMetadataFieldByKeys("creativeworkseries", "issn", null),
+                              MetadataFieldMatcher.matchMetadataFieldByKeys("dc", "contributor", null)
+                              )))
+                   .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadatafields?"),
+                           Matchers.containsString("page=0"), Matchers.containsString("size=3"))))
+                   .andExpect(jsonPath("$._links.prev.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadatafields?"),
+                           Matchers.containsString("page=0"), Matchers.containsString("size=3"))))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadatafields?"),
+                           Matchers.containsString("page=1"), Matchers.containsString("size=3"))))
+                   .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadatafields?"),
+                           Matchers.containsString("page=2"), Matchers.containsString("size=3"))))
+                   .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadatafields?"),
+                           Matchers.containsString("page=63"), Matchers.containsString("size=3"))))
+                   .andExpect(jsonPath("$.page.totalElements", is(192)))
+                   .andExpect(jsonPath("$.page.totalPages", is(64)))
+                   .andExpect(jsonPath("$.page.size", is(3)));
+
+        getClient().perform(get("/api/core/metadatafields")
+                   .param("size", "3")
+                   .param("page", "63"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItems(
+                              MetadataFieldMatcher.matchMetadataFieldByKeys("relation","isVolumeOfJournal", null),
+                              MetadataFieldMatcher.matchMetadataFieldByKeys("relationship", "type", null),
+                              MetadataFieldMatcher.matchMetadataFieldByKeys("workflow", "score", null)
+                              )))
+                   .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadatafields?"),
+                           Matchers.containsString("page=0"), Matchers.containsString("size=3"))))
+                   .andExpect(jsonPath("$._links.prev.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadatafields?"),
+                           Matchers.containsString("page=62"), Matchers.containsString("size=3"))))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadatafields?"),
+                           Matchers.containsString("page=63"), Matchers.containsString("size=3"))))
+                   .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadatafields?"),
+                           Matchers.containsString("page=63"), Matchers.containsString("size=3"))))
+                   .andExpect(jsonPath("$.page.totalElements", is(192)))
+                   .andExpect(jsonPath("$.page.totalPages", is(64)))
+                   .andExpect(jsonPath("$.page.size", is(3)));
+    }
 
 }
