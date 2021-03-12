@@ -127,8 +127,22 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 ScriptMatcher.matchScript(scriptConfigurations.get(2).getName(),
                                                           scriptConfigurations.get(2).getDescription())
                         )))
-                        .andExpect(jsonPath("$.page",
-                                            is(PageMatcher.pageEntry(0, 1))));
+                        .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                                Matchers.containsString("/api/system/scripts?"),
+                                Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                        .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                                Matchers.containsString("/api/system/scripts?"),
+                                Matchers.containsString("size=1"))))
+                        .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                                Matchers.containsString("/api/system/scripts?"),
+                                Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                        .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                                Matchers.containsString("/api/system/scripts?"),
+                                Matchers.containsString("page=6"), Matchers.containsString("size=1"))))
+                        .andExpect(jsonPath("$.page.size", is(1)))
+                        .andExpect(jsonPath("$.page.number", is(0)))
+                        .andExpect(jsonPath("$.page.totalPages", is(7)))
+                        .andExpect(jsonPath("$.page.totalElements", is(7)));
 
 
         getClient(token).perform(get("/api/system/scripts").param("size", "1").param("page", "1"))
@@ -141,8 +155,25 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 ScriptMatcher.matchScript(scriptConfigurations.get(0).getName(),
                                                           scriptConfigurations.get(0).getDescription())
                         ))))
-                        .andExpect(jsonPath("$.page",
-                                            is(PageMatcher.pageEntry(1, 1))));
+                        .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                                Matchers.containsString("/api/system/scripts?"),
+                                Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                        .andExpect(jsonPath("$._links.prev.href", Matchers.allOf(
+                                Matchers.containsString("/api/system/scripts?"),
+                                Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                        .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                                Matchers.containsString("/api/system/scripts?"),
+                                Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                        .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                                Matchers.containsString("/api/system/scripts?"),
+                                Matchers.containsString("page=2"), Matchers.containsString("size=1"))))
+                        .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                                Matchers.containsString("/api/system/scripts?"),
+                                Matchers.containsString("page=6"), Matchers.containsString("size=1"))))
+                        .andExpect(jsonPath("$.page.size", is(1)))
+                        .andExpect(jsonPath("$.page.number", is(1)))
+                        .andExpect(jsonPath("$.page.totalPages", is(7)))
+                        .andExpect(jsonPath("$.page.totalElements", is(7)));
     }
 
     @Test
