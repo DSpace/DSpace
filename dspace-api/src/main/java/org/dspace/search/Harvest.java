@@ -28,8 +28,11 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SearchUtils;
+import org.dspace.discovery.indexobject.IndexableDSpaceObject;
+import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.eperson.Group;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
@@ -96,7 +99,7 @@ public class Harvest {
                                                   boolean items, boolean collections, boolean withdrawn,
                                                   boolean nonAnon) throws SQLException, ParseException {
         DiscoverQuery discoverQuery = new DiscoverQuery();
-        discoverQuery.addFilterQueries("search.resourcetype:" + Constants.ITEM);
+        discoverQuery.addFilterQueries("search.resourcetype:" + IndexableItem.TYPE);
 
         if (scope != null) {
             if (scope instanceof Community) {
@@ -139,15 +142,16 @@ public class Harvest {
             DiscoverResult discoverResult = SearchUtils.getSearchService().search(context, discoverQuery);
 
             // Process results of query into HarvestedItemInfo objects
-            Iterator<DSpaceObject> dsoIterator = discoverResult.getDspaceObjects().iterator();
+            Iterator<IndexableObject> dsoIterator = discoverResult.getIndexableObjects().iterator();
             while (dsoIterator.hasNext() && ((limit == 0) || (itemCounter < limit))) {
-                DSpaceObject dso = dsoIterator.next();
+                // the query is limited to ITEM
+                IndexableDSpaceObject indexableDSpaceObject = (IndexableDSpaceObject) dsoIterator.next();
                 HarvestedItemInfo itemInfo = new HarvestedItemInfo();
                 itemInfo.context = context;
-                itemInfo.handle = dso.getHandle();
-                itemInfo.itemID = dso.getID();
-                itemInfo.datestamp = ((Item) dso).getLastModified();
-                itemInfo.withdrawn = ((Item) dso).isWithdrawn();
+                itemInfo.handle = indexableDSpaceObject.getIndexedObject().getHandle();
+                itemInfo.itemID = indexableDSpaceObject.getID();
+                itemInfo.datestamp = ((IndexableItem) indexableDSpaceObject).getIndexedObject().getLastModified();
+                itemInfo.withdrawn = ((IndexableItem) indexableDSpaceObject).getIndexedObject().isWithdrawn();
 
                 if (collections) {
                     // Add collections data

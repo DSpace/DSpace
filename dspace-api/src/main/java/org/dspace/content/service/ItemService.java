@@ -23,6 +23,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.Thumbnail;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
@@ -36,7 +37,9 @@ import org.dspace.eperson.Group;
  *
  * @author kevinvandevelde at atmire.com
  */
-public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLegacySupportService<Item> {
+public interface ItemService
+        extends DSpaceObjectService<Item>, DSpaceObjectLegacySupportService<Item> {
+
     public Thumbnail getThumbnail(Context context, Item item, boolean requireOriginal) throws SQLException;
 
     /**
@@ -111,6 +114,21 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
         throws SQLException;
 
     /**
+     * Find all the items by a given submitter. The order is
+     * indeterminate. All items are included.
+     *
+     * @param context DSpace context object
+     * @param eperson the submitter
+     * @param retrieveAllItems flag to determine if all items should be returned or only archived items.
+     *                         If true, all items (regardless of status) are returned.
+     *                         If false, only archived items will be returned.
+     * @return an iterator over the items submitted by eperson
+     * @throws SQLException if database error
+     */
+    public Iterator<Item> findBySubmitter(Context context, EPerson eperson, boolean retrieveAllItems)
+            throws SQLException;
+
+    /**
      * Retrieve the list of items submitted by eperson, ordered by recently submitted, optionally limitable
      *
      * @param context DSpace context object
@@ -146,6 +164,29 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
         throws SQLException;
 
     /**
+     * Get all the archived items mapped to this collection (excludes owning collection). The order is indeterminate.
+     *
+     * @param context    DSpace context object
+     * @param collection Collection (parent)
+     * @param limit      limited number of items
+     * @param offset     offset value
+     * @return an iterator over the items in the collection.
+     * @throws SQLException if database error
+     */
+    public Iterator<Item> findByCollectionMapping(Context context, Collection collection, Integer limit, Integer offset)
+            throws SQLException;
+
+    /**
+     * Count all the archived items mapped to this collection (excludes owning collection). The order is indeterminate.
+     *
+     * @param context    DSpace context object
+     * @param collection Collection (parent)
+     * @return an iterator over the items in the collection.
+     * @throws SQLException if database error
+     */
+    public int countByCollectionMapping(Context context, Collection collection) throws SQLException;
+
+    /**
      * Get all the items (including private and withdrawn) in this collection. The order is indeterminate.
      *
      * @param context DSpace context object
@@ -177,7 +218,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * @throws SQLException if database error
      */
     public Iterator<Item> findInArchiveOrWithdrawnNonDiscoverableModifiedSince(Context context, Date since)
-            throws SQLException;
+        throws SQLException;
 
     /**
      * Get all the items (including private and withdrawn) in this collection. The order is indeterminate.
@@ -616,16 +657,25 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * counts all items not in archive
      *
      * @param context DSpace context object
-     * @return total items
+     * @return total items NOT in archive
      * @throws SQLException if database error
      */
     int countNotArchivedItems(Context context) throws SQLException;
 
     /**
+     * counts all items in archive
+     *
+     * @param context DSpace context object
+     * @return total items in archive
+     * @throws SQLException if database error
+     */
+    int countArchivedItems(Context context) throws SQLException;
+
+    /**
      * counts all withdrawn items
      *
      * @param context DSpace context object
-     * @return total items
+     * @return total items withdrawn
      * @throws SQLException if database error
      */
     int countWithdrawnItems(Context context) throws SQLException;
@@ -639,4 +689,57 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * @throws SQLException if database error
      */
     boolean isInProgressSubmission(Context context, Item item) throws SQLException;
+
+    /**
+     * Get metadata for the DSpace Object in a chosen schema.
+     * See <code>MetadataSchema</code> for more information about schemas.
+     * Passing in a <code>null</code> value for <code>qualifier</code>
+     * or <code>lang</code> only matches metadata fields where that
+     * qualifier or languages is actually <code>null</code>.
+     * Passing in <code>DSpaceObject.ANY</code>
+     * retrieves all metadata fields with any value for the qualifier or
+     * language, including <code>null</code>
+     * <P>
+     * Examples:
+     * <P>
+     * Return values of the unqualified "title" field, in any language.
+     * Qualified title fields (e.g. "title.uniform") are NOT returned:
+     * <P>
+     * <code>dspaceobject.getMetadataByMetadataString("dc", "title", null, DSpaceObject.ANY );</code>
+     * <P>
+     * Return all US English values of the "title" element, with any qualifier
+     * (including unqualified):
+     * <P>
+     * <code>dspaceobject.getMetadataByMetadataString("dc, "title", DSpaceObject.ANY, "en_US" );</code>
+     * <P>
+     * The ordering of values of a particular element/qualifier/language
+     * combination is significant. When retrieving with wildcards, values of a
+     * particular element/qualifier/language combinations will be adjacent, but
+     * the overall ordering of the combinations is indeterminate.
+     *
+     * If enableVirtualMetadata is set to false, the virtual metadata will not be included
+     *
+     * @param item         Item
+     * @param schema       the schema for the metadata field. <em>Must</em> match
+     *                     the <code>name</code> of an existing metadata schema.
+     * @param element      the element name. <code>DSpaceObject.ANY</code> matches any
+     *                     element. <code>null</code> doesn't really make sense as all
+     *                     metadata must have an element.
+     * @param qualifier    the qualifier. <code>null</code> means unqualified, and
+     *                     <code>DSpaceObject.ANY</code> means any qualifier (including
+     *                     unqualified.)
+     * @param lang         the ISO639 language code, optionally followed by an underscore
+     *                     and the ISO3166 country code. <code>null</code> means only
+     *                     values with no language are returned, and
+     *                     <code>DSpaceObject.ANY</code> means values with any country code or
+     *                     no country code are returned.
+     * @param enableVirtualMetadata
+     *                     Enables virtual metadata calculation and inclusion from the
+     *                     relationships.
+     * @return metadata fields that match the parameters
+     */
+    public List<MetadataValue> getMetadata(Item item, String schema, String element, String qualifier,
+                                           String lang, boolean enableVirtualMetadata);
+
+
 }

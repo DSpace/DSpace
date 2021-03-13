@@ -7,14 +7,14 @@
  */
 package org.dspace.xmlworkflow.state.actions.processingaction;
 
-import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
-import org.dspace.workflow.WorkflowException;
 import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
@@ -32,20 +32,21 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  */
 public class ScoreReviewAction extends ProcessingAction {
 
+    private static final String SUBMIT_SCORE = "submit_score";
+
     @Override
-    public void activate(Context c, XmlWorkflowItem wf)
-        throws SQLException, IOException, AuthorizeException, WorkflowException {
+    public void activate(Context c, XmlWorkflowItem wf) {
 
     }
 
     @Override
     public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
-        throws SQLException, AuthorizeException, IOException, WorkflowException {
-        if (request.getParameter("submit_score") != null) {
+            throws SQLException, AuthorizeException {
+        if (request.getParameter(SUBMIT_SCORE) != null) {
             int score = Util.getIntParameter(request, "score");
             //Add our score to the metadata
             itemService.addMetadata(c, wfi.getItem(), WorkflowRequirementsService.WORKFLOW_SCHEMA, "score", null, null,
-                                    String.valueOf(score));
+                    String.valueOf(score));
             itemService.update(c, wfi.getItem());
 
             return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
@@ -53,5 +54,10 @@ public class ScoreReviewAction extends ProcessingAction {
             //We have pressed the leave button so return to our submission page
             return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
         }
+    }
+
+    @Override
+    public List<String> getOptions() {
+        return Arrays.asList(SUBMIT_SCORE);
     }
 }

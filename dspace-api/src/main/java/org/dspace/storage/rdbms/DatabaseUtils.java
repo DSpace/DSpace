@@ -10,6 +10,7 @@ package org.dspace.storage.rdbms;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -23,6 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.sql.DataSource;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
@@ -34,11 +36,13 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
 import org.flywaydb.core.api.MigrationInfo;
-import org.flywaydb.core.api.callback.FlywayCallback;
-import org.flywaydb.core.internal.dbsupport.DbSupport;
-import org.flywaydb.core.internal.dbsupport.DbSupportFactory;
-import org.flywaydb.core.internal.dbsupport.SqlScript;
+import org.flywaydb.core.api.callback.Callback;
+import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.flywaydb.core.internal.info.MigrationInfoDumper;
+import org.flywaydb.core.internal.license.VersionPrinter;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 /**
  * Utility class used to manage the Database. This class is used by the
@@ -56,9 +60,6 @@ public class DatabaseUtils {
      */
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DatabaseUtils.class);
 
-    // Our Flyway DB object (initialized by setupFlyway())
-    private static Flyway flywaydb;
-
     // When this temp file exists, the "checkReindexDiscovery()" method will auto-reindex Discovery
     // Reindex flag file is at [dspace]/solr/search/conf/reindex.flag
     // See also setReindexDiscovery()/getReindexDiscover()
@@ -74,6 +75,9 @@ public class DatabaseUtils {
     public static final String DBMS_ORACLE = "oracle";
     public static final String DBMS_H2 = "h2";
 
+    // Name of the table that Flyway uses for its migration history
+    public static final String FLYWAY_TABLE = "schema_version";
+
     /**
      * Default constructor
      */
@@ -88,7 +92,8 @@ public class DatabaseUtils {
         // Usage checks
         if (argv.length < 1) {
             System.out.println("\nDatabase action argument is missing.");
-            System.out.println("Valid actions: 'test', 'info', 'migrate', 'repair', 'validate' or 'clean'");
+            System.out.println("Valid actions: 'test', 'info', 'migrate', 'repair', 'validate', " +
+                    "'update-sequences' or 'clean'");
             System.out.println("\nOr, type 'database help' for more information.\n");
             System.exit(1);
         }
@@ -97,8 +102,13 @@ public class DatabaseUtils {
             // Get a reference to our configured DataSource
             DataSource dataSource = getDataSource();
 
-            // Point Flyway API to our database
-            Flyway flyway = setupFlyway(dataSource);
+            // Initialize Flyway against our database
+            FluentConfiguration flywayConfiguration = setupFlyway(dataSource);
+            Flyway flyway = flywayConfiguration.load();
+
+            // Now, check our Flyway database table to see if it needs upgrading
+            // *before* any other Flyway commands can be run. This is a safety check.
+            FlywayUpgradeUtils.upgradeFlywayTable(flyway, dataSource.getConnection());
 
             // "test" = Test Database Connection
             if (argv[0].equalsIgnoreCase("test")) {
@@ -137,7 +147,7 @@ public class DatabaseUtils {
                     // If Flyway is NOT yet initialized, also print the determined version information
                     // NOTE: search is case sensitive, as flyway table name is ALWAYS lowercase,
                     // See: http://flywaydb.org/documentation/faq.html#case-sensitive
-                    if (!tableExists(connection, flyway.getTable(), true)) {
+                    if (!tableExists(connection, flyway.getConfiguration().getTable(), true)) {
                         System.out
                             .println("\nNOTE: This database is NOT yet initialized for auto-migrations (via Flyway).");
                         // Determine which version of DSpace this looks like
@@ -191,14 +201,11 @@ public class DatabaseUtils {
                                 "You've specified to migrate your database ONLY to version " + migrationVersion + " " +
                                     "...");
                             System.out.println(
-                                "\nWARNING: It is highly likely you will see errors in your logs when the Metadata");
-                            System.out.println(
-                                "or Bitstream Format Registry auto-update. This is because you are attempting to");
-                            System.out.println(
-                                "use an OLD version " + migrationVersion + " Database with a newer DSpace API. NEVER " +
-                                    "do this in a");
-                            System.out.println(
-                                "PRODUCTION scenario. The resulting old DB is only useful for migration testing.\n");
+                                "\nWARNING: In this mode, we DISABLE all callbacks, which means that you will need " +
+                                    "to manually update registries and manually run a reindex. This is because you " +
+                                    "are attempting to use an OLD version (" + migrationVersion + ") Database with " +
+                                    "a newer DSpace API. NEVER do this in a PRODUCTION scenario. The resulting " +
+                                    "database is only useful for migration testing.\n");
 
                             System.out.print(
                                 "Are you SURE you only want to migrate your database to version " + migrationVersion
@@ -262,7 +269,7 @@ public class DatabaseUtils {
                 // "clean" = Run Flyway clean script
 
                 // If clean is disabled, return immediately
-                if (flyway.isCleanDisabled()) {
+                if (flyway.getConfiguration().isCleanDisabled()) {
                     System.out.println(
                         "\nWARNING: 'clean' command is currently disabled, as it is dangerous to run in Production " +
                             "scenarios!");
@@ -328,24 +335,49 @@ public class DatabaseUtils {
                     e.printStackTrace();
                     System.exit(1);
                 }
+            } else if (argv[0].equalsIgnoreCase("update-sequences")) {
+                try (Connection connection = dataSource.getConnection()) {
+                    String dbType = getDbType(connection);
+                    String sqlfile = "org/dspace/storage/rdbms/sqlmigration/" + dbType +
+                            "/update-sequences.sql";
+                    InputStream sqlstream = DatabaseUtils.class.getClassLoader().getResourceAsStream(sqlfile);
+                    if (sqlstream != null) {
+                        String s = IOUtils.toString(sqlstream, "UTF-8");
+                        if (!s.isEmpty()) {
+                            System.out.println("Running " + sqlfile);
+                            connection.createStatement().execute(s);
+                            System.out.println("update-sequences complete");
+                        } else {
+                            System.err.println(sqlfile + " contains no SQL to execute");
+                        }
+                    } else {
+                        System.err.println(sqlfile + " not found");
+                    }
+                }
             } else {
                 System.out.println("\nUsage: database [action]");
-                System.out.println("Valid actions: 'test', 'info', 'migrate', 'repair' or 'clean'");
+                System.out.println("Valid actions: 'test', 'info', 'migrate', 'repair', " +
+                    "'update-sequences' or 'clean'");
                 System.out.println(
-                    " - test          = Performs a test connection to database to validate connection settings");
+                    " - test             = Performs a test connection to database to " +
+                    "validate connection settings");
                 System.out.println(
-                    " - info / status = Describe basic info/status about database, including validating the " +
-                        "compatibility of this database");
-                System.out.println(" - migrate       = Migrate the database to the latest version");
+                    " - info / status    = Describe basic info/status about database, including validating the " +
+                    "compatibility of this database");
                 System.out.println(
-                    " - repair        = Attempt to repair any previously failed database migrations or checksum " +
-                        "mismatches (via Flyway repair)");
+                    " - migrate          = Migrate the database to the latest version");
                 System.out.println(
-                    " - validate      = Validate current database's migration status (via Flyway validate), " +
-                        "validating all migration checksums.");
+                    " - repair           = Attempt to repair any previously failed database " +
+                    "migrations or checksum mismatches (via Flyway repair)");
                 System.out.println(
-                    " - clean         = DESTROY all data and tables in database (WARNING there is no going back!). " +
-                        "Requires 'db.cleanDisabled=false' setting in config.");
+                    " - validate         = Validate current database's migration status (via Flyway validate), " +
+                    "validating all migration checksums.");
+                System.out.println(
+                    " - update-sequences = Update database sequences after running AIP ingest.");
+                System.out.println(
+                    " - clean            = DESTROY all data and tables in database " +
+                    "(WARNING there is no going back!). " +
+                    "Requires 'db.cleanDisabled=false' setting in config.");
                 System.out.println("");
                 System.exit(0);
             }
@@ -385,6 +417,8 @@ public class DatabaseUtils {
                 "PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension installed/up-to-date? " + pgcryptoUpToDate + "" +
                     " " + ((pgcryptoVersion != null) ? "(version=" + pgcryptoVersion + ")" : "(not installed)"));
         }
+        // Finally, print out our version of Flyway
+        System.out.println("FlywayDB Version: " + VersionPrinter.getVersion());
     }
 
     /**
@@ -477,70 +511,79 @@ public class DatabaseUtils {
     }
 
     /**
-     * Setup/Initialize the Flyway API to run against our DSpace database
+     * Setup/Initialize the Flyway Configuration to run against our DSpace database
      * and point at our migration scripts.
      *
      * @param datasource DataSource object initialized by DatabaseManager
-     * @return initialized Flyway object
+     * @return initialized FluentConfiguration (Flyway configuration object)
      */
-    private synchronized static Flyway setupFlyway(DataSource datasource) {
+    private synchronized static FluentConfiguration setupFlyway(DataSource datasource) {
         ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-        if (flywaydb == null) {
-            try (Connection connection = datasource.getConnection()) {
-                // Initialize Flyway DB API (http://flywaydb.org/), used to perform DB migrations
-                flywaydb = new Flyway();
-                flywaydb.setDataSource(datasource);
-                flywaydb.setEncoding("UTF-8");
+        // Initialize Flyway Configuration (http://flywaydb.org/), used to perform DB migrations
+        FluentConfiguration flywayConfiguration = Flyway.configure();
 
-                // Default cleanDisabled to "true" (which disallows the ability to run 'database clean')
-                flywaydb.setCleanDisabled(config.getBooleanProperty("db.cleanDisabled", true));
+        try (Connection connection = datasource.getConnection()) {
+            flywayConfiguration.dataSource(datasource);
+            flywayConfiguration.encoding("UTF-8");
 
-                // Migration scripts are based on DBMS Keyword (see full path below)
-                String dbType = getDbType(connection);
-                connection.close();
+            // Default cleanDisabled to "true" (which disallows the ability to run 'database clean')
+            flywayConfiguration.cleanDisabled(config.getBooleanProperty("db.cleanDisabled", true));
 
-                // Determine location(s) where Flyway will load all DB migrations
-                ArrayList<String> scriptLocations = new ArrayList<String>();
+            // Migration scripts are based on DBMS Keyword (see full path below)
+            String dbType = getDbType(connection);
+            connection.close();
 
-                // First, add location for custom SQL migrations, if any (based on DB Type)
-                // e.g. [dspace.dir]/etc/[dbtype]/
-                // (We skip this for H2 as it's only used for unit testing)
-                if (!dbType.equals(DBMS_H2)) {
-                    scriptLocations.add("filesystem:" + config.getProperty("dspace.dir") +
-                                            "/etc/" + dbType);
-                }
+            // Determine location(s) where Flyway will load all DB migrations
+            ArrayList<String> scriptLocations = new ArrayList<>();
 
-                // Also add the Java package where Flyway will load SQL migrations from (based on DB Type)
-                scriptLocations.add("classpath:org.dspace.storage.rdbms.sqlmigration." + dbType);
-
-                // Also add the Java package where Flyway will load Java migrations from
-                // NOTE: this also loads migrations from any sub-package
-                scriptLocations.add("classpath:org.dspace.storage.rdbms.migration");
-
-                //Add all potential workflow migration paths
-                List<String> workflowFlywayMigrationLocations = WorkflowServiceFactory.getInstance()
-                                                                                      .getWorkflowService()
-                                                                                      .getFlywayMigrationLocations();
-                scriptLocations.addAll(workflowFlywayMigrationLocations);
-
-                // Now tell Flyway which locations to load SQL / Java migrations from
-                log.info("Loading Flyway DB migrations from: " + StringUtils.join(scriptLocations, ", "));
-                flywaydb.setLocations(scriptLocations.toArray(new String[scriptLocations.size()]));
-
-                // Set flyway callbacks (i.e. classes which are called post-DB migration and similar)
-                // In this situation, we have a Registry Updater that runs PRE-migration
-                // NOTE: DatabaseLegacyReindexer only indexes in Legacy Lucene & RDBMS indexes. It can be removed
-                // once those are obsolete.
-                List<FlywayCallback> flywayCallbacks = DSpaceServicesFactory.getInstance().getServiceManager()
-                                                                            .getServicesByType(FlywayCallback.class);
-                flywaydb.setCallbacks(flywayCallbacks.toArray(new FlywayCallback[flywayCallbacks.size()]));
-            } catch (SQLException e) {
-                log.error("Unable to setup Flyway against DSpace database", e);
+            // First, add location for custom SQL migrations, if exists (based on DB Type)
+            // e.g. [dspace.dir]/etc/[dbtype]/
+            // (We skip this for H2 as it's only used for unit testing)
+            String etcDirPath = config.getProperty("dspace.dir") + "/etc/" + dbType;
+            File etcDir = new File(etcDirPath);
+            if (etcDir.exists() && !dbType.equals(DBMS_H2)) {
+                scriptLocations.add("filesystem:" + etcDirPath);
             }
+
+            // Also add the Java package where Flyway will load SQL migrations from (based on DB Type)
+            scriptLocations.add("classpath:org/dspace/storage/rdbms/sqlmigration/" + dbType);
+
+            // Also add the Java package where Flyway will load Java migrations from
+            // NOTE: this also loads migrations from any sub-package
+            scriptLocations.add("classpath:org/dspace/storage/rdbms/migration");
+
+            //Add all potential workflow migration paths
+            List<String> workflowFlywayMigrationLocations = WorkflowServiceFactory.getInstance()
+                                                                                  .getWorkflowService()
+                                                                                  .getFlywayMigrationLocations();
+            scriptLocations.addAll(workflowFlywayMigrationLocations);
+
+            // Now tell Flyway which locations to load SQL / Java migrations from
+            log.info("Loading Flyway DB migrations from: " + StringUtils.join(scriptLocations, ", "));
+            flywayConfiguration.locations(scriptLocations.toArray(new String[scriptLocations.size()]));
+
+            // Tell Flyway NOT to throw a validation error if it finds older "Ignored" migrations.
+            // For DSpace, we sometimes have to insert "old" migrations in after a major release
+            // if further development/bug fixes are needed in older versions. So, "Ignored" migrations are
+            // nothing to worry about...you can always trigger them to run using "database migrate ignored" from CLI
+            flywayConfiguration.ignoreIgnoredMigrations(true);
+
+            // Set Flyway callbacks (i.e. classes which are called post-DB migration and similar)
+            List<Callback> flywayCallbacks = DSpaceServicesFactory.getInstance().getServiceManager()
+                                                                        .getServicesByType(Callback.class);
+
+            flywayConfiguration.callbacks(flywayCallbacks.toArray(new Callback[flywayCallbacks.size()]));
+
+            // Tell Flyway to use the "schema_version" table in the database to manage its migration history
+            // As of Flyway v5, the default table is named "flyway_schema_history"
+            // We are using the older name ("schema_version") for backwards compatibility.
+            flywayConfiguration.table(FLYWAY_TABLE);
+        } catch (SQLException e) {
+            log.error("Unable to setup Flyway against DSpace database", e);
         }
 
-        return flywaydb;
+        return flywayConfiguration;
     }
 
     /**
@@ -601,7 +644,7 @@ public class DatabaseUtils {
      * @param datasource    DataSource object (retrieved from DatabaseManager())
      * @param connection    Database connection
      * @param targetVersion If specified, only migrate the database to a particular *version* of DSpace. This is
-     *                      mostly just useful for testing.
+     *                      just useful for testing migrations, and should NOT be used in Production.
      *                      If null, the database is migrated to the latest version.
      * @param outOfOrder    If true, Flyway will run any lower version migrations that were previously "ignored".
      *                      If false, Flyway will only run new migrations with a higher version number.
@@ -615,38 +658,60 @@ public class DatabaseUtils {
             throw new SQLException("The datasource is a null reference -- cannot continue.");
         }
 
+        // Whether to reindex all content in Solr after successfully updating database
+        boolean reindexAfterUpdate = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                          .getBooleanProperty("discovery.autoReindex", true);
+
         try {
             // Setup Flyway API against our database
-            Flyway flyway = setupFlyway(datasource);
+            FluentConfiguration flywayConfiguration = setupFlyway(datasource);
 
-            // Set whethe Flyway will run migrations "out of order". By default, this is false,
+            // Set whether Flyway will run migrations "out of order". By default, this is false,
             // and Flyway ONLY runs migrations that have a higher version number.
-            flyway.setOutOfOrder(outOfOrder);
+            flywayConfiguration.outOfOrder(outOfOrder);
 
             // If a target version was specified, tell Flyway to ONLY migrate to that version
             // (i.e. all later migrations are left as "pending"). By default we always migrate to latest version.
+            // This mode is only useful for testing migrations & should NEVER be used in Production.
             if (!StringUtils.isBlank(targetVersion)) {
-                flyway.setTargetAsString(targetVersion);
+                flywayConfiguration.target(targetVersion);
+                // Disable all callbacks. Most callbacks use the Context object which triggers a full database update,
+                // bypassing this target version.
+                flywayConfiguration.callbacks(new Callback[]{});
+                // Also disable reindex after update for this migration mode (as reindex also uses Context object)
+                reindexAfterUpdate = false;
             }
+
+            // Initialized Flyway object (will be created by flywayConfiguration.load() below)
+            Flyway flyway;
 
             // Does the necessary Flyway table ("schema_version") exist in this database?
             // If not, then this is the first time Flyway has run, and we need to initialize
             // NOTE: search is case sensitive, as flyway table name is ALWAYS lowercase,
             // See: http://flywaydb.org/documentation/faq.html#case-sensitive
-            if (!tableExists(connection, flyway.getTable(), true)) {
+            if (!tableExists(connection, flywayConfiguration.getTable(), true)) {
                 // Try to determine our DSpace database version, so we know what to tell Flyway to do
-                String dbVersion = determineDBVersion(connection);
+                String dspaceVersion = determineDBVersion(connection);
 
-                // If this is a fresh install, dbVersion will be null
-                if (dbVersion == null) {
-                    // Initialize the Flyway database table with defaults (version=1)
-                    flyway.baseline();
-                } else {
-                    // Otherwise, pass our determined DB version to Flyway to initialize database table
-                    flyway.setBaselineVersionAsString(dbVersion);
-                    flyway.setBaselineDescription("Initializing from DSpace " + dbVersion + " database schema");
-                    flyway.baseline();
+                // If this is NOT a fresh install (i.e. dspaceVersion is not null)
+                if (dspaceVersion != null) {
+                    // Pass our determined DSpace version to Flyway to initialize database table
+                    flywayConfiguration.baselineVersion(dspaceVersion);
+                    flywayConfiguration.baselineDescription(
+                        "Initializing from DSpace " + dspaceVersion + " database schema");
                 }
+
+                // Initialize Flyway in DB with baseline version (either dspaceVersion or default of 1)
+                flyway = flywayConfiguration.load();
+                flyway.baseline();
+            } else {
+                // Otherwise, this database already ran Flyway before
+                // So, just load our Flyway configuration, initializing latest Flyway.
+                flyway = flywayConfiguration.load();
+
+                // Now, check our Flyway database table to see if it needs upgrading
+                // *before* any other Flyway commands can be run.
+                FlywayUpgradeUtils.upgradeFlywayTable(flyway, connection);
             }
 
             // Determine pending Database migrations
@@ -664,7 +729,7 @@ public class DatabaseUtils {
                 flyway.migrate();
 
                 // Flag that Discovery will need reindexing, since database was updated
-                setReindexDiscovery(true);
+                setReindexDiscovery(reindexAfterUpdate);
             } else {
                 log.info("DSpace database schema is up to date");
             }
@@ -1021,16 +1086,13 @@ public class DatabaseUtils {
      */
     public static void executeSql(Connection connection, String sqlToExecute) throws SQLException {
         try {
-            // Create a Flyway DbSupport object (based on our connection)
-            // This is how Flyway determines the database *type* (e.g. Postgres vs Oracle)
-            DbSupport dbSupport = DbSupportFactory.createDbSupport(connection, false);
-
-            // Load our SQL string & execute via Flyway's SQL parser
-            SqlScript script = new SqlScript(sqlToExecute, dbSupport);
-            script.execute(dbSupport.getJdbcTemplate());
-        } catch (FlywayException fe) {
-            // If any FlywayException (Runtime) is thrown, change it to a SQLException
-            throw new SQLException("Flyway executeSql() error occurred", fe);
+            // Run the SQL using Spring JDBC as documented in Flyway's guide for using Spring JDBC directly
+            // https://flywaydb.org/documentation/migrations#spring
+            new JdbcTemplate(new SingleConnectionDataSource(connection, true))
+                .execute(sqlToExecute);
+        } catch (DataAccessException dae) {
+            // If any Exception is thrown, change it to a SQLException
+            throw new SQLException("Flyway executeSql() error occurred", dae);
         }
     }
 
@@ -1162,14 +1224,15 @@ public class DatabaseUtils {
      * <P>
      * Because the DB migration may be initialized by commandline or any one of
      * the many DSpace webapps, this checks for the existence of a temporary
-     * file to know when Discovery/Solr needs reindexing.
-     *
-     * @return whether reindex flag is true/false
+     * file, and the discovery.autoReindex setting to know when
+     * Discovery/Solr needs reindexing.
+     * @return whether reindexing should happen.
      */
-    public static boolean getReindexDiscovery() {
-        // Simply check if the flag file exists
-        File reindexFlag = new File(reindexDiscoveryFilePath);
-        return reindexFlag.exists();
+    public static synchronized boolean getReindexDiscovery() {
+        boolean autoReindex = DSpaceServicesFactory.getInstance()
+            .getConfigurationService()
+            .getBooleanProperty("discovery.autoReindex", true);
+        return (autoReindex && new File(reindexDiscoveryFilePath).exists());
     }
 
     /**
@@ -1194,7 +1257,7 @@ public class DatabaseUtils {
 
     /**
      * Internal class to actually perform re-indexing in a separate thread.
-     * (See checkReindexDiscovery() method)>
+     * (See checkReindexDiscovery() method).
      */
     private static class ReindexerThread extends Thread {
         private final IndexingService indexer;
@@ -1301,13 +1364,6 @@ public class DatabaseUtils {
     }
 
     /**
-     * In case of a unit test the flyway db is cached to long leading to exceptions, we need to clear the object
-     */
-    public static void clearFlywayDBCache() {
-        flywaydb = null;
-    }
-
-    /**
      * Returns the current Flyway schema_version being used by the given database.
      * (i.e. the version of the highest numbered migration that this database has run)
      *
@@ -1317,7 +1373,7 @@ public class DatabaseUtils {
      */
     public static String getCurrentFlywayState(Connection connection) throws SQLException {
         PreparedStatement statement = connection
-            .prepareStatement("SELECT \"version\" FROM \"schema_version\" ORDER BY \"version\" desc");
+            .prepareStatement("SELECT \"version\" FROM \"" + FLYWAY_TABLE + "\" ORDER BY \"version\" desc");
         ResultSet resultSet = statement.executeQuery();
         resultSet.next();
         return resultSet.getString("version");

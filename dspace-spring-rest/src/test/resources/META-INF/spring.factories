@@ -1,2 +1,0 @@
-org.springframework.test.context.ContextCustomizerFactory= \
-    org.dspace.app.rest.test.DSpaceKernelContextCustomizerFactory

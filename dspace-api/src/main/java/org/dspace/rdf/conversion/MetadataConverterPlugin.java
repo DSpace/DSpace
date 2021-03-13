@@ -33,6 +33,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DSpaceObjectService;
@@ -133,7 +134,7 @@ public class MetadataConverterPlugin implements ConverterPlugin {
         }
 
         List<MetadataValue> metadata_values = dsoService
-            .getMetadata(dso, MetadataSchema.DC_SCHEMA, Item.ANY, Item.ANY, Item.ANY);
+            .getMetadata(dso, MetadataSchemaEnum.DC.getName(), Item.ANY, Item.ANY, Item.ANY);
         for (MetadataValue value : metadata_values) {
             MetadataField metadataField = value.getMetadataField();
             MetadataSchema metadataSchema = metadataField.getMetadataSchema();

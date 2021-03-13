@@ -9,6 +9,7 @@ package org.dspace.app.requestitem;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +18,8 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -39,10 +42,11 @@ public class RequestItemMetadataStrategy extends RequestItemSubmitterStrategy {
     @Override
     public List<RequestItemAuthor> getRequestItemAuthor(Context context, Item item)
         throws SQLException {
+        List<RequestItemAuthor> authors;
         if (emailMetadata != null) {
             List<MetadataValue> vals = itemService.getMetadataByMetadataString(item, emailMetadata);
             if (vals.size() > 0) {
-                List<RequestItemAuthor> authors = new ArrayList<>(vals.size());
+                authors = new ArrayList<>(vals.size());
                 for (MetadataValue datum : vals) {
                     String email = datum.getValue();
                     String fullname = null;
@@ -63,9 +67,37 @@ public class RequestItemMetadataStrategy extends RequestItemSubmitterStrategy {
                     authors.add(author);
                 }
                 return authors;
+            } else {
+                return Collections.EMPTY_LIST;
             }
+        } else {
+            // Uses the basic strategy to look for the original submitter
+            authors = super.getRequestItemAuthor(context, item);
+
+            // Remove from the list authors that do not have email addresses.
+            for (RequestItemAuthor author : authors) {
+                if (null == author.getEmail()) {
+                    authors.remove(author);
+                }
+            }
+
+            if (authors.isEmpty()) { // No author email addresses!  Fall back
+                String email = null;
+                String name = null;
+                ConfigurationService configurationService
+                        = DSpaceServicesFactory.getInstance().getConfigurationService();
+                //First get help desk name and email
+                email = configurationService.getProperty("mail.helpdesk");
+                name = configurationService.getProperty("mail.helpdesk.name");
+                // If help desk mail is null get the mail and name of admin
+                if (email == null) {
+                    email = configurationService.getProperty("mail.admin");
+                    name = configurationService.getProperty("mail.admin.name");
+                }
+                authors.add(new RequestItemAuthor(name, email));
+            }
+            return authors;
         }
-        return super.getRequestItemAuthor(context, item);
     }
 
     public void setEmailMetadata(String emailMetadata) {

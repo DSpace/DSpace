@@ -12,12 +12,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Stream;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Root;
 
+import com.google.common.collect.AbstractIterator;
 import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.Session;
 
@@ -64,10 +66,16 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
 
     @Override
     public List<T> findAll(Context context, Class<T> clazz) throws SQLException {
+
+        return findAll(context, clazz, -1, -1);
+    }
+
+    @Override
+    public List<T> findAll(Context context, Class<T> clazz, Integer limit, Integer offset) throws SQLException {
         CriteriaQuery criteriaQuery = getCriteriaQuery(getCriteriaBuilder(context), clazz);
         Root<T> root = criteriaQuery.from(clazz);
         criteriaQuery.select(root);
-        return executeCriteriaQuery(context, criteriaQuery, false, -1, -1);
+        return executeCriteriaQuery(context, criteriaQuery, false, limit, offset);
     }
 
     @Override
@@ -269,8 +277,19 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
      */
     public Iterator<T> iterate(Query query) {
         @SuppressWarnings("unchecked")
-        Iterator<T> result = (Iterator<T>) query.getResultList().iterator();
-        return result;
+        org.hibernate.query.Query hquery = query.unwrap(org.hibernate.query.Query.class);
+        Stream<T> stream = hquery.stream();
+        Iterator<T> iter = stream.iterator();
+        return new AbstractIterator<T> () {
+            @Override
+            protected T computeNext() {
+                return iter.hasNext() ? iter.next() : endOfData();
+            }
+            @Override
+            public void finalize() {
+                stream.close();
+            }
+        };
     }
 
     /**

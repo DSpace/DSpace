@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>7.0-SNAPSHOT</version>
+        <version>7.0-beta5-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -27,93 +27,41 @@
         <module>additions</module>
     </modules>
 
-    <!-- 
+    <!--
          List of enabled DSpace "addon" / local customization Modules to build/install.
-         To disable building of modules, you can use the Maven '-P' commandline 
+         To disable building of modules, you can use the Maven '-P' commandline
          option along with the profile's id.  For example, the following tells
          Maven to *disable* building of the 'dspace-oai' module:
          'mvn package -P !dspace-oai'
-         
+
          Also note that the profile IDs below match the profile IDs of the source
          modules in [dspace-src]/pom.xml, so the above command will also disable the
          compiling of the corresponding source module.
     -->
     <profiles>
-        <profile>
-            <id>dspace-rdf</id>
-            <activation>
-                <file>
-                    <exists>rdf/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>rdf</module>
-            </modules>
-        </profile>
+        <!-- As this old REST API module is deprecated, it only builds if you activate it via -Pdspace-rest -->
         <profile>
             <id>dspace-rest</id>
             <activation>
-                <file>
-                    <exists>rest/pom.xml</exists>
-                </file>
+                <activeByDefault>false</activeByDefault>
+                <!-- Enable if we are doing a release (-Drelease), to tag/release this optional module -->
+                <property>
+                    <name>release</name>
+                </property>
             </activation>
             <modules>
                 <module>rest</module>
             </modules>
         </profile>
         <profile>
-            <id>dspace-sword</id>
+            <id>dspace-server-webapp</id>
             <activation>
                 <file>
-                    <exists>sword/pom.xml</exists>
+                    <exists>server/pom.xml</exists>
                 </file>
             </activation>
             <modules>
-                <module>sword</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>dspace-swordv2</id>
-            <activation>
-                <file>
-                    <exists>swordv2/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>swordv2</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>dspace-solr</id>
-            <activation>
-                <file>
-                    <exists>solr/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>solr</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>dspace-oai</id>
-            <activation>
-                <file>
-                    <exists>oai/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>oai</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>dspace-spring-rest</id>
-            <activation>
-                <file>
-                    <exists>spring-rest/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>spring-rest</module>
+                <module>server</module>
             </modules>
         </profile>
     </profiles>

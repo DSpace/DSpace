@@ -78,7 +78,7 @@ public class DSpaceControlledVocabularyTest extends AbstractDSpaceTest {
         String text = "north 40";
         Collection collection = null;
         int start = 0;
-        int limit = 0;
+        int limit = 10;
         String locale = null;
         // This "farm" Controlled Vocab is included in TestEnvironment data
         // (under /src/test/data/dspaceFolder/) and it should be auto-loaded
@@ -86,8 +86,7 @@ public class DSpaceControlledVocabularyTest extends AbstractDSpaceTest {
         DSpaceControlledVocabulary instance = (DSpaceControlledVocabulary)
             CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(Class.forName(PLUGIN_INTERFACE), "farm");
         assertNotNull(instance);
-        Choices result = instance.getMatches(field, text, collection, start,
-                                             limit, locale);
+        Choices result = instance.getMatches(text, start, limit, locale);
         assertEquals("the farm::north 40", result.values[0].value);
     }
 

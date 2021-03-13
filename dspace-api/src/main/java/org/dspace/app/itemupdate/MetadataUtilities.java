@@ -34,11 +34,12 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -189,7 +190,7 @@ public class MetadataUtilities {
         NodeList metadata = XPathAPI.selectNodeList(document, "/dublin_core");
         Node schemaAttr = metadata.item(0).getAttributes().getNamedItem("schema");
         if (schemaAttr == null) {
-            schema = MetadataSchema.DC_SCHEMA;
+            schema = MetadataSchemaEnum.DC.getName();
         } else {
             schema = schemaAttr.getNodeValue();
         }
@@ -225,7 +226,9 @@ public class MetadataUtilities {
             if (language == null) {
                 language = "en";
             } else if ("".equals(language)) {
-                language = ConfigurationManager.getProperty("default.language");
+                language = DSpaceServicesFactory.getInstance()
+                        .getConfigurationService()
+                        .getProperty("default.language");
             }
 
             DtoMetadata dtom = DtoMetadata.create(schema, element, qualifier, language, value);

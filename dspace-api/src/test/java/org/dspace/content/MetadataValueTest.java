@@ -10,7 +10,7 @@ package org.dspace.content;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -95,7 +95,7 @@ public class MetadataValueTest extends AbstractUnitTest {
             this.it = installItemService.installItem(context, workspaceItem);
 
             this.mf = metadataFieldService.findByElement(context,
-                                                         MetadataSchema.DC_SCHEMA, element, qualifier);
+                                                         MetadataSchemaEnum.DC.getName(), element, qualifier);
             this.mv = metadataValueService.create(context, it, mf);
             context.restoreAuthSystemState();
         } catch (AuthorizeException ex) {

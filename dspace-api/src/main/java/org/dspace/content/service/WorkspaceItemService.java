@@ -40,7 +40,6 @@ public interface WorkspaceItemService extends InProgressSubmissionService<Worksp
      */
     public WorkspaceItem find(Context context, int id) throws SQLException;
 
-
     /**
      * Create a new workspace item, with a new ID. An Item is also created. The
      * submitter is the current user in the context.

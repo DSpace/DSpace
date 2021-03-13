@@ -22,16 +22,17 @@ import java.util.TimeZone;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.AbstractUpdateRequest;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
@@ -43,7 +44,8 @@ import org.apache.solr.client.solrj.response.RangeFacet;
 import org.apache.solr.common.luke.FieldFlag;
 import org.apache.solr.common.params.CoreAdminParams;
 import org.apache.solr.common.params.FacetParams;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Utility class to export, clear and import Solr indexes.
@@ -95,7 +97,9 @@ public class SolrImportExport {
 
     private static final String MULTIPLE_VALUES_SPLITTER = ",";
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SolrImportExport.class);
+    private static final Logger log = LogManager.getLogger(SolrImportExport.class);
+    private static final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
      * Default constructor
@@ -109,7 +113,7 @@ public class SolrImportExport {
      * @throws ParseException if the command-line arguments cannot be parsed
      */
     public static void main(String[] args) throws ParseException {
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
         Options options = makeOptions();
 
         try {
@@ -248,8 +252,8 @@ public class SolrImportExport {
         //The configuration details for the statistics shards reside within the "statistics" folder
         String instanceIndexName = indexName.startsWith("statistics-") ? "statistics" : indexName;
 
-        String solrInstanceDir = ConfigurationManager
-            .getProperty("dspace.dir") + File.separator + "solr" + File.separator + instanceIndexName;
+        String solrInstanceDir = configurationService.getProperty("dspace.dir")
+                + File.separator + "solr" + File.separator + instanceIndexName;
         // the [dspace]/solr/[indexName]/conf directory needs to be available on the local machine for this to work
         // -- we need access to the schema.xml and solrconfig.xml file, plus files referenced from there
         // if this directory can't be found, output an error message and skip this index
@@ -275,7 +279,7 @@ public class SolrImportExport {
         }
 
         try {
-            HttpSolrServer adminSolr = new HttpSolrServer(baseSolrUrl);
+            HttpSolrClient adminSolr = new HttpSolrClient.Builder(baseSolrUrl).build();
 
             // try to find out size of core and compare with free space in export directory
             CoreAdminResponse status = CoreAdminRequest.getStatus(indexName, adminSolr);
@@ -294,7 +298,7 @@ public class SolrImportExport {
             }
 
             // Create a temp directory to store temporary core data
-            File tempDataDir = new File(ConfigurationManager.getProperty(
+            File tempDataDir = new File(configurationService.getProperty(
                 "dspace.dir") + File.separator + "temp" + File.separator + "solr-data");
             boolean createdTempDataDir = tempDataDir.mkdirs();
             if (!createdTempDataDir && !tempDataDir.exists()) {
@@ -334,7 +338,7 @@ public class SolrImportExport {
 
                 // clear actual core (temp core name, clearing actual data dir) & import
                 importIndex(indexName, exportDir, tempSolrUrl, true);
-            } catch (Exception e) {
+            } catch (IOException | SolrServerException | SolrImportExportException e) {
                 // we ran into some problems with the export/import -- keep going to try and restore the solr cores
                 System.err.println(
                     "Encountered problem during reindex: " + e.getMessage() + ", will attempt to restore Solr cores");
@@ -342,7 +346,7 @@ public class SolrImportExport {
             }
 
             // commit changes
-            HttpSolrServer origSolr = new HttpSolrServer(origSolrUrl);
+            HttpSolrClient origSolr = new HttpSolrClient.Builder(origSolrUrl).build();
             origSolr.commit();
 
             // swap back (statistics now going to actual core name in actual data dir)
@@ -406,7 +410,6 @@ public class SolrImportExport {
      *                  and ends with .csv (to match what is generated by #makeExportFilename).
      * @param solrUrl   The solr URL for the index to export. Must not be null.
      * @param clear     if true, clear the index before importing.
-     * @param overwrite if true, skip _version_ field on import to disable Solr's optimistic concurrency functionality
      * @throws IOException               if there is a problem reading the files or communicating with Solr.
      * @throws SolrServerException       if there is a problem reading the files or communicating with Solr.
      * @throws SolrImportExportException if there is a problem communicating with Solr.
@@ -424,7 +427,7 @@ public class SolrImportExport {
                                                     + indexName);
         }
 
-        HttpSolrServer solr = new HttpSolrServer(solrUrl);
+        HttpSolrClient solr = new HttpSolrClient.Builder(solrUrl).build();
 
         // must get multivalue fields before clearing
         List<String> multivaluedFields = getMultiValuedFields(solr);
@@ -471,7 +474,7 @@ public class SolrImportExport {
      * @param solr the solr server to query.
      * @return A list containing all multi-valued fields, or an empty list if none are found / there aren't any.
      */
-    private static List<String> getMultiValuedFields(HttpSolrServer solr) {
+    private static List<String> getMultiValuedFields(HttpSolrClient solr) {
         List<String> result = new ArrayList<>();
         try {
             LukeRequest request = new LukeRequest();
@@ -497,7 +500,7 @@ public class SolrImportExport {
      * @throws SolrServerException if there is a problem in communicating with Solr.
      */
     public static void clearIndex(String solrUrl) throws IOException, SolrServerException {
-        HttpSolrServer solr = new HttpSolrServer(solrUrl);
+        HttpSolrClient solr = new HttpSolrClient.Builder(solrUrl).build();
         solr.deleteByQuery("*:*");
         solr.commit();
         solr.optimize();
@@ -536,7 +539,7 @@ public class SolrImportExport {
                                                     + indexName);
         }
 
-        HttpSolrServer solr = new HttpSolrServer(solrUrl);
+        HttpSolrClient solr = new HttpSolrClient.Builder(solrUrl).build();
 
         SolrQuery query = new SolrQuery("*:*");
         if (StringUtils.isNotBlank(fromWhen)) {
@@ -659,7 +662,8 @@ public class SolrImportExport {
         if (StringUtils.isNotBlank(directoryValue)) {
             return directoryValue;
         }
-        return ConfigurationManager.getProperty("dspace.dir") + File.separator + "solr-export" + File.separator;
+        return configurationService.getProperty("dspace.dir")
+                + File.separator + "solr-export" + File.separator;
     }
 
     /**
@@ -695,10 +699,10 @@ public class SolrImportExport {
     private static String makeSolrUrl(String indexName) {
         if (indexName.startsWith("statistics")) {
             // TODO account for year shards properly?
-            return ConfigurationManager.getProperty("solr-statistics", "server") + indexName
+            return configurationService.getProperty("solr-statistics.server") + indexName
                 .replaceFirst("statistics", "");
         } else if ("authority".equals(indexName)) {
-            return ConfigurationManager.getProperty("solr.authority.server");
+            return configurationService.getProperty("solr.authority.server");
         }
         return "http://localhost:8080/solr/" + indexName; // TODO better default?
     }

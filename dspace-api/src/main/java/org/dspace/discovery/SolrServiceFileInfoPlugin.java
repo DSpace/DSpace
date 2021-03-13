@@ -12,9 +12,9 @@ import java.util.List;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.discovery.indexobject.IndexableItem;
 
 /**
  * <p>
@@ -41,9 +41,9 @@ public class SolrServiceFileInfoPlugin implements SolrServiceIndexPlugin {
     private static final String SOLR_FIELD_NAME_FOR_DESCRIPTIONS = "original_bundle_descriptions";
 
     @Override
-    public void additionalIndex(Context context, DSpaceObject dso, SolrInputDocument document) {
-        if (dso instanceof Item) {
-            Item item = (Item) dso;
+    public void additionalIndex(Context context, IndexableObject indexableObject, SolrInputDocument document) {
+        if (indexableObject instanceof IndexableItem) {
+            Item item = ((IndexableItem) indexableObject).getIndexedObject();
             List<Bundle> bundles = item.getBundles();
             if (bundles != null) {
                 for (Bundle bundle : bundles) {

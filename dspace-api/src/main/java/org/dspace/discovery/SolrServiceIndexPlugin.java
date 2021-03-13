@@ -8,7 +8,6 @@
 package org.dspace.discovery;
 
 import org.apache.solr.common.SolrInputDocument;
-import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 
 /**
@@ -20,5 +19,5 @@ import org.dspace.core.Context;
  */
 public interface SolrServiceIndexPlugin {
 
-    public void additionalIndex(Context context, DSpaceObject dso, SolrInputDocument document);
+    public void additionalIndex(Context context, IndexableObject dso, SolrInputDocument document);
 }

@@ -7,12 +7,18 @@
  */
 package org.dspace.eperson;
 
+import static org.dspace.eperson.service.EPersonService.MD_PHONE;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
@@ -80,7 +86,7 @@ public class EPersonCLITool {
         globalOptions.addOptionGroup(VERBS);
         globalOptions.addOption("h", "help", false, "explain options");
 
-        GnuParser parser = new GnuParser();
+        CommandLineParser parser = new DefaultParser();
         CommandLine command = parser.parse(globalOptions, argv, true);
 
         Context context = new Context();
@@ -142,7 +148,7 @@ public class EPersonCLITool {
         options.addOption("h", "help", false, "explain --add options");
 
         // Rescan the command for more details.
-        GnuParser parser = new GnuParser();
+        CommandLineParser parser = new DefaultParser();
         CommandLine command;
         try {
             command = parser.parse(options, argv);
@@ -184,7 +190,8 @@ public class EPersonCLITool {
         eperson.setLastName(context, command.getOptionValue(OPT_SURNAME.getOpt()));
         eperson.setLanguage(context, command.getOptionValue(OPT_LANGUAGE.getOpt(),
                                                             Locale.getDefault().getLanguage()));
-        ePersonService.setMetadata(context, eperson, "phone", command.getOptionValue(OPT_PHONE.getOpt()));
+        ePersonService.setMetadataSingleValue(context, eperson, MD_PHONE,
+                command.getOptionValue(OPT_PHONE.getOpt()), null);
         eperson.setNetid(command.getOptionValue(OPT_NETID.getOpt()));
         ePersonService.setPassword(eperson, command.getOptionValue('p'));
         if (command.hasOption(OPT_REQUIRE_CERTIFICATE.getOpt())) {
@@ -196,7 +203,6 @@ public class EPersonCLITool {
 
         try {
             ePersonService.update(context, eperson);
-            context.complete();
             System.out.printf("Created EPerson %s\n", eperson.getID().toString());
         } catch (SQLException ex) {
             context.abort();
@@ -223,7 +229,7 @@ public class EPersonCLITool {
 
         options.addOption("h", "help", false, "explain --delete options");
 
-        GnuParser parser = new GnuParser();
+        CommandLineParser parser = new DefaultParser();
         CommandLine command;
         try {
             command = parser.parse(options, argv);
@@ -259,16 +265,26 @@ public class EPersonCLITool {
         }
 
         try {
-            ePersonService.delete(context, eperson);
-            context.complete();
-            System.out.printf("Deleted EPerson %s\n", eperson.getID().toString());
-        } catch (SQLException ex) {
-            System.err.println(ex.getMessage());
-            return 1;
-        } catch (AuthorizeException ex) {
-            System.err.println(ex.getMessage());
-            return 1;
-        } catch (IOException ex) {
+            List<String> tableList = ePersonService.getDeleteConstraints(context, eperson);
+            if (!tableList.isEmpty()) {
+                System.out.printf("The EPerson with ID: %s is referenced by the following database tables:%n",
+                        eperson.getID().toString());
+                tableList.forEach((s) -> {
+                    System.out.println(s);
+                });
+            }
+            System.out.printf("Are you sure you want to delete this EPerson with ID: %s? (y or n): ",
+                    eperson.getID().toString());
+            BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+            System.out.flush();
+            String s = input.readLine();
+            if (s != null && s.trim().toLowerCase().startsWith("y")) {
+                ePersonService.delete(context, eperson);
+                System.out.printf("%nDeleted EPerson with ID: %s", eperson.getID().toString());
+            } else {
+                System.out.printf("%nAbort Deletion of EPerson with ID: %s %n", eperson.getID().toString());
+            }
+        } catch (SQLException | AuthorizeException | IOException ex) {
             System.err.println(ex.getMessage());
             return 1;
         }
@@ -302,7 +318,7 @@ public class EPersonCLITool {
 
         options.addOption("h", "help", false, "explain --modify options");
 
-        GnuParser parser = new GnuParser();
+        CommandLineParser parser = new DefaultParser();
         CommandLine command;
         try {
             command = parser.parse(options, argv);
@@ -354,7 +370,8 @@ public class EPersonCLITool {
                 modified = true;
             }
             if (command.hasOption(OPT_PHONE.getOpt())) {
-                ePersonService.setMetadata(context, eperson, "phone", command.getOptionValue(OPT_PHONE.getOpt()));
+                ePersonService.setMetadataSingleValue(context, eperson, MD_PHONE,
+                        command.getOptionValue(OPT_PHONE.getOpt()), null);
                 modified = true;
             }
             if (command.hasOption(OPT_LANGUAGE.getOpt())) {
@@ -373,7 +390,6 @@ public class EPersonCLITool {
             if (modified) {
                 try {
                     ePersonService.update(context, eperson);
-                    context.complete();
                     System.out.printf("Modified EPerson %s\n", eperson.getID().toString());
                 } catch (SQLException ex) {
                     context.abort();

@@ -20,6 +20,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
 import org.dspace.xmlworkflow.storedcomponents.dao.XmlWorkflowItemDAO;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
@@ -47,6 +48,8 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
     @Autowired(required = true)
     protected PoolTaskService poolTaskService;
     @Autowired(required = true)
+    protected WorkflowRequirementsService workflowRequirementsService;
+    @Autowired(required = true)
     protected WorkflowItemRoleService workflowItemRoleService;
 
     /*
@@ -72,7 +75,6 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
     public XmlWorkflowItem find(Context context, int id) throws SQLException {
         XmlWorkflowItem workflowItem = xmlWorkflowItemDAO.findByID(context, XmlWorkflowItem.class, id);
 
-
         if (workflowItem == null) {
             if (log.isDebugEnabled()) {
                 log.debug(LogManager.getHeader(context, "find_workflow_item",
@@ -93,13 +95,17 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
     }
 
     @Override
-    public List<XmlWorkflowItem> findAll(Context context, Integer offset, Integer pagesize) throws SQLException {
-        return findAllInCollection(context, offset, pagesize, null);
+    public List<XmlWorkflowItem> findAll(Context context, Integer page, Integer pagesize) throws SQLException {
+        return findAllInCollection(context, page, pagesize, null);
     }
 
     @Override
-    public List<XmlWorkflowItem> findAllInCollection(Context context, Integer offset, Integer pagesize,
+    public List<XmlWorkflowItem> findAllInCollection(Context context, Integer page, Integer pagesize,
                                                      Collection collection) throws SQLException {
+        Integer offset = null;
+        if (page != null && pagesize != null) {
+            offset = page * pagesize;
+        }
         return xmlWorkflowItemDAO.findAllInCollection(context, offset, pagesize, collection);
     }
 
@@ -116,6 +122,21 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
     @Override
     public List<XmlWorkflowItem> findBySubmitter(Context context, EPerson ep) throws SQLException {
         return xmlWorkflowItemDAO.findBySubmitter(context, ep);
+    }
+
+    @Override
+    public List<XmlWorkflowItem> findBySubmitter(Context context, EPerson ep, Integer pageNumber, Integer pageSize)
+            throws SQLException {
+        Integer offset = null;
+        if (pageNumber != null && pageSize != null) {
+            offset = pageNumber * pageSize;
+        }
+        return xmlWorkflowItemDAO.findBySubmitter(context, ep, pageNumber, pageSize);
+    }
+
+    @Override
+    public int countBySubmitter(Context context, EPerson ep) throws SQLException {
+        return xmlWorkflowItemDAO.countBySubmitter(context, ep);
     }
 
     @Override
@@ -175,6 +196,7 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
         }
 
         poolTaskService.deleteByWorkflowItem(context, workflowItem);
+        workflowRequirementsService.clearInProgressUsers(context, workflowItem);
         claimedTaskService.deleteByWorkflowItem(context, workflowItem);
 
         // FIXME - auth?

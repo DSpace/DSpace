@@ -17,11 +17,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -34,19 +36,33 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.core.service.LicenseService;
+import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.DiscoverResult;
+import org.dspace.discovery.IndexableObject;
+import org.dspace.discovery.SearchService;
+import org.dspace.discovery.SearchServiceException;
+import org.dspace.discovery.indexobject.IndexableCollection;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.Event;
 import org.dspace.harvest.HarvestedCollection;
 import org.dspace.harvest.service.HarvestedCollectionService;
+import org.dspace.identifier.IdentifierException;
+import org.dspace.identifier.service.IdentifierService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.dspace.xmlworkflow.WorkflowConfigurationException;
+import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
+import org.dspace.xmlworkflow.state.Workflow;
+import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
+import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -78,6 +94,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     protected CommunityService communityService;
     @Autowired(required = true)
     protected GroupService groupService;
+    @Autowired(required = true)
+    protected IdentifierService identifierService;
 
     @Autowired(required = true)
     protected LicenseService licenseService;
@@ -88,6 +106,17 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     @Autowired(required = true)
     protected HarvestedCollectionService harvestedCollectionService;
 
+    @Autowired(required = true)
+    protected XmlWorkflowFactory workflowFactory;
+
+    @Autowired(required = true)
+    protected CollectionRoleService collectionRoleService;
+
+    @Autowired(required = true)
+    protected SearchService searchService;
+
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
 
     protected CollectionServiceImpl() {
         super();
@@ -109,13 +138,6 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         //Add our newly created collection to our community, authorization checks occur in THIS method
         communityService.addCollection(context, community, newCollection);
 
-        //Update our community so we have a collection identifier
-        if (handle == null) {
-            handleService.createHandle(context, newCollection);
-        } else {
-            handleService.createHandle(context, newCollection, handle);
-        }
-
         // create the default authorization policy for collections
         // of 'anonymous' READ
         Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
@@ -128,6 +150,18 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         authorizeService
             .createResourcePolicy(context, newCollection, anonymousGroup, null, Constants.DEFAULT_BITSTREAM_READ, null);
 
+        collectionDAO.save(context, newCollection);
+
+        //Update our collection so we have a collection identifier
+        try {
+            if (handle == null) {
+                identifierService.register(context, newCollection);
+            } else {
+                identifierService.register(context, newCollection, handle);
+            }
+        } catch (IllegalStateException | IdentifierException ex) {
+            throw new IllegalStateException(ex);
+        }
 
         context.addEvent(new Event(Event.CREATE, Constants.COLLECTION,
                                    newCollection.getID(), newCollection.getHandle(),
@@ -137,16 +171,16 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                                       "collection_id=" + newCollection.getID())
                      + ",handle=" + newCollection.getHandle());
 
-        collectionDAO.save(context, newCollection);
         return newCollection;
     }
 
     @Override
     public List<Collection> findAll(Context context) throws SQLException {
-        MetadataField nameField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null);
+        MetadataField nameField = metadataFieldService.findByElement(context, MetadataSchemaEnum.DC.getName(),
+                                                                     "title", null);
         if (nameField == null) {
             throw new IllegalArgumentException(
-                "Required metadata field '" + MetadataSchema.DC_SCHEMA + ".title' doesn't exist!");
+                "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".title' doesn't exist!");
         }
 
         return collectionDAO.findAll(context, nameField);
@@ -154,10 +188,11 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public List<Collection> findAll(Context context, Integer limit, Integer offset) throws SQLException {
-        MetadataField nameField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null);
+        MetadataField nameField = metadataFieldService.findByElement(context, MetadataSchemaEnum.DC.getName(),
+                                                                     "title", null);
         if (nameField == null) {
             throw new IllegalArgumentException(
-                "Required metadata field '" + MetadataSchema.DC_SCHEMA + ".title' doesn't exist!");
+                "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".title' doesn't exist!");
         }
 
         return collectionDAO.findAll(context, nameField, limit, offset);
@@ -165,7 +200,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public List<Collection> findAuthorizedOptimized(Context context, int actionID) throws SQLException {
-        if (!ConfigurationManager
+        if (!configurationService
             .getBooleanProperty("org.dspace.content.Collection.findAuthorizedPerformanceOptimize", false)) {
             // Fallback to legacy query if config says so. The rationale could be that a site found a bug.
             return findAuthorized(context, null, actionID);
@@ -266,9 +301,10 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
-    public void setMetadata(Context context, Collection collection, String field, String value)
-        throws MissingResourceException, SQLException {
-        if ((field.trim()).equals("name") && (value == null || value.trim().equals(""))) {
+    public void setMetadataSingleValue(Context context, Collection collection,
+            MetadataFieldName field, String language, String value)
+            throws MissingResourceException, SQLException {
+        if (field.equals(MD_NAME) && (value == null || value.trim().equals(""))) {
             try {
                 value = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
             } catch (MissingResourceException e) {
@@ -276,21 +312,19 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             }
         }
 
-        String[] MDValue = getMDValueByLegacyField(field);
-
         /*
          * Set metadata field to null if null
          * and trim strings to eliminate excess
          * whitespace.
          */
         if (value == null) {
-            clearMetadata(context, collection, MDValue[0], MDValue[1], MDValue[2], Item.ANY);
+            clearMetadata(context, collection, field.SCHEMA, field.ELEMENT, field.QUALIFIER, Item.ANY);
             collection.setMetadataModified();
         } else {
-            setMetadataSingleValue(context, collection, MDValue[0], MDValue[1], MDValue[2], null, value);
+            super.setMetadataSingleValue(context, collection, field, null, value);
         }
 
-        collection.addDetails(field);
+        collection.addDetails(field.toString());
     }
 
     @Override
@@ -338,108 +372,96 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         // Check authorisation - Must be an Admin to create Workflow Group
         AuthorizeUtil.authorizeManageWorkflowsGroup(context, collection);
 
-        if (getWorkflowGroup(collection, step) == null) {
+        if (getWorkflowGroup(context, collection, step) == null) {
             //turn off authorization so that Collection Admins can create Collection Workflow Groups
             context.turnOffAuthorisationSystem();
             Group g = groupService.create(context);
-            context.restoreAuthSystemState();
-
             groupService.setName(g,
                                  "COLLECTION_" + collection.getID() + "_WORKFLOW_STEP_" + step);
             groupService.update(context, g);
+            context.restoreAuthSystemState();
             setWorkflowGroup(context, collection, step, g);
-
         }
 
-        return getWorkflowGroup(collection, step);
+        return getWorkflowGroup(context, collection, step);
     }
 
     @Override
     public void setWorkflowGroup(Context context, Collection collection, int step, Group group)
-        throws SQLException, AuthorizeException {
-        // we need to store the old group to be able to revoke permissions if granted before
-        Group oldGroup = null;
-        int action;
+        throws SQLException {
+        Workflow workflow = null;
+        try {
+            workflow = workflowFactory.getWorkflow(collection);
+        } catch (WorkflowConfigurationException e) {
+            log.error(LogManager.getHeader(context, "setWorkflowGroup",
+                    "collection_id=" + collection.getID() + " " + e.getMessage()), e);
+        }
+        if (!StringUtils.equals(workflowFactory.getDefaultWorkflow().getID(), workflow.getID())) {
+            throw new IllegalArgumentException(
+                    "setWorkflowGroup can be used only on collection with the default basic dspace workflow. "
+                    + "Instead, the collection: "
+                            + collection.getID() + " has the workflow: " + workflow.getID());
+        }
+        String roleId;
 
         switch (step) {
             case 1:
-                oldGroup = collection.getWorkflowStep1();
-                action = Constants.WORKFLOW_STEP_1;
-                collection.setWorkflowStep1(group);
+                roleId = CollectionRoleService.LEGACY_WORKFLOW_STEP1_NAME;
                 break;
             case 2:
-                oldGroup = collection.getWorkflowStep2();
-                action = Constants.WORKFLOW_STEP_2;
-                collection.setWorkflowStep2(group);
+                roleId = CollectionRoleService.LEGACY_WORKFLOW_STEP2_NAME;
                 break;
             case 3:
-                oldGroup = collection.getWorkflowStep3();
-                action = Constants.WORKFLOW_STEP_3;
-                collection.setWorkflowStep3(group);
+                roleId = CollectionRoleService.LEGACY_WORKFLOW_STEP3_NAME;
                 break;
             default:
                 throw new IllegalArgumentException("Illegal step count: " + step);
         }
 
-        // deal with permissions.
-        try {
-            context.turnOffAuthorisationSystem();
-            // remove the policies for the old group
-            if (oldGroup != null) {
-                Iterator<ResourcePolicy> oldPolicies =
-                    resourcePolicyService.find(context, collection, oldGroup, action).iterator();
-                while (oldPolicies.hasNext()) {
-                    resourcePolicyService.delete(context, oldPolicies.next());
-                }
-                oldPolicies = resourcePolicyService.find(context, collection, oldGroup, Constants.ADD).iterator();
-                while (oldPolicies.hasNext()) {
-                    ResourcePolicy rp = oldPolicies.next();
-                    if (rp.getRpType() == ResourcePolicy.TYPE_WORKFLOW) {
-                        resourcePolicyService.delete(context, rp);
-                    }
-                }
-            }
-
-            // group can be null to delete workflow step.
-            // we need to grant permissions if group is not null
+        CollectionRole colRole = collectionRoleService.find(context, collection, roleId);
+        if (colRole == null) {
             if (group != null) {
-                authorizeService.addPolicy(context, collection, action, group, ResourcePolicy.TYPE_WORKFLOW);
-                authorizeService.addPolicy(context, collection, Constants.ADD, group, ResourcePolicy.TYPE_WORKFLOW);
+                colRole = collectionRoleService.create(context, collection, roleId, group);
             }
-        } finally {
-            context.restoreAuthSystemState();
+        } else {
+            if (group != null) {
+                colRole.setGroup(group);
+                collectionRoleService.update(context, colRole);
+            } else {
+                collectionRoleService.delete(context, colRole);
+            }
         }
         collection.setModified();
     }
 
     @Override
-    public Group getWorkflowGroup(Collection collection, int step) {
+    public Group getWorkflowGroup(Context context, Collection collection, int step) {
+        String roleId;
+
         switch (step) {
             case 1:
-                return collection.getWorkflowStep1();
+                roleId = CollectionRoleService.LEGACY_WORKFLOW_STEP1_NAME;
+                break;
             case 2:
-                return collection.getWorkflowStep2();
+                roleId = CollectionRoleService.LEGACY_WORKFLOW_STEP2_NAME;
+                break;
             case 3:
-                return collection.getWorkflowStep3();
+                roleId = CollectionRoleService.LEGACY_WORKFLOW_STEP3_NAME;
+                break;
             default:
-                throw new IllegalStateException("Illegal step count: " + step);
+                throw new IllegalArgumentException("Illegal step count: " + step);
         }
-    }
 
-    /**
-     * Get the value of a metadata field
-     *
-     * @param collection which collection to operate on
-     * @param field      the name of the metadata field to get
-     * @return the value of the metadata field
-     * @throws IllegalArgumentException if the requested metadata field doesn't exist
-     */
-    @Override
-    @Deprecated
-    public String getMetadata(Collection collection, String field) {
-        String[] MDValue = getMDValueByLegacyField(field);
-        String value = getMetadataFirstValue(collection, MDValue[0], MDValue[1], MDValue[2], Item.ANY);
-        return value == null ? "" : value;
+        CollectionRole colRole;
+        try {
+            colRole = collectionRoleService.find(context, collection, roleId);
+            if (colRole != null) {
+                return colRole.getGroup();
+            }
+            return null;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -522,7 +544,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public String getLicense(Collection collection) {
-        String license = getMetadata(collection, "license");
+        String license = getMetadataFirstValue(collection, CollectionService.MD_LICENSE, Item.ANY);
 
         if (license == null || license.trim().equals("")) {
             // Fallback to site-wide default
@@ -733,29 +755,13 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         // Remove any Handle
         handleService.unbindHandle(context, collection);
 
-        // Remove any workflow groups - must happen after deleting collection
-        Group g = collection.getWorkflowStep1();
-        if (g != null) {
-            collection.setWorkflowStep1(null);
-            groupService.delete(context, g);
-        }
+        // Remove any workflow roles
+        collectionRoleService.deleteByCollection(context, collection);
 
-        g = collection.getWorkflowStep2();
-
-        if (g != null) {
-            collection.setWorkflowStep2(null);
-            groupService.delete(context, g);
-        }
-
-        g = collection.getWorkflowStep3();
-
-        if (g != null) {
-            collection.setWorkflowStep3(null);
-            groupService.delete(context, g);
-        }
+        collection.getResourcePolicies().clear();
 
         // Remove default administrators group
-        g = collection.getAdministrators();
+        Group g = collection.getAdministrators();
 
         if (g != null) {
             collection.setAdmins(null);
@@ -887,5 +893,96 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     public List<Map.Entry<Collection, Long>> getCollectionsWithBitstreamSizesTotal(Context context)
         throws SQLException {
         return collectionDAO.getCollectionsWithBitstreamSizesTotal(context);
+    }
+
+    @Override
+    public Group createDefaultReadGroup(Context context, Collection collection, String typeOfGroupString,
+                                        int defaultRead)
+        throws SQLException, AuthorizeException {
+        Group role = groupService.create(context);
+        groupService.setName(role, "COLLECTION_" + collection.getID().toString() + "_" + typeOfGroupString +
+            "_DEFAULT_READ");
+
+        // Remove existing privileges from the anonymous group.
+        authorizeService.removePoliciesActionFilter(context, collection, defaultRead);
+
+        // Grant our new role the default privileges.
+        authorizeService.addPolicy(context, collection, defaultRead, role);
+        groupService.update(context, role);
+        return role;
+    }
+
+    @Override
+    public List<Collection> findCollectionsWithSubmit(String q, Context context, Community community,
+        int offset, int limit) throws SQLException, SearchServiceException {
+
+        List<Collection> collections = new ArrayList<>();
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
+        discoverQuery.setStart(offset);
+        discoverQuery.setMaxResults(limit);
+        DiscoverResult resp = retrieveCollectionsWithSubmit(context, discoverQuery,community, q);
+        for (IndexableObject solrCollections : resp.getIndexableObjects()) {
+            Collection c = ((IndexableCollection) solrCollections).getIndexedObject();
+            collections.add(c);
+        }
+        return collections;
+    }
+
+    @Override
+    public int countCollectionsWithSubmit(String q, Context context, Community community)
+        throws SQLException, SearchServiceException {
+
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.setMaxResults(0);
+        discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
+        DiscoverResult resp = retrieveCollectionsWithSubmit(context, discoverQuery,community,q);
+        return (int)resp.getTotalSearchResults();
+    }
+
+    /**
+     * Finds all Indexed Collections where the current user has submit rights. If the user is an Admin,
+     * this is all Indexed Collections. Otherwise, it includes those collections where
+     * an indexed "submit" policy lists either the eperson or one of the eperson's groups
+     * 
+     * @param context                    DSpace context
+     * @param discoverQuery
+     * @param community                  parent community, could be null
+     * @param q                          limit the returned collection to those with metadata values matching the query
+     *                                   terms. The terms are used to make also a prefix query on SOLR
+     *                                   so it can be used to implement an autosuggest feature over the collection name
+     * @return                           discovery search result objects
+     * @throws SQLException              if something goes wrong
+     * @throws SearchServiceException    if search error
+     */
+    private DiscoverResult retrieveCollectionsWithSubmit(Context context, DiscoverQuery discoverQuery,
+            Community community, String q) throws SQLException, SearchServiceException {
+
+        StringBuilder query = new StringBuilder();
+        EPerson currentUser = context.getCurrentUser();
+        if (!authorizeService.isAdmin(context)) {
+            String userId = "";
+            if (currentUser != null) {
+                userId = currentUser.getID().toString();
+            }
+            query.append("submit:(e").append(userId);
+            Set<Group> groups = groupService.allMemberGroupsSet(context, currentUser);
+            for (Group group : groups) {
+                query.append(" OR g").append(group.getID());
+            }
+            query.append(")");
+            discoverQuery.addFilterQueries(query.toString());
+        }
+        if (community != null) {
+            discoverQuery.addFilterQueries("location.comm:" + community.getID().toString());
+        }
+        if (StringUtils.isNotBlank(q)) {
+            StringBuilder buildQuery = new StringBuilder();
+            String escapedQuery = ClientUtils.escapeQueryChars(q);
+            buildQuery.append(escapedQuery).append(" OR ").append(escapedQuery).append("*");
+            discoverQuery.setQuery(buildQuery.toString());
+        }
+        DiscoverResult resp = searchService.search(context, discoverQuery);
+        return resp;
     }
 }

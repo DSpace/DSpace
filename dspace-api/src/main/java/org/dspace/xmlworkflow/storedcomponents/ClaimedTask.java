@@ -34,7 +34,6 @@ import org.dspace.eperson.EPerson;
 @Table(name = "cwf_claimtask")
 public class ClaimedTask implements ReloadableEntity<Integer> {
 
-
     @Id
     @Column(name = "claimtask_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cwf_claimtask_seq")

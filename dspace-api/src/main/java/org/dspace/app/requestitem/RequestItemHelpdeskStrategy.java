@@ -68,18 +68,16 @@ public class RequestItemHelpdeskStrategy extends RequestItemSubmitterStrategy {
      * @throws SQLException if database error
      */
     public RequestItemAuthor getHelpDeskPerson(Context context, String helpDeskEmail) throws SQLException {
-        EPerson helpdeskEPerson = null;
-
         context.turnOffAuthorisationSystem();
-        helpdeskEPerson = ePersonService.findByEmail(context, helpDeskEmail);
+        EPerson helpdeskEPerson = ePersonService.findByEmail(context, helpDeskEmail);
         context.restoreAuthSystemState();
 
         if (helpdeskEPerson != null) {
             return new RequestItemAuthor(helpdeskEPerson);
         } else {
             String helpdeskName = I18nUtil.getMessage(
-                "org.dspace.app.requestitem.RequestItemHelpdeskStrategy.helpdeskname",
-                context);
+                    "org.dspace.app.requestitem.RequestItemHelpdeskStrategy.helpdeskname",
+                    context);
             return new RequestItemAuthor(helpdeskName, helpDeskEmail);
         }
     }

@@ -17,17 +17,16 @@ import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
@@ -67,6 +66,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * 
  * @author Terry Brady, Georgetown University Library
  */
+
 public class SolrUpgradePre6xStatistics {
     //Command line parameter constants
     private static final String INDEX_NAME_OPTION = "i";
@@ -92,7 +92,7 @@ public class SolrUpgradePre6xStatistics {
     private int numProcessed = 0;
     private long totalCache = 0;
     private long numUncache = 0;
-    private List<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
+    private final List<SolrInputDocument> docs = new ArrayList<>();
     private Context context;
 
     //Enum to identify the named SOLR statistics fields to update
@@ -122,7 +122,7 @@ public class SolrUpgradePre6xStatistics {
 
     // This code will operate on one shard at a time, therefore the SOLR web service will be accessed directly rather
     // than make use of the DSpace Solr Logger which only writes to the current shard
-    private HttpSolrServer server;
+    private final HttpSolrClient server;
 
     //Allows for smart use of hibernate cache
     private Item lastItem = null;
@@ -137,6 +137,7 @@ public class SolrUpgradePre6xStatistics {
      * Construct the utility class from the command line options
      * @param indexName name of the statistics shard to update
      * @param numRec    maximum number of records to process
+     * @param batchSize batch this many documents before updating.
      * @throws IOException
      * @throws SolrServerException
      */
@@ -145,8 +146,8 @@ public class SolrUpgradePre6xStatistics {
         String serverPath = configurationService.getProperty("solr-statistics.server");
         serverPath = serverPath.replaceAll("statistics$", indexName);
         System.out.println("Connecting to " + serverPath);
-        server = new HttpSolrServer(serverPath);
-        server.setMaxTotalConnections(1);
+        server = new HttpSolrClient.Builder(serverPath)
+                .build();
         this.numRec = numRec;
         this.batchSize = batchSize;
         refreshContext();
@@ -189,7 +190,7 @@ public class SolrUpgradePre6xStatistics {
         long count = 0;
         try {
             count = context.getCacheSize();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             //no action
         }
         count += this.numUncache;
@@ -319,7 +320,7 @@ public class SolrUpgradePre6xStatistics {
      *             if the command-line arguments cannot be parsed
      */
     public static void main(String[] args) throws ParseException {
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
         Options options = makeOptions();
 
         System.out.println(" * This process should be run iteratively over every statistics shard ");
@@ -362,11 +363,7 @@ public class SolrUpgradePre6xStatistics {
         try {
             SolrUpgradePre6xStatistics upgradeStats = new SolrUpgradePre6xStatistics(indexName, numrec, batchSize);
             upgradeStats.run();
-        } catch (SolrServerException e) {
-            log.error("Error querying stats", e);
-        } catch (SQLException e) {
-            log.error("Error querying stats", e);
-        } catch (IOException e) {
+        } catch (SolrServerException | SQLException | IOException e) {
             log.error("Error querying stats", e);
         }
     }
@@ -374,7 +371,7 @@ public class SolrUpgradePre6xStatistics {
     /*
      * Report on the existence of legacy id records within a shard
      */
-    private void runReport() throws SolrServerException {
+    private void runReport() throws SolrServerException, IOException {
         System.out.println();
         System.out.println("=================================================================");
         System.out.println("\t*** Statistics Records with Legacy Id ***\n");
@@ -388,10 +385,9 @@ public class SolrUpgradePre6xStatistics {
     /*
      * Report on the existence of specific legacy id records within a shard
      */
-    private long runReportQuery() throws SolrServerException {
-        StringBuilder sb = new StringBuilder(MIGQUERY);
+    private long runReportQuery() throws SolrServerException, IOException {
         SolrQuery sQ = new SolrQuery();
-        sQ.setQuery(sb.toString());
+        sQ.setQuery(MIGQUERY);
         sQ.setFacet(true);
         sQ.addFacetField("type");
         sQ.addFacetField("scopeType");
@@ -487,15 +483,18 @@ public class SolrUpgradePre6xStatistics {
         sQ.addSort("type", SolrQuery.ORDER.desc);
         sQ.addSort("scopeType", SolrQuery.ORDER.desc);
         sQ.addSort("ord(owningItem)", SolrQuery.ORDER.desc);
-        sQ.addSort("id", SolrQuery.ORDER.asc);
-        sQ.addSort("scopeId", SolrQuery.ORDER.asc);
+        sQ.addSort("ord(id)", SolrQuery.ORDER.asc);
+        sQ.addSort("ord(scopeId)", SolrQuery.ORDER.asc);
 
         QueryResponse sr = server.query(sQ);
         SolrDocumentList sdl = sr.getResults();
 
         for (int i = 0; i < sdl.size() && (numProcessed < numRec); i++) {
             SolrDocument sd = sdl.get(i);
-            SolrInputDocument input = ClientUtils.toSolrInputDocument(sd);
+            SolrInputDocument input = new SolrInputDocument(); //ClientUtils.toSolrInputDocument(sd);
+            for (String name : sd.getFieldNames()) { // https://stackoverflow.com/a/38536843/2916377
+                input.addField(name, sd.getFieldValue(name));
+            }
             input.remove("_version_");
             for (FIELD col : FIELD.values()) {
                 mapField(input, col);

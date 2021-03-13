@@ -117,16 +117,13 @@ public abstract class AbstractMetadataFieldMapping<RecordType>
     public Collection<MetadatumDTO> resultToDCValueMapping(RecordType record) {
         List<MetadatumDTO> values = new LinkedList<MetadatumDTO>();
 
-
         for (MetadataContributor<RecordType> query : getMetadataFieldMap().values()) {
             try {
                 values.addAll(query.contributeMetadata(record));
             } catch (Exception e) {
                 log.error("Error", e);
             }
-
         }
         return values;
-
     }
 }

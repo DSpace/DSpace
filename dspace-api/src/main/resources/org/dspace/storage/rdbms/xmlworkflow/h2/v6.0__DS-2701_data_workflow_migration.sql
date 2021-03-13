@@ -1,0 +1,27 @@
+--
+-- The contents of this file are subject to the license and copyright
+-- detailed in the LICENSE and NOTICE files at the root of the source
+-- tree and available online at
+--
+-- http://www.dspace.org/license/
+--
+
+----------------------------------------------------
+-- Data Migration for XML/Configurable Workflow
+--
+-- This file will automatically migrate existing
+-- classic workflows to XML/Configurable workflows.
+-- NOTE however that the corresponding
+-- "xml_workflow_migration.sql" script must FIRST be
+-- called to create the appropriate database tables.
+--
+-- This script is called automatically by the following
+-- Flyway Java migration class:
+-- org.dspace.storage.rdbms.xmlworkflow.V6_0_2015_09_01__DS_2701_Enable_XMLWorkflow_Migration
+----------------------------------------------------
+
+-- Convert workflow groups:
+-- TODO: is 'to_number' ok? do not forget to change role_id values
+--
+-- Nothing here as the H2 in memory database is always a fresh installation
+-- so the xml workflow is already activated in version 5

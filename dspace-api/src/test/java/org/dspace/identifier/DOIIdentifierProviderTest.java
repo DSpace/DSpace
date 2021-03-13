@@ -13,6 +13,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeNotNull;
+import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
@@ -36,6 +38,8 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.identifier.doi.DOIConnector;
+import org.dspace.identifier.doi.DOIIdentifierException;
 import org.dspace.identifier.factory.IdentifierServiceFactory;
 import org.dspace.identifier.service.DOIService;
 import org.dspace.services.ConfigurationService;
@@ -48,7 +52,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Tests for {@link DataCiteIdentifierProvider}.
+ * Tests for {@link DOIIdentifierProvider}.
  *
  * @author Mark H. Wood
  * @author Pascal-Nicolas Becker
@@ -58,7 +62,7 @@ public class DOIIdentifierProviderTest
     /**
      * log4j category
      */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DOIIdentifierProviderTest.class);
+    private static final Logger log = LogManager.getLogger(DOIIdentifierProviderTest.class);
 
     private static final String PREFIX = "10.5072";
     private static final String NAMESPACE_SEPARATOR = "dspaceUnitTests-";
@@ -75,7 +79,7 @@ public class DOIIdentifierProviderTest
     private static Community community;
     private static Collection collection;
 
-    private static MockDOIConnector connector;
+    private static DOIConnector connector;
     private DOIIdentifierProvider provider;
 
     public DOIIdentifierProviderTest() {
@@ -97,10 +101,12 @@ public class DOIIdentifierProviderTest
             context.turnOffAuthorisationSystem();
             // Create an environment for our test objects to live in.
             community = communityService.create(null, context);
-            communityService.setMetadata(context, community, "name", "A Test Community");
+            communityService.setMetadataSingleValue(context, community,
+                    CommunityService.MD_NAME, null, "A Test Community");
             communityService.update(context, community);
             collection = collectionService.create(context, community);
-            collectionService.setMetadata(context, collection, "name", "A Test Collection");
+            collectionService.setMetadataSingleValue(context, collection,
+                    CollectionService.MD_NAME, null, "A Test Collection");
             collectionService.update(context, collection);
             //we need to commit the changes so we don't block the table for testing
             context.restoreAuthSystemState();
@@ -111,11 +117,12 @@ public class DOIIdentifierProviderTest
             config.setProperty(DOIIdentifierProvider.CFG_NAMESPACE_SEPARATOR,
                                NAMESPACE_SEPARATOR);
 
-            connector = new MockDOIConnector();
+            connector = mock(DOIConnector.class);
 
-            provider = DSpaceServicesFactory.getInstance().getServiceManager()
-                                            .getServiceByName(DOIIdentifierProvider.class.getName(),
-                                                              DOIIdentifierProvider.class);
+            provider = new DOIIdentifierProvider();
+            provider.doiService = doiService;
+            provider.contentServiceFactory = ContentServiceFactory.getInstance();
+            provider.itemService = itemService;
             provider.setConfigurationService(config);
             provider.setDOIConnector(connector);
         } catch (AuthorizeException ex) {
@@ -140,7 +147,6 @@ public class DOIIdentifierProviderTest
     public void destroy() {
         community = null;
         collection = null;
-        connector.reset();
         connector = null;
         provider = null;
         super.destroy();
@@ -178,7 +184,7 @@ public class DOIIdentifierProviderTest
                                                                DOIIdentifierProvider.DOI_ELEMENT,
                                                                DOIIdentifierProvider.DOI_QUALIFIER,
                                                                null);
-        List<String> remainder = new ArrayList<String>();
+        List<String> remainder = new ArrayList<>();
 
         for (MetadataValue id : metadata) {
             if (!id.getValue().startsWith(DOI.RESOLVER)) {
@@ -215,9 +221,11 @@ public class DOIIdentifierProviderTest
      * @param item     Item the DOI should be created for.
      * @param status   The status of the DOI.
      * @param metadata Whether the DOI should be included in the metadata of the item.
-     * @param doi      The doi or null if we should generate one.
+     * @param doi      The DOI or null if we should generate one.
      * @return the DOI
      * @throws SQLException if database error
+     * @throws org.dspace.identifier.IdentifierException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
      */
     public String createDOI(Item item, Integer status, boolean metadata, String doi)
         throws SQLException, IdentifierException, AuthorizeException {
@@ -261,14 +269,13 @@ public class DOIIdentifierProviderTest
 
     @Test
     public void testSupports_valid_String() {
-        String[] validDOIs = new String[]
-            {
-                "10.5072/123abc-lkj/kljl",
-                PREFIX + "/" + NAMESPACE_SEPARATOR + "lkjljasd1234",
-                DOI.SCHEME + "10.5072/123abc-lkj/kljl",
-                "http://dx.doi.org/10.5072/123abc-lkj/kljl",
-                DOI.RESOLVER + "/10.5072/123abc-lkj/kljl"
-            };
+        String[] validDOIs = new String[] {
+            "10.5072/123abc-lkj/kljl",
+            PREFIX + "/" + NAMESPACE_SEPARATOR + "lkjljasd1234",
+            DOI.SCHEME + "10.5072/123abc-lkj/kljl",
+            "http://dx.doi.org/10.5072/123abc-lkj/kljl",
+            DOI.RESOLVER + "/10.5072/123abc-lkj/kljl"
+        };
 
         for (String doi : validDOIs) {
             assertTrue("DOI should be supported", provider.supports(doi));
@@ -277,13 +284,12 @@ public class DOIIdentifierProviderTest
 
     @Test
     public void testDoes_not_support_invalid_String() {
-        String[] invalidDOIs = new String[]
-            {
-                "11.5072/123abc-lkj/kljl",
-                "http://hdl.handle.net/handle/10.5072/123abc-lkj/kljl",
-                "",
-                null
-            };
+        String[] invalidDOIs = new String[] {
+            "11.5072/123abc-lkj/kljl",
+            "http://hdl.handle.net/handle/10.5072/123abc-lkj/kljl",
+            "",
+            null
+        };
 
         for (String notADoi : invalidDOIs) {
             assertFalse("Invalid DOIs shouldn't be supported",
@@ -332,8 +338,8 @@ public class DOIIdentifierProviderTest
         itemService.update(context, item);
         context.restoreAuthSystemState();
 
-        assertTrue("Failed to recognize DOI in item metadata.",
-                   doi.equals(provider.getDOIOutOfObject(item)));
+        assertEquals("Failed to recognize DOI in item metadata.",
+                doi, provider.getDOIOutOfObject(item));
     }
 
     @Test
@@ -496,7 +502,7 @@ public class DOIIdentifierProviderTest
             // get a DOI:
             doi = provider.mint(context, item);
         } catch (IdentifierException e) {
-            e.printStackTrace();
+            e.printStackTrace(System.err);
             fail("Got an IdentifierException: " + e.getMessage());
         }
 
@@ -505,8 +511,8 @@ public class DOIIdentifierProviderTest
 
         try {
             doiService.formatIdentifier(doi);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (DOIIdentifierException e) {
+            e.printStackTrace(System.err);
             fail("Minted an unrecognizable DOI: " + e.getMessage());
         }
     }

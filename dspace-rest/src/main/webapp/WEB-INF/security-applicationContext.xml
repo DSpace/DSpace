@@ -13,7 +13,7 @@
        xmlns:security="http://www.springframework.org/schema/security"
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-  http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+  http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
     <context:annotation-config/>
 
@@ -21,7 +21,7 @@
         Every url in the rest will pass through these filters, login & shibboleth-login will trigger an authentication attempt.
      -->
     <bean id="springSecurityFilterChain" class="org.springframework.security.web.FilterChainProxy">
-        <security:filter-chain-map path-type="ant">
+        <security:filter-chain-map request-matcher="ant">
             <security:filter-chain pattern="/login" filters="sif,passwordLoginAuthenticationFilter"/>
             <security:filter-chain pattern="/shibboleth-login" filters="sif,passwordLoginAuthenticationFilter"/>
             <security:filter-chain pattern="/logout" filters="sif,logoutFilter"/>

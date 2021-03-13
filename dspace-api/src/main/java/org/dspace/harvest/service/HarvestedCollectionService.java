@@ -137,4 +137,15 @@ public interface HarvestedCollectionService {
     public void update(Context context, HarvestedCollection harvestedCollection) throws SQLException;
 
     public boolean exists(Context context) throws SQLException;
+
+    /**
+     * Test the given harvest settings
+     * @param oaiSource  the address of the OAI-PMH provider
+     * @param oaiSetId   OAI set identifier
+     * @param metaPrefix OAI metadataPrefix
+     * @param testORE    whether the method should also check the PMH provider for ORE support
+     * @return list of errors encountered during verification. An empty list indicates a "success" condition.
+     */
+    public List<String> verifyOAIharvester(String oaiSource,
+                                           String oaiSetId, String metaPrefix, boolean testORE);
 }
