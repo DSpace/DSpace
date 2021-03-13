@@ -1,11 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE forms [
   <!ATTLIST form-definitions id ID #IMPLIED>
   <!ATTLIST form id ID #IMPLIED>
   ]>
-
-<!-- Forms for journals and related entities. -->
-<form-definitions id='journals'>
+  <form-definitions id='journals'>
     <form id='journalStep'
           name="journalStep">
         <row>
@@ -61,10 +59,12 @@
         <row>
             <relation-field>
                 <relationship-type>isVolumeOfJournal</relationship-type>
-                <search-configuration>periodical</search-configuration>
-                <filter>creativework.publisher:somepublishername</filter>
+                <search-configuration>journal</search-configuration>
+                <!-- example of filtering Discovery search for Journal by a specific publisher -->
+                <!--<filter>creativework.publisher:somepublishername</filter>-->
                 <label>Journal</label>
                 <hint>Select the journal related to this volume.</hint>
+                <externalsources>sherpaJournal</externalsources>
             </relation-field>
         </row>
         <row>
@@ -107,6 +107,14 @@
 
     <form id='journalIssueStep'
           name="journalIssueStep">
+        <row>
+            <relation-field>
+                <relationship-type>isJournalVolumeOfIssue</relationship-type>
+                <search-configuration>journalvolume</search-configuration>
+                <label>Journal Volume</label>
+                <hint>Select the journal volume related to this issue.</hint>
+            </relation-field>
+        </row>
         <row>
             <field>
                 <dc-schema>dc</dc-schema>
