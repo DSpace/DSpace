@@ -102,7 +102,7 @@ public class AbstractIntegrationTest extends AbstractUnitTest {
     }
 
     /**
-     * 
+     *
      * @return the full path to the in use local.cfg file
      */
     private String getLocalConfigurationFilePath() {
@@ -114,7 +114,7 @@ public class AbstractIntegrationTest extends AbstractUnitTest {
      * Append the input text to the current local.cfg file assuring
      * that the new text goes in a new line and sleep enough time to allow the
      * configuration reload
-     * 
+     *
      * @param textToAppend
      */
     protected void appendToLocalConfiguration(String textToAppend) {

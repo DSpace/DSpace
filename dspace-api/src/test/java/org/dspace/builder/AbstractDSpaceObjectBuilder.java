@@ -31,6 +31,7 @@ import org.joda.time.format.PeriodFormatter;
  *
  * @author Tom Desair (tom dot desair at atmire dot com)
  * @author Raf Ponsaerts (raf dot ponsaerts at atmire dot com)
+ * @param <T> Type of DSO being built.
  */
 public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
     extends AbstractBuilder<T, DSpaceObjectService> {
@@ -52,6 +53,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
 
 
     @Override
+    @SuppressWarnings("TypeParameterUnusedInFormals")
     protected <B> B handleException(final Exception e) {
         log.error(e.getMessage(), e);
         return null;
