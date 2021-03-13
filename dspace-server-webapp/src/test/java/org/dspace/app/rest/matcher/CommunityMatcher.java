@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
@@ -57,12 +58,23 @@ public class CommunityMatcher {
         );
     }
 
+    public static Matcher<? super Object> matchCommunityEntryNonAdminEmbeds(String name, UUID uuid, String handle) {
+        return allOf(
+            matchProperties(name, uuid, handle),
+            hasJsonPath("$._embedded.collections", Matchers.not(Matchers.empty())),
+            hasJsonPath("$._embedded.logo", Matchers.not(Matchers.empty())),
+            matchLinks(uuid),
+            matchNonAdminEmbeds()
+        );
+    }
+
     public static Matcher<? super Object> matchCommunityEntryFullProjection(String name, UUID uuid, String handle) {
         return allOf(
             matchProperties(name, uuid, handle),
             hasJsonPath("$._embedded.collections", Matchers.not(Matchers.empty())),
             hasJsonPath("$._embedded.logo", Matchers.not(Matchers.empty())),
-            matchLinks(uuid)
+            matchLinks(uuid),
+            matchFullEmbeds()
         );
     }
 
@@ -81,12 +93,25 @@ public class CommunityMatcher {
     /**
      * Gets a matcher for all expected embeds when the full projection is requested.
      */
-    public static Matcher<? super Object> matchFullEmbeds() {
+    public static Matcher<? super Object> matchNonAdminEmbeds() {
         return matchEmbeds(
                 "collections[]",
                 "logo",
                 "parentCommunity",
                 "subcommunities[]"
+        );
+    }
+
+    /**
+     * Gets a matcher for all expected embeds when the full projection is requested.
+     */
+    public static Matcher<? super Object> matchFullEmbeds() {
+        return matchEmbeds(
+            "collections[]",
+            "logo",
+            "parentCommunity",
+            "subcommunities[]",
+            "adminGroup"
         );
     }
 
@@ -99,7 +124,8 @@ public class CommunityMatcher {
                 "logo",
                 "self",
                 "parentCommunity",
-                "subcommunities"
+                "subcommunities",
+                "adminGroup"
         );
     }
 
@@ -115,4 +141,14 @@ public class CommunityMatcher {
         );
     }
 
+    public static String getNonAdminEmbeds() {
+        return "collections,logo,parentCommunity,subcommunities";
+    }
+
+    public static Matcher<? super Object> matchCommunity(Community community) {
+        return allOf(hasJsonPath("$.uuid", is(community.getID().toString())),
+                hasJsonPath("$.name", is(community.getName())),
+                hasJsonPath("$.type", is("community")),
+                hasJsonPath("$.handle", is(community.getHandle())));
+    }
 }

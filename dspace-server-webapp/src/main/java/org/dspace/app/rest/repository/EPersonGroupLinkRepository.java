@@ -17,7 +17,6 @@ import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +27,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
- * Link repository for "groups" subresource of an individual eperson.
+ * Link repository for the direct "groups" subresource of an individual eperson.
  */
 @Component(EPersonRest.CATEGORY + "." + EPersonRest.NAME + "." + EPersonRest.GROUPS)
 public class EPersonGroupLinkRepository extends AbstractDSpaceRestRepository
@@ -51,8 +50,7 @@ public class EPersonGroupLinkRepository extends AbstractDSpaceRestRepository
             if (eperson == null) {
                 throw new ResourceNotFoundException("No such eperson: " + epersonId);
             }
-            Page<Group> groups = utils.getPage(groupService.allMemberGroups(context, eperson), optionalPageable);
-            return converter.toRestPage(groups, projection);
+            return converter.toRestPage(eperson.getGroups(), optionalPageable, projection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

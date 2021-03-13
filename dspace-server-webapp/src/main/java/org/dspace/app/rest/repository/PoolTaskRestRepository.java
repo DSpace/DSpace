@@ -9,12 +9,12 @@ package org.dspace.app.rest.repository;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
@@ -22,24 +22,22 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.PoolTaskRest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
-import org.dspace.workflow.WorkflowException;
-import org.dspace.xmlworkflow.WorkflowConfigurationException;
-import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
-import org.dspace.xmlworkflow.state.Step;
-import org.dspace.xmlworkflow.state.Workflow;
-import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.hateoas.Link;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -50,7 +48,8 @@ import org.springframework.stereotype.Component;
  */
 
 @Component(PoolTaskRest.CATEGORY + "." + PoolTaskRest.NAME)
-public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, Integer> {
+public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, Integer>
+                                    implements InitializingBean {
 
     private static final Logger log = Logger.getLogger(PoolTaskRestRepository.class);
 
@@ -71,6 +70,12 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
 
     @Autowired
     AuthorizeService authorizeService;
+
+    @Autowired
+    DiscoverableEndpointsService discoverableEndpointsService;
+
+    @Autowired
+    private XmlWorkflowItemService xmlWorkflowItemService;
 
     @Override
     @PreAuthorize("hasPermission(#id, 'POOLTASK', 'READ')")
@@ -101,7 +106,7 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
             if (authorizeService.isAdmin(context) || userID.equals(currentUser.getID())) {
                 EPerson ep = epersonService.find(context, userID);
                 List<PoolTask> tasks = poolTaskService.findByEperson(context, ep);
-                return converter.toRestPage(utils.getPage(tasks, pageable), utils.obtainProjection());
+                return converter.toRestPage(tasks, pageable, utils.obtainProjection());
             } else {
                 throw new RESTAuthorizationException("Only administrators can search for pool tasks of other users");
             }
@@ -118,32 +123,62 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'POOLTASK', 'WRITE')")
-    protected PoolTaskRest action(Context context, HttpServletRequest request, Integer id)
-        throws SQLException, IOException {
-        PoolTask task = null;
-        try {
-            task = poolTaskService.find(context, id);
-            if (task == null) {
-                throw new ResourceNotFoundException("PoolTask ID " + id + " not found");
-            }
-            XmlWorkflowServiceFactory factory = (XmlWorkflowServiceFactory) XmlWorkflowServiceFactory.getInstance();
-            Workflow workflow = factory.getWorkflowFactory().getWorkflow(task.getWorkflowItem().getCollection());
-            Step step = workflow.getStep(task.getStepID());
-            WorkflowActionConfig currentActionConfig = step.getActionConfig(task.getActionID());
-            workflowService
-                .doState(context, context.getCurrentUser(), request, task.getWorkflowItem().getID(), workflow,
-                    currentActionConfig);
-        } catch (AuthorizeException e) {
-            throw new RESTAuthorizationException(e);
-        } catch (WorkflowConfigurationException | MessagingException | WorkflowException e) {
-            throw new UnprocessableEntityException(e.getMessage(), e);
-        }
-        return null;
+    public Page<PoolTaskRest> findAll(Context context, Pageable pageable) {
+        throw new RuntimeException("Method not allowed!");
     }
 
     @Override
-    public Page<PoolTaskRest> findAll(Context context, Pageable pageable) {
-        throw new RuntimeException("Method not allowed!");
+    public void afterPropertiesSet() throws Exception {
+        discoverableEndpointsService.register(this, Arrays.asList(
+                new Link("/api/" + PoolTaskRest.CATEGORY + "/" + PoolTaskRest.NAME + "/search",
+                        PoolTaskRest.NAME + "-search")));
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @SearchRestMethod(name = "findAllByItem")
+    public Page<PoolTaskRest> findAllByItem(@Parameter(value = "uuid", required = true) UUID itemUUID,
+           Pageable pageable) {
+        List<PoolTask> poolTasks = null;
+        try {
+            Context context = obtainContext();
+            Item item = itemService.find(context, itemUUID);
+            if (item == null) {
+                throw new UnprocessableEntityException("There is no Item with uuid provided, uuid:" + itemUUID);
+            }
+            XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemService.findByItem(context, item);
+            if (xmlWorkflowItem == null) {
+                return null;
+            } else {
+                poolTasks = poolTaskService.find(context, xmlWorkflowItem);
+            }
+            return converter.toRestPage(poolTasks, pageable, utils.obtainProjection());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @SearchRestMethod(name = "findByItem")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    public PoolTaskRest findByItem(@Parameter(value = "uuid", required = true) UUID itemUUID) {
+        PoolTask poolTask = null;
+        try {
+            Context context = obtainContext();
+            Item item = itemService.find(context, itemUUID);
+            if (item == null) {
+                throw new UnprocessableEntityException("There is no Item with uuid provided, uuid:" + itemUUID);
+            }
+            XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemService.findByItem(context, item);
+            if (xmlWorkflowItem == null) {
+                return null;
+            } else {
+                poolTask = poolTaskService.findByWorkflowIdAndEPerson(context,xmlWorkflowItem,context.getCurrentUser());
+            }
+            if (poolTask == null) {
+                return null;
+            }
+            return converter.toRest(poolTask, utils.obtainProjection());
+        } catch (SQLException | AuthorizeException | IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 }

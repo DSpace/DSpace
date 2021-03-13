@@ -59,6 +59,11 @@ public class Context implements AutoCloseable {
     private EPerson currentUser;
 
     /**
+     * Temporary store when the current user is temporary switched
+     */
+    private EPerson currentUserPreviousState;
+
+    /**
      * Current Locale
      */
     private Locale currentLocale;
@@ -88,6 +93,11 @@ public class Context implements AutoCloseable {
      * Group IDs of special groups user is a member of
      */
     private List<UUID> specialGroups;
+
+    /**
+     * Temporary store for the specialGroups when the current user is temporary switched
+     */
+    private List<UUID> specialGroupsPreviousState;
 
     /**
      * Content events
@@ -169,7 +179,7 @@ public class Context implements AutoCloseable {
         }
 
         currentUser = null;
-        currentLocale = I18nUtil.DEFAULTLOCALE;
+        currentLocale = I18nUtil.getDefaultLocale();
         extraLogInfo = "";
         ignoreAuth = false;
 
@@ -180,7 +190,15 @@ public class Context implements AutoCloseable {
         setMode(this.mode);
     }
 
-    public static boolean updateDatabase() {
+    /**
+     * Update the DSpace database, ensuring that any necessary migrations are run prior to initializing
+     * Hibernate.
+     * <P>
+     * This is synchronized as it only needs to be run successfully *once* (for the first Context initialized).
+     *
+     * @return true/false, based on whether database was successfully updated
+     */
+    public static synchronized boolean updateDatabase() {
         //If the database has not been updated yet, update it and remember that.
         if (databaseUpdated.compareAndSet(false, true)) {
 
@@ -190,7 +208,7 @@ public class Context implements AutoCloseable {
             try {
                 DatabaseUtils.updateDatabase();
             } catch (SQLException sqle) {
-                log.fatal("Cannot initialize database via Flyway!", sqle);
+                log.fatal("Cannot update or initialize database via Flyway!", sqle);
                 databaseUpdated.set(false);
             }
         }
@@ -629,6 +647,42 @@ public class Context implements AutoCloseable {
     }
 
     /**
+     * Temporary change the user bound to the context, empty the special groups that
+     * are retained to allow subsequent restore
+     *
+     * @param newUser the EPerson to bound to the context
+     *
+     * @throws IllegalStateException if the switch was already performed without be
+     *                               restored
+     */
+    public void switchContextUser(EPerson newUser) {
+        if (currentUserPreviousState != null) {
+            throw new IllegalStateException(
+                    "A previous user is already set, you can only switch back and foreward one time");
+        }
+
+        currentUserPreviousState = currentUser;
+        specialGroupsPreviousState = specialGroups;
+        specialGroups = new ArrayList<UUID>();
+        currentUser = newUser;
+    }
+
+    /**
+     * Restore the user bound to the context and his special groups
+     *
+     * @throws IllegalStateException if no switch was performed before
+     */
+    public void restoreContextUser() {
+        if (specialGroupsPreviousState == null) {
+            throw new IllegalStateException("No previous state found");
+        }
+        currentUser = currentUserPreviousState;
+        specialGroups = specialGroupsPreviousState;
+        specialGroupsPreviousState = null;
+        currentUserPreviousState = null;
+    }
+
+    /**
      *  Close the context, aborting any open transactions (if any).
      * @throws Throwable
      */
@@ -830,4 +884,5 @@ public class Context implements AutoCloseable {
     private void reloadContextBoundEntities() throws SQLException {
         currentUser = reloadEntity(currentUser);
     }
+
 }

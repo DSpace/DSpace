@@ -10,6 +10,7 @@ package org.dspace.app.rest.converter;
 import org.dspace.app.rest.model.ClaimedTaskRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.discovery.IndexableObject;
+import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,9 @@ public class ClaimedTaskConverter
     @Autowired
     private ConverterService converter;
 
+    @Autowired
+    protected XmlWorkflowFactory xmlWorkflowFactory;
+
     @Override
     public ClaimedTaskRest convert(ClaimedTask obj, Projection projection) {
         ClaimedTaskRest taskRest = new ClaimedTaskRest();
@@ -35,8 +39,7 @@ public class ClaimedTaskConverter
         XmlWorkflowItem witem = obj.getWorkflowItem();
         taskRest.setId(obj.getID());
         taskRest.setWorkflowitem(converter.toRest(witem, projection));
-        taskRest.setAction(obj.getActionID());
-        taskRest.setStep(obj.getStepID());
+        taskRest.setAction(converter.toRest(xmlWorkflowFactory.getActionByName(obj.getActionID()), projection));
         taskRest.setOwner(converter.toRest(obj.getOwner(), projection));
         return taskRest;
     }

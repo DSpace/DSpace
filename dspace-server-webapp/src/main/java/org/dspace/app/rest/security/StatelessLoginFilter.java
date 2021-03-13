@@ -14,6 +14,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -27,10 +29,11 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
  * @author Tom Desair (tom dot desair at atmire dot com)
  */
 public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter {
+    private static final Logger log = LoggerFactory.getLogger(StatelessLoginFilter.class);
 
-    private AuthenticationManager authenticationManager;
+    protected AuthenticationManager authenticationManager;
 
-    private RestAuthenticationService restAuthenticationService;
+    protected RestAuthenticationService restAuthenticationService;
 
     @Override
     public void afterPropertiesSet() {
@@ -63,7 +66,7 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
                                             Authentication auth) throws IOException, ServletException {
 
         DSpaceAuthentication dSpaceAuthentication = (DSpaceAuthentication) auth;
-        restAuthenticationService.addAuthenticationDataForUser(req, res, dSpaceAuthentication);
+        restAuthenticationService.addAuthenticationDataForUser(req, res, dSpaceAuthentication, false);
     }
 
     @Override
@@ -74,7 +77,9 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
         String authenticateHeaderValue = restAuthenticationService.getWwwAuthenticateHeaderValue(request, response);
 
         response.setHeader("WWW-Authenticate", authenticateHeaderValue);
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, failed.getMessage());
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed!");
+        log.error("Authentication failed (status:{})",
+                  HttpServletResponse.SC_UNAUTHORIZED, failed);
     }
 
 }

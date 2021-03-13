@@ -115,13 +115,14 @@ public abstract class StatisticsData {
      * Run the accumulated query and return its results.
      *
      * @param context The relevant DSpace Context.
+     * @param facetMinCount Minimum count of results facet must have to return a result
      * @return accumulated query results
      * @throws SQLException        An exception that provides information on a database access error or other errors.
      * @throws SolrServerException Exception from the Solr server to the solrj Java client.
      * @throws IOException         A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws ParseException      if the dataset cannot be parsed
      */
-    public abstract Dataset createDataset(Context context) throws SQLException,
+    public abstract Dataset createDataset(Context context, int facetMinCount) throws SQLException,
         SolrServerException, IOException, ParseException;
 
 }

@@ -8,6 +8,7 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
@@ -49,10 +50,10 @@ public class ItemMappedCollectionLinkRepository extends AbstractDSpaceRestReposi
                 throw new ResourceNotFoundException("No such item: " + itemId);
             }
             UUID owningCollectionId = item.getOwningCollection() == null ? null : item.getOwningCollection().getID();
-            Page<Collection> mappedCollectionPage = utils.getPage(item.getCollections().stream()
-                    .filter((collection) -> !collection.getID().equals(owningCollectionId))
-                    .collect(Collectors.toList()), optionalPageable);
-            return converter.toRestPage(mappedCollectionPage, projection);
+            List<Collection> collections = item.getCollections().stream()
+                                           .filter((collection) -> !collection.getID().equals(owningCollectionId))
+                                           .collect(Collectors.toList());
+            return converter.toRestPage(collections, optionalPageable, projection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

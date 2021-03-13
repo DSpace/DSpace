@@ -15,9 +15,9 @@ import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
 import org.dspace.app.itemexport.factory.ItemExportServiceFactory;
 import org.dspace.app.itemexport.service.ItemExportService;
 import org.dspace.content.Collection;
@@ -69,7 +69,7 @@ public class ItemExportCLITool {
      */
     public static void main(String[] argv) throws Exception {
         // create an options object and populate it
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
 
         Options options = new Options();
 

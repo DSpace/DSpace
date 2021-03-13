@@ -10,16 +10,21 @@ package org.dspace.app.rest;
 import java.sql.SQLException;
 import java.util.Arrays;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.EPersonConverter;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.AuthenticationStatusRest;
+import org.dspace.app.rest.model.AuthenticationTokenRest;
 import org.dspace.app.rest.model.AuthnRest;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.hateoas.AuthenticationStatusResource;
+import org.dspace.app.rest.model.hateoas.AuthenticationTokenResource;
 import org.dspace.app.rest.model.hateoas.AuthnResource;
+import org.dspace.app.rest.model.wrapper.AuthenticationToken;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.app.rest.security.RestAuthenticationService;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.core.Context;
@@ -30,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -61,6 +67,9 @@ public class AuthenticationRestController implements InitializingBean {
     private HalLinkService halLinkService;
 
     @Autowired
+    private RestAuthenticationService restAuthenticationService;
+
+    @Autowired
     private Utils utils;
 
     @Override
@@ -76,8 +85,19 @@ public class AuthenticationRestController implements InitializingBean {
         return converter.toResource(authnRest);
     }
 
+    /**
+     * Check the current user's authentication status (i.e. whether they are authenticated or not)
+     * <P>
+     * If the user is NOT currently authenticated, a list of all currently enabled DSpace authentication endpoints
+     * is returned in the WWW-Authenticate header.
+     * @param request current request
+     * @param response response
+     * @return AuthenticationStatusResource
+     * @throws SQLException
+     */
     @RequestMapping(value = "/status", method = RequestMethod.GET)
-    public AuthenticationStatusResource status(HttpServletRequest request) throws SQLException {
+    public AuthenticationStatusResource status(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException {
         Context context = ContextUtil.obtainContext(request);
         EPersonRest ePersonRest = null;
         Projection projection = utils.obtainProjection();
@@ -86,36 +106,107 @@ public class AuthenticationRestController implements InitializingBean {
         }
 
         AuthenticationStatusRest authenticationStatusRest = new AuthenticationStatusRest(ePersonRest);
+        // When not authenticated add WWW-Authenticate so client can retrieve all available authentication methods
+        if (!authenticationStatusRest.isAuthenticated()) {
+            String authenticateHeaderValue = restAuthenticationService
+                    .getWwwAuthenticateHeaderValue(request, response);
+
+            response.setHeader("WWW-Authenticate", authenticateHeaderValue);
+        }
         authenticationStatusRest.setProjection(projection);
         AuthenticationStatusResource authenticationStatusResource = converter.toResource(authenticationStatusRest);
 
         return authenticationStatusResource;
     }
 
+    /**
+     * Check whether the login has succeeded or not. The actual login is performed by one of the enabled login filters
+     * (e.g. {@link org.dspace.app.rest.security.StatelessLoginFilter}).
+     * See {@link org.dspace.app.rest.security.WebSecurityConfiguration} for enabled login filters.
+     *
+     * @param request current request
+     * @param user user
+     * @param password password
+     * @return ResponseEntity with information about whether login was successful or failed
+     */
     @RequestMapping(value = "/login", method = {RequestMethod.POST})
     public ResponseEntity login(HttpServletRequest request, @RequestParam(name = "user", required = false) String user,
                                 @RequestParam(name = "password", required = false) String password) {
         //If you can get here, you should be authenticated, the actual login is handled by spring security
-        //see org.dspace.app.rest.security.StatelessLoginFilter
 
-        //If we don't have an EPerson here, this means authentication failed and we should return an error message.
+        // Build our response. This will check if we have an EPerson.
+        // If not, that means the authentication failed and we should return the error message
         return getLoginResponse(request,
-                                "Authentication failed for user " + user + ": The credentials you provided are not " +
-                                    "valid.");
+                                "Authentication failed. The credentials you provided are not valid.");
     }
 
+    /**
+     * This method will generate a short lived token to be used for bitstream downloads among other things.
+     *
+     * curl -v -X POST https://{dspace-server.url}/api/authn/shortlivedtokens -H "Authorization: Bearer eyJhbG...COdbo"
+     *
+     * Example:
+     * <pre>
+     * {@code
+     * curl -v -X POST https://{dspace-server.url}/api/authn/shortlivedtokens -H "Authorization: Bearer eyJhbG...COdbo"
+     * }
+     * </pre>
+     * @param request The StandardMultipartHttpServletRequest
+     * @return        The created short lived token
+     */
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @RequestMapping(value = "/shortlivedtokens", method = RequestMethod.POST)
+    public AuthenticationTokenResource shortLivedToken(HttpServletRequest request) {
+        Projection projection = utils.obtainProjection();
+        AuthenticationToken shortLivedToken =
+            restAuthenticationService.getShortLivedAuthenticationToken(ContextUtil.obtainContext(request), request);
+        AuthenticationTokenRest authenticationTokenRest = converter.toRest(shortLivedToken, projection);
+        return converter.toResource(authenticationTokenRest);
+    }
+
+    /**
+     * Disables GET/PUT/PATCH on the /login endpoint. You must use POST (see above method)
+     * @return ResponseEntity
+     */
     @RequestMapping(value = "/login", method = { RequestMethod.GET, RequestMethod.PUT, RequestMethod.PATCH,
             RequestMethod.DELETE })
     public ResponseEntity login() {
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("Only POST is allowed for login requests.");
     }
 
-    @RequestMapping(value = "/logout", method = {RequestMethod.GET, RequestMethod.POST})
+    /**
+     * Returns a successful "204 No Content" response for a logout request.
+     * Actual logout is performed by our {@link org.dspace.app.rest.security.CustomLogoutHandler}
+     * <P>
+     * For logout we *require* POST requests. HEAD is also supported for endpoint visibility in HAL Browser, etc.
+     * @return ResponseEntity (204 No Content)
+     */
+    @RequestMapping(value = "/logout", method = {RequestMethod.HEAD, RequestMethod.POST})
     public ResponseEntity logout() {
-        //This is handled by org.dspace.app.rest.security.CustomLogoutHandler
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Disables GET/PUT/PATCH on the /logout endpoint. You must use POST (see above method)
+     * @return ResponseEntity
+     */
+    @RequestMapping(value = "/logout", method = { RequestMethod.GET, RequestMethod.PUT, RequestMethod.PATCH,
+        RequestMethod.DELETE })
+    public ResponseEntity logoutMethodNotAllowed() {
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("Only POST is allowed for logout requests.");
+    }
+
+    /**
+     * Check the request to see if the login succeeded or failed.
+     * If the request includes a valid EPerson, then it was successful.
+     * If the request does not include a valid EPerson, then return the failedMessage.
+     * <P>
+     * NOTE: This method assumes that a login filter (e.g. {@link org.dspace.app.rest.security.StatelessLoginFilter})
+     * has already attempted the authentication and, if successful, added EPerson data to the current request.
+     * @param request current request
+     * @param failedMessage message to send if no EPerson found
+     * @return ResponseEntity
+     */
     protected ResponseEntity getLoginResponse(HttpServletRequest request, String failedMessage) {
         //Get the context and check if we have an authenticated eperson
         org.dspace.core.Context context = null;

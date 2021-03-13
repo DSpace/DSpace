@@ -7,14 +7,13 @@
  */
 package org.dspace.discovery.indexobject;
 
-import org.dspace.discovery.IndexableObject;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 
 /**
  * PoolTask implementation for the IndexableObject
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public class IndexablePoolTask implements IndexableObject<PoolTask, Integer> {
+public class IndexablePoolTask extends AbstractIndexableObject<PoolTask, Integer> {
 
     public static final String TYPE = PoolTask.class.getSimpleName();
 

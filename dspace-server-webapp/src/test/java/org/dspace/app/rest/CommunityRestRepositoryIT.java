@@ -11,6 +11,8 @@ import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static junit.framework.TestCase.assertEquals;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataNotEmpty;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataStringEndsWith;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -30,9 +32,8 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.converter.ConverterService;
+import org.dspace.app.rest.converter.CommunityConverter;
+import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.CommunityMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
@@ -44,6 +45,10 @@ import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.service.CommunityService;
@@ -63,13 +68,16 @@ import org.springframework.test.web.servlet.MvcResult;
 public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
-    ConverterService converter;
+    CommunityConverter communityConverter;
 
     @Autowired
     CommunityService communityService;
 
     @Autowired
     AuthorizeService authorizeService;
+
+    @Autowired
+    ResourcePolicyService resoucePolicyService;
 
     @Test
     public void createTest() throws Exception {
@@ -109,16 +117,18 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         String authToken = getAuthToken(admin.getEmail(), password);
 
         // Capture the UUID of the created Community (see andDo() below)
-        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
-        AtomicReference<UUID> idRefNoEmbeds = new AtomicReference<UUID>();
+        AtomicReference<UUID> idRef = new AtomicReference<>();
+        AtomicReference<UUID> idRefNoEmbeds = new AtomicReference<>();
+        AtomicReference<String> handle = new AtomicReference<>();
+
         try {
             getClient(authToken).perform(post("/api/core/communities")
                                         .content(mapper.writeValueAsBytes(comm))
                                         .contentType(contentType)
-                                .param("projection", "full"))
+                                   .param("embed", CommunityMatcher.getNonAdminEmbeds()))
                                 .andExpect(status().isCreated())
                                 .andExpect(content().contentType(contentType))
-                                .andExpect(jsonPath("$", CommunityMatcher.matchFullEmbeds()))
+                                .andExpect(jsonPath("$", CommunityMatcher.matchNonAdminEmbeds()))
                                 .andExpect(jsonPath("$", Matchers.allOf(
                                     hasJsonPath("$.id", not(empty())),
                                     hasJsonPath("$.uuid", not(empty())),
@@ -130,15 +140,26 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                     hasJsonPath("$._links.subcommunities.href", not(empty())),
                                     hasJsonPath("$._links.self.href", not(empty())),
                                     hasJsonPath("$.metadata", Matchers.allOf(
-                                        matchMetadata("dc.description", "<p>Some cool HTML code here</p>"),
-                                        matchMetadata("dc.description.abstract",
-                                               "Sample top-level community created via the REST API"),
-                                        matchMetadata("dc.description.tableofcontents", "<p>HTML News</p>"),
-                                        matchMetadata("dc.rights", "Custom Copyright Text"),
-                                        matchMetadata("dc.title", "Title Text")
+                                            matchMetadata("dc.description", "<p>Some cool HTML code here</p>"),
+                                            matchMetadata("dc.description.abstract",
+                                                   "Sample top-level community created via the REST API"),
+                                            matchMetadata("dc.description.tableofcontents", "<p>HTML News</p>"),
+                                            matchMetadata("dc.rights", "Custom Copyright Text"),
+                                            matchMetadata("dc.title", "Title Text")
+                                            )
                                         )
-                                    )
                                 )))
+
+                                // capture "handle" returned in JSON response and check against the metadata
+                                .andDo(result -> handle.set(
+                                        read(result.getResponse().getContentAsString(), "$.handle")))
+                                .andExpect(jsonPath("$",
+                                    hasJsonPath("$.metadata", Matchers.allOf(
+                                        matchMetadataNotEmpty("dc.identifier.uri"),
+                                        matchMetadataStringEndsWith("dc.identifier.uri", handle.get())
+                                        )
+                                    )))
+
                                 // capture "id" returned in JSON response
                                 .andDo(result -> idRef
                                     .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
@@ -227,8 +248,9 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
             .put("dc.title",
                 new MetadataValueRest("Title Text")));
 
-        // Capture the UUID of the created Community (see andDo() below)
-        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
+        // Capture the UUID and Handle of the created Community (see andDo() below)
+        AtomicReference<UUID> idRef = new AtomicReference<>();
+        AtomicReference<String> handle = new AtomicReference<>();
         try {
             getClient(authToken).perform(post("/api/core/communities")
                 .content(mapper.writeValueAsBytes(comm))
@@ -247,17 +269,26 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                     hasJsonPath("$._links.subcommunities.href", not(empty())),
                                     hasJsonPath("$._links.self.href", not(empty())),
                                     hasJsonPath("$.metadata", Matchers.allOf(
-                                        MetadataMatcher.matchMetadata("dc.description",
-                                            "<p>Some cool HTML code here</p>"),
-                                        MetadataMatcher.matchMetadata("dc.description.abstract",
-                                            "Sample top-level community created via the REST API"),
-                                        MetadataMatcher.matchMetadata("dc.description.tableofcontents",
-                                            "<p>HTML News</p>"),
-                                        MetadataMatcher.matchMetadata("dc.rights",
-                                            "Custom Copyright Text"),
-                                        MetadataMatcher.matchMetadata("dc.title",
-                                            "Title Text")
+                                            MetadataMatcher.matchMetadata("dc.description",
+                                                "<p>Some cool HTML code here</p>"),
+                                            MetadataMatcher.matchMetadata("dc.description.abstract",
+                                                "Sample top-level community created via the REST API"),
+                                            MetadataMatcher.matchMetadata("dc.description.tableofcontents",
+                                                "<p>HTML News</p>"),
+                                            MetadataMatcher.matchMetadata("dc.rights",
+                                                "Custom Copyright Text"),
+                                            MetadataMatcher.matchMetadata("dc.title",
+                                                "Title Text")
+                                            )
                                         )
+                                )))
+                                // capture "handle" returned in JSON response and check against the metadata
+                                .andDo(result -> handle.set(
+                                        read(result.getResponse().getContentAsString(), "$.handle")))
+                                .andExpect(jsonPath("$",
+                                    hasJsonPath("$.metadata", Matchers.allOf(
+                                        matchMetadataNotEmpty("dc.identifier.uri"),
+                                        matchMetadataStringEndsWith("dc.identifier.uri", handle.get())
                                     )
                                 )))
                                 // capture "id" returned in JSON response
@@ -320,20 +351,216 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/communities")
-                   .param("projection", "full"))
+                      .param("embed", CommunityMatcher.getNonAdminEmbeds()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
-                       CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity.getName(),
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(parentCommunity.getName(),
                                                                           parentCommunity.getID(),
                                                                           parentCommunity.getHandle()),
                        CommunityMatcher
-                           .matchCommunityEntryFullProjection(child1.getName(), child1.getID(), child1.getHandle())
+                           .matchCommunityEntryNonAdminEmbeds(child1.getName(), child1.getID(), child1.getHandle())
                    )))
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
                    .andExpect(jsonPath("$.page.size", is(20)))
                    .andExpect(jsonPath("$.page.totalElements", is(2)))
         ;
+    }
+
+    @Test
+    public void findOneTestWithEmbedsNoPageSize() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with 10 sub-communities
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child0 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 0")
+                                           .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 1")
+                                           .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 2")
+                                           .build();
+        Community child3 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 3")
+                                           .build();
+        Community child4 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 4")
+                                           .build();
+        Community child5 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 5")
+                                           .build();
+        Community child6 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 6")
+                                           .build();
+        Community child7 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 7")
+                                           .build();
+        Community child8 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 8")
+                                           .build();
+        Community child9 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 9")
+                                           .build();
+
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/communities/" + parentCommunity.getID())
+                                    .param("embed", "subcommunities"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", CommunityMatcher.matchCommunity(parentCommunity)))
+                   .andExpect(
+                           jsonPath("$._embedded.subcommunities._embedded.subcommunities", Matchers.containsInAnyOrder(
+                                   CommunityMatcher.matchCommunity(child0),
+                                   CommunityMatcher.matchCommunity(child1),
+                                   CommunityMatcher.matchCommunity(child2),
+                                   CommunityMatcher.matchCommunity(child3),
+                                   CommunityMatcher.matchCommunity(child4),
+                                   CommunityMatcher.matchCommunity(child5),
+                                   CommunityMatcher.matchCommunity(child6),
+                                   CommunityMatcher.matchCommunity(child7),
+                                   CommunityMatcher.matchCommunity(child8),
+                                   CommunityMatcher.matchCommunity(child9)
+                           )))
+                   .andExpect(jsonPath("$._links.self.href",
+                                       Matchers.containsString("/api/core/communities/" + parentCommunity.getID())))
+                   .andExpect(jsonPath("$._embedded.subcommunities.page.size", is(20)))
+                   .andExpect(jsonPath("$._embedded.subcommunities.page.totalElements", is(10)));
+    }
+
+    @Test
+    public void findOneTestWithEmbedsWithPageSize() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with 10 sub-communities
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child0 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 0")
+                                           .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 1")
+                                           .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 2")
+                                           .build();
+        Community child3 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 3")
+                                           .build();
+        Community child4 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 4")
+                                           .build();
+        Community child5 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 5")
+                                           .build();
+        Community child6 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 6")
+                                           .build();
+        Community child7 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 7")
+                                           .build();
+        Community child8 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 8")
+                                           .build();
+        Community child9 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 9")
+                                           .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/communities/" + parentCommunity.getID())
+                                    .param("embed", "subcommunities")
+                                    .param("embed.size", "subcommunities=5"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", CommunityMatcher.matchCommunity(parentCommunity)))
+                   .andExpect(
+                           jsonPath("$._embedded.subcommunities._embedded.subcommunities", Matchers.containsInAnyOrder(
+                                   CommunityMatcher.matchCommunity(child0),
+                                   CommunityMatcher.matchCommunity(child1),
+                                   CommunityMatcher.matchCommunity(child2),
+                                   CommunityMatcher.matchCommunity(child3),
+                                   CommunityMatcher.matchCommunity(child4)
+                           )))
+                   .andExpect(jsonPath("$._links.self.href",
+                                       Matchers.containsString("/api/core/communities/" + parentCommunity.getID())))
+                   .andExpect(jsonPath("$._embedded.subcommunities.page.size", is(5)))
+                   .andExpect(jsonPath("$._embedded.subcommunities.page.totalElements", is(10)));
+    }
+
+    @Test
+    public void findOneTestWithEmbedsWithInvalidPageSize() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with 10 sub-communities
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child0 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 0")
+                                           .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 1")
+                                           .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 2")
+                                           .build();
+        Community child3 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 3")
+                                           .build();
+        Community child4 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 4")
+                                           .build();
+        Community child5 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 5")
+                                           .build();
+        Community child6 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 6")
+                                           .build();
+        Community child7 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 7")
+                                           .build();
+        Community child8 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 8")
+                                           .build();
+        Community child9 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 9")
+                                           .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/communities/" + parentCommunity.getID())
+                                    .param("embed", "subcommunities")
+                                    .param("embed.size", "subcommunities=invalidPage"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", CommunityMatcher.matchCommunity(parentCommunity)))
+                   .andExpect(
+                           jsonPath("$._embedded.subcommunities._embedded.subcommunities", Matchers.containsInAnyOrder(
+                                   CommunityMatcher.matchCommunity(child0),
+                                   CommunityMatcher.matchCommunity(child1),
+                                   CommunityMatcher.matchCommunity(child2),
+                                   CommunityMatcher.matchCommunity(child3),
+                                   CommunityMatcher.matchCommunity(child4),
+                                   CommunityMatcher.matchCommunity(child5),
+                                   CommunityMatcher.matchCommunity(child6),
+                                   CommunityMatcher.matchCommunity(child7),
+                                   CommunityMatcher.matchCommunity(child8),
+                                   CommunityMatcher.matchCommunity(child9)
+                           )))
+                   .andExpect(jsonPath("$._links.self.href",
+                                       Matchers.containsString("/api/core/communities/" + parentCommunity.getID())))
+                   .andExpect(jsonPath("$._embedded.subcommunities.page.size", is(20)))
+                   .andExpect(jsonPath("$._embedded.subcommunities.page.totalElements", is(10)));
     }
 
     @Test
@@ -351,15 +578,16 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .withName("Sub Community")
                                            .build();
 
+        context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/communities").param("size", "2").param("projection",
-                                                                                  "full"))
+        getClient().perform(get("/api/core/communities").param("size", "2")
+                                                        .param("embed", CommunityMatcher.getNonAdminEmbeds()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
                         CommunityMatcher.matchCommunityEntryMultipleTitles(titles, parentCommunity.getID(),
                                 parentCommunity.getHandle()),
-                        CommunityMatcher.matchCommunityEntryFullProjection(child1.getName(), child1.getID(),
+                        CommunityMatcher.matchCommunityEntryNonAdminEmbeds(child1.getName(), child1.getID(),
                                                                            child1.getHandle())
                 )))
                 .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
@@ -384,14 +612,14 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/communities").param("size", "2").param("projection",
-                                                                                  "full"))
+        getClient().perform(get("/api/core/communities").param("size", "2")
+                                                        .param("embed", CommunityMatcher.getNonAdminEmbeds()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
                        CommunityMatcher.matchCommunityEntryMultipleTitles(titles, parentCommunity.getID(),
                                                                           parentCommunity.getHandle()),
-                       CommunityMatcher.matchCommunityEntryFullProjection(childCommunity.getName(),
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(childCommunity.getName(),
                                                                           childCommunity.getID(),
                                                                           childCommunity.getHandle())
                        )))
@@ -401,14 +629,14 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                                                                                 2, 4)));
 
         getClient().perform(get("/api/core/communities").param("size", "2").param("page", "1")
-                   .param("projection", "full"))
+                      .param("embed", CommunityMatcher.getNonAdminEmbeds()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
-                       CommunityMatcher.matchCommunityEntryFullProjection(secondParentCommunity.getName(),
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(secondParentCommunity.getName(),
                                                                           secondParentCommunity.getID(),
                                                                           secondParentCommunity.getHandle()),
-                       CommunityMatcher.matchCommunityEntryFullProjection(thirdParentCommunity.getName(),
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(thirdParentCommunity.getName(),
                                                                           thirdParentCommunity.getID(),
                                                                           thirdParentCommunity.getHandle())
                    )))
@@ -423,12 +651,14 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context).withName("test").build();
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/communities")
-                .param("projection", "full"))
+                      .param("embed", CommunityMatcher.getNonAdminEmbeds()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
-                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity.getName(),
+                        CommunityMatcher.matchCommunityEntryNonAdminEmbeds(parentCommunity.getName(),
                                                                            parentCommunity.getID(),
                                                                            parentCommunity.getHandle())
                 )))
@@ -456,6 +686,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         Community community3 = CommunityBuilder.createCommunity(context)
             .withName(orderedTitles.get(2))
             .build();
+
+        context.restoreAuthSystemState();
 
         ObjectMapper mapper = new ObjectMapper();
         MvcResult result = getClient().perform(get("/api/core/communities")).andReturn();
@@ -488,44 +720,176 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         getClient().perform(get("/api/core/communities")
                                 .param("size", "1")
-                                .param("projection", "full"))
+                      .param("embed", CommunityMatcher.getNonAdminEmbeds()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
-                       CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity.getName(),
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(parentCommunity.getName(),
                                                                           parentCommunity.getID(),
                                                                           parentCommunity.getHandle())
                    )))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.not(
                        Matchers.contains(
-                           CommunityMatcher.matchCommunityEntryFullProjection(child1.getName(), child1.getID(),
+                           CommunityMatcher.matchCommunityEntryNonAdminEmbeds(child1.getName(), child1.getID(),
                                                                               child1.getHandle())
                        )
                    )))
-                   .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
+                   .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/communities?"),
+                           Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/communities?"),
+                           Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/communities?"),
+                           Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/communities?"),
+                           Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$.page.size", is(1)))
+                   .andExpect(jsonPath("$.page.totalPages", is(2)))
+                   .andExpect(jsonPath("$.page.number", is(0)))
+                   .andExpect(jsonPath("$.page.totalElements", is(2)))
         ;
 
         getClient().perform(get("/api/core/communities")
                                 .param("size", "1")
                                 .param("page", "1")
-                   .param("projection", "full"))
+                      .param("embed", CommunityMatcher.getNonAdminEmbeds()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
-                       CommunityMatcher.matchCommunityEntryFullProjection(child1.getName(), child1.getID(),
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(child1.getName(), child1.getID(),
                                                                           child1.getHandle())
                    )))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.not(
                        Matchers.contains(
-                           CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity.getName(),
+                           CommunityMatcher.matchCommunityEntryNonAdminEmbeds(parentCommunity.getName(),
                                                                               parentCommunity.getID(),
                                                                               parentCommunity.getHandle())
                        )
                    )))
-                   .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
+                   .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/communities?"),
+                           Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$._links.prev.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/communities?"),
+                           Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/communities?"),
+                           Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/communities?"),
+                           Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$.page.number", is(1)))
+                   .andExpect(jsonPath("$.page.totalPages", is(2)))
                    .andExpect(jsonPath("$.page.size", is(1)))
                    .andExpect(jsonPath("$.page.totalElements", is(2)))
         ;
+    }
+
+    @Test
+    public void findAllUnAuthenticatedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community 2")
+                .build();
+
+        resoucePolicyService.removePolicies(context, parentCommunity, Constants.READ);
+        resoucePolicyService.removePolicies(context, child1, Constants.READ);
+        context.restoreAuthSystemState();
+
+        // anonymous can see only public communities
+        getClient().perform(get("/api/core/communities"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
+                            CommunityMatcher.matchCommunity(child2))))
+                   .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void findAllForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                   .withName("Parent Community")
+                   .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                   .withName("Sub Community")
+                   .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                   .withName("Sub Community 2")
+                   .build();
+
+        resoucePolicyService.removePolicies(context, parentCommunity, Constants.READ);
+        resoucePolicyService.removePolicies(context, child1, Constants.READ);
+        context.restoreAuthSystemState();
+
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(get("/api/core/communities"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
+                            CommunityMatcher.matchCommunity(child2))))
+                   .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void findAllGrantAccessAdminsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson parentAdmin = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                   .withName("Parent Community")
+                   .withAdminGroup(parentAdmin)
+                   .build();
+
+        EPerson child1Admin = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson2@mail.com")
+                .withPassword("qwerty02")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                   .withName("Sub Community 1")
+                   .withAdminGroup(child1Admin)
+                   .build();
+
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community 2")
+                .build();
+
+        resoucePolicyService.removePolicies(context, parentCommunity, Constants.READ);
+        resoucePolicyService.removePolicies(context, child1, Constants.READ);
+        context.restoreAuthSystemState();
+
+        String tokenParentAdmin = getAuthToken(parentAdmin.getEmail(), "qwerty01");
+        getClient(tokenParentAdmin).perform(get("/api/core/communities"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
+                           CommunityMatcher.matchCommunity(parentCommunity),
+                           CommunityMatcher.matchCommunity(child1),
+                           CommunityMatcher.matchCommunity(child2))))
+                   .andExpect(jsonPath("$.page.totalElements", is(3)));
+
+        String tokenChild1Admin = getAuthToken(child1Admin.getEmail(), "qwerty02");
+        getClient(tokenChild1Admin).perform(get("/api/core/communities"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
+                           CommunityMatcher.matchCommunity(child1),
+                           CommunityMatcher.matchCommunity(child2))))
+                   .andExpect(jsonPath("$.page.totalElements", is(2)));
     }
 
     @Test
@@ -547,10 +911,10 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         // When full projection is requested, response should include expected properties, links, and embeds.
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString())
-                .param("projection", "full"))
+                      .param("embed", CommunityMatcher.getNonAdminEmbeds()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$", CommunityMatcher.matchFullEmbeds()))
+                .andExpect(jsonPath("$", CommunityMatcher.matchNonAdminEmbeds()))
                 .andExpect(jsonPath("$", CommunityMatcher.matchCommunityEntry(
                         parentCommunity.getName(), parentCommunity.getID(), parentCommunity.getHandle())));
 
@@ -562,6 +926,119 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$", CommunityMatcher.matchLinks(parentCommunity.getID())))
                 .andExpect(jsonPath("$", CommunityMatcher.matchProperties(
                         parentCommunity.getName(), parentCommunity.getID(), parentCommunity.getHandle())));
+    }
+
+    @Test
+    public void findOneFullProjectionTest() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/core/communities/" + parentCommunity.getID().toString())
+                                .param("projection", "full"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", CommunityMatcher.matchCommunityEntryFullProjection(
+                       parentCommunity.getName(), parentCommunity.getID(), parentCommunity.getHandle())));
+
+        getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString())
+                                .param("projection", "full"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.not(CommunityMatcher.matchCommunityEntryFullProjection(
+                       parentCommunity.getName(), parentCommunity.getID(), parentCommunity.getHandle()))));
+    }
+
+    @Test
+    public void findOneUnAuthenticatedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community privateCommunity = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Private Community")
+                .build();
+
+        resoucePolicyService.removePolicies(context, privateCommunity, Constants.READ);
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/communities/" + privateCommunity.getID().toString()))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void findOneForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community privateCommunity = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Private Community")
+                .build();
+
+        resoucePolicyService.removePolicies(context, privateCommunity, Constants.READ);
+
+        context.restoreAuthSystemState();
+
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(get("/api/core/communities/" + privateCommunity.getID().toString()))
+                   .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void findOneGrantAccessAdminsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .withAdminGroup(eperson)
+                .build();
+
+        EPerson privateCommunityAdmin = EPersonBuilder.createEPerson(context)
+                .withEmail("comunityAdmin@mail.com")
+                .withPassword("qwerty01")
+                .build();
+        Community privateCommunity = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .withAdminGroup(privateCommunityAdmin)
+                .build();
+
+        EPerson privateCommunityAdmin2 = EPersonBuilder.createEPerson(context)
+                .withEmail("comunityAdmin2@mail.com")
+                .withPassword("qwerty02")
+                .build();
+        Community privateCommunity2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community 2")
+                .withAdminGroup(privateCommunityAdmin2)
+                .build();
+
+        resoucePolicyService.removePolicies(context, privateCommunity, Constants.READ);
+
+        context.restoreAuthSystemState();
+
+        String tokenParentComunityAdmin = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenParentComunityAdmin).perform(get("/api/core/communities/" + privateCommunity.getID().toString()))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$", Matchers.is(CommunityMatcher.matchCommunity(privateCommunity))));
+
+        String tokenCommunityAdmin = getAuthToken(privateCommunityAdmin.getEmail(), "qwerty01");
+        getClient(tokenCommunityAdmin).perform(get("/api/core/communities/" + privateCommunity.getID().toString()))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$", Matchers.is(CommunityMatcher.matchCommunity(privateCommunity))));
+
+        String tokenComunityAdmin2 = getAuthToken(privateCommunityAdmin2.getEmail(), "qwerty02");
+        getClient(tokenComunityAdmin2).perform(get("/api/core/communities/"
+                                                   + privateCommunity.getID().toString()))
+                 .andExpect(status().isForbidden());
     }
 
     @Test
@@ -583,17 +1060,17 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString())
-                   .param("projection", "full"))
+                      .param("embed", CommunityMatcher.getNonAdminEmbeds()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
-                       CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity.getName(),
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(parentCommunity.getName(),
                                                                           parentCommunity.getID(),
                                                                           parentCommunity.getHandle())
                    )))
                    .andExpect(jsonPath("$", Matchers.not(
                        Matchers.is(
-                           CommunityMatcher.matchCommunityEntryFullProjection(child1.getName(), child1.getID(),
+                           CommunityMatcher.matchCommunityEntryNonAdminEmbeds(child1.getName(), child1.getID(),
                                                                               child1.getHandle())
                        )
                    )))
@@ -615,7 +1092,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/core/communities/" + child1.getID().toString() + "/logo"))
                    .andExpect(status().isNoContent());
 
-        //Main community has no collections, therefore contentType is not set
+        //Main community has no collections
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString() + "/collections"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page.totalElements", is(0)));
@@ -665,21 +1142,21 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/communities/search/top")
-                   .param("projection", "full"))
+                      .param("embed", CommunityMatcher.getNonAdminEmbeds()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
-                       CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity.getName(),
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(parentCommunity.getName(),
                                                                           parentCommunity.getID(),
                                                                           parentCommunity.getHandle()),
-                       CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity2.getName(),
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(parentCommunity2.getName(),
                                                                           parentCommunity2.getID(),
                                                                           parentCommunity2.getHandle())
                    )))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.not(Matchers.containsInAnyOrder(
-                       CommunityMatcher.matchCommunityEntryFullProjection(child1.getName(), child1.getID(),
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(child1.getName(), child1.getID(),
                                                                           child1.getHandle()),
-                       CommunityMatcher.matchCommunityEntryFullProjection(child12.getName(), child12.getID(),
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(child12.getName(), child12.getID(),
                                                                           child12.getHandle())
                    ))))
                    .andExpect(
@@ -698,31 +1175,30 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and one collection.
         parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .withLogo("ThisIsSomeDummyText")
-                                          .build();
+                          .withName("Parent Community")
+                          .withLogo("ThisIsSomeDummyText")
+                          .build();
 
         Community parentCommunity2 = CommunityBuilder.createCommunity(context)
-                                                     .withName("Parent Community 2")
-                                                     .withLogo("SomeTest")
-                                                     .build();
+                                     .withName("Parent Community 2")
+                                     .withLogo("SomeTest")
+                                     .build();
 
         Community parentCommunityChild1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
+                                          .withName("Sub Community")
+                                          .build();
 
         Community parentCommunityChild2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community2")
-                .build();
+                                          .withName("Sub Community2")
+                                          .build();
 
         Community parentCommunityChild2Child1 = CommunityBuilder.createSubCommunity(context, parentCommunityChild2)
-                .withName("Sub Sub Community")
-                .build();
-
+                                                .withName("Sub Sub Community")
+                                                .build();
 
         Community parentCommunity2Child1 = CommunityBuilder.createSubCommunity(context, parentCommunity2)
-                .withName("Sub2 Community")
-                .build();
+                                           .withName("Sub2 Community")
+                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunityChild1)
                                            .withName("Collection 1")
@@ -730,98 +1206,379 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/communities/search/subCommunities")
-                .param("parent", parentCommunity.getID().toString())
-                .param("projection", "full"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                //Checking that these communities are present
-                .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
-                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunityChild1.getName(),
-                                                             parentCommunityChild1.getID(),
-                                                             parentCommunityChild1.getHandle()),
-                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunityChild2.getName(),
-                                                             parentCommunityChild2.getID(),
-                                                             parentCommunityChild2.getHandle())
-                )))
-                //Checking that these communities are not present
-                .andExpect(jsonPath("$._embedded.communities", Matchers.not(Matchers.anyOf(
-                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity.getName(),
-                                                             parentCommunity.getID(),
-                                                             parentCommunity.getHandle()),
-                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity2.getName(),
-                                                             parentCommunity2.getID(),
-                                                             parentCommunity2.getHandle()),
-                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity2Child1.getName(),
-                                                             parentCommunity2Child1.getID(),
-                                                             parentCommunity2Child1.getHandle()),
-                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunityChild2Child1.getName(),
-                                                             parentCommunityChild2Child1.getID(),
-                                                             parentCommunityChild2Child1.getHandle())
-                ))))
-                .andExpect(jsonPath("$._links.self.href",
-                                    Matchers.containsString("/api/core/communities/search/subCommunities")))
-                .andExpect(jsonPath("$.page.size", is(20)))
-                .andExpect(jsonPath("$.page.totalElements", is(2)))
-        ;
+        getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString() + "/subcommunities"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   //Checking that these communities are present
+                   .andExpect(jsonPath("$._embedded.subcommunities", Matchers.containsInAnyOrder(
+                        CommunityMatcher.matchCommunity(parentCommunityChild1),
+                        CommunityMatcher.matchCommunity(parentCommunityChild2)
+                   )))
+                   //Checking that these communities are not present
+                   .andExpect(jsonPath("$._embedded.subcommunities", Matchers.not(Matchers.anyOf(
+                        CommunityMatcher.matchCommunity(parentCommunity),
+                        CommunityMatcher.matchCommunity(parentCommunity2),
+                        CommunityMatcher.matchCommunity(parentCommunity2Child1),
+                        CommunityMatcher.matchCommunity(parentCommunityChild2Child1)
+                   ))))
+                   .andExpect(jsonPath("$._links.self.href",
+                              Matchers.containsString("/api/core/communities/" + parentCommunity.getID().toString())))
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$.page.totalElements", is(2)));
 
-        getClient().perform(get("/api/core/communities/search/subCommunities")
-                .param("parent", parentCommunityChild2.getID().toString())
-                .param("projection", "full"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                //Checking that these communities are present
-                .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
-                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunityChild2Child1.getName(),
-                                                             parentCommunityChild2Child1.getID(),
-                                                             parentCommunityChild2Child1.getHandle())
-                )))
-                //Checking that these communities are not present
-                .andExpect(jsonPath("$._embedded.communities", Matchers.not(Matchers.anyOf(
-                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity.getName(),
-                                                             parentCommunity.getID(),
-                                                             parentCommunity.getHandle()),
-                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity2.getName(),
-                                                             parentCommunity2.getID(),
-                                                             parentCommunity2.getHandle()),
-                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity2Child1.getName(),
-                                                             parentCommunity2Child1.getID(),
-                                                             parentCommunity2Child1.getHandle()),
-                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunityChild2Child1.getName(),
-                                                             parentCommunityChild2Child1.getID(),
-                                                             parentCommunityChild2Child1.getHandle()),
-                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunityChild1.getName(),
-                                                             parentCommunityChild1.getID(),
-                                                             parentCommunityChild1.getHandle())
-                ))))
-                .andExpect(jsonPath("$._links.self.href",
-                                    Matchers.containsString("/api/core/communities/search/subCommunities")))
-                .andExpect(jsonPath("$.page.size", is(20)))
-                .andExpect(jsonPath("$.page.totalElements", is(1)))
-        ;
+       getClient().perform(get("/api/core/communities/" + parentCommunityChild2.getID().toString() + "/subcommunities"))
+                  .andExpect(status().isOk())
+                  .andExpect(content().contentType(contentType))
+                  //Checking that these communities are present
+                  .andExpect(jsonPath("$._embedded.subcommunities", Matchers.contains(
+                            CommunityMatcher.matchCommunity(parentCommunityChild2Child1)
+                  )))
+                  //Checking that these communities are not present
+                  .andExpect(jsonPath("$._embedded.subcommunities", Matchers.not(Matchers.anyOf(
+                            CommunityMatcher.matchCommunity(parentCommunity),
+                            CommunityMatcher.matchCommunity(parentCommunity2),
+                            CommunityMatcher.matchCommunity(parentCommunity2Child1),
+                            CommunityMatcher.matchCommunity(parentCommunityChild2Child1),
+                            CommunityMatcher.matchCommunity(parentCommunityChild1)
+                  ))))
+                  .andExpect(jsonPath("$._links.self.href",
+                          Matchers.containsString("/api/core/communities/" + parentCommunityChild2.getID().toString())))
+                  .andExpect(jsonPath("$.page.size", is(20)))
+                  .andExpect(jsonPath("$.page.totalElements", is(1)));
 
-        getClient().perform(get("/api/core/communities/search/subCommunities")
-                .param("parent", parentCommunityChild2Child1.getID().toString()))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._links.self.href",
-                                    Matchers.containsString("/api/core/communities/search/subCommunities")))
-                .andExpect(jsonPath("$.page.size", is(20)))
-                .andExpect(jsonPath("$.page.totalElements", is(0)))
-        ;
+        getClient().perform(get("/api/core/communities/"
+                                + parentCommunityChild2Child1.getID().toString() + "/subcommunities"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._links.self.href",
+                    Matchers.containsString("/api/core/communities/" + parentCommunityChild2Child1.getID().toString())))
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
-    public void findAllSubCommunitiesWithoutUUID() throws Exception {
-        getClient().perform(get("/api/core/communities/search/subCommunities"))
-                 .andExpect(status().isBadRequest());
+    public void findAllSubCommunitiesUnAuthenticatedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                          .withName("Parent Community")
+                          .withLogo("ThisIsSomeDummyText")
+                          .build();
+
+        Community communityChild1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+
+        Community communityChild2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community2")
+                .build();
+
+        Community communityChild2Child1 = CommunityBuilder.createSubCommunity(context, communityChild2)
+                .withName("Sub Community2")
+                .build();
+
+        resoucePolicyService.removePolicies(context, communityChild2, Constants.READ);
+        context.restoreAuthSystemState();
+
+        // anonymous can NOT see the private communities
+        getClient().perform(get("/api/core/communities/" + communityChild2.getID().toString() + "/subcommunities"))
+                .andExpect(status().isUnauthorized());
+
+        // anonymous can see only public communities
+        getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString() + "/subcommunities"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.subcommunities", Matchers.contains(
+                        CommunityMatcher.matchCommunity(communityChild1))))
+                .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        // admin can see all communities
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/communities/"
+                + parentCommunity.getID().toString() + "/subcommunities"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.subcommunities", Matchers.containsInAnyOrder(
+                        CommunityMatcher.matchCommunity(communityChild1),
+                        CommunityMatcher.matchCommunity(communityChild2))))
+                .andExpect(jsonPath("$.page.totalElements", is(2)));
+    }
+
+    @Test
+    public void findAllSubCommunitiesForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                          .withName("Parent Community")
+                          .withLogo("ThisIsSomeDummyText")
+                          .build();
+
+        Community communityChild1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+
+        Community communityChild2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community2")
+                .build();
+
+        Community communityChild2Child1 = CommunityBuilder.createSubCommunity(context, communityChild2)
+                .withName("Sub Community2")
+                .build();
+
+        resoucePolicyService.removePolicies(context, communityChild2, Constants.READ);
+        context.restoreAuthSystemState();
+
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(get("/api/core/communities/"
+                + parentCommunity.getID().toString() + "/subcommunities"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.subcommunities", Matchers.contains(
+                        CommunityMatcher.matchCommunity(communityChild1))))
+                .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        getClient(tokenEperson).perform(get("/api/core/communities/"
+                + communityChild2.getID().toString() + "/subcommunities"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void findAllSubCommunitiesGrantAccessAdminsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson parentComAdmin = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                          .withName("Parent Community")
+                          .withLogo("ThisIsSomeDummyText")
+                          .withAdminGroup(parentComAdmin)
+                          .build();
+
+        EPerson child1Admin = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson2@mail.com")
+                .withPassword("qwerty02")
+                .build();
+        Community communityChild1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .withAdminGroup(child1Admin)
+                .build();
+
+        EPerson child2Admin = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson3@mail.com")
+                .withPassword("qwerty03")
+                .build();
+        Community communityChild2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community2")
+                .withAdminGroup(child2Admin)
+                .build();
+
+        Community ommunityChild1Child1 = CommunityBuilder.createSubCommunity(context, communityChild1)
+                .withName("Sub1 Community 1")
+                .build();
+
+        Community сommunityChild2Child1 = CommunityBuilder.createSubCommunity(context, communityChild2)
+                .withName("Sub2 Community 1")
+                .build();
+
+        resoucePolicyService.removePolicies(context, parentCommunity, Constants.READ);
+        resoucePolicyService.removePolicies(context, communityChild1, Constants.READ);
+        resoucePolicyService.removePolicies(context, communityChild2, Constants.READ);
+
+        context.restoreAuthSystemState();
+
+        String tokenParentAdmin = getAuthToken(parentComAdmin.getEmail(), "qwerty01");
+        getClient(tokenParentAdmin).perform(get("/api/core/communities/"
+                + parentCommunity.getID().toString() + "/subcommunities"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.subcommunities", Matchers.containsInAnyOrder(
+                        CommunityMatcher.matchCommunity(communityChild1),
+                        CommunityMatcher.matchCommunity(communityChild2))))
+                .andExpect(jsonPath("$.page.totalElements", is(2)));
+
+        String tokenChild1Admin = getAuthToken(child1Admin.getEmail(), "qwerty02");
+        getClient(tokenChild1Admin).perform(get("/api/core/communities/"
+                + parentCommunity.getID().toString() + "/subcommunities"))
+                .andExpect(status().isForbidden());
+
+        String tokenChild2Admin = getAuthToken(child2Admin.getEmail(), "qwerty03");
+        getClient(tokenChild2Admin).perform(get("/api/core/communities/"
+                + communityChild1.getID().toString() + "/subcommunities"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void findAllCollectionsUnAuthenticatedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .withLogo("ThisIsSomeDummyText")
+                .build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+
+        Collection child1Col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1 child 1")
+                .build();
+        Collection child1Col2 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 2 child 1")
+                .build();
+
+        Collection child2Col1 = CollectionBuilder.createCollection(context, child2)
+                .withName("Collection 1 child 2")
+                .build();
+
+        resoucePolicyService.removePolicies(context, child1Col2, Constants.READ);
+        resoucePolicyService.removePolicies(context, child2, Constants.READ);
+        context.restoreAuthSystemState();
+
+        // anonymous can see only public communities
+        getClient().perform(get("/api/core/communities/" + child1.getID().toString() + "/collections"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.collections", Matchers.contains(CollectionMatcher
+                     .matchCollection(child1Col1))))
+                .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        // anonymous can NOT see the private communities
+        getClient().perform(get("/api/core/communities/" + child2.getID().toString() + "/collections"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void findAllCollectionsForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .withLogo("ThisIsSomeDummyText")
+                .build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community 1")
+                .build();
+
+
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community 2")
+                .build();
+
+        Collection child1Col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1 child 1")
+                .build();
+        Collection child1Col2 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 2 child 1")
+                .build();
+
+        Collection child2Col1 = CollectionBuilder.createCollection(context, child2)
+                .withName("Collection 1 child 2")
+                .build();
+
+        resoucePolicyService.removePolicies(context, child1Col2, Constants.READ);
+        resoucePolicyService.removePolicies(context, child2, Constants.READ);
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/communities/" + child1.getID().toString() + "/collections"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                        CollectionMatcher.matchCollection(child1Col1),
+                        CollectionMatcher.matchCollection(child1Col2))))
+                .andExpect(jsonPath("$.page.totalElements", is(2)));
+
+        getClient(tokenAdmin).perform(get("/api/core/communities/" + child2.getID().toString() + "/collections"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
+                CollectionMatcher.matchCollection(child2Col1))))
+        .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(get("/api/core/communities/" + child2.getID().toString() + "/collections"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void findAllCollectionsGrantAccessAdminsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson parentAdmin = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .withLogo("ThisIsSomeDummyText")
+                .withAdminGroup(parentAdmin)
+                .build();
+
+        EPerson child1Admin = EPersonBuilder.createEPerson(context)
+                .withEmail("child1admin@mail.com")
+                .withPassword("qwerty02")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .withAdminGroup(child1Admin)
+                .build();
+
+        EPerson child2Admin = EPersonBuilder.createEPerson(context)
+                .withEmail("child2admin@mail.com")
+                .withPassword("qwerty03")
+                .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .withAdminGroup(child2Admin)
+                .build();
+
+        Collection child1Col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Child 1 Collection 1")
+                .build();
+        Collection child1Col2 = CollectionBuilder.createCollection(context, child1)
+                .withName("Child 1 Collection 2")
+                .build();
+
+        Collection child2Col1 = CollectionBuilder.createCollection(context, child2)
+                .withName("Child 2 Collection 1")
+                .build();
+
+        resoucePolicyService.removePolicies(context, child1Col2, Constants.READ);
+        resoucePolicyService.removePolicies(context, child2, Constants.READ);
+        context.restoreAuthSystemState();
+
+        String tokenParentAdmin = getAuthToken(parentAdmin.getEmail(), "qwerty01");
+        getClient(tokenParentAdmin).perform(get("/api/core/communities/" + child1.getID().toString() + "/collections"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                        CollectionMatcher.matchCollection(child1Col1),
+                        CollectionMatcher.matchCollection(child1Col2))))
+                .andExpect(jsonPath("$.page.totalElements", is(2)));
+
+
+        getClient(tokenParentAdmin).perform(get("/api/core/communities/" + child2.getID().toString() + "/collections"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
+                        CollectionMatcher.matchCollection(child2Col1))))
+                .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        String tokenChild2Admin = getAuthToken(child2Admin.getEmail(), "qwerty03");
+        getClient(tokenChild2Admin).perform(get("/api/core/communities/" + child1.getID().toString() + "/collections"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
+                        CollectionMatcher.matchCollection(child1Col1))))
+                .andExpect(jsonPath("$.page.totalElements", is(1)));
     }
 
     @Test
     public void findAllSubCommunitiesWithUnexistentUUID() throws Exception {
-        getClient().perform(get("/api/core/communities/search/subCommunities")
-                 .param("parent", UUID.randomUUID().toString()))
-                 .andExpect(status().isNotFound());
+        getClient().perform(get("/api/core/communities/" + UUID.randomUUID().toString() + "/subcommunities"))
+                   .andExpect(status().isNotFound());
     }
 
     @Test
@@ -859,18 +1616,20 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString())
-                   .param("projection", "full"))
+                      .param("embed", CommunityMatcher.getNonAdminEmbeds()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
-                       CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity.getName(),
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(parentCommunity.getName(),
                                                                           parentCommunity.getID(),
                                                                           parentCommunity.getHandle())
                    )))
                    .andExpect(jsonPath("$", Matchers.not(
                        Matchers.is(
-                           CommunityMatcher.matchCommunityEntryFullProjection(child1.getName(), child1.getID(),
+                           CommunityMatcher.matchCommunityEntryNonAdminEmbeds(child1.getName(), child1.getID(),
                                                                               child1.getHandle())
                        )
                    )))
@@ -879,9 +1638,11 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         String token = getAuthToken(admin.getEmail(), password);
 
+        context.turnOffAuthorisationSystem();
+
         ObjectMapper mapper = new ObjectMapper();
 
-        CommunityRest communityRest = converter.toRest(parentCommunity, Projection.DEFAULT);
+        CommunityRest communityRest = communityConverter.convert(parentCommunity, Projection.DEFAULT);
 
         communityRest.setMetadata(new MetadataRest()
                 .put("dc.title", new MetadataValueRest("Electronic theses and dissertations")));
@@ -895,13 +1656,13 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         ;
 
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString())
-                   .param("projection", "full"))
+                      .param("embed", CommunityMatcher.getNonAdminEmbeds()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
-                       CommunityMatcher.matchCommunityEntryFullProjection("Electronic theses and dissertations",
-                                                            parentCommunity.getID(),
-                                                            parentCommunity.getHandle())
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds("Electronic theses and dissertations",
+                                                                          parentCommunity.getID(),
+                                                                          parentCommunity.getHandle())
                    )))
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
         ;
@@ -950,11 +1711,11 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
 
         getClient(token).perform(get("/api/core/communities/" + parentCommunity.getID().toString())
-                        .param("projection", "full"))
+                           .param("embed", CommunityMatcher.getNonAdminEmbeds()))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
-                            CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity.getName(),
+                            CommunityMatcher.matchCommunityEntryNonAdminEmbeds(parentCommunity.getName(),
                                                                                parentCommunity.getID(),
                                                                                parentCommunity.getHandle())
                         )))
@@ -1013,11 +1774,11 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString())
-                        .param("projection", "full"))
+                           .param("embed", CommunityMatcher.getNonAdminEmbeds()))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
-                            CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity.getName(),
+                            CommunityMatcher.matchCommunityEntryNonAdminEmbeds(parentCommunity.getName(),
                                                                                parentCommunity.getID(),
                                                                                parentCommunity.getHandle())
                         )))
@@ -1047,11 +1808,11 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
 
         getClient(token).perform(get("/api/core/communities/" + parentCommunity.getID().toString())
-                        .param("projection", "full"))
+                           .param("embed", CommunityMatcher.getNonAdminEmbeds()))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
-                            CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity.getName(),
+                            CommunityMatcher.matchCommunityEntryNonAdminEmbeds(parentCommunity.getName(),
                                                                                parentCommunity.getID(),
                                                                                parentCommunity.getHandle())
                         )))
@@ -1081,27 +1842,31 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .withName("Sub Community")
                                            .build();
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString())
-                   .param("projection", "full"))
+                      .param("embed", CommunityMatcher.getNonAdminEmbeds()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
-                       CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity.getName(),
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds(parentCommunity.getName(),
                                                                           parentCommunity.getID(),
                                                                           parentCommunity.getHandle())
                    )))
                    .andExpect(jsonPath("$", Matchers.not(
                        Matchers.is(
-                           CommunityMatcher.matchCommunityEntryFullProjection(child1.getName(), child1.getID(),
+                           CommunityMatcher.matchCommunityEntryNonAdminEmbeds(child1.getName(), child1.getID(),
                                                                               child1.getHandle())
                        )
                    )))
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
         ;
 
+        context.turnOffAuthorisationSystem();
+
         ObjectMapper mapper = new ObjectMapper();
 
-        CommunityRest communityRest = converter.toRest(parentCommunity, Projection.DEFAULT);
+        CommunityRest communityRest = communityConverter.convert(parentCommunity, Projection.DEFAULT);
 
         communityRest.setMetadata(new MetadataRest()
                 .put("dc.title", new MetadataValueRest("Electronic theses and dissertations")));
@@ -1120,13 +1885,13 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         ;
 
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString())
-                   .param("projection", "full"))
+                      .param("embed", CommunityMatcher.getNonAdminEmbeds()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
-                       CommunityMatcher.matchCommunityEntryFullProjection("Electronic theses and dissertations",
-                                                            parentCommunity.getID(),
-                                                            parentCommunity.getHandle())
+                       CommunityMatcher.matchCommunityEntryNonAdminEmbeds("Electronic theses and dissertations",
+                                                                          parentCommunity.getID(),
+                                                                          parentCommunity.getHandle())
                    )))
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
         ;

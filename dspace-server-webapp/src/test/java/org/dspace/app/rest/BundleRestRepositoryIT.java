@@ -27,16 +27,10 @@ import javax.ws.rs.core.MediaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
-import org.dspace.app.rest.builder.BitstreamBuilder;
-import org.dspace.app.rest.builder.BundleBuilder;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.EPersonBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
-import org.dspace.app.rest.builder.ResourcePolicyBuilder;
 import org.dspace.app.rest.matcher.BitstreamMatcher;
 import org.dspace.app.rest.matcher.BundleMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
+import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.MetadataRest;
@@ -45,18 +39,34 @@ import org.dspace.app.rest.model.patch.MoveOperation;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.builder.BitstreamBuilder;
+import org.dspace.builder.BundleBuilder;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.ResourcePolicyBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MvcResult;
 
 public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    ResourcePolicyService resourcePolicyService;
+
+    @Autowired
+    ItemService itemService;
 
     private Collection collection;
     private Item item;
@@ -66,6 +76,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
     private Bitstream bitstream2;
 
     @Before
+    @Override
     public void setUp() throws Exception {
         super.setUp();
 
@@ -136,6 +147,30 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         ;
     }
 
+    @Test
+    public void findOneForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String bitstreamContent = "Dummy content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
+                                         .withName("Bitstream")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                               .withName("testname")
+                               .withBitstream(bitstream1)
+                               .build();
+
+        resourcePolicyService.removePolicies(context, bundle1, Constants.READ);
+        context.restoreAuthSystemState();
+
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(get("/api/core/bundles/" + bundle1.getID()))
+                .andExpect(status().isForbidden());
+    }
 
     @Test
     public void getItemBundles() throws Exception {
@@ -186,9 +221,9 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         ObjectMapper mapper = new ObjectMapper();
         BundleRest bundleRest = new BundleRest();
         bundleRest.setName("Create Bundle Without Metadata");
-
+        UUID bundleUuid = null;
         String token = getAuthToken(admin.getEmail(), password);
-
+        try {
         MvcResult mvcResult = getClient(token).perform(post("/api/core/items/" + item.getID() + "/bundles")
                                                                .content(mapper.writeValueAsBytes(bundleRest))
                                                                .contentType(contentType))
@@ -197,7 +232,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String content = mvcResult.getResponse().getContentAsString();
         Map<String, Object> map = mapper.readValue(content, Map.class);
-        UUID bundleUuid = UUID.fromString(String.valueOf(map.get("uuid")));
+        bundleUuid = UUID.fromString(String.valueOf(map.get("uuid")));
 
 
         getClient().perform(get("/api/core/bundles/" + bundleUuid)
@@ -207,12 +242,16 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(jsonPath("$", BundleMatcher.matchBundle(
                            "Create Bundle Without Metadata",
                            bundleUuid, null, Constants.BUNDLE, new ArrayList<>())));
+        } finally {
+            BundleBuilder.deleteBundle(bundleUuid);
+        }
     }
 
     @Test
     public void createBundleWithMetadata() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
-
+        UUID bundleUuid = null;
+        try {
         BundleRest bundleRest = new BundleRest();
         bundleRest.setName("Create Bundle Without Metadata");
         bundleRest.setMetadata(new MetadataRest()
@@ -232,7 +271,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String content = mvcResult.getResponse().getContentAsString();
         Map<String, Object> map = mapper.readValue(content, Map.class);
-        UUID bundleUuid = UUID.fromString(String.valueOf(map.get("uuid")));
+        bundleUuid = UUID.fromString(String.valueOf(map.get("uuid")));
 
 
         getClient().perform(get("/api/core/bundles/" + bundleUuid)
@@ -248,6 +287,9 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                                  "A description"),
                                    MetadataMatcher.matchMetadata("dc.relation",
                                                                  "A relation"))))));
+        } finally {
+            BundleBuilder.deleteBundle(bundleUuid);
+        }
     }
 
     @Test
@@ -303,8 +345,8 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                   .withAction(Constants.ADD)
                                                   .withDspaceObject(item).build();
         context.restoreAuthSystemState();
-
-
+        UUID bundleUuid = null;
+        try {
         BundleRest bundleRest = new BundleRest();
         bundleRest.setName("Create Bundle Without Metadata");
 
@@ -320,7 +362,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String content = mvcResult.getResponse().getContentAsString();
         Map<String, Object> map = mapper.readValue(content, Map.class);
-        UUID bundleUuid = UUID.fromString(String.valueOf(map.get("uuid")));
+        bundleUuid = UUID.fromString(String.valueOf(map.get("uuid")));
 
 
         getClient().perform(get("/api/core/bundles/" + bundleUuid)
@@ -330,7 +372,9 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(jsonPath("$", BundleMatcher.matchBundle(
                            "Create Bundle Without Metadata",
                            bundleUuid, null, Constants.BUNDLE, new ArrayList<>())));
-
+        } finally {
+            BundleBuilder.deleteBundle(bundleUuid);
+        }
     }
 
     @Test
@@ -383,6 +427,38 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                            BitstreamMatcher.matchBitstreamEntry(bitstream1),
                            BitstreamMatcher.matchBitstreamEntry(bitstream2)
                    )));
+    }
+
+    @Test
+    public void getBitstreamsForBundleForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String bitstreamContent = "Dummy content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
+                                         .withName("Bitstream")
+                                         .withDescription("Description")
+                                         .withMimeType("text/plain")
+                                         .build();
+            bitstream2 = BitstreamBuilder.createBitstream(context, item, is)
+                                         .withName("Bitstream2")
+                                         .withDescription("Description2")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                               .withName("testname")
+                               .withBitstream(bitstream1)
+                               .withBitstream(bitstream2)
+                               .build();
+
+        resourcePolicyService.removePolicies(context, bundle1, Constants.READ);
+        context.restoreAuthSystemState();
+
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(get("/api/core/bundles/" + bundle1.getID() + "/bitstreams"))
+                   .andExpect(status().isForbidden());
     }
 
     @Test
@@ -564,6 +640,56 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         // Verify the bundle is still here
         getClient().perform(get("/api/core/bundles/" + bundle1.getID()))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void getEmbeddedItemForBundle() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                .withName("testname")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/bundles/" + bundle1.getID() + "?embed=item"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.item",
+                        ItemMatcher.matchItemWithTitleAndDateIssued(item, "Public item 1", "2017-10-17")
+                ));
+    }
+
+    @Test
+    /**
+     * This test proves that, if a bundle is linked to multiple items, we only ever return the first item.
+     * **NOTE: DSpace does NOT support or expect to have a bundle linked to multiple items**.
+     * But, because the database does allow for it, this test simply proves the REST API will respond without an error
+     */
+    public void linksToFirstItemWhenMultipleItems() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                .withName("testname")
+                .build();
+
+        Item item2 = ItemBuilder.createItem(context, collection)
+                .withTitle("Public item 2")
+                .withIssueDate("2020-07-08")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("SecondEntry")
+                .build();
+
+        itemService.addBundle(context, item2, bundle1);
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/bundles/" + bundle1.getID() + "/item"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$",
+                        ItemMatcher.matchItemWithTitleAndDateIssued(item, "Public item 1", "2017-10-17")
+                ));
     }
 
 }

@@ -16,9 +16,11 @@ import java.util.TreeMap;
 import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.scripts.handler.impl.CommandLineDSpaceRunnableHandler;
+import org.dspace.scripts.service.ScriptService;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.services.RequestService;
@@ -44,7 +46,8 @@ public class ScriptLauncher {
     /**
      * Default constructor
      */
-    private ScriptLauncher() { }
+    private ScriptLauncher() {
+    }
 
     /**
      * Execute the DSpace script launcher
@@ -54,7 +57,7 @@ public class ScriptLauncher {
      * @throws FileNotFoundException if file doesn't exist
      */
     public static void main(String[] args)
-        throws FileNotFoundException, IOException {
+        throws FileNotFoundException, IOException, IllegalAccessException, InstantiationException {
         // Initialise the service manager kernel
         try {
             kernelImpl = DSpaceKernelInit.getKernel(null);
@@ -107,13 +110,18 @@ public class ScriptLauncher {
      * @param commandConfigs        The Document
      * @param dSpaceRunnableHandler The DSpaceRunnableHandler for this execution
      * @param kernelImpl            The relevant DSpaceKernelImpl
-     * @return                      A 1 or 0 depending on whether the script failed or passed respectively
+     * @return A 1 or 0 depending on whether the script failed or passed respectively
      */
     public static int handleScript(String[] args, Document commandConfigs,
-                                       DSpaceRunnableHandler dSpaceRunnableHandler,
-                                       DSpaceKernelImpl kernelImpl) {
+                                   DSpaceRunnableHandler dSpaceRunnableHandler,
+                                   DSpaceKernelImpl kernelImpl) throws InstantiationException, IllegalAccessException {
         int status;
-        DSpaceRunnable script = ScriptServiceFactory.getInstance().getScriptService().getScriptForName(args[0]);
+        ScriptService scriptService = ScriptServiceFactory.getInstance().getScriptService();
+        ScriptConfiguration scriptConfiguration = scriptService.getScriptConfiguration(args[0]);
+        DSpaceRunnable script = null;
+        if (scriptConfiguration != null) {
+            script = scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfiguration);
+        }
         if (script != null) {
             status = executeScript(args, dSpaceRunnableHandler, script);
         } else {
@@ -127,12 +135,12 @@ public class ScriptLauncher {
      * @param args                  The arguments of the script with the script name as first place in the array
      * @param dSpaceRunnableHandler The relevant DSpaceRunnableHandler
      * @param script                The script to be executed
-     * @return                      A 1 or 0 depending on whether the script failed or passed respectively
+     * @return A 1 or 0 depending on whether the script failed or passed respectively
      */
     private static int executeScript(String[] args, DSpaceRunnableHandler dSpaceRunnableHandler,
                                      DSpaceRunnable script) {
         try {
-            script.initialize(args, dSpaceRunnableHandler);
+            script.initialize(args, dSpaceRunnableHandler, null);
             script.run();
             return 0;
         } catch (ParseException e) {

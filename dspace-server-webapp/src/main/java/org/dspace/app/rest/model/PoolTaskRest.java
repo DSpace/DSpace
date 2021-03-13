@@ -16,11 +16,17 @@ import org.dspace.xmlworkflow.storedcomponents.PoolTask;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
+@LinksRest(links = {
+    @LinkRest(
+        name = PoolTaskRest.STEP,
+        method = "getStep"
+    )
+})
 public class PoolTaskRest extends BaseObjectRest<Integer> {
     public static final String NAME = "pooltask";
     public static final String CATEGORY = RestAddressableModel.WORKFLOW;
 
-    private String step;
+    public static final String STEP = "step";
 
     private String action;
 
@@ -46,18 +52,6 @@ public class PoolTaskRest extends BaseObjectRest<Integer> {
     @Override
     public Class getController() {
         return RestResourceController.class;
-    }
-
-    /**
-     * @see PoolTask#getStepID()
-     * @return
-     */
-    public String getStep() {
-        return step;
-    }
-
-    public void setStep(String step) {
-        this.step = step;
     }
 
     /**

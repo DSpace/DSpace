@@ -21,7 +21,7 @@ import org.dspace.core.ReloadableEntity;
  * @param <PK>
  *            the Class of the primary key
  */
-public interface IndexableObject<T extends ReloadableEntity, PK extends Serializable> {
+public interface IndexableObject<T extends ReloadableEntity<PK>, PK extends Serializable> {
 
     /**
      * 

@@ -13,8 +13,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.rmi.dgc.VMID;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -414,6 +416,23 @@ public final class Utils {
         }
     }
 
+    /**
+     * Retrieve the baseurl from a given URL string
+     * @param urlString URL string
+     * @return baseurl (without any context path) or null (if URL was invalid)
+     */
+    public static String getBaseUrl(String urlString) {
+        try {
+            URL url = new URL(urlString);
+            String baseUrl = url.getProtocol() + "://" + url.getHost();
+            if (url.getPort() != -1) {
+                baseUrl += (":" + url.getPort());
+            }
+            return baseUrl;
+        } catch (MalformedURLException e) {
+            return null;
+        }
+    }
 
     /**
      * Retrieve the hostname from a given URI string

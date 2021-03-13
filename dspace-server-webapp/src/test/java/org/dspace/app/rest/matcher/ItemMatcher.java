@@ -53,6 +53,7 @@ public class ItemMatcher {
                 "bundles[]",
                 "mappedCollections[]",
                 "owningCollection",
+                "version",
                 "relationships[]",
                 "templateItemOf"
         );
@@ -68,6 +69,7 @@ public class ItemMatcher {
                 "owningCollection",
                 "relationships",
                 "self",
+                "version",
                 "templateItemOf"
         );
     }

@@ -30,7 +30,23 @@ import com.fasterxml.jackson.annotation.JsonProperty;
         @LinkRest(
                 name = CollectionRest.PARENT_COMMUNITY,
                 method = "getParentCommunity"
-        )
+        ),
+        @LinkRest(
+                name = CollectionRest.ADMIN_GROUP,
+                method = "getAdminGroup"
+        ),
+        @LinkRest(
+                name = CollectionRest.SUBMITTERS_GROUP,
+                method = "getSubmittersGroup"
+        ),
+        @LinkRest(
+                name = CollectionRest.ITEM_READ_GROUP,
+                method = "getItemReadGroup"
+        ),
+        @LinkRest(
+                name = CollectionRest.BITSTREAM_READ_GROUP,
+                method = "getBitstreamReadGroup"
+        ),
 })
 public class CollectionRest extends DSpaceObjectRest {
     public static final String NAME = "collection";
@@ -42,6 +58,11 @@ public class CollectionRest extends DSpaceObjectRest {
     public static final String LOGO = "logo";
     public static final String MAPPED_ITEMS = "mappedItems";
     public static final String PARENT_COMMUNITY = "parentCommunity";
+    public static final String ADMIN_GROUP = "adminGroup";
+    public static final String SUBMITTERS_GROUP = "submittersGroup";
+    public static final String ITEM_READ_GROUP = "itemReadGroup";
+    public static final String BITSTREAM_READ_GROUP = "bitstreamReadGroup";
+
 
     @Override
     public String getCategory() {

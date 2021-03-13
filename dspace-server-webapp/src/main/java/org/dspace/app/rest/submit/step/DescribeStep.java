@@ -10,9 +10,12 @@ package org.dspace.app.rest.submit.step;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.RemoveOperation;
 import org.dspace.app.rest.model.step.DataDescribe;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
@@ -110,13 +113,56 @@ public class DescribeStep extends org.dspace.submit.step.DescribeStep implements
     }
 
     @Override
-    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op)
-        throws Exception {
+    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op,
+                                  SubmissionStepConfig stepConf) throws Exception {
 
-        PatchOperation<MetadataValueRest> patchOperation = new PatchOperationFactory()
-            .instanceOf(DESCRIBE_STEP_METADATA_OPERATION_ENTRY, op.getOp());
-        patchOperation.perform(context, currentRequest, source, op);
-
+        String[] pathParts = op.getPath().substring(1).split("/");
+        DCInputSet inputConfig = inputReader.getInputsByFormName(stepConf.getId());
+        if ("remove".equals(op.getOp()) && pathParts.length < 3) {
+            // manage delete all step fields
+            String[] path = op.getPath().substring(1).split("/", 3);
+            String configId = path[1];
+            List<String> fieldsName = getInputFieldsName(inputConfig, configId);
+            for (String fieldName : fieldsName) {
+                String fieldPath = op.getPath() + "/" + fieldName;
+                Operation fieldRemoveOp = new RemoveOperation(fieldPath);
+                PatchOperation<MetadataValueRest> patchOperation = new PatchOperationFactory()
+                     .instanceOf(DESCRIBE_STEP_METADATA_OPERATION_ENTRY, fieldRemoveOp.getOp());
+                patchOperation.perform(context, currentRequest, source, fieldRemoveOp);
+            }
+        } else {
+            PatchOperation<MetadataValueRest> patchOperation = new PatchOperationFactory()
+                        .instanceOf(DESCRIBE_STEP_METADATA_OPERATION_ENTRY, op.getOp());
+            String[] split = patchOperation.getAbsolutePath(op.getPath()).split("/");
+            if (inputConfig.isFieldPresent(split[0])) {
+                patchOperation.perform(context, currentRequest, source, op);
+            } else {
+                throw new UnprocessableEntityException("The field " + split[0] + " is not present in section "
+                                                                                   + inputConfig.getFormName());
+            }
+        }
     }
 
+    private List<String> getInputFieldsName(DCInputSet inputConfig, String configId) throws DCInputsReaderException {
+        List<String> fieldsName = new ArrayList<String>();
+        for (DCInput[] row : inputConfig.getFields()) {
+            for (DCInput input : row) {
+                if (input.isQualdropValue()) {
+                    for (Object qualifier : input.getPairs()) {
+                        fieldsName.add(input.getFieldName() + "." + (String) qualifier);
+                    }
+                } else if (StringUtils.equalsIgnoreCase(input.getInputType(), "group") ||
+                        StringUtils.equalsIgnoreCase(input.getInputType(), "inline-group")) {
+                    log.info("Called child form:" + configId + "-" +
+                        Utils.standardize(input.getSchema(), input.getElement(), input.getQualifier(), "-"));
+                    DCInputSet inputConfigChild = inputReader.getInputsByFormName(configId + "-" + Utils
+                        .standardize(input.getSchema(), input.getElement(), input.getQualifier(), "-"));
+                    fieldsName.addAll(getInputFieldsName(inputConfigChild, configId));
+                } else {
+                    fieldsName.add(input.getFieldName());
+                }
+            }
+        }
+        return fieldsName;
+    }
 }

@@ -27,7 +27,7 @@ public abstract class DiscoveryResultsRest extends BaseObjectRest<String> {
     private List<SearchResultsRest.AppliedFilter> appliedFilters;
     private SearchResultsRest.Sorting sort;
     @JsonIgnore
-    private String dsoType;
+    private List<String> dsoTypes;
     @JsonIgnore
     private List<SearchFilter> searchFilters;
     private String configuration;
@@ -52,12 +52,12 @@ public abstract class DiscoveryResultsRest extends BaseObjectRest<String> {
         this.query = query;
     }
 
-    public String getDsoType() {
-        return dsoType;
+    public List<String> getDsoTypes() {
+        return dsoTypes;
     }
 
-    public void setDsoType(final String dsoType) {
-        this.dsoType = dsoType;
+    public void setDsoTypes(final List<String> dsoTypes) {
+        this.dsoTypes = dsoTypes;
     }
 
     public String getScope() {

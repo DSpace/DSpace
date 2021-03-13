@@ -30,7 +30,7 @@ public class RoleTest extends AbstractUnitTest {
 
     @Test
     public void defaultWorkflow_RoleReviewer() {
-        Role role = defaultWorkflow.getRoles().get("Reviewer");
+        Role role = defaultWorkflow.getRoles().get("reviewer");
         assertEquals("The people responsible for this step are able to edit the metadata of incoming submissions, " +
                         "and then accept or reject them.", role.getDescription());
         assertEquals("Reviewer", role.getName());
@@ -39,7 +39,7 @@ public class RoleTest extends AbstractUnitTest {
 
     @Test
     public void defaultWorkflow_RoleEditor() {
-        Role role = defaultWorkflow.getRoles().get("Editor");
+        Role role = defaultWorkflow.getRoles().get("editor");
         assertEquals("The people responsible for this step are able to edit the " +
                 "metadata of incoming submissions, and then accept or reject them.", role.getDescription());
         assertEquals("Editor", role.getName());
@@ -48,7 +48,7 @@ public class RoleTest extends AbstractUnitTest {
 
     @Test
     public void defaultWorkflow_RoleFinalEditor() {
-        Role role = defaultWorkflow.getRoles().get("Final Editor");
+        Role role = defaultWorkflow.getRoles().get("finaleditor");
         assertEquals("The people responsible for this step are able to edit the " +
                 "metadata of incoming submissions, but will not be able to reject them.", role.getDescription());
         assertEquals("Final Editor", role.getName());
@@ -57,21 +57,21 @@ public class RoleTest extends AbstractUnitTest {
 
     @Test
     public void selectSingleReviewer_RoleReviewManagers() {
-        Role role = selectSingleReviewer.getRoles().get("ReviewManagers");
+        Role role = selectSingleReviewer.getRoles().get("reviewmanagers");
         assertEquals("ReviewManagers", role.getName());
         assertEquals(Role.Scope.REPOSITORY, role.getScope());
     }
 
     @Test
     public void selectSingleReviewer_RoleReviewer() {
-        Role role = selectSingleReviewer.getRoles().get("Reviewer");
+        Role role = selectSingleReviewer.getRoles().get("scoreassignedreviewer");
         assertEquals("Reviewer", role.getName());
         assertEquals(Role.Scope.ITEM, role.getScope());
     }
 
     @Test
     public void scoreReview_RoleScoreReviewers() {
-        Role role = scoreReview.getRoles().get("ScoreReviewers");
+        Role role = scoreReview.getRoles().get("scorereviewers");
         assertEquals("ScoreReviewers", role.getName());
         assertEquals(Role.Scope.COLLECTION, role.getScope());
     }

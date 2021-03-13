@@ -6,4 +6,5 @@
 
     <!-- Replace harvestCollectionService with a mocked service -->
     <bean class="org.dspace.harvest.MockHarvestedCollectionServiceImpl" id="org.dspace.harvest.service.HarvestedCollectionService" primary="true"/>
+    <bean class="org.dspace.license.MockCCLicenseConnectorServiceImpl" id="org.dspace.license.CCLicenseConnectorService" primary="true"/>
 </beans>

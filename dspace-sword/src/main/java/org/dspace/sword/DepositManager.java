@@ -245,6 +245,8 @@ public class DepositManager {
 
         String filenameBase =
             "sword-" + deposit.getUsername() + "-" + (new Date()).getTime();
+        // No dots or slashes allowed in filename
+        filenameBase = filenameBase.replaceAll("\\.", "").replaceAll("/", ""). replaceAll("\\\\", "");
 
         File packageFile = new File(path, filenameBase);
         File headersFile = new File(path, filenameBase + "-headers");

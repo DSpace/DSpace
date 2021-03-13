@@ -35,13 +35,14 @@ public class DiscoverFacetResultsConverter {
     @Autowired
     private SearchFilterToAppliedFilterConverter searchFilterToAppliedFilterConverter;
 
-    public FacetResultsRest convert(Context context, String facetName, String prefix, String query, String dsoType,
-                                    String dsoScope, List<SearchFilter> searchFilters, DiscoverResult searchResult,
-                                    DiscoveryConfiguration configuration, Pageable page, Projection projection) {
+    public FacetResultsRest convert(Context context, String facetName, String prefix, String query,
+                                    List<String> dsoTypes, String dsoScope, List<SearchFilter> searchFilters,
+                                    DiscoverResult searchResult, DiscoveryConfiguration configuration, Pageable page,
+                                    Projection projection) {
         FacetResultsRest facetResultsRest = new FacetResultsRest();
         facetResultsRest.setProjection(projection);
 
-        setRequestInformation(context, facetName, prefix, query, dsoType, dsoScope, searchFilters, searchResult,
+        setRequestInformation(context, facetName, prefix, query, dsoTypes, dsoScope, searchFilters, searchResult,
                 configuration, facetResultsRest, page, projection);
 
         addToFacetResultList(facetName, searchResult, facetResultsRest, configuration, page, projection);
@@ -72,14 +73,14 @@ public class DiscoverFacetResultsConverter {
         return facetValueConverter.convert(value, projection);
     }
 
-    private void setRequestInformation(Context context, String facetName, String prefix, String query, String dsoType,
-                                       String dsoScope, List<SearchFilter> searchFilters, DiscoverResult searchResult,
-                                       DiscoveryConfiguration configuration, FacetResultsRest facetResultsRest,
-                                       Pageable page, Projection projection) {
+    private void setRequestInformation(Context context, String facetName, String prefix, String query,
+                                       List<String> dsoTypes, String dsoScope, List<SearchFilter> searchFilters,
+                                       DiscoverResult searchResult, DiscoveryConfiguration configuration,
+                                       FacetResultsRest facetResultsRest, Pageable page, Projection projection) {
         facetResultsRest.setQuery(query);
         facetResultsRest.setPrefix(prefix);
         facetResultsRest.setScope(dsoScope);
-        facetResultsRest.setDsoType(dsoType);
+        facetResultsRest.setDsoTypes(dsoTypes);
 
         facetResultsRest.setFacetEntry(convertFacetEntry(facetName, searchResult, configuration, page, projection));
 

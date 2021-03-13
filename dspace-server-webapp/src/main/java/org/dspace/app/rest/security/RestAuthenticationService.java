@@ -11,6 +11,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.dspace.app.rest.model.wrapper.AuthenticationToken;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -26,13 +27,22 @@ import org.springframework.stereotype.Service;
 public interface RestAuthenticationService {
 
     void addAuthenticationDataForUser(HttpServletRequest request, HttpServletResponse response,
-                                      DSpaceAuthentication authentication) throws IOException;
+                                      DSpaceAuthentication authentication, boolean addCookie) throws IOException;
+
+    /**
+     * Retrieve a short lived authentication token, this can be used (among other things) for file downloads
+     * @param context the DSpace context
+     * @param request The current client request
+     * @return An AuthenticationToken that contains a string with the token
+     */
+    AuthenticationToken getShortLivedAuthenticationToken(Context context, HttpServletRequest request);
 
     EPerson getAuthenticatedEPerson(HttpServletRequest request, Context context);
 
     boolean hasAuthenticationData(HttpServletRequest request);
 
-    void invalidateAuthenticationData(HttpServletRequest request, Context context) throws Exception;
+    void invalidateAuthenticationData(HttpServletRequest request, HttpServletResponse response, Context context)
+            throws Exception;
 
     AuthenticationService getAuthenticationService();
 
@@ -43,5 +53,7 @@ public interface RestAuthenticationService {
      * @return A string value that should be set in the WWWW-Authenticate header
      */
     String getWwwAuthenticateHeaderValue(HttpServletRequest request, HttpServletResponse response);
+
+    void invalidateAuthenticationCookie(HttpServletResponse res);
 
 }

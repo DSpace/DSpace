@@ -8,10 +8,8 @@
 package org.dspace.authorize.dao.impl;
 
 import java.sql.SQLException;
-
 import java.util.List;
 import java.util.UUID;
-
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -62,6 +60,16 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
                                        criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.rptype), type)
                    )
         );
+        return list(context, criteriaQuery, false, ResourcePolicy.class, -1, -1);
+    }
+
+    @Override
+    public List<ResourcePolicy> findByEPerson(Context context, EPerson ePerson) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
+        Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
+        criteriaQuery.select(resourcePolicyRoot);
+        criteriaQuery.where(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.eperson), ePerson));
         return list(context, criteriaQuery, false, ResourcePolicy.class, -1, -1);
     }
 
@@ -197,6 +205,15 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
     }
 
     @Override
+    public void deleteByEPerson(Context context, EPerson ePerson) throws SQLException {
+        String queryString = "delete from ResourcePolicy where eperson= :eperson";
+        Query query = createQuery(context, queryString);
+        query.setParameter("eperson", ePerson);
+        query.executeUpdate();
+
+    }
+
+    @Override
     public void deleteByDsoAndTypeNotEqualsTo(Context context, DSpaceObject dso, String type) throws SQLException {
 
         String queryString = "delete from ResourcePolicy where dSpaceObject=:dso AND rptype <> :rptype";
@@ -249,10 +266,10 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
     }
 
     @Override
-    public int countByEPerson(Context context, EPerson eperson) throws SQLException {
+    public int countByEPerson(Context context, EPerson ePerson) throws SQLException {
         Query query = createQuery(context,
                 "SELECT count(*) FROM " + ResourcePolicy.class.getSimpleName() + " WHERE eperson_id = (:epersonUuid) ");
-        query.setParameter("epersonUuid", eperson.getID());
+        query.setParameter("epersonUuid", ePerson.getID());
         return count(query);
     }
 

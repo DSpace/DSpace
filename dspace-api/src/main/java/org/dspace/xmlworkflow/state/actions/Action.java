@@ -50,6 +50,20 @@ public abstract class Action {
      */
     public abstract List<String> getOptions();
 
+    /**
+     * Returns true if one of the options is a parameter of the request
+     * @param request   Action request
+     * @return  true if one of the options is a parameter of the request; false if none was found
+     */
+    protected boolean isOptionInParam(HttpServletRequest request) {
+        for (String option: this.getOptions()) {
+            if (request.getParameter(option) != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public WorkflowActionConfig getParent() {
         return parent;
     }

@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.step.DataUpload;
@@ -45,6 +46,8 @@ public class UploadStep extends org.dspace.submit.step.UploadStep
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(UploadStep.class);
 
+    public static final String UPLOAD_STEP_METADATA_SECTION = "bitstream-metadata";
+
     @Override
     public DataUpload getData(SubmissionService submissionService, InProgressSubmission obj,
                               SubmissionStepConfig config) throws Exception {
@@ -61,10 +64,10 @@ public class UploadStep extends org.dspace.submit.step.UploadStep
     }
 
     @Override
-    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op)
-        throws Exception {
+    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op,
+                                  SubmissionStepConfig stepConf) throws Exception {
 
-        String instance = "";
+        String instance = null;
         if ("remove".equals(op.getOp())) {
             if (op.getPath().contains(UPLOAD_STEP_METADATA_PATH)) {
                 instance = UPLOAD_STEP_METADATA_OPERATION_ENTRY;
@@ -82,13 +85,16 @@ public class UploadStep extends org.dspace.submit.step.UploadStep
         } else {
             if (op.getPath().contains(UPLOAD_STEP_ACCESSCONDITIONS_OPERATION_ENTRY)) {
                 instance = UPLOAD_STEP_ACCESSCONDITIONS_OPERATION_ENTRY;
-            } else {
+            } else if (op.getPath().contains(UPLOAD_STEP_METADATA_PATH)) {
                 instance = UPLOAD_STEP_METADATA_OPERATION_ENTRY;
             }
         }
+        if (instance == null) {
+            throw new UnprocessableEntityException("The path " + op.getPath() + " is not supported by the operation "
+                                                                              + op.getOp());
+        }
         PatchOperation<?> patchOperation = new PatchOperationFactory().instanceOf(instance, op.getOp());
         patchOperation.perform(context, currentRequest, source, op);
-
     }
 
     @Override

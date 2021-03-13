@@ -173,13 +173,14 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
     public void addDiscoveryFields(SolrInputDocument doc, Context context, Item item,
                                    List<DiscoveryConfiguration> discoveryConfigurations)
             throws SQLException, IOException {
+        // use the item service to retrieve the owning collection also for inprogress submission
+        Collection collection = (Collection) itemService.getParentObject(context, item);
         //Keep a list of our sort values which we added, sort values can only be added once
         List<String> sortFieldsAdded = new ArrayList<>();
-        Map<String, List<DiscoverySearchFilter>> searchFilters = null;
+        Map<String, List<DiscoverySearchFilter>> searchFilters = new HashMap<>();
         Set<String> hitHighlightingFields = new HashSet<>();
         try {
             //A map used to save each sidebarFacet config by the metadata fields
-            searchFilters = new HashMap<>();
             Map<String, DiscoverySortFieldConfiguration> sortFields = new HashMap<>();
             Map<String, DiscoveryRecentSubmissionsConfiguration> recentSubmissionsConfigurationMap = new
                     HashMap<>();
@@ -339,8 +340,9 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                                             DSpaceServicesFactory
                                                     .getInstance()
                                                     .getConfigurationService()
-                                                    .getPropertyAsType("discovery.index.authority.ignore",
-                                                            new Boolean(false)),
+                                                    .getPropertyAsType(
+                                                            "discovery.index.authority.ignore",
+                                                            Boolean.FALSE),
                                             true);
                     if (!ignoreAuthority) {
                         authority = meta.getAuthority();
@@ -353,13 +355,14 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                                                 DSpaceServicesFactory
                                                         .getInstance()
                                                         .getConfigurationService()
-                                                        .getPropertyAsType("discovery.index.authority.ignore-prefered",
-                                                                new Boolean(false)),
+                                                        .getPropertyAsType(
+                                                                "discovery.index.authority.ignore-prefered",
+                                                                Boolean.FALSE),
                                                 true);
                         if (!ignorePrefered) {
 
                             preferedLabel = choiceAuthorityService
-                                    .getLabel(meta, meta.getLanguage());
+                                    .getLabel(meta, collection, meta.getLanguage());
                         }
 
                         boolean ignoreVariants =
@@ -371,11 +374,11 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                                                         .getInstance()
                                                         .getConfigurationService()
                                                         .getPropertyAsType("discovery.index.authority.ignore-variants",
-                                                                new Boolean(false)),
+                                                                Boolean.FALSE),
                                                 true);
                         if (!ignoreVariants) {
                             variants = choiceAuthorityService
-                                    .getVariants(meta);
+                                    .getVariants(meta, collection);
                         }
 
                     }

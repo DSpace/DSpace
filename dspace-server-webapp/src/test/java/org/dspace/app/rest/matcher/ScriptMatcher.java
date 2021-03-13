@@ -32,7 +32,8 @@ public class ScriptMatcher {
             matchScript("mock-script", "Mocking a script for testing purposes"),
             hasJsonPath("$.parameters", Matchers.containsInAnyOrder(
                 ParameterMatcher.matchParameter(options.getOption("r")),
-                ParameterMatcher.matchParameter(options.getOption("i"))
+                ParameterMatcher.matchParameter(options.getOption("i")),
+                ParameterMatcher.matchParameter(options.getOption("f"))
             ))
         );
     }

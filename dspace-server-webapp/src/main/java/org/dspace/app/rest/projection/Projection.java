@@ -10,9 +10,13 @@ package org.dspace.app.rest.projection;
 import javax.persistence.Entity;
 
 import org.dspace.app.rest.model.LinkRest;
+import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
+import org.dspace.app.rest.utils.Utils;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,7 +48,7 @@ import org.springframework.web.bind.annotation.RestController;
  *   <li> After it is converted to a {@link RestModel}, the projection may modify it
  *        via {@link #transformRest(RestModel)}.</li>
  *   <li> During conversion to a {@link HALResource}, the projection may opt in to certain annotation-discovered
- *        HAL embeds and links via {@link #allowEmbedding(HALResource, LinkRest)}
+ *        HAL embeds and links via {@link #allowEmbedding(HALResource, LinkRest, Link...)}
  *        and {@link #allowLinking(HALResource, LinkRest)}</li>
  *   <li> After conversion to a {@link HALResource}, the projection may modify it
  *        via {@link #transformResource(HALResource)}.</li>
@@ -52,8 +56,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * <h2>How a projection is chosen</h2>
  *
- * When a REST request is made, the projection argument, if present, is used to look up the projection to use,
- * by name. If no argument is present, {@link DefaultProjection} will be used.
+ * See {@link Utils#obtainProjection()}.
  */
 public interface Projection {
 
@@ -115,16 +118,18 @@ public interface Projection {
      *
      * @param halResource the resource from which the embed may or may not be made.
      * @param linkRest the LinkRest annotation through which the related resource was discovered on the rest object.
+     * @param oldLinks    The previously traversed links
      * @return true if allowed, false otherwise.
      */
-    boolean allowEmbedding(HALResource halResource, LinkRest linkRest);
+    boolean allowEmbedding(HALResource<? extends RestAddressableModel> halResource, LinkRest linkRest,
+                           Link... oldLinks);
 
     /**
      * Tells whether this projection permits the linking of a particular linkable subresource.
      *
      * This gives the projection an opportunity to opt in to to certain links, by returning {@code true}.
      *
-     * Note: If {@link #allowEmbedding(HALResource, LinkRest)} returns {@code true} for a given subresource,
+     * Note: If {@link #allowEmbedding(HALResource, LinkRest, Link...)} returns {@code true} for a given subresource,
      * it will be automatically linked regardless of what this method returns.
      *
      * @param halResource the resource from which the link may or may not be made.
@@ -132,4 +137,14 @@ public interface Projection {
      * @return true if allowed, false otherwise.
      */
     boolean allowLinking(HALResource halResource, LinkRest linkRest);
+
+    /**
+     * This method will return the {@link PageRequest} object for a specific given rel
+     * @param rel   The rel for which the {@link PageRequest} object will be made
+     * @param resource the resource from which the embed may or may not be made.
+     * @param oldLinks    The previously traversed links
+     * @return      The {@link PageRequest} object for the given rel
+     */
+    PageRequest getPagingOptions(String rel, HALResource<? extends RestAddressableModel> resource,
+                                 Link... oldLinks);
 }

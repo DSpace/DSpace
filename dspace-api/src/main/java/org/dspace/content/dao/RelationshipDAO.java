@@ -189,15 +189,17 @@ public interface RelationshipDAO extends GenericDAO<Relationship> {
     int countByItem(Context context, Item item) throws SQLException;
 
     /**
-     * Count total number of relationships (rows in relationship table) by an item and a relationship type
+     * Count total number of relationships (rows in relationship table) by an item and a relationship type and a boolean
+     * indicating whether the item should be the leftItem or the rightItem
      *
      * @param context context
      * @param relationshipType relationship type to filter by
      * @param item item to filter by
+     * @param isLeft Indicating whether the counted Relationships should have the given Item on the left side or not
      * @return total count
      * @throws SQLException if database error
      */
-    int countByItemAndRelationshipType(Context context, Item item, RelationshipType relationshipType)
+    int countByItemAndRelationshipType(Context context, Item item, RelationshipType relationshipType, boolean isLeft)
             throws SQLException;
 
     /**

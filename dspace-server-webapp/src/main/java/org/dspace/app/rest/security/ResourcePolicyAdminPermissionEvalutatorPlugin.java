@@ -8,7 +8,6 @@
 package org.dspace.app.rest.security;
 
 import java.io.Serializable;
-
 import java.sql.SQLException;
 
 import org.apache.commons.lang3.StringUtils;
@@ -29,9 +28,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 /**
- * 
+ *
  * {@link RestPermissionEvaluatorPlugin} class that evaluate ADMIN permissions over a Resource Policy
- * 
+ *
  * @author Mykhaylo Boychuk - (4Science.it)
  */
 @Component

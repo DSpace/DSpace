@@ -10,7 +10,6 @@ package org.dspace.content;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -157,11 +156,11 @@ public class WorkspaceItem
             return true;
         }
         Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(o);
-        if (getClass() != objClass) {
+        if (!getClass().equals(objClass)) {
             return false;
         }
         final WorkspaceItem that = (WorkspaceItem) o;
-        if (this.getID() != that.getID()) {
+        if (!this.getID().equals(that.getID())) {
             return false;
         }
 

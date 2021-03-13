@@ -75,6 +75,7 @@ public class MetadataConverter implements DSpaceConverter<MetadataValueList, Met
 
     /**
      * Sets a DSpace object's domain metadata values from a rest representation.
+     * Any existing metadata value is deleted or overwritten.
      *
      * @param context the context to use.
      * @param dso the DSpace object.
@@ -82,10 +83,52 @@ public class MetadataConverter implements DSpaceConverter<MetadataValueList, Met
      * @throws SQLException if a database error occurs.
      * @throws AuthorizeException if an authorization error occurs.
      */
-    public void setMetadata(Context context, DSpaceObject dso, MetadataRest metadataRest)
+    public <T extends DSpaceObject> void setMetadata(Context context, T dso, MetadataRest metadataRest)
             throws SQLException, AuthorizeException {
-        DSpaceObjectService dsoService = contentServiceFactory.getDSpaceObjectService(dso);
+        DSpaceObjectService<T> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
         dsoService.clearMetadata(context, dso, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        persistMetadataRest(context, dso, metadataRest, dsoService);
+    }
+
+    /**
+     * Add to a DSpace object's domain metadata values from a rest representation.
+     * Any existing metadata value is preserved.
+     *
+     * @param context the context to use.
+     * @param dso the DSpace object.
+     * @param metadataRest the rest representation of the new metadata.
+     * @throws SQLException if a database error occurs.
+     * @throws AuthorizeException if an authorization error occurs.
+     */
+    public <T extends DSpaceObject> void addMetadata(Context context, T dso, MetadataRest metadataRest)
+            throws SQLException, AuthorizeException {
+        DSpaceObjectService<T> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
+        persistMetadataRest(context, dso, metadataRest, dsoService);
+    }
+
+    /**
+     * Merge into a DSpace object's domain metadata values from a rest representation.
+     * Any existing metadata value is preserved or overwritten with the new ones
+     *
+     * @param context the context to use.
+     * @param dso the DSpace object.
+     * @param metadataRest the rest representation of the new metadata.
+     * @throws SQLException if a database error occurs.
+     * @throws AuthorizeException if an authorization error occurs.
+     */
+    public <T extends DSpaceObject> void mergeMetadata(Context context, T dso, MetadataRest metadataRest)
+            throws SQLException, AuthorizeException {
+        DSpaceObjectService<T> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
+        for (Map.Entry<String, List<MetadataValueRest>> entry: metadataRest.getMap().entrySet()) {
+            List<MetadataValue> metadataByMetadataString = dsoService.getMetadataByMetadataString(dso, entry.getKey());
+            dsoService.removeMetadataValues(context, dso, metadataByMetadataString);
+        }
+        persistMetadataRest(context, dso, metadataRest, dsoService);
+    }
+
+    private <T extends DSpaceObject> void persistMetadataRest(Context context, T dso, MetadataRest metadataRest,
+            DSpaceObjectService<T> dsoService)
+                    throws SQLException, AuthorizeException {
         for (Map.Entry<String, List<MetadataValueRest>> entry: metadataRest.getMap().entrySet()) {
             String[] seq = entry.getKey().split("\\.");
             String schema = seq[0];
@@ -98,4 +141,5 @@ public class MetadataConverter implements DSpaceConverter<MetadataValueList, Met
         }
         dsoService.update(context, dso);
     }
+
 }

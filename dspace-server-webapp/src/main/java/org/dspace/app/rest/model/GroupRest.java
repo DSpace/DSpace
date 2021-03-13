@@ -19,8 +19,16 @@ import org.dspace.app.rest.RestResourceController;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @LinksRest(links = {
         @LinkRest(
-                name = GroupRest.GROUPS,
+                name = GroupRest.SUBGROUPS,
                 method = "getGroups"
+        ),
+        @LinkRest(
+                name = GroupRest.EPERSONS,
+                method = "getMembers"
+        ),
+        @LinkRest(
+                name = GroupRest.OBJECT,
+                method = "getParentObject"
         )
 })
 public class GroupRest extends DSpaceObjectRest {
@@ -28,6 +36,9 @@ public class GroupRest extends DSpaceObjectRest {
     public static final String CATEGORY = RestAddressableModel.EPERSON;
 
     public static final String GROUPS = "groups";
+    public static final String SUBGROUPS = "subgroups";
+    public static final String EPERSONS = "epersons";
+    public static final String OBJECT = "object";
 
     private String name;
 

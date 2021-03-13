@@ -28,18 +28,16 @@ import com.lyncode.xoai.dataprovider.services.api.ResourceResolver;
 import com.lyncode.xoai.dataprovider.services.impl.BaseDateProvider;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.Configuration;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.ContextConfiguration;
-
 import org.apache.commons.lang3.time.DateUtils;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
 import org.dspace.content.Community;
 import org.dspace.services.ConfigurationService;
 import org.dspace.xoai.services.api.EarliestDateResolver;
 import org.dspace.xoai.services.api.cache.XOAICacheService;
 import org.dspace.xoai.services.api.config.XOAIManagerResolver;
 import org.dspace.xoai.services.api.xoai.DSpaceFilterResolver;
-
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
@@ -78,7 +76,7 @@ public class OAIpmhIT extends AbstractControllerIntegrationTest {
     private EarliestDateResolver earliestDateResolver;
 
     // XOAI's BaseDateProvider (used for date-based testing below)
-    private static BaseDateProvider baseDateProvider = new BaseDateProvider();
+    private static final BaseDateProvider baseDateProvider = new BaseDateProvider();
 
     // Spy on the current XOAIManagerResolver bean, to allow us to change behavior of XOAIManager in tests
     // See also: createMockXOAIManager() method
@@ -280,6 +278,6 @@ public class OAIpmhIT extends AbstractControllerIntegrationTest {
      * @throws ConfigurationException
      */
     private XOAIManager createMockXOAIManager(Configuration xoaiConfig) throws ConfigurationException {
-      return new XOAIManager(filterResolver, resourceResolver, xoaiConfig);
+        return new XOAIManager(filterResolver, resourceResolver, xoaiConfig);
     }
 }

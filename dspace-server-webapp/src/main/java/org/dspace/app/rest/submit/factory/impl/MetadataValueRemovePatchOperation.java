@@ -8,6 +8,7 @@
 package org.dspace.app.rest.submit.factory.impl;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -40,17 +41,10 @@ public abstract class MetadataValueRemovePatchOperation<DSO extends DSpaceObject
         String[] metadata = Utils.tokenize(target);
         List<MetadataValue> mm = getDSpaceObjectService().getMetadata(source, metadata[0], metadata[1], metadata[2],
                                                                       Item.ANY);
-        getDSpaceObjectService().clearMetadata(context, source, metadata[0], metadata[1], metadata[2], Item.ANY);
         if (index != -1) {
-            int idx = 0;
-            for (MetadataValue m : mm) {
-                if (idx != index) {
-                    getDSpaceObjectService().addMetadata(context, source, metadata[0], metadata[1], metadata[2],
-                                                         m.getLanguage(), m.getValue(), m.getAuthority(),
-                                                         m.getConfidence());
-                }
-                idx++;
-            }
+            getDSpaceObjectService().removeMetadataValues(context, source, Arrays.asList(mm.get(index)));
+        } else {
+            getDSpaceObjectService().clearMetadata(context, source, metadata[0], metadata[1], metadata[2], Item.ANY);
         }
     }
 

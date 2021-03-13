@@ -29,7 +29,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
  * @param <R> the corresponding DSpaceObjectRest.
  */
 public abstract class DSpaceObjectRestRepository<M extends DSpaceObject, R extends DSpaceObjectRest>
-        extends DSpaceRestRepository<R, UUID> {
+        extends DSpaceRestRepository<R, UUID> implements ReloadableEntityObjectRepository<M, UUID> {
 
     final DSpaceObjectService<M> dsoService;
 
@@ -63,5 +63,15 @@ public abstract class DSpaceObjectRestRepository<M extends DSpaceObject, R exten
         }
         resourcePatch.patch(obtainContext(), dso, patch.getOperations());
         dsoService.update(obtainContext(), dso);
+    }
+
+    @Override
+    public M findDomainObjectByPk(Context context, UUID uuid) throws SQLException {
+        return dsoService.find(context, uuid);
+    }
+
+    @Override
+    public Class<UUID> getPKClass() {
+        return UUID.class;
     }
 }
