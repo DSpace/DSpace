@@ -7,6 +7,10 @@
  */
 package org.dspace.app.rest.repository;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -145,9 +149,11 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
     @PreAuthorize("#epersonUuid==null || hasPermission(#epersonUuid, 'EPERSON', 'READ')")
     @SearchRestMethod(name = "object")
     public Page<AuthorizationRest> findByObject(@Parameter(value = "uri", required = true) String uri,
-            @Parameter(value = "eperson") UUID epersonUuid,
+            @Parameter(value = "eperson") UUID epersonUuid, @Parameter(value = "feature") String featureName,
             Pageable pageable) throws AuthorizeException, SQLException {
+
         Context context = obtainContext();
+
         BaseObjectRest obj = utils.getBaseObjectRestFromUri(context, uri);
         if (obj == null) {
             return null;
@@ -162,11 +168,16 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
             context.switchContextUser(user);
         }
 
-        List<AuthorizationFeature> features = authorizationFeatureService.findByResourceType(obj.getUniqueType());
-        List<Authorization> authorizations = new ArrayList<Authorization>();
-        for (AuthorizationFeature f : features) {
-            if (authorizationFeatureService.isAuthorized(context, f, obj)) {
-                authorizations.add(new Authorization(user, f, obj));
+        List<Authorization> authorizations;
+        if (isNotBlank(featureName)) {
+            authorizations = findByObjectAndFeature(context, user, obj, featureName);
+        } else {
+            List<AuthorizationFeature> features = authorizationFeatureService.findByResourceType(obj.getUniqueType());
+            authorizations = new ArrayList<>();
+            for (AuthorizationFeature f : features) {
+                if (authorizationFeatureService.isAuthorized(context, f, obj)) {
+                    authorizations.add(new Authorization(user, f, obj));
+                }
             }
         }
 
@@ -177,57 +188,17 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
         return converter.toRestPage(authorizations, pageable, utils.obtainProjection());
     }
 
-    /**
-     * It returns the authorization related to the requested feature if granted to the specified eperson or to the
-     * anonymous user. Only administrators and the user identified by the epersonUuid parameter can access this method
-     *
-     * @param uri
-     *            the uri of the object to check the authorization against
-     * @param epersonUuid
-     *            the eperson uuid to use in the authorization evaluation
-     * @param featureName
-     *            limit the authorization check to only the feature identified via its name
-     * @param pageable
-     *            the pagination options
-     * @return the list of matching authorization available for the requested user and object, filtered by feature if
-     *         provided
-     * @throws AuthorizeException
-     * @throws SQLException
-     */
-    @PreAuthorize("#epersonUuid==null || hasPermission(#epersonUuid, 'EPERSON', 'READ')")
-    @SearchRestMethod(name = "objectAndFeature")
-    public AuthorizationRest findByObjectAndFeature(@Parameter(value = "uri", required = true) String uri,
-            @Parameter(value = "eperson") UUID epersonUuid,
-            @Parameter(value = "feature", required = true) String featureName,
-            Pageable pageable) throws AuthorizeException, SQLException {
-        Context context = obtainContext();
-        BaseObjectRest obj = utils.getBaseObjectRestFromUri(context, uri);
-        if (obj == null) {
-            return null;
+    private List<Authorization> findByObjectAndFeature(
+            Context context, EPerson user, BaseObjectRest obj, String featureName
+    ) throws SQLException {
+
+        AuthorizationFeature feature = authorizationFeatureService.find(featureName);
+
+        if (!authorizationFeatureService.isAuthorized(context, feature, obj)) {
+            return emptyList();
         }
 
-        EPerson currUser = context.getCurrentUser();
-        // get the user specified in the requested parameters, can be null for anonymous
-        EPerson user = getUserFromRequestParameter(context, epersonUuid);
-        if (currUser != user) {
-            // Temporarily change the Context's current user in order to retrieve
-            // authorizations based on that user
-            context.switchContextUser(user);
-        }
-        AuthorizationFeature feature = authorizationFeatureService.find(featureName);
-        AuthorizationRest authorizationRest = null;
-        if (authorizationFeatureService.isAuthorized(context, feature, obj)) {
-            Authorization authz = new Authorization();
-            authz.setEperson(user);
-            authz.setFeature(feature);
-            authz.setObject(obj);
-            authorizationRest = converter.toRest(authz, utils.obtainProjection());
-        }
-        if (currUser != user) {
-            // restore the real current user
-            context.restoreContextUser();
-        }
-        return authorizationRest;
+        return singletonList(new Authorization(user, feature, obj));
     }
 
     /**

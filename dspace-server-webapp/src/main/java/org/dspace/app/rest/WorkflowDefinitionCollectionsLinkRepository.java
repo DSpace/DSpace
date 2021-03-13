@@ -12,13 +12,11 @@ import java.util.List;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
-import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.WorkflowDefinitionRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.AbstractDSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
-import org.dspace.app.rest.utils.Utils;
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
@@ -43,12 +41,6 @@ public class WorkflowDefinitionCollectionsLinkRepository extends AbstractDSpaceR
     @Autowired
     protected XmlWorkflowFactory xmlWorkflowFactory;
 
-    @Autowired
-    protected ConverterService converter;
-
-    @Autowired
-    protected Utils utils;
-
     /**
      * GET endpoint that returns the list of collections that make an explicit use of the workflow-definition.
      * If a collection doesn't specify the workflow-definition to be used, the default mapping applies,
@@ -69,10 +61,10 @@ public class WorkflowDefinitionCollectionsLinkRepository extends AbstractDSpaceR
             if (xmlWorkflowFactory.isDefaultWorkflow(workflowName)) {
                 collectionsMappedToWorkflow.addAll(xmlWorkflowFactory.getAllNonMappedCollectionsHandles(context));
             }
-            collectionsMappedToWorkflow.addAll(xmlWorkflowFactory.getCollectionHandlesMappedToWorklow(context,
+            collectionsMappedToWorkflow.addAll(xmlWorkflowFactory.getCollectionHandlesMappedToWorkflow(context,
                 workflowName));
             Pageable pageable = optionalPageable != null ? optionalPageable : PageRequest.of(0, 20);
-            return converter.toRestPage(collectionsMappedToWorkflow, pageable,
+            return super.converter.toRestPage(collectionsMappedToWorkflow, pageable,
                 projection);
         } else {
             throw new ResourceNotFoundException("No workflow with name " + workflowName + " is configured");

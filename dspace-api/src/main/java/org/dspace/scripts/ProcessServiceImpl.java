@@ -7,9 +7,14 @@
  */
 package org.dspace.scripts;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -20,6 +25,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -37,6 +43,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.scripts.service.ProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -61,6 +68,9 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Autowired
     private MetadataFieldService metadataFieldService;
+
+    @Autowired
+    private EPersonService ePersonService;
 
     @Override
     public Process create(Context context, EPerson ePerson, String scriptName,
@@ -243,6 +253,61 @@ public class ProcessServiceImpl implements ProcessService {
             }
         }
         return new ArrayList<>(fileTypesSet);
+    }
+
+    @Override
+    public List<Process> search(Context context, ProcessQueryParameterContainer processQueryParameterContainer,
+                                int limit, int offset) throws SQLException {
+        return processDAO.search(context, processQueryParameterContainer, limit, offset);
+    }
+
+    @Override
+    public int countSearch(Context context, ProcessQueryParameterContainer processQueryParameterContainer)
+        throws SQLException {
+        return processDAO.countTotalWithParameters(context, processQueryParameterContainer);
+    }
+
+
+    @Override
+    public void appendLog(int processId, String scriptName, String output, ProcessLogLevel processLogLevel)
+            throws IOException {
+        File tmpDir = FileUtils.getTempDirectory();
+        File tempFile = new File(tmpDir, scriptName + processId + ".log");
+        FileWriter out = new FileWriter(tempFile, true);
+        try {
+            try (BufferedWriter writer = new BufferedWriter(out)) {
+                writer.append(formatLogLine(processId, scriptName, output, processLogLevel));
+                writer.newLine();
+            }
+        } finally {
+            out.close();
+        }
+    }
+
+    @Override
+    public void createLogBitstream(Context context, Process process)
+            throws IOException, SQLException, AuthorizeException {
+        File tmpDir = FileUtils.getTempDirectory();
+        File tempFile = new File(tmpDir, process.getName() + process.getID() + ".log");
+        FileInputStream inputStream = FileUtils.openInputStream(tempFile);
+        appendFile(context, process, inputStream, Process.OUTPUT_TYPE, process.getName() + process.getID() + ".log");
+        inputStream.close();
+        tempFile.delete();
+    }
+
+    private String formatLogLine(int processId, String scriptName, String output, ProcessLogLevel processLogLevel) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        StringBuilder sb = new StringBuilder();
+        sb.append(sdf.format(new Date()));
+        sb.append(" ");
+        sb.append(processLogLevel);
+        sb.append(" ");
+        sb.append(scriptName);
+        sb.append(" - ");
+        sb.append(processId);
+        sb.append(" @ ");
+        sb.append(output);
+        return  sb.toString();
     }
 
 }

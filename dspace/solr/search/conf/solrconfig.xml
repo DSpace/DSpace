@@ -20,10 +20,10 @@
     DSpace 'search' core.
 
      For more details about configurations options that may appear in
-     this file, see http://wiki.apache.org/solr/SolrConfigXml. 
+     this file, see http://wiki.apache.org/solr/SolrConfigXml.
 -->
 <config>
-  <luceneMatchVersion>7.2.1</luceneMatchVersion>
+  <luceneMatchVersion>8.7.0</luceneMatchVersion>
 
   <!-- Include contributed libraries that we use in DSpace. -->
   <lib dir='${solr.install.dir}/contrib/analysis-extras/lib/'
@@ -36,15 +36,15 @@
 
   <dataDir>${solr.data.dir:}</dataDir>
 
-  <directoryFactory name="DirectoryFactory" 
-                    class="${solr.directoryFactory:solr.NRTCachingDirectoryFactory}"/> 
+  <directoryFactory name="DirectoryFactory"
+                    class="${solr.directoryFactory:solr.NRTCachingDirectoryFactory}"/>
 
   <codecFactory class="solr.SchemaCodecFactory"/>
 
   <schemaFactory class="ClassicIndexSchemaFactory"/>
 
   <indexConfig>
-    <ramBufferSizeMB>32</ramBufferSizeMB>
+    <ramBufferSizeMB>100</ramBufferSizeMB>
     <maxBufferedDocs>1000</maxBufferedDocs>
 
     <lockType>${solr.lock.type:native}</lockType>
@@ -59,21 +59,21 @@
     <updateLog>
       <str name="dir">${solr.ulog.dir:}</str>
     </updateLog>
- 
-     <autoCommit> 
+
+     <autoCommit>
        <maxDocs>10000</maxDocs> <!--Commit every 10.000 documents-->
        <maxTime>${solr.autoCommit.maxTime:10000}</maxTime> <!--Default commit every 10 seconds-->
-       <openSearcher>true</openSearcher> 
+       <openSearcher>true</openSearcher>
      </autoCommit>
 
-     <autoSoftCommit> 
-       <maxTime>${solr.autoSoftCommit.maxTime:-1}</maxTime> 
+     <autoSoftCommit>
+       <maxTime>${solr.autoSoftCommit.maxTime:-1}</maxTime>
      </autoSoftCommit>
 
   </updateHandler>
 
   <query>
-    <maxBooleanClauses>1024</maxBooleanClauses>
+    <maxBooleanClauses>${solr.max.booleanClauses:1024}</maxBooleanClauses>
 
     <filterCache class="solr.FastLRUCache"
                  size="512"
@@ -84,12 +84,12 @@
                      size="512"
                      initialSize="512"
                      autowarmCount="0"/>
-   
+
     <documentCache class="solr.LRUCache"
                    size="512"
                    initialSize="512"
                    autowarmCount="0"/>
-    
+
     <enableLazyFieldLoading>true</enableLazyFieldLoading>
 
     <queryResultWindowSize>20</queryResultWindowSize>
@@ -113,11 +113,11 @@
     <maxWarmingSearchers>2</maxWarmingSearchers>
 
   </query>
-  
+
   <requestDispatcher handleSelect="false" >
-    <requestParsers enableRemoteStreaming="true" 
-                    multipartUploadLimitInKB="2048000"
-                    formdataUploadLimitInKB="2048"
+    <requestParsers enableRemoteStreaming="true"
+                    multipartUploadLimitInKB="-1"
+                    formdataUploadLimitInKB="-1"
                     addHttpRequestToContext="false"/>
 
     <httpCaching never304="true" />
@@ -133,7 +133,7 @@
     <arr name="last-components">
         <str>spellcheck</str>
     </arr>
-    </requestHandler>
+  </requestHandler>
 
   <!-- A request handler that returns indented JSON by default -->
   <requestHandler name="/query" class="solr.SearchHandler">
@@ -152,7 +152,7 @@
         <str name="indent">true</str>
     </lst>
   </requestHandler>
- 
+
   <requestHandler name="/browse" class="solr.SearchHandler">
     <lst name="defaults">
         <str name="echoParams">explicit</str>
@@ -239,7 +239,7 @@
         <str>spellcheck</str>
     </arr>
   </requestHandler>
-  
+
   <requestHandler name="/update" class="solr.UpdateRequestHandler"/>
 
   <requestHandler name="/update/json" class="solr.UpdateRequestHandler">
@@ -248,7 +248,7 @@
        </lst>
   </requestHandler>
 
-  <requestHandler name="/update/extract" 
+  <requestHandler name="/update/extract"
                   startup="lazy"
                   class="solr.extraction.ExtractingRequestHandler" >
     <lst name="defaults">
@@ -257,12 +257,12 @@
     </lst>
   </requestHandler>
 
-  <requestHandler name="/analysis/field" 
+  <requestHandler name="/analysis/field"
                   startup="lazy"
                   class="solr.FieldAnalysisRequestHandler" />
 
-  <requestHandler name="/analysis/document" 
-                  class="solr.DocumentAnalysisRequestHandler" 
+  <requestHandler name="/analysis/document"
+                  class="solr.DocumentAnalysisRequestHandler"
                   startup="lazy" />
 
   <!-- Admin Handlers -->
@@ -295,7 +295,7 @@
     </lst>
   </requestHandler>
 
-	<requestHandler name="/replication" class="solr.ReplicationHandler" > 
+	<requestHandler name="/replication" class="solr.ReplicationHandler" >
   </requestHandler>
 
   <searchComponent name="spellcheck" class="solr.SpellCheckComponent">
@@ -339,10 +339,10 @@
       <int name="minQueryLength">4</int>
       <float name="maxQueryFrequency">0.01</float>
     </lst>
-    
+
     <lst name="spellchecker">
       <str name="name">wordbreak</str>
-      <str name="classname">solr.WordBreakSolrSpellChecker</str>      
+      <str name="classname">solr.WordBreakSolrSpellChecker</str>
       <str name="field">name</str>
       <str name="combineWords">true</str>
       <str name="breakWords">true</str>
@@ -356,14 +356,14 @@
       <str name="spellcheck.dictionary">default</str>
       <str name="spellcheck.dictionary">wordbreak</str>
       <str name="spellcheck">on</str>
-      <str name="spellcheck.extendedResults">true</str>       
+      <str name="spellcheck.extendedResults">true</str>
       <str name="spellcheck.count">10</str>
       <str name="spellcheck.alternativeTermCount">5</str>
-      <str name="spellcheck.maxResultsForSuggest">5</str>       
+      <str name="spellcheck.maxResultsForSuggest">5</str>
       <str name="spellcheck.collate">true</str>
-      <str name="spellcheck.collateExtendedResults">true</str>  
+      <str name="spellcheck.collateExtendedResults">true</str>
       <str name="spellcheck.maxCollationTries">10</str>
-      <str name="spellcheck.maxCollations">5</str>         
+      <str name="spellcheck.maxCollations">5</str>
     </lst>
     <arr name="last-components">
       <str>spellcheck</str>
@@ -431,7 +431,7 @@
      <lst name="defaults">
       <bool name="terms">true</bool>
       <bool name="distrib">false</bool>
-    </lst>     
+    </lst>
     <arr name="components">
       <str>terms</str>
     </arr>
@@ -455,7 +455,7 @@
 
   <searchComponent class="solr.HighlightComponent" name="highlight">
     <highlighting>
-      <fragmenter name="gap" 
+      <fragmenter name="gap"
                   default="true"
                   class="solr.highlight.GapFragmenter">
         <lst name="defaults">
@@ -463,7 +463,7 @@
         </lst>
       </fragmenter>
 
-      <fragmenter name="regex" 
+      <fragmenter name="regex"
                   class="solr.highlight.RegexFragmenter">
         <lst name="defaults">
           <!-- slightly smaller fragsizes work better because of slop -->
@@ -475,7 +475,7 @@
         </lst>
       </fragmenter>
 
-      <formatter name="html" 
+      <formatter name="html"
                  default="true"
                  class="solr.highlight.HtmlFormatter">
         <lst name="defaults">
@@ -484,25 +484,25 @@
         </lst>
       </formatter>
 
-      <encoder name="html" 
+      <encoder name="html"
                class="solr.highlight.HtmlEncoder" />
 
-      <fragListBuilder name="simple" 
+      <fragListBuilder name="simple"
                        class="solr.highlight.SimpleFragListBuilder"/>
-      
-      <fragListBuilder name="single" 
+
+      <fragListBuilder name="single"
                        class="solr.highlight.SingleFragListBuilder"/>
-      
-      <fragListBuilder name="weighted" 
+
+      <fragListBuilder name="weighted"
                        default="true"
                        class="solr.highlight.WeightedFragListBuilder"/>
-      
-      <fragmentsBuilder name="default" 
+
+      <fragmentsBuilder name="default"
                         default="true"
                         class="solr.highlight.ScoreOrderFragmentsBuilder">
       </fragmentsBuilder>
 
-      <fragmentsBuilder name="colored" 
+      <fragmentsBuilder name="colored"
                         class="solr.highlight.ScoreOrderFragmentsBuilder">
         <lst name="defaults">
           <str name="hl.tag.pre"><![CDATA[
@@ -514,8 +514,8 @@
           <str name="hl.tag.post"><![CDATA[</b>]]></str>
         </lst>
       </fragmentsBuilder>
-      
-      <boundaryScanner name="default" 
+
+      <boundaryScanner name="default"
                        default="true"
                        class="solr.highlight.SimpleBoundaryScanner">
         <lst name="defaults">
@@ -523,8 +523,8 @@
           <str name="hl.bs.chars">.,!? &#9;&#10;&#13;</str>
         </lst>
       </boundaryScanner>
-      
-      <boundaryScanner name="breakIterator" 
+
+      <boundaryScanner name="breakIterator"
                        class="solr.highlight.BreakIteratorBoundaryScanner">
         <lst name="defaults">
           <str name="hl.bs.type">WORD</str>
@@ -538,7 +538,7 @@
   <queryResponseWriter name="json" class="solr.JSONResponseWriter">
     <str name="content-type">text/plain; charset=UTF-8</str>
   </queryResponseWriter>
-  
+
   <queryResponseWriter name="velocity" class="solr.VelocityResponseWriter" startup="lazy"/>
 
   <queryResponseWriter name="xslt" class="solr.XSLTResponseWriter">

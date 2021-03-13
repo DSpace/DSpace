@@ -460,7 +460,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
                                                                        groupService.allMemberGroups(c, e),
                                                                        Constants.ADMIN, Constants.COLLECTION);
 
-            if (CollectionUtils.isNotEmpty(policies)) {
+            if (CollectionUtils.isNotEmpty(policies) || isCommunityAdmin(c, e)) {
                 return true;
             }
         }
@@ -612,6 +612,12 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     public void removeEPersonPolicies(Context c, DSpaceObject o, EPerson e)
         throws SQLException, AuthorizeException {
         resourcePolicyService.removeDsoEPersonPolicies(c, o, e);
+    }
+
+    @Override
+    public void removeAllEPersonPolicies(Context c, EPerson e)
+        throws SQLException, AuthorizeException {
+        resourcePolicyService.removeAllEPersonPolicies(c, e);
     }
 
     @Override

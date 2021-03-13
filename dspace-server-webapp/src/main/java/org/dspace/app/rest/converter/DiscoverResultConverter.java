@@ -38,12 +38,16 @@ public class DiscoverResultConverter {
 
     @Autowired
     private List<IndexableObjectConverter> converters;
+
+    @Autowired
+    protected ConverterService converter;
+
     @Autowired
     private DiscoverFacetsConverter facetConverter;
     @Autowired
     private SearchFilterToAppliedFilterConverter searchFilterToAppliedFilterConverter;
 
-    public SearchResultsRest convert(final Context context, final String query, final String dsoType,
+    public SearchResultsRest convert(final Context context, final String query, final List<String> dsoTypes,
                                      final String configurationName, final String scope,
                                      final List<SearchFilter> searchFilters, final Pageable page,
                                      final DiscoverResult searchResult, final DiscoveryConfiguration configuration,
@@ -52,7 +56,7 @@ public class DiscoverResultConverter {
         SearchResultsRest resultsRest = new SearchResultsRest();
         resultsRest.setProjection(projection);
 
-        setRequestInformation(context, query, dsoType, configurationName, scope, searchFilters, page, resultsRest);
+        setRequestInformation(context, query, dsoTypes, configurationName, scope, searchFilters, page, resultsRest);
 
         addSearchResults(searchResult, resultsRest, projection);
 
@@ -93,21 +97,16 @@ public class DiscoverResultConverter {
 
     private RestAddressableModel convertDSpaceObject(final IndexableObject indexableObject,
                                                      final Projection projection) {
-        for (IndexableObjectConverter<Object, RestAddressableModel> converter : converters) {
-            if (converter.supportsModel(indexableObject)) {
-                return converter.convert(indexableObject.getIndexedObject(), projection);
-            }
-        }
-        return null;
+        return converter.toRest(indexableObject.getIndexedObject(), projection);
     }
 
-    private void setRequestInformation(final Context context, final String query, final String dsoType,
+    private void setRequestInformation(final Context context, final String query, final List<String> dsoTypes,
                                        final String configurationName, final String scope,
                                        final List<SearchFilter> searchFilters, final Pageable page,
                                        final SearchResultsRest resultsRest) {
         resultsRest.setQuery(query);
         resultsRest.setConfiguration(configurationName);
-        resultsRest.setDsoType(dsoType);
+        resultsRest.setDsoTypes(dsoTypes);
 
         resultsRest.setScope(scope);
 

@@ -23,15 +23,15 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
-import org.dspace.app.rest.builder.BitstreamBuilder;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.EPersonBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
-import org.dspace.app.rest.builder.PoolTaskBuilder;
 import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.matcher.WorkflowItemMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.BitstreamBuilder;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.PoolTaskBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -46,6 +46,7 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.RestMediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -256,10 +257,12 @@ public class LoginAsEPersonIT extends AbstractControllerIntegrationTest {
 
         String authToken = getAuthToken(admin.getEmail(), password);
 
-        getClient(authToken).perform(post("/api/workflow/pooltasks/" + poolTask.getID())
-                                             .header("X-On-Behalf-Of", reviewer.getID())
-                                             .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                                .andExpect(status().isNoContent());
+        getClient(authToken).perform(post("/api/workflow/claimedtasks")
+                 .header("X-On-Behalf-Of", reviewer.getID())
+                 .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                 .content("/api/workflow/pooltasks/" + poolTask.getID()))
+                 .andExpect(status().isCreated())
+                 .andExpect(jsonPath("$", Matchers.allOf(hasJsonPath("$.type", is("claimedtask")))));
 
         // verify that the pool task no longer exists
         getClient(authToken).perform(get("/api/workflow/pooltasks/" + poolTask.getID()))

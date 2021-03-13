@@ -40,7 +40,6 @@ import org.dspace.content.service.BundleService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
@@ -51,6 +50,7 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.event.Event;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageWorkflowEvent;
 import org.dspace.workflow.WorkflowException;
@@ -74,7 +74,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * When an item is submitted and is somewhere in a workflow, it has a row in the
- * WorkflowItem table pointing to it.
+ * cwf_workflowitem table pointing to it.
  *
  * Once the item has completed the workflow it will be archived
  *
@@ -88,7 +88,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     /* support for 'no notification' */
     protected Map<UUID, Boolean> noEMail = new HashMap<>();
 
-    private Logger log = org.apache.logging.log4j.LogManager.getLogger(XmlWorkflowServiceImpl.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(XmlWorkflowServiceImpl.class);
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
@@ -122,6 +122,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     protected BitstreamFormatService bitstreamFormatService;
     @Autowired(required = true)
     protected BitstreamService bitstreamService;
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
 
     protected XmlWorkflowServiceImpl() {
 
@@ -137,7 +139,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
     @Override
     public List<String> getEPersonDeleteConstraints(Context context, EPerson ePerson) throws SQLException {
-        List<String> constraints = new ArrayList<String>();
+        List<String> constraints = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(claimedTaskService.findByEperson(context, ePerson))) {
             constraints.add("cwf_claimtask");
         }
@@ -188,7 +190,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
     @Override
     public List<String> getFlywayMigrationLocations() {
-        return Collections.singletonList("classpath:org.dspace.storage.rdbms.xmlworkflow");
+        return Collections.singletonList("classpath:org/dspace/storage/rdbms/xmlworkflow");
     }
 
     @Override
@@ -237,7 +239,9 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     /**
      * startWithoutNotify() starts the workflow normally, but disables
      * notifications (useful for large imports,) for the first workflow step -
-     * subsequent notifications happen normally
+     * subsequent notifications happen normally.
+     * @param context the current DSpace session.
+     * @param wsi the submitted Item entering workflow.
      */
     @Override
     public XmlWorkflowItem startWithoutNotify(Context context, WorkspaceItem wsi)
@@ -269,19 +273,21 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     }
 
     protected void grantSubmitterReadPolicies(Context context, Item item) throws SQLException, AuthorizeException {
-        //A list of policies the user has for this item
-        List<Integer> userHasPolicies = new ArrayList<Integer>();
-        List<ResourcePolicy> itempols = authorizeService.getPolicies(context, item);
         EPerson submitter = item.getSubmitter();
-        for (ResourcePolicy resourcePolicy : itempols) {
-            if (submitter.equals(resourcePolicy.getEPerson())) {
-                //The user has already got this policy so add it to the list
-                userHasPolicies.add(resourcePolicy.getAction());
+        if (null != submitter) {
+            //A list of policies the user has for this item
+            List<Integer> userHasPolicies = new ArrayList<>();
+            List<ResourcePolicy> itempols = authorizeService.getPolicies(context, item);
+            for (ResourcePolicy resourcePolicy : itempols) {
+                if (submitter.equals(resourcePolicy.getEPerson())) {
+                    //The user has already got this policy so add it to the list
+                    userHasPolicies.add(resourcePolicy.getAction());
+                }
             }
-        }
-        //Make sure we don't add duplicate policies
-        if (!userHasPolicies.contains(Constants.READ)) {
-            addPolicyToItem(context, item, Constants.READ, submitter, ResourcePolicy.TYPE_SUBMISSION);
+            //Make sure we don't add duplicate policies
+            if (!userHasPolicies.contains(Constants.READ)) {
+                addPolicyToItem(context, item, Constants.READ, submitter, ResourcePolicy.TYPE_SUBMISSION);
+            }
         }
     }
 
@@ -434,7 +440,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                         return null;
                     }
                 }
-            } catch (Exception e) {
+            } catch (IOException | SQLException | AuthorizeException
+                    | WorkflowException | WorkflowConfigurationException e) {
                 log.error("error while processing workflow outcome", e);
                 e.printStackTrace();
             } finally {
@@ -461,8 +468,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             Collection myCollection = wfi.getCollection();
             String workflowStepString = null;
 
-            List<EPerson> currentEpersonOwners = new ArrayList<EPerson>();
-            List<Group> currentGroupOwners = new ArrayList<Group>();
+            List<EPerson> currentEpersonOwners = new ArrayList<>();
+            List<Group> currentGroupOwners = new ArrayList<>();
             //These are only null if our item is sent back to the submission
             if (newStep != null && newActionConfig != null) {
                 workflowStepString = workflowId + "." + newStep.getId() + "." + newActionConfig.getId();
@@ -495,7 +502,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             usageWorkflowEvent.setGroupOwners(currentGroupOwners.toArray(new Group[currentGroupOwners.size()]));
 
             DSpaceServicesFactory.getInstance().getEventService().fireEvent(usageWorkflowEvent);
-        } catch (Exception e) {
+        } catch (SQLException e) {
             //Catch all errors we do not want our workflow to crash because the logging threw an exception
             log.error(LogManager.getHeader(c, "Error while logging workflow event", "Workflow Item: " + wfi.getID()),
                       e);
@@ -589,35 +596,38 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         try {
             // Get submitter
             EPerson ep = item.getSubmitter();
-            // Get the Locale
-            Locale supportedLocale = I18nUtil.getEPersonLocale(ep);
-            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_archive"));
+            // send the notification to the submitter unless the submitter eperson has been deleted
+            if (null != ep) {
+                // Get the Locale
+                Locale supportedLocale = I18nUtil.getEPersonLocale(ep);
+                Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_archive"));
 
-            // Get the item handle to email to user
-            String handle = handleService.findHandle(context, item);
+                // Get the item handle to email to user
+                String handle = handleService.findHandle(context, item);
 
-            // Get title
-            List<MetadataValue> titles = itemService
-                .getMetadata(item, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
-            String title = "";
-            try {
-                title = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
-            } catch (MissingResourceException e) {
-                title = "Untitled";
+                // Get title
+                List<MetadataValue> titles = itemService
+                    .getMetadata(item, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
+                String title = "";
+                try {
+                    title = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
+                } catch (MissingResourceException e) {
+                    title = "Untitled";
+                }
+                if (titles.size() > 0) {
+                    title = titles.iterator().next().getValue();
+                }
+
+                email.addRecipient(ep.getEmail());
+                email.addArgument(title);
+                email.addArgument(coll.getName());
+                email.addArgument(handleService.getCanonicalForm(handle));
+
+                email.send();
             }
-            if (titles.size() > 0) {
-                title = titles.iterator().next().getValue();
-            }
-
-            email.addRecipient(ep.getEmail());
-            email.addArgument(title);
-            email.addArgument(coll.getName());
-            email.addArgument(handleService.getCanonicalForm(handle));
-
-            email.send();
         } catch (MessagingException e) {
             log.warn(LogManager.getHeader(context, "notifyOfArchive",
-                                          "cannot email user" + " item_id=" + item.getID()));
+                    "cannot email user" + " item_id=" + item.getID()));
         }
     }
 
@@ -731,11 +741,12 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         grantUserAllItemPolicies(context, wi.getItem(), e, ResourcePolicy.TYPE_WORKFLOW);
     }
 
+    @Override
     public void grantUserAllItemPolicies(Context context, Item item, EPerson epa, String policyType)
         throws AuthorizeException, SQLException {
         if (epa != null) {
             //A list of policies the user has for this item
-            List<Integer> userHasPolicies = new ArrayList<Integer>();
+            List<Integer> userHasPolicies = new ArrayList<>();
             List<ResourcePolicy> itempols = authorizeService.getPolicies(context, item);
             for (ResourcePolicy resourcePolicy : itempols) {
                 if (epa.equals(resourcePolicy.getEPerson())) {
@@ -767,7 +778,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         throws AuthorizeException, SQLException {
         if (group != null) {
             //A list of policies the user has for this item
-            List<Integer> groupHasPolicies = new ArrayList<Integer>();
+            List<Integer> groupHasPolicies = new ArrayList<>();
             List<ResourcePolicy> itempols = authorizeService.getPolicies(context, item);
             for (ResourcePolicy resourcePolicy : itempols) {
                 if (group.equals(resourcePolicy.getGroup())) {
@@ -824,8 +835,9 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         }
     }
 
+    @Override
     public void removeUserItemPolicies(Context context, Item item, EPerson e) throws SQLException, AuthorizeException {
-        if (e != null) {
+        if (e != null && item.getSubmitter() != null) {
             //Also remove any lingering authorizations from this user
             authorizeService.removeEPersonPolicies(context, item, e);
             //Remove the bundle rights
@@ -847,7 +859,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
     protected void removeGroupItemPolicies(Context context, Item item, Group e)
         throws SQLException, AuthorizeException {
-        if (e != null) {
+        if (e != null && item.getSubmitter() != null) {
             //Also remove any lingering authorizations from this user
             authorizeService.removeGroupPolicies(context, item, e);
             //Remove the bundle rights
@@ -863,7 +875,32 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     }
 
     @Override
-    public WorkspaceItem sendWorkflowItemBackSubmission(Context context, XmlWorkflowItem wi, EPerson e,
+    public void deleteWorkflowByWorkflowItem(Context context, XmlWorkflowItem wi, EPerson e)
+            throws SQLException, AuthorizeException, IOException {
+        Item myitem = wi.getItem();
+        UUID itemID = myitem.getID();
+        Integer workflowID = wi.getID();
+        UUID collID = wi.getCollection().getID();
+        // stop workflow
+        deleteAllTasks(context, wi);
+        context.turnOffAuthorisationSystem();
+        //Also clear all info for this step
+        workflowRequirementsService.clearInProgressUsers(context, wi);
+        // Remove (if any) the workflowItemroles for this item
+        workflowItemRoleService.deleteForWorkflowItem(context, wi);
+        // Now remove the workflow object manually from the database
+        xmlWorkflowItemService.deleteWrapper(context, wi);
+        // Now delete the item
+        itemService.delete(context, myitem);
+        log.info(LogManager.getHeader(context, "delete_workflow", "workflow_item_id="
+                + workflowID + "item_id=" + itemID
+                + "collection_id=" + collID + "eperson_id="
+                + e.getID()));
+        context.restoreAuthSystemState();
+    }
+
+    @Override
+   public WorkspaceItem sendWorkflowItemBackSubmission(Context context, XmlWorkflowItem wi, EPerson e,
                                                         String provenance,
                                                         String rejection_message)
         throws SQLException, AuthorizeException,
@@ -1038,37 +1075,44 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     protected void notifyOfReject(Context c, XmlWorkflowItem wi, EPerson e,
                                   String reason) {
         try {
-            // Get the item title
-            String title = wi.getItem().getName();
+            // send the notification only if the person was not deleted in the
+            // meantime between submission and archiving.
+            EPerson eperson = wi.getSubmitter();
+            if (eperson != null) {
+                // Get the item title
+                String title = wi.getItem().getName();
 
-            // Get the collection
-            Collection coll = wi.getCollection();
+                // Get the collection
+                Collection coll = wi.getCollection();
 
-            // Get rejector's name
-            String rejector = getEPersonName(e);
-            Locale supportedLocale = I18nUtil.getEPersonLocale(e);
-            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_reject"));
+                // Get rejector's name
+                String rejector = getEPersonName(e);
+                Locale supportedLocale = I18nUtil.getEPersonLocale(e);
+                Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_reject"));
 
-            email.addRecipient(wi.getSubmitter().getEmail());
-            email.addArgument(title);
-            email.addArgument(coll.getName());
-            email.addArgument(rejector);
-            email.addArgument(reason);
-            email.addArgument(ConfigurationManager.getProperty("dspace.ui.url") + "/mydspace");
+                email.addRecipient(eperson.getEmail());
+                email.addArgument(title);
+                email.addArgument(coll.getName());
+                email.addArgument(rejector);
+                email.addArgument(reason);
+                email.addArgument(configurationService.getProperty("dspace.ui.url") + "/mydspace");
 
-            email.send();
-        } catch (Exception ex) {
+                email.send();
+            } else {
+                // DO nothing
+            }
+        } catch (IOException | MessagingException ex) {
             // log this email error
             log.warn(LogManager.getHeader(c, "notify_of_reject",
-                                          "cannot email user" + " eperson_id" + e.getID()
-                                              + " eperson_email" + e.getEmail()
-                                              + " workflow_item_id" + wi.getID()));
+                    "cannot email user" + " eperson_id" + e.getID()
+                    + " eperson_email" + e.getEmail()
+                    + " workflow_item_id" + wi.getID()));
         }
     }
 
     @Override
     public String getMyDSpaceLink() {
-        return ConfigurationManager.getProperty("dspace.ui.url") + "/mydspace";
+        return configurationService.getProperty("dspace.ui.url") + "/mydspace";
     }
 
     protected void revokeReviewerPolicies(Context context, Item item) throws SQLException, AuthorizeException {

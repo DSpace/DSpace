@@ -54,7 +54,7 @@ public class CuratorTest extends AbstractUnitTest {
      */
     @Test
     public void testCurate_DSpaceObject() throws Exception {
-        System.out.println("curate");
+        CoreServiceFactory.getInstance().getPluginService().clearNamedPluginClasses();
 
         final String TASK_NAME = "dummyTask";
 
@@ -114,6 +114,6 @@ public class CuratorTest extends AbstractUnitTest {
         curator.curate(context, item);
 
         assertEquals(Curator.CURATE_SUCCESS, curator.getStatus(TASK_NAME));
-        assertEquals(reporterOutput.toString(), "No operation performed on testHandle");
+        assertEquals("No operation performed on testHandle", reporterOutput.toString());
     }
 }

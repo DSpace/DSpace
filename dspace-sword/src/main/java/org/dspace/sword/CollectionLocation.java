@@ -11,13 +11,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * This class provides a single point of contact for
@@ -30,10 +32,12 @@ public class CollectionLocation {
     /**
      * Log4j logger
      */
-    public static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CollectionLocation.class);
+    public static final Logger log = LogManager.getLogger(CollectionLocation.class);
 
     protected HandleService handleService = HandleServiceFactory.getInstance()
                                                                 .getHandleService();
+    private final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
      * Obtain the deposit URL for the given collection.  These URLs
@@ -106,10 +110,10 @@ public class CollectionLocation {
      */
     private String getBaseUrl()
         throws DSpaceSWORDException {
-        String depositUrl = ConfigurationManager.getProperty(
-            "sword-server", "deposit.url");
+        String depositUrl = configurationService.getProperty(
+            "sword-server.deposit.url");
         if (depositUrl == null || "".equals(depositUrl)) {
-            String dspaceUrl = ConfigurationManager
+            String dspaceUrl = configurationService
                 .getProperty("dspace.server.url");
             if (dspaceUrl == null || "".equals(dspaceUrl)) {
                 throw new DSpaceSWORDException(

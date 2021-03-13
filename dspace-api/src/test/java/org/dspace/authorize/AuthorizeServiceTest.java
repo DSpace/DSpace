@@ -8,13 +8,16 @@
 
 package org.dspace.authorize;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
@@ -36,6 +39,7 @@ public class AuthorizeServiceTest extends AbstractUnitTest {
     protected ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance()
                                                                                    .getResourcePolicyService();
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
     public AuthorizeServiceTest() {
     }
@@ -123,6 +127,72 @@ public class AuthorizeServiceTest extends AbstractUnitTest {
             Assert.assertTrue(authorizeService.authorizeActionBoolean(context, eperson, dso, Constants.ADD, true));
         } catch (SQLException ex) {
             throw new AssertionError(ex);
+        }
+    }
+
+    @Test
+    public void testIsCollectionAdmin() throws SQLException, AuthorizeException, IOException {
+
+        Community community = null;
+        EPerson eperson = null;
+
+        try {
+
+            context.turnOffAuthorisationSystem();
+
+            community = communityService.create(null, context);
+            Collection collection = collectionService.create(context, community);
+            eperson = ePersonService.create(context);
+
+            Group administrators = collectionService.createAdministrators(context, collection);
+            groupService.addMember(context, administrators, eperson);
+            context.commit();
+
+            Assert.assertTrue(authorizeService.isCollectionAdmin(context, eperson));
+
+        } finally {
+
+            if (community != null) {
+                communityService.delete(context, context.reloadEntity(community));
+            }
+            if (eperson != null) {
+                ePersonService.delete(context, context.reloadEntity(eperson));
+            }
+
+            context.restoreAuthSystemState();
+        }
+    }
+
+    @Test
+    public void testIsCollectionAdminReturnsTrueIfTheUserIsCommunityAdmin()
+        throws SQLException, AuthorizeException, IOException {
+
+        Community community = null;
+        EPerson eperson = null;
+
+        try {
+
+            context.turnOffAuthorisationSystem();
+
+            community = communityService.create(null, context);
+            eperson = ePersonService.create(context);
+
+            Group administrators = communityService.createAdministrators(context, community);
+            groupService.addMember(context, administrators, eperson);
+            context.commit();
+
+            Assert.assertTrue(authorizeService.isCollectionAdmin(context, eperson));
+
+        } finally {
+
+            if (community != null) {
+                communityService.delete(context, context.reloadEntity(community));
+            }
+            if (eperson != null) {
+                ePersonService.delete(context, context.reloadEntity(eperson));
+            }
+
+            context.restoreAuthSystemState();
         }
     }
 }

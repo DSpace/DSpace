@@ -3,7 +3,7 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-rest</artifactId>
     <packaging>war</packaging>
-    <version>7.0-beta4-SNAPSHOT</version>
+    <version>7.0-beta5-SNAPSHOT</version>
     <name>DSpace (Deprecated) REST Webapp</name>
     <description>DSpace RESTful Web Services API. NOTE: this REST API is DEPRECATED.
         Please consider using the REST API in the dspace-server-webapp instead!</description>
@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>7.0-beta4-SNAPSHOT</version>
+        <version>7.0-beta5-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -36,7 +36,7 @@
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
                 <configuration>
-                    <!--Exclude license check for XMLUI files which don't need it-->
+                    <!--Exclude license check for third-party files which don't need it-->
                     <excludes>
                         <exclude>**/static/reports/spin.js</exclude>
                         <exclude>**/static/reports/README.md</exclude>
@@ -155,6 +155,11 @@
                 <exclusion>
                     <groupId>jakarta.annotation</groupId>
                     <artifactId>jakarta.annotation-api</artifactId>
+                </exclusion>
+                <!-- Newer version provided by solr-cell -->
+                <exclusion>
+                    <groupId>org.ow2.asm</groupId>
+                    <artifactId>asm-commons</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

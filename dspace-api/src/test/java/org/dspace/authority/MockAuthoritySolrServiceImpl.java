@@ -21,4 +21,8 @@ public class MockAuthoritySolrServiceImpl extends AuthoritySolrServiceImpl imple
         //We don't use SOLR in the tests of this module
         solr = null;
     }
+
+    public void reset() {
+        // This method intentionally left blank.
+    }
 }

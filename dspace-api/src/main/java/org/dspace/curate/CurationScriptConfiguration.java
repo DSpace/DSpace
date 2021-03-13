@@ -16,11 +16,11 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * The {@link ScriptConfiguration} for the {@link CurationCli} script
+ * The {@link ScriptConfiguration} for the {@link Curation} script
  *
  * @author Maria Verdonck (Atmire) on 23/06/2020
  */
-public class CurationScriptConfiguration<T extends CurationCli> extends ScriptConfiguration<T> {
+public class CurationScriptConfiguration<T extends Curation> extends ScriptConfiguration<T> {
 
     @Autowired
     private AuthorizeService authorizeService;

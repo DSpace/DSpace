@@ -191,6 +191,23 @@ public class I18nUtil {
         return supportedLocale;
     }
 
+    /**
+     * Gets the appropriate supported Locale according for a given Locale If
+     * no appropriate supported locale is found, the DEFAULTLOCALE is used
+     *
+     * @param locale String to find the corresponding Locale
+     * @return supportedLocale
+     * Locale for session according to locales supported by this DSpace instance as set in dspace.cfg
+     */
+    public static Locale getSupportedLocale(String locale) {
+        Locale currentLocale = null;
+        if (locale != null) {
+            currentLocale = I18nUtil.getSupportedLocale(new Locale(locale));
+        } else {
+            currentLocale = I18nUtil.getDefaultLocale();
+        }
+        return currentLocale;
+    }
 
     /**
      * Get the appropriate localized version of submission-forms.xml according to language settings

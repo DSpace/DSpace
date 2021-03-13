@@ -8,12 +8,14 @@
 package org.dspace.submit.lookup;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.Value;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchema;
@@ -21,8 +23,9 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataSchemaService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * @author Andrea Bollini
@@ -31,17 +34,19 @@ import org.dspace.core.Context;
  * @author Panagiotis Koutsourakis
  */
 public class SubmissionLookupUtils {
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(SubmissionLookupUtils.class);
+    private static final Logger log = LogManager.getLogger(SubmissionLookupUtils.class);
 
     /**
      * Default constructor
      */
     private SubmissionLookupUtils() { }
 
+    private static final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
     /**
      * Location of config file
      */
-    private static final String configFilePath = ConfigurationManager
+    private static final String configFilePath = configurationService
         .getProperty("dspace.dir")
         + File.separator
         + "config"
@@ -69,7 +74,7 @@ public class SubmissionLookupUtils {
                     SubmissionLookupService.SL_NAMESPACE_PREFIX)) {
                     List<MetadataValue> slCache = itemService.getMetadata(item, schema.getName(),
                                                                           dcElement, dcQualifier, Item.ANY);
-                    if (slCache.size() == 0) {
+                    if (slCache.isEmpty()) {
                         continue;
                     }
 
@@ -95,7 +100,7 @@ public class SubmissionLookupUtils {
                 }
             }
             return check;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -121,7 +126,7 @@ public class SubmissionLookupUtils {
     }
 
     public static List<String> getValues(Record rec, String field) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         List<Value> values = rec.getValues(field);
         if (values != null && values.size() > 0) {
             for (Value value : values) {
@@ -137,10 +142,10 @@ public class SubmissionLookupUtils {
         result.append("\nPublication {\n");
 
         for (String field : record.getFields()) {
-            result.append("--" + field + ":\n");
+            result.append("--").append(field).append(":\n");
             List<Value> values = record.getValues(field);
             for (Value value : values) {
-                result.append("\t" + value.getAsString() + "\n");
+                result.append("\t").append(value.getAsString()).append("\n");
             }
         }
 

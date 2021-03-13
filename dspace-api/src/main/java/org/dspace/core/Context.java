@@ -190,7 +190,15 @@ public class Context implements AutoCloseable {
         setMode(this.mode);
     }
 
-    public static boolean updateDatabase() {
+    /**
+     * Update the DSpace database, ensuring that any necessary migrations are run prior to initializing
+     * Hibernate.
+     * <P>
+     * This is synchronized as it only needs to be run successfully *once* (for the first Context initialized).
+     *
+     * @return true/false, based on whether database was successfully updated
+     */
+    public static synchronized boolean updateDatabase() {
         //If the database has not been updated yet, update it and remember that.
         if (databaseUpdated.compareAndSet(false, true)) {
 
@@ -200,7 +208,7 @@ public class Context implements AutoCloseable {
             try {
                 DatabaseUtils.updateDatabase();
             } catch (SQLException sqle) {
-                log.fatal("Cannot initialize database via Flyway!", sqle);
+                log.fatal("Cannot update or initialize database via Flyway!", sqle);
                 databaseUpdated.set(false);
             }
         }
@@ -641,9 +649,9 @@ public class Context implements AutoCloseable {
     /**
      * Temporary change the user bound to the context, empty the special groups that
      * are retained to allow subsequent restore
-     * 
+     *
      * @param newUser the EPerson to bound to the context
-     * 
+     *
      * @throws IllegalStateException if the switch was already performed without be
      *                               restored
      */
@@ -661,7 +669,7 @@ public class Context implements AutoCloseable {
 
     /**
      * Restore the user bound to the context and his special groups
-     * 
+     *
      * @throws IllegalStateException if no switch was performed before
      */
     public void restoreContextUser() {

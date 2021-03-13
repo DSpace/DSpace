@@ -40,9 +40,10 @@ public class EPersonConsumer implements Consumer {
     private static final Logger log
             = org.apache.logging.log4j.LogManager.getLogger(EPersonConsumer.class);
 
-    protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    protected EPersonService ePersonService
+            = EPersonServiceFactory.getInstance().getEPersonService();
 
-    protected ConfigurationService cfg
+    protected ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
@@ -75,7 +76,7 @@ public class EPersonConsumer implements Consumer {
             case Constants.EPERSON:
                 if (et == Event.CREATE) {
                     // Notify of new user registration
-                    String notifyRecipient = cfg.getProperty("registration.notify");
+                    String notifyRecipient = configurationService.getProperty("registration.notify");
                     EPerson eperson = ePersonService.find(context, id);
                     if (notifyRecipient == null) {
                         notifyRecipient = "";
@@ -88,8 +89,8 @@ public class EPersonConsumer implements Consumer {
                                 .getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "registration_notify"));
                             adminEmail.addRecipient(notifyRecipient);
 
-                            adminEmail.addArgument(cfg.getProperty("dspace.name"));
-                            adminEmail.addArgument(cfg.getProperty("dspace.ui.url"));
+                            adminEmail.addArgument(configurationService.getProperty("dspace.name"));
+                            adminEmail.addArgument(configurationService.getProperty("dspace.ui.url"));
                             adminEmail.addArgument(eperson.getFirstName() + " " + eperson.getLastName()); // Name
                             adminEmail.addArgument(eperson.getEmail());
                             adminEmail.addArgument(new Date());
@@ -107,7 +108,7 @@ public class EPersonConsumer implements Consumer {
                     }
 
                     // If enabled, send a "welcome" message to the new EPerson.
-                    if (cfg.getBooleanProperty("mail.welcome.enabled", false)) {
+                    if (configurationService.getBooleanProperty("mail.welcome.enabled", false)) {
                         String addressee = eperson.getEmail();
                         if (StringUtils.isNotBlank(addressee)) {
                             log.debug("Sending welcome email to {}", addressee);

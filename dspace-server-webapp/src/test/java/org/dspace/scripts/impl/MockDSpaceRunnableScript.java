@@ -15,6 +15,10 @@ import org.dspace.utils.DSpace;
 public class MockDSpaceRunnableScript extends DSpaceRunnable<MockDSpaceRunnableScriptConfiguration> {
     @Override
     public void internalRun() throws Exception {
+        handler.logInfo("Logging INFO for Mock DSpace Script");
+        handler.logError("Logging ERROR for Mock DSpace Script");
+        handler.logWarning("Logging WARNING for Mock DSpace Script");
+        handler.logDebug("Logging DEBUG for Mock DSpace Script");
     }
 
     @Override

@@ -11,7 +11,6 @@ import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFI
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG;
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -83,6 +82,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  * This is the main entry point of the new REST API. Its responsibility is to
@@ -149,7 +149,7 @@ public class RestResourceController implements InitializingBean {
      * @return single DSpaceResource
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT)
-    public DSpaceResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
+    public HALResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
                                                         @PathVariable Integer id) {
         return findOneInternal(apiCategory, model, id);
     }
@@ -180,7 +180,7 @@ public class RestResourceController implements InitializingBean {
      * @return single DSpaceResource
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG)
-    public DSpaceResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
+    public HALResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
                                                         @PathVariable String id) {
         return findOneInternal(apiCategory, model, id);
     }
@@ -200,7 +200,7 @@ public class RestResourceController implements InitializingBean {
      * @return single DSpaceResource
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
-    public DSpaceResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
+    public HALResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
                                                         @PathVariable UUID uuid) {
         return findOneInternal(apiCategory, model, uuid);
     }
@@ -213,7 +213,7 @@ public class RestResourceController implements InitializingBean {
      * @param id Identifier from request
      * @return single DSpaceResource
      */
-    private <ID extends Serializable> DSpaceResource<RestAddressableModel> findOneInternal(String apiCategory,
+    private <ID extends Serializable> HALResource<RestAddressableModel> findOneInternal(String apiCategory,
                                                                                            String model, ID id) {
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
         Optional<RestAddressableModel> modelObject = Optional.empty();
@@ -624,7 +624,7 @@ public class RestResourceController implements InitializingBean {
             HttpServletRequest request,
             @PathVariable String apiCategory,
             @PathVariable String model,
-            @RequestParam("file") MultipartFile uploadfile)
+            @RequestParam("file") List<MultipartFile> uploadfile)
         throws SQLException, FileNotFoundException, IOException, AuthorizeException {
 
         checkModelPluralForm(apiCategory, model);
@@ -799,7 +799,7 @@ public class RestResourceController implements InitializingBean {
             Method linkMethod = utils.requireMethod(linkRepository.getClass(), linkRest.method());
             try {
                 if (Page.class.isAssignableFrom(linkMethod.getReturnType())) {
-                    Page<? extends RestModel> pageResult = (Page<? extends RestAddressableModel>) linkMethod
+                    Page<? extends RestModel> pageResult = (Page<? extends RestModel>) linkMethod
                             .invoke(linkRepository, request, uuid, page, utils.obtainProjection());
 
                     if (pageResult == null) {
@@ -823,8 +823,8 @@ public class RestResourceController implements InitializingBean {
                     return new EntityModel(new EmbeddedPage(link.getHref(),
                             pageResult.map(converter::toResource), null, subpath));
                 } else {
-                    RestModel object = (RestModel) linkMethod.invoke(linkRepository, request, uuid, page,
-                            utils.obtainProjection());
+                    RestModel object = (RestModel) linkMethod.invoke(linkRepository, request,
+                            uuid, page, utils.obtainProjection());
                     if (object == null) {
                         response.setStatus(HttpServletResponse.SC_NO_CONTENT);
                         return null;
@@ -846,7 +846,7 @@ public class RestResourceController implements InitializingBean {
                 throw new RuntimeException(e);
             }
         }
-        RestAddressableModel modelObject = repository.findById(uuid).orElse(null);
+        RestModel modelObject = repository.findById(uuid).orElse(null);
 
         if (modelObject == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");
@@ -915,14 +915,12 @@ public class RestResourceController implements InitializingBean {
     @RequestMapping(method = RequestMethod.GET)
     @SuppressWarnings("unchecked")
     public <T extends RestAddressableModel> PagedModel<DSpaceResource<T>> findAll(@PathVariable String apiCategory,
-                                                                                      @PathVariable String model,
-                                                                                      Pageable page,
-                                                                                      PagedResourcesAssembler assembler,
-                                                                                      HttpServletResponse response) {
+            @PathVariable String model, Pageable page, PagedResourcesAssembler assembler, HttpServletResponse response,
+            @RequestParam MultiValueMap<String, Object> parameters) {
+
+        String encodedParameterString = getEncodedParameterStringFromRequestParams(parameters);
         DSpaceRestRepository<T, ?> repository = utils.getResourceRepository(apiCategory, model);
-        Link link = linkTo(methodOn(this.getClass(), apiCategory, model).findAll(apiCategory, model,
-                                                                                 page, assembler, response))
-            .withSelfRel();
+        Link link = linkTo(this.getClass(), apiCategory, model).slash(encodedParameterString).withSelfRel();
 
         Page<DSpaceResource<T>> resources;
         try {
@@ -977,8 +975,10 @@ public class RestResourceController implements InitializingBean {
             PagedResourcesAssembler assembler,
             @RequestParam MultiValueMap<String, Object> parameters)
         throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        String encodedParameterString = getEncodedParameterStringFromRequestParams(parameters);
 
-        Link link = linkTo(this.getClass(), apiCategory, model).slash("search").slash(searchMethodName).withSelfRel();
+        Link link = linkTo(this.getClass(), apiCategory, model).slash("search").slash(searchMethodName)
+                                                               .slash(encodedParameterString).withSelfRel();
         DSpaceRestRepository repository = utils.getResourceRepository(apiCategory, model);
         boolean returnPage = false;
         Object searchResult = null;
@@ -1014,6 +1014,24 @@ public class RestResourceController implements InitializingBean {
             return converter.toResource((T) searchResult);
         }
         return result;
+    }
+
+    /**
+     * Internal method to convert the parameters provided as a MultivalueMap as a string to use in the self-link.
+     * This function will exclude all "embed" parameters and parameters starting with "embed."
+     * @param parameters
+     * @return encoded uriString containing request parameters without embed parameter
+     */
+    private String getEncodedParameterStringFromRequestParams(
+            @RequestParam MultiValueMap<String, Object> parameters) {
+        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance();
+
+        for (String key : parameters.keySet()) {
+            if (!StringUtils.equals(key, "embed") && !StringUtils.startsWith(key, "embed.")) {
+                uriComponentsBuilder.queryParam(key, parameters.get(key));
+            }
+        }
+        return uriComponentsBuilder.encode().build().toString();
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT)

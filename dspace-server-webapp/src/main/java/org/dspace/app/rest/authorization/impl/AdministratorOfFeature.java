@@ -14,11 +14,13 @@ import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
+import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -53,6 +55,10 @@ public class AdministratorOfFeature implements AuthorizationFeature {
                 Collection collection = (Collection) utils.getDSpaceAPIObjectFromRest(context, object);
                 return authService.isAdmin(context, collection);
             }
+            if (object instanceof ItemRest) {
+                Item item = (Item) utils.getDSpaceAPIObjectFromRest(context, object);
+                return authService.isAdmin(context, item);
+            }
         }
         return authService.isAdmin(context);
     }
@@ -62,7 +68,8 @@ public class AdministratorOfFeature implements AuthorizationFeature {
         return new String[]{
             SiteRest.CATEGORY + "." + SiteRest.NAME,
             CommunityRest.CATEGORY + "." + CommunityRest.NAME,
-            CollectionRest.CATEGORY + "." + CollectionRest.NAME
+            CollectionRest.CATEGORY + "." + CollectionRest.NAME,
+            ItemRest.CATEGORY + "." + ItemRest.NAME
             };
     }
 }

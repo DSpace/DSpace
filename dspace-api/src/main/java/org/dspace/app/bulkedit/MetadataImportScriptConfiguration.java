@@ -57,9 +57,6 @@ public class MetadataImportScriptConfiguration<T extends MetadataImport> extends
             options.addOption("f", "file", true, "source file");
             options.getOption("f").setType(InputStream.class);
             options.getOption("f").setRequired(true);
-            options.addOption("e", "email", true, "email address or user id of user (required if adding new items)");
-            options.getOption("e").setType(String.class);
-            options.getOption("e").setRequired(true);
             options.addOption("s", "silent", false,
                               "silent operation - doesn't request confirmation of changes USE WITH CAUTION");
             options.getOption("s").setType(boolean.class);

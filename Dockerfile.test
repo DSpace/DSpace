@@ -51,7 +51,12 @@ RUN ant init_installation update_configs update_code update_webapps
 # Create a new tomcat image that does not retain the the build directory contents
 FROM tomcat:8-jdk11
 ENV DSPACE_INSTALL=/dspace
+ENV TOMCAT_INSTALL=/usr/local/tomcat
 COPY --from=ant_build /dspace $DSPACE_INSTALL
+# Enable the AJP connector in Tomcat's server.xml
+# NOTE: secretRequired="false" should only be used when AJP is NOT accessible from an external network. But, secretRequired="true" isn't supported by mod_proxy_ajp until Apache 2.5
+RUN sed -i '/Service name="Catalina".*/a \\n    <Connector protocol="AJP/1.3" port="8009" address="0.0.0.0" redirectPort="8443" URIEncoding="UTF-8" secretRequired="false" />' $TOMCAT_INSTALL/conf/server.xml
+# Expose Tomcat port and AJP port
 EXPOSE 8080 8009
 
 ENV JAVA_OPTS=-Xmx2000m

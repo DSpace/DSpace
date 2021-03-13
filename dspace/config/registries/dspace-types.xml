@@ -16,5 +16,18 @@
         <scope_note></scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>dspace</schema>
+        <element>agreements</element>
+        <qualifier>end-user</qualifier>
+        <scope_note>Stores whether the End User Agreement has been accepted by an EPerson. Valid values; true, false</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>agreements</element>
+        <qualifier>cookies</qualifier>
+        <scope_note>Stores the cookie preferences of an EPerson, as selected in last session. Value will be an array of cookieName/boolean pairs, specifying which cookies are allowed or not allowed.</scope_note>
+    </dc-type>
 
 </dspace-dc-types>

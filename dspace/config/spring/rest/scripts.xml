@@ -12,4 +12,20 @@
         <property name="description" value="Import metadata after batch editing" />
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataImport"/>
     </bean>
+
+    <bean id="metadata-export" class="org.dspace.app.bulkedit.MetadataExportScriptConfiguration" primary="true">
+        <property name="description" value="Export metadata for batch editing"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataExport"/>
+    </bean>
+
+    <bean id="curate" class="org.dspace.curate.CurationScriptConfiguration">
+        <property name="description" value="Curation tasks"/>
+        <property name="dspaceRunnableClass" value="org.dspace.curate.Curation"/>
+    </bean>
+
+    <!-- Not runnable from REST -->
+    <bean id="submission-forms-migrate" class="org.dspace.submit.migration.SubmissionFormsMigrationScriptConfiguration">
+        <property name="description" value="Script for migrating submission forms to DSpace 7"/>
+        <property name="dspaceRunnableClass" value="org.dspace.submit.migration.SubmissionFormsMigration"/>
+    </bean>
 </beans>

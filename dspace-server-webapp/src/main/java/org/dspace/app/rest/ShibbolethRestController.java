@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import javax.servlet.http.HttpServletResponse;
 
@@ -62,8 +63,14 @@ public class ShibbolethRestController implements InitializingBean {
         // Validate that the redirectURL matches either the server or UI hostname. It *cannot* be an arbitrary URL.
         String redirectHostName = Utils.getHostName(redirectUrl);
         String serverHostName = Utils.getHostName(configurationService.getProperty("dspace.server.url"));
-        String clientHostName = Utils.getHostName(configurationService.getProperty("dspace.ui.url"));
-        if (StringUtils.equalsAnyIgnoreCase(redirectHostName, serverHostName, clientHostName)) {
+        ArrayList<String> allowedHostNames = new ArrayList<String>();
+        allowedHostNames.add(serverHostName);
+        String[] allowedUrls = configurationService.getArrayProperty("rest.cors.allowed-origins");
+        for (String url : allowedUrls) {
+            allowedHostNames.add(Utils.getHostName(url));
+        }
+
+        if (StringUtils.equalsAnyIgnoreCase(redirectHostName, allowedHostNames.toArray(new String[0]))) {
             log.debug("Shibboleth redirecting to " + redirectUrl);
             response.sendRedirect(redirectUrl);
         } else {

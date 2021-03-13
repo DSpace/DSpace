@@ -19,6 +19,7 @@ import java.util.UUID;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
+import com.opencsv.exceptions.CsvValidationException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -112,6 +113,9 @@ public class RepairDump {
         } catch (IOException ex) {
             System.err.format("Could not read the export at record %d:  ", recordCount);
             System.err.println(ex.getMessage());
+        } catch (CsvValidationException csve) {
+            System.err.format("Invalid line at record %d:  ", recordCount);
+            System.err.println(csve.getMessage());
         } finally {
             System.err.format("Repaired %d out of %d records.%n",
                     repairCount, recordCount);

@@ -20,6 +20,7 @@ public class RootRest extends RestAddressableModel {
     private String dspaceUI;
     private String dspaceName;
     private String dspaceServer;
+    private String dspaceVersion;
 
     public String getCategory() {
         return CATEGORY;
@@ -56,6 +57,14 @@ public class RootRest extends RestAddressableModel {
 
     public void setDspaceServer(String dspaceServerURL) {
         this.dspaceServer = dspaceServerURL;
+    }
+
+    public String getDspaceVersion() {
+        return dspaceVersion;
+    }
+
+    public void setDspaceVersion(String dspaceVersion) {
+        this.dspaceVersion = dspaceVersion;
     }
 
     @Override

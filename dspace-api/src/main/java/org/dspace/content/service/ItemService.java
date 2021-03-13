@@ -114,6 +114,21 @@ public interface ItemService
         throws SQLException;
 
     /**
+     * Find all the items by a given submitter. The order is
+     * indeterminate. All items are included.
+     *
+     * @param context DSpace context object
+     * @param eperson the submitter
+     * @param retrieveAllItems flag to determine if all items should be returned or only archived items.
+     *                         If true, all items (regardless of status) are returned.
+     *                         If false, only archived items will be returned.
+     * @return an iterator over the items submitted by eperson
+     * @throws SQLException if database error
+     */
+    public Iterator<Item> findBySubmitter(Context context, EPerson eperson, boolean retrieveAllItems)
+            throws SQLException;
+
+    /**
      * Retrieve the list of items submitted by eperson, ordered by recently submitted, optionally limitable
      *
      * @param context DSpace context object

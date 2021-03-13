@@ -14,10 +14,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.UUID;
 
-import org.dspace.app.rest.builder.SiteBuilder;
 import org.dspace.app.rest.matcher.SiteMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
+import org.dspace.builder.SiteBuilder;
 import org.dspace.content.Site;
 import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;

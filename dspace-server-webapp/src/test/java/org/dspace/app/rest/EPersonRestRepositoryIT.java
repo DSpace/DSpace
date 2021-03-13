@@ -10,12 +10,14 @@ package org.dspace.app.rest;
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -30,20 +32,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.EPersonBuilder;
-import org.dspace.app.rest.builder.GroupBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
+import org.dspace.app.rest.exception.EPersonNameNotProvidedException;
+import org.dspace.app.rest.exception.RESTEmptyWorkflowGroupException;
 import org.dspace.app.rest.jackson.IgnoreJacksonWriteOnlyAccess;
 import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.matcher.GroupMatcher;
@@ -53,13 +54,19 @@ import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.RegistrationRest;
+import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.GroupBuilder;
+import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.Item;
+import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.PasswordHash;
@@ -68,6 +75,7 @@ import org.dspace.eperson.service.AccountService;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.RegistrationDataService;
 import org.dspace.services.ConfigurationService;
+import org.dspace.workflow.WorkflowService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,6 +91,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private EPersonService ePersonService;
+
+    @Autowired
+    private WorkflowService workflowService;
 
     @Autowired
     private RegistrationDataDAO registrationDataDAO;
@@ -133,7 +144,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                hasJsonPath("$._links.self.href", not(empty())),
                                hasJsonPath("$.metadata", Matchers.allOf(
                                        matchMetadata("eperson.firstname", "John"),
-                                       matchMetadata("eperson.lastname", "Doe")
+                                       matchMetadata("eperson.lastname", "Doe"),
+                                       matchMetadataDoesNotExist("dc.identifier.uri")
                                )))))
                             .andDo(result -> idRef
                                     .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
@@ -798,7 +810,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void deleteViolatingConstraints() throws Exception {
+    public void deleteViolatingWorkFlowConstraints() throws Exception {
         // We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
 
@@ -817,23 +829,73 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         // 2. A collection with a logo
         Collection col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection")
-                                          .withLogo("logo_collection").build();
+                                          .withLogo("logo_collection")
+                                          .withWorkflowGroup(1, ePerson)
+                                          .build();
 
 
         // 3. Create an item that will prevent the deletion of the eperson account (it is the submitter)
-        Item item = ItemBuilder.createItem(context, col).build();
-
+        WorkflowItemBuilder.createWorkflowItem(context, col);
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
 
         // 422 error when trying to DELETE the eperson=submitter
         getClient(token).perform(delete("/api/eperson/epersons/" + ePerson.getID()))
-                   .andExpect(status().is(422));
+                   .andExpect(status().isUnprocessableEntity());
 
         // Verify the eperson is still here
         getClient(token).perform(get("/api/eperson/epersons/" + ePerson.getID()))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void deleteLastPersonInWorkflowGroup() throws Exception {
+        // set up workflow group with ePerson as only member
+        context.turnOffAuthorisationSystem();
+        EPerson ePerson = EPersonBuilder
+            .createEPerson(context)
+            .withEmail("eperson@example.com")
+            .withNameInMetadata("Sample", "EPerson")
+            .build();
+        Community community = CommunityBuilder
+            .createCommunity(context)
+            .build();
+        Collection collection = CollectionBuilder
+            .createCollection(context, community)
+            .withWorkflowGroup(1, ePerson)
+            .build();
+        Group workflowGroup = collection.getWorkflowStep1(context);
+        context.restoreAuthSystemState();
+
+        // enable Polish locale
+        configurationService.setProperty("webui.supported.locales", "en, pl");
+
+        // generate expectations
+        String key = RESTEmptyWorkflowGroupException.MESSAGE_KEY;
+        String[] values = {
+            ePerson.getID().toString(),
+            workflowGroup.getID().toString(),
+        };
+        MessageFormat defaultFmt = new MessageFormat(I18nUtil.getMessage(key));
+        MessageFormat plFmt = new MessageFormat(I18nUtil.getMessage(key, new Locale("pl")));
+
+        // make request using Polish locale
+        getClient(getAuthToken(admin.getEmail(), password))
+            .perform(
+                delete("/api/eperson/epersons/" + ePerson.getID())
+                    .header("Accept-Language", "pl") // request Polish response
+            )
+            .andExpect(status().isUnprocessableEntity())
+            .andExpect(status().reason(is(plFmt.format(values))))
+            .andExpect(status().reason(startsWith("[PL]"))); // verify it did not fall back to default locale
+
+        // make request using default locale
+        getClient(getAuthToken(admin.getEmail(), password))
+            .perform(delete("/api/eperson/epersons/" + ePerson.getID()))
+            .andExpect(status().isUnprocessableEntity())
+            .andExpect(status().reason(is(defaultFmt.format(values))))
+            .andExpect(status().reason(not(startsWith("[PL]"))));
     }
 
     @Test
@@ -1232,8 +1294,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         String newPassword = "newpassword";
 
         List<Operation> ops = new ArrayList<Operation>();
-        ReplaceOperation replaceOperation = new ReplaceOperation("/password", newPassword);
-        ops.add(replaceOperation);
+        AddOperation addOperation = new AddOperation("/password", newPassword);
+        ops.add(addOperation);
         String patchBody = getPatchContent(ops);
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -1246,9 +1308,19 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         // login with new password
         token = getAuthToken(ePerson.getEmail(), newPassword);
-        getClient(token).perform(get("/api/"))
-                        .andExpect(status().isOk());
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
 
+        // can't login with old password
+        token = getAuthToken(ePerson.getEmail(), password);
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(false)))
+                        .andExpect(jsonPath("$.type", is("status")));
     }
 
     @Test
@@ -1273,8 +1345,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         String newPassword = "newpassword";
 
         List<Operation> ops = new ArrayList<Operation>();
-        ReplaceOperation replaceOperation = new ReplaceOperation("/password", newPassword);
-        ops.add(replaceOperation);
+        AddOperation addOperation = new AddOperation("/password", newPassword);
+        ops.add(addOperation);
         String patchBody = getPatchContent(ops);
 
         // eperson one
@@ -1288,10 +1360,21 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         // login with old password
         token = getAuthToken(ePerson2.getEmail(), password);
-        getClient(token).perform(get("/api/"))
-                        .andExpect(status().isOk());
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
 
+        // can't login with new password
+        token = getAuthToken(ePerson2.getEmail(), newPassword);
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(false)))
+                        .andExpect(jsonPath("$.type", is("status")));
     }
+
     @Test
     public void patchPasswordForNonAdminUser() throws Exception {
 
@@ -1308,8 +1391,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         String newPassword = "newpassword";
 
         List<Operation> ops = new ArrayList<Operation>();
-        ReplaceOperation replaceOperation = new ReplaceOperation("/password", newPassword);
-        ops.add(replaceOperation);
+        AddOperation addOperation = new AddOperation("/password", newPassword);
+        ops.add(addOperation);
         String patchBody = getPatchContent(ops);
 
         String token = getAuthToken(ePerson.getEmail(), password);
@@ -1322,14 +1405,23 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         // login with new password
         token = getAuthToken(ePerson.getEmail(), newPassword);
-        getClient(token).perform(get("/api/"))
-                        .andExpect(status().isOk());
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
 
+        // can't login with old password
+        token = getAuthToken(ePerson.getEmail(), password);
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(false)))
+                        .andExpect(jsonPath("$.type", is("status")));
     }
 
     @Test
     public void patchPasswordReplaceOnNonExistentValue() throws Exception {
-
         context.turnOffAuthorisationSystem();
 
         EPerson ePerson = EPersonBuilder.createEPerson(context)
@@ -1342,8 +1434,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         String newPassword = "newpassword";
 
         List<Operation> ops = new ArrayList<Operation>();
-        ReplaceOperation replaceOperation = new ReplaceOperation("/password", newPassword);
-        ops.add(replaceOperation);
+        AddOperation addOperation = new AddOperation("/password", newPassword);
+        ops.add(addOperation);
         String patchBody = getPatchContent(ops);
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -1353,6 +1445,14 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                 .andExpect(status().isBadRequest());
+
+        // can't login with new password
+        token = getAuthToken(ePerson.getEmail(), newPassword);
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(false)))
+                        .andExpect(jsonPath("$.type", is("status")));
     }
 
     @Test
@@ -1411,13 +1511,57 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void patchPasswordMissingValue() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String originalPw = "testpass79bC";
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@example.com")
+                                        .withPassword(originalPw)
+                                        .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<>();
+        AddOperation addOperation = new AddOperation("/password", null);
+        ops.add(addOperation);
+        String patchBody = getPatchContent(ops);
+
+        // adding null pw should return bad request
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isBadRequest());
+
+        // login with original password
+        token = getAuthToken(ePerson.getEmail(), originalPw);
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
+
+        // can't login with null password
+        token = getAuthToken(ePerson.getEmail(), null);
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(false)))
+                        .andExpect(jsonPath("$.type", is("status")));
+    }
+
+    @Test
+    public void patchPasswordNotInitialised() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
         EPerson ePerson = EPersonBuilder.createEPerson(context)
                                         .withNameInMetadata("John", "Doe")
-                                        .withEmail("Johndoe@example.com")
-                                        .withPassword("testpass79bC")
+                                        .withEmail("userNotInitialised@example.com")
+                                        .withCanLogin(true)
                                         .build();
 
         context.restoreAuthSystemState();
@@ -1427,33 +1571,31 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         String newPassword = "newpass";
 
         List<Operation> ops = new ArrayList<Operation>();
-        ReplaceOperation replaceOperation = new ReplaceOperation("/password", newPassword);
-        ops.add(replaceOperation);
+        AddOperation addOperation = new AddOperation("/password", newPassword);
+        ops.add(addOperation);
         String patchBody = getPatchContent(ops);
 
-        // initialize passwd
+        // initialize password with add operation, not set during creation
         getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                         .andExpect(status().isOk());
 
-
-        List<Operation> ops2 = new ArrayList<Operation>();
-        ReplaceOperation replaceOperation2 = new ReplaceOperation("/password", null);
-        ops2.add(replaceOperation2);
-        patchBody = getPatchContent(ops2);
-
-        // should return bad request
-        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
-                .content(patchBody)
-                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                        .andExpect(status().isBadRequest());
-
-        // login with original password
+        // login with new password => succeeds
         token = getAuthToken(ePerson.getEmail(), newPassword);
-        getClient(token).perform(get("/api/"))
-                        .andExpect(status().isOk());
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
 
+        // can't login with old password
+        token = getAuthToken(ePerson.getEmail(), password);
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(false)))
+                        .andExpect(jsonPath("$.type", is("status")));
     }
 
     @Test
@@ -1487,8 +1629,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         // login with new email address
         token = getAuthToken(newEmail, password);
-        getClient(token).perform(get("/api/"))
-                        .andExpect(status().isOk());
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
 
     }
 
@@ -1547,11 +1692,13 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                         .andExpect(status().isBadRequest());
 
-        // login with original password
+        // login with original email
         token = getAuthToken(ePerson.getEmail(), password);
-        getClient(token).perform(get("/api/"))
-                        .andExpect(status().isOk());
-
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
     }
 
     @Test
@@ -1866,8 +2013,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        ReplaceOperation replaceOperation = new ReplaceOperation("/password", newPassword);
-        ops.add(replaceOperation);
+        AddOperation addOperation = new AddOperation("/password", newPassword);
+        ops.add(addOperation);
         String patchBody = getPatchContent(ops);
         accountService.sendRegistrationInfo(context, ePerson.getEmail());
         String tokenForEPerson = registrationDataService.findByEmail(context, ePerson.getEmail()).getToken();
@@ -1902,8 +2049,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        ReplaceOperation replaceOperation = new ReplaceOperation("/password", newPassword);
-        ops.add(replaceOperation);
+        AddOperation addOperation = new AddOperation("/password", newPassword);
+        ops.add(addOperation);
         String patchBody = getPatchContent(ops);
         accountService.sendRegistrationInfo(context, ePerson.getEmail());
         String tokenForEPerson = registrationDataService.findByEmail(context, ePerson.getEmail()).getToken();
@@ -1947,8 +2094,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        ReplaceOperation replaceOperation = new ReplaceOperation("/password", newPassword);
-        ops.add(replaceOperation);
+        AddOperation addOperation = new AddOperation("/password", newPassword);
+        ops.add(addOperation);
         String patchBody = getPatchContent(ops);
         accountService.sendRegistrationInfo(context, ePerson.getEmail());
         accountService.sendRegistrationInfo(context, ePersonTwo.getEmail());
@@ -2038,8 +2185,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        ReplaceOperation replaceOperation = new ReplaceOperation("/password", newPassword);
-        ops.add(replaceOperation);
+        AddOperation addOperation = new AddOperation("/password", newPassword);
+        ops.add(addOperation);
         String patchBody = getPatchContent(ops);
         accountService.sendRegistrationInfo(context, ePerson.getEmail());
         String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
@@ -2440,12 +2587,33 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
 
+        // enable Polish locale
+        configurationService.setProperty("webui.supported.locales", "en, pl");
+
         try {
+            // make request using Polish locale
             getClient().perform(post("/api/eperson/epersons")
-                                         .param("token", newRegisterToken)
-                                         .content(mapper.writeValueAsBytes(ePersonRest))
-                                         .contentType(MediaType.APPLICATION_JSON))
-                            .andExpect(status().isUnprocessableEntity());
+                                        .header("Accept-Language", "pl") // request Polish response
+                                        .param("token", newRegisterToken)
+                                        .content(mapper.writeValueAsBytes(ePersonRest))
+                                        .contentType(MediaType.APPLICATION_JSON))
+                            .andExpect(status().isUnprocessableEntity())
+                            .andExpect(status().reason(is(
+                                // find message in dspace-server-webapp/src/test/resources/Messages_pl.properties
+                                I18nUtil.getMessage(EPersonNameNotProvidedException.MESSAGE_KEY, new Locale("pl"))
+                            )))
+                            .andExpect(status().reason(startsWith("[PL]"))); // verify default locale was NOT used
+
+            // make request using default locale
+            getClient().perform(post("/api/eperson/epersons")
+                                        .param("token", newRegisterToken)
+                                        .content(mapper.writeValueAsBytes(ePersonRest))
+                                        .contentType(MediaType.APPLICATION_JSON))
+                            .andExpect(status().isUnprocessableEntity())
+                            .andExpect(status().reason(is(
+                                I18nUtil.getMessage(EPersonNameNotProvidedException.MESSAGE_KEY)
+                            )))
+                            .andExpect(status().reason(not(startsWith("[PL]"))));
 
             EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
             assertNull(createdEPerson);
@@ -2486,12 +2654,34 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
 
+        // enable Polish locale
+        configurationService.setProperty("webui.supported.locales", "en, pl");
+
         try {
+            // make request using Polish locale
             getClient().perform(post("/api/eperson/epersons")
-                                         .param("token", newRegisterToken)
-                                         .content(mapper.writeValueAsBytes(ePersonRest))
-                                         .contentType(MediaType.APPLICATION_JSON))
-                            .andExpect(status().isUnprocessableEntity());
+                                        .header("Accept-Language", "pl") // request Polish response
+                                        .param("token", newRegisterToken)
+                                        .content(mapper.writeValueAsBytes(ePersonRest))
+                                        .contentType(MediaType.APPLICATION_JSON))
+                            .andExpect(status().isUnprocessableEntity())
+                            .andExpect(status().reason(is(
+                                // find message in dspace-server-webapp/src/test/resources/Messages_pl.properties
+                                I18nUtil.getMessage(EPersonNameNotProvidedException.MESSAGE_KEY, new Locale("pl"))
+                            )))
+                            .andExpect(status().reason(startsWith("[PL]"))); // verify default locale was NOT used
+
+            // make request using default locale
+            getClient().perform(post("/api/eperson/epersons")
+                                        .param("token", newRegisterToken)
+                                        .content(mapper.writeValueAsBytes(ePersonRest))
+                                        .contentType(MediaType.APPLICATION_JSON))
+                            .andExpect(status().isUnprocessableEntity())
+                            .andExpect(status().reason(is(
+                                // find message in dspace-server-webapp/src/test/resources/Messages_pl.properties
+                                I18nUtil.getMessage(EPersonNameNotProvidedException.MESSAGE_KEY)
+                            )))
+                            .andExpect(status().reason(not(startsWith("[PL]"))));
 
             EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
             assertNull(createdEPerson);
@@ -2835,6 +3025,99 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 hasJsonPath("$.eperson-registration.href",
                                          is("http://localhost/api/eperson/registrations"))
                         )));
+    }
+
+    @Test
+    public void findByMetadataUsingFirstNamePaginationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("John", "Doe")
+                .withEmail("Johndoe@example.com").build();
+
+        EPerson ePerson2 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Jane", "Smith")
+                .withEmail("janesmith@example.com").build();
+
+        EPerson ePerson3 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("John", "Smith")
+                .withEmail("tomdoe@example.com")
+                .build();
+
+        EPerson ePerson4 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("John-Postfix", "Smath")
+                .withEmail("dirkdoepostfix@example.com")
+                .build();
+
+        EPerson ePerson5 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Prefix-John", "Smoth")
+                .withEmail("harrydoeprefix@example.com")
+                .build();
+
+        EPerson ePerson6 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("John", "Boychuk")
+                .withEmail("johnboychuk@example.com")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
+                 .param("query", ePerson.getFirstName())
+                 .param("page", "0")
+                 .param("size", "2"))
+                 .andExpect(status().isOk())
+                 .andExpect(content().contentType(contentType))
+                 .andExpect(jsonPath("$._embedded.epersons", Matchers.everyItem(
+                         hasJsonPath("$.type", is("eperson")))
+                         ))
+                 .andExpect(jsonPath("$._embedded.epersons").value(Matchers.hasSize(2)))
+                 .andExpect(jsonPath("$.page.size", is(2)))
+                 .andExpect(jsonPath("$.page.number", is(0)))
+                 .andExpect(jsonPath("$.page.totalPages", is(3)))
+                 .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+        getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
+                .param("query", ePerson.getFirstName())
+                .param("page", "1")
+                .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.epersons", Matchers.everyItem(
+                        hasJsonPath("$.type", is("eperson")))
+                        ))
+                .andExpect(jsonPath("$._embedded.epersons").value(Matchers.hasSize(2)))
+                .andExpect(jsonPath("$.page.size", is(2)))
+                .andExpect(jsonPath("$.page.number", is(1)))
+                .andExpect(jsonPath("$.page.totalPages", is(3)))
+                .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+        getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
+                .param("query", ePerson.getFirstName())
+                .param("page", "2")
+                .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.epersons", Matchers.everyItem(
+                        hasJsonPath("$.type", is("eperson")))
+                        ))
+                .andExpect(jsonPath("$._embedded.epersons").value(Matchers.hasSize(1)))
+                .andExpect(jsonPath("$.page.size", is(2)))
+                .andExpect(jsonPath("$.page.number", is(2)))
+                .andExpect(jsonPath("$.page.totalPages", is(3)))
+                .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+        getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
+                .param("query", ePerson.getFirstName())
+                .param("page", "3")
+                .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.epersons").doesNotExist())
+                .andExpect(jsonPath("$.page.size", is(2)))
+                .andExpect(jsonPath("$.page.number", is(3)))
+                .andExpect(jsonPath("$.page.totalPages", is(3)))
+                .andExpect(jsonPath("$.page.totalElements", is(5)));
+
     }
 
 }
