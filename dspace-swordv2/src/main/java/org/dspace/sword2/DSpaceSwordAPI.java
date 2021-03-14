@@ -39,10 +39,11 @@ import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.swordapp.server.AuthCredentials;
 import org.swordapp.server.Deposit;
 import org.swordapp.server.DepositReceipt;
@@ -52,7 +53,7 @@ import org.swordapp.server.SwordServerException;
 import org.swordapp.server.UriRegistry;
 
 public class DSpaceSwordAPI {
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(DSpaceSwordAPI.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DSpaceSwordAPI.class);
 
     protected ItemService itemService =
         ContentServiceFactory.getInstance().getItemService();
@@ -65,6 +66,9 @@ public class DSpaceSwordAPI {
 
     protected BitstreamFormatService bitstreamFormatService =
         ContentServiceFactory.getInstance().getBitstreamFormatService();
+
+    protected ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     public SwordContext noAuthContext()
         throws DSpaceSwordException {
@@ -115,7 +119,7 @@ public class DSpaceSwordAPI {
 
         String[] parts = acceptHeader.split(",");
 
-        List<Object[]> unsorted = new ArrayList<Object[]>();
+        List<Object[]> unsorted = new ArrayList<>();
         float highest_q = 0;
         int counter = 0;
         for (String part : parts) {
@@ -174,7 +178,7 @@ public class DSpaceSwordAPI {
 
         // set up a dictionary to hold our sorted results.  The dictionary will be keyed with the q value, and the
         // value of each key will be a list of content type strings (in no particular order)
-        TreeMap<Float, List<String>> sorted = new TreeMap<Float, List<String>>();
+        TreeMap<Float, List<String>> sorted = new TreeMap<>();
 
         // go through the unsorted list
         for (Object[] oa : unsorted) {
@@ -192,7 +196,7 @@ public class DSpaceSwordAPI {
                 if (sorted.containsKey(qv)) {
                     sorted.get(qv).add(contentType);
                 } else {
-                    List<String> cts = new ArrayList<String>();
+                    List<String> cts = new ArrayList<>();
                     cts.add(contentType);
                     sorted.put(qv, cts);
                 }
@@ -205,7 +209,7 @@ public class DSpaceSwordAPI {
                 if (sorted.containsKey(nq)) {
                     sorted.get(nq).add(contentType);
                 } else {
-                    List<String> cts = new ArrayList<String>();
+                    List<String> cts = new ArrayList<>();
                     cts.add(contentType);
                     sorted.put(nq, cts);
                 }
@@ -255,8 +259,8 @@ public class DSpaceSwordAPI {
                 // for a moment
                 context.turnOffAuthorisationSystem();
 
-                String bundleName = ConfigurationManager.getProperty(
-                    "swordv2-server", "bundle.name");
+                String bundleName = configurationService.getProperty(
+                    "swordv2-server.bundle.name");
                 if (bundleName == null || "".equals(bundleName)) {
                     bundleName = "SWORD";
                 }
@@ -496,9 +500,8 @@ public class DSpaceSwordAPI {
 
     protected void addVerboseDescription(DepositReceipt receipt,
                                          VerboseDescription verboseDescription) {
-        boolean includeVerbose = ConfigurationManager
-            .getBooleanProperty("swordv2-server",
-                                "verbose-description.receipt.enable");
+        boolean includeVerbose = configurationService
+            .getBooleanProperty("swordv2-server.verbose-description.receipt.enable");
         if (includeVerbose) {
             receipt.setVerboseDescription(verboseDescription.toString());
         }

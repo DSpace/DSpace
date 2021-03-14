@@ -92,7 +92,7 @@ public class OREDisseminationCrosswalk
     private Element disseminateItem(Context context, Item item)
         throws CrosswalkException, IOException, SQLException, AuthorizeException {
         String oaiUrl = null;
-        String dsUrl = configurationService.getProperty("dspace.url");
+        String dsUrl = configurationService.getProperty("dspace.ui.url");
 
         String remSource = configurationService.getProperty("oai.ore.authoritative.source");
         if (remSource == null || remSource.equalsIgnoreCase("oai")) {
@@ -265,7 +265,8 @@ public class OREDisseminationCrosswalk
         Element pmhMeta = new Element("entry",ATOM_NS);
 
         pUri = new Element("id",ATOM_NS);
-        String oaiId = new String("oai:" + ConfigurationManager.getProperty("dspace.hostname") + ":" + item.getHandle
+        String hostname = Utils.getHostName(ConfigurationManager.getProperty("dspace.ui.url"));
+        String oaiId = new String("oai:" + hostname + ":" + item.getHandle
         ());
         pUri.addContent(oaiId + "#oai_dc");
         pmhMeta.addContent(pUri);

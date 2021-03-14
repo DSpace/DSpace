@@ -26,7 +26,7 @@ import org.dspace.eperson.EPerson;
  *
  * @author kevinvandevelde at atmire.com
  */
-public interface WorkflowItemService<T extends WorkflowItem> extends InProgressSubmissionService<T, Integer> {
+public interface WorkflowItemService<T extends WorkflowItem> extends InProgressSubmissionService<T> {
 
     public T create(Context context, Item item, Collection collection) throws SQLException, AuthorizeException;
 

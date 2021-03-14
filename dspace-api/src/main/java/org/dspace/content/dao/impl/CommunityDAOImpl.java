@@ -8,8 +8,6 @@
 package org.dspace.content.dao.impl;
 
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import javax.persistence.Query;
@@ -62,11 +60,20 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
     public List<Community> findAll(Context context, MetadataField sortField, Integer limit, Integer offset)
         throws SQLException {
         StringBuilder queryBuilder = new StringBuilder();
-        queryBuilder.append("SELECT ").append(Community.class.getSimpleName()).append(" FROM Community as ")
-                    .append(Community.class.getSimpleName()).append(" ");
-        addMetadataLeftJoin(queryBuilder, Community.class.getSimpleName(), Arrays.asList(sortField));
-        addMetadataSortQuery(queryBuilder, Arrays.asList(sortField), Collections.EMPTY_LIST);
 
+        // The query has to be rather complex because we want to sort the retrieval of Communities based on the title
+        // We'll join the Communities with the metadata fields on the sortfield specified in the parameters
+        // then we'll sort on this metadata field (this is usually the title). We're also making sure that the place
+        // is the lowest place in the metadata fields list so that we avoid the duplication bug
+        queryBuilder.append("SELECT c" +
+                                " FROM Community c" +
+                                " left join c.metadata title on title.metadataField = :sortField and" +
+                                " title.dSpaceObject = c.id and" +
+                                " title.place = (select min(internal.place) " +
+                                                "from c.metadata internal " +
+                                                "where internal.metadataField = :sortField and" +
+                                                    " internal.dSpaceObject = c.id)" +
+                                " ORDER BY LOWER(title.value)");
         Query query = createQuery(context, queryBuilder.toString());
         if (offset != null) {
             query.setFirstResult(offset);
@@ -74,7 +81,8 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
         if (limit != null) {
             query.setMaxResults(limit);
         }
-        query.setParameter(sortField.toString(), sortField.getID());
+        query.setParameter("sortField", sortField);
+
         return list(query);
     }
 
@@ -91,15 +99,25 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
     @Override
     public List<Community> findAllNoParent(Context context, MetadataField sortField) throws SQLException {
         StringBuilder queryBuilder = new StringBuilder();
-        queryBuilder.append("SELECT community FROM Community as community ");
-        addMetadataLeftJoin(queryBuilder, Community.class.getSimpleName().toLowerCase(), Arrays.asList(sortField));
-        addMetadataValueWhereQuery(queryBuilder, Collections.EMPTY_LIST, null, " community.parentCommunities IS EMPTY");
-        addMetadataSortQuery(queryBuilder, Arrays.asList(sortField), Collections.EMPTY_LIST);
 
+        // The query has to be rather complex because we want to sort the retrieval of Communities based on the title
+        // We'll join the Communities with the metadata fields on the sortfield specified in the parameters
+        // then we'll sort on this metadata field (this is usually the title). We're also making sure that the place
+        // is the lowest place in the metadata fields list so that we avoid the duplication bug
+        // This query has the added where clause to enforce that the community cannot have any parent communities
+        queryBuilder.append("SELECT c" +
+                                " FROM Community c" +
+                                " left join c.metadata title on title.metadataField = :sortField and" +
+                                " title.dSpaceObject = c.id and" +
+                                " title.place = (select min(internal.place) " +
+                                                "from c.metadata internal " +
+                                                "where internal.metadataField = :sortField and" +
+                                                        " internal.dSpaceObject = c.id)" +
+                                " WHERE c.parentCommunities IS EMPTY " +
+                                " ORDER BY LOWER(title.value)");
         Query query = createQuery(context, queryBuilder.toString());
-        query.setParameter(sortField.toString(), sortField.getID());
+        query.setParameter("sortField", sortField);
         query.setHint("org.hibernate.cacheable", Boolean.TRUE);
-
 
         return findMany(context, query);
     }

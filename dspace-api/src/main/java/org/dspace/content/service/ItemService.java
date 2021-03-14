@@ -24,10 +24,8 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
-import org.dspace.content.RelationshipMetadataValue;
 import org.dspace.content.Thumbnail;
 import org.dspace.content.WorkspaceItem;
-import org.dspace.content.virtual.VirtualMetadataPopulator;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -40,7 +38,7 @@ import org.dspace.eperson.Group;
  * @author kevinvandevelde at atmire.com
  */
 public interface ItemService
-        extends DSpaceObjectService<Item>, DSpaceObjectLegacySupportService<Item>, IndexableObjectService<Item, UUID> {
+        extends DSpaceObjectService<Item>, DSpaceObjectLegacySupportService<Item> {
 
     public Thumbnail getThumbnail(Context context, Item item, boolean requireOriginal) throws SQLException;
 
@@ -116,6 +114,21 @@ public interface ItemService
         throws SQLException;
 
     /**
+     * Find all the items by a given submitter. The order is
+     * indeterminate. All items are included.
+     *
+     * @param context DSpace context object
+     * @param eperson the submitter
+     * @param retrieveAllItems flag to determine if all items should be returned or only archived items.
+     *                         If true, all items (regardless of status) are returned.
+     *                         If false, only archived items will be returned.
+     * @return an iterator over the items submitted by eperson
+     * @throws SQLException if database error
+     */
+    public Iterator<Item> findBySubmitter(Context context, EPerson eperson, boolean retrieveAllItems)
+            throws SQLException;
+
+    /**
      * Retrieve the list of items submitted by eperson, ordered by recently submitted, optionally limitable
      *
      * @param context DSpace context object
@@ -151,6 +164,29 @@ public interface ItemService
         throws SQLException;
 
     /**
+     * Get all the archived items mapped to this collection (excludes owning collection). The order is indeterminate.
+     *
+     * @param context    DSpace context object
+     * @param collection Collection (parent)
+     * @param limit      limited number of items
+     * @param offset     offset value
+     * @return an iterator over the items in the collection.
+     * @throws SQLException if database error
+     */
+    public Iterator<Item> findByCollectionMapping(Context context, Collection collection, Integer limit, Integer offset)
+            throws SQLException;
+
+    /**
+     * Count all the archived items mapped to this collection (excludes owning collection). The order is indeterminate.
+     *
+     * @param context    DSpace context object
+     * @param collection Collection (parent)
+     * @return an iterator over the items in the collection.
+     * @throws SQLException if database error
+     */
+    public int countByCollectionMapping(Context context, Collection collection) throws SQLException;
+
+    /**
      * Get all the items (including private and withdrawn) in this collection. The order is indeterminate.
      *
      * @param context DSpace context object
@@ -182,7 +218,7 @@ public interface ItemService
      * @throws SQLException if database error
      */
     public Iterator<Item> findInArchiveOrWithdrawnNonDiscoverableModifiedSince(Context context, Date since)
-            throws SQLException;
+        throws SQLException;
 
     /**
      * Get all the items (including private and withdrawn) in this collection. The order is indeterminate.
@@ -653,19 +689,6 @@ public interface ItemService
      * @throws SQLException if database error
      */
     boolean isInProgressSubmission(Context context, Item item) throws SQLException;
-
-    /**
-     * This method retrieves a list of MetadataValue objects that get constructed from processing
-     * the given Item's Relationships through the config given to the {@link VirtualMetadataPopulator}
-     * @param item  The Item that will be processed through it's Relationships
-     * @param enableVirtualMetadata This parameter will determine whether the list of Relationship metadata
-     *                              should be populated with metadata that is being generated through the
-     *                              VirtualMetadataPopulator functionality or not
-     * @return      The list of MetadataValue objects constructed through the Relationships
-     */
-    public List<RelationshipMetadataValue> getRelationshipMetadata(Item item, boolean enableVirtualMetadata);
-
-
 
     /**
      * Get metadata for the DSpace Object in a chosen schema.

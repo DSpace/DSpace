@@ -8,6 +8,7 @@
 package org.dspace.app.itemimport;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -15,9 +16,9 @@ import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
 import org.dspace.app.itemimport.factory.ItemImportServiceFactory;
 import org.dspace.app.itemimport.service.ItemImportService;
 import org.dspace.content.Collection;
@@ -67,7 +68,7 @@ public class ItemImportCLITool {
 
         try {
             // create an options object and populate it
-            CommandLineParser parser = new PosixParser();
+            CommandLineParser parser = new DefaultParser();
 
             Options options = new Options();
 
@@ -408,7 +409,7 @@ public class ItemImportCLITool {
                         "Deleting temporary zip directory: " + myloader.getTempWorkDirFile().getAbsolutePath());
                     myloader.cleanupZipTemp();
                 }
-            } catch (Exception ex) {
+            } catch (IOException ex) {
                 System.out.println("Unable to delete temporary zip archive location: " + myloader.getTempWorkDirFile()
                                                                                                  .getAbsolutePath());
             }

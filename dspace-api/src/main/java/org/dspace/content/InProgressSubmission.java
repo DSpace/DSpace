@@ -7,10 +7,9 @@
  */
 package org.dspace.content;
 
-import java.io.Serializable;
 import java.sql.SQLException;
 
-import org.dspace.discovery.IndexableObject;
+import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
 
 /**
@@ -20,13 +19,13 @@ import org.dspace.eperson.EPerson;
  * @author Robert Tansley
  * @version $Revision$
  */
-public interface InProgressSubmission<ID extends Serializable> extends IndexableObject<ID> {
+public interface InProgressSubmission extends ReloadableEntity<Integer> {
     /**
      * Get the internal ID of this submission
      *
      * @return the internal identifier
      */
-    ID getID();
+    Integer getID();
 
     /**
      * Get the incomplete item object
@@ -48,7 +47,7 @@ public interface InProgressSubmission<ID extends Serializable> extends Indexable
      * @return the submitting e-person
      * @throws SQLException if database error
      */
-    EPerson getSubmitter() throws SQLException;
+    EPerson getSubmitter();
 
     /**
      * Find out if the submission has (or is intended to have) more than one

@@ -10,10 +10,10 @@ package org.dspace.statistics.util;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import mockit.Mock;
-import mockit.MockUp;
 import org.dspace.AbstractDSpaceTest;
-import org.dspace.statistics.SolrLoggerServiceImpl;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -21,6 +21,15 @@ import org.junit.Test;
  */
 public class SpiderDetectorTest extends AbstractDSpaceTest {
     private static final String NOT_A_BOT_ADDRESS = "192.168.0.1";
+
+    @Before
+    public void init() {
+        // Get current configuration
+        ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+        // Ensure useProxies is set to false for all tests
+        configurationService.setProperty("useProxies", false);
+    }
 
     /**
      * Test method for {@link org.dspace.statistics.util.SpiderDetector#readPatterns(java.io.File)}.
@@ -127,26 +136,5 @@ public class SpiderDetectorTest extends AbstractDSpaceTest {
         assertFalse(candidate + " matched IP patterns",
                     SpiderDetector.isSpider(candidate, null, null, null));
 
-    }
-
-    /**
-     * Dummy SolrLogger for testing.
-     *
-     * @author mwood
-     */
-    static public class MockSolrLogger
-        extends MockUp<SolrLoggerServiceImpl> {
-        @Mock
-        public void $init() {
-        }
-
-        @Mock
-        public void $clinit() {
-        }
-
-        @Mock
-        public boolean isUseProxies() {
-            return false;
-        }
     }
 }

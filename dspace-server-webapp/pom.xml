@@ -1,0 +1,520 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.dspace</groupId>
+    <artifactId>dspace-server-webapp</artifactId>
+    <packaging>war</packaging>
+    <name>DSpace Server Webapp</name>
+    <description>
+        DSpace Server Webapp (Spring Boot)
+    </description>
+
+    <!--
+      A Parent POM that Maven inherits DSpace Default
+      POM attributes from.
+    -->
+    <parent>
+        <groupId>org.dspace</groupId>
+        <artifactId>dspace-parent</artifactId>
+        <version>7.0-beta5-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <properties>
+        <!-- This is the path to the root [dspace-src] directory. -->
+        <root.basedir>${basedir}/..</root.basedir>
+
+        <!-- Default resource delimiter for Spring Boot, so it doesn't clash with Spring ${} placeholders-->
+        <resource.delimiter>@</resource.delimiter>
+        <!-- Define our starting class for our Spring Boot Application -->
+        <start-class>org.dspace.app.rest.Application</start-class>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <attachClasses>true</attachClasses>
+                    <!-- Filter the web.xml (needed for IDE compatibility/debugging) -->
+                    <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <!-- Builds a *-tests.jar of all test classes -->
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Verify OS license headers for all source code files -->
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/src/test/resources/**</exclude>
+                        <exclude>**/src/test/data/**</exclude>
+                        <!--Skip license check of third party files included/customized from HAL Browser -->
+                        <exclude>src/main/webapp/index.html</exclude>
+                        <exclude>src/main/webapp/login.html</exclude>
+                        <exclude>src/main/webapp/js/hal/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <!-- This plugin allows us to run a Groovy script in our Maven POM
+                 (see: https://groovy.github.io/gmaven/groovy-maven-plugin/execute.html )
+                 We are generating a OS-agnostic version (agnostic.build.dir) of
+                 the ${project.build.directory} property (full path of target dir).
+                 This is needed by the Surefire & Failsafe plugins (see below)
+                 to initialize the Unit Test environment's dspace.cfg file.
+                 Otherwise, the Unit Test Framework will not work on Windows OS.
+                 This Groovy code was mostly borrowed from:
+                 http://stackoverflow.com/questions/3872355/how-to-convert-file-separator-in-maven
+            -->
+            <plugin>
+                <groupId>org.codehaus.gmaven</groupId>
+                <artifactId>groovy-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>setproperty</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <source>
+                                project.properties['agnostic.build.dir'] = project.build.directory.replace(File.separator, '/');
+                                log.info("Initializing Maven property 'agnostic.build.dir' to: {}", project.properties['agnostic.build.dir']);
+                            </source>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <!-- Setup the Unit Test Environment (when -DskipUnitTests=false) -->
+        <profile>
+            <id>unit-test-environment</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>skipUnitTests</name>
+                    <value>false</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- Unit Testing setup: This plugin unzips the
+                         'testEnvironment.zip' file (created by dspace-parent POM), into
+                         the 'target/testing/' folder, to essentially create a test
+                         install of DSpace, against which Tests can be run. -->
+                    <plugin>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/testing</outputDirectory>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.dspace</groupId>
+                                    <artifactId>dspace-parent</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                    <classifier>testEnvironment</classifier>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>setupUnitTestEnvironment</id>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- Run Unit Testing! This plugin just kicks off the tests -->
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <!-- Specify the dspace.dir to use for test environment -->
+                                <!-- This system property is loaded by AbstractDSpaceTest to initialize the test environment -->
+                                <dspace.dir>${agnostic.build.dir}/testing/dspace/</dspace.dir>
+                                <!-- Turn off any DSpace logging -->
+                                <dspace.log.init.disable>true</dspace.log.init.disable>
+                                <solr.install.dir>${agnostic.build.dir}/testing/dspace/solr/</solr.install.dir>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+
+        </profile>
+
+        <!-- Setup the Integration Test Environment (when -DskipIntegrationTests=false) -->
+        <profile>
+            <id>integration-test-environment</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>skipIntegrationTests</name>
+                    <value>false</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- Integration Testing setup: This plugin unzips the
+                         'testEnvironment.zip' file (created by dspace-parent POM), into
+                         the 'target/testing/' folder, to essentially create a test
+                         install of DSpace, against which Tests can be run. -->
+                    <plugin>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/testing</outputDirectory>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.dspace</groupId>
+                                    <artifactId>dspace-parent</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                    <classifier>testEnvironment</classifier>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>setupIntegrationTestEnvironment</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- Run Integration Testing! This plugin just kicks off the tests (when enabled). -->
+                    <plugin>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <!-- Specify the dspace.dir to use for test environment -->
+                                <dspace.dir>${agnostic.build.dir}/testing/dspace/</dspace.dir>
+                                <!-- Turn off any DSpace logging -->
+                                <dspace.log.init.disable>true</dspace.log.init.disable>
+                                <solr.install.dir>${agnostic.build.dir}/testing/dspace/solr/</solr.install.dir>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-expression</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+
+        <!-- These next two dependencies build a WAR that is BOTH executable
+             AND deployable into an external container (Tomcat).
+             See: http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#build-tool-plugins-maven-packaging -->
+        <!-- NOTE: For rapid development (if you don't need Solr or other webapps),
+             you can temporarily comment these out, and switch <packaging> to "jar".
+             This lets you develop in a standalone, runnable JAR application. -->
+        <!--<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>-->
+        <!-- Ensure embedded servlet container doesn't interfere when this
+             WAR is deployed to an external Tomcat (i.e. provided). -->
+        <!--<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+        </dependency>-->
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+            <version>${spring-boot.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-rest</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.flipkart.zjsonpatch</groupId>
+            <artifactId>zjsonpatch</artifactId>
+            <version>0.4.6</version>
+        </dependency>
+
+        <!-- The HAL Browser -->
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-rest-hal-browser</artifactId>
+            <version>${spring-hal-browser.version}</version>
+        </dependency>
+
+        <!-- WebJars dependencies used to update/enhance the default HAL Browser -->
+        <!-- Pull in current version of JQuery via WebJars
+             Made available at: webjars/jquery/dist/jquery.min.js -->
+        <dependency>
+            <groupId>org.webjars.bowergithub.jquery</groupId>
+            <artifactId>jquery-dist</artifactId>
+            <version>3.5.1</version>
+        </dependency>
+        <!-- Pull in current version of Toastr (toastrjs.com) via WebJars
+             Made available at: webjars/toastr/build/toastr.min.js -->
+        <dependency>
+            <groupId>org.webjars.bowergithub.codeseven</groupId>
+            <artifactId>toastr</artifactId>
+            <version>2.1.4</version>
+        </dependency>
+        <!-- Also pull in current version of Bootstrap via WebJars. This is currently ONLY used by our OAI-PMH
+             interface. But, it is include here so that it's accessible to all interfaces enabled in server webapp.
+             Made available at: webjars/bootstrap/dist/js/bootstrap.min.js and
+             webjars/bootstrap/dist/css/bootstrap.min.css -->
+        <dependency>
+            <groupId>org.webjars.bowergithub.twbs</groupId>
+            <artifactId>bootstrap</artifactId>
+            <version>4.5.2</version>
+        </dependency>
+
+
+        <!-- Add in Spring Security for AuthN and AuthZ -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+
+        <!-- Add in log4j support by excluding default logging, and using starter-log4j -->
+        <!-- See: https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto-logging -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+	        <version>${spring-boot.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+	        <version>${spring-boot.version}</version>
+        </dependency>
+
+        <!-- DSpace dependencies -->
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-api</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-services</artifactId>
+        </dependency>
+
+        <!-- DSpace modules to deploy (this modules are all optional, but add features/endpoints to webapp) -->
+        <!-- You may choose to comment out any of these modules if you do not want/need its features -->
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-oai</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-rdf</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-sword</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-swordv2</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.nimbusds</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+            <version>${nimbus-jose-jwt.version}</version>
+        </dependency>
+
+        <!-- TEST DEPENDENCIES -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <version>${spring-security.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <version>${json-path.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path-assert</artifactId>
+            <version>${json-path.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Solr Core is needed for Integration Tests (to run a MockSolrServer)     -->
+        <!-- The following Solr / Lucene dependencies also support integration tests -->
+        <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-core</artifactId>
+            <version>${solr.client.version}</version>
+            <scope>test</scope>
+            <exclusions>
+                <!-- Newer version brought in by opencsv -->
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-text</artifactId>
+                </exclusion>
+                <!-- Newer Jetty version brought in via Parent POM -->
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-http</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-io</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-util</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-cell</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <!-- Newer version brought in by opencsv -->
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-text</artifactId>
+                </exclusion>
+                <!-- Newer Jetty version brought in via Parent POM -->
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-http</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-io</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-util</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers-icu</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers-smartcn</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers-stempel</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+</project>

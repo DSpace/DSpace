@@ -213,6 +213,26 @@ public interface AuthorizeService {
 
     public boolean isCollectionAdmin(Context c) throws SQLException;
 
+    /**
+     * Check to see if a specific user is Community admin
+     * 
+     * @param c current context
+     * @param e the user to check
+     * @return true if user is an admin of some community
+     * @throws SQLException
+     */
+    public boolean isCommunityAdmin(Context c, EPerson e) throws SQLException;
+
+    /**
+     * Check to see if a specific user is Collection admin
+     * 
+     * @param c current context
+     * @param e the user to check
+     * @return true if user is an admin of some collection
+     * @throws SQLException if database error
+     */
+    public boolean isCollectionAdmin(Context c, EPerson e) throws SQLException;
+
     ///////////////////////////////////////////////
     // policy manipulation methods
     ///////////////////////////////////////////////
@@ -428,6 +448,16 @@ public interface AuthorizeService {
      * @throws AuthorizeException if authorization error
      */
     public void removeEPersonPolicies(Context c, DSpaceObject o, EPerson e) throws SQLException, AuthorizeException;
+
+    /**
+     * Removes all policies from an eperson that belong to an EPerson.
+     *
+     * @param c current context
+     * @param e the eperson
+     * @throws SQLException if there's a database problem
+     * @throws AuthorizeException if authorization error
+     */
+    public void removeAllEPersonPolicies(Context c, EPerson e) throws SQLException, AuthorizeException;
 
     /**
      * Returns all groups authorized to perform an action on an object. Returns

@@ -72,6 +72,12 @@ public class MetadataValueServiceImpl implements MetadataValueService {
     }
 
     @Override
+    public Iterator<MetadataValue> findByFieldAndValue(Context context, MetadataField metadataField, String value)
+            throws SQLException {
+        return metadataValueDAO.findItemValuesByFieldAndValue(context, metadataField, value);
+    }
+
+    @Override
     public void update(Context context, MetadataValue metadataValue) throws SQLException {
         metadataValueDAO.save(context, metadataValue);
         log.info(LogManager.getHeader(context, "update_metadatavalue",

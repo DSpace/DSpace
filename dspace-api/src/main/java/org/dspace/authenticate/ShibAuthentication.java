@@ -24,16 +24,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataFieldName;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Context;
+import org.dspace.core.Utils;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -64,13 +68,12 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * @author <a href="mailto:bliong@melcoe.mq.edu.au">Bruc Liong, MELCOE</a>
  * @author <a href="mailto:kli@melcoe.mq.edu.au">Xiang Kevin Li, MELCOE</a>
  * @author <a href="http://www.scottphillips.com">Scott Phillips</a>
- * @version $Revision$
  */
 public class ShibAuthentication implements AuthenticationMethod {
     /**
      * log4j category
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ShibAuthentication.class);
+    private static final Logger log = LogManager.getLogger(ShibAuthentication.class);
 
     /**
      * Additional metadata mappings
@@ -492,35 +495,22 @@ public class ShibAuthentication implements AuthenticationMethod {
         boolean lazySession = configurationService.getBooleanProperty("authentication-shibboleth.lazysession", false);
 
         if ( lazySession ) {
-            String shibURL = configurationService.getProperty("authentication-shibboleth.lazysession.loginurl");
-            boolean forceHTTPS =
-                configurationService.getBooleanProperty("authentication-shibboleth.lazysession.secure",true);
+            String shibURL = getShibURL(request);
 
-            // Shibboleth authentication initiator
-            if (shibURL == null || shibURL.length() == 0) {
-                shibURL = "/Shibboleth.sso/Login";
+            // Determine the client redirect URL, where to redirect after authenticating.
+            String redirectUrl = null;
+            if (request.getHeader("Referer") != null && StringUtils.isNotBlank(request.getHeader("Referer"))) {
+                redirectUrl = request.getHeader("Referer");
+            } else if (request.getHeader("X-Requested-With") != null
+                    && StringUtils.isNotBlank(request.getHeader("X-Requested-With"))) {
+                redirectUrl = request.getHeader("X-Requested-With");
             }
-            shibURL = shibURL.trim();
 
-            // Determine the return URL, where shib will send the user after authenticating. We need it to go back
-            // to DSpace's shibboleth-login url so the we will extract the user's information and locally
-            // authenticate them.
-            String host = request.getServerName();
-            int port = request.getServerPort();
-            String contextPath = request.getContextPath();
-
-            String returnURL = request.getHeader("Referer");
-            if (returnURL == null) {
-                if (request.isSecure() || forceHTTPS) {
-                    returnURL = "https://";
-                } else {
-                    returnURL = "http://";
-                }
-                returnURL += host;
-                if (!(port == 443 || port == 80)) {
-                    returnURL += ":" + port;
-                }
-            }
+            // Determine the server return URL, where shib will send the user after authenticating.
+            // We need it to go back to DSpace's shibboleth-login url so we will extract the user's information
+            // and locally authenticate them.
+            String returnURL = configurationService.getProperty("dspace.server.url") + "/api/authn/shibboleth"
+                    + ((redirectUrl != null) ? "?redirectUrl=" + redirectUrl : "");
 
             try {
                 shibURL += "?target=" + URLEncoder.encode(returnURL, "UTF-8");
@@ -855,25 +845,24 @@ public class ShibAuthentication implements AuthenticationMethod {
 
             // Truncate values
             if (value == null) {
-                log.warn(
-                    "Unable to update the eperson's '" + field + "' metadata because the header '" + header + "' does" +
-                        " not exist.");
+                log.warn("Unable to update the eperson's '{}' metadata"
+                        + " because the header '{}' does not exist.", field, header);
                 continue;
             } else if ("phone".equals(field) && value.length() > PHONE_MAX_SIZE) {
-                log.warn(
-                    "Truncating eperson phone metadata because it is longer than " + PHONE_MAX_SIZE + ": '" + value +
-                        "'");
+                log.warn("Truncating eperson phone metadata because it is longer than {}: '{}'",
+                        PHONE_MAX_SIZE, value);
                 value = value.substring(0, PHONE_MAX_SIZE);
             } else if (value.length() > METADATA_MAX_SIZE) {
-                log.warn(
-                    "Truncating eperson " + field + " metadata because it is longer than " + METADATA_MAX_SIZE + ": " +
-                        "'" + value + "'");
+                log.warn("Truncating eperson {} metadata because it is longer than {}: '{}'",
+                        field, METADATA_MAX_SIZE, value);
                 value = value.substring(0, METADATA_MAX_SIZE);
             }
 
-            ePersonService.setMetadata(context, eperson, field, value);
-            log.debug(
-                "Updated the eperson's '" + field + "' metadata using header: '" + header + "' = '" + value + "'.");
+            String[] nameParts = MetadataFieldName.parse(field);
+            ePersonService.setMetadataSingleValue(context, eperson,
+                    nameParts[0], nameParts[1], nameParts[2], value, null);
+            log.debug("Updated the eperson's '{}' metadata using header: '{}' = '{}'.",
+                    field, header, value);
         }
         ePersonService.update(context, eperson);
         context.dispatchEvents();
@@ -901,10 +890,8 @@ public class ShibAuthentication implements AuthenticationMethod {
     protected int swordCompatibility(Context context, String username, String password, HttpServletRequest request)
         throws SQLException {
 
-        EPerson eperson = null;
-
         log.debug("Shibboleth Sword compatibility activated.");
-        eperson = ePersonService.findByEmail(context, username.toLowerCase());
+        EPerson eperson = ePersonService.findByEmail(context, username.toLowerCase());
 
         if (eperson == null) {
             // lookup failed.
@@ -963,7 +950,7 @@ public class ShibAuthentication implements AuthenticationMethod {
         }
 
 
-        HashMap<String, String> map = new HashMap<String, String>();
+        HashMap<String, String> map = new HashMap<>();
 
         String[] mappingString = configurationService.getArrayProperty("authentication-shibboleth.eperson.metadata");
         boolean autoCreate = configurationService
@@ -1002,19 +989,19 @@ public class ShibAuthentication implements AuthenticationMethod {
 
             if (valid) {
                 // The eperson field is fine, we can use it.
-                log.debug("Loading additional eperson metadata mapping for: '" + header + "' = '" + name + "'");
+                log.debug("Loading additional eperson metadata mapping for: '{}' = '{}'",
+                        header, name);
                 map.put(header, name);
             } else {
                 // The field doesn't exist, and we can't use it.
-                log.error(
-                    "Skipping the additional eperson metadata mapping for: '" + header + "' = '" + name + "' because " +
-                        "the field is not supported by the current configuration.");
+                log.error("Skipping the additional eperson metadata mapping for: '{}' = '{}'"
+                        + " because the field is not supported by the current configuration.",
+                        header, name);
             }
         } // foreach metadataStringList
 
 
         metadataHeaderMap = map;
-        return;
     }
 
     /**
@@ -1032,12 +1019,8 @@ public class ShibAuthentication implements AuthenticationMethod {
             return false;
         }
 
-        // The phone is a predefined field
-        if ("phone".equals(metadataName)) {
-            return true;
-        }
-
-        MetadataField metadataField = metadataFieldService.findByElement(context, "eperson", metadataName, null);
+        MetadataField metadataField = metadataFieldService.findByElement(context,
+                MetadataSchemaEnum.EPERSON.getName(), metadataName, null);
         return metadataField != null;
     }
 
@@ -1075,10 +1058,7 @@ public class ShibAuthentication implements AuthenticationMethod {
         try {
             context.turnOffAuthorisationSystem();
             metadataField = metadataFieldService.create(context, epersonSchema, metadataName, null, null);
-        } catch (AuthorizeException e) {
-            log.error(e.getMessage(), e);
-            return false;
-        } catch (NonUniqueMetadataException e) {
+        } catch (AuthorizeException | NonUniqueMetadataException e) {
             log.error(e.getMessage(), e);
             return false;
         } finally {
@@ -1223,7 +1203,7 @@ public class ShibAuthentication implements AuthenticationMethod {
         // Shibboleth attributes are separated by semicolons (and semicolons are
         // escaped with a backslash). So here we will scan through the string and
         // split on any unescaped semicolons.
-        List<String> valueList = new ArrayList<String>();
+        List<String> valueList = new ArrayList<>();
         int idx = 0;
         do {
             idx = values.indexOf(';', idx);
@@ -1258,6 +1238,23 @@ public class ShibAuthentication implements AuthenticationMethod {
         return valueList;
     }
 
+    private String getShibURL(HttpServletRequest request) {
+        String shibURL = configurationService.getProperty("authentication-shibboleth.lazysession.loginurl",
+                "/Shibboleth.sso/Login");
+        boolean forceHTTPS =
+                configurationService.getBooleanProperty("authentication-shibboleth.lazysession.secure", true);
+
+        // Shibboleth url must be absolute
+        if (shibURL.startsWith("/")) {
+            String serverUrl = Utils.getBaseUrl(configurationService.getProperty("dspace.server.url"));
+            shibURL = serverUrl + shibURL;
+            if ((request.isSecure() || forceHTTPS) && shibURL.startsWith("http://")) {
+                shibURL = shibURL.replace("http://", "https://");
+            }
+        }
+        return shibURL;
+
+    }
 
 }
 

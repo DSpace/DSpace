@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
@@ -140,8 +140,8 @@ public class PersonAuthorityValue extends AuthorityValue {
     @Override
     public void setValues(SolrDocument document) {
         super.setValues(document);
-        this.firstName = ObjectUtils.toString(document.getFieldValue("first_name"));
-        this.lastName = ObjectUtils.toString(document.getFieldValue("last_name"));
+        this.firstName = Objects.toString(document.getFieldValue("first_name"), "");
+        this.lastName = Objects.toString(document.getFieldValue("last_name"), "");
         nameVariants = new ArrayList<String>();
         Collection<Object> document_name_variant = document.getFieldValues("name_variant");
         if (document_name_variant != null) {

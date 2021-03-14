@@ -47,7 +47,6 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
@@ -57,6 +56,7 @@ import org.dspace.core.Utils;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -97,6 +97,8 @@ public class ItemExportServiceImpl implements ItemExportService {
     protected ItemService itemService;
     @Autowired(required = true)
     protected HandleService handleService;
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
 
 
     /**
@@ -194,7 +196,7 @@ public class ItemExportServiceImpl implements ItemExportService {
      */
     protected void writeMetadata(Context c, Item i, File destDir, boolean migrate)
         throws Exception {
-        Set<String> schemas = new HashSet<String>();
+        Set<String> schemas = new HashSet<>();
         List<MetadataValue> dcValues = itemService.getMetadata(i, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
         for (MetadataValue metadataValue : dcValues) {
             schemas.add(metadataValue.getMetadataField().getMetadataSchema().getName());
@@ -504,7 +506,7 @@ public class ItemExportServiceImpl implements ItemExportService {
     public void createDownloadableExport(DSpaceObject dso,
                                          Context context, boolean migrate) throws Exception {
         EPerson eperson = context.getCurrentUser();
-        ArrayList<DSpaceObject> list = new ArrayList<DSpaceObject>(1);
+        ArrayList<DSpaceObject> list = new ArrayList<>(1);
         list.add(dso);
         processDownloadableExport(list, context, eperson == null ? null
             : eperson.getEmail(), migrate);
@@ -521,7 +523,7 @@ public class ItemExportServiceImpl implements ItemExportService {
     @Override
     public void createDownloadableExport(DSpaceObject dso,
                                          Context context, String additionalEmail, boolean migrate) throws Exception {
-        ArrayList<DSpaceObject> list = new ArrayList<DSpaceObject>(1);
+        ArrayList<DSpaceObject> list = new ArrayList<>(1);
         list.add(dso);
         processDownloadableExport(list, context, additionalEmail, migrate);
     }
@@ -637,7 +639,7 @@ public class ItemExportServiceImpl implements ItemExportService {
 
         // check the size of all the bitstreams against the configuration file
         // entry if it exists
-        String megaBytes = ConfigurationManager
+        String megaBytes = configurationService
             .getProperty("org.dspace.app.itemexport.max.size");
         if (megaBytes != null) {
             float maxSize = 0;
@@ -682,7 +684,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                         while (iter.hasNext()) {
                             String keyName = iter.next();
                             List<UUID> uuids = itemsMap.get(keyName);
-                            List<Item> items = new ArrayList<Item>();
+                            List<Item> items = new ArrayList<>();
                             for (UUID uuid : uuids) {
                                 items.add(itemService.find(context, uuid));
                             }
@@ -762,7 +764,7 @@ public class ItemExportServiceImpl implements ItemExportService {
     @Override
     public String getExportDownloadDirectory(EPerson ePerson)
         throws Exception {
-        String downloadDir = ConfigurationManager
+        String downloadDir = configurationService
             .getProperty("org.dspace.app.itemexport.download.dir");
         if (downloadDir == null) {
             throw new Exception(
@@ -779,7 +781,7 @@ public class ItemExportServiceImpl implements ItemExportService {
 
     @Override
     public String getExportWorkDirectory() throws Exception {
-        String exportDir = ConfigurationManager
+        String exportDir = configurationService
             .getProperty("org.dspace.app.itemexport.work.dir");
         if (exportDir == null) {
             throw new Exception(
@@ -885,7 +887,7 @@ public class ItemExportServiceImpl implements ItemExportService {
             return null;
         }
 
-        List<String> fileNames = new ArrayList<String>();
+        List<String> fileNames = new ArrayList<>();
 
         for (String fileName : downloadDir.list()) {
             if (fileName.contains("export") && fileName.endsWith(".zip")) {
@@ -902,7 +904,7 @@ public class ItemExportServiceImpl implements ItemExportService {
 
     @Override
     public void deleteOldExportArchives(EPerson eperson) throws Exception {
-        int hours = ConfigurationManager
+        int hours = configurationService
             .getIntProperty("org.dspace.app.itemexport.life.span.hours");
         Calendar now = Calendar.getInstance();
         now.setTime(new Date());
@@ -923,11 +925,11 @@ public class ItemExportServiceImpl implements ItemExportService {
 
     @Override
     public void deleteOldExportArchives() throws Exception {
-        int hours = ConfigurationManager.getIntProperty("org.dspace.app.itemexport.life.span.hours");
+        int hours = configurationService.getIntProperty("org.dspace.app.itemexport.life.span.hours");
         Calendar now = Calendar.getInstance();
         now.setTime(new Date());
         now.add(Calendar.HOUR, (-hours));
-        File downloadDir = new File(ConfigurationManager.getProperty("org.dspace.app.itemexport.download.dir"));
+        File downloadDir = new File(configurationService.getProperty("org.dspace.app.itemexport.download.dir"));
         if (downloadDir.exists()) {
             // Get a list of all the sub-directories, potentially one for each ePerson.
             File[] dirs = downloadDir.listFiles();
@@ -961,8 +963,8 @@ public class ItemExportServiceImpl implements ItemExportService {
             Locale supportedLocale = I18nUtil.getEPersonLocale(eperson);
             Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "export_success"));
             email.addRecipient(eperson.getEmail());
-            email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/exportdownload/" + fileName);
-            email.addArgument(ConfigurationManager.getProperty("org.dspace.app.itemexport.life.span.hours"));
+            email.addArgument(configurationService.getProperty("dspace.ui.url") + "/exportdownload/" + fileName);
+            email.addArgument(configurationService.getProperty("org.dspace.app.itemexport.life.span.hours"));
 
             email.send();
         } catch (Exception e) {
@@ -979,7 +981,7 @@ public class ItemExportServiceImpl implements ItemExportService {
             Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "export_error"));
             email.addRecipient(eperson.getEmail());
             email.addArgument(error);
-            email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/feedback");
+            email.addArgument(configurationService.getProperty("dspace.ui.url") + "/feedback");
 
             email.send();
         } catch (Exception e) {

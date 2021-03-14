@@ -101,6 +101,7 @@
      <field name="last_name" type="text" multiValued="false" indexed="true" stored="true" required="false"/>
      <field name="name_variant" type="text" multiValued="true" indexed="true" stored="true" required="false"/>
      <dynamicField name="label_*" type="text" multiValued="true" indexed="true" stored="true" required="false"/>
+     <dynamicField name="value_*" type="text" multiValued="false" indexed="true" stored="true" required="false"/>
      <field name="all_labels" type="text" multiValued="true" indexed="true" stored="true" required="false"/>
      <copyField source="label_*" dest="all_labels"/>
      <field name="deleted" type="boolean" multiValued="false" indexed="true" stored="true" required="false"/>

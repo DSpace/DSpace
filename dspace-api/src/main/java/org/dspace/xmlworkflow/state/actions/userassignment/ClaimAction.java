@@ -10,14 +10,16 @@ package org.dspace.xmlworkflow.state.actions.userassignment;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xmlworkflow.Role;
 import org.dspace.xmlworkflow.RoleMembers;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
@@ -37,6 +39,8 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  * @author Mark Diggory (markd at atmire dot com)
  */
 public class ClaimAction extends UserSelectionAction {
+    private final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     @Override
     public void activate(Context context, XmlWorkflowItem wfItem) throws SQLException, IOException, AuthorizeException {
@@ -68,25 +72,33 @@ public class ClaimAction extends UserSelectionAction {
     }
 
     @Override
+    public List<String> getOptions() {
+        return new ArrayList<>();
+    }
+
+    @Override
     public void alertUsersOnActivation(Context c, XmlWorkflowItem wfi, RoleMembers roleMembers)
         throws IOException, SQLException {
         try {
+            EPerson ep = wfi.getSubmitter();
+            String submitterName = null;
+            if (ep != null) {
+                submitterName = ep.getFullName();
+            }
             XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
             xmlWorkflowService.alertUsersOnTaskActivation(c, wfi, "submit_task", roleMembers.getAllUniqueMembers(c),
-                                                          //The arguments
-                                                          wfi.getItem().getName(),
-                                                          wfi.getCollection().getName(),
-                                                          wfi.getSubmitter().getFullName(),
-                                                          //TODO: message
-                                                          "New task available.",
-                                                          xmlWorkflowService.getMyDSpaceLink()
+                    //The arguments
+                    wfi.getItem().getName(),
+                    wfi.getCollection().getName(),
+                    submitterName,
+                    //TODO: message
+                    "New task available.",
+                    xmlWorkflowService.getMyDSpaceLink()
             );
         } catch (MessagingException e) {
             log.info(LogManager.getHeader(c, "error emailing user(s) for claimed task",
-                                          "step: " + getParent().getStep().getId() + " workflowitem: " + wfi.getID()));
+                    "step: " + getParent().getStep().getId() + " workflowitem: " + wfi.getID()));
         }
-
-
     }
 
     @Override
@@ -96,7 +108,7 @@ public class ClaimAction extends UserSelectionAction {
             //Create task for the users left
             XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
                                      .createPoolTasks(c, wfi, roleMembers, getParent().getStep(), getParent());
-            if (ConfigurationManager.getBooleanProperty("workflow", "notify.returned.tasks", true)) {
+            if (configurationService.getBooleanProperty("workflow.notify.returned.tasks", true)) {
                 alertUsersOnActivation(c, wfi, roleMembers);
             }
 
@@ -126,7 +138,7 @@ public class ClaimAction extends UserSelectionAction {
                 RoleMembers roleMembers = role.getMembers(context, wfi);
 
                 ArrayList<EPerson> epersons = roleMembers.getAllUniqueMembers(context);
-                return !(epersons.size() == 0 || step.getRequiredUsers() > epersons.size());
+                return !(epersons.isEmpty() || step.getRequiredUsers() > epersons.size());
             } else {
                 // We don't have a role and do have a UI so throw a workflow exception
                 throw new WorkflowConfigurationException(

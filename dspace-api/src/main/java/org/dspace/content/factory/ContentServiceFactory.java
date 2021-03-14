@@ -7,11 +7,11 @@
  */
 package org.dspace.content.factory;
 
-import java.io.Serializable;
 import java.util.List;
 
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.InProgressSubmission;
+import org.dspace.content.RelationshipMetadataService;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
@@ -23,7 +23,6 @@ import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.EntityService;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.InProgressSubmissionService;
-import org.dspace.content.service.IndexableObjectService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
@@ -34,7 +33,6 @@ import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.SiteService;
 import org.dspace.content.service.SupervisedItemService;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.discovery.IndexableObject;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 
@@ -45,13 +43,6 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
  * @author kevinvandevelde at atmire.com
  */
 public abstract class ContentServiceFactory {
-
-    /**
-     * Return the list of all the available implementations of the IndexableObjectService interface
-     * 
-     * @return the list of IndexableObjectService
-     */
-    public abstract List<IndexableObjectService> getIndexableObjectServices();
 
     public abstract List<DSpaceObjectService<? extends DSpaceObject>> getDSpaceObjectServices();
 
@@ -112,6 +103,8 @@ public abstract class ContentServiceFactory {
      */
     public abstract EntityService getEntityService();
 
+    public abstract RelationshipMetadataService getRelationshipMetadataService();
+
     public InProgressSubmissionService getInProgressSubmissionService(InProgressSubmission inProgressSubmission) {
         if (inProgressSubmission instanceof WorkspaceItem) {
             return getWorkspaceItemService();
@@ -137,18 +130,6 @@ public abstract class ContentServiceFactory {
             }
         }
         throw new UnsupportedOperationException("Unknown DSpace type: " + type);
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T extends IndexableObject<PK>, PK extends Serializable> IndexableObjectService<T, PK>
-        getIndexableObjectService(int type) {
-        for (int i = 0; i < getIndexableObjectServices().size(); i++) {
-            IndexableObjectService objectService = getIndexableObjectServices().get(i);
-            if (objectService.getSupportsIndexableObjectTypeConstant() == type) {
-                return (IndexableObjectService<T, PK>) objectService;
-            }
-        }
-        throw new UnsupportedOperationException("Unknown Findable Object type: " + type);
     }
 
     public DSpaceObjectLegacySupportService<? extends DSpaceObject> getDSpaceLegacyObjectService(int type) {

@@ -7,14 +7,12 @@
  */
 package org.dspace.xmlworkflow.state.actions.userassignment;
 
-import java.io.IOException;
-import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.xmlworkflow.RoleMembers;
-import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
@@ -34,12 +32,11 @@ public class NoUserSelectionAction extends UserSelectionAction {
     }
 
     @Override
-    public void regenerateTasks(Context c, XmlWorkflowItem wfi, RoleMembers roleMembers) throws SQLException {
+    public void regenerateTasks(Context c, XmlWorkflowItem wfi, RoleMembers roleMembers) {
     }
 
     @Override
-    public boolean isValidUserSelection(Context context, XmlWorkflowItem wfi, boolean hasUI)
-        throws WorkflowConfigurationException, SQLException {
+    public boolean isValidUserSelection(Context context, XmlWorkflowItem wfi, boolean hasUI) {
         return true;
     }
 
@@ -49,12 +46,16 @@ public class NoUserSelectionAction extends UserSelectionAction {
     }
 
     @Override
-    public void activate(Context c, XmlWorkflowItem wf) throws SQLException, IOException {
+    public void activate(Context c, XmlWorkflowItem wf) {
     }
 
     @Override
-    public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
-        throws SQLException, AuthorizeException, IOException {
+    public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request) {
         return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
+    }
+
+    @Override
+    public List<String> getOptions() {
+        return new ArrayList<>();
     }
 }

@@ -122,7 +122,6 @@
     <field name="submitter" type="string" indexed="true" stored="true" required="false" />
     <field name="actor" type="string" indexed="true" stored="true" required="false" />
     <field name="workflowItemId" type="integer" indexed="true" stored="true" required="false" />
-
  </fields>
 
  <uniqueKey>uid</uniqueKey>

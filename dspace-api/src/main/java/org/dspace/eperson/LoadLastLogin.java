@@ -27,10 +27,10 @@ import jdbm.helper.StringComparator;
 import jdbm.helper.Tuple;
 import jdbm.helper.TupleBrowser;
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.MissingOptionException;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -68,7 +68,7 @@ public class LoadLastLogin {
         options.addOption("p", "pretend", false, "Output TSV instead of updating database");
         options.addOption("v", "verbose", false, "Talk more about what we are doing");
 
-        PosixParser parser = new PosixParser();
+        DefaultParser parser = new DefaultParser();
         CommandLine command = null;
         try {
             command = parser.parse(options, argv);

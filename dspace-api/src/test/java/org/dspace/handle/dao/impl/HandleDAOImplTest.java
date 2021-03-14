@@ -71,10 +71,10 @@ public class HandleDAOImplTest extends AbstractUnitTest {
     private Community owningCommunity;
 
     private static final String HANDLE_PREFIX = "123456789";
-    private static final String SUFFIX_1 = "11";
-    private static final String SUFFIX_2 = "11.2";
-    private static final String SUFFIX_3 = "33";
-    private static final String SUFFIX_4 = "44";
+    private static final String SUFFIX_1 = "101";
+    private static final String SUFFIX_2 = "101.2";
+    private static final String SUFFIX_3 = "303";
+    private static final String SUFFIX_4 = "404";
 
     @Before
     @Override
@@ -128,12 +128,8 @@ public class HandleDAOImplTest extends AbstractUnitTest {
             owningCommunity = context.reloadEntity(owningCommunity);
             ContentServiceFactory.getInstance().getCommunityService().delete(context, owningCommunity);
             owningCommunity = null;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (AuthorizeException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new AssertionError("Error occurred in destroy()", e);
         }
         item1 = null;
         item2 = null;

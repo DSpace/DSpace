@@ -8,6 +8,8 @@
 package org.dspace.license;
 
 
+import java.util.List;
+
 /**
  * @author wbossons
  */
@@ -15,17 +17,17 @@ public class CCLicense {
 
     private String licenseName;
     private String licenseId;
-    private int order = 0;
+    private List<CCLicenseField> ccLicenseFieldList;
 
     public CCLicense() {
         super();
     }
 
-    public CCLicense(String licenseId, String licenseName, int order) {
+    public CCLicense(String licenseId, String licenseName, List<CCLicenseField> ccLicenseFieldList) {
         super();
         this.licenseId = licenseId;
         this.licenseName = licenseName;
-        this.order = order;
+        this.ccLicenseFieldList = ccLicenseFieldList;
     }
 
     public String getLicenseName() {
@@ -44,13 +46,19 @@ public class CCLicense {
         this.licenseId = licenseId;
     }
 
-    public int getOrder() {
-        return this.order;
+    /**
+     * Gets the list of CC License Fields
+     * @return the list of CC License Fields
+     */
+    public List<CCLicenseField> getCcLicenseFieldList() {
+        return ccLicenseFieldList;
     }
 
-    public void setOrder(int order) {
-        this.order = order;
+    /**
+     * Sets the list of CC License Fields
+     * @param ccLicenseFieldList
+     */
+    public void setCcLicenseFieldList(final List<CCLicenseField> ccLicenseFieldList) {
+        this.ccLicenseFieldList = ccLicenseFieldList;
     }
-
-
 }

@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Collection;
@@ -21,8 +22,9 @@ import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.swordapp.server.Deposit;
 import org.swordapp.server.SwordAuthException;
 import org.swordapp.server.SwordError;
@@ -30,7 +32,7 @@ import org.swordapp.server.SwordServerException;
 
 public abstract class AbstractSwordContentIngester
     implements SwordContentIngester {
-    public static final Logger log = org.apache.logging.log4j.LogManager.getLogger(
+    public static final Logger log = LogManager.getLogger(
         AbstractSwordContentIngester.class);
 
     protected BitstreamFormatService bitstreamFormatService =
@@ -39,6 +41,10 @@ public abstract class AbstractSwordContentIngester
     protected ItemService itemService =
         ContentServiceFactory.getInstance().getItemService();
 
+    protected ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    @Override
     public DepositResult ingest(Context context, Deposit deposit,
                                 DSpaceObject dso, VerboseDescription verboseDescription)
         throws DSpaceSwordException, SwordError, SwordAuthException,
@@ -46,6 +52,7 @@ public abstract class AbstractSwordContentIngester
         return this.ingest(context, deposit, dso, verboseDescription, null);
     }
 
+    @Override
     public DepositResult ingest(Context context, Deposit deposit,
                                 DSpaceObject dso, VerboseDescription verboseDescription,
                                 DepositResult result)
@@ -110,8 +117,8 @@ public abstract class AbstractSwordContentIngester
     protected void setUpdatedDate(Context context, Item item,
                                   VerboseDescription verboseDescription)
         throws DSpaceSwordException {
-        String field = ConfigurationManager
-            .getProperty("swordv2-server", "updated.field");
+        String field = configurationService
+            .getProperty("swordv2-server.updated.field");
         if (field == null || "".equals(field)) {
             throw new DSpaceSwordException(
                 "No configuration, or configuration is invalid for: sword.updated.field");
@@ -153,8 +160,8 @@ public abstract class AbstractSwordContentIngester
             return;
         }
 
-        String field = ConfigurationManager
-            .getProperty("swordv2-server", "slug.field");
+        String field = configurationService
+            .getProperty("swordv2-server.slug.field");
         if (field == null || "".equals(field)) {
             throw new DSpaceSwordException(
                 "No configuration, or configuration is invalid for: sword.slug.field");
