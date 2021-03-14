@@ -7,6 +7,15 @@
  */
 package org.dspace.authority.orcid;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.common.SolrDocument;
@@ -15,10 +24,12 @@ import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.AuthorityValueServiceImpl;
 import org.dspace.authority.PersonAuthorityValue;
 import org.dspace.utils.DSpace;
-import org.orcid.jaxb.model.common_v2.ExternalId;
-import org.orcid.jaxb.model.record_v2.*;
-
-import java.util.*;
+import org.orcid.jaxb.model.v3.release.record.Keyword;
+import org.orcid.jaxb.model.v3.release.record.Name;
+import org.orcid.jaxb.model.v3.release.record.Person;
+import org.orcid.jaxb.model.v3.release.record.PersonExternalIdentifier;
+import org.orcid.jaxb.model.v3.release.record.PersonExternalIdentifiers;
+import org.orcid.jaxb.model.v3.release.record.ResearcherUrl;
 
 /**
  * @author Jonas Van Goolen (jonas at atmire dot com)
@@ -95,45 +106,44 @@ public class Orcidv2AuthorityValue extends PersonAuthorityValue {
      * @param person Person
      */
     protected void setValues(Person person) {
-        NameType name = person.getName();
+        Name name = person.getName();
 
         if (!StringUtils.equals(name.getPath(), this.getOrcid_id())) {
             this.setOrcid_id(name.getPath());
         }
 
-        if (!StringUtils.equals(name.getFamilyName().getValue(), this.getLastName())) {
-            this.setLastName(name.getFamilyName().getValue());
+        if (!StringUtils.equals(name.getFamilyName().getContent(), this.getLastName())) {
+            this.setLastName(name.getFamilyName().getContent());
         }
 
-        if (!StringUtils.equals(name.getGivenNames().getValue(), this.getFirstName())) {
-            this.setFirstName(name.getGivenNames().getValue());
+        if (!StringUtils.equals(name.getGivenNames().getContent(), this.getFirstName())) {
+            this.setFirstName(name.getGivenNames().getContent());
         }
 
-        if (name.getCreditName() != null && StringUtils.isNotBlank(name.getCreditName().getValue())) {
-            if (!this.getNameVariants().contains(name.getCreditName())) {
-                this.addNameVariant(name.getCreditName().getValue());
+        if (name.getCreditName() != null && StringUtils.isNotBlank(name.getCreditName().getContent())) {
+            if (!this.getNameVariants().contains(name.getCreditName().getContent())) {
+                this.addNameVariant(name.getCreditName().getContent());
             }
         }
 
         if (person.getKeywords() != null) {
-            for (KeywordType keyword : person.getKeywords().getKeyword()) {
+            for (Keyword keyword : person.getKeywords().getKeywords()) {
                 if (this.isNewMetadata("keyword", keyword.getContent())) {
                     this.addOtherMetadata("keyword", keyword.getContent());
                 }
             }
         }
 
-        ExternalIdentifiers externalIdentifiers = person.getExternalIdentifiers();
+        PersonExternalIdentifiers externalIdentifiers = person.getExternalIdentifiers();
         if (externalIdentifiers != null) {
-            for (ExternalId externalIdentifier : externalIdentifiers.getExternalIdentifier()) {
-                if (this.isNewMetadata("external_identifier", externalIdentifier.getExternalIdValue())) {
-                    this.addOtherMetadata("external_identifier", externalIdentifier.getExternalIdValue());
-
+            for (PersonExternalIdentifier externalIdentifier : externalIdentifiers.getExternalIdentifiers()) {
+                if (this.isNewMetadata("external_identifier", externalIdentifier.getValue())) {
+                    this.addOtherMetadata("external_identifier", externalIdentifier.getValue());
                 }
             }
         }
         if (person.getResearcherUrls() != null) {
-            for (ResearcherUrlType researcherUrl : person.getResearcherUrls().getResearcherUrl()) {
+            for (ResearcherUrl researcherUrl : person.getResearcherUrls().getResearcherUrls()) {
                 if (this.isNewMetadata("researcher_url", researcherUrl.getUrl().getValue())) {
                     this.addOtherMetadata("researcher_url", researcherUrl.getUrl().getValue());
                 }
@@ -245,12 +255,18 @@ public class Orcidv2AuthorityValue extends PersonAuthorityValue {
     }
 
     /**
-     * Provides a string that will allow this AuthorityType to be recognized and provides information to create a new instance to be created using public Orcidv2AuthorityValue newInstance(String info).
-     * @return see {@link org.dspace.authority.service.AuthorityValueService#GENERATE AuthorityValueService.GENERATE}
+     * Provides a string that will allow this AuthorityType to be recognized and
+     * provides information to create a new instance to be created using public
+     * Orcidv2AuthorityValue newInstance(String info).
+     * 
+     * @return see
+     *         {@link org.dspace.authority.service.AuthorityValueService#GENERATE
+     *         AuthorityValueService.GENERATE}
      */
     @Override
     public String generateString() {
-        String generateString = AuthorityValueServiceImpl.GENERATE + getAuthorityType() + AuthorityValueServiceImpl.SPLIT;
+        String generateString = AuthorityValueServiceImpl.GENERATE + getAuthorityType()
+                + AuthorityValueServiceImpl.SPLIT;
         if (StringUtils.isNotBlank(getOrcid_id())) {
             generateString += getOrcid_id();
         }

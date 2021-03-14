@@ -156,22 +156,6 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
         return ma.getMatches(query, start, limit, locale);
     }
 
-
-    @Override
-    public Choices getMatches(String fieldKey, String query, Collection collection, int start, int limit, String locale,
-                              boolean externalInput) {
-        ChoiceAuthority ma = getAuthorityByFieldKeyCollection(fieldKey, collection);
-        if (ma == null) {
-            throw new IllegalArgumentException(
-                "No choices plugin was configured for  field \"" + fieldKey
-                    + "\", collection=" + collection.getID().toString() + ".");
-        }
-        if (externalInput && ma instanceof SolrAuthority) {
-            ((SolrAuthority) ma).addExternalResultsInNextMatches();
-        }
-        return ma.getMatches(query, start, limit, locale);
-    }
-
     @Override
     public Choices getBestMatch(String fieldKey, String query, Collection collection,
                                 String locale) {
