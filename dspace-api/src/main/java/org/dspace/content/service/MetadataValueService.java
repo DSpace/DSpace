@@ -64,6 +64,18 @@ public interface MetadataValueService {
         throws IOException, SQLException;
 
     /**
+     * Retrieves matching MetadataValues for a given field and value.
+     *
+     * @param context dspace context
+     * @param metadataField The field that must match
+     * @param value The value that must match
+     * @return the matching MetadataValues
+     * @throws SQLException if database error
+     */
+    public Iterator<MetadataValue> findByFieldAndValue(Context context, MetadataField metadataField, String value)
+            throws SQLException;
+
+    /**
      * Update the metadata value in the database.
      *
      * @param context       dspace context

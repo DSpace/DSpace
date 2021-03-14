@@ -8,6 +8,7 @@
 package org.dspace.authorize;
 
 import java.util.Date;
+import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -23,7 +24,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
@@ -123,16 +123,16 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
         if (getAction() != other.getAction()) {
             return false;
         }
-        if (!ObjectUtils.equals(getEPerson(), other.getEPerson())) {
+        if (!Objects.equals(getEPerson(), other.getEPerson())) {
             return false;
         }
-        if (!ObjectUtils.equals(getGroup(), other.getGroup())) {
+        if (!Objects.equals(getGroup(), other.getGroup())) {
             return false;
         }
-        if (!ObjectUtils.equals(getStartDate(), other.getStartDate())) {
+        if (!Objects.equals(getStartDate(), other.getStartDate())) {
             return false;
         }
-        if (!ObjectUtils.equals(getEndDate(), other.getEndDate())) {
+        if (!Objects.equals(getEndDate(), other.getEndDate())) {
             return false;
         }
         return true;
@@ -185,7 +185,7 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
     /**
      * set the action this policy authorizes
      *
-     * @param myid action ID from {@link org.dspace.core.Constants#Constants Constants}
+     * @param myid action ID from {@link org.dspace.core.Constants Constants}
      */
     public void setAction(int myid) {
         this.actionId = myid;

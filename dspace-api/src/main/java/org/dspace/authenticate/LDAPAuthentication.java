@@ -7,6 +7,8 @@
  */
 package org.dspace.authenticate;
 
+import static org.dspace.eperson.service.EPersonService.MD_PHONE;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -34,7 +36,6 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
@@ -42,6 +43,8 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * This combined LDAP authentication method supersedes both the 'LDAPAuthentication'
@@ -78,7 +81,8 @@ public class LDAPAuthentication
     implements AuthenticationMethod {
 
     /** Logging category */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
+    private static final Logger log
+            = org.apache.logging.log4j.LogManager.getLogger(LDAPAuthentication.class);
 
     protected AuthenticationService authenticationService
             = AuthenticateServiceFactory.getInstance().getAuthenticationService();
@@ -86,6 +90,8 @@ public class LDAPAuthentication
             = EPersonServiceFactory.getInstance().getEPersonService();
     protected GroupService groupService
             = EPersonServiceFactory.getInstance().getGroupService();
+    protected ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
      * Let a real authentication method return true if it wants.
@@ -98,7 +104,7 @@ public class LDAPAuthentication
                                    String username)
         throws SQLException {
         // Looks to see if autoregister is set or not
-        return ConfigurationManager.getBooleanProperty("authentication-ldap", "autoregister");
+        return configurationService.getBooleanProperty("authentication-ldap.autoregister");
     }
 
     /**
@@ -146,7 +152,7 @@ public class LDAPAuthentication
         // ensures they are LDAP users
         try {
             if (!context.getCurrentUser().getNetid().equals("")) {
-                String groupName = ConfigurationManager.getProperty("authentication-ldap", "login.specialgroup");
+                String groupName = configurationService.getProperty("authentication-ldap.login.specialgroup");
                 if ((groupName != null) && (!groupName.trim().equals(""))) {
                     Group ldapGroup = groupService.findByName(context, groupName);
                     if (ldapGroup == null) {
@@ -223,11 +229,11 @@ public class LDAPAuthentication
         SpeakerToLDAP ldap = new SpeakerToLDAP(log);
 
         // Get the DN of the user
-        boolean search = ConfigurationManager.getBooleanProperty("authentication-ldap", "search");
-        String adminUser = ConfigurationManager.getProperty("authentication-ldap", "search.user");
-        String adminPassword = ConfigurationManager.getProperty("authentication-ldap", "search.password");
-        String objectContext = ConfigurationManager.getProperty("authentication-ldap", "object_context");
-        String idField = ConfigurationManager.getProperty("authentication-ldap", "id_field");
+        boolean search = configurationService.getBooleanProperty("authentication-ldap.search.anonymous");
+        String adminUser = configurationService.getProperty("authentication-ldap.search.user");
+        String adminPassword = configurationService.getProperty("authentication-ldap.search.password");
+        String objectContext = configurationService.getProperty("authentication-ldap.object_context");
+        String idField = configurationService.getProperty("authentication-ldap.id_field");
         String dn = "";
 
         // Search the hierarchy for the user, or just compose an assumed DN.
@@ -280,9 +286,8 @@ public class LDAPAuthentication
                 if (StringUtils.isEmpty(email)) {
                     // If no email, check if we have a "netid_email_domain". If so, append it to the netid to create
                     // email
-                    if (StringUtils
-                        .isNotEmpty(ConfigurationManager.getProperty("authentication-ldap", "netid_email_domain"))) {
-                        email = netid + ConfigurationManager.getProperty("authentication-ldap", "netid_email_domain");
+                    if (configurationService.hasProperty("authentication-ldap.netid_email_domain")) {
+                        email = netid + configurationService.getProperty("authentication-ldap.netid_email_domain");
                     } else {
                         // We don't have a valid email address. We'll default it to 'netid' but log a warning
                         log.warn(LogManager.getHeader(context, "autoregister",
@@ -327,7 +332,8 @@ public class LDAPAuthentication
                                         eperson.setLastName(context, ldap.ldapSurname);
                                     }
                                     if (StringUtils.isNotEmpty(ldap.ldapPhone)) {
-                                        ePersonService.setMetadata(context, eperson, "phone", ldap.ldapPhone);
+                                        ePersonService.setMetadataSingleValue(context, eperson,
+                                                MD_PHONE, ldap.ldapPhone, null);
                                     }
                                     eperson.setNetid(netid.toLowerCase());
                                     eperson.setCanLogIn(true);
@@ -382,21 +388,34 @@ public class LDAPAuthentication
         /**
          * LDAP settings
          */
-        String ldap_provider_url = ConfigurationManager.getProperty("authentication-ldap", "provider_url");
-        String ldap_id_field = ConfigurationManager.getProperty("authentication-ldap", "id_field");
-        String ldap_search_context = ConfigurationManager.getProperty("authentication-ldap", "search_context");
-        String ldap_search_scope = ConfigurationManager.getProperty("authentication-ldap", "search_scope");
+        final String ldap_provider_url;
+        final String ldap_id_field;
+        final String ldap_search_context;
+        final String ldap_search_scope;
 
-        String ldap_email_field = ConfigurationManager.getProperty("authentication-ldap", "email_field");
-        String ldap_givenname_field = ConfigurationManager.getProperty("authentication-ldap", "givenname_field");
-        String ldap_surname_field = ConfigurationManager.getProperty("authentication-ldap", "surname_field");
-        String ldap_phone_field = ConfigurationManager.getProperty("authentication-ldap", "phone_field");
-        String ldap_group_field = ConfigurationManager.getProperty("authentication-ldap", "login.groupmap.attribute");
+        final String ldap_email_field;
+        final String ldap_givenname_field;
+        final String ldap_surname_field;
+        final String ldap_phone_field;
+        final String ldap_group_field;
 
-        boolean useStartTLS = ConfigurationManager.getBooleanProperty("authentication-ldap", "starttls", false);
+        final boolean useStartTLS;
 
         SpeakerToLDAP(Logger thelog) {
+            ConfigurationService configurationService
+                    = DSpaceServicesFactory.getInstance().getConfigurationService();
             log = thelog;
+
+            ldap_provider_url = configurationService.getProperty("authentication-ldap.provider_url");
+            ldap_id_field = configurationService.getProperty("authentication-ldap.id_field");
+            ldap_search_context = configurationService.getProperty("authentication-ldap.search_context");
+            ldap_search_scope = configurationService.getProperty("authentication-ldap.search_scope");
+            ldap_email_field = configurationService.getProperty("authentication-ldap.email_field");
+            ldap_givenname_field = configurationService.getProperty("authentication-ldap.givenname_field");
+            ldap_surname_field = configurationService.getProperty("authentication-ldap.surname_field");
+            ldap_phone_field = configurationService.getProperty("authentication-ldap.phone_field");
+            ldap_group_field = configurationService.getProperty("authentication-ldap.login.groupmap.attribute");
+            useStartTLS = configurationService.getBooleanProperty("authentication-ldap.starttls", false);
         }
 
         /**
@@ -431,6 +450,7 @@ public class LDAPAuthentication
             }
 
             // Set up environment for creating initial context
+            @SuppressWarnings("UseOfObsoleteCollectionType")
             Hashtable<String, String> env = new Hashtable<>();
             env.put(javax.naming.Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
             if (StringUtils.isNotBlank(ldap_provider_url)) {
@@ -472,7 +492,7 @@ public class LDAPAuthentication
                     SearchControls ctrls = new SearchControls();
                     ctrls.setSearchScope(ldap_search_scope_value);
 
-                    String searchName = "";
+                    String searchName;
                     if (useStartTLS) {
                         searchName = ldap_search_context;
                     } else {
@@ -589,6 +609,7 @@ public class LDAPAuthentication
                 StartTlsResponse startTLSResponse = null;
 
                 // Set up environment for creating initial context
+                @SuppressWarnings("UseOfObsoleteCollectionType")
                 Hashtable<String, String> env = new Hashtable<>();
                 env.put(javax.naming.Context.INITIAL_CONTEXT_FACTORY,
                         "com.sun.jndi.ldap.LdapCtxFactory");
@@ -699,7 +720,7 @@ public class LDAPAuthentication
         if (StringUtils.isNotBlank(dn)) {
             System.out.println("dn:" + dn);
             int i = 1;
-            String groupMap = ConfigurationManager.getProperty("authentication-ldap", "login.groupmap." + i);
+            String groupMap = configurationService.getProperty("authentication-ldap", "login.groupmap." + i);
 
             boolean cmp;
 
@@ -739,7 +760,7 @@ public class LDAPAuthentication
                     }
                 }
 
-                groupMap = ConfigurationManager.getProperty("authentication-ldap", "login.groupmap." + ++i);
+                groupMap = configurationService.getProperty("authentication-ldap", "login.groupmap." + ++i);
             }
         }
     }

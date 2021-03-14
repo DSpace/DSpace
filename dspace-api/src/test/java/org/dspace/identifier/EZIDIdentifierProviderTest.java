@@ -180,11 +180,13 @@ public class EZIDIdentifierProviderTest
 
         // Create an environment for our test objects to live in.
         community = communityService.create(community, context);
-        communityService.setMetadata(context, community, "name", "A Test Community");
+        communityService.setMetadataSingleValue(context, community,
+                CommunityService.MD_NAME, null, "A Test Community");
         communityService.update(context, community);
 
         collection = collectionService.create(context, community);
-        collectionService.setMetadata(context, collection, "name", "A Test Collection");
+        collectionService.setMetadataSingleValue(context, collection,
+                CollectionService.MD_NAME, null, "A Test Collection");
         collectionService.update(context, collection);
     }
 
@@ -449,7 +451,7 @@ public class EZIDIdentifierProviderTest
             // Evaluate
             String target = (String) metadata.get("_target");
             assertEquals("Generates correct _target metadatum",
-                         config.getProperty("dspace.url") + "/handle/" + handle,
+                         config.getProperty("dspace.ui.url") + "/handle/" + handle,
                          target);
             assertTrue("Has title", metadata.containsKey("datacite.title"));
             assertTrue("Has publication year", metadata.containsKey("datacite.publicationyear"));

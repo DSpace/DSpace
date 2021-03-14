@@ -11,8 +11,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
-
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -32,7 +30,6 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.Group;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.proxy.HibernateProxyHelper;
@@ -51,7 +48,7 @@ import org.hibernate.proxy.HibernateProxyHelper;
 @Table(name = "community")
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
-public class Community extends DSpaceObject implements DSpaceObjectLegacySupport, IndexableObject<UUID> {
+public class Community extends DSpaceObject implements DSpaceObjectLegacySupport {
     /**
      * log4j category
      */
@@ -66,13 +63,13 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
         joinColumns = {@JoinColumn(name = "parent_comm_id")},
         inverseJoinColumns = {@JoinColumn(name = "child_comm_id")}
     )
-    private Set<Community> subCommunities = new HashSet<>();
+    private final Set<Community> subCommunities = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "subCommunities")
-    private Set<Community> parentCommunities = new HashSet<>();
+    private final Set<Community> parentCommunities = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "communities", cascade = {CascadeType.PERSIST})
-    private Set<Collection> collections = new HashSet<>();
+    private final Set<Collection> collections = new HashSet<>();
 
     @OneToOne
     @JoinColumn(name = "admin")
@@ -85,12 +82,6 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     @OneToOne
     @JoinColumn(name = "logo_bitstream_id")
     private Bitstream logo = null;
-
-    // Keys for accessing Community metadata
-    public static final String COPYRIGHT_TEXT = "copyright_text";
-    public static final String INTRODUCTORY_TEXT = "introductory_text";
-    public static final String SHORT_DESCRIPTION = "short_description";
-    public static final String SIDEBAR_TEXT = "side_bar_text";
 
     @Transient
     protected transient CommunityService communityService;
@@ -252,11 +243,6 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     @Override
     public int getType() {
         return Constants.COMMUNITY;
-    }
-
-    @Override
-    public String getTypeText() {
-        return Constants.typeText[Constants.COMMUNITY];
     }
 
     @Override

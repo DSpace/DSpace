@@ -46,4 +46,11 @@ public interface AccountService {
 
     public void deleteToken(Context context, String token)
         throws SQLException;
+
+    /**
+     * This method verifies that a certain String adheres to the password rules for DSpace
+     * @param password  The String to be checked
+     * @return          A boolean indicating whether or not the given String adheres to the password rules
+     */
+    public boolean verifyPasswordStructure(String password);
 }

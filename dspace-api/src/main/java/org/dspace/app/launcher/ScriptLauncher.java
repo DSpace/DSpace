@@ -13,6 +13,14 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.TreeMap;
 
+import org.apache.commons.cli.ParseException;
+import org.apache.log4j.Logger;
+import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
+import org.dspace.scripts.factory.ScriptServiceFactory;
+import org.dspace.scripts.handler.DSpaceRunnableHandler;
+import org.dspace.scripts.handler.impl.CommandLineDSpaceRunnableHandler;
+import org.dspace.scripts.service.ScriptService;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.services.RequestService;
@@ -27,6 +35,9 @@ import org.jdom.input.SAXBuilder;
  * @author Mark Diggory
  */
 public class ScriptLauncher {
+
+    private static final Logger log = Logger.getLogger(ScriptLauncher.class);
+
     /**
      * The service manager kernel
      */
@@ -35,7 +46,8 @@ public class ScriptLauncher {
     /**
      * Default constructor
      */
-    private ScriptLauncher() { }
+    private ScriptLauncher() {
+    }
 
     /**
      * Execute the DSpace script launcher
@@ -45,7 +57,7 @@ public class ScriptLauncher {
      * @throws FileNotFoundException if file doesn't exist
      */
     public static void main(String[] args)
-        throws FileNotFoundException, IOException {
+        throws FileNotFoundException, IOException, IllegalAccessException, InstantiationException {
         // Initialise the service manager kernel
         try {
             kernelImpl = DSpaceKernelInit.getKernel(null);
@@ -76,8 +88,9 @@ public class ScriptLauncher {
         }
 
         // Look up command in the configuration, and execute.
-        int status;
-        status = runOneCommand(commandConfigs, args);
+
+        CommandLineDSpaceRunnableHandler commandLineDSpaceRunnableHandler = new CommandLineDSpaceRunnableHandler();
+        int status = handleScript(args, commandConfigs, commandLineDSpaceRunnableHandler, kernelImpl);
 
         // Destroy the service kernel if it is still alive
         if (kernelImpl != null) {
@@ -86,6 +99,55 @@ public class ScriptLauncher {
         }
 
         System.exit(status);
+
+    }
+
+    /**
+     * This method will take the arguments from a commandline input and it'll find the script that the first argument
+     * refers to and it'll execute this script.
+     * It can return a 1 or a 0 depending on whether the script failed or passed respectively
+     * @param args                  The arguments for the script and the script as first one in the array
+     * @param commandConfigs        The Document
+     * @param dSpaceRunnableHandler The DSpaceRunnableHandler for this execution
+     * @param kernelImpl            The relevant DSpaceKernelImpl
+     * @return A 1 or 0 depending on whether the script failed or passed respectively
+     */
+    public static int handleScript(String[] args, Document commandConfigs,
+                                   DSpaceRunnableHandler dSpaceRunnableHandler,
+                                   DSpaceKernelImpl kernelImpl) throws InstantiationException, IllegalAccessException {
+        int status;
+        ScriptService scriptService = ScriptServiceFactory.getInstance().getScriptService();
+        ScriptConfiguration scriptConfiguration = scriptService.getScriptConfiguration(args[0]);
+        DSpaceRunnable script = null;
+        if (scriptConfiguration != null) {
+            script = scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfiguration);
+        }
+        if (script != null) {
+            status = executeScript(args, dSpaceRunnableHandler, script);
+        } else {
+            status = runOneCommand(commandConfigs, args, kernelImpl);
+        }
+        return status;
+    }
+
+    /**
+     * This method will simply execute the script
+     * @param args                  The arguments of the script with the script name as first place in the array
+     * @param dSpaceRunnableHandler The relevant DSpaceRunnableHandler
+     * @param script                The script to be executed
+     * @return A 1 or 0 depending on whether the script failed or passed respectively
+     */
+    private static int executeScript(String[] args, DSpaceRunnableHandler dSpaceRunnableHandler,
+                                     DSpaceRunnable script) {
+        try {
+            script.initialize(args, dSpaceRunnableHandler, null);
+            script.run();
+            return 0;
+        } catch (ParseException e) {
+            script.printHelp();
+            e.printStackTrace();
+            return 1;
+        }
     }
 
     protected static int runOneCommand(Document commandConfigs, String[] args) {
@@ -98,7 +160,7 @@ public class ScriptLauncher {
      * @param commandConfigs  Document
      * @param args the command line arguments given
      */
-    public static int runOneCommand(Document commandConfigs, String[] args, DSpaceKernelImpl kernelImpl) {
+    protected static int runOneCommand(Document commandConfigs, String[] args, DSpaceKernelImpl kernelImpl) {
         String request = args[0];
         Element root = commandConfigs.getRootElement();
         List<Element> commands = root.getChildren("command");

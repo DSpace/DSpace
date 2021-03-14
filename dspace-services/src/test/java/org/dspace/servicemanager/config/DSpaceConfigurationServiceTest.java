@@ -12,17 +12,20 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import mockit.Expectations;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -523,13 +526,17 @@ public class DSpaceConfigurationServiceTest {
      * of time.
      */
     @Test
-    public void testAutomaticReload() throws ConfigurationException, InterruptedException {
+    public void testAutomaticReload() throws ConfigurationException, IOException, InterruptedException {
         // Initialize new config service
         DSpaceConfigurationService dscs = new DSpaceConfigurationService();
 
         // Assert a property exists with a specific initial value
         assertNotNull(dscs.getProperty("prop.to.auto.reload"));
         assertEquals("D-space", dscs.getProperty("prop.to.auto.reload"));
+
+        // Copy our test local.properties file to a temp location (so we can restore it after tests below)
+        File tempPropFile = File.createTempFile("temp", "properties");
+        FileUtils.copyFile(new File(propertyFilePath), tempPropFile);
 
         // Now, change the value of that Property in the file itself (using a separate builder instance)
         FileBasedConfigurationBuilder<PropertiesConfiguration> builder = new Configurations()
@@ -538,7 +545,7 @@ public class DSpaceConfigurationServiceTest {
         // Clear out current value. Add in a new value
         config.clearProperty("prop.to.auto.reload");
         config.addProperty("prop.to.auto.reload", "DSpace");
-        // Save updates to file
+        // Save updates to file (this changes our test local.properties)
         builder.save();
 
         // Check immediately. Property should be unchanged
@@ -551,6 +558,9 @@ public class DSpaceConfigurationServiceTest {
         // Check again. Property should have reloaded
         // NOTE: reload time is set in config-definition.xml to reload every 2 seconds
         assertEquals("DSpace", dscs.getProperty("prop.to.auto.reload"));
+
+        // Restore our test local.properties file to original content
+        FileUtils.copyFile(tempPropFile, new File(propertyFilePath));
     }
 
     /**
@@ -605,60 +615,58 @@ public class DSpaceConfigurationServiceTest {
      */
     @Test
     public void testGetDSpaceHomeSysProperty() {
-        final DSpaceConfigurationService dscs = new DSpaceConfigurationService();
+        // Capture current value of DSPACE_HOME (so we can reset it after test)
+        String previousValue = System.getProperty(DSpaceConfigurationService.DSPACE_HOME);
+        // Change to a mocked value
+        System.setProperty(DSpaceConfigurationService.DSPACE_HOME, "/mydspace");
 
-        // Set System Property for DSpace Home
-        new Expectations(System.class) {{
-            // return "/mydspace" two times
-            System.getProperty(DSpaceConfigurationService.DSPACE_HOME);
-            result = "/mydspace";
-        }};
-        // Ensure /mydspace looks like a valid DSpace home directory
-        new Expectations(dscs.getClass()) {{
-            dscs.isValidDSpaceHome("/mydspace");
-            result = true;
-        }};
+        // Create a spy of our loaded configurationService, and tell it to return true
+        // when "isValidDSpaceHome()" is called with "/mydspace"
+        DSpaceConfigurationService spy = spy(configurationService);
+        when(spy.isValidDSpaceHome("/mydspace")).thenReturn(true);
 
         // Assert Home is the same as System Property
-        assertEquals("System property set", "/mydspace", dscs.getDSpaceHome(null));
+        assertEquals("System property set", "/mydspace", spy.getDSpaceHome(null));
+
+        // reset DSPACE_HOME to previous value
+        System.setProperty(DSpaceConfigurationService.DSPACE_HOME, previousValue);
     }
 
     @Test
     public void testGetDSpaceHomeSysPropertyOverride() {
-        final DSpaceConfigurationService dscs = new DSpaceConfigurationService();
+        // Capture current value of DSPACE_HOME (so we can reset it after test)
+        String previousValue = System.getProperty(DSpaceConfigurationService.DSPACE_HOME);
+        // Change to a mocked value
+        System.setProperty(DSpaceConfigurationService.DSPACE_HOME, "/mydspace");
 
-        // Set System Property for DSpace Home
-        new Expectations(System.class) {{
-            System.getProperty(DSpaceConfigurationService.DSPACE_HOME);
-            result = "/mydspace";
-        }};
-        // Ensure /mydspace looks like a valid DSpace home directory
-        new Expectations(dscs.getClass()) {{
-            dscs.isValidDSpaceHome("/mydspace");
-            result = true;
-        }};
+        // Create a spy of our loaded configurationService, and tell it to return true
+        // when "isValidDSpaceHome()" is called with "/mydspace"
+        DSpaceConfigurationService spy = spy(configurationService);
+        when(spy.isValidDSpaceHome("/mydspace")).thenReturn(true);
 
         // Assert System Property overrides the value passed in, if it is valid
-        assertEquals("System property override", "/mydspace", dscs.getDSpaceHome("/myotherdspace"));
+        assertEquals("System property override", "/mydspace", spy.getDSpaceHome("/myotherdspace"));
+
+        // reset DSPACE_HOME to previous value
+        System.setProperty(DSpaceConfigurationService.DSPACE_HOME, previousValue);
     }
 
     @Test
     public void testGetDSpaceHomeNoSysProperty() {
+        // Capture current value of DSPACE_HOME (so we can reset it after test)
+        String previousValue = System.getProperty(DSpaceConfigurationService.DSPACE_HOME);
+        // Clear the value
+        System.clearProperty(DSpaceConfigurationService.DSPACE_HOME);
 
-        final DSpaceConfigurationService dscs = new DSpaceConfigurationService();
-
-        // No system property set
-        new Expectations(System.class) {{
-            System.getProperty(DSpaceConfigurationService.DSPACE_HOME);
-            result = null;
-        }};
-        // Ensure /mydspace looks like a valid DSpace home directory
-        new Expectations(dscs.getClass()) {{
-            dscs.isValidDSpaceHome("/mydspace");
-            result = true;
-        }};
+        // Create a spy of our loaded configurationService, and tell it to return true
+        // when "isValidDSpaceHome()" is called with "/mydspace"
+        DSpaceConfigurationService spy = spy(configurationService);
+        when(spy.isValidDSpaceHome("/mydspace")).thenReturn(true);
 
         // Assert provided home is used
-        assertEquals("Home based on passed in value", "/mydspace", dscs.getDSpaceHome("/mydspace"));
+        assertEquals("Home based on passed in value", "/mydspace", spy.getDSpaceHome("/mydspace"));
+
+        // reset DSPACE_HOME to previous value
+        System.setProperty(DSpaceConfigurationService.DSPACE_HOME, previousValue);
     }
 }

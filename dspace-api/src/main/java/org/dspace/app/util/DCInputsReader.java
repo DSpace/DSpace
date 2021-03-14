@@ -366,11 +366,15 @@ public class DCInputsReader {
                         metadataField += "." + qualifier;
                     }
                 }
-
                 // we omit the duplicate validation, allowing multiple
                 // fields definition for
                 // the same metadata and different visibility/type-bind
+            } else if (StringUtils.equalsIgnoreCase(npg.getNodeName(), "relation-field")) {
+                Map<String, String> relationField = new HashMap<>();
+                processField(formName, npg, relationField);
+                fields.add(relationField);
             }
+
         }
         // sanity check number of fields
         if (fields.size() < 1) {
@@ -396,19 +400,7 @@ public class DCInputsReader {
                 String value = getValue(nd);
                 field.put(tagName, value);
                 if (tagName.equals("input-type")) {
-                    if (value.equals("dropdown")
-                        || value.equals("qualdrop_value")
-                        || value.equals("list")) {
-                        String pairTypeName = getAttribute(nd, PAIR_TYPE_NAME);
-                        if (pairTypeName == null) {
-                            throw new SAXException("Form " + formName + ", field " +
-                                                       field.get("dc-element") +
-                                                       "." + field.get("dc-qualifier") +
-                                                       " has no name attribute");
-                        } else {
-                            field.put(PAIR_TYPE_NAME, pairTypeName);
-                        }
-                    }
+                    handleInputTypeTagName(formName, field, nd, value);
                 } else if (tagName.equals("vocabulary")) {
                     String closedVocabularyString = getAttribute(nd, "closed");
                     field.put("closedVocabulary", closedVocabularyString);
@@ -424,17 +416,30 @@ public class DCInputsReader {
                             field.put(PAIR_TYPE_NAME, pairTypeName);
                         }
                     }
+                } else if (StringUtils.equalsIgnoreCase(tagName, "linked-metadata-field")) {
+                    for (int j = 0; j < nd.getChildNodes().getLength(); j ++) {
+                        Node nestedNode = nd.getChildNodes().item(j);
+                        String nestedTagName = nestedNode.getNodeName();
+                        String nestedValue = getValue(nestedNode);
+                        field.put(nestedTagName, nestedValue);
+                        if (nestedTagName.equals("input-type")) {
+                            handleInputTypeTagName(formName, field, nestedNode, nestedValue);
+                        }
+                    }
                 }
             }
         }
         String missing = null;
-        if (field.get("dc-element") == null) {
+        String nodeName = n.getNodeName();
+        if (field.get("dc-element") == null &&
+                (nodeName.equals("field") || field.containsKey("linked-metadata-field"))) {
             missing = "dc-element";
         }
         if (field.get("label") == null) {
             missing = "label";
         }
-        if (field.get("input-type") == null) {
+        if (field.get("input-type") == null &&
+                (nodeName.equals("field") || field.containsKey("linked-metadata-field"))) {
             missing = "input-type";
         }
         if (missing != null) {
@@ -442,13 +447,30 @@ public class DCInputsReader {
             throw new SAXException(msg);
         }
         String type = field.get("input-type");
-        if (type.equals("twobox") || type.equals("qualdrop_value")) {
+        if (StringUtils.isNotBlank(type) && (type.equals("twobox") || type.equals("qualdrop_value"))) {
             String rpt = field.get("repeatable");
             if ((rpt == null) ||
                 ((!rpt.equalsIgnoreCase("yes")) &&
                     (!rpt.equalsIgnoreCase("true")))) {
                 String msg = "The field \'" + field.get("label") + "\' must be repeatable";
                 throw new SAXException(msg);
+            }
+        }
+    }
+
+    private void handleInputTypeTagName(String formName, Map<String, String> field, Node nd, String value)
+        throws SAXException {
+        if (value.equals("dropdown")
+            || value.equals("qualdrop_value")
+            || value.equals("list")) {
+            String pairTypeName = getAttribute(nd, PAIR_TYPE_NAME);
+            if (pairTypeName == null) {
+                throw new SAXException("Form " + formName + ", field " +
+                                           field.get("dc-element") +
+                                           "." + field.get("dc-qualifier") +
+                                           " has no name attribute");
+            } else {
+                field.put(PAIR_TYPE_NAME, pairTypeName);
             }
         }
     }
@@ -584,9 +606,9 @@ public class DCInputsReader {
                     Map<String, String> fld = fields.get(i);
                     // verify reference in certain input types
                     String type = fld.get("input-type");
-                    if (type.equals("dropdown")
+                    if (StringUtils.isNotBlank(type) && (type.equals("dropdown")
                         || type.equals("qualdrop_value")
-                        || type.equals("list")) {
+                        || type.equals("list"))) {
                         String pairsName = fld.get(PAIR_TYPE_NAME);
                         List<String> v = valuePairs.get(pairsName);
                         if (v == null) {

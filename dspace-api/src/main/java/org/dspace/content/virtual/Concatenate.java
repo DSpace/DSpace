@@ -44,6 +44,7 @@ public class Concatenate implements VirtualMetadataConfiguration {
      */
     private boolean useForPlace = false;
 
+    private boolean populateWithNameVariant = false;
     /**
      * Generic getter for the fields property
      * @return The list of fields to be used in this bean
@@ -80,6 +81,7 @@ public class Concatenate implements VirtualMetadataConfiguration {
      * Generic setter for the useForPlace property
      * @param useForPlace   The boolean value that the useForPlace property will be set to
      */
+    @Override
     public void setUseForPlace(boolean useForPlace) {
         this.useForPlace = useForPlace;
     }
@@ -88,8 +90,19 @@ public class Concatenate implements VirtualMetadataConfiguration {
      * Generic getter for the useForPlace property
      * @return  The useForPlace to be used by this bean
      */
+    @Override
     public boolean getUseForPlace() {
         return useForPlace;
+    }
+
+    @Override
+    public void setPopulateWithNameVariant(boolean populateWithNameVariant) {
+        this.populateWithNameVariant = populateWithNameVariant;
+    }
+
+    @Override
+    public boolean getPopulateWithNameVariant() {
+        return populateWithNameVariant;
     }
 
     /**
@@ -100,6 +113,7 @@ public class Concatenate implements VirtualMetadataConfiguration {
      * @param item      The item that will be used to either retrieve metadata values from
      * @return The String value for all of the retrieved metadatavalues combined with the separator
      */
+    @Override
     public List<String> getValues(Context context, Item item) {
 
         List<String> resultValues = new LinkedList<>();

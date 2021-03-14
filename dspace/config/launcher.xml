@@ -55,13 +55,6 @@
         </step>
     </command>
     <command>
-        <name>curate</name>
-        <description>Perform curation tasks on DSpace objects</description>
-        <step>
-            <class>org.dspace.curate.CurationCli</class>
-        </step>
-    </command>
-    <command>
         <name>database</name>
         <description>Perform database tasks like test database connection, migrate/repair database, remove database</description>
         <step>
@@ -139,13 +132,6 @@
         </step>
     </command>
     <command>
-        <name>index-discovery</name>
-        <description>Update Discovery Solr Search Index</description>
-        <step>
-            <class>org.dspace.discovery.IndexClient</class>
-        </step>
-    </command>
-    <command>
         <name>itemupdate</name>
         <description>Item update tool for altering metadata and bitstream content in items</description>
         <step>
@@ -157,20 +143,6 @@
         <description>Run the handle server simple setup command</description>
         <step>
             <class>net.handle.server.SimpleSetup</class>
-        </step>
-    </command>
-    <command>
-        <name>metadata-export</name>
-        <description>Export metadata for batch editing</description>
-        <step>
-            <class>org.dspace.app.bulkedit.MetadataExport</class>
-        </step>
-    </command>
-    <command>
-        <name>metadata-import</name>
-        <description>Import metadata after batch editing</description>
-        <step>
-            <class>org.dspace.app.bulkedit.MetadataImport</class>
         </step>
     </command>
     <command>
@@ -213,6 +185,13 @@
         <description>Load entries into a registry</description>
         <step>
             <class>org.dspace.administer.RegistryLoader</class>
+        </step>
+    </command>
+    <command>
+        <name>retry-tracker</name>
+        <description>Retry all failed commits to the OpenURLTracker</description>
+        <step>
+            <class>org.dspace.statistics.export.RetryFailedOpenUrlTracker</class>
         </step>
     </command>
     <command>
@@ -378,6 +357,13 @@
         <description>Initialize the entities with a provided xml</description>
         <step>
             <class>org.dspace.app.util.InitializeEntities</class>
+        </step>
+    </command>
+    <command>
+        <name>anonymize-statistics</name>
+        <description>Anonymize the ip values of the solr statistics</description>
+        <step>
+            <class>org.dspace.statistics.AnonymizeStatistics</class>
         </step>
     </command>
 </commands>

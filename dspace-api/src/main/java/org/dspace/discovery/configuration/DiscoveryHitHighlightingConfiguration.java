@@ -9,12 +9,12 @@ package org.dspace.discovery.configuration;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Class that contains all the configuration concerning the hit highlighting in search resutls
- * This class can be configured in the [dspace
- * .dir]/config/spring/discovery/spring-dspace-addon-discovery-configuration-services.xml
+ * Class that contains all the configuration concerning the hit highlighting in search results.
+ * This class can be configured in the
+ * {@code [dspace.dir]/config/spring/discovery/spring-dspace-addon-discovery-configuration-services.xml}
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
@@ -26,7 +26,7 @@ public class DiscoveryHitHighlightingConfiguration {
     private List<DiscoveryHitHighlightFieldConfiguration> metadataFields;
 
 
-    @Required
+    @Autowired(required = true)
     public void setMetadataFields(List<DiscoveryHitHighlightFieldConfiguration> metadataFields) {
         this.metadataFields = metadataFields;
     }

@@ -36,14 +36,33 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 public abstract class Action {
 
     private WorkflowActionConfig parent;
-    private static String ERROR_FIELDS_ATTRIBUTE = "dspace.workflow.error_fields";
-
+    private static final String ERROR_FIELDS_ATTRIBUTE = "dspace.workflow.error_fields";
 
     public abstract void activate(Context c, XmlWorkflowItem wf)
         throws SQLException, IOException, AuthorizeException, WorkflowException;
 
     public abstract ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
         throws SQLException, AuthorizeException, IOException, WorkflowException;
+
+    /**
+     * Returns a list of options that the user can select at this action which results in the next step in the workflow
+     * @return  A list of options of this action, resulting in the next step of the workflow
+     */
+    public abstract List<String> getOptions();
+
+    /**
+     * Returns true if one of the options is a parameter of the request
+     * @param request   Action request
+     * @return  true if one of the options is a parameter of the request; false if none was found
+     */
+    protected boolean isOptionInParam(HttpServletRequest request) {
+        for (String option: this.getOptions()) {
+            if (request.getParameter(option) != null) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public WorkflowActionConfig getParent() {
         return parent;

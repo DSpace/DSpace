@@ -1,0 +1,139 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>Person Types</title>
+    </dspace-header>
+
+    <dc-schema>
+        <name>person</name>
+        <namespace>https://schema.org/Person</namespace>
+    </dc-schema>
+
+
+    <!--NO EQUIVALENT FOUND
+        - person.identifier.orcid > NOT FOUND
+        - person.identifier.staffid > NOT FOUND (optional but very specific id: person.isicV4, person.naics, taxID, vatID, …)
+        - person.contributor.other > NOT FOUND
+    -->
+
+    <!--
+	  OpenAIRE4 Guidelines	
+      2.2.3. Subproperty givenName (R)
+      The personal or first name of the author. -->
+    <dc-type>
+        <schema>person</schema>
+        <element>givenName</element>
+        <scope_note>Given name. In the U.S., the first name of a Person. This can be used along with familyName instead
+            of the name property.
+        </scope_note>
+    </dc-type>
+	
+    <!--
+	  OpenAIRE4 Guidelines
+      2.2.4. Subproperty familyName (R)
+      The surname or last name of the author. -->
+    <dc-type>
+        <schema>person</schema>
+        <element>familyName</element>
+        <scope_note>Family name. In the U.S., the last name of an Person. This can be used along with givenName instead
+            of the name property.
+        </scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>person</schema>
+        <element>telephone</element>
+        <scope_note>The telephone number.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>person</schema>
+        <element>knowsLanguage</element>
+        <scope_note>Of a Person, and less typically of an Organization, to indicate a known language. We do not
+            distinguish skill levels or reading/writing/speaking/signing here. Use language codes from the IETF BCP 47
+            standard.
+        </scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>person</schema>
+        <element>email</element>
+        <scope_note>Email address.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>person</schema>
+        <element>birthDate</element>
+        <scope_note>Date of birth.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>person</schema>
+        <element>jobTitle</element>
+        <scope_note>The job title of the person (for example, Financial Manager).</scope_note>
+    </dc-type>
+	
+    <!--
+      OpenAIRE4 Guidelines
+      2.2.6. Subproperty affiliation (R)
+      The organizational or institutional affiliation of the creator (occurrence: 0-n). -->
+    <dc-type>
+        <schema>person</schema>
+        <element>affiliation</element>
+        <qualifier>name</qualifier>
+        <scope_note>The organizational or institutional affiliation of the creator</scope_note>
+    </dc-type>
+    
+    <!-- OpenAIRE4 Guidelines -->
+    <!-- 2.2.2.1. Attribute nameType (R) -->
+    <!-- and 3.2.6. Subproperty nameIdentifier (R) -->
+    <!-- specific type required by OpenAIRE4 Guidelines -->  
+    <dc-type>
+        <schema>person</schema>
+        <element>identifier</element>
+        <scope_note>Generic Identifier</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>person</schema>
+        <element>identifier</element>
+        <qualifier>scopus-author-id</qualifier>
+        <scope_note>Scopus Author ID</scope_note>
+    </dc-type>
+  
+    <dc-type>
+        <schema>person</schema>
+        <element>identifier</element>
+        <qualifier>ciencia-id</qualifier>
+        <scope_note>Permanent individual means of identification and authentication for citizens carrying out scientific activity. - https://www.ciencia-id.pt/</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>person</schema>
+        <element>identifier</element>
+        <qualifier>gsid</qualifier>
+        <scope_note>Google Scholar ID</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>person</schema>
+        <element>identifier</element>
+        <qualifier>orcid</qualifier>
+        <scope_note>Open Researcher and Contributor ID</scope_note>
+    </dc-type>
+  
+    <dc-type>
+        <schema>person</schema>
+        <element>identifier</element>
+        <qualifier>rid</qualifier>
+        <scope_note>Web of Science ResearcherID</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>person</schema>
+        <element>identifier</element>
+        <qualifier>isni</qualifier>
+        <scope_note>International Standard Name Identifier</scope_note>
+    </dc-type>
+
+</dspace-dc-types>

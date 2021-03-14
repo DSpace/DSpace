@@ -78,6 +78,18 @@ public class Relationship implements ReloadableEntity<Integer> {
     private int rightPlace;
 
     /**
+     * A String containing an alternative value (name variant) for the left side
+     */
+    @Column(name = "leftward_value")
+    private String leftwardValue;
+
+    /**
+     * A String containing an alternative value (name variant) for the right side
+     */
+    @Column(name = "rightward_value")
+    private String rightwardValue;
+
+    /**
      * Protected constructor, create object using:
      * {@link org.dspace.content.service.RelationshipService#create(Context)} }
      */
@@ -168,6 +180,38 @@ public class Relationship implements ReloadableEntity<Integer> {
      */
     public void setRightPlace(int rightPlace) {
         this.rightPlace = rightPlace;
+    }
+
+    /**
+     * Standard getter for the leftwardValue String in this Relationship
+     * @return  the leftwardValue String for this relationship
+     */
+    public String getLeftwardValue() {
+        return leftwardValue;
+    }
+
+    /**
+     * Standard setter for the leftwardValue String in this Relationship
+     * @param leftwardValue    the leftwardValue String that will be used in this relationship
+     */
+    public void setLeftwardValue(String leftwardValue) {
+        this.leftwardValue = leftwardValue;
+    }
+
+    /**
+     * Standard getter for the rightwardValue String in this Relationship
+     * @return  the rightwardValue string for this relationship
+     */
+    public String getRightwardValue() {
+        return rightwardValue;
+    }
+
+    /**
+     * Standard setter for the rightwardValue String in this Relationship
+     * @param rightwardValue    the rightwardValue String that will be used in this relationship
+     */
+    public void setRightwardValue(String rightwardValue) {
+        this.rightwardValue = rightwardValue;
     }
 
     /**

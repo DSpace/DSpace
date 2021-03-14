@@ -8,6 +8,7 @@
 package org.dspace.authority;
 
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
+import org.dspace.util.SolrUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -34,8 +36,6 @@ import org.joda.time.format.ISODateTimeFormat;
  * @author Mark Diggory (markd at atmire dot com)
  */
 public class AuthorityValue {
-
-
     /**
      * The id of the record in solr
      */
@@ -150,12 +150,13 @@ public class AuthorityValue {
     public SolrInputDocument getSolrInputDocument() {
 
         SolrInputDocument doc = new SolrInputDocument();
+        DateFormat solrDateFormatter = SolrUtils.getDateFormatter();
         doc.addField("id", getId());
         doc.addField("field", getField());
         doc.addField("value", getValue());
         doc.addField("deleted", isDeleted());
-        doc.addField("creation_date", getCreationDate());
-        doc.addField("last_modified_date", getLastModified());
+        doc.addField("creation_date", solrDateFormatter.format(getCreationDate()));
+        doc.addField("last_modified_date", solrDateFormatter.format(getLastModified()));
         doc.addField("authority_type", getAuthorityType());
         return doc;
     }
@@ -196,12 +197,12 @@ public class AuthorityValue {
      * @return map
      */
     public Map<String, String> choiceSelectMap() {
-        return new HashMap<String, String>();
+        return new HashMap<>();
     }
 
 
     public List<DateTimeFormatter> getDateFormatters() {
-        List<DateTimeFormatter> list = new ArrayList<DateTimeFormatter>();
+        List<DateTimeFormatter> list = new ArrayList<>();
         list.add(ISODateTimeFormat.dateTime());
         list.add(ISODateTimeFormat.dateTimeNoMillis());
         return list;

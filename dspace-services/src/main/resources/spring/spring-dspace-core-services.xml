@@ -39,7 +39,8 @@
     <bean id="org.dspace.caching.ehcache.CacheManager"
           class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
         <property name="configLocation">
-            <bean class="org.dspace.servicemanager.spring.ResourceFinder" factory-method="getResourceFromPaths">
+            <bean class="org.dspace.servicemanager.spring.ResourceFinder"
+                  factory-method="getResourceFromPaths">
                 <constructor-arg>
                     <list>
                         <value>ehcache-config.xml</value>
@@ -48,7 +49,8 @@
                 </constructor-arg>
             </bean>
         </property>
-        <property name="shared" value="true"/>
+        <property name='acceptExisting' value='true'/>
+        <property name='cacheManagerName' value='org.dspace.services'/>
     </bean>
     <!-- CACHING end beans -->
 

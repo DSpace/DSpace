@@ -22,7 +22,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
-
 import javax.xml.stream.XMLStreamException;
 
 import com.lyncode.xoai.dataprovider.exceptions.ConfigurationException;
@@ -30,8 +29,8 @@ import com.lyncode.xoai.dataprovider.exceptions.WritingXmlException;
 import com.lyncode.xoai.dataprovider.xml.XmlOutputContext;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
@@ -56,6 +55,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.util.SolrUtils;
 import org.dspace.xoai.exceptions.CompilingException;
 import org.dspace.xoai.services.api.CollectionsService;
 import org.dspace.xoai.services.api.cache.XOAICacheService;
@@ -211,7 +211,7 @@ public class XOAI {
         try {
             SolrQuery params = new SolrQuery("item.willChangeStatus:true").addField("item.id");
             SolrDocumentList documents = DSpaceSolrSearch.query(solrServerResolver.getServer(), params);
-            List<Item> items = new LinkedList<Item>();
+            List<Item> items = new LinkedList<>();
             for (int i = 0; i < documents.getNumFound(); i++) {
                 Item item = itemService.find(context,
                         UUID.fromString((String) documents.get(i).getFieldValue("item.id")));
@@ -313,7 +313,9 @@ public class XOAI {
             }
             System.out.println("Total: " + i + " items");
             if (i > 0) {
-                server.add(list);
+                if (!list.isEmpty()) {
+                    server.add(list);
+                }
                 server.commit(true, true);
                 list.clear();
             }
@@ -334,7 +336,7 @@ public class XOAI {
      * @throws SQLException
      */
     private Date getMostRecentModificationDate(Item item) throws SQLException {
-        List<Date> dates = new LinkedList<Date>();
+        List<Date> dates = new LinkedList<>();
         List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, item, Constants.READ);
         for (ResourcePolicy policy : policies) {
             if ((policy.getGroup() != null) && (policy.getGroup().getName().equals("Anonymous"))) {
@@ -413,7 +415,8 @@ public class XOAI {
          * relevant policy dates and the standard lastModified date and take the
          * most recent of those which have already passed.
          */
-        doc.addField("item.lastmodified", this.getMostRecentModificationDate(item));
+        doc.addField("item.lastmodified", SolrUtils.getDateFormatter()
+                .format(this.getMostRecentModificationDate(item)));
 
         if (item.getSubmitter() != null) {
             doc.addField("item.submitter", item.getSubmitter().getEmail());
@@ -442,6 +445,12 @@ public class XOAI {
 
         for (String f : getFileFormats(item)) {
             doc.addField("metadata.dc.format.mimetype", f);
+        }
+
+        // Message output before processing - for debugging purposes
+        if (verbose) {
+            println(String.format("Item %s with handle %s is about to be indexed",
+                    item.getID().toString(), handle));
         }
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -544,7 +553,7 @@ public class XOAI {
         Context ctx = null;
 
         try {
-            CommandLineParser parser = new PosixParser();
+            CommandLineParser parser = new DefaultParser();
             Options options = new Options();
             options.addOption("c", "clear", false, "Clear index before indexing");
             options.addOption("o", "optimize", false,
