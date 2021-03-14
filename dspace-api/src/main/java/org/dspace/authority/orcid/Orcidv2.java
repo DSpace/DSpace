@@ -7,6 +7,16 @@
  */
 package org.dspace.authority.orcid;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -15,18 +25,12 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.Logger;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.SolrAuthorityInterface;
-import org.dspace.authority.orcid.xml.XMLtoBio;
-import org.dspace.authority.rest.RESTConnector;
+import org.dspace.external.OrcidRestConnector;
+import org.dspace.external.provider.orcid.xml.XMLtoBio;
 import org.json.JSONObject;
-import org.orcid.jaxb.model.record_v2.Person;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
+import org.orcid.jaxb.model.v3.release.common.OrcidIdentifier;
+import org.orcid.jaxb.model.v3.release.record.Person;
+import org.orcid.jaxb.model.v3.release.search.Result;
 
 /**
  * @author Jonas Van Goolen (jonas at atmire dot com)
@@ -37,7 +41,7 @@ public class Orcidv2 implements SolrAuthorityInterface {
 
     private static Logger log = Logger.getLogger(Orcidv2.class);
 
-    public RESTConnector restConnector;
+    private OrcidRestConnector orcidRestConnector;
     private String OAUTHUrl;
     private String clientId;
 
@@ -48,55 +52,46 @@ public class Orcidv2 implements SolrAuthorityInterface {
     /**
      *  Initialize the accessToken that is required for all subsequent calls to ORCID
      */
-    public void init() throws IOException {
-        if (StringUtils.isNotBlank(accessToken) && StringUtils.isNotBlank(clientSecret)) {
-            String authenticationParameters = "?client_id=" + clientId + "&client_secret=" + clientSecret + "&scope=/read-public&grant_type=client_credentials";
-            HttpPost httpPost = new HttpPost(OAUTHUrl + authenticationParameters);
-            httpPost.addHeader("Accept", "application/json");
-            httpPost.addHeader("Content-Type", "application/x-www-form-urlencoded");
+    public void init() {
+        if (StringUtils.isNotBlank(clientSecret) && StringUtils.isNotBlank(clientId)
+            && StringUtils.isNotBlank(OAUTHUrl)) {
+            String authenticationParameters = "?client_id=" + clientId +
+                    "&client_secret=" + clientSecret +
+                    "&scope=/read-public&grant_type=client_credentials";
+            try {
+                HttpPost httpPost = new HttpPost(OAUTHUrl + authenticationParameters);
+                httpPost.addHeader("Accept", "application/json");
+                httpPost.addHeader("Content-Type", "application/x-www-form-urlencoded");
 
-            HttpClient httpClient = HttpClientBuilder.create().build();
-            HttpResponse getResponse = httpClient.execute(httpPost);
+                HttpClient httpClient = HttpClientBuilder.create().build();
+                HttpResponse getResponse = httpClient.execute(httpPost);
 
-            InputStream is = getResponse.getEntity().getContent();
-            BufferedReader streamReader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-
-            JSONObject responseObject = null;
-            String inputStr;
-            while ((inputStr = streamReader.readLine()) != null && responseObject == null) {
-                if (inputStr.startsWith("{") && inputStr.endsWith("}") && inputStr.contains("access_token")) {
-                    try {
-                        responseObject = new JSONObject(inputStr);
-                    } catch (Exception e) {
-                        //Not as valid as I'd hoped, move along
-                        responseObject = null;
+                JSONObject responseObject = null;
+                try (InputStream is = getResponse.getEntity().getContent();
+                     BufferedReader streamReader = new BufferedReader(new InputStreamReader(is, "UTF-8"))) {
+                    String inputStr;
+                    while ((inputStr = streamReader.readLine()) != null && responseObject == null) {
+                        if (inputStr.startsWith("{") && inputStr.endsWith("}") && inputStr.contains("access_token")) {
+                            try {
+                                responseObject = new JSONObject(inputStr);
+                            } catch (Exception e) {
+                                //Not as valid as I'd hoped, move along
+                                responseObject = null;
+                            }
+                        }
                     }
                 }
-            }
-
-            if (responseObject != null && responseObject.has("access_token")) {
-                accessToken = (String) responseObject.get("access_token");
+                if (responseObject != null && responseObject.has("access_token")) {
+                    accessToken = (String) responseObject.get("access_token");
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("Error during initialization of the Orcid connector", e);
             }
         }
     }
 
-    /**
-     * Makes an instance of the Orcidv2 class based on the provided parameters.
-     * This constructor is called through the spring bean initialization
-     */
-    private Orcidv2(String url, String OAUTHUrl, String clientId, String clientSecret) {
-        this.restConnector = new RESTConnector(url);
-        this.OAUTHUrl = OAUTHUrl;
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
-    }
-
-    /**
-     * Makes an instance of the Orcidv2 class based on the provided parameters.
-     * This constructor is called through the spring bean initialization
-     */
-    private Orcidv2(String url) {
-        this.restConnector = new RESTConnector(url);
+    public void setOrcidRestConnector(OrcidRestConnector orcidRestConnector) {
+        this.orcidRestConnector = orcidRestConnector;
     }
 
     /**
@@ -106,6 +101,7 @@ public class Orcidv2 implements SolrAuthorityInterface {
      */
     @Override
     public List<AuthorityValue> queryAuthorities(String text, int max) {
+        init();
         List<Person> bios = queryBio(text, max);
         List<AuthorityValue> result = new ArrayList<>();
         for (Person person : bios) {
@@ -123,6 +119,7 @@ public class Orcidv2 implements SolrAuthorityInterface {
      * @return AuthorityValue
      */
     public AuthorityValue queryAuthorityID(String id) {
+        init();
         Person person = getBio(id);
         AuthorityValue valueFromPerson = Orcidv2AuthorityValue.create(person);
         return valueFromPerson;
@@ -135,10 +132,11 @@ public class Orcidv2 implements SolrAuthorityInterface {
      */
     public Person getBio(String id) {
         log.debug("getBio called with ID=" + id);
-        if(!isValid(id)){
+        if (!isValid(id)) {
             return null;
         }
-        InputStream bioDocument = restConnector.get(id + ((id.endsWith("/person")) ? "" : "/person"), accessToken);
+        init();
+        InputStream bioDocument = orcidRestConnector.get(id + ((id.endsWith("/person")) ? "" : "/person"), accessToken);
         XMLtoBio converter = new XMLtoBio();
         Person person = converter.convertSinglePerson(bioDocument);
         return person;
@@ -153,16 +151,38 @@ public class Orcidv2 implements SolrAuthorityInterface {
      * @return List<Person>
      */
     public List<Person> queryBio(String text, int start, int rows) {
+        init();
         if (rows > 100) {
             throw new IllegalArgumentException("The maximum number of results to retrieve cannot exceed 100.");
         }
 
         String searchPath = "search?q=" + URLEncoder.encode(text) + "&start=" + start + "&rows=" + rows;
         log.debug("queryBio searchPath=" + searchPath + " accessToken=" + accessToken);
-        InputStream bioDocument = restConnector.get(searchPath, accessToken);
+        InputStream bioDocument = orcidRestConnector.get(searchPath, accessToken);
         XMLtoBio converter = new XMLtoBio();
-        List<Person> bios = converter.convert(bioDocument);
-        return bios;
+        List<Result> results = converter.convert(bioDocument);
+        List<Person> bios = new LinkedList<>();
+        for (Result result : results) {
+            OrcidIdentifier orcidIdentifier = result.getOrcidIdentifier();
+            if (orcidIdentifier != null) {
+                log.debug("Found OrcidId=" + orcidIdentifier.toString());
+                String orcid = orcidIdentifier.getPath();
+                Person bio = getBio(orcid);
+                if (bio != null) {
+                    bios.add(bio);
+                }
+            }
+        }
+        try {
+            bioDocument.close();
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+        if (bios == null) {
+            return Collections.emptyList();
+        } else {
+            return bios;
+        }
     }
 
     /**
@@ -176,8 +196,9 @@ public class Orcidv2 implements SolrAuthorityInterface {
     }
 
     /**
-     * Check to see if the provided text has the correct ORCID syntax.
-     * Since only searching on ORCID id is allowed, this way, we filter out any queries that would return a blank result anyway
+     * Check to see if the provided text has the correct ORCID syntax. Since only
+     * searching on ORCID id is allowed, this way, we filter out any queries that
+     * would return a blank result anyway
      */
     private boolean isValid(String text) {
         return StringUtils.isNotBlank(text) && text.matches(Orcidv2AuthorityValue.ORCID_ID_SYNTAX);
