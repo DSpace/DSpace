@@ -17,7 +17,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
@@ -64,11 +63,6 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
     }
 
     @Override
-    public int getSupportsIndexableObjectTypeConstant() {
-        return Constants.WORKFLOWITEM;
-    }
-
-    @Override
     public XmlWorkflowItem create(Context context, Item item, Collection collection)
         throws SQLException, AuthorizeException {
         XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemDAO.create(context, new XmlWorkflowItem());
@@ -93,14 +87,6 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
             }
         }
         return workflowItem;
-    }
-
-    @Override
-    public XmlWorkflowItem findIndexableObject(Context context, Integer id) throws SQLException {
-        if (id != null) {
-            return find(context, id);
-        }
-        return null;
     }
 
     @Override

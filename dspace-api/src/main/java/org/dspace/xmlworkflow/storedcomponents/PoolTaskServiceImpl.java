@@ -17,7 +17,6 @@ import java.util.Set;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -49,8 +48,8 @@ public class PoolTaskServiceImpl implements PoolTaskService {
     }
 
     @Override
-    public int getSupportsIndexableObjectTypeConstant() {
-        return Constants.POOLTASK;
+    public List<PoolTask> findAll(Context context) throws SQLException {
+        return poolTaskDAO.findAll(context, PoolTask.class);
     }
 
     @Override
@@ -127,8 +126,26 @@ public class PoolTaskServiceImpl implements PoolTaskService {
     }
 
     @Override
+    public void deleteByEperson(Context context, EPerson ePerson)
+        throws SQLException, AuthorizeException, IOException {
+        List<PoolTask> tasks = findByEperson(context, ePerson);
+        //Use an iterator to remove the tasks !
+        Iterator<PoolTask> iterator = tasks.iterator();
+        while (iterator.hasNext()) {
+            PoolTask poolTask = iterator.next();
+            iterator.remove();
+            delete(context, poolTask);
+        }
+    }
+
+    @Override
     public List<PoolTask> findByEPerson(Context context, EPerson ePerson) throws SQLException {
         return poolTaskDAO.findByEPerson(context, ePerson);
+    }
+
+    @Override
+    public List<PoolTask> findByGroup(Context context, Group group) throws SQLException {
+        return poolTaskDAO.findByGroup(context, group);
     }
 
     @Override
@@ -139,14 +156,6 @@ public class PoolTaskServiceImpl implements PoolTaskService {
     @Override
     public PoolTask find(Context context, int id) throws SQLException {
         return poolTaskDAO.findByID(context, PoolTask.class, id);
-    }
-
-    @Override
-    public PoolTask findIndexableObject(Context context, Integer id) throws SQLException {
-        if (id == null) {
-            return null;
-        }
-        return find(context, id.intValue());
     }
 
     @Override

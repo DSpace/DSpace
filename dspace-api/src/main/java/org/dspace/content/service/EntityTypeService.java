@@ -38,6 +38,16 @@ public interface EntityTypeService extends DSpaceCRUDService<EntityType> {
     public List<EntityType> findAll(Context context) throws SQLException;
 
     /**
+     * Retrieves all the EntityType objects currently in the system
+     * @param context   The relevant DSpace context
+     * @param limit     paging limit
+     * @param offset    paging offset
+     * @return          A list of all EntityType objects
+     * @throws SQLException If something goes wrong
+     */
+    List<EntityType> findAll(Context context, Integer limit, Integer offset) throws SQLException;
+
+    /**
      * This method creates an EntityType object in the database with the given entityTypeString as it's label
      * @param context           The relevant DSpace context
      * @param entityTypeString  The label for the newly created EntityType

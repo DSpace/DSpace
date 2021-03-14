@@ -239,17 +239,17 @@ public class MetadataValue implements ReloadableEntity<Integer> {
             return false;
         }
         Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(obj);
-        if (getClass() != objClass) {
+        if (!getClass().equals(objClass)) {
             return false;
         }
         final MetadataValue other = (MetadataValue) obj;
-        if (this.id != other.id) {
+        if (!this.id.equals(other.id)) {
             return false;
         }
-        if (this.getID() != other.getID()) {
+        if (!this.getID().equals(other.getID())) {
             return false;
         }
-        if (this.getDSpaceObject().getID() != other.getDSpaceObject().getID()) {
+        if (!this.getDSpaceObject().getID().equals(other.getDSpaceObject().getID())) {
             return false;
         }
         return true;

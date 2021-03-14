@@ -17,10 +17,10 @@ import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -66,6 +66,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * 
  * @author Terry Brady, Georgetown University Library
  */
+
 public class SolrUpgradePre6xStatistics {
     //Command line parameter constants
     private static final String INDEX_NAME_OPTION = "i";
@@ -189,7 +190,7 @@ public class SolrUpgradePre6xStatistics {
         long count = 0;
         try {
             count = context.getCacheSize();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             //no action
         }
         count += this.numUncache;
@@ -319,7 +320,7 @@ public class SolrUpgradePre6xStatistics {
      *             if the command-line arguments cannot be parsed
      */
     public static void main(String[] args) throws ParseException {
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
         Options options = makeOptions();
 
         System.out.println(" * This process should be run iteratively over every statistics shard ");
@@ -362,11 +363,7 @@ public class SolrUpgradePre6xStatistics {
         try {
             SolrUpgradePre6xStatistics upgradeStats = new SolrUpgradePre6xStatistics(indexName, numrec, batchSize);
             upgradeStats.run();
-        } catch (SolrServerException e) {
-            log.error("Error querying stats", e);
-        } catch (SQLException e) {
-            log.error("Error querying stats", e);
-        } catch (IOException e) {
+        } catch (SolrServerException | SQLException | IOException e) {
             log.error("Error querying stats", e);
         }
     }
@@ -486,8 +483,8 @@ public class SolrUpgradePre6xStatistics {
         sQ.addSort("type", SolrQuery.ORDER.desc);
         sQ.addSort("scopeType", SolrQuery.ORDER.desc);
         sQ.addSort("ord(owningItem)", SolrQuery.ORDER.desc);
-        sQ.addSort("id", SolrQuery.ORDER.asc);
-        sQ.addSort("scopeId", SolrQuery.ORDER.asc);
+        sQ.addSort("ord(id)", SolrQuery.ORDER.asc);
+        sQ.addSort("ord(scopeId)", SolrQuery.ORDER.asc);
 
         QueryResponse sr = server.query(sQ);
         SolrDocumentList sdl = sr.getResults();

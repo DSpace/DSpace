@@ -7,13 +7,14 @@
  */
 package org.dspace.content;
 
+import static org.dspace.content.service.DSpaceObjectService.MD_LICENSE;
+
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
-
+import javax.annotation.Nonnull;
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -32,7 +33,6 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.Group;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.proxy.HibernateProxyHelper;
@@ -49,13 +49,12 @@ import org.hibernate.proxy.HibernateProxyHelper;
  * effect.
  *
  * @author Robert Tansley
- * @version $Revision$
  */
 @Entity
 @Table(name = "collection")
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
-public class Collection extends DSpaceObject implements DSpaceObjectLegacySupport, IndexableObject<UUID> {
+public class Collection extends DSpaceObject implements DSpaceObjectLegacySupport {
 
     @Column(name = "collection_id", insertable = false, updatable = false)
     private Integer legacyId;
@@ -90,22 +89,10 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
         joinColumns = {@JoinColumn(name = "collection_id")},
         inverseJoinColumns = {@JoinColumn(name = "community_id")}
     )
-    private Set<Community> communities = new HashSet<>();
+    private final Set<Community> communities = new HashSet<>();
 
     @Transient
     private transient CollectionService collectionService;
-
-    // Keys for accessing Collection metadata
-    @Transient
-    public static final String COPYRIGHT_TEXT = "copyright_text";
-    @Transient
-    public static final String INTRODUCTORY_TEXT = "introductory_text";
-    @Transient
-    public static final String SHORT_DESCRIPTION = "short_description";
-    @Transient
-    public static final String SIDEBAR_TEXT = "side_bar_text";
-    @Transient
-    public static final String PROVENANCE_TEXT = "provenance_description";
 
     /**
      * Protected constructor, create object using:
@@ -210,10 +197,17 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * Get the license that users must grant before submitting to this
      * collection.
      *
-     * @return the license for this collection
+     * @return the license for this collection. Never null.
      */
+    @Nonnull
     public String getLicenseCollection() {
-        return getCollectionService().getMetadata(this, "license");
+        String license = getCollectionService()
+                .getMetadataFirstValue(this, CollectionService.MD_LICENSE, Item.ANY);
+        if (null == license) {
+            return "";
+        } else {
+            return license;
+        }
     }
 
     /**
@@ -225,7 +219,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * @throws SQLException if database error
      */
     public void setLicense(Context context, String license) throws SQLException {
-        getCollectionService().setMetadata(context, this, "license", license);
+        getCollectionService().setMetadataSingleValue(context, this, MD_LICENSE, Item.ANY, license);
     }
 
     /**
@@ -329,11 +323,6 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
             collectionService = ContentServiceFactory.getInstance().getCollectionService();
         }
         return collectionService;
-    }
-
-    @Override
-    public String getTypeText() {
-        return Constants.typeText[Constants.COLLECTION];
     }
 
 }

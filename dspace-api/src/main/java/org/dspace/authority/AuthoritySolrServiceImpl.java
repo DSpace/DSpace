@@ -12,7 +12,9 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -20,7 +22,8 @@ import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.authority.indexer.AuthorityIndexingService;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * @author Antoine Snyers (antoine at atmire.com)
@@ -30,7 +33,7 @@ import org.dspace.core.ConfigurationManager;
  */
 public class AuthoritySolrServiceImpl implements AuthorityIndexingService, AuthoritySearchService {
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(AuthoritySolrServiceImpl.class);
+    private static final Logger log = LogManager.getLogger(AuthoritySolrServiceImpl.class);
 
     protected AuthoritySolrServiceImpl() {
 
@@ -39,22 +42,26 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
     /**
      * Non-Static CommonsHttpSolrServer for processing indexing events.
      */
-    protected HttpSolrClient solr = null;
+    protected SolrClient solr = null;
 
-    protected HttpSolrClient getSolr()
+    protected SolrClient getSolr()
             throws MalformedURLException, SolrServerException, IOException {
         if (solr == null) {
 
-            String solrService = ConfigurationManager.getProperty("solr.authority.server");
+            ConfigurationService configurationService
+                    = DSpaceServicesFactory.getInstance().getConfigurationService();
+            String solrService = configurationService.getProperty("solr.authority.server");
 
             log.debug("Solr authority URL: " + solrService);
 
-            solr = new HttpSolrClient.Builder(solrService).build();
-            solr.setBaseURL(solrService);
+            HttpSolrClient solrServer = new HttpSolrClient.Builder(solrService).build();
+            solrServer.setBaseURL(solrService);
 
             SolrQuery solrQuery = new SolrQuery().setQuery("*:*");
 
-            solr.query(solrQuery);
+            solrServer.query(solrQuery);
+
+            solr = solrServer;
         }
 
         return solr;
@@ -150,7 +157,7 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
 
         QueryResponse response = getSolr().query(solrQuery);
 
-        List<String> results = new ArrayList<String>();
+        List<String> results = new ArrayList<>();
         FacetField facetField = response.getFacetField("field");
         if (facetField != null) {
             List<FacetField.Count> values = facetField.getValues();

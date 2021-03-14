@@ -65,6 +65,7 @@ public class Collected implements VirtualMetadataConfiguration {
      * Generic setter for the useForPlace property
      * @param useForPlace   The boolean value that the useForPlace property will be set to
      */
+    @Override
     public void setUseForPlace(boolean useForPlace) {
         this.useForPlace = useForPlace;
     }
@@ -73,8 +74,17 @@ public class Collected implements VirtualMetadataConfiguration {
      * Generic getter for the useForPlace property
      * @return  The useForPlace to be used by this bean
      */
+    @Override
     public boolean getUseForPlace() {
         return useForPlace;
+    }
+
+    @Override
+    public void setPopulateWithNameVariant(boolean populateWithNameVariant) { }
+
+    @Override
+    public boolean getPopulateWithNameVariant() {
+        return false;
     }
 
     /**

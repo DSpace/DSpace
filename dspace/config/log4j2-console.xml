@@ -6,27 +6,27 @@
 
     Its goal is to simply output logs to the commandline / console.
 -->
-<configuration strict='true'
+<Configuration strict='true'
                xmlns='http://logging.apache.org/log4j/2.0/config'>
-    <properties>
+    <Properties>
         <!-- Default log file directory for DSpace. -->
-        <property name='log.dir'>${log4j:configParentLocation}/../log</property>
-    </properties>
+        <Property name='log.dir'>${log4j:configParentLocation}/../log</Property>
+    </Properties>
 
-    <appenders>
-        <appender name='A1'
+    <Appenders>
+        <Appender name='A1'
 		  type='Console'>
-            <layout type='PatternLayout'
+            <Layout type='PatternLayout'
 		    pattern='%d %-5p %c @ %m%n'/>
-        </appender>
-    </appenders>
+        </Appender>
+    </Appenders>
 
     <!-- Set root category priority to WARN and its only appender to A1.
          For command line / Ant scripts, we are only concerned about significant warnings/errors.
          For the full detail, change this to INFO and re-run Ant. -->
-    <loggers>
-        <root level='WARN'>
-            <appenderRef ref='A1'/>
-        </root>
-    </loggers>
-</configuration>
+    <Loggers>
+        <Root level='WARN'>
+            <AppenderRef ref='A1'/>
+        </Root>
+    </Loggers>
+</Configuration>

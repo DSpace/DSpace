@@ -14,6 +14,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.discovery.indexobject.IndexableItem;
 
 /**
  * This plugin adds three fields to the solr index to make a facet with/without
@@ -29,9 +30,9 @@ import org.dspace.core.Context;
 public class SolrServiceContentInOriginalBundleFilterPlugin implements SolrServiceIndexPlugin {
 
     @Override
-    public void additionalIndex(Context context, IndexableObject dso, SolrInputDocument document) {
-        if (dso instanceof Item) {
-            Item item = (Item) dso;
+    public void additionalIndex(Context context, IndexableObject indexableObject, SolrInputDocument document) {
+        if (indexableObject instanceof IndexableItem) {
+            Item item = ((IndexableItem) indexableObject).getIndexedObject();
             boolean hasOriginalBundleWithContent = hasOriginalBundleWithContent(item);
 
             // _keyword and _filter because

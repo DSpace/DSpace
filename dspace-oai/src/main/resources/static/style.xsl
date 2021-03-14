@@ -22,27 +22,28 @@
 		<html>
 			<head>
                 <title>DSpace OAI-PMH Data Provider</title>
+                <meta name="Generator" content="DSpace"/>
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-                <script src="static/js/jquery.js" type="text/javascript"></script>
-                <script src="static/js/bootstrap.min.js" type="text/javascript"></script>
-
-                <link rel="stylesheet" href="static/css/bootstrap.min.css" type="text/css" />
-                <link rel="stylesheet" href="static/css/bootstrap-theme.min.css" type="text/css" />
+                <!-- NOTE: We use JQuery and Bootstrap via WebJars which are configured in dspace-server-webapp -->
+                <script src="../webjars/jquery/dist/jquery.min.js" type="text/javascript"></script>
+                <script src="../webjars/bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>
+                <link rel="stylesheet" href="../webjars/bootstrap/dist/css/bootstrap.min.css" type="text/css"/>
                 <link rel="stylesheet" href="static/css/style.css" type="text/css" />
 			</head>
 			<body>
                 <div class="container">
-                    <div class="navbar navbar-default" role="navigation">
-                        <div class="navbar-header">
-                            <a class="navbar-brand" href="#">DSpace OAI-PMH Data Provider</a>
-                        </div>
-                        <div class="navbar-collapse collapse">
-                            <ul class="nav navbar-nav navbar-right">
-                                <li>
-                                    <a title="Institutional information">
+                    <nav class="navbar navbar-light bg-light navbar-expand-lg" role="navigation">
+                        <a class="navbar-brand" href="#">DSpace OAI-PMH Data Provider</a>
+                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="navbar-collapse collapse" id="navbarNav">
+                            <ul class="nav navbar-nav ml-auto">
+                                <li class="nav-item">
+                                    <a class="nav-link" title="Institutional information">
                                         <xsl:if test="/oai:OAI-PMH/oai:request/@verb = 'Identify'">
-                                            <xsl:attribute name="class">active</xsl:attribute>
+                                            <xsl:attribute name="class">active nav-link</xsl:attribute>
                                         </xsl:if>
                                         <xsl:attribute name="href">
                                             <xsl:value-of
@@ -51,10 +52,10 @@
                                         Identify
                                     </a>
                                 </li>
-                                <li>
-                                    <a title="Listing available sets">
+                                <li class="nav-item">
+                                    <a class="nav-link" title="Listing available sets">
                                         <xsl:if test="/oai:OAI-PMH/oai:request/@verb = 'ListSets'">
-                                            <xsl:attribute name="class">active</xsl:attribute>
+                                            <xsl:attribute name="class">active nav-link</xsl:attribute>
                                         </xsl:if>
                                         <xsl:attribute name="href">
                                             <xsl:value-of
@@ -63,10 +64,10 @@
                                         Sets
                                     </a>
                                 </li>
-                                <li>
-                                    <a title="Listing records (with metadata)">
+                                <li class="nav-item">
+                                    <a class="nav-link" title="Listing records (with metadata)">
                                         <xsl:if test="/oai:OAI-PMH/oai:request/@verb = 'ListRecords'">
-                                            <xsl:attribute name="class">active</xsl:attribute>
+                                            <xsl:attribute name="class">active nav-link</xsl:attribute>
                                         </xsl:if>
                                         <xsl:attribute name="href">
                                             <xsl:value-of
@@ -75,10 +76,10 @@
                                         Records
                                     </a>
                                 </li>
-                                <li>
-                                    <a title="Listing identifiers only">
+                                <li class="nav-item">
+                                    <a class="nav-link" title="Listing identifiers only">
                                         <xsl:if test="/oai:OAI-PMH/oai:request/@verb = 'ListIdentifiers'">
-                                            <xsl:attribute name="class">active</xsl:attribute>
+                                            <xsl:attribute name="class">active nav-link</xsl:attribute>
                                         </xsl:if>
                                         <xsl:attribute name="href">
                                             <xsl:value-of
@@ -87,11 +88,11 @@
                                         Identifiers
                                     </a>
                                 </li>
-                                <li>
-                                    <a title="Metadata Formats available">
+                                <li class="nav-item">
+                                    <a class="nav-link" title="Metadata Formats available">
                                         <xsl:if
                                                 test="/oai:OAI-PMH/oai:request/@verb = 'ListMetadataFormats'">
-                                            <xsl:attribute name="class">active</xsl:attribute>
+                                            <xsl:attribute name="class">active nav-link</xsl:attribute>
                                         </xsl:if>
                                         <xsl:attribute name="href">
                                             <xsl:value-of
@@ -102,11 +103,11 @@
                                 </li>
                             </ul>
                         </div><!--/.nav-collapse -->
-                    </div>
+                    </nav>
                     <div class="row">
-                        <div class="col-lg-offset-1 col-lg-10">
-                            <div class="row">
-                                <h5>Response Date <small><xsl:value-of select="translate(oai:OAI-PMH/oai:responseDate/text(), 'TZ', ' ')" /></small></h5>
+                        <div class="offset-lg-1 col-lg-10">
+                            <div class="row my-2">
+                                <h5>Response Date <small class="text-muted"><xsl:value-of select="translate(oai:OAI-PMH/oai:responseDate/text(), 'TZ', ' ')" /></small></h5>
                             </div>
                             <div class="row">
                                 <xsl:apply-templates select="oai:OAI-PMH/oai:error" />
@@ -123,10 +124,10 @@
 
                     <div class="row-fluid text-center">
                         <div class="vertical-space"></div>
-                        <p><small>Design by Lyncode</small></p>
+                        <p><small>DSpace OAI-PMH Data Provider</small></p>
                         <p>
-                            <a href="http://www.lyncode.com">
-                                <img style="height: 20px;" src="static/img/lyncode.png" alt="Lyncode" />
+                            <a href="https://dspace.org">
+                                <img src="static/img/dspace-logo.png" alt="DSpace" />
                             </a>
                         </p>
                     </div>
@@ -136,7 +137,7 @@
 	</xsl:template>
 
     <xsl:template match="oai:OAI-PMH/oai:error">
-        <div class="alert alert-danger">
+        <div class="alert alert-danger w-100" role="alert">
             <h4>Error</h4>
             <p>
                 <xsl:value-of select="text()"></xsl:value-of>
@@ -146,7 +147,7 @@
 
     <xsl:template match="oai:OAI-PMH/oai:Identify">
         <h2>Repository Information</h2>
-        <hr />
+        <hr class="w-100"/>
         <table class="table table-striped table-bordered">
             <tr>
                 <td><b>Repository Name</b></td>
@@ -215,17 +216,17 @@
 
     <xsl:template match="oai:OAI-PMH/oai:ListSets">
         <h2>List of Sets</h2>
-        <hr />
-        <div class="well well-sm">
+        <hr class="w-100"/>
+        <div class="card card-body bg-light py-2 my-2 w-100">
             <h4>Results fetched
-                <small>
+                <small class="text-muted">
                     <xsl:call-template name="result-count">
                         <xsl:with-param name="path" select="oai:set" />
                     </xsl:call-template>
                 </small>
             </h4>
         </div>
-        <div class="list-group">
+        <div class="list-group w-100">
             <xsl:for-each select="oai:set">
                 <div class="list-group-item">
                     <h5 class="list-group-item-heading">
@@ -242,15 +243,15 @@
                             [<xsl:value-of select="oai:setSpec/text()" />]
                         </small>
                     </h5>
-                    <div class="spec">
-                        <a>
+                    <div class="btn-group spec">
+                        <a role="button" class="btn btn-outline-secondary">
                             <xsl:attribute name="href">
                                 <xsl:value-of
                                         select="concat(/oai:OAI-PMH/oai:request/text(), '?verb=ListRecords&amp;metadataPrefix=oai_dc&amp;set=', oai:setSpec/text())" />
                             </xsl:attribute>
                             Records
                         </a>
-                        <a>
+                        <a role="button" class="btn btn-outline-secondary">
                             <xsl:attribute name="href">
                                 <xsl:value-of
                                         select="concat(/oai:OAI-PMH/oai:request/text(), '?verb=ListIdentifiers&amp;metadataPrefix=oai_dc&amp;set=', oai:setSpec/text())" />
@@ -267,10 +268,10 @@
 
     <xsl:template match="oai:OAI-PMH/oai:ListRecords">
         <h2>List of Records</h2>
-        <hr />
-        <div class="well well-sm">
+        <hr class="w-100"/>
+        <div class="card card-body bg-light py-2 my-2">
             <h4>Results fetched
-                <small>
+                <small class="text-muted">
                     <xsl:call-template name="result-count">
                         <xsl:with-param name="path" select="oai:record" />
                     </xsl:call-template>
@@ -278,8 +279,8 @@
             </h4>
         </div>
         <xsl:for-each select="oai:record">
-            <div class="panel panel-default">
-                <div class="panel-heading">
+            <div class="card w-100 my-2">
+                <div class="card-header">
                     <div class="row">
                         <div class="col-lg-6">
                             <h5>Identifier <small><xsl:value-of select="oai:header/oai:identifier/text()"></xsl:value-of></small></h5>
@@ -289,23 +290,21 @@
                         </div>
                     </div>
                 </div>
-                <div class="panel-body">
+                <div class="card-body">
                     <!-- If this record has a "status", display it as a warning -->
                     <xsl:if test="oai:header/@status">
-                      <div class="alert alert-warning">Record Status: <xsl:value-of select="oai:header/@status"/></div>
+                      <div class="alert alert-warning w-100" role="alert">Record Status: <xsl:value-of select="oai:header/@status"/></div>
                     </xsl:if>
-                    <div class="panel panel-success">
+                    <div class="card mb-2">
                         <a data-toggle="collapse">
                             <xsl:attribute name="href">#sets<xsl:value-of select="translate(oai:header/oai:identifier/text(), ':/.', '')"></xsl:value-of></xsl:attribute>
-                            <div class="panel-heading">
-                                <h5 class="panel-title">
-                                    Sets
-                                </h5>
+                            <div class="card-header">
+                                <h5>Sets</h5>
                             </div>
                         </a>
-                        <div class="panel-collapse collapse">
+                        <div class="collapse ml-2">
                             <xsl:attribute name="id">sets<xsl:value-of select="translate(oai:header/oai:identifier/text(), ':/.', '')"></xsl:value-of></xsl:attribute>
-                            <div class="panel-body list-group">
+                            <div class="card-body list-group">
                                 <xsl:for-each select="oai:header/oai:setSpec">
                                     <div class="list-group-item">
                                         <a>
@@ -320,18 +319,16 @@
                             </div>
                         </div>
                     </div>
-                    <div class="panel panel-info">
+                    <div class="card">
                         <a data-toggle="collapse">
                             <xsl:attribute name="href">#<xsl:value-of select="translate(oai:header/oai:identifier/text(), ':/.', '')"></xsl:value-of></xsl:attribute>
-                            <div class="panel-heading">
-                                <h5 class="panel-title">
-                                        Metadata
-                                </h5>
+                            <div class="card-header">
+                                <h5>Metadata</h5>
                             </div>
                         </a>
-                        <div class="panel-collapse collapse">
+                        <div class="collapse">
                             <xsl:attribute name="id"><xsl:value-of select="translate(oai:header/oai:identifier/text(), ':/.', '')"></xsl:value-of></xsl:attribute>
-                            <div class="panel-body">
+                            <div class="card-body">
                                 <xsl:apply-templates select="oai:metadata/*" />
                             </div>
                         </div>
@@ -345,10 +342,10 @@
 
     <xsl:template match="oai:OAI-PMH/oai:GetRecord">
         <h2>Record Details</h2>
-        <hr />
+        <hr class="w-100" />
         <xsl:for-each select="oai:record">
-            <div class="panel panel-default">
-                <div class="panel-heading">
+            <div class="card w-100 my-2">
+                <div class="card-header">
                     <div class="row">
                         <div class="col-lg-6">
                             <h5>Identifier <small><xsl:value-of select="oai:header/oai:identifier/text()"></xsl:value-of></small></h5>
@@ -358,18 +355,16 @@
                         </div>
                     </div>
                 </div>
-                <div class="panel-body">
+                <div class="card-body">
                     <!-- If this record has a "status", display it as a warning -->
                     <xsl:if test="oai:header/@status">
-                      <div class="alert alert-warning">Record Status: <xsl:value-of select="oai:header/@status"/></div>
+                      <div class="alert alert-warning w-100" role="alert">Record Status: <xsl:value-of select="oai:header/@status"/></div>
                     </xsl:if>
-                    <div class="panel panel-success">
-                            <div class="panel-heading">
-                                <h5 class="panel-title">
-                                    Sets
-                                </h5>
+                    <div class="card mb-2">
+                            <div class="card-header">
+                                <h5>Sets</h5>
                             </div>
-                            <div class="panel-body list-group">
+                            <div class="card-body list-group">
                                 <xsl:for-each select="oai:header/oai:setSpec">
                                     <div class="list-group-item">
                                         <a>
@@ -383,13 +378,11 @@
                                 </xsl:for-each>
                             </div>
                     </div>
-                    <div class="panel panel-info">
-                            <div class="panel-heading">
-                                <h5 class="panel-title">
-                                    Metadata
-                                </h5>
+                    <div class="card">
+                            <div class="card-header">
+                                <h5>Metadata</h5>
                             </div>
-                            <div class="panel-body">
+                            <div class="card-body">
                                 <xsl:apply-templates select="oai:metadata/*" />
                             </div>
                     </div>
@@ -400,8 +393,8 @@
 
     <xsl:template match="oai:OAI-PMH/oai:ListIdentifiers">
         <h2>List of Identifiers</h2>
-        <hr />
-        <div class="well well-sm">
+        <hr class="w-100"/>
+        <div class="card card-body bg-light py-2">
             <h4>Results fetched
                 <small>
                     <xsl:call-template name="result-count">
@@ -411,8 +404,8 @@
             </h4>
         </div>
         <xsl:for-each select="oai:header">
-            <div class="panel panel-default">
-                <div class="panel-heading">
+            <div class="card w-100 my-2">
+                <div class="card-header">
                     <div class="row">
                         <div class="col-lg-4">
                             <h5>Identifier <small><xsl:value-of select="oai:identifier/text()"></xsl:value-of></small></h5>
@@ -421,7 +414,7 @@
                             <h5>Last Modified <small><xsl:value-of select="translate(oai:datestamp/text(), 'TZ', ' ')"></xsl:value-of></small></h5>
                         </div>
                         <div class="col-lg-4">
-                            <a class="btn btn-default pull-right">
+                            <a class="btn btn-outline-secondary float-right">
                                 <xsl:attribute name="href">
                                     <xsl:value-of select="concat(/oai:OAI-PMH/oai:request/text(), '?verb=GetRecord&amp;metadataPrefix=oai_dc&amp;identifier=', oai:identifier/text())" />
                                 </xsl:attribute>
@@ -430,23 +423,21 @@
                         </div>
                     </div>
                 </div>
-                <div class="panel-body">
+                <div class="card-body">
                     <!-- If this record has a "status", display it as a warning -->
                     <xsl:if test="@status">
-                      <div class="alert alert-warning">Record Status: <xsl:value-of select="@status"/></div>
+                      <div class="alert alert-warning w-100" role="alert">Record Status: <xsl:value-of select="@status"/></div>
                     </xsl:if>
-                    <div class="panel panel-success">
+                    <div class="card">
                         <a data-toggle="collapse">
                             <xsl:attribute name="href">#sets<xsl:value-of select="translate(oai:identifier/text(), ':/.', '')"></xsl:value-of></xsl:attribute>
-                            <div class="panel-heading">
-                                <h5 class="panel-title">
-                                    Sets
-                                </h5>
+                            <div class="card-header">
+                                <h5>Sets</h5>
                             </div>
                         </a>
-                        <div class="panel-collapse collapse">
+                        <div class="collapse ml-2">
                             <xsl:attribute name="id">sets<xsl:value-of select="translate(oai:identifier/text(), ':/.', '')"></xsl:value-of></xsl:attribute>
-                            <div class="panel-body list-group">
+                            <div class="card-body list-group">
                                 <xsl:for-each select="oai:setSpec">
                                     <div class="list-group-item">
                                         <a>
@@ -470,23 +461,23 @@
 
     <xsl:template match="oai:OAI-PMH/oai:ListMetadataFormats">
         <h2>List of Metadata Formats</h2>
-        <hr />
-        <div class="well well-sm">
+        <hr class="w-100"/>
+        <div class="card card-body bg-light py-2">
             <h4>Results fetched
-                <small>
+                <small class="text-muted">
                     <xsl:value-of select="count(oai:OAI-PMH/oai:ListMetadataFormats/oai:metadataFormat)" />
                 </small>
             </h4>
         </div>
         <xsl:for-each select="oai:metadataFormat">
-            <div class="panel panel-default">
-                <div class="panel-heading">
+            <div class="card w-100 my-2">
+                <div class="card-header">
                     <div class="row">
                         <div class="col-lg-9">
                             <h5><xsl:value-of select="oai:metadataPrefix/text()"></xsl:value-of></h5>
                         </div>
                         <div class="col-lg-3">
-                            <a class="btn btn-default pull-right">
+                            <a class="btn btn-outline-secondary float-right">
                                 <xsl:attribute name="href">
                                     <xsl:value-of
                                             select="concat(/oai:OAI-PMH/oai:request/text(), '?verb=ListRecords&amp;metadataPrefix=', oai:metadataPrefix/text())" />
@@ -496,7 +487,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="panel-body">
+                <div class="card-body">
                     <div class="row">
                         <div class="col-lg-9">
                             <h5>Namespace <small><xsl:value-of select="oai:metadataNamespace/text()"></xsl:value-of></small></h5>
@@ -511,7 +502,7 @@
     <xsl:template match="oai:resumptionToken">
         <xsl:if test="text() != ''">
             <div class="text-center">
-                <a class="btn btn-primary">
+                <a class="btn btn-outline-secondary">
                 <xsl:attribute name="href">
                     <xsl:value-of select="concat(/oai:OAI-PMH/oai:request/text(), '?verb=',/oai:OAI-PMH/oai:request/@verb,'&amp;resumptionToken=', text())"></xsl:value-of>
                 </xsl:attribute>

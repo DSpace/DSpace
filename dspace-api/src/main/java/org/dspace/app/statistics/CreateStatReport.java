@@ -16,10 +16,11 @@ import java.util.Properties;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * This class allows the running of the DSpace statistic tools
@@ -56,7 +57,7 @@ public class CreateStatReport {
     /**
      * File suffix for log files
      */
-    private static String outputSuffix = ".dat";
+    private static final String outputSuffix = ".dat";
 
     /**
      * User context
@@ -66,9 +67,6 @@ public class CreateStatReport {
     /**
      * the config file from which to configure the analyser
      */
-    private static String configFile = ConfigurationManager.getProperty("dspace.dir") +
-        File.separator + "config" + File.separator +
-        "dstat.cfg";
 
     /**
      * Default constructor
@@ -81,8 +79,12 @@ public class CreateStatReport {
      * Usage: java CreateStatReport -r <statistic to run>
      */
     public static void main(String[] argv) throws Exception {
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
 
         // Open the statistics config file
+        final String configFile = configurationService.getProperty("dspace.dir")
+                + File.separator + "config" + File.separator + "dstat.cfg";
         FileInputStream fis = new java.io.FileInputStream(new File(configFile));
         Properties config = new Properties();
         config.load(fis);
@@ -108,11 +110,11 @@ public class CreateStatReport {
         context.turnOffAuthorisationSystem();
 
         //get paths to directories
-        outputLogDirectory = ConfigurationManager.getProperty("log.report.dir") + File.separator;
-        outputReportDirectory = ConfigurationManager.getProperty("report.dir") + File.separator;
+        outputLogDirectory = configurationService.getProperty("log.report.dir") + File.separator;
+        outputReportDirectory = configurationService.getProperty("report.dir") + File.separator;
 
         //read in command line variable to determine which statistic to run
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
         Options options = new Options();
         options.addOption("r", "report", true, "report");
         CommandLine line = parser.parse(options, argv);
@@ -405,6 +407,5 @@ public class CreateStatReport {
         System.out.println(
             "Available: <stat-initial> <stat-general> <stat-monthly> <stat-report-initial> <stat-report-general> " +
                 "<stat-report-monthly>");
-        return;
     }
 }

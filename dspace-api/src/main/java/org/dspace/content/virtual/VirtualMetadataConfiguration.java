@@ -42,4 +42,18 @@ public interface VirtualMetadataConfiguration {
      * @return  The useForPlace to be used by this bean
      */
     boolean getUseForPlace();
+
+    /**
+     * Generic setter for the populateWithNameVariant
+     * This property defines whether the value should be retrieved from the left/rightward on the Relationship (true)
+     * or through the configuration and usual way (false)
+     * @param populateWithNameVariant   The boolean value that the populateWithNameVariant property will be set to
+     */
+    void setPopulateWithNameVariant(boolean populateWithNameVariant);
+
+    /**
+     * Generic getter for the populateWithNameVariant property
+     * @return  The populatewithNameVariant to be used by this bean
+     */
+    boolean getPopulateWithNameVariant();
 }

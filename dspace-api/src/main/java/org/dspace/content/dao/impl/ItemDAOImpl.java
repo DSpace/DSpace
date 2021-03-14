@@ -15,10 +15,14 @@ import java.util.List;
 import java.util.UUID;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.Item_;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.dao.ItemDAO;
@@ -100,6 +104,17 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     public Iterator<Item> findBySubmitter(Context context, EPerson eperson) throws SQLException {
         Query query = createQuery(context, "FROM Item WHERE inArchive= :in_archive and submitter= :submitter");
         query.setParameter("in_archive", true);
+        query.setParameter("submitter", eperson);
+        return iterate(query);
+    }
+
+    @Override
+    public Iterator<Item> findBySubmitter(Context context, EPerson eperson, boolean retrieveAllItems)
+        throws SQLException {
+        if (!retrieveAllItems) {
+            return findBySubmitter(context, eperson);
+        }
+        Query query = createQuery(context, "FROM Item WHERE submitter= :submitter");
         query.setParameter("submitter", eperson);
         return iterate(query);
     }
@@ -281,6 +296,33 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
             query.setMaxResults(limit);
         }
         return iterate(query);
+    }
+
+    @Override
+    public Iterator<Item> findArchivedByCollectionExcludingOwning(Context context, Collection collection, Integer limit,
+                                                                  Integer offset) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Item.class);
+        Root<Item> itemRoot = criteriaQuery.from(Item.class);
+        criteriaQuery.select(itemRoot);
+        criteriaQuery.where(criteriaBuilder.and(
+                criteriaBuilder.notEqual(itemRoot.get(Item_.owningCollection), collection),
+                criteriaBuilder.isMember(collection, itemRoot.get(Item_.collections)),
+                criteriaBuilder.isTrue(itemRoot.get(Item_.inArchive))));
+        return list(context, criteriaQuery, false, Item.class, limit, offset).iterator();
+    }
+
+    @Override
+    public int countArchivedByCollectionExcludingOwning(Context context, Collection collection) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Item.class);
+        Root<Item> itemRoot = criteriaQuery.from(Item.class);
+        criteriaQuery.select(itemRoot);
+        criteriaQuery.where(criteriaBuilder.and(
+                criteriaBuilder.notEqual(itemRoot.get(Item_.owningCollection), collection),
+                criteriaBuilder.isMember(collection, itemRoot.get(Item_.collections)),
+                criteriaBuilder.isTrue(itemRoot.get(Item_.inArchive))));
+        return count(context, criteriaQuery, criteriaBuilder, itemRoot);
     }
 
     @Override

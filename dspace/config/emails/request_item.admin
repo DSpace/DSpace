@@ -1,8 +1,8 @@
-Subject: Request for Open Access
+#set($subject = 'Request for Open Access')
 
-{3}, with address {4},
-requested the following document/file to be in Open Access: 
+${params[3]}, with address ${params[4]},
+requested the following document/file to be in Open Access:
 
-Document Handle:{1} 
-File ID: {0} 
-Token:{2}
+Document Handle:${params[1]}
+File ID: ${params[0]}
+Token:${params[2]}

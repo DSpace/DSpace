@@ -12,10 +12,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Demonstration and test consumer for the event system. This consumer only
@@ -27,10 +29,13 @@ import org.dspace.eperson.EPerson;
  */
 public class TestConsumer implements Consumer {
     // Log4j logger
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(TestConsumer.class);
+    private static final Logger log = LogManager.getLogger(TestConsumer.class);
+
+    private static final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     // Send diagnostic output here - set to null to turn it off.
-    private static PrintStream out = ConfigurationManager
+    private static final PrintStream out = configurationService
         .getBooleanProperty("testConsumer.verbose") ? System.out : null;
 
     @Override

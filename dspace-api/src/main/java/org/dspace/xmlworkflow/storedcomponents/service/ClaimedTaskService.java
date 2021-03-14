@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.service.IndexableObjectService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.service.DSpaceCRUDService;
@@ -25,8 +24,7 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  *
  * @author kevinvandevelde at atmire.com
  */
-public interface ClaimedTaskService extends DSpaceCRUDService<ClaimedTask>,
-    IndexableObjectService<ClaimedTask, Integer> {
+public interface ClaimedTaskService extends DSpaceCRUDService<ClaimedTask> {
 
     public List<ClaimedTask> findByWorkflowItem(Context context, XmlWorkflowItem workflowItem) throws SQLException;
 
@@ -49,4 +47,6 @@ public interface ClaimedTaskService extends DSpaceCRUDService<ClaimedTask>,
 
     public void deleteByWorkflowItem(Context context, XmlWorkflowItem workflowItem)
         throws SQLException, AuthorizeException;
+
+    List<ClaimedTask> findAll(Context context) throws SQLException;
 }

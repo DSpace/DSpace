@@ -26,11 +26,12 @@ public class DSpaceSolrServerResolver implements SolrServerResolver {
     @Override
     public SolrClient getServer() throws SolrServerException {
         if (server == null) {
+            String serverUrl = configurationService.getProperty("oai.solr.url");
             try {
-                server = new HttpSolrClient.Builder(configurationService.getProperty("oai", "solr.url")).build();
-                log.debug("Solr Server Initialized");
+                server = new HttpSolrClient.Builder(serverUrl).build();
+                log.debug("OAI Solr Server Initialized");
             } catch (Exception e) {
-                log.error(e.getMessage(), e);
+                log.error("Could not initialize OAI Solr Server at " + serverUrl , e);
             }
         }
         return server;
