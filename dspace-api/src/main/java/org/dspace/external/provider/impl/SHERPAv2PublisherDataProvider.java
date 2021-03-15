@@ -90,7 +90,7 @@ public class SHERPAv2PublisherDataProvider implements ExternalDataProvider {
     public List<ExternalDataObject> searchExternalDataObjects(String query, int start, int limit) {
         // Search SHERPA for publishers with the query term in the title (name)
         SHERPAPublisherResponse sherpaResponse = sherpaService.performPublisherRequest(
-            "publication", "title", "contains word", query, start, limit);
+            "publisher", "name", "contains word", query, start, limit);
 
         // If at least one publisher was found, convert to a list of ExternalDataObjects and return
         if (CollectionUtils.isNotEmpty(sherpaResponse.getPublishers())) {
