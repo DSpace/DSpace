@@ -17,8 +17,7 @@
 
 <!--
     <alias name="OrcidSource" alias="AuthoritySource"/>
-    <bean name="OrcidSource" class="org.dspace.authority.orcid.Orcidv2">
-        <property name="orcidUrl" value="${orcid.url}" />
+    <bean name="OrcidSource" class="org.dspace.authority.orcid.Orcidv3">
         <property name="clientId" value="${orcid.clientid}" />
         <property name="clientSecret" value="${orcid.clientsecret}" />
         <property name="OAUTHUrl" value="${orcid.oauth.url}" />
@@ -29,7 +28,7 @@
     <bean name="AuthorityTypes" class="org.dspace.authority.AuthorityTypes">
         <property name="types">
             <list>
-                <!-- <bean class="org.dspace.authority.orcid.Orcidv2AuthorityValue"/> -->
+                <!-- <bean class="org.dspace.authority.orcid.Orcidv3AuthorityValue"/> -->
                 <bean class="org.dspace.authority.PersonAuthorityValue"/>
             </list>
         </property>

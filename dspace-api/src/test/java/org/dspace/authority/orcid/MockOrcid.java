@@ -11,7 +11,6 @@ import static org.mockito.Mockito.when;
 
 import java.io.InputStream;
 
-import org.dspace.app.rest.OrcidExternalSourcesIT;
 import org.dspace.external.OrcidRestConnector;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
@@ -25,7 +24,7 @@ import org.mockito.stubbing.Answer;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public class MockOrcid extends Orcidv2 {
+public class MockOrcid extends Orcidv3 {
 
     @Override
     public void init() {
@@ -33,19 +32,19 @@ public class MockOrcid extends Orcidv2 {
         when(orcidRestConnector.get(ArgumentMatchers.startsWith("search?"), ArgumentMatchers.any()))
         .thenAnswer(new Answer<InputStream>() {
                 public InputStream answer(InvocationOnMock invocation) {
-                    return OrcidExternalSourcesIT.class.getResourceAsStream("orcid-search-noresults.xml");
+                    return this.getClass().getResourceAsStream("orcid-search-noresults.xml");
                 }
             });
         when(orcidRestConnector.get(ArgumentMatchers.startsWith("search?q=Bollini"), ArgumentMatchers.any()))
             .thenAnswer(new Answer<InputStream>() {
                     public InputStream answer(InvocationOnMock invocation) {
-                        return OrcidExternalSourcesIT.class.getResourceAsStream("orcid-search.xml");
+                        return this.getClass().getResourceAsStream("orcid-search.xml");
                     }
                 });
         when(orcidRestConnector.get(ArgumentMatchers.endsWith("/person"), ArgumentMatchers.any()))
             .thenAnswer(new Answer<InputStream>() {
                     public InputStream answer(InvocationOnMock invocation) {
-                        return OrcidExternalSourcesIT.class.getResourceAsStream("orcid-person-record.xml");
+                        return this.getClass().getResourceAsStream("orcid-person-record.xml");
                     }
                 });
 

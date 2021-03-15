@@ -75,14 +75,14 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                 "dc.contributor.author");
 
         configurationService.setProperty("choices.plugin.dc.publisher",
-                "SherpaPublisherAuthority");
+                "SRPublisher");
         configurationService.setProperty("choices.presentation.dc.publisher",
                 "lookup");
         configurationService.setProperty("authority.controlled.dc.publisher",
                 "true");
 
         configurationService.setProperty("choices.plugin.dc.relation.ispartof",
-                "SherpaJournalAuthority");
+                "SRJournalTitle");
         configurationService.setProperty("choices.presentation.dc.relation.ispartof",
                 "lookup");
         configurationService.setProperty("authority.controlled.dc.relation.ispartof",
