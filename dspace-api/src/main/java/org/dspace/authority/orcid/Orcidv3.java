@@ -37,24 +37,37 @@ import org.orcid.jaxb.model.v3.release.search.Result;
  * This class contains all methods for retrieving "Person" objects calling the ORCID (version 2) endpoints.
  * Additionally, this can also create AuthorityValues based on these returned Person objects
  */
-public class Orcidv2 implements SolrAuthorityInterface {
+public class Orcidv3 implements SolrAuthorityInterface {
 
-    private static Logger log = Logger.getLogger(Orcidv2.class);
+    private static Logger log = Logger.getLogger(Orcidv3.class);
 
     private OrcidRestConnector orcidRestConnector;
     private String OAUTHUrl;
     private String clientId;
-
     private String clientSecret;
 
     private String accessToken;
+
+    public void setOAUTHUrl(String oAUTHUrl) {
+        OAUTHUrl = oAUTHUrl;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    public void setClientSecret(String clientSecret) {
+        this.clientSecret = clientSecret;
+    }
 
     /**
      *  Initialize the accessToken that is required for all subsequent calls to ORCID
      */
     public void init() {
-        if (StringUtils.isNotBlank(clientSecret) && StringUtils.isNotBlank(clientId)
-            && StringUtils.isNotBlank(OAUTHUrl)) {
+        if (StringUtils.isBlank(accessToken)
+                && StringUtils.isNotBlank(clientSecret)
+                && StringUtils.isNotBlank(clientId)
+                && StringUtils.isNotBlank(OAUTHUrl)) {
             String authenticationParameters = "?client_id=" + clientId +
                     "&client_secret=" + clientSecret +
                     "&scope=/read-public&grant_type=client_credentials";
@@ -105,7 +118,7 @@ public class Orcidv2 implements SolrAuthorityInterface {
         List<Person> bios = queryBio(text, max);
         List<AuthorityValue> result = new ArrayList<>();
         for (Person person : bios) {
-            AuthorityValue orcidAuthorityValue = Orcidv2AuthorityValue.create(person);
+            AuthorityValue orcidAuthorityValue = Orcidv3AuthorityValue.create(person);
             if (orcidAuthorityValue != null) {
                 result.add(orcidAuthorityValue);
             }
@@ -121,7 +134,7 @@ public class Orcidv2 implements SolrAuthorityInterface {
     public AuthorityValue queryAuthorityID(String id) {
         init();
         Person person = getBio(id);
-        AuthorityValue valueFromPerson = Orcidv2AuthorityValue.create(person);
+        AuthorityValue valueFromPerson = Orcidv3AuthorityValue.create(person);
         return valueFromPerson;
     }
 
@@ -201,6 +214,6 @@ public class Orcidv2 implements SolrAuthorityInterface {
      * would return a blank result anyway
      */
     private boolean isValid(String text) {
-        return StringUtils.isNotBlank(text) && text.matches(Orcidv2AuthorityValue.ORCID_ID_SYNTAX);
+        return StringUtils.isNotBlank(text) && text.matches(Orcidv3AuthorityValue.ORCID_ID_SYNTAX);
     }
 }

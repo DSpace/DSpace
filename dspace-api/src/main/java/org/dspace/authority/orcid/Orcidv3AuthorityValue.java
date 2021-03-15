@@ -34,7 +34,7 @@ import org.orcid.jaxb.model.v3.release.record.ResearcherUrl;
 /**
  * @author Jonas Van Goolen (jonas at atmire dot com)
  */
-public class Orcidv2AuthorityValue extends PersonAuthorityValue {
+public class Orcidv3AuthorityValue extends PersonAuthorityValue {
 
     /*
      * The ORCID identifier
@@ -58,10 +58,10 @@ public class Orcidv2AuthorityValue extends PersonAuthorityValue {
      * This is meant to be filled in with values from an existing record.
      * To create a brand new Orcidv2AuthorityValue, use create()
      */
-    public Orcidv2AuthorityValue() {
+    public Orcidv3AuthorityValue() {
     }
 
-    public Orcidv2AuthorityValue(SolrDocument document) {
+    public Orcidv3AuthorityValue(SolrDocument document) {
         super(document);
     }
 
@@ -78,8 +78,8 @@ public class Orcidv2AuthorityValue extends PersonAuthorityValue {
      * Create an empty authority.
      * @return OrcidAuthorityValue
      */
-    public static Orcidv2AuthorityValue create() {
-        Orcidv2AuthorityValue orcidAuthorityValue = new Orcidv2AuthorityValue();
+    public static Orcidv3AuthorityValue create() {
+        Orcidv3AuthorityValue orcidAuthorityValue = new Orcidv3AuthorityValue();
         orcidAuthorityValue.setId(UUID.randomUUID().toString());
         orcidAuthorityValue.updateLastModifiedDate();
         orcidAuthorityValue.setCreationDate(new Date());
@@ -90,11 +90,11 @@ public class Orcidv2AuthorityValue extends PersonAuthorityValue {
      * Create an authority based on a given orcid bio
      * @return OrcidAuthorityValue
      */
-    public static Orcidv2AuthorityValue create(Person person) {
+    public static Orcidv3AuthorityValue create(Person person) {
         if (person == null) {
             return null;
         }
-        Orcidv2AuthorityValue authority = Orcidv2AuthorityValue.create();
+        Orcidv3AuthorityValue authority = Orcidv3AuthorityValue.create();
 
         authority.setValues(person);
 
@@ -169,7 +169,7 @@ public class Orcidv2AuthorityValue extends PersonAuthorityValue {
     public AuthorityValue newInstance(String info) {
         AuthorityValue authorityValue = null;
         if (StringUtils.isNotBlank(info)) {
-            Orcidv2 orcid = new DSpace().getServiceManager().getServiceByName("AuthoritySource", Orcidv2.class);
+            Orcidv3 orcid = new DSpace().getServiceManager().getServiceByName("AuthoritySource", Orcidv3.class);
             authorityValue = orcid.queryAuthorityID(info);
         } else {
             authorityValue = this.create();
@@ -283,7 +283,7 @@ public class Orcidv2AuthorityValue extends PersonAuthorityValue {
             return false;
         }
 
-        Orcidv2AuthorityValue that = (Orcidv2AuthorityValue) o;
+        Orcidv3AuthorityValue that = (Orcidv3AuthorityValue) o;
 
         if (orcid_id != null ? !orcid_id.equals(that.orcid_id) : that.orcid_id != null) {
             return false;
@@ -316,7 +316,7 @@ public class Orcidv2AuthorityValue extends PersonAuthorityValue {
             return false;
         }
 
-        Orcidv2AuthorityValue that = (Orcidv2AuthorityValue) o;
+        Orcidv3AuthorityValue that = (Orcidv3AuthorityValue) o;
 
         if (orcid_id != null ? !orcid_id.equals(that.orcid_id) : that.orcid_id != null) {
             return false;
