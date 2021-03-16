@@ -1116,7 +1116,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
                 throw new DOIIdentifierNotApplicableException(e);
             }
         } else {
-            log.debug("DOI Identifier Provider: filterService is null");
+            log.debug("DOI Identifier Provider: filterService is null (ie. don't prevent DOI minting)");
         }
     }
 }
