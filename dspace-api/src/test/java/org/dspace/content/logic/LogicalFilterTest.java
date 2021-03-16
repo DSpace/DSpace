@@ -11,6 +11,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,6 +23,7 @@ import java.util.Map;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -28,12 +32,15 @@ import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.logic.condition.InCollectionCondition;
 import org.dspace.content.logic.condition.MetadataValueMatchCondition;
 import org.dspace.content.logic.operator.And;
 import org.dspace.content.logic.operator.Nand;
 import org.dspace.content.logic.operator.Nor;
 import org.dspace.content.logic.operator.Not;
 import org.dspace.content.logic.operator.Or;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.InstallItemService;
@@ -52,6 +59,8 @@ import org.junit.Test;
 public class LogicalFilterTest extends AbstractUnitTest {
     // Required services
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
@@ -63,10 +72,13 @@ public class LogicalFilterTest extends AbstractUnitTest {
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(LogicalFilterTest.class);
 
     // Items and repository structure for testing
-    Community owningCommunity;
-    Collection collection;
+    Community communityOne;
+    Community communityTwo;
+    Collection collectionOne;
+    Collection collectionTwo;
     Item itemOne;
     Item itemTwo;
+    Item itemThree;
 
     // Some simple statement lists for testing
     List<LogicalStatement> trueStatements;
@@ -96,22 +108,48 @@ public class LogicalFilterTest extends AbstractUnitTest {
             // Set up logical statement lists for operator testing
             setUpStatements();
             // Set up DSpace resources for condition and filter testing
-            this.owningCommunity = communityService.create(null, context);
-            this.collection = collectionService.create(context, owningCommunity);
-            WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
+            // Set up first community, collection and item
+            this.communityOne = communityService.create(null, context);
+            this.collectionOne = collectionService.create(context, communityOne);
+            WorkspaceItem workspaceItem = workspaceItemService.create(context, collectionOne, false);
             this.itemOne = installItemService.installItem(context, workspaceItem);
-            workspaceItem = workspaceItemService.create(context, collection, false);
+            // Add one bitstream to item one, but put it in THUMBNAIL bundle
+            bundleService.addBitstream(context, bundleService.create(context, itemTwo, "THUMBNAIL"),
+                bitstreamService.create(context,
+                    new ByteArrayInputStream("Item 1 Thumbnail 1".getBytes(StandardCharsets.UTF_8))));
+            // Set up second community, collection and item, and third item
+            this.communityTwo = communityService.create(null, context);
+            this.collectionTwo = collectionService.create(context, communityTwo);
+            // Item two
+            workspaceItem = workspaceItemService.create(context, collectionTwo, false);
             this.itemTwo = installItemService.installItem(context, workspaceItem);
+            // Add two bitstreams to item two
+            Bundle bundleTwo = bundleService.create(context, itemTwo, "ORIGINAL");
+            bundleService.addBitstream(context, bundleTwo, bitstreamService.create(context,
+                new ByteArrayInputStream("Item 2 Bitstream 1".getBytes(StandardCharsets.UTF_8))));
+            bundleService.addBitstream(context, bundleTwo, bitstreamService.create(context,
+                new ByteArrayInputStream("Item 2 Bitstream 2".getBytes(StandardCharsets.UTF_8))));
+            // Item three
+            workspaceItem = workspaceItemService.create(context, collectionTwo, false);
+            this.itemThree = installItemService.installItem(context, workspaceItem);
+            // Add three bitstreams to item three
+            Bundle bundleThree = bundleService.create(context, itemThree, "ORIGINAL");
+            bundleService.addBitstream(context, bundleThree, bitstreamService.create(context,
+                new ByteArrayInputStream("Item 3 Bitstream 1".getBytes(StandardCharsets.UTF_8))));
+            bundleService.addBitstream(context, bundleThree, bitstreamService.create(context,
+                new ByteArrayInputStream("Item 3 Bitstream 2".getBytes(StandardCharsets.UTF_8))));
+            bundleService.addBitstream(context, bundleThree, bitstreamService.create(context,
+                new ByteArrayInputStream("Item 3 Bitstream 2".getBytes(StandardCharsets.UTF_8))));
+
+            // Withdraw the second item for later testing
+            itemService.withdraw(context, itemTwo);
             // Initialise metadata field for later testing with both items
             this.metadataField = metadataFieldService.findByElement(context,
                 MetadataSchemaEnum.DC.getName(), element, qualifier);
             context.restoreAuthSystemState();
-        } catch (AuthorizeException ex) {
-            log.error("Authorize Error in init", ex);
-            fail("Authorize Error in init: " + ex.getMessage());
-        } catch (SQLException ex) {
-            log.error("SQL Error in init", ex);
-            fail("SQL Error in init: " + ex.getMessage());
+        } catch (AuthorizeException | SQLException | IOException e) {
+            log.error("Error encountered during init", e);
+            fail("Error encountered during init: " + e.getMessage());
         }
     }
 
@@ -130,19 +168,25 @@ public class LogicalFilterTest extends AbstractUnitTest {
         try {
             itemService.delete(context, itemOne);
             itemService.delete(context, itemTwo);
-            itemService.delete(context, itemOne);
-            collectionService.delete(context, collection);
-            communityService.delete(context, owningCommunity);
+            itemService.delete(context, itemThree);
+            collectionService.delete(context, collectionOne);
+            collectionService.delete(context, collectionTwo);
+            communityService.delete(context, communityOne);
+            communityService.delete(context, communityTwo);
         } catch (Exception e) {
             // ignore
+            log.error("Error cleaning up test resources: " + e.getMessage());
         }
         context.restoreAuthSystemState();
 
         // Set all class members to null
-        owningCommunity = null;
-        collection = null;
+        communityOne = null;
+        communityTwo = null;
+        collectionOne = null;
+        collectionTwo = null;
         itemOne = null;
         itemTwo = null;
+        itemThree = null;
         trueStatements = null;
         trueFalseStatements = null;
         falseStatements = null;
@@ -167,15 +211,15 @@ public class LogicalFilterTest extends AbstractUnitTest {
             // Set to True, True (expect True)
             and.setStatements(trueStatements);
             assertTrue("AND operator did not return true for a list of true statements",
-                and.getResult(context, null));
+                and.getResult(context, itemOne));
             // Set to True, False (expect False)
             and.setStatements(trueFalseStatements);
             assertFalse("AND operator did not return false for a list of statements with at least one false",
-                and.getResult(context, null));
+                and.getResult(context, itemOne));
             // Set to False, False (expect False)
             and.setStatements(falseStatements);
             assertFalse("AND operator did not return false for a list of false statements",
-                and.getResult(context, null));
+                and.getResult(context, itemOne));
         } catch (LogicalStatementException e) {
             log.error(e.getMessage());
             fail("LogicalStatementException thrown testing the AND operator" + e.getMessage());
@@ -288,7 +332,7 @@ public class LogicalFilterTest extends AbstractUnitTest {
 
     /**
      * Test a simple filter with a single logical statement: the MetadataValueMatchCondition
-     * looking for a dc.title field beginning with "TEST"
+     * looking for a dc.title field beginning with "TEST", and an item that doesn't match this test
      */
     @Test
     public void testMetadataValueMatchCondition() {
@@ -302,10 +346,8 @@ public class LogicalFilterTest extends AbstractUnitTest {
         }
 
         // Instantiate new filter for testing this condition
-        DefaultFilter metadataMatchFilter = new DefaultFilter();
-        //Filter metadataMatchFilter = DSpaceServicesFactory.getInstance().getServiceManager()
-        //    .getServiceByName("starts_with_title_filter", DefaultFilter.class);
-        log.debug("Filter class: " + metadataMatchFilter.getClass());
+        DefaultFilter filter = new DefaultFilter();
+
         // Create condition to match pattern on dc.title metadata
         MetadataValueMatchCondition condition = new MetadataValueMatchCondition();
         condition.setItemService(ContentServiceFactory.getInstance().getItemService());
@@ -317,16 +359,147 @@ public class LogicalFilterTest extends AbstractUnitTest {
         // Set up condition with these parameters and add it as the sole statement to the metadata filter
         try {
             condition.setParameters(parameters);
-            metadataMatchFilter.setStatement(condition);
+            filter.setStatement(condition);
             // Test the filter on the first item - expected outcome is true
             assertTrue("itemOne unexpectedly did not match the 'dc.title starts with TEST' test",
-                metadataMatchFilter.getResult(context, itemOne));
+                filter.getResult(context, itemOne));
             // Test the filter on the second item - expected outcome is false
             assertFalse("itemTwo unexpectedly matched the 'dc.title starts with TEST' test",
-                metadataMatchFilter.getResult(context, itemTwo));
+                filter.getResult(context, itemTwo));
         } catch (LogicalStatementException e) {
             log.error(e.getMessage());
             fail("LogicalStatementException thrown testing the MetadataValueMatchCondition filter" + e.getMessage());
+        }
+    }
+
+    /**
+     * Test a simple filter with a single logical statement: the InCollectionCondition
+     * looking for an item that is in collectionOne, and one that is not in collectionOne
+     */
+    @Test
+    public void testInCollectionCondition() {
+        // Instantiate new filter for testing this condition
+        DefaultFilter filter = new DefaultFilter();
+        InCollectionCondition condition = new InCollectionCondition();
+        condition.setItemService(ContentServiceFactory.getInstance().getItemService());
+        Map<String, Object> parameters = new HashMap<>();
+
+        // Add collectionOne handle to the collections parameter - ie. we are testing to see if the item is
+        // in collectionOne only
+        List<String> collections = new ArrayList<>();
+        collections.add(collectionOne.getHandle());
+        parameters.put("collections", collections);
+
+        try {
+            // Set parameters and condition
+            condition.setParameters(parameters);
+            filter.setStatement(condition);
+
+            // Test the filter on the first item - this item is in collectionOne: expected outcome is true
+            assertTrue("itemOne unexpectedly did not match the 'item in collectionOne' test",
+                filter.getResult(context, itemOne));
+            // Test the filter on the second item - this item is NOT in collectionOne: expected outcome is false
+            assertFalse("itemTwo unexpectedly matched the 'item in collectionOne' test",
+                filter.getResult(context, itemTwo));
+        } catch (LogicalStatementException e) {
+            log.error(e.getMessage());
+            fail("LogicalStatementException thrown testing the InCollectionCondition filter" + e.getMessage());
+        }
+    }
+
+    /**
+     * Test a simple filter with a single logical statement: the InCommunityCondition
+     * looking for an item that is in communityOne, and one that is not in communityOne
+     */
+    @Test
+    public void testInCommunityCondition() {
+        // Instantiate new filter for testing this condition
+        DefaultFilter filter = new DefaultFilter();
+        InCollectionCondition condition = new InCollectionCondition();
+        condition.setItemService(ContentServiceFactory.getInstance().getItemService());
+        Map<String, Object> parameters = new HashMap<>();
+
+        // Add collectionOne handle to the collections parameter - ie. we are testing to see if the item is
+        // in collectionOne only
+        List<String> collections = new ArrayList<>();
+        collections.add(communityOne.getHandle());
+        parameters.put("communities", collections);
+
+        try {
+            // Set parameters and condition
+            condition.setParameters(parameters);
+            filter.setStatement(condition);
+
+            // Test the filter on the first item - this item is in communityOne: expected outcome is true
+            assertTrue("itemOne unexpectedly did not match the 'item in communityOne' test",
+                filter.getResult(context, itemOne));
+            // Test the filter on the second item - this item is NOT in communityOne: expected outcome is false
+            assertFalse("itemTwo unexpectedly matched the 'item in communityOne' test",
+                filter.getResult(context, itemTwo));
+        } catch (LogicalStatementException e) {
+            log.error(e.getMessage());
+            fail("LogicalStatementException thrown testing the InCommunityCondition filter" + e.getMessage());
+        }
+    }
+
+    /**
+     * Test a simple filter with the IsWithdrawnCondition. During setup, itemTwo was withdrawn.
+     */
+    @Test
+    public void testIsWithdrawnCondition() {
+        // Instantiate new filter for testing this condition
+        DefaultFilter filter = new DefaultFilter();
+        InCollectionCondition condition = new InCollectionCondition();
+
+        try {
+            condition.setItemService(ContentServiceFactory.getInstance().getItemService());
+            condition.setParameters(new HashMap<>());
+            filter.setStatement(condition);
+
+            // Test the filter on itemOne - this item is not withdrawn: expected outcome is false
+            assertFalse("itemOne unexpectedly matched the 'item is withdrawn' test",
+                filter.getResult(context, itemOne));
+            // Test the filter on itemTwo - this item was withdrawn in setup: expected outcome is true
+            assertTrue("itemTwo unexpectedly did NOT match the 'item is withdrawn' test",
+                filter.getResult(context, itemTwo));
+        } catch (LogicalStatementException e) {
+            log.error(e.getMessage());
+            fail("LogicalStatementException thrown testing the IsWithdrawnCondition filter" + e.getMessage());
+        }
+    }
+
+    /**
+     * Test a simple filter with the BitstreamCountCondition.
+     */
+    @Test
+    public void testBitstreamCountCondition() {
+        // Instantiate new filter for testing this condition
+        DefaultFilter filter = new DefaultFilter();
+        InCollectionCondition condition = new InCollectionCondition();
+
+        try {
+            condition.setItemService(ContentServiceFactory.getInstance().getItemService());
+
+            // Set parameters to check for items with at least 1 and at most 2 bitstreams in the ORIGINAL bundle
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("bundle", "ORIGINAL");
+            parameters.put("min", 1);
+            parameters.put("max", 2);
+            condition.setParameters(new HashMap<>());
+            filter.setStatement(condition);
+
+            // Test the filter on itemOne - this item has one THUMBNAIL but zero ORIGINAL bitstreams: expect false
+            assertFalse("itemOne unexpectedly matched the '>=1 and <=2 ORIGINAL bitstreams' test" +
+                    " (it has zero ORIGINAL bitstreams)", filter.getResult(context, itemOne));
+            // Test the filter on itemTwo - this item has two ORIGINAL bitstreams: expect true
+            assertTrue("itemTwo unexpectedly did NOT match the '>=1 and <=2 ORIGINAL bitstreams' test" +
+                    " (it has 2 ORIGINAL bitstreams)", filter.getResult(context, itemTwo));
+            // Test the filter on itemTwo - this item has three ORIGINAL bitstreams: expect false
+            assertFalse("itemThree unexpectedly did NOT match the '>=1 and <=2 ORIGINAL bitstreams' test" +
+                " (it has 3 ORIGINAL bitstreams)", filter.getResult(context, itemThree));
+        } catch (LogicalStatementException e) {
+            log.error(e.getMessage());
+            fail("LogicalStatementException thrown testing the IsWithdrawnCondition filter" + e.getMessage());
         }
     }
 
