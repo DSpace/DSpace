@@ -119,14 +119,15 @@
             <processing-class>org.dspace.app.rest.submit.step.CCLicenseStep</processing-class>
 	       <type>cclicense</type> </step-definition> -->
 
-        <!--Step will be to Check for potential duplicate -->
-        <!-- <step-definition id="detect-duplicate"> <heading>submit.progressbar.detect.duplicate</heading>
-            <processing-class>org.dspace.submit.step.DetectPotentialDuplicate</processing-class> 
-            <type>duplicate</type> </step-definition> -->
-
-        <!--Step will be to Verify/Review everything -->
-        <!-- <step-definition id="verify"> <heading>submit.progressbar.verify</heading> <processing-class>org.dspace.submit.step.VerifyStep</processing-class>
-            <type>verify</type> </step-definition> -->
+        <!--Step will be to enrich the current submission querying external providers or processing the uploaded file -->
+        <!-- Uncomment this step to enrich the current submission using information extracted 
+            from uploaded files or metadata. Please check also config/spring/api/step-processing-listener.xml
+            for further configuration -->
+        <!-- <step-definition id="extractionstep"> 
+            <heading>submit.progressbar.ExtractMetadataStep</heading>
+            <processing-class>org.dspace.app.rest.submit.step.ExtractMetadataStep</processing-class>
+            <type>extract</type> 
+        </step-definition> -->
 
         <!-- Fake Steps to test parsing of all options -->
         <!-- <step-definition mandatory="false"> <heading>fake.submission.readonly</heading>
@@ -201,7 +202,7 @@
             <!--Step will be to Upload the item -->
             <step id="upload"/>
             <!-- <step id="upload-with-embargo"/> -->
-            <!-- <step id="detect-duplicate"/> -->
+            <!-- <step id="extractionstep"/> -->
 
             <!--Step will be to select a Creative Commons License -->
             <!-- Uncomment this step to allow the user to select a Creative Commons -->

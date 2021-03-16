@@ -25,7 +25,15 @@ import org.dspace.services.model.Request;
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
-public class CollectionStep extends org.dspace.submit.step.SelectCollectionStep implements AbstractRestProcessingStep {
+public class CollectionStep implements AbstractRestProcessingStep {
+
+    @Override
+    public void doPreProcessing(Context context, InProgressSubmission wsi) {
+    }
+
+    @Override
+    public void doPostProcessing(Context context, InProgressSubmission wsi) {
+    }
 
     @Override
     public UUID getData(SubmissionService submissionService, InProgressSubmission obj, SubmissionStepConfig config) {

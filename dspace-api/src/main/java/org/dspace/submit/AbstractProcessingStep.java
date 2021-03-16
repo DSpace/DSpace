@@ -7,7 +7,6 @@
  */
 package org.dspace.submit;
 
-import org.dspace.app.itemimport.BTEBatchImportService;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.InProgressSubmission;
@@ -38,8 +37,6 @@ public abstract class AbstractProcessingStep {
     protected MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
     protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-    protected BTEBatchImportService bteBatchImportService = DSpaceServicesFactory.getInstance().getServiceManager()
-            .getServiceByName("org.dspace.app.itemimport" + ".BTEBatchImportService", BTEBatchImportService.class);
 
     public abstract void doPreProcessing(Context context, InProgressSubmission wsi);
 

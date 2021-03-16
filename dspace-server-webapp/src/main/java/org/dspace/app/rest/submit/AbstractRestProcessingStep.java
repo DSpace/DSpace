@@ -57,6 +57,19 @@ public interface AbstractRestProcessingStep extends ListenerProcessingStep {
                                               SubmissionStepConfig config) throws Exception;
 
     /**
+     * Method to inform the converter that this step has it own section data. This
+     * can be overriden by step that only process/validate data in other section. In
+     * such case the @link
+     * {@link #getData(SubmissionService, InProgressSubmission, SubmissionStepConfig)}
+     * method should return null as it will be ignored
+     * 
+     * @return true by default to indicate that the step has it own section data
+     */
+    default public boolean hasDataSection() {
+        return true;
+    }
+
+    /**
      * The method will expose the list of validation errors identified by the step. The default implementation will
      * found a {@link Validation} spring bean in the context with the same name that the step id
      * 
