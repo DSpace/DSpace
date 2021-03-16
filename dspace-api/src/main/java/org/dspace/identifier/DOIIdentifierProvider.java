@@ -905,7 +905,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * @param context       - DSpace context
      * @param dso           - DSpaceObject to identify
      * @param doiIdentifier - DOI to load or create (null to mint a new one)
-     * @param skipFilter    - Whether or not to skip the filters for the canMint() check
+     * @param skipFilter    - Whether or not to skip the filters for the checkMintable() check
      * @return
      * @throws SQLException
      * @throws DOIIdentifierException
@@ -964,9 +964,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
             } else {
                 // Find out if we're allowed to create a DOI
                 // throws an exception if creation of a new DOI is prohibited by a filter
-                boolean canMintDOI = canMint(context, dso);
-                log.debug("Called canMint(), result was " + canMintDOI +
-                    " (and presumably an exception was not thrown)");
+                checkMintable(context, dso);
             }
 
             // check prefix
@@ -986,10 +984,8 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
                 log.warn("loadOrCreateDOI: Skipping default item filter");
             } else {
                 // Find out if we're allowed to create a DOI
-                // throws an exception if creation of a new DOI is prohibeted by a filter
-                boolean canMintDOI = canMint(context, dso);
-                log.debug("Called canMint(), result was " + canMintDOI +
-                    " (and presumably an exception was not thrown)");
+                // throws an exception if creation of a new DOI is prohibited by a filter
+                checkMintable(context, dso);
             }
 
             doi = doiService.create(context);
@@ -1101,14 +1097,11 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * Checks to see if an item can have a DOI minted, using the configured logical filter
      * @param context
      * @param dso The item to be evaluated
-     * @return
      * @throws DOIIdentifierNotApplicableException
      */
     @Override
-    public Boolean canMint(Context context, DSpaceObject dso) throws DOIIdentifierNotApplicableException {
-        // Default is 'true' in the case of a null/missing filter. All we really care about is whether
-        // an exception was thrown or not.
-        log.debug("canMint is being called");
+    public void checkMintable(Context context, DSpaceObject dso) throws DOIIdentifierNotApplicableException {
+        // If the check fails, an exception will be thrown to be caught by the calling method
         if (this.filterService != null && contentServiceFactory
             .getDSpaceObjectService(dso).getTypeText(dso).equals("ITEM")) {
             try {
@@ -1125,7 +1118,5 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         } else {
             log.debug("DOI Identifier Provider: filterService is null");
         }
-
-        return true;
     }
 }

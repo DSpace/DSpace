@@ -84,10 +84,9 @@ public abstract class FilteredIdentifierProvider extends IdentifierProvider {
      * Check configured item filters to see if this identifier is allowed to be minted
      * @param context    - DSpace context
      * @param dso        - DSpaceObject to be inspected
-     * @return a Boolean indicating whether an identifier may be minted for this item (after filters are applied)
      * @throws IdentifierException
      */
-    public abstract Boolean canMint(Context context, DSpaceObject dso) throws IdentifierException;
+    public abstract void checkMintable(Context context, DSpaceObject dso) throws IdentifierException;
 
 
 }
