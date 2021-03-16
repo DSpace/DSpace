@@ -13,6 +13,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.logic.LogicalStatementException;
 import org.dspace.core.Context;
@@ -41,6 +42,7 @@ public class InCommunityCondition extends AbstractCondition {
         List<String> communityHandles = (List<String>)getParameters().get("communities");
         List<Collection> itemCollections = item.getCollections();
 
+        // Check communities of item.getCollections() - this will only see collections if the item is archived
         for (Collection collection : itemCollections) {
             try {
                 List<Community> communities = collection.getCommunities();
@@ -53,6 +55,34 @@ public class InCommunityCondition extends AbstractCondition {
                 log.error(e.getMessage());
                 throw new LogicalStatementException(e);
             }
+        }
+
+        // Look for the parent object of the item. This is important as the item.getOwningCollection method
+        // may return null, even though the item itself does have a parent object, at the point of archival
+        try {
+            DSpaceObject parent = itemService.getParentObject(context, item);
+            if (parent instanceof Collection) {
+                log.debug("Got parent DSO for item: " + parent.getID().toString());
+                log.debug("Parent DSO handle: " + parent.getHandle());
+                try {
+                    // Now iterate communities of this parent collection
+                    Collection collection = (Collection)parent;
+                    List<Community> communities = collection.getCommunities();
+                    for (Community community : communities) {
+                        if (communityHandles.contains(community.getHandle())) {
+                            return true;
+                        }
+                    }
+                } catch (SQLException e) {
+                    log.error(e.getMessage());
+                    throw new LogicalStatementException(e);
+                }
+            } else {
+                log.debug("Parent DSO is null or is not a Collection...");
+            }
+        } catch (SQLException e) {
+            log.error("Error obtaining parent DSO", e);
+            throw new LogicalStatementException(e);
         }
 
         return false;
