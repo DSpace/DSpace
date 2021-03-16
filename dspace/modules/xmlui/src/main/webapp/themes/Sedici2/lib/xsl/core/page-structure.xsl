@@ -816,7 +816,7 @@ placeholders for header images -->
 			      var js, fjs = d.getElementsByTagName(s)[0];
 			      if (d.getElementById(id)) return;
 			      js = d.createElement(s); js.id = id;
-			      js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&amp;version=v2.3&amp;appId=79106916048";
+			      js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&amp;version=v3.0";
 			      fjs.parentNode.insertBefore(js, fjs);
 			    }(document, 'script', 'facebook-jssdk'));
 			
