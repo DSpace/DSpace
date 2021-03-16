@@ -63,6 +63,7 @@ public abstract class InprogressSubmissionIndexFactoryImpl
         List<String> locations = indexableCollectionService.
                 getCollectionLocations(context, inProgressSubmission.getCollection());
 
+        // Add item metadata
         indexableItemService.addDiscoveryFields(doc, context, item, SearchUtils.getAllDiscoveryConfigurations(item));
         indexableCollectionService.storeCommunityCollectionLocations(doc, locations);
     }
