@@ -201,6 +201,8 @@ public class DiscoveryRestController implements InitializingBean {
         FacetResultsRest facetResultsRest = discoveryRestRepository
             .getFacetObjects(facetName, prefix, query, dsoTypes, dsoScope, configuration, searchFilters, page);
 
+        facetResultsRest.setConfiguration(configuration);
+
         FacetResultsResource facetResultsResource = converter.toResource(facetResultsRest);
 
         halLinkService.addLinks(facetResultsResource, page);
