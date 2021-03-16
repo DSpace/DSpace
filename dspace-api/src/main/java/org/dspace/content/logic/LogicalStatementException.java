@@ -14,7 +14,7 @@ package org.dspace.content.logic;
  * @author Kim Shepherd
  * @version $Revision$
  */
-public class LogicalStatementException extends Exception {
+public class LogicalStatementException extends RuntimeException {
 
     public LogicalStatementException() {
         super();
