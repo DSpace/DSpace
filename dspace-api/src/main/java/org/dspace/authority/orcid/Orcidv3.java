@@ -191,11 +191,7 @@ public class Orcidv3 implements SolrAuthorityInterface {
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
-        if (bios == null) {
-            return Collections.emptyList();
-        } else {
-            return bios;
-        }
+        return bios;
     }
 
     /**
