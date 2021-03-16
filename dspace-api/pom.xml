@@ -537,17 +537,17 @@
             <artifactId>rome-modules</artifactId>
             <version>1.0</version>
         </dependency>
-        <dependency>
-            <groupId>gr.ekt.bte</groupId>
-            <artifactId>bte-io</artifactId>
-            <version>0.9.3.5</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>net.bytebuddy</groupId>
-                    <artifactId>byte-buddy</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+		<dependency>
+			<groupId>net.sf.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>2.3</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jbibtex</groupId>
+			<artifactId>jbibtex</artifactId>
+			<version>1.0.10</version>
+		</dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>

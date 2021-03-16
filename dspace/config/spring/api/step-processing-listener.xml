@@ -4,19 +4,16 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
-	<bean id="lookupListener" class="org.dspace.submit.listener.MetadataListener">
-		<property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
-        <property name="metadata">
+	<bean id="org.dspace.submit.listener.MetadataListener" class="org.dspace.submit.listener.SimpleMetadataListener">
+        <property name="externalDataProvidersMap">
 	        <map>
-                <entry key="dc.identifier.doi" value="doi"/>
+                <entry key="dc.identifier.other">
+                    <list>
+                        <ref bean="pubmedLiveImportDataProvider"/>
+                    </list>
+                </entry>
 	        </map>            
         </property>
-        <property name="dataloadersMap">
-	        <map>
-	            <entry key="crossref" value-ref="crossRefOnlineDataLoader"/>
-	            <entry key="cinii" value-ref="ciniiOnlineDataLoader"/>
-	        </map>
-	    </property>
     </bean>
 	
  </beans>

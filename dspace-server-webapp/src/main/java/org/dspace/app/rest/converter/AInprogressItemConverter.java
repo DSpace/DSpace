@@ -100,8 +100,10 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
                         for (ErrorRest error : stepProcessing.validate(submissionService, obj, stepConfig)) {
                             addError(witem.getErrors(), error);
                         }
-                        witem.getSections()
-                            .put(sections.getId(), stepProcessing.getData(submissionService, obj, stepConfig));
+                        if (stepProcessing.hasDataSection()) {
+                            witem.getSections()
+                                .put(sections.getId(), stepProcessing.getData(submissionService, obj, stepConfig));
+                        }
                     } else {
                         log.warn("The submission step class specified by '" + stepConfig.getProcessingClassName() +
                                  "' does not extend the class org.dspace.app.rest.submit.AbstractRestProcessingStep!" +
