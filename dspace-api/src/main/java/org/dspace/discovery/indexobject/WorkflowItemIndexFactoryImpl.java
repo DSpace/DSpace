@@ -76,9 +76,9 @@ public class WorkflowItemIndexFactoryImpl
         final XmlWorkflowItem workflowItem = indexableObject.getIndexedObject();
         final Item item = workflowItem.getItem();
         // Add the item metadata as configured
-        List<DiscoveryConfiguration> discoveryConfigurations = SearchUtils
-                .getAllDiscoveryConfigurations(workflowItem);
-        indexableItemService.addDiscoveryFields(doc, context, item, discoveryConfigurations);
+//        List<DiscoveryConfiguration> discoveryConfigurations = SearchUtils
+//                .getAllDiscoveryConfigurations(workflowItem);
+//        indexableItemService.addDiscoveryFields(doc, context, item, discoveryConfigurations);
 
         String acvalue = DSpaceServicesFactory.getInstance().getConfigurationService()
                 .getProperty("discovery.facet.namedtype.workflow.item");

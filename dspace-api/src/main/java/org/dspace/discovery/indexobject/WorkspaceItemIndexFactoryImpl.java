@@ -74,9 +74,9 @@ public class WorkspaceItemIndexFactoryImpl
         final WorkspaceItem inProgressSubmission = indexableObject.getIndexedObject();
 
         // Add the item metadata as configured
-        List<DiscoveryConfiguration> discoveryConfigurations = SearchUtils
-                .getAllDiscoveryConfigurations(inProgressSubmission);
-        indexableItemService.addDiscoveryFields(doc, context, inProgressSubmission.getItem(), discoveryConfigurations);
+//        List<DiscoveryConfiguration> discoveryConfigurations = SearchUtils
+//                .getAllDiscoveryConfigurations(inProgressSubmission);
+//        indexableItemService.addDiscoveryFields(doc, context, inProgressSubmission.getItem(), discoveryConfigurations);
 
         return doc;
     }
