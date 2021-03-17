@@ -10,7 +10,8 @@ package org.dspace.app.rest.submit.step.validation;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.repository.WorkspaceItemRestRepository;
 import org.dspace.app.rest.submit.SubmissionService;
@@ -32,7 +33,7 @@ public class LicenseValidation extends AbstractValidation {
 
     private static final String ERROR_VALIDATION_LICENSEREQUIRED = "error.validation.license.notgranted";
 
-    private static final Logger log = Logger.getLogger(LicenseValidation.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     private BitstreamService bitstreamService;

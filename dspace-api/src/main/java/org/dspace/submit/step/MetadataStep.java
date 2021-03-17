@@ -21,7 +21,8 @@ import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.Value;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
@@ -41,14 +42,14 @@ public class MetadataStep extends AbstractProcessingStep {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(MetadataStep.class);
+    private static final Logger log = LogManager.getLogger();
 
     protected List<MetadataListener> listeners = DSpaceServicesFactory.getInstance().getServiceManager()
                                                                       .getServicesByType(MetadataListener.class);
 
-    protected Map<String, List<MetadataValue>> metadataMap = new HashMap<String, List<MetadataValue>>();
-    private Map<String, Set<String>> results = new HashMap<String, Set<String>>();
-    private Map<String, String> mappingIdentifier = new HashMap<String, String>();
+    protected Map<String, List<MetadataValue>> metadataMap = new HashMap<>();
+    private final Map<String, Set<String>> results = new HashMap<>();
+    private final Map<String, String> mappingIdentifier = new HashMap<>();
 
     @Override
     public void doPreProcessing(Context context, InProgressSubmission wsi) {
@@ -60,7 +61,7 @@ public class MetadataStep extends AbstractProcessingStep {
                 if (mm != null && !mm.isEmpty()) {
                     metadataMap.put(metadata, mm);
                 } else {
-                    metadataMap.put(metadata, new ArrayList<MetadataValue>());
+                    metadataMap.put(metadata, new ArrayList<>());
                 }
                 mappingIdentifier.put(metadata, listener.getMetadata().get(metadata));
             }
@@ -160,7 +161,7 @@ public class MetadataStep extends AbstractProcessingStep {
         String key = mappingIdentifier.get(metadata);
         Set<String> identifiers = null;
         if (!results.containsKey(key)) {
-            identifiers = new HashSet<String>();
+            identifiers = new HashSet<>();
         } else {
             identifiers = results.get(key);
         }
@@ -169,7 +170,7 @@ public class MetadataStep extends AbstractProcessingStep {
     }
 
     public List<Record> convertFields(List<Record> recordSet, Map<String, String> fieldMap) {
-        List<Record> result = new ArrayList<Record>();
+        List<Record> result = new ArrayList<>();
         for (Record publication : recordSet) {
             for (String fieldName : fieldMap.keySet()) {
                 String md = null;

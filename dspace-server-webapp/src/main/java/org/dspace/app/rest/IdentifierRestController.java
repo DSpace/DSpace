@@ -16,7 +16,8 @@ import java.util.Arrays;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.DSpaceObjectRest;
@@ -49,8 +50,7 @@ public class IdentifierRestController implements InitializingBean {
 
     public static final String PARAM = "id";
 
-    private static final Logger log =
-            Logger.getLogger(IdentifierRestController.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     private ConverterService converter;
