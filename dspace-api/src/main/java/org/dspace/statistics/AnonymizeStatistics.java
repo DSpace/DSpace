@@ -15,7 +15,7 @@ import static java.util.Calendar.DAY_OF_YEAR;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.cli.Option.builder;
 import static org.apache.commons.lang.time.DateFormatUtils.format;
-import static org.apache.log4j.Logger.getLogger;
+import static org.apache.logging.log4j.LogManager.getLogger;
 import static org.dspace.core.LogManager.getHeader;
 import static org.dspace.statistics.SolrLoggerServiceImpl.DATE_FORMAT_8601;
 
@@ -33,7 +33,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
@@ -55,9 +55,9 @@ import org.dspace.statistics.service.SolrLoggerService;
  */
 public class AnonymizeStatistics {
 
-    private static Logger log = getLogger(AnonymizeStatistics.class);
-    private static Context context = new Context();
-    private static String action = "anonymize_statistics";
+    private static final Logger log = getLogger();
+    private static final Context context = new Context();
+    private static final String action = "anonymize_statistics";
 
     private static final String HELP_OPTION = "h";
     private static final String SLEEP_OPTION = "s";
@@ -66,9 +66,9 @@ public class AnonymizeStatistics {
 
     private static int sleep;
 
-    private static SolrLoggerService solrLoggerService =
+    private static final SolrLoggerService solrLoggerService =
             StatisticsServiceFactory.getInstance().getSolrLoggerService();
-    private static ConfigurationService configurationService =
+    private static final ConfigurationService configurationService =
             DSpaceServicesFactory.getInstance().getConfigurationService();
 
     private static int batchSize = 100;

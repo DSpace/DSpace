@@ -12,7 +12,8 @@ import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.query.SearchQueryConverter;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.SearchResultEntryRest;
@@ -34,7 +35,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DiscoverResultConverter {
 
-    private static final Logger log = Logger.getLogger(DiscoverResultConverter.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     private List<IndexableObjectConverter> converters;

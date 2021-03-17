@@ -20,7 +20,8 @@ import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.link.HalLinkFactory;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.BaseObjectRest;
@@ -52,13 +53,13 @@ import org.springframework.stereotype.Service;
 /**
  * Converts domain objects from the DSpace service layer to rest objects, and from rest objects to resource
  * objects, applying {@link Projection}s where applicable.
- * 
+ *
  * @author Luca Giamminonni (luca.giamminonni at 4science dot it)
  */
 @Service
 public class ConverterService {
 
-    private static final Logger log = Logger.getLogger(ConverterService.class);
+    private static final Logger log = LogManager.getLogger();
 
     private final Map<String, Projection> projectionMap = new HashMap<>();
 

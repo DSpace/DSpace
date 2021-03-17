@@ -14,7 +14,8 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.commons.cli.ParseException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.factory.ScriptServiceFactory;
@@ -36,7 +37,7 @@ import org.jdom.input.SAXBuilder;
  */
 public class ScriptLauncher {
 
-    private static final Logger log = Logger.getLogger(ScriptLauncher.class);
+    private static final Logger log = LogManager.getLogger();
 
     /**
      * The service manager kernel

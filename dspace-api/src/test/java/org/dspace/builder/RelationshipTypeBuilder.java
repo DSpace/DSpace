@@ -10,7 +10,8 @@ package org.dspace.builder;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.EntityType;
 import org.dspace.content.Relationship;
@@ -22,7 +23,7 @@ import org.dspace.discovery.SearchServiceException;
 public class RelationshipTypeBuilder extends AbstractBuilder<RelationshipType, RelationshipTypeService> {
 
     /* Log4j logger*/
-    private static final Logger log = Logger.getLogger(RelationshipTypeBuilder.class);
+    private static final Logger log = LogManager.getLogger();
 
     private RelationshipType relationshipType;
 
