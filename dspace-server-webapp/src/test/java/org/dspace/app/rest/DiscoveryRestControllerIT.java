@@ -50,6 +50,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -188,10 +189,15 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
     @Test
     public void discoverFacetsAuthorWithAuthorityWithSizeParameter() throws Exception {
-        configurationService.setProperty("choices.plugin.dc.subject",
-                                         "SolrSubjectAuthority");
-        configurationService.setProperty("authority.controlled.dc.subject",
+        configurationService.setProperty("choices.plugin.dc.contributor.author",
+                                         "SolrAuthorAuthority");
+        configurationService.setProperty("authority.controlled.dc.contributor.author",
                                          "true");
+        configurationService.setProperty("discovery.browse.authority.ignore-prefered.author", true);
+        configurationService.setProperty("discovery.index.authority.ignore-prefered.dc.contributor.author", true);
+        configurationService.setProperty("discovery.browse.authority.ignore-variants.author", true);
+        configurationService.setProperty("discovery.index.authority.ignore-variants.dc.contributor.author", true);
+
 
         metadataAuthorityService.clearCache();
 
@@ -213,38 +219,38 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         Item publicItem1 = ItemBuilder.createItem(context, col1)
                                       .withTitle("Public item 1")
                                       .withIssueDate("2017-10-17")
-                                      .withAuthor("Smith, Donald")
-                                      .withAuthor("Doe, John")
-                                      .withSubject("History of religion", "VR110102", 600)
+                                      .withAuthor("Smith, Donald", "test_authority", Choices.CF_ACCEPTED)
+                                      .withAuthor("Doe, John", "test_authority_2", Choices.CF_ACCEPTED)
+                                      .withSubject("History of religion")
                                       .build();
 
         Item publicItem2 = ItemBuilder.createItem(context, col2)
                                       .withTitle("Public item 2")
                                       .withIssueDate("2016-02-13")
-                                      .withAuthor("Smith, Maria")
-                                      .withAuthor("Doe, Jane")
-                                      .withSubject("Church studies", "VR110103", 600)
-                                      .withSubject("History of religion", "VR110102", 600)
+                                      .withAuthor("Smith, Maria", "test_authority_3", Choices.CF_ACCEPTED)
+                                      .withAuthor("Doe, Jane", "test_authority_4", Choices.CF_ACCEPTED)
+                                      .withSubject("Church studies")
+                                      .withSubject("History of religion")
                                       .build();
 
         Item publicItem3 = ItemBuilder.createItem(context, col2)
                                       .withTitle("Public item 2")
                                       .withIssueDate("2016-02-13")
-                                      .withAuthor("Smith, Maria")
-                                      .withAuthor("Doe, Jane")
-                                      .withAuthor("test, test")
-                                      .withAuthor("test2, test2")
-                                      .withAuthor("Maybe, Maybe")
-                                      .withSubject("Missionary studies", "VR110104", 600)
-                                      .withSubject("Church studies", "VR110103", 600)
-                                      .withSubject("History of religion", "VR110102", 600)
+                                      .withAuthor("Smith, Maria", "test_authority_3", Choices.CF_ACCEPTED)
+                                      .withAuthor("Doe, Jane", "test_authority_4", Choices.CF_ACCEPTED)
+                                      .withAuthor("test, test", "test_authority_5", Choices.CF_ACCEPTED)
+                                      .withAuthor("test2, test2", "test_authority_6", Choices.CF_ACCEPTED)
+                                      .withAuthor("Maybe, Maybe", "test_authority_7", Choices.CF_ACCEPTED)
+                                      .withSubject("Missionary studies")
+                                      .withSubject("Church studies")
+                                      .withSubject("History of religion")
                                       .build();
 
         context.restoreAuthSystemState();
 
         //** WHEN **
         //An anonymous user browses this endpoint to find the objects in the system and enters a size of 2
-        getClient().perform(get("/api/discover/facets/subject")
+        getClient().perform(get("/api/discover/facets/author")
                                 .param("size", "2"))
 
                    //** THEN **
@@ -253,12 +259,12 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                    //The type needs to be 'discover'
                    .andExpect(jsonPath("$.type", is("discover")))
                    //The name of the facet needs to be seubject, because that's what we called
-                   .andExpect(jsonPath("$.name", is("subject")))
+                   .andExpect(jsonPath("$.name", is("author")))
                    //Because we've constructed such a structure so that we have more than 2 (size) subjects, there
                    // needs to be a next link
-                   .andExpect(jsonPath("$._links.next.href", containsString("api/discover/facets/subject?page")))
+                   .andExpect(jsonPath("$._links.next.href", containsString("api/discover/facets/author?page")))
                    //There always needs to be a self link
-                   .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets/subject")))
+                   .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets/author")))
                    //Because there are more subjects than is represented (because of the size param), hasMore has to
                    // be true
                    //The page object needs to be present and just like specified in the matcher
@@ -268,8 +274,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                    // up in different items
                    //These subjects are the most used ones. Only two show up because of the size.
                    .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
-                       FacetValueMatcher.entrySubject("History of religion", "VR110102", 3),
-                       FacetValueMatcher.entrySubject("Church studies", "VR110103", 2)
+                       FacetValueMatcher.entryAuthorWithAuthority("Doe, Jane", "test_authority_4", 2),
+                       FacetValueMatcher.entryAuthorWithAuthority("Smith, Maria", "test_authority_3", 2)
                    )));
     }
 
