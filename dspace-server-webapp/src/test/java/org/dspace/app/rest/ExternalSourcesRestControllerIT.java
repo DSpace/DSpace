@@ -30,11 +30,13 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
                                 ExternalSourceMatcher.matchExternalSource(
                                     "sherpaJournalIssn", "sherpaJournalIssn", false),
                                 ExternalSourceMatcher.matchExternalSource(
+                                    "sherpaJournal", "sherpaJournal", false),
+                                ExternalSourceMatcher.matchExternalSource(
                                     "sherpaPublisher", "sherpaPublisher", false),
                                 ExternalSourceMatcher.matchExternalSource(
-                                    "sherpaPublisher", "sherpaPublisher", false)
+                                        "pubmed", "pubmed", false)
                             )))
-                            .andExpect(jsonPath("$.page.totalElements", Matchers.is(5)));
+                            .andExpect(jsonPath("$.page.totalElements", Matchers.is(6)));
     }
 
     @Test
