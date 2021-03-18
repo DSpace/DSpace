@@ -17,14 +17,10 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.core.Context;
-import org.dspace.discovery.SearchUtils;
-import org.dspace.discovery.configuration.DiscoveryConfiguration;
-import org.dspace.discovery.indexobject.factory.ItemIndexFactory;
 import org.dspace.discovery.indexobject.factory.PoolTaskIndexFactory;
 import org.dspace.discovery.indexobject.factory.WorkflowItemIndexFactory;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -40,9 +36,6 @@ public class PoolTaskIndexFactoryImpl extends IndexFactoryImpl<IndexablePoolTask
 
     @Autowired
     WorkflowItemIndexFactory indexableWorkflowItemService;
-
-    @Autowired
-    protected ItemIndexFactory indexableItemService;
 
     @Override
     public Iterator<IndexablePoolTask> findAll(Context context) throws SQLException {
@@ -89,12 +82,6 @@ public class PoolTaskIndexFactoryImpl extends IndexFactoryImpl<IndexablePoolTask
             acvalue = indexableObject.getTypeText();
         }
         addNamedResourceTypeIndex(doc, acvalue);
-        final XmlWorkflowItem xmlWorkflowItem = indexableObject.getIndexedObject().getWorkflowItem();
-
-        // Add the item metadata as configured
-        List<DiscoveryConfiguration> discoveryConfigurations = SearchUtils
-                                                     .getAllDiscoveryConfigurations(xmlWorkflowItem);
-        indexableItemService.addDiscoveryFields(doc, context, xmlWorkflowItem.getItem(), discoveryConfigurations);
 
         return doc;
     }
