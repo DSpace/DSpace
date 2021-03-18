@@ -61,7 +61,7 @@ public class SearchResultMatcher {
         );
     }
 
-    private static Matcher<? super Object> matchEmbeddedObjectOnItemName(String type, String itemName) {
+    public static Matcher<? super Object> matchEmbeddedObjectOnItemName(String type, String itemName) {
         return allOf(
             hasJsonPath("$.uuid", notNullValue()),
             hasJsonPath("$.name", is(itemName)),
