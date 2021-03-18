@@ -112,4 +112,6 @@ public interface MetadataAuthorityService {
      * @return the list of metadata field with authority control
      */
     public List<String> getAuthorityMetadata();
+
+    public void reset();
 }
