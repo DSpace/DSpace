@@ -70,8 +70,11 @@ public class DSpaceCsrfAuthenticationStrategy implements SessionAuthenticationSt
             // If token exists was sent in a parameter, then we need to reset our token
             // (as sending token in a param is insecure)
             if (containsParameter) {
+                // Note: We first set the token to null & then set a new one. This results in 2 cookies sent,
+                // the first being empty and the second having the new token.
+                // This behavior is borrowed from Spring Security's CsrfAuthenticationStrategy, see
+                // https://github.com/spring-projects/spring-security/blob/5.4.x/web/src/main/java/org/springframework/security/web/csrf/CsrfAuthenticationStrategy.java
                 this.csrfTokenRepository.saveToken(null, request, response);
-
                 CsrfToken newToken = this.csrfTokenRepository.generateToken(request);
                 this.csrfTokenRepository.saveToken(newToken, request, response);
 
