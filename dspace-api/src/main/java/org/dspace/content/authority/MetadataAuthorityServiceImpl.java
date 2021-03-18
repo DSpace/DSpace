@@ -83,6 +83,11 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
 
     }
 
+    @Override
+    public void reset() {
+        isAuthorityRequired = null;
+    }
+
     public void init() {
 
         if (isAuthorityRequired == null) {
