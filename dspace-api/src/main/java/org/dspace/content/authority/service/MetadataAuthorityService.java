@@ -113,5 +113,10 @@ public interface MetadataAuthorityService {
      */
     public List<String> getAuthorityMetadata();
 
+
+    /**
+     * This method has been created to have a way of clearing the cache kept inside
+     * the service
+     */
     public void reset();
 }
