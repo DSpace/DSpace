@@ -34,6 +34,7 @@ import org.dspace.content.Item;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -323,6 +324,10 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                            )
                        )
                    );
+        DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
+
+        metadataAuthorityService.clearCache();
+
     }
 
     @Test
