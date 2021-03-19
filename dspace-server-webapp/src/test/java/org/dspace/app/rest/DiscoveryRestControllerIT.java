@@ -55,6 +55,7 @@ import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
@@ -277,6 +278,11 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                        FacetValueMatcher.entryAuthorWithAuthority("Doe, Jane", "test_authority_4", 2),
                        FacetValueMatcher.entryAuthorWithAuthority("Smith, Maria", "test_authority_3", 2)
                    )));
+
+        DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
+
+        metadataAuthorityService.clearCache();
+
     }
 
     @Test
