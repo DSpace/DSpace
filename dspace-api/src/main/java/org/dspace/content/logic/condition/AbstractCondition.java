@@ -73,7 +73,7 @@ public abstract class AbstractCondition implements Condition {
      * @throws LogicalStatementException
      */
     @Override
-    public Boolean getResult(Context context, Item item) throws LogicalStatementException {
+    public boolean getResult(Context context, Item item) throws LogicalStatementException {
         if (item == null) {
             log.error("Error evaluating item. Passed item is null, returning false");
             return false;

@@ -40,7 +40,7 @@ public class DefaultFilter implements Filter {
      * @return boolean
      * @throws LogicalStatementException
      */
-    public Boolean getResult(Context context, Item item) throws LogicalStatementException {
+    public boolean getResult(Context context, Item item) throws LogicalStatementException {
         return this.statement.getResult(context, item);
     }
 }

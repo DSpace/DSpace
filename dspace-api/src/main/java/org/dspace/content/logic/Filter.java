@@ -31,5 +31,5 @@ public interface Filter extends LogicalStatement {
      * @return boolean
      * @throws LogicalStatementException
      */
-    Boolean getResult(Context context, Item item) throws LogicalStatementException;
+    boolean getResult(Context context, Item item) throws LogicalStatementException;
 }

@@ -48,7 +48,7 @@ public interface Condition extends LogicalStatement {
      * @return boolean
      * @throws LogicalStatementException
      */
-    Boolean getResult(Context context, Item item) throws LogicalStatementException;
+    boolean getResult(Context context, Item item) throws LogicalStatementException;
 
     public void setItemService(ItemService itemService);
 
