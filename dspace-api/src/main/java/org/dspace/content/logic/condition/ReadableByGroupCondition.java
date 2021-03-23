@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.content.logic.LogicalStatementException;
@@ -29,8 +30,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ReadableByGroupCondition extends AbstractCondition {
     private static Logger log = Logger.getLogger(ReadableByGroupCondition.class);
 
-    @Autowired(required = true)
-    AuthorizeService authorizeService;
+    // Authorize service
+    AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
     /**
      * Return true if this item allows a specified action (eg READ, WRITE, ADD) by a specified group

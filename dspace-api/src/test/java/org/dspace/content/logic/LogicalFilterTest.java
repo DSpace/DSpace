@@ -23,6 +23,8 @@ import java.util.Map;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -32,8 +34,14 @@ import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.logic.condition.BitstreamCountCondition;
+import org.dspace.content.logic.condition.Condition;
 import org.dspace.content.logic.condition.InCollectionCondition;
+import org.dspace.content.logic.condition.InCommunityCondition;
+import org.dspace.content.logic.condition.IsWithdrawnCondition;
 import org.dspace.content.logic.condition.MetadataValueMatchCondition;
+import org.dspace.content.logic.condition.MetadataValuesMatchCondition;
+import org.dspace.content.logic.condition.ReadableByGroupCondition;
 import org.dspace.content.logic.operator.And;
 import org.dspace.content.logic.operator.Nand;
 import org.dspace.content.logic.operator.Nor;
@@ -48,6 +56,10 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.core.Constants;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.GroupService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -67,6 +79,8 @@ public class LogicalFilterTest extends AbstractUnitTest {
     protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
     private MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
     private MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
+    private AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    private GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
 
     // Logger
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(LogicalFilterTest.class);
@@ -114,7 +128,7 @@ public class LogicalFilterTest extends AbstractUnitTest {
             WorkspaceItem workspaceItem = workspaceItemService.create(context, collectionOne, false);
             this.itemOne = installItemService.installItem(context, workspaceItem);
             // Add one bitstream to item one, but put it in THUMBNAIL bundle
-            bundleService.addBitstream(context, bundleService.create(context, itemTwo, "THUMBNAIL"),
+            bundleService.addBitstream(context, bundleService.create(context, itemOne, "THUMBNAIL"),
                 bitstreamService.create(context,
                     new ByteArrayInputStream("Item 1 Thumbnail 1".getBytes(StandardCharsets.UTF_8))));
             // Set up second community, collection and item, and third item
@@ -349,7 +363,7 @@ public class LogicalFilterTest extends AbstractUnitTest {
         DefaultFilter filter = new DefaultFilter();
 
         // Create condition to match pattern on dc.title metadata
-        MetadataValueMatchCondition condition = new MetadataValueMatchCondition();
+        Condition condition = new MetadataValueMatchCondition();
         condition.setItemService(ContentServiceFactory.getInstance().getItemService());
         Map<String, Object> parameters = new HashMap<>();
         // Match on the dc.title field
@@ -373,6 +387,58 @@ public class LogicalFilterTest extends AbstractUnitTest {
     }
 
     /**
+     * Test a simple filter with a single logical statement: the MetadataValuesMatchCondition
+     * looking for a dc.title field beginning with "TEST" or "ALSO", and an item that doesn't match this test
+     */
+    @Test
+    public void testMetadataValuesMatchCondition() {
+        try {
+            MetadataValue metadataValueOne = metadataValueService.create(context, itemOne, metadataField);
+            MetadataValue metadataValueTwo = metadataValueService.create(context, itemTwo, metadataField);
+            MetadataValue metadataValueThree = metadataValueService.create(context, itemThree, metadataField);
+            metadataValueOne.setValue("TEST this title should match the condition");
+            metadataValueTwo.setValue("This title should match the condition, yEs");
+            metadataValueThree.setValue("This title should not match the condition");
+        } catch (SQLException e) {
+            fail("Encountered SQL error creating metadata value on item: " + e.getMessage());
+        }
+
+        // Instantiate new filter for testing this condition
+        DefaultFilter filter = new DefaultFilter();
+
+        // Create condition to match pattern on dc.title metadata
+        Condition condition = new MetadataValuesMatchCondition();
+        Map<String, Object> parameters = new HashMap<>();
+        // Match on the dc.title field
+        parameters.put("field", "dc.title");
+
+        List<String> patterns = new ArrayList<>();
+        // "Starts with "TEST" (case sensitive)
+        patterns.add("^TEST");
+        // "Ends with 'yes' (case insensitive)
+        patterns.add("(?i)yes$");
+        // Add the list of possible patterns
+        parameters.put("patterns", patterns);
+        // Set up condition with these parameters and add it as the sole statement to the metadata filter
+        try {
+            condition.setParameters(parameters);
+            filter.setStatement(condition);
+            // Test the filter on the first item - expected outcome is true
+            assertTrue("itemOne unexpectedly did not match the " +
+                "'dc.title starts with TEST or ends with yes' test", filter.getResult(context, itemOne));
+            // Test the filter on the second item - expected outcome is true
+            assertTrue("itemTwo unexpectedly did not match the " +
+                "'dc.title starts with TEST or ends with yes' test", filter.getResult(context, itemTwo));
+            // Test the filter on the third item - expected outcome is false
+            assertFalse("itemThree unexpectedly matched the " +
+                "'dc.title starts with TEST or ends with yes' test", filter.getResult(context, itemThree));
+        } catch (LogicalStatementException e) {
+            log.error(e.getMessage());
+            fail("LogicalStatementException thrown testing the MetadataValuesMatchCondition filter" + e.getMessage());
+        }
+    }
+
+    /**
      * Test a simple filter with a single logical statement: the InCollectionCondition
      * looking for an item that is in collectionOne, and one that is not in collectionOne
      */
@@ -380,8 +446,7 @@ public class LogicalFilterTest extends AbstractUnitTest {
     public void testInCollectionCondition() {
         // Instantiate new filter for testing this condition
         DefaultFilter filter = new DefaultFilter();
-        InCollectionCondition condition = new InCollectionCondition();
-        condition.setItemService(ContentServiceFactory.getInstance().getItemService());
+        Condition condition = new InCollectionCondition();
         Map<String, Object> parameters = new HashMap<>();
 
         // Add collectionOne handle to the collections parameter - ie. we are testing to see if the item is
@@ -415,15 +480,15 @@ public class LogicalFilterTest extends AbstractUnitTest {
     public void testInCommunityCondition() {
         // Instantiate new filter for testing this condition
         DefaultFilter filter = new DefaultFilter();
-        InCollectionCondition condition = new InCollectionCondition();
+        Condition condition = new InCommunityCondition();
         condition.setItemService(ContentServiceFactory.getInstance().getItemService());
         Map<String, Object> parameters = new HashMap<>();
 
-        // Add collectionOne handle to the collections parameter - ie. we are testing to see if the item is
-        // in collectionOne only
-        List<String> collections = new ArrayList<>();
-        collections.add(communityOne.getHandle());
-        parameters.put("communities", collections);
+        // Add communitynOne handle to the communities parameter - ie. we are testing to see if the item is
+        // in communityOne only
+        List<String> communities = new ArrayList<>();
+        communities.add(communityOne.getHandle());
+        parameters.put("communities", communities);
 
         try {
             // Set parameters and condition
@@ -449,7 +514,7 @@ public class LogicalFilterTest extends AbstractUnitTest {
     public void testIsWithdrawnCondition() {
         // Instantiate new filter for testing this condition
         DefaultFilter filter = new DefaultFilter();
-        InCollectionCondition condition = new InCollectionCondition();
+        Condition condition = new IsWithdrawnCondition();
 
         try {
             condition.setItemService(ContentServiceFactory.getInstance().getItemService());
@@ -475,7 +540,7 @@ public class LogicalFilterTest extends AbstractUnitTest {
     public void testBitstreamCountCondition() {
         // Instantiate new filter for testing this condition
         DefaultFilter filter = new DefaultFilter();
-        InCollectionCondition condition = new InCollectionCondition();
+        Condition condition = new BitstreamCountCondition();
 
         try {
             condition.setItemService(ContentServiceFactory.getInstance().getItemService());
@@ -483,9 +548,9 @@ public class LogicalFilterTest extends AbstractUnitTest {
             // Set parameters to check for items with at least 1 and at most 2 bitstreams in the ORIGINAL bundle
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("bundle", "ORIGINAL");
-            parameters.put("min", 1);
-            parameters.put("max", 2);
-            condition.setParameters(new HashMap<>());
+            parameters.put("min", String.valueOf(1));
+            parameters.put("max", String.valueOf(2));
+            condition.setParameters(parameters);
             filter.setStatement(condition);
 
             // Test the filter on itemOne - this item has one THUMBNAIL but zero ORIGINAL bitstreams: expect false
@@ -499,7 +564,49 @@ public class LogicalFilterTest extends AbstractUnitTest {
                 " (it has 3 ORIGINAL bitstreams)", filter.getResult(context, itemThree));
         } catch (LogicalStatementException e) {
             log.error(e.getMessage());
-            fail("LogicalStatementException thrown testing the IsWithdrawnCondition filter" + e.getMessage());
+            fail("LogicalStatementException thrown testing the IsWithdrawnCondition filter: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Test a simple filter using the ReadableByGroupCondition
+     */
+    @Test
+    public void testReadableByGroupCondition() {
+        // Instantiate new filter for testing this condition
+        DefaultFilter filter = new DefaultFilter();
+        Condition condition = new ReadableByGroupCondition();
+
+        try {
+            condition.setItemService(ContentServiceFactory.getInstance().getItemService());
+
+            // Make item one readable by Test Group
+            try {
+                context.turnOffAuthorisationSystem();
+                Group g = groupService.create(context);
+                groupService.setName(g, "Test Group");
+                groupService.update(context, g);
+                authorizeService.addPolicy(context, itemOne, Constants.READ, g);
+                context.restoreAuthSystemState();
+            } catch (AuthorizeException | SQLException e) {
+                fail("Exception thrown adding group READ policy to item: " + itemOne + ": " + e.getMessage());
+            }
+            // Set parameters to check for items with Anonymous READ permission
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("group", "Test Group");
+            parameters.put("action", "READ");
+            condition.setParameters(parameters);
+            filter.setStatement(condition);
+
+            // Test the filter on itemOne - this item was explicitly set with expected group READ policy
+            assertTrue("itemOne unexpectedly did not match the 'is readable by Test Group' test",
+                filter.getResult(context, itemOne));
+            // Test the filter on itemTwo - this item has no policies: expect false
+            assertFalse("itemTwo unexpectedly matched the 'is readable by Test Group' test",
+                filter.getResult(context, itemTwo));
+        } catch (LogicalStatementException e) {
+            log.error(e.getMessage());
+            fail("LogicalStatementException thrown testing the ReadableByGroup filter" + e.getMessage());
         }
     }
 
