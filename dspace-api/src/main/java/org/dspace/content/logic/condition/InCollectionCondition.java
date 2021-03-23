@@ -31,10 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class InCollectionCondition extends AbstractCondition {
     private static Logger log = LogManager.getLogger(InCollectionCondition.class);
 
-    @Autowired(required = true)
-    protected CollectionService collectionService;
-    protected ItemService itemService;
-
     /**
      * Return true if item is in one of the specified collections
      * Return false if not

@@ -27,8 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @version $Revision$
  */
 public class MetadataValuesMatchCondition extends AbstractCondition {
-    @Autowired(required = true)
-    protected ItemService itemService;
 
     private static Logger log = Logger.getLogger(MetadataValuesMatchCondition.class);
 
