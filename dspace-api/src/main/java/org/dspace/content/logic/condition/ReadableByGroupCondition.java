@@ -18,7 +18,6 @@ import org.dspace.content.Item;
 import org.dspace.content.logic.LogicalStatementException;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * A condition that accepts a group and action parameter and returns true if the group
