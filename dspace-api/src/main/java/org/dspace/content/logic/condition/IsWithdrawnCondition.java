@@ -30,7 +30,7 @@ public class IsWithdrawnCondition extends AbstractCondition {
      * @throws LogicalStatementException
      */
     @Override
-    public Boolean getResult(Context context, Item item) throws LogicalStatementException {
+    public boolean getResult(Context context, Item item) throws LogicalStatementException {
         log.debug("Result of isWithdrawn is " + item.isWithdrawn());
         return item.isWithdrawn();
     }

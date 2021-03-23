@@ -27,5 +27,5 @@ public interface LogicalStatement {
      * @return boolean result of evaluation
      * @throws LogicalStatementException
      */
-    Boolean getResult(Context context, Item item) throws LogicalStatementException;
+    boolean getResult(Context context, Item item) throws LogicalStatementException;
 }

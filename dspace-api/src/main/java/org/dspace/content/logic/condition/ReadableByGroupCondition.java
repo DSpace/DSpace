@@ -40,7 +40,7 @@ public class ReadableByGroupCondition extends AbstractCondition {
      * @throws LogicalStatementException
      */
     @Override
-    public Boolean getResult(Context context, Item item) throws LogicalStatementException {
+    public boolean getResult(Context context, Item item) throws LogicalStatementException {
 
         String group = (String)getParameters().get("group");
         String action = (String)getParameters().get("action");

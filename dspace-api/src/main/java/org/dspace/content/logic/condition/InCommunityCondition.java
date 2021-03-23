@@ -37,7 +37,7 @@ public class InCommunityCondition extends AbstractCondition {
      * @throws LogicalStatementException
      */
     @Override
-    public Boolean getResult(Context context, Item item) throws LogicalStatementException {
+    public boolean getResult(Context context, Item item) throws LogicalStatementException {
 
         List<String> communityHandles = (List<String>)getParameters().get("communities");
         List<Collection> itemCollections = item.getCollections();

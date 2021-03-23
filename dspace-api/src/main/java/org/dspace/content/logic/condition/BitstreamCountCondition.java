@@ -30,7 +30,7 @@ public class BitstreamCountCondition extends AbstractCondition {
      * @throws LogicalStatementException
      */
     @Override
-    public Boolean getResult(Context context, Item item) throws LogicalStatementException {
+    public boolean getResult(Context context, Item item) throws LogicalStatementException {
 
         // This super call just throws some useful exceptions if required objects are null
         super.getResult(context, item);

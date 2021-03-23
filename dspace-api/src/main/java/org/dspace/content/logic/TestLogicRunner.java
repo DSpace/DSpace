@@ -110,7 +110,7 @@ public class TestLogicRunner {
                     DSpaceObject dso = handleService.resolveToObject(c, handle);
                     if (Constants.typeText[dso.getType()].equals("ITEM")) {
                         Item item = (Item) dso;
-                        System.out.println(filter.getResult(c, item).toString());
+                        System.out.println(filter.getResult(c, item));
                     } else {
                         System.out.println(handle + " is not an ITEM");
                     }
@@ -127,7 +127,7 @@ public class TestLogicRunner {
                         System.out.println(
                             "Testing '" + filter + "' on item " + i.getHandle() + " ('" + i.getName() + "')"
                         );
-                        System.out.println(filter.getResult(c, i).toString());
+                        System.out.println(filter.getResult(c, i));
 
                     }
                 } catch (SQLException | LogicalStatementException e) {

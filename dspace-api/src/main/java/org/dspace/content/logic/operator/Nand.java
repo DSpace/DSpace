@@ -46,7 +46,7 @@ public class Nand extends AbstractOperator {
      * @throws LogicalStatementException
      */
     @Override
-    public Boolean getResult(Context context, Item item) throws LogicalStatementException {
+    public boolean getResult(Context context, Item item) throws LogicalStatementException {
         return !(new And(getStatements()).getResult(context, item));
     }
 }
