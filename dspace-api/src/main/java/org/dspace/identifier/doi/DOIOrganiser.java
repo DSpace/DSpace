@@ -40,6 +40,7 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.DOI;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierException;
+import org.dspace.identifier.IdentifierNotApplicableException;
 import org.dspace.identifier.factory.IdentifierServiceFactory;
 import org.dspace.identifier.service.DOIService;
 import org.dspace.services.ConfigurationService;
@@ -243,8 +244,6 @@ public class DOIOrganiser {
             } catch (SQLException ex) {
                 System.err.println("Error in database connection:" + ex.getMessage());
                 ex.printStackTrace(System.err);
-            } catch (DOIIdentifierNotApplicableException e) {
-                System.err.println("DOI not registered: " + e.getMessage());
             } catch (DOIIdentifierException ex) {
                 System.err.println("Error registering DOI identifier:" + ex.getMessage());
             }

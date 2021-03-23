@@ -891,7 +891,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      *                                DOI is registered for another object already.
      */
     protected DOI loadOrCreateDOI(Context context, DSpaceObject dso, String doiIdentifier)
-            throws SQLException, DOIIdentifierException {
+            throws SQLException, DOIIdentifierException, IdentifierNotApplicableException {
         return loadOrCreateDOI(context, dso, doiIdentifier, false);
     }
 
@@ -911,7 +911,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * @throws DOIIdentifierException
      */
     protected DOI loadOrCreateDOI(Context context, DSpaceObject dso, String doiIdentifier, Boolean skipFilter)
-        throws SQLException, DOIIdentifierException {
+        throws SQLException, DOIIdentifierException, IdentifierNotApplicableException {
 
         DOI doi = null;
 

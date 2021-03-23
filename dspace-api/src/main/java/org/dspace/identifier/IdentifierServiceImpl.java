@@ -72,8 +72,8 @@ public class IdentifierServiceImpl implements IdentifierService {
                 if (!StringUtils.isEmpty(identifier)) {
                     service.reserve(context, dso, identifier);
                 }
-            } catch (DOIIdentifierNotApplicableException e) {
-                log.warn("DOI Identifier not reserved (inapplicable): " + e.getMessage());
+            } catch (IdentifierNotApplicableException e) {
+                log.warn("Identifier not reserved (inapplicable): " + e.getMessage());
             }
         }
         //Update our item
@@ -88,8 +88,8 @@ public class IdentifierServiceImpl implements IdentifierService {
             if (service.supports(identifier)) {
                 try {
                     service.reserve(context, dso, identifier);
-                } catch (DOIIdentifierNotApplicableException e) {
-                    log.warn("DOI Identifier not reserved (inapplicable): " + e.getMessage());
+                } catch (IdentifierNotApplicableException e) {
+                    log.warn("Identifier not reserved (inapplicable): " + e.getMessage());
                 }
             }
         }
@@ -105,8 +105,8 @@ public class IdentifierServiceImpl implements IdentifierService {
         for (IdentifierProvider service : providers) {
             try {
                 service.register(context, dso);
-            } catch (DOIIdentifierNotApplicableException e) {
-                log.warn("DOI Identifier not registered (inapplicable): " + e.getMessage());
+            } catch (IdentifierNotApplicableException e) {
+                log.warn("Identifier not registered (inapplicable): " + e.getMessage());
             }
         }
         //Update our item / collection / community
@@ -124,8 +124,8 @@ public class IdentifierServiceImpl implements IdentifierService {
                 try {
                     service.register(context, object, identifier);
                     registered = true;
-                } catch (DOIIdentifierNotApplicableException e) {
-                    log.warn("DOI Identifier not registered (inapplicable): " + e.getMessage());
+                } catch (IdentifierNotApplicableException e) {
+                    log.warn("Identifier not registered (inapplicable): " + e.getMessage());
                 }
             }
         }
