@@ -5,9 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.identifier.doi;
-
-import org.dspace.identifier.IdentifierNotApplicableException;
+package org.dspace.identifier;
 
 /**
  *
@@ -16,21 +14,21 @@ import org.dspace.identifier.IdentifierNotApplicableException;
  *
  * @author Kim Shepherd
  */
-public class DOIIdentifierNotApplicableException extends IdentifierNotApplicableException {
+public class IdentifierNotApplicableException extends IdentifierException {
 
-    public DOIIdentifierNotApplicableException() {
+    public IdentifierNotApplicableException() {
         super();
     }
 
-    public DOIIdentifierNotApplicableException(String message) {
+    public IdentifierNotApplicableException(String message) {
         super(message);
     }
 
-    public DOIIdentifierNotApplicableException(String message, Throwable cause) {
+    public IdentifierNotApplicableException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public DOIIdentifierNotApplicableException(Throwable cause) {
+    public IdentifierNotApplicableException(Throwable cause) {
         super(cause);
     }
 }
