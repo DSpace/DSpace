@@ -1350,6 +1350,8 @@ prevent the generation of resource policy entry values with null dspace_object a
                                            boolean enableVirtualMetadata) {
         //Fields of the relation schema are virtual metadata
         //except for relation.type which is the type of item in the model
+        enableVirtualMetadata = enableVirtualMetadata
+            && configurationService.getBooleanProperty("item.enable-virtual-metadata", false);
         if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName()) && !StringUtils.equals(element, "type")) {
 
             List<RelationshipMetadataValue> relationMetadata = relationshipMetadataService
