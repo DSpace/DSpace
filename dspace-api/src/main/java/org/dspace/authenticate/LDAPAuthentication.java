@@ -156,7 +156,7 @@ public class LDAPAuthentication
                     }
                 }
             }
-        } catch (SQLException ex) {
+        } catch (Exception ex) {
             // The user is not an LDAP user, so we don't need to worry about them
         }
         return Collections.EMPTY_LIST;
