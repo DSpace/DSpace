@@ -115,7 +115,7 @@ public class RelationshipType implements ReloadableEntity<Integer> {
     private boolean copyToRight;
 
     /**
-     * The value indicating whether the relationship has more relationships on the right/left/neither.
+     * The value indicating whether relationships of this type should be ignored on the right/left/neither.
      */
     @Column(name = "tilted")
     private Tilted tilted;
