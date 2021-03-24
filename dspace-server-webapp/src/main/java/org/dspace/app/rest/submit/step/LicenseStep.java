@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.submit.step;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
@@ -21,7 +23,6 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.services.model.Request;
 
 /**
  * License step for DSpace Spring Rest. Expose the license information about the in progress submission.
@@ -51,8 +52,8 @@ public class LicenseStep extends org.dspace.submit.step.LicenseStep implements A
     }
 
     @Override
-    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op,
-                                  SubmissionStepConfig stepConf) throws Exception {
+    public void doPatchProcessing(Context context, HttpServletRequest currentRequest, InProgressSubmission source,
+            Operation op, SubmissionStepConfig stepConf) throws Exception {
 
         if (op.getPath().endsWith(LICENSE_STEP_OPERATION_ENTRY)) {
 

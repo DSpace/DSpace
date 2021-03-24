@@ -9,7 +9,6 @@ package org.dspace.app.rest.submit.step;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,8 +22,7 @@ import org.apache.commons.collections4.Equator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ErrorRest;
-import org.dspace.app.rest.model.patch.Operation;
-import org.dspace.app.rest.submit.AbstractRestProcessingStep;
+import org.dspace.app.rest.submit.ListenerProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.submit.UploadableStep;
 import org.dspace.app.rest.utils.Utils;
@@ -40,7 +38,6 @@ import org.dspace.external.model.ExternalDataObject;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.dspace.importer.external.service.ImportService;
-import org.dspace.services.model.Request;
 import org.dspace.submit.listener.MetadataListener;
 import org.dspace.utils.DSpace;
 import org.springframework.web.multipart.MultipartFile;
@@ -61,7 +58,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public class ExtractMetadataStep implements AbstractRestProcessingStep, UploadableStep {
+public class ExtractMetadataStep implements ListenerProcessingStep, UploadableStep {
 
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     private ImportService importService = new DSpace().getSingletonService(ImportService.class);
@@ -197,19 +194,4 @@ public class ExtractMetadataStep implements AbstractRestProcessingStep, Uploadab
         return null;
     }
 
-    @Override
-    public boolean hasDataSection() {
-        return false;
-    }
-
-    @Override
-    public <T extends Serializable> T getData(SubmissionService submissionService, InProgressSubmission obj,
-            SubmissionStepConfig config) throws Exception {
-        return null;
-    }
-
-    @Override
-    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op,
-            SubmissionStepConfig stepConf) throws Exception {
-    }
 }

@@ -29,7 +29,6 @@ import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.handler.service.UriListHandlerService;
-import org.dspace.app.rest.submit.AbstractRestProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.submit.UploadableStep;
 import org.dspace.app.rest.utils.Utils;
@@ -62,7 +61,6 @@ import org.dspace.submit.AbstractProcessingStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.rest.webmvc.json.patch.PatchException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -227,53 +225,8 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         Context context = obtainContext();
         WorkspaceItemRest wsi = findOne(context, id);
         WorkspaceItem source = wis.find(context, id);
-        List<ErrorRest> errors = new ArrayList<ErrorRest>();
-        SubmissionConfig submissionConfig =
-            submissionConfigReader.getSubmissionConfigByName(wsi.getSubmissionDefinition().getName());
-        List<Object[]> stepInstancesAndConfigs = new ArrayList<Object[]>();
-        // we need to run the preProcess of all the appropriate steps and move on to the
-        // upload and postProcess step
-        // We will initialize the step class just one time so that it will be the same
-        // instance over all the phase and we will reduce initialization time as well
-        for (int i = 0; i < submissionConfig.getNumberOfSteps(); i++) {
-            SubmissionStepConfig stepConfig = submissionConfig.getStep(i);
-            /*
-             * First, load the step processing class (using the current
-             * class loader)
-             */
-            ClassLoader loader = this.getClass().getClassLoader();
-            Class stepClass;
-            try {
-                stepClass = loader.loadClass(stepConfig.getProcessingClassName());
-                if (UploadableStep.class.isAssignableFrom(stepClass)) {
-                    Object stepInstance = stepClass.newInstance();
-                    stepInstancesAndConfigs.add(new Object[] {stepInstance, stepConfig});
-                }
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-            }
-        }
-        for (Object[] stepInstanceAndCfg : stepInstancesAndConfigs) {
-            UploadableStep uploadableStep = (UploadableStep) stepInstanceAndCfg[0];
-            uploadableStep.doPreProcessing(context, source);
-        }
-        for (Object[] stepInstanceAndCfg : stepInstancesAndConfigs) {
-            UploadableStep uploadableStep = (UploadableStep) stepInstanceAndCfg[0];
-            ErrorRest err;
-            try {
-                err = uploadableStep.upload(context, submissionService, (SubmissionStepConfig) stepInstanceAndCfg[1],
-                        source, file);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            if (err != null) {
-                errors.add(err);
-            }
-        }
-        for (Object[] stepInstanceAndCfg : stepInstancesAndConfigs) {
-            UploadableStep uploadableStep = (UploadableStep) stepInstanceAndCfg[0];
-            uploadableStep.doPostProcessing(context, source);
-        }
+        List<ErrorRest> errors = submissionService.uploadFileToInprogressSubmission(context, request, wsi, source,
+                file);
         wsi = converter.toRest(source, utils.obtainProjection());
 
         if (!errors.isEmpty()) {
@@ -296,81 +249,13 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             String[] path = op.getPath().substring(1).split("/", 3);
             if (OPERATION_PATH_SECTIONS.equals(path[0])) {
                 String section = path[1];
-                evaluatePatch(context, request, source, wsi, section, op);
+                submissionService.evaluatePatchToInprogressSubmission(context, request, source, wsi, section, op);
             } else {
                 throw new DSpaceBadRequestException(
                     "Patch path operation need to starts with '" + OPERATION_PATH_SECTIONS + "'");
             }
         }
         wis.update(context, source);
-    }
-
-    private void evaluatePatch(Context context, HttpServletRequest request, WorkspaceItem source, WorkspaceItemRest wsi,
-                               String section, Operation op) {
-        boolean sectionExist = false;
-        SubmissionConfig submissionConfig = submissionConfigReader
-            .getSubmissionConfigByName(wsi.getSubmissionDefinition().getName());
-        List<Object[]> stepInstancesAndConfigs = new ArrayList<Object[]>();
-        // we need to run the preProcess of all the appropriate steps and move on to the
-        // doPatchProcessing and postProcess step
-        // We will initialize the step classes just one time so that it will be the same
-        // instance over all the phase and we will reduce initialization time as well
-        for (int i = 0; i < submissionConfig.getNumberOfSteps(); i++) {
-            SubmissionStepConfig stepConfig = submissionConfig.getStep(i);
-            if (section.equals(stepConfig.getId())) {
-                sectionExist = true;
-            }
-            /*
-             * First, load the step processing class (using the current
-             * class loader)
-             */
-            ClassLoader loader = this.getClass().getClassLoader();
-            Class stepClass;
-            try {
-                stepClass = loader.loadClass(stepConfig.getProcessingClassName());
-                if (AbstractRestProcessingStep.class.isAssignableFrom(stepClass)) {
-                    Object stepInstance = stepClass.newInstance();
-                    stepInstancesAndConfigs.add(new Object[] {stepInstance, stepConfig});
-                } else {
-                    throw new DSpaceBadRequestException(
-                        "The submission step class specified by '" + stepConfig.getProcessingClassName() +
-                        "' does not extend the class org.dspace.app.rest.submit.AbstractRestProcessingStep!" +
-                        " Therefore it cannot be used by the Configurable Submission as the <processing-class>!");
-                }
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                throw new PatchException("Error processing the patch request", e);
-            }
-        }
-        if (!sectionExist) {
-            throw new UnprocessableEntityException("The section with name " + section +
-                                                   " does not exist in this submission!");
-        }
-        for (Object[] stepInstanceAndCfg : stepInstancesAndConfigs) {
-            AbstractRestProcessingStep step = (AbstractRestProcessingStep) stepInstanceAndCfg[0];
-            step.doPreProcessing(context, source);
-        }
-        for (Object[] stepInstanceAndCfg : stepInstancesAndConfigs) {
-            // only the step related to the involved section need to be invoked
-            SubmissionStepConfig stepConfig = (SubmissionStepConfig) stepInstanceAndCfg[1];
-            if (!section.equals(stepConfig.getId())) {
-                continue;
-            }
-            AbstractRestProcessingStep step = (AbstractRestProcessingStep) stepInstanceAndCfg[0];
-            try {
-                step.doPatchProcessing(context, getRequestService().getCurrentRequest(), source, op,
-                        stepConfig);
-            } catch (UnprocessableEntityException e) {
-                throw e;
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                throw new PatchException("Error processing the patch request", e);
-            }
-        }
-        for (Object[] stepInstanceAndCfg : stepInstancesAndConfigs) {
-            AbstractRestProcessingStep step = (AbstractRestProcessingStep) stepInstanceAndCfg[0];
-            step.doPostProcessing(context, source);
-        }
     }
 
     @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'DELETE')")

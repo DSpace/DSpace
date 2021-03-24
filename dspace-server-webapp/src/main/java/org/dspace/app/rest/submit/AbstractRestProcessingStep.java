@@ -10,6 +10,7 @@ package org.dspace.app.rest.submit;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.patch.Operation;
@@ -18,7 +19,6 @@ import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.core.Context;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.services.model.Request;
 
 /**
  * Interface for the submission steps to populate sections in the in progress submission and react to patch requests.
@@ -26,7 +26,7 @@ import org.dspace.services.model.Request;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public interface AbstractRestProcessingStep extends ListenerProcessingStep {
+public interface AbstractRestProcessingStep {
 
     public static final String DESCRIBE_STEP_METADATA_OPERATION_ENTRY = "itemmetadata";
     public static final String COLLECTION_STEP_OPERATION_ENTRY = "collection";
@@ -55,19 +55,6 @@ public interface AbstractRestProcessingStep extends ListenerProcessingStep {
      */
     public <T extends Serializable> T getData(SubmissionService submissionService, InProgressSubmission obj,
                                               SubmissionStepConfig config) throws Exception;
-
-    /**
-     * Method to inform the converter that this step has it own section data. This
-     * can be overriden by step that only process/validate data in other section. In
-     * such case the @link
-     * {@link #getData(SubmissionService, InProgressSubmission, SubmissionStepConfig)}
-     * method should return null as it will be ignored
-     * 
-     * @return true by default to indicate that the step has it own section data
-     */
-    default public boolean hasDataSection() {
-        return true;
-    }
 
     /**
      * The method will expose the list of validation errors identified by the step. The default implementation will
@@ -108,7 +95,7 @@ public interface AbstractRestProcessingStep extends ListenerProcessingStep {
      *            the json patch operation
      * @throws Exception
      */
-    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op,
-                                  SubmissionStepConfig stepConf) throws Exception;
+    public void doPatchProcessing(Context context, HttpServletRequest currentRequest, InProgressSubmission source,
+            Operation op, SubmissionStepConfig stepConf) throws Exception;
 
 }
