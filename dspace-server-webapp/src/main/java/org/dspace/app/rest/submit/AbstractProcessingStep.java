@@ -5,11 +5,10 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.submit;
+package org.dspace.app.rest.submit;
 
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.InProgressSubmission;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
@@ -18,15 +17,14 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
- * Abstract processing class for DSpace Submission Steps. This defines the base methods which are required for any Step
- * processing class.
+ * Abstract processing class for DSpace Submission Steps. This retrieve several
+ * collaborators that are usually needed by all the processing class.
  */
-public abstract class AbstractProcessingStep {
+public abstract class AbstractProcessingStep implements DataProcessingStep {
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance()
@@ -37,9 +35,5 @@ public abstract class AbstractProcessingStep {
     protected MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
     protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-
-    public abstract void doPreProcessing(Context context, InProgressSubmission wsi);
-
-    public abstract void doPostProcessing(Context context, InProgressSubmission wsi);
 
 }

@@ -18,7 +18,7 @@ import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.submit.AbstractRestProcessingStep;
+import org.dspace.app.rest.submit.DataProcessingStep;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReaderException;
@@ -61,7 +61,7 @@ public class SubmissionDefinitionConverter implements DSpaceConverter<Submission
             SubmissionStepConfig step = obj.getStep(idx);
             try {
                 // only the step that process data must be included in the panels list
-                if (AbstractRestProcessingStep.class.isAssignableFrom(Class.forName(step.getProcessingClassName()))) {
+                if (DataProcessingStep.class.isAssignableFrom(Class.forName(step.getProcessingClassName()))) {
                     SubmissionSectionRest sp = converter.toRest(step, projection);
                     panels.add(sp);
                 }

@@ -19,7 +19,7 @@ import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.step.DataUpload;
 import org.dspace.app.rest.model.step.UploadBitstreamRest;
 import org.dspace.app.rest.repository.WorkspaceItemRestRepository;
-import org.dspace.app.rest.submit.AbstractRestProcessingStep;
+import org.dspace.app.rest.submit.AbstractProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.submit.UploadableStep;
 import org.dspace.app.rest.submit.factory.PatchOperationFactory;
@@ -41,8 +41,8 @@ import org.springframework.web.multipart.MultipartFile;
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
-public class UploadStep extends org.dspace.submit.step.UploadStep
-        implements AbstractRestProcessingStep, UploadableStep {
+public class UploadStep extends AbstractProcessingStep
+        implements UploadableStep {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(UploadStep.class);
 

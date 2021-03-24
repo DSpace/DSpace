@@ -18,7 +18,7 @@ import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.RemoveOperation;
 import org.dspace.app.rest.model.step.DataDescribe;
-import org.dspace.app.rest.submit.AbstractRestProcessingStep;
+import org.dspace.app.rest.submit.AbstractProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.submit.factory.PatchOperationFactory;
 import org.dspace.app.rest.submit.factory.impl.PatchOperation;
@@ -31,7 +31,6 @@ import org.dspace.content.InProgressSubmission;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
-import org.dspace.submit.AbstractProcessingStep;
 
 /**
  * Describe step for DSpace Spring Rest. Expose and allow patching of the in progress submission metadata. It is
@@ -40,7 +39,7 @@ import org.dspace.submit.AbstractProcessingStep;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public class DescribeStep extends AbstractProcessingStep implements AbstractRestProcessingStep {
+public class DescribeStep extends AbstractProcessingStep {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DescribeStep.class);
 
@@ -48,14 +47,6 @@ public class DescribeStep extends AbstractProcessingStep implements AbstractRest
 
     public DescribeStep() throws DCInputsReaderException {
         inputReader = new DCInputsReader();
-    }
-
-    @Override
-    public void doPreProcessing(Context context, InProgressSubmission wsi) {
-    }
-
-    @Override
-    public void doPostProcessing(Context context, InProgressSubmission wsi) {
     }
 
     @Override

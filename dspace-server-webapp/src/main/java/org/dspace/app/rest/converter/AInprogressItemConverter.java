@@ -16,7 +16,7 @@ import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.submit.AbstractRestProcessingStep;
+import org.dspace.app.rest.submit.DataProcessingStep;
 import org.dspace.app.rest.submit.RestProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.util.SubmissionConfigReader;
@@ -94,10 +94,10 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
 
                     Object stepInstance = stepClass.newInstance();
 
-                    if (stepInstance instanceof AbstractRestProcessingStep) {
+                    if (stepInstance instanceof DataProcessingStep) {
                         // load the interface for this step
-                        AbstractRestProcessingStep stepProcessing =
-                            (AbstractRestProcessingStep) stepClass.newInstance();
+                        DataProcessingStep stepProcessing =
+                            (DataProcessingStep) stepClass.newInstance();
                         for (ErrorRest error : stepProcessing.validate(submissionService, obj, stepConfig)) {
                             addError(witem.getErrors(), error);
                         }

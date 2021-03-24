@@ -14,7 +14,7 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.step.DataLicense;
-import org.dspace.app.rest.submit.AbstractRestProcessingStep;
+import org.dspace.app.rest.submit.AbstractProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.submit.factory.PatchOperationFactory;
 import org.dspace.app.rest.submit.factory.impl.PatchOperation;
@@ -29,7 +29,7 @@ import org.dspace.core.Context;
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
-public class LicenseStep extends org.dspace.submit.step.LicenseStep implements AbstractRestProcessingStep {
+public class LicenseStep extends AbstractProcessingStep {
 
     private static final String DCTERMS_RIGHTSDATE = "dcterms.accessRights";
 

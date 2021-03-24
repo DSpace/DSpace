@@ -10,7 +10,8 @@ package org.dspace.app.rest.submit;
 /**
  * This is a placeholder interface to simplify validation of the configuration.
  * Any processing step MUST inherit such interface usually implementing the
- * {@link AbstractRestProcessingStep} or {@link ListenerProcessingStep} or both
+ * {@link DataProcessingStep}, {@link ListenerProcessingStep} or
+ * {@link UploadableStep} or any combination of them
  * 
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
