@@ -32,9 +32,11 @@ import org.orcid.jaxb.model.v3.release.record.Person;
 import org.orcid.jaxb.model.v3.release.search.Result;
 
 /**
- * @author Jonas Van Goolen (jonas at atmire dot com)
- * This class contains all methods for retrieving "Person" objects calling the ORCID (version 2) endpoints.
+ * This class contains all methods for retrieving "Person" objects calling the ORCID (version 3) endpoints.
  * Additionally, this can also create AuthorityValues based on these returned Person objects
+ *
+ * @author Jonas Van Goolen (jonas at atmire dot com)
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class Orcidv3 implements SolrAuthorityInterface {
 
@@ -130,6 +132,7 @@ public class Orcidv3 implements SolrAuthorityInterface {
      * @param id orcid identifier
      * @return AuthorityValue
      */
+    @Override
     public AuthorityValue queryAuthorityID(String id) {
         init();
         Person person = getBio(id);

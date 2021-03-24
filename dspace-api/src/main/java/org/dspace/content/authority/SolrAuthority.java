@@ -134,8 +134,8 @@ public class SolrAuthority implements ChoiceAuthority {
                     int sizeFromSolr = alreadyPresent.size();
                     int maxExternalResults = sizeFromSolr < limit ? limit + 1 : sizeFromSolr + 1;
                     // force an upper limit for external results
-                    if (maxExternalResults > 100) {
-                        maxExternalResults = 100;
+                    if (maxExternalResults > 10) {
+                        maxExternalResults = 10;
                     }
                     addExternalResults(text, choices, alreadyPresent, maxExternalResults);
                 }
