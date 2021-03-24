@@ -26,7 +26,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public interface AbstractRestProcessingStep extends RestProcessingStep {
+public interface DataProcessingStep extends RestProcessingStep {
 
     public static final String DESCRIBE_STEP_METADATA_OPERATION_ENTRY = "itemmetadata";
     public static final String COLLECTION_STEP_OPERATION_ENTRY = "collection";

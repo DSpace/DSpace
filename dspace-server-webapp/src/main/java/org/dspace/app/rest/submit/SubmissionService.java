@@ -441,7 +441,7 @@ public class SubmissionService {
             if (!section.equals(stepConfig.getId())) {
                 continue;
             }
-            AbstractRestProcessingStep step = (AbstractRestProcessingStep) stepInstanceAndCfg[0];
+            DataProcessingStep step = (DataProcessingStep) stepInstanceAndCfg[0];
             try {
                 step.doPatchProcessing(context, request, source, op, stepConfig);
             } catch (UnprocessableEntityException e) {

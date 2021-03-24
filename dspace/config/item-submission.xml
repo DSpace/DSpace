@@ -32,11 +32,11 @@
     <!-- @id - The unique identifier for this step -->
     <!-- -->
     <!-- <processing-class> - The class which will process all information for -->
-    <!-- this step. The class must extend -->
-    <!-- 'org.dspace.submit.AbstractProcessingStep' -->
-    <!-- (or one of the org.dspace.submit.step.* classes) -->
+    <!-- this step. The class must implement -->
+    <!-- 'org.dspace.app.rest.submit.RestProcessingStep' -->
+    <!-- (or one of the org.dspace.rest.submit.step.* classes) -->
     <!-- This property should reference the full path of the class -->
-    <!-- (e.g. org.dspace.submit.step.MyCustomStep) -->
+    <!-- (e.g. org.dspace.app.rest.submit.step.MyCustomStep) -->
     <!-- -->
     <!-- The following properties are OPTIONAL for each <step-definition>: -->
     <!-- <heading> - References the message key, from the -->

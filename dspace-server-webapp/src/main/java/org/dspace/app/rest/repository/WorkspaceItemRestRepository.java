@@ -57,7 +57,6 @@ import org.dspace.importer.external.exception.FileMultipleOccurencesException;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.dspace.importer.external.service.ImportService;
 import org.dspace.services.ConfigurationService;
-import org.dspace.submit.AbstractProcessingStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -171,45 +170,6 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     protected WorkspaceItemRest createAndReturn(Context context) throws SQLException, AuthorizeException {
         WorkspaceItem source = submissionService.createWorkspaceItem(context, getRequestService().getCurrentRequest());
         return converter.toRest(source, utils.obtainProjection());
-    }
-
-    @Override
-    protected WorkspaceItemRest save(Context context, WorkspaceItemRest wsi) {
-        SubmissionConfig submissionConfig = submissionConfigReader
-            .getSubmissionConfigByName(submissionConfigReader.getDefaultSubmissionConfigName());
-        WorkspaceItem source = workspaceItemConverter.toModel(wsi);
-        for (int stepNum = 0; stepNum < submissionConfig.getNumberOfSteps(); stepNum++) {
-
-            SubmissionStepConfig stepConfig = submissionConfig.getStep(stepNum);
-            /*
-             * First, load the step processing class (using the current
-             * class loader)
-             */
-            ClassLoader loader = this.getClass().getClassLoader();
-            Class stepClass;
-            try {
-                stepClass = loader.loadClass(stepConfig.getProcessingClassName());
-
-                Object stepInstance = stepClass.newInstance();
-
-                if (stepInstance instanceof AbstractProcessingStep) {
-                    // load the JSPStep interface for this step
-                    AbstractProcessingStep stepProcessing = (AbstractProcessingStep) stepClass
-                        .newInstance();
-                    stepProcessing.doPreProcessing(context, source);
-                } else {
-                    throw new Exception("The submission step class specified by '"
-                                            + stepConfig.getProcessingClassName()
-                                            + "' does not extend the class org.dspace.submit.AbstractProcessingStep!"
-                                            + " Therefore it cannot be used by the Configurable Submission as the " +
-                                            "<processing-class>!");
-                }
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-            }
-        }
-        submissionService.saveWorkspaceItem(context, source);
-        return wsi;
     }
 
     @Override
