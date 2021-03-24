@@ -19,7 +19,6 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
-import org.dspace.identifier.doi.DOIIdentifierNotApplicableException;
 import org.dspace.identifier.service.IdentifierService;
 import org.springframework.beans.factory.annotation.Autowired;
 
