@@ -90,7 +90,7 @@
         <step-definition id="extractionstep"> 
             <heading>submit.progressbar.ExtractMetadataStep</heading>
             <processing-class>org.dspace.app.rest.submit.step.ExtractMetadataStep</processing-class>
-            <type>cclicense</type> 
+            <type>extract</type>
         </step-definition>
 
         <!-- Fake Steps to test parsing of all options -->
