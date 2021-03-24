@@ -17,6 +17,7 @@ import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
+import org.dspace.app.rest.submit.RestProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
@@ -100,13 +101,11 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
                         for (ErrorRest error : stepProcessing.validate(submissionService, obj, stepConfig)) {
                             addError(witem.getErrors(), error);
                         }
-                        if (stepProcessing.hasDataSection()) {
-                            witem.getSections()
-                                .put(sections.getId(), stepProcessing.getData(submissionService, obj, stepConfig));
-                        }
-                    } else {
+                        witem.getSections()
+                            .put(sections.getId(), stepProcessing.getData(submissionService, obj, stepConfig));
+                    } else if (!(stepInstance instanceof RestProcessingStep)) {
                         log.warn("The submission step class specified by '" + stepConfig.getProcessingClassName() +
-                                 "' does not extend the class org.dspace.app.rest.submit.AbstractRestProcessingStep!" +
+                                 "' does not implement the interface org.dspace.app.rest.submit.RestProcessingStep!" +
                                  " Therefore it cannot be used by the Configurable Submission as the " +
                                  "<processing-class>!");
                     }

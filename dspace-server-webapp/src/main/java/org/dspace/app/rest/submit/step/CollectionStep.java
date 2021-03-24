@@ -8,6 +8,7 @@
 package org.dspace.app.rest.submit.step;
 
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
@@ -17,7 +18,6 @@ import org.dspace.app.rest.submit.factory.impl.PatchOperation;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.core.Context;
-import org.dspace.services.model.Request;
 
 /**
  * Collection step for DSpace Spring Rest. Expose the collection information of
@@ -28,14 +28,6 @@ import org.dspace.services.model.Request;
 public class CollectionStep implements AbstractRestProcessingStep {
 
     @Override
-    public void doPreProcessing(Context context, InProgressSubmission wsi) {
-    }
-
-    @Override
-    public void doPostProcessing(Context context, InProgressSubmission wsi) {
-    }
-
-    @Override
     public UUID getData(SubmissionService submissionService, InProgressSubmission obj, SubmissionStepConfig config) {
         if (obj.getCollection() != null) {
             return obj.getCollection().getID();
@@ -44,12 +36,10 @@ public class CollectionStep implements AbstractRestProcessingStep {
     }
 
     @Override
-    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op,
-                                  SubmissionStepConfig stepConf) throws Exception {
-
+    public void doPatchProcessing(Context context, HttpServletRequest currentRequest, InProgressSubmission source,
+            Operation op, SubmissionStepConfig stepConf) throws Exception {
         PatchOperation<String> patchOperation = new PatchOperationFactory()
             .instanceOf(COLLECTION_STEP_OPERATION_ENTRY, op.getOp());
         patchOperation.perform(context, currentRequest, source, op);
-
     }
 }

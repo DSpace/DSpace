@@ -9,6 +9,7 @@ package org.dspace.app.rest.submit.step;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -30,7 +31,6 @@ import org.dspace.content.InProgressSubmission;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
-import org.dspace.services.model.Request;
 import org.dspace.submit.AbstractProcessingStep;
 
 /**
@@ -122,8 +122,8 @@ public class DescribeStep extends AbstractProcessingStep implements AbstractRest
     }
 
     @Override
-    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op,
-                                  SubmissionStepConfig stepConf) throws Exception {
+    public void doPatchProcessing(Context context, HttpServletRequest currentRequest, InProgressSubmission source,
+            Operation op, SubmissionStepConfig stepConf) throws Exception {
 
         String[] pathParts = op.getPath().substring(1).split("/");
         DCInputSet inputConfig = inputReader.getInputsByFormName(stepConf.getId());

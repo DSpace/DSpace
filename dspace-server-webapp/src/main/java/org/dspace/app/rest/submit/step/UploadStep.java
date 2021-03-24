@@ -10,6 +10,7 @@ package org.dspace.app.rest.submit.step;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
@@ -32,7 +33,6 @@ import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.services.model.Request;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -64,8 +64,8 @@ public class UploadStep extends org.dspace.submit.step.UploadStep
     }
 
     @Override
-    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op,
-                                  SubmissionStepConfig stepConf) throws Exception {
+    public void doPatchProcessing(Context context, HttpServletRequest currentRequest, InProgressSubmission source,
+            Operation op, SubmissionStepConfig stepConf) throws Exception {
 
         String instance = null;
         if ("remove".equals(op.getOp())) {

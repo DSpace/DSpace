@@ -221,6 +221,21 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
                                                                   "config/submissionsections/traditionalpageone"))
                                            ))))
         ;
+        // the extract submission should NOT expose the backend only extract panel
+        getClient(token).perform(get("/api/config/submissiondefinitions/extractiontestprocess/sections")
+                .param("projection", "full"))
+                // The status has to be 200 OK
+                .andExpect(status().isOk())
+                // We expect the content type to be "application/hal+json;charset=UTF-8"
+                .andExpect(content().contentType(contentType))
+                // Match only that a section exists with a submission configuration behind
+                .andExpect(jsonPath("$._embedded.submissionsections", hasSize(6)))
+                .andExpect(jsonPath("$._embedded.submissionsections",
+                        Matchers.not(Matchers.hasItem(
+                                            hasJsonPath("$.id", is("extractionstep"))
+                                        ))))
+     ;
+
     }
 
     @Test
