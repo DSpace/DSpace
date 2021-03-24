@@ -41,6 +41,10 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
         criteriaQuery.select(relationshipRoot);
         if (excludeTilted) {
+            // If this item is the left item,
+            //    return relationships for types which are not tilted right (tilted is either left nor null)
+            // If this item is the right item,
+            //    return relationships for types which are not tilted left (tilted is either right nor null)
             criteriaQuery
                     .where(criteriaBuilder.or(
                             criteriaBuilder.and(
