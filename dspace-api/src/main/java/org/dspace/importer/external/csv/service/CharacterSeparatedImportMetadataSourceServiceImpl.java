@@ -39,7 +39,9 @@ public class CharacterSeparatedImportMetadataSourceServiceImpl extends AbstractP
 
     private char separator = ',';
 
-    private char escapeCharacter = '"';
+    private char quoteCharacter = '"';
+
+    private char escapeCharacter = '\\';
 
     private Integer skipLines = 1;
 
@@ -73,6 +75,26 @@ public class CharacterSeparatedImportMetadataSourceServiceImpl extends AbstractP
         this.separator = separator;
     }
 
+    /**
+     * Method to inject the escape character, usually ". This must be the ASCII integer
+     * related to the char.
+     * In example, 9 for tab, 44 for comma
+     *
+     */
+    public void setQuoteCharacter(char quoteCharacter) {
+        this.quoteCharacter = quoteCharacter;
+    }
+
+    /**
+     * Method to inject the escape character, usually \. This must be the ASCII integer
+     * related to the char.
+     * In example, 9 for tab, 44 for comma
+     * 
+     */
+    public void setEscapeCharacter(char escapeCharacter) {
+        this.escapeCharacter = escapeCharacter;
+    }
+
     @Override
     public String getImportSource() {
         return importSource;
@@ -85,15 +107,6 @@ public class CharacterSeparatedImportMetadataSourceServiceImpl extends AbstractP
         this.importSource = importSource;
     }
 
-    /**
-     * Method to inject the escape character. This must be the ASCII integer
-     * related to the char.
-     * In example, 9 for tab, 44 for comma
-     * 
-     */
-    public void setEscapeCharacter(char escapeCharacter) {
-        this.escapeCharacter = escapeCharacter;
-    }
 
     /**
      * The method process any kind of "character separated" files, like CSV, TSV, and so on.
@@ -113,7 +126,8 @@ public class CharacterSeparatedImportMetadataSourceServiceImpl extends AbstractP
     @Override
     protected List<PlainMetadataSourceDto> readData(InputStream inputStream) throws FileSourceException {
         List<PlainMetadataSourceDto> plainMetadataList = new ArrayList<>();
-        CSVParser parser = new CSVParserBuilder().withSeparator(separator).withEscapeChar(escapeCharacter).build();
+        CSVParser parser = new CSVParserBuilder().withSeparator(separator).withQuoteChar(quoteCharacter)
+                .withEscapeChar(escapeCharacter).build();
         try (
                 InputStreamReader inputReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
                 CSVReader csvReader = new CSVReaderBuilder(inputReader).withCSVParser(parser).build()) {
