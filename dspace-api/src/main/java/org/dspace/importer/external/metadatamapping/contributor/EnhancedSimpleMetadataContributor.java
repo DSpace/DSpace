@@ -8,15 +8,20 @@
 package org.dspace.importer.external.metadatamapping.contributor;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import au.com.bytecode.opencsv.CSVReader;
+import com.opencsv.CSVParser;
+import com.opencsv.CSVParserBuilder;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.exceptions.CsvException;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.dspace.importer.external.service.components.dto.PlainMetadataKeyValueItem;
 import org.dspace.importer.external.service.components.dto.PlainMetadataSourceDto;
+
 
 
 /**
@@ -94,10 +99,11 @@ public class EnhancedSimpleMetadataContributor extends SimpleMetadataContributor
         // For example, list of author must be: Author 1, author 2, author 3
         // if author name contains comma, is important to escape its in
         // this way: Author 1, \"Author 2, something\", Author 3
-        try (CSVReader csvReader = new CSVReader(new StringReader(value),
-            delimiter, escape);) {
+        CSVParser parser = new CSVParserBuilder().withSeparator(delimiter).withEscapeChar(escape).build();
+        try (   Reader inputReader = new StringReader(value);
+                com.opencsv.CSVReader csvReader = new CSVReaderBuilder(inputReader).withCSVParser(parser).build()) {
             rows = csvReader.readAll();
-        } catch (IOException e) {
+        } catch (IOException | CsvException e) {
             //fallback, use the inpu as value
             return new String[] { value };
         }
