@@ -15,7 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import au.com.bytecode.opencsv.CSVReader;
+import com.opencsv.CSVParser;
+import com.opencsv.CSVParserBuilder;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.exceptions.CsvException;
 import org.dspace.importer.external.exception.FileSourceException;
 import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
 import org.dspace.importer.external.metadatamapping.contributor.MetadataContributor;
@@ -23,7 +27,6 @@ import org.dspace.importer.external.service.components.AbstractPlainMetadataSour
 import org.dspace.importer.external.service.components.MetadataSource;
 import org.dspace.importer.external.service.components.dto.PlainMetadataKeyValueItem;
 import org.dspace.importer.external.service.components.dto.PlainMetadataSourceDto;
-
 
 /**
  * This class is an implementation of {@link MetadataSource} which extends {@link AbstractPlainMetadataSource}
@@ -110,8 +113,10 @@ public class CharacterSeparatedImportMetadataSourceServiceImpl extends AbstractP
     @Override
     protected List<PlainMetadataSourceDto> readData(InputStream inputStream) throws FileSourceException {
         List<PlainMetadataSourceDto> plainMetadataList = new ArrayList<>();
-        try (CSVReader csvReader = new CSVReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8),
-            separator, escapeCharacter);) {
+        CSVParser parser = new CSVParserBuilder().withSeparator(separator).withEscapeChar(escapeCharacter).build();
+        try (
+                InputStreamReader inputReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+                CSVReader csvReader = new CSVReaderBuilder(inputReader).withCSVParser(parser).build()) {
             // read all row
             List<String[]> lines = csvReader.readAll();
             int listSize = lines == null ? 0 : lines.size();
@@ -139,7 +144,7 @@ public class CharacterSeparatedImportMetadataSourceServiceImpl extends AbstractP
                 }
                 count++;
             }
-        } catch (IOException e) {
+        } catch (IOException | CsvException e) {
             throw new FileSourceException("Error reading file", e);
         }
         return plainMetadataList;
