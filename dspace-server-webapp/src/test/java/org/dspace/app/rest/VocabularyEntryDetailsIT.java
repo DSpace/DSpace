@@ -439,4 +439,19 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
           );
     }
 
+    @Test
+    public void vocabularyEntryDetailSerchMethodWithSingleModelTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/submission/vocabularyEntryDetail/search"))
+                             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void vocabularyEntryDetailSerchMethodWithPluralModelTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/submission/vocabularyEntryDetails/search"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._links.top.href", Matchers.allOf(
+                                 Matchers.containsString("/api/submission/vocabularyEntryDetails/search/top"))));
+    }
 }
