@@ -23,6 +23,7 @@ import org.dspace.app.rest.RestResourceController;
 })
 public class ClaimedTaskRest extends BaseObjectRest<Integer> {
     public static final String NAME = "claimedtask";
+    public static final String PLURAL_NAME = "claimedtasks";
     public static final String CATEGORY = RestAddressableModel.WORKFLOW;
 
     public static final String STEP = "step";

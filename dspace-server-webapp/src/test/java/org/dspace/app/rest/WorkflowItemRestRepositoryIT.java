@@ -1810,12 +1810,12 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                         .andExpect(jsonPath("$._links",Matchers.allOf(
                                 hasJsonPath("$.claimedtasks.href",
                                          is("http://localhost/api/workflow/claimedtasks")),
-                                hasJsonPath("$.claimedtask-search.href",
-                                         is("http://localhost/api/workflow/claimedtask/search")),
+                                hasJsonPath("$.claimedtasks-search.href",
+                                         is("http://localhost/api/workflow/claimedtasks/search")),
                                 hasJsonPath("$.pooltasks.href",
                                          is("http://localhost/api/workflow/pooltasks")),
-                                hasJsonPath("$.pooltask-search.href",
-                                         is("http://localhost/api/workflow/pooltask/search"))
+                                hasJsonPath("$.pooltasks-search.href",
+                                         is("http://localhost/api/workflow/pooltasks/search"))
                         )));
     }
 
