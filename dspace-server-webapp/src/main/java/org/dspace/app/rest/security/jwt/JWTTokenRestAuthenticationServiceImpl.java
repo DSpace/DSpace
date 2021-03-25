@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.wrapper.AuthenticationToken;
 import org.dspace.app.rest.security.DSpaceAuthentication;
 import org.dspace.app.rest.security.RestAuthenticationService;
+import org.dspace.app.rest.security.WebSecurityConfiguration;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authenticate.service.AuthenticationService;
@@ -34,6 +35,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseCookie;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.stereotype.Component;
 
 /**
@@ -64,6 +67,9 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     @Autowired
     private AuthenticationService authenticationService;
 
+    @Autowired
+    private WebSecurityConfiguration webSecurityConfiguration;
+
     @Override
     public void afterPropertiesSet() throws Exception {
 
@@ -80,9 +86,13 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
 
             String token = loginJWTTokenHandler.createTokenForEPerson(context, request,
                                                                  authentication.getPreviousLoginDate(), groups);
-
-            addTokenToResponse(response, token, addCookie);
             context.commit();
+
+            // Add newly generated auth token to the response
+            addTokenToResponse(response, token, addCookie);
+
+            // Reset our CSRF token, generating a new one
+            resetCSRFToken(request, response);
 
         } catch (JOSEException e) {
             log.error("JOSE Exception", e);
@@ -149,6 +159,9 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
         String token = getLoginToken(request);
         invalidateAuthenticationCookie(response);
         loginJWTTokenHandler.invalidateToken(token, request, context);
+
+        // Reset our CSRF token, generating a new one
+        resetCSRFToken(request, response);
     }
 
     @Override
@@ -252,6 +265,24 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
             }
         }
         return authCookie;
+    }
+
+    /**
+     * Force reset the CSRF Token, causing a new one to be generated.
+     * This method is used internally during login/logout to ensure a new CSRF token is generated anytime authentication
+     * information changes.
+     * @param request current request
+     * @param response current response
+     */
+    private void resetCSRFToken(HttpServletRequest request, HttpServletResponse response) {
+        // Get access to our enabled CSRF token repository
+        CsrfTokenRepository csrfTokenRepository = webSecurityConfiguration.getCsrfTokenRepository();
+
+        // Remove current CSRF token & generate a new one
+        // We do this as we want the token to change anytime you login or logout
+        csrfTokenRepository.saveToken(null, request, response);
+        CsrfToken newToken = csrfTokenRepository.generateToken(request);
+        csrfTokenRepository.saveToken(newToken, request, response);
     }
 
 }

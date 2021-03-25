@@ -29,6 +29,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -1127,9 +1129,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.turnOffAuthorisationSystem();
 
+        // Create a new EPerson and ensure canLogin is set to "false" initially
         EPerson ePerson = EPersonBuilder.createEPerson(context)
                                         .withNameInMetadata("John", "Doe")
                                         .withEmail("Johndoe@example.com")
+                                        .withCanLogin(false)
                                         .build();
 
         context.restoreAuthSystemState();
@@ -1148,7 +1152,12 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.canLogIn", Matchers.is(true)))
                         .andExpect(jsonPath("$.email", Matchers.is("johndoe@example.com")))
-                        .andExpect(jsonPath("$.netid", Matchers.nullValue()));
+                        .andExpect(jsonPath("$.netid", Matchers.nullValue()))
+                        // Verify CSRF token has NOT been changed (as neither the cookie nor header are sent back)
+                        // This is included in this single test as a simple proof that CSRF tokens don't change on
+                        // basic requests. Additional tests regarding CSRF tokens are in AuthenticationRestControllerIT
+                        .andExpect(cookie().doesNotExist("DSPACE-XSRF-COOKIE"))
+                        .andExpect(header().doesNotExist("DSPACE-XSRF-TOKEN"));
 
 
     }

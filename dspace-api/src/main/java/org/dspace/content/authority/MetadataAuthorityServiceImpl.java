@@ -83,11 +83,6 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
 
     }
 
-    @Override
-    public void reset() {
-        isAuthorityRequired = null;
-    }
-
     public void init() {
 
         if (isAuthorityRequired == null) {
@@ -226,5 +221,13 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
             copy.add(s.replaceAll("_", "."));
         }
         return copy;
+    }
+
+    @Override
+    public void clearCache() {
+        controlled.clear();
+        minConfidence.clear();
+
+        isAuthorityRequired = null;
     }
 }
