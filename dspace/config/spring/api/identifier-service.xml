@@ -49,17 +49,18 @@
     <bean id="org.dspace.identifier.doi.service.DOIFilterService"
          class="ar.edu.unlp.sedici.dspace.identifier.doi.service.DOIFilterServiceImpl"
          scope="singleton">
-         <property name="typeFilter">
-             <!-- Define a list of sub-tipologies values (sedici.subtype) used as a filter
-             for determine if the current item must be generated a DOI. 
-             Set this list EMPTY if you dont want to specify any filter...-->
-             <list>
-                 <value>Tesis de doctorado</value>
-                 <value>Tesis de maestria</value>
-                 <!--<value>Libro</value>-->
-             </list>
-         </property>
+         <property name="mainFilter" ref="DOIMainFilter"/>
      </bean>
+     
+    <!-- Tendria que ser prototype este bean?? -->
+     <bean name="DOIMainFilter" class="ar.edu.unlp.sedici.dspace.identifier.doi.filters.HasSingleMetadataFilter">
+       <property name="metadata">
+           <bean class="ar.edu.unlp.sedici.dspace.identifier.doi.filters.MetadataComponentFilter">
+               <property name="metadataName" value="sedici.subtype"/>
+               <property name="valueRegexFilter" value="Tesis de doctorado|Tesis de maestria"/>
+           </bean>
+       </property>
+    </bean>
     
     <!-- The DOIConnector will handle the API calls to your DOI registration
          agency for the DOIIdentifierProvider. If your registration agency
