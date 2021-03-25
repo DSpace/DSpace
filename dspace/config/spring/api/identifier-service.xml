@@ -42,17 +42,24 @@
             ref="org.dspace.services.ConfigurationService" />
         <property name="DOIConnector"
             ref="org.dspace.identifier.doi.DOIConnector" />
-        <property name="typeFilter">
-            <!-- Define a list of sub-tipologies values (sedici.subtype) used as a filter
-            for determine if the current item must be generated a DOI. 
-            Set this list EMPTY if you dont want to specify any filter...-->
-            <list>
-                <value>Tesis de doctorado</value>
-                <value>Tesis de maestria</value>
-                <!--<value>Libro</value>-->
-            </list>
-        </property>
+        <property name="doiFilterService"
+            ref="org.dspace.identifier.doi.service.DOIFilterService"/>
     </bean>
+    
+    <bean id="org.dspace.identifier.doi.service.DOIFilterService"
+         class="ar.edu.unlp.sedici.dspace.identifier.doi.service.DOIFilterServiceImpl"
+         scope="singleton">
+         <property name="typeFilter">
+             <!-- Define a list of sub-tipologies values (sedici.subtype) used as a filter
+             for determine if the current item must be generated a DOI. 
+             Set this list EMPTY if you dont want to specify any filter...-->
+             <list>
+                 <value>Tesis de doctorado</value>
+                 <value>Tesis de maestria</value>
+                 <!--<value>Libro</value>-->
+             </list>
+         </property>
+     </bean>
     
     <!-- The DOIConnector will handle the API calls to your DOI registration
          agency for the DOIIdentifierProvider. If your registration agency

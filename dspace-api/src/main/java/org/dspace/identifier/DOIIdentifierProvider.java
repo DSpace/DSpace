@@ -20,6 +20,7 @@ import org.dspace.content.MetadataSchema;
 import org.dspace.core.Context;
 import org.dspace.identifier.doi.DOIConnector;
 import org.dspace.identifier.doi.DOIIdentifierException;
+import org.dspace.identifier.doi.service.DOIFilterService;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.slf4j.Logger;
@@ -57,12 +58,9 @@ public class DOIIdentifierProvider
      * DSpace items.
      */
     private DOIConnector connector;
-    /**
-     * List containing values of sub-tipologies (sedici.subtype) used to determine for what items 
-     * the DOI provider must generate doi's. Configure this at "identifier-service" configuration file.
-     */
-    protected List<String> typeFilter;
     
+    protected DOIFilterService doiFilterService;
+
     static final String CFG_PREFIX = "identifier.doi.prefix";
     static final String CFG_NAMESPACE_SEPARATOR = "identifier.doi.namespaceseparator";
         
@@ -131,8 +129,8 @@ public class DOIIdentifierProvider
     }
     
     @Required
-    public void setTypeFilter(List<String> typeFilterList) {
-        this.typeFilter = typeFilterList;
+    public void setdoiFilterService(DOIFilterService doiFilterService) {
+        this.doiFilterService = doiFilterService;
     }
 
     /**
@@ -177,7 +175,7 @@ public class DOIIdentifierProvider
             throws IdentifierException
     {
         // Solo registrar el item si cumple ciertas condiciones
-        if (!isEligibleDSO(dso)) {
+        if (!doiFilterService.isEligibleDSO(dso)) {
             log.info("Couldn't register doi for DSO with handle " + dso.getHandle()
                     + ", the DSO does not meet the conditions that the repository imposes to have doi");
             return null;
@@ -189,34 +187,13 @@ public class DOIIdentifierProvider
         return doi;
     }
 
-    /**
-     * Determine if DSO is eligible for register at DOI connector registration agency. It is determined 
-     * based on the check of different filters conditions.
-     * @param dso
-     * @return false if the item does not apply any filters conditions. Else, return true.
-     */
-    public boolean isEligibleDSO(DSpaceObject dso) {
-        if(this.typeFilter != null && this.typeFilter.size() > 0) {
-            Metadatum[] metadataList = dso.getMetadata("sedici", "subtype", null, Item.ANY);
-	        for (String subtipology : typeFilter) {
-                for (Metadatum mdt : metadataList) {
-                    if (mdt.value.equalsIgnoreCase(subtipology)) {
-                        return true;
-                    }
-                }
-            }
-	        //If no filter is triggered, then this item must not be approved for DOI generation.
-	        return false;
-	    }
-	    return true;
-    }
 
     @Override
     public void register(Context context, DSpaceObject dso, String identifier)
             throws IdentifierException
     {
         // Solo registrar el item si cumple ciertas condiciones
-        if (!isEligibleDSO(dso)) {
+        if (!doiFilterService.isEligibleDSO(dso)) {
             log.info("Couldn't register doi for DSO with handle " + dso.getHandle()
                     + ", the DSO does not meet the conditions that the repository imposes to have doi");
             return;
