@@ -475,6 +475,37 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>de.digitalcollections.iiif</groupId>
+            <artifactId>iiif-apis</artifactId>
+            <version>0.3.7</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.reflections</groupId>
+                    <artifactId>reflections</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.datatype</groupId>
+                    <artifactId>jackson-datatype-jsr310</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.security</groupId>
+                    <artifactId>spring-security-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.dmfs</groupId>
+                    <artifactId>iterators</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.module</groupId>
+                    <artifactId>jackson-module-parameter-names</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.datatype</groupId>
+                    <artifactId>jackson-datatype-jsr310</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-cell</artifactId>
             <scope>test</scope>
