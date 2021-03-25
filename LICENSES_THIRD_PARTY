@@ -395,6 +395,7 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
         * JUL to SLF4J bridge (org.slf4j:jul-to-slf4j:1.7.14 - http://www.slf4j.org)
         * SLF4J API Module (org.slf4j:slf4j-api:1.7.14 - http://www.slf4j.org)
         * SLF4J LOG4J-12 Binding (org.slf4j:slf4j-log4j12:1.7.14 - http://www.slf4j.org)
+        * iiif-apis (de.digitalcollections.iiif:iiif-apis:0.3.9 - https://github.com/dbmdz/iiif-apis)
 
     Mozilla Public License:
 
