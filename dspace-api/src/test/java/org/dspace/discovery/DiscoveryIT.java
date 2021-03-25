@@ -284,7 +284,7 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
     @Test
     public void solrRecordFromMessyItemTest() throws Exception {
         configurationService.setProperty("authority.controlled.dc.subject", "true");
-        metadataAuthorityService.reset();
+        metadataAuthorityService.clearCache();
         try {
             context.turnOffAuthorisationSystem();
 
@@ -293,6 +293,12 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
 
             Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
                                                .withName("Collection 1").build();
+
+            context.restoreAuthSystemState();
+
+            assertSearchQuery(IndexableItem.TYPE, 0);
+
+            context.turnOffAuthorisationSystem();
 
            ItemBuilder.createItem(context, col1)
                       .withTitle("Public item 1")
@@ -305,7 +311,7 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
             assertSearchQuery(IndexableItem.TYPE, 1);
         } finally {
             configurationService.setProperty("authority.controlled.dc.subject", "false");
-            metadataAuthorityService.reset();
+            metadataAuthorityService.clearCache();
         }
 
     }
