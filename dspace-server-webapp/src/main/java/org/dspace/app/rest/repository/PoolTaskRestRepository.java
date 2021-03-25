@@ -130,8 +130,8 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
     @Override
     public void afterPropertiesSet() throws Exception {
         discoverableEndpointsService.register(this, Arrays.asList(
-                new Link("/api/" + PoolTaskRest.CATEGORY + "/" + PoolTaskRest.NAME + "/search",
-                        PoolTaskRest.NAME + "-search")));
+                new Link("/api/" + PoolTaskRest.CATEGORY + "/" + PoolTaskRest.PLURAL_NAME + "/search",
+                        PoolTaskRest.PLURAL_NAME + "-search")));
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
