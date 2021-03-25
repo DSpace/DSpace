@@ -145,7 +145,8 @@ public class LDAPAuthentication
             if (context.getCurrentUser() == null) {
                 return Collections.EMPTY_LIST;
             }
-            // if the logged in user does not have a netid, it's not an LDAP user and this method should return an empty list
+            // if the logged in user does not have a netid, it's not an LDAP user
+            // and this method should return an empty list
             if (context.getCurrentUser().getNetid() == null) {
                 return Collections.EMPTY_LIST;
             }
