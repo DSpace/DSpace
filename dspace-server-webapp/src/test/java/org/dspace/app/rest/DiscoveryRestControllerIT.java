@@ -43,6 +43,7 @@ import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.PoolTaskBuilder;
 import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Bitstream;
@@ -5067,4 +5068,163 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 ))
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
     }
+
+    @Test
+    public void discoverSearchPoolTaskObjectsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+
+        EPerson reviewer = EPersonBuilder.createEPerson(context)
+                                          .withEmail("reviewer1@example.com")
+                                          .withPassword(password).build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .withWorkflowGroup(1, reviewer, admin).build();
+
+        ItemBuilder.createItem(context, col)
+                   .withTitle("Punnett square")
+                   .withIssueDate("2016-02-13")
+                   .withAuthor("Bandola, Roman")
+                   .withSubject("ExtraEntry").build();
+
+        // create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                                          .withEmail("submitter@example.com")
+                                          .withPassword(password).build();
+
+        context.setCurrentUser(submitter);
+
+        PoolTaskBuilder.createPoolTask(context, col, reviewer)
+                       .withTitle("Metaphysics")
+                       .withIssueDate("2017-10-17")
+                       .withAuthor("Smith, Donald")
+                       .withSubject("ExtraEntry").build();
+
+        PoolTaskBuilder.createPoolTask(context, col, reviewer)
+                       .withTitle("Mathematical Theory")
+                       .withIssueDate("2020-01-19")
+                       .withAuthor("Tommaso, Gattari")
+                       .withSubject("ExtraEntry").build();
+
+        PoolTaskBuilder.createPoolTask(context, col, reviewer)
+                       .withTitle("Test Metaphysics")
+                       .withIssueDate("2017-10-17")
+                       .withAuthor("Smith, Donald")
+                       .withSubject("ExtraEntry").build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(adminToken).perform(get("/api/discover/search/objects")
+                             .param("configuration", "workflow")
+                             .param("sort", "dc.date.issued,DESC")
+                             .param("query", "Mathematical Theory"))
+                         .andExpect(status().isOk())
+                         .andExpect(jsonPath("$.query", is("Mathematical Theory")))
+                         .andExpect(jsonPath("$.configuration", is("workflow")))
+                         .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.contains(
+                                             SearchResultMatcher.match("workflow", "pooltask", "pooltasks")
+                          )))
+                         .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",Matchers.contains(
+                              allOf(hasJsonPath("$._embedded.indexableObject._embedded.workflowitem._embedded.item",
+                                 is(SearchResultMatcher.matchEmbeddedObjectOnItemName("item", "Mathematical Theory"))))
+                          )))
+                         .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(1)));
+
+        getClient(adminToken).perform(get("/api/discover/search/objects")
+                             .param("configuration", "workflow")
+                             .param("sort", "dc.date.issued,DESC")
+                             .param("query", "Metaphysics"))
+                         .andExpect(status().isOk())
+                         .andExpect(jsonPath("$.query", is("Metaphysics")))
+                         .andExpect(jsonPath("$.configuration", is("workflow")))
+                         .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                                             SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
+                                             SearchResultMatcher.match("workflow", "pooltask", "pooltasks")
+                                             )))
+                         .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",Matchers.containsInAnyOrder(
+                              allOf(hasJsonPath("$._embedded.indexableObject._embedded.workflowitem._embedded.item",
+                                 is(SearchResultMatcher.matchEmbeddedObjectOnItemName("item", "Metaphysics")))),
+                              allOf(hasJsonPath("$._embedded.indexableObject._embedded.workflowitem._embedded.item",
+                                 is(SearchResultMatcher.matchEmbeddedObjectOnItemName("item", "Test Metaphysics"))))
+                          )))
+                         .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(2)));
+    }
+
+    @Test
+    public void discoverSearchPoolTaskObjectsEmptyQueryTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+
+        EPerson reviewer = EPersonBuilder.createEPerson(context)
+                                          .withEmail("reviewer1@example.com")
+                                          .withPassword(password).build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .withWorkflowGroup(1, reviewer, admin).build();
+
+        ItemBuilder.createItem(context, col)
+                   .withTitle("Punnett square")
+                   .withIssueDate("2016-02-13")
+                   .withAuthor("Bandola, Roman")
+                   .withSubject("ExtraEntry").build();
+
+        // create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                                          .withEmail("submitter@example.com")
+                                          .withPassword(password).build();
+
+        context.setCurrentUser(submitter);
+
+        PoolTaskBuilder.createPoolTask(context, col, reviewer)
+                       .withTitle("Metaphysics")
+                       .withIssueDate("2017-10-17")
+                       .withAuthor("Smith, Donald")
+                       .withSubject("ExtraEntry").build();
+
+        PoolTaskBuilder.createPoolTask(context, col, reviewer)
+                       .withTitle("Mathematical Theory")
+                       .withIssueDate("2020-01-19")
+                       .withAuthor("Tommaso, Gattari")
+                       .withSubject("ExtraEntry").build();
+
+        PoolTaskBuilder.createPoolTask(context, col, reviewer)
+                       .withTitle("Test Metaphysics")
+                       .withIssueDate("2017-10-17")
+                       .withAuthor("Smith, Donald")
+                       .withSubject("ExtraEntry").build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(adminToken).perform(get("/api/discover/search/objects")
+                             .param("configuration", "workflow")
+                             .param("sort", "dc.date.issued,DESC")
+                             .param("query", ""))
+                         .andExpect(status().isOk())
+                         .andExpect(jsonPath("$.configuration", is("workflow")))
+                         .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                                             SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
+                                             SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
+                                             SearchResultMatcher.match("workflow", "pooltask", "pooltasks")
+                                             )))
+                         .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",Matchers.containsInAnyOrder(
+                              allOf(hasJsonPath("$._embedded.indexableObject._embedded.workflowitem._embedded.item",
+                                 is(SearchResultMatcher.matchEmbeddedObjectOnItemName("item", "Mathematical Theory")))),
+                              allOf(hasJsonPath("$._embedded.indexableObject._embedded.workflowitem._embedded.item",
+                                 is(SearchResultMatcher.matchEmbeddedObjectOnItemName("item", "Metaphysics")))),
+                              allOf(hasJsonPath("$._embedded.indexableObject._embedded.workflowitem._embedded.item",
+                                 is(SearchResultMatcher.matchEmbeddedObjectOnItemName("item", "Test Metaphysics"))))
+                          )))
+                         .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(3)));
+    }
+
 }
