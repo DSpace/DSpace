@@ -56,13 +56,13 @@ public class ManifestGenerator implements IIIFResource {
     private List<Range> ranges = new ArrayList<>();
 
     @Autowired
-    org.dspace.app.rest.iiif.model.generator.PropertyValueGenerator propertyValue;
+    PropertyValueGenerator propertyValue;
 
     @Autowired
-    org.dspace.app.rest.iiif.model.generator.MetadataEntryGenerator metadataEntry;
+    MetadataEntryGenerator metadataEntryGenerator;
 
     @Autowired
-    BehaviorGenerator behaviorFascade;
+    BehaviorGenerator behaviorGenerator;
 
     /**
      * Sets the mandatory Manifest ID.
@@ -86,8 +86,8 @@ public class ManifestGenerator implements IIIFResource {
      * @param viewingHint
      */
     public void addViewingHint(String viewingHint) {
-        behaviorFascade.setType(viewingHint);
-        this.viewingHint = behaviorFascade.getValue();
+        behaviorGenerator.setType(viewingHint);
+        this.viewingHint = behaviorGenerator.getValue();
     }
 
     /**
@@ -137,9 +137,9 @@ public class ManifestGenerator implements IIIFResource {
      * @param value
      */
     public void addMetadata(String field, String value) {
-        metadataEntry.setField(field);
-        metadataEntry.setValue(value);
-        metadata.add(metadataEntry.getValue());
+        metadataEntryGenerator.setField(field);
+        metadataEntryGenerator.setValue(value);
+        metadata.add(metadataEntryGenerator.getValue());
     }
 
     /**
