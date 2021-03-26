@@ -78,7 +78,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
 
     @Override
     public boolean supports(String identifier) {
-        return handleService.formatHandle(identifier) != null;
+        return handleService.parseHandle(identifier) != null;
     }
 
     @Override
@@ -284,7 +284,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
     public DSpaceObject resolve(Context context, String identifier, String... attributes) {
         // We can do nothing with this, return null
         try {
-            identifier = handleService.formatHandle(identifier);
+            identifier = handleService.parseHandle(identifier);
             return handleService.resolveToObject(context, identifier);
         } catch (IllegalStateException | SQLException e) {
             log.error(LogManager.getHeader(context, "Error while resolving handle to item", "handle: " + identifier),

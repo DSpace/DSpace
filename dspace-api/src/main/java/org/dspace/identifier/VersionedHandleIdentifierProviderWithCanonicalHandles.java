@@ -72,7 +72,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
 
     @Override
     public boolean supports(String identifier) {
-        return handleService.formatHandle(identifier) != null;
+        return handleService.parseHandle(identifier) != null;
     }
 
     @Override
