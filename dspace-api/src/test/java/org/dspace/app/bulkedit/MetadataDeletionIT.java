@@ -81,6 +81,8 @@ public class MetadataDeletionIT extends AbstractIntegrationTestWithDatabase {
     @Test
     public void metadataDeletionListWithoutErasableMetadataTest() throws Exception {
 
+        configurationService.setProperty("bulkedit.allow-bulk-deletion", null);
+
         TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
 
         String[] args = new String[] { "metadata-deletion", "-l" };
