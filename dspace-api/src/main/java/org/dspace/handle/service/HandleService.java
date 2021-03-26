@@ -191,5 +191,5 @@ public interface HandleService {
      * @param identifier
      * @return
      */
-    String formatHandle(String identifier);
+    String parseHandle(String identifier);
 }

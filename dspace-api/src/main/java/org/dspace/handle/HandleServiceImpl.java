@@ -386,7 +386,8 @@ public class HandleServiceImpl implements HandleService {
         return handleDAO.countRows(context);
     }
 
-    public String formatHandle(String identifier) {
+    @Override
+    public String parseHandle(String identifier) {
         if (identifier == null) {
             return null;
         }
