@@ -15,7 +15,6 @@ import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.authorize.service.AuthorizeSolrService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -36,8 +35,6 @@ public class ManageGroupsFeature implements AuthorizationFeature {
 
     @Autowired
     private AuthorizeService authorizeService;
-    @Autowired
-    private AuthorizeSolrService authorizeSolrService;
 
     @Override
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
@@ -48,7 +45,7 @@ public class ManageGroupsFeature implements AuthorizationFeature {
 
             if ((AuthorizeConfiguration.canCommunityAdminManagePolicies() ||
                 AuthorizeConfiguration.canCommunityAdminManageAdminGroup()) &&
-                authorizeSolrService.isCommunityAdmin(context)) {
+                authorizeService.isCommunityAdminSolr(context)) {
                 return true;
             }
 
@@ -57,7 +54,7 @@ public class ManageGroupsFeature implements AuthorizationFeature {
                     AuthorizeConfiguration.canCommunityAdminManageCollectionSubmitters() ||
                     AuthorizeConfiguration.canCommunityAdminManageCollectionWorkflows() ||
                     AuthorizeConfiguration.canCommunityAdminManageCollectionAdminGroup())
-                    && authorizeSolrService.isCollectionAdmin(context)) {
+                    && authorizeService.isCollectionAdminSolr(context)) {
                 return true;
             }
         }

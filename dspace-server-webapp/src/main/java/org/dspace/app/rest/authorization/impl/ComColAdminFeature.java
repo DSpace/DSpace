@@ -14,7 +14,6 @@ import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.authorize.service.AuthorizeSolrService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -35,8 +34,6 @@ public class ComColAdminFeature implements AuthorizationFeature {
 
     @Autowired
     private AuthorizeService authorizeService;
-    @Autowired
-    private AuthorizeSolrService authorizeSolrService;
 
     @Override
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
@@ -45,7 +42,7 @@ public class ComColAdminFeature implements AuthorizationFeature {
                 return true;
             }
 
-            return authorizeSolrService.isComColAdmin(context);
+            return authorizeService.isComColAdmin(context);
         }
         return false;
     }
