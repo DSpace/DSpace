@@ -38,7 +38,6 @@ import org.dspace.app.rest.utils.CollectionRestEqualityUtils;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.authorize.service.AuthorizeSolrService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -115,9 +114,6 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
 
     @Autowired
     SearchService searchService;
-
-    @Autowired
-    private AuthorizeSolrService authorizeSolrService;
 
     public CollectionRestRepository(CollectionService dsoService) {
         super(dsoService);
@@ -204,15 +200,16 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         }
     }
 
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @SearchRestMethod(name = "findAdminAuthorized")
     public Page<CollectionRest> findAdminAuthorized (
         Pageable pageable, @Parameter(value = "query") String query) {
         try {
             Context context = obtainContext();
-            List<Collection> collections = authorizeSolrService.findAdminAuthorizedCollection(context, query,
+            List<Collection> collections = authorizeService.findAdminAuthorizedCollection(context, query,
                 Math.toIntExact(pageable.getOffset()),
                 Math.toIntExact(pageable.getPageSize()));
-            Long tot = authorizeSolrService.countAdminAuthorizedCollection(context, query);
+            Long tot = authorizeService.countAdminAuthorizedCollection(context, query);
             return converter.toRestPage(collections, pageable, tot , utils.obtainProjection());
         } catch (SearchServiceException | SQLException e) {
             throw new RuntimeException(e.getMessage(), e);

@@ -2916,4 +2916,11 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections").doesNotExist());
     }
+
+    @Test
+    public void testAdminAuthorizedSearchUnauthenticated() throws Exception {
+        // Verify a non-authenticated user can't use this function
+        getClient().perform(get("/api/core/collections/search/findAdminAuthorized"))
+            .andExpect(status().isUnauthorized());
+    }
 }

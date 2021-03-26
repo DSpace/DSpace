@@ -2443,4 +2443,11 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.communities").doesNotExist());
     }
+
+    @Test
+    public void testAdminAuthorizedSearchUnauthenticated() throws Exception {
+        // Verify a non-authenticated user can't use this function
+        getClient().perform(get("/api/core/communities/search/findAdminAuthorized"))
+            .andExpect(status().isUnauthorized());
+    }
 }

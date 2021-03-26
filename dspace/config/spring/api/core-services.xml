@@ -27,7 +27,6 @@
 
     <bean class="org.dspace.authorize.AuthorizeServiceImpl"/>
     <bean class="org.dspace.authorize.ResourcePolicyServiceImpl"/>
-    <bean class="org.dspace.authorize.AuthorizeSolrServiceImpl"/>
 
     <bean class="org.dspace.authority.AuthorityValueServiceImpl"/>
     <bean class="org.dspace.authority.AuthorityServiceImpl"/>
