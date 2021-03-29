@@ -44,7 +44,6 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.eperson.service.GroupService;
 import org.dspace.scripts.service.ProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -70,9 +69,6 @@ public class ProcessServiceImpl implements ProcessService {
     @Autowired
     private MetadataFieldService metadataFieldService;
 
-    @Autowired
-    private GroupService groupService;
-
     @Override
     public Process create(Context context, EPerson ePerson, String scriptName,
                           List<DSpaceCommandLineParameter> parameters) throws SQLException {
@@ -82,20 +78,15 @@ public class ProcessServiceImpl implements ProcessService {
         process.setName(scriptName);
         process.setParameters(DSpaceCommandLineParameter.concatenate(parameters));
         process.setCreationTime(new Date());
-        addMembersGroup(ePerson, context, process);
+        for (Group group : context.getSpecialGroups()) {
+            process.addGroup(group);
+        }
         Process createdProcess = processDAO.create(context, process);
         log.info(LogManager.getHeader(context, "process_create",
                                       "Process has been created for eperson with email " + ePerson.getEmail()
                                           + " with ID " + createdProcess.getID() + " and scriptName " +
                                           scriptName + " and parameters " + parameters));
         return createdProcess;
-    }
-
-    private void addMembersGroup(EPerson ePerson, Context context, Process process) throws SQLException {
-        List<Group> groups = groupService.allMemberGroups(context, ePerson);
-        for (Group group : groups) {
-            process.addGroup(group);
-        }
     }
 
     @Override

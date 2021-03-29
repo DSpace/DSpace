@@ -58,6 +58,7 @@ public class UpdateCrisMetricsInSolrDoc extends
     @Override
     public void internalRun() throws Exception {
         assignCurrentUserInContext();
+        assignSpecialGroupsInContext();
         try {
             performUpdate(context);
             context.complete();
@@ -95,4 +96,11 @@ public class UpdateCrisMetricsInSolrDoc extends
             context.setCurrentUser(ePerson);
         }
     }
+
+    private void assignSpecialGroupsInContext() throws SQLException {
+        for (UUID uuid : handler.getSpecialGroups()) {
+            context.setSpecialGroup(uuid);
+        }
+    }
+
 }

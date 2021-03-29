@@ -187,7 +187,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         context = new Context();
         context.setMode(Context.Mode.BATCH_EDIT);
         assignCurrentUserInContext();
-
+        assignSpecialGroupsInContext();
         //FIXME: see https://4science.atlassian.net/browse/CSTPER-236 for final solution
 
         context.turnOffAuthorisationSystem();
@@ -927,6 +927,12 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         if (uuid != null) {
             EPerson ePerson = EPersonServiceFactory.getInstance().getEPersonService().find(context, uuid);
             context.setCurrentUser(ePerson);
+        }
+    }
+
+    private void assignSpecialGroupsInContext() throws SQLException {
+        for (UUID uuid : handler.getSpecialGroups()) {
+            context.setSpecialGroup(uuid);
         }
     }
 
