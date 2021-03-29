@@ -24,6 +24,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.dspace.app.rest.iiif.model.generator.AnnotationGenerator;
 import org.dspace.app.rest.iiif.model.generator.CanvasGenerator;
 import org.dspace.app.rest.iiif.model.generator.ContentAsTextGenerator;
@@ -41,6 +42,8 @@ import org.springframework.web.context.annotation.RequestScope;
 @Component
 @RequestScope
 public class SearchService extends AbstractResourceService {
+
+    private static final Logger log = Logger.getLogger(SearchService.class);
 
     @Autowired
     IIIFUtils utils;
@@ -84,7 +87,7 @@ public class SearchService extends AbstractResourceService {
      */
     private String getSolrSearchResponse(URL url) {
         InputStream jsonStream;
-        String json = null;
+        String json;
         try {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
@@ -92,7 +95,7 @@ public class SearchService extends AbstractResourceService {
             jsonStream = connection.getInputStream();
             json = IOUtils.toString(jsonStream, StandardCharsets.UTF_8);
         } catch (IOException e)  {
-            e.printStackTrace();
+            throw new RuntimeException("Unable to query solr at: " + url, e);
         }
         return json;
     }
@@ -114,8 +117,11 @@ public class SearchService extends AbstractResourceService {
                 "&hl.ocr.contextBlock=line" +
                 "&hl.ocr.contextSize=2" +
                 "&hl.snippets=10" +
-                "&hl.ocr.limitBlock=page" +
+                // "&hl.ocr.limitBlock=page" +
                 "&hl.ocr.absoluteHighlights=true";
+
+        log.debug(fullQuery);
+
         try {
             URL url = new URL(fullQuery);
             return url;
