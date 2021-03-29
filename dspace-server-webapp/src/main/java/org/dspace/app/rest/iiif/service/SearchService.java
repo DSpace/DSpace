@@ -8,10 +8,6 @@
 package org.dspace.app.rest.iiif.service;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -21,10 +17,18 @@ import java.util.UUID;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.impl.NoOpResponseParser;
+import org.apache.solr.client.solrj.request.QueryRequest;
+import org.apache.solr.common.params.CommonParams;
+import org.apache.solr.common.util.NamedList;
 import org.dspace.app.rest.iiif.model.generator.AnnotationGenerator;
 import org.dspace.app.rest.iiif.model.generator.CanvasGenerator;
 import org.dspace.app.rest.iiif.model.generator.ContentAsTextGenerator;
@@ -32,6 +36,7 @@ import org.dspace.app.rest.iiif.model.generator.ManifestGenerator;
 import org.dspace.app.rest.iiif.model.generator.SearchResultGenerator;
 import org.dspace.app.rest.iiif.service.util.IIIFUtils;
 import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
@@ -44,6 +49,8 @@ import org.springframework.web.context.annotation.RequestScope;
 public class SearchService extends AbstractResourceService {
 
     private static final Logger log = Logger.getLogger(SearchService.class);
+
+    private final boolean validationEnabled;
 
     @Autowired
     IIIFUtils utils;
@@ -65,38 +72,53 @@ public class SearchService extends AbstractResourceService {
 
     public SearchService(ConfigurationService configurationService) {
         setConfiguration(configurationService);
+        validationEnabled = configurationService
+                .getBooleanProperty("discovery.solr.url.validation.enabled", true);
     }
 
     /**
      * Executes a search that is scoped to the manifest.
      *
-     * @param uuid the IIIF manifest uuid
+     * @param uuid dspace item uuid
      * @param query the solr query
      * @return IIIF json
      */
     public String searchWithinManifest(UUID uuid, String query) {
         String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
-        String json = getSolrSearchResponse(createSearchUrl(encodedQuery, getManifestId(uuid)));
+        String json = getSolrSearchResponse(encodedQuery, getManifestId(uuid));
         return getAnnotationList(json, uuid, encodedQuery);
     }
 
     /**
      * Executes the Search API solr query.
-     * @param url solr query url
+     * @param encodedQuery encoded query terms
+     * @param manifestId the iiif manifest id
+     *
      * @return json query response
      */
-    private String getSolrSearchResponse(URL url) {
-        InputStream jsonStream;
-        String json;
-        try {
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("Accept", "application/json");
-            jsonStream = connection.getInputStream();
-            json = IOUtils.toString(jsonStream, StandardCharsets.UTF_8);
-        } catch (IOException e)  {
-            throw new RuntimeException("Unable to query solr at: " + url, e);
+    private String getSolrSearchResponse(String encodedQuery, String manifestId) {
+        String json = "";
+        String solrService = DSpaceServicesFactory.getInstance().getConfigurationService()
+                .getProperty("iiif.solr.search.url");
+        UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS);
+        if (urlValidator.isValid(solrService) || this.validationEnabled) {
+            HttpSolrClient solrServer = new HttpSolrClient.Builder(solrService).build();
+            solrServer.setBaseURL(solrService);
+            solrServer.setUseMultiPartPost(true);
+            SolrQuery solrQuery = getSolrQuery(encodedQuery, manifestId);
+            QueryRequest req = new QueryRequest(solrQuery);
+            req.setResponseParser(new NoOpResponseParser("json"));
+            NamedList<Object> resp = null;
+            try {
+                resp = solrServer.request(req);
+                json =  (String) resp.get("response");
+            } catch (SolrServerException | IOException e) {
+                throw new RuntimeException("Unable to retrieve search response.", e);
+            }
+        } else {
+            log.error("Error while initializing solr, invalid url: " + solrService);
         }
+
         return json;
     }
 
@@ -107,27 +129,20 @@ public class SearchService extends AbstractResourceService {
      * @param manifestId the id of the manifest in which to search
      * @return solr query
      */
-    private URL createSearchUrl(String encodedQuery, String manifestId) {
+    private SolrQuery getSolrQuery(String encodedQuery, String manifestId) {
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setQuery("ocr_text:" + encodedQuery +
+                " AND manifest_url:\"" + manifestId + "\"");
+        solrQuery.set(CommonParams.WT, "json");
+        solrQuery.set("hl", "true");
+        solrQuery.set("hl.ocr.fl", "ocr_text");
+        solrQuery.set("hl.ocr.contextBlock", "line");
+        solrQuery.set("hl.ocr.contextSize", "2");
+        solrQuery.set("hl.snippets", "10");
+        solrQuery.set("hl.ocr.limitBlock","page");
+        solrQuery.set("hl.ocr.absoluteHighlights", "true");
 
-        String fullQuery = SEARCH_URL + "/select?" +
-                "q=ocr_text:\"" + encodedQuery +
-                "\"%20AND%20manifest_url:\"" + manifestId + "\"" +
-                "&hl=true" +
-                "&hl.ocr.fl=ocr_text" +
-                "&hl.ocr.contextBlock=line" +
-                "&hl.ocr.contextSize=2" +
-                "&hl.snippets=10" +
-                // "&hl.ocr.limitBlock=page" +
-                "&hl.ocr.absoluteHighlights=true";
-
-        log.debug(fullQuery);
-
-        try {
-            URL url = new URL(fullQuery);
-            return url;
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Malformed query URL", e);
-        }
+        return solrQuery;
     }
 
     /**
@@ -154,6 +169,10 @@ public class SearchService extends AbstractResourceService {
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
         JsonObject body = gson.fromJson(json, JsonObject.class);
+        if (body == null) {
+            log.warn("Unable to process json response.");
+            return utils.asJson(searchResult.getResource());
+        }
         // outer ocr highlight element
         JsonObject highs = body.getAsJsonObject("ocrHighlighting");
         // highlight entries
@@ -163,20 +182,10 @@ public class SearchService extends AbstractResourceService {
             // snippets array
             if (ocrObj != null) {
                 for (JsonElement snippetArray : ocrObj.getAsJsonObject().get("snippets").getAsJsonArray()) {
+                    String pageId = getCanvasId(snippetArray.getAsJsonObject().get("pages"));
                     for (JsonElement highlights : snippetArray.getAsJsonObject().getAsJsonArray("highlights")) {
                         for (JsonElement highlight : highlights.getAsJsonArray()) {
-                            JsonObject hcoords = highlight.getAsJsonObject();
-                            String text = (hcoords.get("text").getAsString());
-                            String pageId = getCanvasId((hcoords.get("page").getAsString()));
-                            Integer ulx = hcoords.get("ulx").getAsInt();
-                            Integer uly = hcoords.get("uly").getAsInt();
-                            Integer lrx = hcoords.get("lrx").getAsInt();
-                            Integer lry = hcoords.get("lry").getAsInt();
-                            String w = Integer.toString(lrx - ulx);
-                            String h = Integer.toString(lry - uly);
-                            String params = ulx + "," + uly + "," + w + "," + h;
-                            AnnotationGenerator annot = createSearchResultAnnotation(params, text, pageId, uuid);
-                            searchResult.addResource(annot);
+                            searchResult.addResource(getAnnotation(highlight, pageId, uuid));
                         }
                     }
                 }
@@ -185,8 +194,36 @@ public class SearchService extends AbstractResourceService {
         return utils.asJson(searchResult.getResource());
     }
 
-    private String getCanvasId(String altoId) {
-        String[] identArr = altoId.split("\\.");
+    /**
+     * Returns the annotation generator for the highlight.
+     * @param highlight highlight element from solor response
+     * @param pageId page id from solr response
+     * @param uuid dspace item uuid
+     * @return generator for a single annotation
+     */
+    private AnnotationGenerator getAnnotation(JsonElement highlight, String pageId, UUID uuid) {
+        JsonObject hcoords = highlight.getAsJsonObject();
+        String text = (hcoords.get("text").getAsString());
+        Integer ulx = hcoords.get("ulx").getAsInt();
+        Integer uly = hcoords.get("uly").getAsInt();
+        Integer lrx = hcoords.get("lrx").getAsInt();
+        Integer lry = hcoords.get("lry").getAsInt();
+        String w = Integer.toString(lrx - ulx);
+        String h = Integer.toString(lry - uly);
+        String params = ulx + "," + uly + "," + w + "," + h;
+        return createSearchResultAnnotation(params, text, pageId, uuid);
+    }
+
+    /**
+     * Returns position of canvas by extracting from the pages id element.
+     * @param element the pages element
+     * @return canvas id
+     */
+    private String getCanvasId(JsonElement element) {
+        JsonArray pages = element.getAsJsonArray();
+        JsonObject page = pages.get(0).getAsJsonObject();
+        String[] identArr = page.get("id").getAsString().split("\\.");
+        // the canvas id.
         return "c" + identArr[1];
     }
 
