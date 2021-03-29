@@ -612,7 +612,6 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         // Instead we add the collection to an item which works in the same way.
         if (!item.getCollections().contains(collection)) {
             item.addCollection(collection);
-            item.setModified();
         }
 
         context.addEvent(new Event(Event.ADD, Constants.COLLECTION, collection.getID(),
@@ -633,7 +632,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         } else {
             //Remove the item from the collection if we have multiple collections
             item.removeCollection(collection);
-            item.setModified();
+
         }
 
         context.addEvent(new Event(Event.REMOVE, Constants.COLLECTION,
