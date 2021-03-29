@@ -690,7 +690,7 @@ public class LDAPAuthentication
         if (StringUtils.isNotBlank(dn)) {
             System.out.println("dn:" + dn);
             int i = 1;
-            String groupMap = configurationService.getProperty("authentication-ldap", "login.groupmap." + i);
+            String groupMap = configurationService.getProperty("authentication-ldap.login.groupmap." + i);
 
             boolean cmp;
 
@@ -730,7 +730,7 @@ public class LDAPAuthentication
                     }
                 }
 
-                groupMap = configurationService.getProperty("authentication-ldap", "login.groupmap." + ++i);
+                groupMap = configurationService.getProperty("authentication-ldap.login.groupmap." + ++i);
             }
         }
     }
