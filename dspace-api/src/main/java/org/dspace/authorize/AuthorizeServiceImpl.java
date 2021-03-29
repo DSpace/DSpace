@@ -872,7 +872,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
      * @throws SearchServiceException
      */
     @Override
-    public Long countAdminAuthorizedCommunity(Context context, String query)
+    public long countAdminAuthorizedCommunity(Context context, String query)
         throws SearchServiceException, SQLException {
         query = formatCustomQuery(query);
         DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:Community",
