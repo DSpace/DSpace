@@ -7,7 +7,8 @@
  */
 package org.dspace.handle;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import org.dspace.AbstractUnitTest;
 import org.dspace.handle.factory.HandleServiceFactory;
@@ -15,7 +16,6 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class HandleServiceTest extends AbstractUnitTest {
