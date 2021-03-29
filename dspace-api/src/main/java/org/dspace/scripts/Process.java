@@ -7,6 +7,7 @@
  */
 package org.dspace.scripts;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,6 +34,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.ProcessStatus;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 
 /**
  * This class is the DB Entity representation of the Process object to be stored in the Database
@@ -76,6 +78,14 @@ public class Process implements ReloadableEntity<Integer> {
         inverseJoinColumns = {@JoinColumn(name = "bitstream_id")}
     )
     private List<Bitstream> bitstreams;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "process2group",
+        joinColumns = {@JoinColumn(name = "process_id")},
+        inverseJoinColumns = {@JoinColumn(name = "group_id")}
+    )
+    private final List<Group> groups = new ArrayList<Group>();
 
     @Column(name = "creation_time", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -207,6 +217,14 @@ public class Process implements ReloadableEntity<Integer> {
      */
     public Date getCreationTime() {
         return creationTime;
+    }
+
+    public List<Group> getGroups() {
+        return groups;
+    }
+
+    public void addGroup(Group group) {
+        this.groups.add(group);
     }
 
     /**
