@@ -588,7 +588,7 @@ public interface AuthorizeService {
      * @throws SearchServiceException
      * @throws SQLException
      */
-    Long countAdminAuthorizedCommunity(Context context, String query)
+    long countAdminAuthorizedCommunity(Context context, String query)
         throws SearchServiceException, SQLException;
 
     /**
