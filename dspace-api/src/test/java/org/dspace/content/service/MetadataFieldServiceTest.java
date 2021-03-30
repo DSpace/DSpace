@@ -45,6 +45,22 @@ public class MetadataFieldServiceTest extends AbstractUnitTest {
                 metadataFieldService.findByElement(context, "dspace", "identifier", "issn")
         );
 
+        // The dspace.subject and dspace.identifier.issn metadatafields should now reference the 'dspace' metadataschema
+        assertEquals(
+                "dspace",
+                metadataFieldService
+                        .findByElement(context, "dspace", "subject", null)
+                        .getMetadataSchema()
+                        .getName()
+        );
+        assertEquals(
+                "dspace",
+                metadataFieldService
+                        .findByElement(context, "dspace", "identifier", "issn")
+                        .getMetadataSchema()
+                        .getName()
+        );
+
         // Metadatafields dc.subject and dc.identifier.issn should no longer be found
         assertNull(
                 metadataFieldService.findByElement(context, "dc", "subject", null)
@@ -65,6 +81,20 @@ public class MetadataFieldServiceTest extends AbstractUnitTest {
         assertEquals(
                 issnField,
                 metadataFieldService.findByElement(context, "dspace", "identifier", "issn")
+        );
+        assertEquals(
+                "dspace",
+                metadataFieldService
+                        .findByElement(context, "dspace", "subject", null)
+                        .getMetadataSchema()
+                        .getName()
+        );
+        assertEquals(
+                "dspace",
+                metadataFieldService
+                        .findByElement(context, "dspace", "identifier", "issn")
+                        .getMetadataSchema()
+                        .getName()
         );
         assertNull(
                 metadataFieldService.findByElement(context, "dc", "subject", null)
