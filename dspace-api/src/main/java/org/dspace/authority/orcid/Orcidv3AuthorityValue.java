@@ -32,6 +32,8 @@ import org.orcid.jaxb.model.v3.release.record.PersonExternalIdentifiers;
 import org.orcid.jaxb.model.v3.release.record.ResearcherUrl;
 
 /**
+ * An {@link AuthorityValue} encapsulating information retrieved from ORCID
+ *
  * @author Jonas Van Goolen (jonas at atmire dot com)
  */
 public class Orcidv3AuthorityValue extends PersonAuthorityValue {
@@ -54,9 +56,9 @@ public class Orcidv3AuthorityValue extends PersonAuthorityValue {
 
 
     /**
-     * Creates an instance of Orcidv2AuthorityValue with only uninitialized fields.
+     * Creates an instance of Orcidv3AuthorityValue with only uninitialized fields.
      * This is meant to be filled in with values from an existing record.
-     * To create a brand new Orcidv2AuthorityValue, use create()
+     * To create a brand new Orcidv3AuthorityValue, use create()
      */
     public Orcidv3AuthorityValue() {
     }
@@ -258,7 +260,7 @@ public class Orcidv3AuthorityValue extends PersonAuthorityValue {
     /**
      * Provides a string that will allow this AuthorityType to be recognized and
      * provides information to create a new instance to be created using public
-     * Orcidv2AuthorityValue newInstance(String info).
+     * Orcidv3AuthorityValue newInstance(String info).
      * 
      * @return see
      *         {@link org.dspace.authority.service.AuthorityValueService#GENERATE
