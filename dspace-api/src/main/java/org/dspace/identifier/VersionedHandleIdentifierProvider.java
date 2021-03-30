@@ -78,33 +78,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
 
     @Override
     public boolean supports(String identifier) {
-        String prefix = handleService.getPrefix();
-        String canonicalPrefix = DSpaceServicesFactory.getInstance().getConfigurationService()
-                                                      .getProperty("handle.canonical.prefix");
-        if (identifier == null) {
-            return false;
-        }
-        // return true if handle has valid starting pattern
-        if (identifier.startsWith(prefix + "/")
-            || identifier.startsWith(canonicalPrefix)
-            || identifier.startsWith("hdl:")
-            || identifier.startsWith("info:hdl")
-            || identifier.matches("^https?://hdl\\.handle\\.net/.*")
-            || identifier.matches("^https?://.+/handle/.*")) {
-            return true;
-        }
-
-        //Check additional prefixes supported in the config file
-        String[] additionalPrefixes = DSpaceServicesFactory.getInstance().getConfigurationService()
-                                                           .getArrayProperty("handle.additional.prefixes");
-        for (String additionalPrefix : additionalPrefixes) {
-            if (identifier.startsWith(additionalPrefix + "/")) {
-                return true;
-            }
-        }
-
-        // otherwise, assume invalid handle
-        return false;
+        return handleService.parseHandle(identifier) != null;
     }
 
     @Override
@@ -310,6 +284,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
     public DSpaceObject resolve(Context context, String identifier, String... attributes) {
         // We can do nothing with this, return null
         try {
+            identifier = handleService.parseHandle(identifier);
             return handleService.resolveToObject(context, identifier);
         } catch (IllegalStateException | SQLException e) {
             log.error(LogManager.getHeader(context, "Error while resolving handle to item", "handle: " + identifier),
