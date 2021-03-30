@@ -56,7 +56,7 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
 
     private DSpace dspace = new DSpace();
 
-    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
     private SearchService searchService = dspace.getServiceManager().getServiceByName(
         "org.dspace.discovery.SearchService", SearchService.class);

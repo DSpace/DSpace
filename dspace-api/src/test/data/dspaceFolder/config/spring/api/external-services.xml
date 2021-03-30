@@ -109,5 +109,12 @@
     </bean>
 
     <bean class="org.dspace.app.suggestion.MockSuggestionExternalDataSource" />
+    
+    <bean id="openaireLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="OpenAIREService"/>
+        <property name="sourceIdentifier" value="openaire"/>
+        <property name="recordIdMetadata" value="dc.identifier.other"/>
+    </bean>
+    
 </beans>
 
