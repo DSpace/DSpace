@@ -16,11 +16,7 @@ import org.dspace.app.sherpa.v2.SHERPAResponse;
 import org.dspace.utils.DSpace;
 
 /**
- * Sample Journal-name authority based on SHERPA/RoMEO v2
- *
- * WARNING: This is a very crude and incomplete implementation, done mainly
- * as a proof-of-concept.  Any site that actually wants to use it will
- * probably have to refine it (and give patches back to dspace.org).
+ * Journal-name authority based on SHERPA/RoMEO v2
  *
  * @author Larry Stone
  * @author Andrea Bollini (andrea.bollini at 4science.it)
