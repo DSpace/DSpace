@@ -155,4 +155,15 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
         // Run our work, returning the next value in the sequence (see 'nextValReturningWork' above)
         return getHibernateSession(context).doReturningWork(nextValReturningWork);
     }
+
+    @Override
+    public List<Handle> getDeletedItemHandles(Context context) throws SQLException {
+        Query query = createQuery(context,
+                "SELECT h " +
+                        "FROM Handle h " +
+                        "LEFT JOIN FETCH h.dso " +
+                        "WHERE h.dso.id is NULL and " +
+                        "h.resourceTypeId = 2");
+        return list(query);
+    }
 }

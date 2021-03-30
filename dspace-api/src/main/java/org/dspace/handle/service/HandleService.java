@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.handle.Handle;
 
 /**
  * Interface to the <a href="http://www.handle.net" target=_new>CNRI Handle
@@ -173,6 +174,17 @@ public interface HandleService {
      * @return configured prefix or "123456789"
      */
     public String getPrefix();
+
+    /**
+     * Returns a list of handles of items that have been deleted.
+     *
+     * @param context
+     *            DSpace context
+     * @return The handle for object, or null if the object has no handle.
+     * @exception SQLException
+     *                If a database error occurs
+     */
+    public List<Handle> getDeletedItemHandles(Context context) throws SQLException;
 
     public long countHandlesByPrefix(Context context, String prefix) throws SQLException;
 
