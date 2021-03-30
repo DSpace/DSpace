@@ -24,7 +24,7 @@ import org.mockito.stubbing.Answer;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public class MockOrcid extends Orcidv3 {
+public class MockOrcid extends Orcidv3SolrAuthorityImpl {
 
     @Override
     public void init() {
