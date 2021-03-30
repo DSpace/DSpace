@@ -45,7 +45,8 @@
         <property name="doiFilterService"
             ref="org.dspace.identifier.doi.service.DOIFilterService"/>
     </bean>
-    
+
+<!-- ========   DOI FILTER SERVICE CONFIGURATION START   ======== -->
     <bean id="org.dspace.identifier.doi.service.DOIFilterService"
          class="ar.edu.unlp.sedici.dspace.identifier.doi.service.DOIFilterServiceImpl"
          scope="singleton">
@@ -53,7 +54,17 @@
      </bean>
      
     <!-- Tendria que ser prototype este bean?? -->
-     <bean name="DOIMainFilter" class="ar.edu.unlp.sedici.dspace.identifier.doi.filters.HasSingleMetadataFilter">
+     <bean name="DOIMainFilter" class="ar.edu.unlp.sedici.dspace.identifier.doi.filters.MultipleOrFilter">
+        <property name="filtersToEval">
+            <list value-type="ar.edu.unlp.sedici.dspace.identifier.doi.filters.AbstractDOIFilter">
+                <ref bean="tesisFilter"/>
+                <ref bean="libroEditorialesUNLPFilter"/>
+                <ref bean="datasetFilter"/>
+            </list>
+        </property>
+     </bean>
+
+    <bean name="tesisFilter" class="ar.edu.unlp.sedici.dspace.identifier.doi.filters.HasSingleMetadataFilter">
        <property name="metadata">
            <bean class="ar.edu.unlp.sedici.dspace.identifier.doi.filters.MetadataComponentFilter">
                <property name="metadataName" value="sedici.subtype"/>
@@ -61,6 +72,42 @@
            </bean>
        </property>
     </bean>
+
+    <bean name="datasetFilter" class="ar.edu.unlp.sedici.dspace.identifier.doi.filters.HasSingleMetadataFilter">
+       <property name="metadata">
+           <bean class="ar.edu.unlp.sedici.dspace.identifier.doi.filters.MetadataComponentFilter">
+               <property name="metadataName" value="sedici.subtype"/>
+               <property name="valueRegexFilter" value="Conjunto de datos|Placa espectrografica|Placa fotografica"/>
+           </bean>
+       </property>
+    </bean>
+
+    <bean name="libroEditorialesUNLPFilter" class="ar.edu.unlp.sedici.dspace.identifier.doi.filters.MultipleAndFilter">
+        <property name="filtersToEval">
+            <list value-type="ar.edu.unlp.sedici.dspace.identifier.doi.filters.AbstractDOIFilter">
+                <bean class="ar.edu.unlp.sedici.dspace.identifier.doi.filters.HasSingleMetadataFilter">
+                    <property name="metadata">
+                        <bean class="ar.edu.unlp.sedici.dspace.identifier.doi.filters.MetadataComponentFilter">
+                            <property name="metadataName" value="sedici.subtype"/>
+                            <property name="valueRegexFilter" value="Libro"/>
+                        </bean>
+                    </property>
+                </bean>
+                <bean class="ar.edu.unlp.sedici.dspace.identifier.doi.filters.HasSingleMetadataFilter">
+                    <property name="metadata">
+                        <bean class="ar.edu.unlp.sedici.dspace.identifier.doi.filters.MetadataComponentFilter">
+                            <property name="metadataName" value="sedici.identifier.isbn"/>
+                            <property name="valueRegexFilter" value="978-987-1985-.*|978-987-4127-.*|978-950-34-.*|978-987-25535-.*|978-987-20132-.*|978-987-95358-.*"/>
+                            <!-- EDULP = 978-987-1985|978-987-4127 -->   <!-- UNLP = 978-950-34|978-987-25535 -->
+                            <!-- Fundación de FAHCE = 978-987-20132 -->   <!-- Fundación Museo = 978-987-95358 -->
+                        </bean>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+<!-- ========   DOI FILTER SERVICE CONFIGURATION END   ======== -->
     
     <!-- The DOIConnector will handle the API calls to your DOI registration
          agency for the DOIIdentifierProvider. If your registration agency

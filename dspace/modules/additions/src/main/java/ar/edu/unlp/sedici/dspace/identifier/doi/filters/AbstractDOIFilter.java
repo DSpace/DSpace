@@ -21,7 +21,6 @@ public abstract class AbstractDOIFilter {
      */
     public abstract boolean evaluate(DSpaceObject dso);
 
-    @Required
     public void setMetadata(MetadataComponentFilter metadata) {
         this.metadata = metadata;
     }
