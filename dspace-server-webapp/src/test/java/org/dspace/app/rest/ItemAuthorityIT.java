@@ -24,7 +24,6 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
-import org.dspace.content.service.ItemService;
 import org.dspace.core.service.PluginService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -35,14 +34,11 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * This class handles ItemAuthority and ZDBAuthority related IT.
+ * This class handles ItemAuthority related IT.
  *
  * @author Mykhaylo Boychuk (4Science.it)
  */
-public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
-
-    @Autowired
-    private ItemService itemService;
+public class ItemAuthorityIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private ConfigurationService configurationService;
@@ -51,7 +47,7 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
     private PluginService pluginService;
 
     @Autowired
-    private ChoiceAuthorityService cas;
+    private ChoiceAuthorityService choiceAuthorityService;
 
     @Test
     public void singleItemAuthorityTest() throws Exception {
@@ -137,7 +133,7 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
        // These clears have to happen so that the config is actually reloaded in those classes. This is needed for
        // the properties that we're altering above and this is only used within the tests
        pluginService.clearNamedPluginClasses();
-       cas.clearCache();
+       choiceAuthorityService.clearCache();
 
        parentCommunity = CommunityBuilder.createCommunity(context).build();
        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).build();
@@ -391,7 +387,7 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
        // These clears have to happen so that the config is actually reloaded in those classes. This is needed for
        // the properties that we're altering above and this is only used within the tests
        pluginService.clearNamedPluginClasses();
-       cas.clearCache();
+       choiceAuthorityService.clearCache();
 
        context.restoreAuthSystemState();
 
@@ -412,7 +408,7 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
        // These clears have to happen so that the config is actually reloaded in those classes. This is needed for
        // the properties that we're altering above and this is only used within the tests
        pluginService.clearNamedPluginClasses();
-       cas.clearCache();
+       choiceAuthorityService.clearCache();
 
        context.restoreAuthSystemState();
 
@@ -423,93 +419,12 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
                        .andExpect(jsonPath("$.externalSource", Matchers.is(exptectedMap)));
     }
 
-    @Test
-    public void openAIREAuthorityTest() throws Exception {
-       context.turnOffAuthorisationSystem();
-       configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority",
-                            "org.dspace.content.authority.OpenAIREProjectAuthority = OpenAIREProjectAuthority");
-       configurationService.setProperty("solr.authority.server", "${solr.server}/authority");
-       configurationService.setProperty("choices.plugin.dc.contributor.author", "OpenAIREProjectAuthority");
-       configurationService.setProperty("choices.presentation.dc.contributor.author", "authorLookup");
-       configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
-       configurationService.setProperty("authority.author.indexer.field.1", "dc.contributor.author");
-       // These clears have to happen so that the config is actually reloaded in those classes. This is needed for
-       // the properties that we're altering above and this is only used within the tests
-       pluginService.clearNamedPluginClasses();
-       cas.clearCache();
-       context.restoreAuthSystemState();
-
-       String token = getAuthToken(eperson.getEmail(), password);
-       getClient(token).perform(get("/api/submission/vocabularies/OpenAIREProjectAuthority/entries")
-                       .param("metadata", "dc.contributor.author")
-                       .param("filter", "openaire"))
-                       .andExpect(status().isOk())
-                       .andExpect(jsonPath("$._embedded.entries", Matchers.containsInAnyOrder(
-                               ItemAuthorityMatcher.matchItemAuthorityProperties(
-                                   "will be generated::openAireProject::777541",
-                                   "OpenAIRE Advancing Open Scholarship",
-                                   "OpenAIRE Advancing Open Scholarship(777541)",
-                                   "vocabularyEntry"),
-                               ItemAuthorityMatcher.matchItemAuthorityProperties(
-                                   "will be generated::openAireProject::731011",
-                                   "OpenAIRE - CONNECTing scientific results in support of Open Science",
-                                   "OpenAIRE - CONNECTing scientific results in support of Open Science(731011)",
-                                   "vocabularyEntry"))))
-                       .andExpect(jsonPath("$.page.totalElements", Matchers.is(2)));
-    }
-
-
-    @Test
-    public void zdbAuthorityTest() throws Exception {
-        String token = getAuthToken(eperson.getEmail(), password);
-        getClient(token).perform(get("/api/submission/vocabularies/ZDBAuthority/entries")
-                        .param("filter", "Acta AND Mathematica AND informatica"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.entries",
-                        Matchers.containsInAnyOrder(
-                                ItemAuthorityMatcher.matchItemAuthorityWithTwoMetadataInOtherInformations(
-                                        "will be generated::zdb::1447228-4", "Acta mathematica et informatica",
-                                        "Acta mathematica et informatica", "vocabularyEntry", "relation_ispartof",
-                                        "Acta mathematica et informatica::will be generated::zdb::1447228-4",
-                                        "relation_issn",""),
-                                ItemAuthorityMatcher.matchItemAuthorityWithTwoMetadataInOtherInformations(
-                                        "will be generated::zdb::1194912-0",
-                                        "Acta mathematica Universitatis Ostraviensis",
-                                        "Acta mathematica Universitatis Ostraviensis", "vocabularyEntry",
-                                        "relation_ispartof",
-                                  "Acta mathematica Universitatis Ostraviensis::will be generated::zdb::1194912-0",
-                                  "relation_issn","1211-4774"),
-                                ItemAuthorityMatcher.matchItemAuthorityWithTwoMetadataInOtherInformations(
-                                        "will be generated::zdb::2618143-5",
-                                        "Acta mathematica Universitatis Ostraviensis",
-                                        "Acta mathematica Universitatis Ostraviensis", "vocabularyEntry",
-                                        "relation_ispartof",
-                                   "Acta mathematica Universitatis Ostraviensis::will be generated::zdb::2618143-5",
-                                   "relation_issn",""))))
-                .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
-    }
-
-    @Test
-    public void zdbAuthorityEmptyQueryTest() throws Exception {
-        String token = getAuthToken(eperson.getEmail(), password);
-        getClient(token).perform(get("/api/submission/vocabularies/ZDBAuthority/entries")
-                        .param("filter", ""))
-                        .andExpect(status().isUnprocessableEntity());
-    }
-
-    @Test
-    public void zdbAuthorityUnauthorizedTest() throws Exception {
-        getClient().perform(get("/api/submission/vocabularies/ZDBAuthority/entries")
-                   .param("filter", "Mathematica AND informatica"))
-                   .andExpect(status().isUnauthorized());
-    }
-
     @Override
     @After
     // We need to cleanup the authorities cache once than the configuration has been restored
     public void destroy() throws Exception {
         super.destroy();
         pluginService.clearNamedPluginClasses();
-        cas.clearCache();
+        choiceAuthorityService.clearCache();
     }
 }

@@ -9,6 +9,7 @@ package org.dspace.content.authority.zdb;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,12 +24,12 @@ import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.conn.params.ConnRoutePNames;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.XMLUtils;
 import org.dspace.authority.AuthorityValue;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -41,32 +42,27 @@ public class ZDBService {
 
     private static Logger log = Logger.getLogger(ZDBService.class);
 
-    public String detailURL;
-    public String searchURL;
-
-    public ZDBService(String searchURL, String detailsURL) {
-        this.searchURL = searchURL;
-        this.detailURL = detailsURL;
-    }
+    @Autowired
+    private ConfigurationService configurationService;
 
     private List<ZDBAuthorityValue> search(String requestURL) throws IOException {
 
-        String proxyHost = ConfigurationManager.getProperty("http.proxy.host");
-        String proxyPort = ConfigurationManager.getProperty("http.proxy.port");
+        String proxyHost = configurationService.getProperty("http.proxy.host");
+        String proxyPort = configurationService.getProperty("http.proxy.port");
 
         List<ZDBAuthorityValue> results = new ArrayList<ZDBAuthorityValue>();
 
         HttpGet method = null;
-        HttpHost proxy = null;
         try {
 
             method = new HttpGet(requestURL);
 
-            HttpClient client = new DefaultHttpClient();
+            HttpClientBuilder clientBuilder = HttpClientBuilder.create();
             if (StringUtils.isNotBlank(proxyHost) && StringUtils.isNotBlank(proxyPort)) {
-                proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort), "http");
-                client.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+                clientBuilder.setProxy(new HttpHost(proxyHost, Integer.parseInt(proxyPort), "http"));
             }
+
+            HttpClient client = clientBuilder.build();
 
             // Execute the method.
             HttpResponse response = client.execute(method);
@@ -179,11 +175,11 @@ public class ZDBService {
     }
 
     public List<ZDBAuthorityValue> list(String query, int page, int pagesize) throws IOException {
-        if (query == null || query.isEmpty()) {
-            throw new IllegalArgumentException();
+        if (StringUtils.isEmpty(query)) {
+            throw new IllegalArgumentException("The query must not be empty");
         }
 
-        String queryURL = getSearchURL();
+        String queryURL = configurationService.getProperty("cris.zdb.search.url");
 
         // TODO seems that numberOfRecords is not supported
         // if (pagesize >= 0)
@@ -191,20 +187,11 @@ public class ZDBService {
         // searchURL += "&numberOfRecords=" + Integer.toString(pagesize);
         // }
 
-        queryURL += "&query=tit=" + URLEncoder.encode(query);
+        queryURL += "&query=tit=" + URLEncoder.encode(query, Charset.defaultCharset());
         return search(queryURL);
     }
 
     public String buildDetailsURL(String id) {
-        String url = MessageFormat.format(getDetailURL(), id);
-        return url;
-    }
-
-    public String getDetailURL() {
-        return detailURL;
-    }
-
-    public String getSearchURL() {
-        return searchURL;
+        return MessageFormat.format(configurationService.getProperty("cris.zdb.detail.url"), id);
     }
 }

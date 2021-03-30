@@ -16,18 +16,7 @@
     default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
 
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
-
-	<!--  resources  -->
-	<bean id="dspaceZDBConfiguration" class="org.dspace.content.authority.DSpaceZDBConfiguration">
-		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
-	</bean>
 	
-	<bean id="dspaceZDBSearchURL" factory-bean="dspaceZDBConfiguration" factory-method="getSearchURL" />
-	<bean id="dspaceZDBDetailsURL" factory-bean="dspaceZDBConfiguration" factory-method="getDetailsURL" />
-	
-	<bean name="ZDBSource" class="org.dspace.content.authority.zdb.ZDBService" depends-on="dspaceZDBConfiguration">
-		<constructor-arg ref="dspaceZDBSearchURL"/>
-		<constructor-arg ref="dspaceZDBDetailsURL"/>
-	</bean>           
+	<bean name="ZDBSource" class="org.dspace.content.authority.zdb.ZDBService" />
 
 </beans>

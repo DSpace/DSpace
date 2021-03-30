@@ -18,10 +18,10 @@ import org.dspace.importer.external.metadatamapping.AbstractMetadataFieldMapping
  * 
  * @author Mykhaylo Boychuk (4science.it)
  */
-public class OpenAIREFieldMapping extends AbstractMetadataFieldMapping {
+public class OpenAIREProjectFieldMapping extends AbstractMetadataFieldMapping {
 
     @Override
-    @Resource(name = "openaireMetadataFieldMap")
+    @Resource(name = "openaireProjectsMetadataFieldMap")
     public void setMetadataFieldMap(Map metadataFieldMap) {
         super.setMetadataFieldMap(metadataFieldMap);
     }

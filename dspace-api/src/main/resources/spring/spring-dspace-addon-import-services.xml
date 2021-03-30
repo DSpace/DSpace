@@ -177,7 +177,7 @@
           <property name="metadataFieldMapping" ref="openaireMetadataFieldMapping"/>
     </bean>
     <bean id="openaireMetadataFieldMapping"
-          class="org.dspace.importer.external.openaire.metadatamapping.OpenAIREFieldMapping">
+          class="org.dspace.importer.external.openaire.metadatamapping.OpenAIREProjectFieldMapping">
     </bean>
 
     <bean id="scopusMetadataFieldMapping"
@@ -208,9 +208,6 @@
           class="org.dspace.importer.external.openaire.service.OpenAireImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="openaireMetadataFieldMapping"/>
         <property name="queryParam" value="title"/>
-    </bean>
-    <bean id="openaireMetadataFieldMapping"
-          class="org.dspace.importer.external.openaire.service.metadatamapping.OpenAireFieldMapping">
     </bean>
 
 </beans>
