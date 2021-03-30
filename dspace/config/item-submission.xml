@@ -120,9 +120,12 @@
 	       <type>cclicense</type> </step-definition> -->
 
         <!--Step will be to enrich the current submission querying external providers or processing the uploaded file -->
-        <!-- Uncomment this step to enrich the current submission using information extracted 
-            from uploaded files or metadata. Please check also config/spring/api/step-processing-listener.xml
-            for further configuration -->
+        <!-- Uncomment this step to enrich the current submission using information extracted
+            from uploaded files or metadata. Please note that this step will be triggered only when a request is performed that mean
+            the file to be uploaded or the metadata saved. Angular allows to configure an autosave feature based on a timer or the input
+            of specific metadata such as identifiers used by this step, see the submission.autosave settings in the environment.common.ts
+            Check also config/spring/api/step-processing-listener.xml for further server side configuration
+             -->
         <!-- <step-definition id="extractionstep"> 
             <heading>submit.progressbar.ExtractMetadataStep</heading>
             <processing-class>org.dspace.app.rest.submit.step.ExtractMetadataStep</processing-class>
