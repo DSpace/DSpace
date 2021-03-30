@@ -38,9 +38,9 @@ import org.orcid.jaxb.model.v3.release.search.Result;
  * @author Jonas Van Goolen (jonas at atmire dot com)
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public class Orcidv3 implements SolrAuthorityInterface {
+public class Orcidv3SolrAuthorityImpl implements SolrAuthorityInterface {
 
-    private static Logger log = Logger.getLogger(Orcidv3.class);
+    private static Logger log = Logger.getLogger(Orcidv3SolrAuthorityImpl.class);
 
     private OrcidRestConnector orcidRestConnector;
     private String OAUTHUrl;
