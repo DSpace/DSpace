@@ -7,8 +7,6 @@
  */
 package org.dspace.app.rest.iiif.service;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import org.dspace.app.rest.iiif.model.generator.CanvasGenerator;
@@ -35,9 +33,8 @@ public abstract class AbstractResourceService {
     protected String CLIENT_URL;
     protected String BITSTREAM_PATH_PREFIX;
     /**
-     * Possible values: "paged" or "individuals".  Typically paged is preferred
-     * for documents. However, it can be overridden in configuration if necessary
-     * for the viewer client.
+     * Possible values: "paged" or "individuals". The property
+     * value is set in dspace configuration.
      */
     protected static String DOCUMENT_VIEWING_HINT;
 
