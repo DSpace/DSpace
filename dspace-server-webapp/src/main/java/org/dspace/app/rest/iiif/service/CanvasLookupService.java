@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.iiif.service;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 import org.dspace.app.rest.iiif.model.generator.CanvasGenerator;
