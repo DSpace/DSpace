@@ -1194,7 +1194,7 @@
             <!-- Used for full-text indexing with Solr. Should be synced with version of Tika in solr-cell -->
             <dependency>
                 <groupId>org.apache.tika</groupId>
-                <artifactId>tika-core</artifactId>
+                <artifactId>tika-parsers</artifactId>
                 <version>1.24.1</version>
             </dependency>
             <!-- Reminder: Keep icu4j (in Parent POM) synced with version used by lucene-analyzers-icu below,
