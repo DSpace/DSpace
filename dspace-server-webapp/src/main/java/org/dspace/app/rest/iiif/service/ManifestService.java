@@ -112,7 +112,7 @@ public class ManifestService extends AbstractResourceService {
     }
 
     /**
-     * Returns a single sequence with canvases and item rendering (optional).
+     * Returns a single sequence with canvases and a rendering property (optional).
      * @param item DSpace Item
      * @param bitstreams list of bitstreams
      * @param context the DSpace context
@@ -121,7 +121,7 @@ public class ManifestService extends AbstractResourceService {
     private void addSequence(Item item, List<Bitstream> bitstreams, Context context, Info info) {
         sequenceGenerator.setIdentifier(IIIF_ENDPOINT + item.getID() + "/sequence/s0");
         if (bitstreams.size() > 0) {
-            addCanvas(sequenceGenerator, context, item, bitstreams, info);
+            addCanvases(sequenceGenerator, context, item, bitstreams, info);
         }
         addRendering(sequenceGenerator, item, context);
         manifestGenerator.addSequence(sequenceGenerator);
@@ -178,8 +178,9 @@ public class ManifestService extends AbstractResourceService {
      * @param item the DSpace Item
      * @param bitstreams list of DSpace bitstreams
      */
-    private void addCanvas(CanvasItemsGenerator sequence, Context context, Item item,
-                           List<Bitstream> bitstreams, Info info) {
+    private void addCanvases(CanvasItemsGenerator sequence, Context context, Item item,
+                             List<Bitstream> bitstreams, Info info) {
+        // TODO: This adds all bitstreams from a bundle.  Consider bitstream pagination.
         /**
          * Counter tracks the position of the bitstream in the list and is used to create the canvas identifier.
          * Bitstream order is determined by position in the IIIF DSpace bundle.
