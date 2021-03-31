@@ -138,8 +138,9 @@ public class IndexEventConsumer implements Consumer {
                     // became directly an item without giving us the chance to retrieve a
                     // workflowitem... so we need to force the unindex of all the related data
                     // before to index it again to be sure to don't leave any zombie in solr
-                        String detail =
-                                Constants.typeText[event.getSubjectType()] + "-" + event.getSubjectID().toString();
+                        IndexFactory indexableObjectService = IndexObjectFactoryFactory.getInstance()
+                                              .getIndexFactoryByType(Constants.typeText[event.getSubjectType()]);
+                        String detail = indexableObjectService.getType() + "-" + event.getSubjectID().toString();
                         uniqueIdsToDelete.add(detail);
                     }
                     objectsToUpdate.addAll(indexObjectServiceFactory.getIndexableObjects(ctx, subject));
@@ -163,7 +164,9 @@ public class IndexEventConsumer implements Consumer {
                 if (event.getSubjectType() == -1 || event.getSubjectID() == null) {
                     log.warn("got null subject type and/or ID on DELETE event, skipping it.");
                 } else {
-                    String detail = Constants.typeText[event.getSubjectType()] + "-" + event.getSubjectID().toString();
+                    IndexFactory indexableObjectService = IndexObjectFactoryFactory.getInstance()
+                                          .getIndexFactoryByType(Constants.typeText[event.getSubjectType()]);
+                    String detail = indexableObjectService.getType() + "-" + event.getSubjectID().toString();
                     log.debug("consume() adding event to delete queue: " + event.toString());
                     uniqueIdsToDelete.add(detail);
                 }
