@@ -60,8 +60,7 @@ public class CollectionExport extends DSpaceRunnable<CollectionExportScriptConfi
     @Override
     public void internalRun() throws Exception {
 
-        context = new Context();
-        context.setMode(Context.Mode.BATCH_EDIT);
+        context = new Context(Context.Mode.BATCH_EDIT);
         assignCurrentUserInContext();
 
         //FIXME: see https://4science.atlassian.net/browse/CSTPER-236 for final solution
