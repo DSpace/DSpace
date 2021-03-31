@@ -22,7 +22,6 @@ import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -38,8 +37,6 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
-import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

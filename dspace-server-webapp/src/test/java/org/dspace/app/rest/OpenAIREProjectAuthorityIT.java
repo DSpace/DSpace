@@ -13,8 +13,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.dspace.app.rest.matcher.ItemAuthorityMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.content.authority.service.ChoiceAuthorityService;
-import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -32,30 +30,10 @@ public class OpenAIREProjectAuthorityIT extends AbstractControllerIntegrationTes
     @Autowired
     private ConfigurationService configurationService;
 
-    @Autowired
-    private PluginService pluginService;
-
-    @Autowired
-    private ChoiceAuthorityService choiceAuthorityService;
-
     @Before
     public void setup() {
-        context.turnOffAuthorisationSystem();
-
         configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority",
             "org.dspace.content.authority.OpenAIREProjectAuthority = OpenAIREProjectAuthority");
-        configurationService.setProperty("solr.authority.server", "${solr.server}/authority");
-        configurationService.setProperty("choices.plugin.dc.contributor.author", "OpenAIREProjectAuthority");
-        configurationService.setProperty("choices.presentation.dc.contributor.author", "authorLookup");
-        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
-        configurationService.setProperty("authority.author.indexer.field.1", "dc.contributor.author");
-
-        // These clears have to happen so that the config is actually reloaded in those classes. This is needed for
-        // the properties that we're altering above and this is only used within the tests
-        pluginService.clearNamedPluginClasses();
-        choiceAuthorityService.clearCache();
-
-        context.restoreAuthSystemState();
     }
 
     @Test
