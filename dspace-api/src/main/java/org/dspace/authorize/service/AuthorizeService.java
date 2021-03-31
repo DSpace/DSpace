@@ -211,30 +211,6 @@ public interface AuthorizeService {
      */
     public boolean isAdmin(Context c, EPerson e) throws SQLException;
 
-    public boolean isCommunityAdmin(Context c) throws SQLException;
-
-    public boolean isCollectionAdmin(Context c) throws SQLException;
-
-    /**
-     * Check to see if a specific user is Community admin
-     * 
-     * @param c current context
-     * @param e the user to check
-     * @return true if user is an admin of some community
-     * @throws SQLException
-     */
-    public boolean isCommunityAdmin(Context c, EPerson e) throws SQLException;
-
-    /**
-     * Check to see if a specific user is Collection admin
-     * 
-     * @param c current context
-     * @param e the user to check
-     * @return true if user is an admin of some collection
-     * @throws SQLException if database error
-     */
-    public boolean isCollectionAdmin(Context c, EPerson e) throws SQLException;
-
     ///////////////////////////////////////////////
     // policy manipulation methods
     ///////////////////////////////////////////////
@@ -545,7 +521,7 @@ public interface AuthorizeService {
      * @return          true if the current user is a community admin in the site
      *                  false when this is not the case, or an exception occurred
      */
-    boolean isCommunityAdminSolr(Context context) throws SQLException;
+    boolean isCommunityAdmin(Context context) throws SQLException;
 
     /**
      * Checks that the context's current user is a collection admin in the site by querying the solr database.
@@ -554,7 +530,7 @@ public interface AuthorizeService {
      * @return          true if the current user is a collection admin in the site
      *                  false when this is not the case, or an exception occurred
      */
-    boolean isCollectionAdminSolr(Context context) throws SQLException;
+    boolean isCollectionAdmin(Context context) throws SQLException;
 
     /**
      * Checks that the context's current user is a community or collection admin in the site.

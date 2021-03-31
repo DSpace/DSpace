@@ -41,7 +41,7 @@ public class CollectionAdminFeature implements AuthorizationFeature {
                 return true;
             }
 
-            return authorizeService.isCollectionAdminSolr(context);
+            return authorizeService.isCollectionAdmin(context);
         }
         return false;
     }

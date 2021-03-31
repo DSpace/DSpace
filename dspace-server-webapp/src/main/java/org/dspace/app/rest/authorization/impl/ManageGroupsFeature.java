@@ -45,7 +45,7 @@ public class ManageGroupsFeature implements AuthorizationFeature {
 
             if ((AuthorizeConfiguration.canCommunityAdminManagePolicies() ||
                 AuthorizeConfiguration.canCommunityAdminManageAdminGroup()) &&
-                authorizeService.isCommunityAdminSolr(context)) {
+                authorizeService.isCommunityAdmin(context)) {
                 return true;
             }
 
@@ -54,7 +54,7 @@ public class ManageGroupsFeature implements AuthorizationFeature {
                     AuthorizeConfiguration.canCommunityAdminManageCollectionSubmitters() ||
                     AuthorizeConfiguration.canCommunityAdminManageCollectionWorkflows() ||
                     AuthorizeConfiguration.canCommunityAdminManageCollectionAdminGroup())
-                    && authorizeService.isCollectionAdminSolr(context)) {
+                    && authorizeService.isCollectionAdmin(context)) {
                 return true;
             }
         }
