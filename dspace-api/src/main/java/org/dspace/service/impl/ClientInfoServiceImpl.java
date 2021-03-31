@@ -7,6 +7,7 @@
  */
 package org.dspace.service.impl;
 
+import java.lang.reflect.Array;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -84,51 +85,66 @@ public class ClientInfoServiceImpl implements ClientInfoService {
      * allow the X-FORWARDED-FOR header. We don't accept that header from any IP address, as the header could be used
      * to spoof/fake your IP address.
      * <P>
-     * If "proxies.trusted.ipranges" configuration is specified, we trust ONLY those IP addresses.
+     * If "proxies.trusted.include_ui_ip = true" (which is the default), then we lookup the IP address(es) associated
+     * with ${dspace.ui.url}, and append them to the list of trusted proxies. This is necessary to allow the Angular
+     * UI server-side rendering (SSR) to send us the X-FORWARDED-FOR header, which it usually uses to specify the
+     * original client IP address.
      * <P>
-     * If "proxies.trusted.ipranges" is UNSPECIFIED, we only trust the IP address(es) associated with ${dspace.ui.url}.
-     * This is necessary to allow the Angular UI server-side rendering (SSR) to send us the X-FORWARDED-FOR header,
-     * which it usually uses to specify the original client IP address.
+     * If "proxies.trusted.ipranges" configuration is specified, those IP addresses/ranges are also included in the
+     * list of trusted proxies.
+     * <P>
+     * Localhost (127.0.0.1) is ALWAYS included in the list of trusted proxies
+     *
      * @return IPTable of trusted IP addresses/ranges, or null if none could be found.
      */
     private IPTable parseTrustedProxyRanges() {
-        IPTable ipTable = null;
-        // Whether we had to look up the UI's IP address (based on its URL), or not
-        boolean uiUrlLookup = false;
+        String localhostIP = "127.0.0.1";
+        IPTable ipTable = new IPTable();
 
-        String[] ipAddresses = configurationService.getArrayProperty("proxies.trusted.ipranges");
-        String uiUrl = configurationService.getProperty("dspace.ui.url");
-
-        // If configuration is empty, determine IPs of ${dspace.ui.url} as the default trusted proxy
-        if (ArrayUtils.isEmpty(ipAddresses)) {
-            // Get any IP address(es) associated with our UI
-            ipAddresses = Utils.getIPAddresses(uiUrl);
-            uiUrlLookup = true;
+        // Get list of trusted proxy IP ranges
+        String[] trustedIpRanges = configurationService.getArrayProperty("proxies.trusted.ipranges");
+        // Always append localhost (127.0.0.1) to the list of trusted proxies, if not already included
+        if (!ArrayUtils.contains(trustedIpRanges, localhostIP)) {
+            trustedIpRanges = ArrayUtils.add(trustedIpRanges, localhostIP);
+        }
+        try {
+            // Load all IPs into our IP Table
+            for (String ipRange : trustedIpRanges) {
+                ipTable.add(ipRange);
+            }
+        } catch (IPTable.IPFormatException e) {
+            log.error("Property 'proxies.trusted.ipranges' contains an invalid IP range", e);
         }
 
-        // Only continue if we have IPs to trust.
-        if (ArrayUtils.isNotEmpty(ipAddresses)) {
-            ipTable = new IPTable();
-            try {
-                // Load all IPs into our IP Table
-                for (String ipAddress : ipAddresses) {
-                    ipTable.add(ipAddress);
+        // Is the UI IP address always trusted (default = true)
+        boolean uiIsTrustedProxy = configurationService.getBooleanProperty("proxies.trusted.include_ui_ip", true);
+
+        // As long as the UI is a trusted proxy, determine IP(s) of ${dspace.ui.url}
+        if (uiIsTrustedProxy) {
+            String uiUrl = configurationService.getProperty("dspace.ui.url");
+            // Get any IP address(es) associated with our UI
+            String[] uiIpAddresses = Utils.getIPAddresses(uiUrl);
+
+            if (ArrayUtils.isNotEmpty(uiIpAddresses)) {
+                try {
+                    // Load all UI IPs into our IP Table
+                    for (String ipRange : uiIpAddresses) {
+                        ipTable.add(ipRange);
+                    }
+                } catch (IPTable.IPFormatException e) {
+                    log.error("IP address lookup for dspace.ui.url={} was invalid and could not be added to trusted" +
+                                  " proxies", uiUrl, e);
                 }
-            } catch (IPTable.IPFormatException e) {
-                if (uiUrlLookup) {
-                    log.error("IP address found for dspace.ui.url={} was invalid", uiUrl, e);
-                } else {
-                    log.error("Property 'proxies.trusted.ipranges' contains an invalid IP range", e);
-                }
-                ipTable = null;
             }
         }
 
-        if (ipTable != null) {
+        // If our IPTable is not empty, log the trusted proxies and return it
+        if (!ipTable.isEmpty()) {
             log.info("Trusted proxies (configure via 'proxies.trusted.ipranges'): {}", ipTable.toSet().toString());
+            return ipTable;
+        } else {
+            return null;
         }
-
-        return ipTable;
     }
 
     /**
@@ -149,6 +165,10 @@ public class ClientInfoServiceImpl implements ClientInfoService {
     /**
      * Get the first X-FORWARDED-FOR header value which does not match the IP or another proxy IP. This is the most
      * likely client IP address when proxies are in use.
+     * <P>
+     * NOTE: This method does NOT validate the X-FORWARDED-FOR header value is accurate, so be aware this header
+     * could contain a spoofed value. Therefore, any code calling this method should verify the source is somehow
+     * trusted, e.g. by using isRequestFromTrustedProxy() or similar.
      * @param remoteIp remote IP address
      * @param xForwardedForValue X-FORWARDED-FOR header value passed by that address
      * @return likely client IP address from X-FORWARDED-FOR header
