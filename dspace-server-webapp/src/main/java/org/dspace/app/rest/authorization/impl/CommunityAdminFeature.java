@@ -41,7 +41,7 @@ public class CommunityAdminFeature implements AuthorizationFeature {
                 return true;
             }
 
-            return authorizeService.isCommunityAdminSolr(context);
+            return authorizeService.isCommunityAdmin(context);
         }
         return false;
     }

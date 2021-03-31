@@ -443,46 +443,6 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         }
     }
 
-    public boolean isCommunityAdmin(Context c) throws SQLException {
-        EPerson e = c.getCurrentUser();
-        return isCommunityAdmin(c, e);
-    }
-
-    @Override
-    public boolean isCommunityAdmin(Context c, EPerson e) throws SQLException {
-        if (e != null) {
-            List<ResourcePolicy> policies = resourcePolicyService.find(c, e,
-                                                                       groupService.allMemberGroups(c, e),
-                                                                       Constants.ADMIN, Constants.COMMUNITY);
-
-            if (CollectionUtils.isNotEmpty(policies)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public boolean isCollectionAdmin(Context c) throws SQLException {
-        EPerson e = c.getCurrentUser();
-        return isCollectionAdmin(c, e);
-    }
-
-    @Override
-    public boolean isCollectionAdmin(Context c, EPerson e) throws SQLException {
-        if (e != null) {
-            List<ResourcePolicy> policies = resourcePolicyService.find(c, e,
-                                                                       groupService.allMemberGroups(c, e),
-                                                                       Constants.ADMIN, Constants.COLLECTION);
-
-            if (CollectionUtils.isNotEmpty(policies) || isCommunityAdmin(c, e)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     ///////////////////////////////////////////////
     // policy manipulation methods
     ///////////////////////////////////////////////
@@ -810,8 +770,8 @@ public class AuthorizeServiceImpl implements AuthorizeService {
      *                  false when this is not the case, or an exception occurred
      */
     @Override
-    public boolean isCommunityAdminSolr(Context context) throws SQLException {
-        return performCheck(context, "search.resourcetype:Community");
+    public boolean isCommunityAdmin(Context context) throws SQLException {
+        return performCheck(context, "search.resourcetype:" + IndexableCommunity.TYPE);
     }
 
     /**
@@ -822,8 +782,8 @@ public class AuthorizeServiceImpl implements AuthorizeService {
      *                  false when this is not the case, or an exception occurred
      */
     @Override
-    public boolean isCollectionAdminSolr(Context context) throws SQLException {
-        return performCheck(context, "search.resourcetype:Collection");
+    public boolean isCollectionAdmin(Context context) throws SQLException {
+        return performCheck(context, "search.resourcetype:" + IndexableCollection.TYPE);
     }
 
     /**
@@ -836,7 +796,8 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     @Override
     public boolean isComColAdmin(Context context) throws SQLException {
         return performCheck(context,
-            "(search.resourcetype:Community OR search.resourcetype:Collection)");
+            "(search.resourcetype:" + IndexableCommunity.TYPE + " OR search.resourcetype:" +
+                IndexableCollection.TYPE + ")");
     }
 
     /**
@@ -854,7 +815,8 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         throws SearchServiceException, SQLException {
         List<Community> communities = new ArrayList<>();
         query = formatCustomQuery(query);
-        DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:Community",
+        DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:" +
+                                                              IndexableCommunity.TYPE,
             offset, limit);
         for (IndexableObject solrCollections : discoverResult.getIndexableObjects()) {
             Community community = ((IndexableCommunity) solrCollections).getIndexedObject();
@@ -875,7 +837,8 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     public long countAdminAuthorizedCommunity(Context context, String query)
         throws SearchServiceException, SQLException {
         query = formatCustomQuery(query);
-        DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:Community",
+        DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:" +
+                                                              IndexableCommunity.TYPE,
             null, null);
         return discoverResult.getTotalSearchResults();
     }
@@ -899,7 +862,8 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         }
 
         query = formatCustomQuery(query);
-        DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:Collection",
+        DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:" +
+                                                              IndexableCollection.TYPE,
             offset, limit);
         for (IndexableObject solrCollections : discoverResult.getIndexableObjects()) {
             Collection collection = ((IndexableCollection) solrCollections).getIndexedObject();
@@ -920,7 +884,8 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     public long countAdminAuthorizedCollection(Context context, String query)
         throws SearchServiceException, SQLException {
         query = formatCustomQuery(query);
-        DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:Collection",
+        DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:" +
+                                                              IndexableCollection.TYPE,
             null, null);
         return discoverResult.getTotalSearchResults();
     }
