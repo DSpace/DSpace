@@ -7,7 +7,10 @@
  */
 package org.dspace.authorize.dao.impl;
 
+import static java.util.Collections.emptyList;
+
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import javax.persistence.Query;
@@ -16,7 +19,9 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.ResourcePolicyOwnerVO;
 import org.dspace.authorize.ResourcePolicy_;
 import org.dspace.authorize.dao.ResourcePolicyDAO;
 import org.dspace.content.DSpaceObject;
@@ -384,5 +389,30 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
         criteriaQuery.select(resourcePolicyRoot);
         criteriaQuery.where(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.id), id));
         return singleResult(context, criteriaQuery);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<ResourcePolicyOwnerVO> findValidPolicyOwners(Context context, List<UUID> dsoIds, int actionID)
+        throws SQLException {
+
+        if (CollectionUtils.isEmpty(dsoIds)) {
+            return emptyList();
+        }
+
+        String sqlQuery = ""
+            + " SELECT new org.dspace.authorize.ResourcePolicyOwnerVO(policy.eperson.id, policy.epersonGroup.id)"
+            + "   FROM ResourcePolicy policy "
+            + "  WHERE policy.dSpaceObject.id in (:dsoIds) "
+            + "    AND policy.actionId = :actionId "
+            + "    AND (policy.startDate is NULL OR policy.startDate <= :date)"
+            + "    AND (policy.endDate is NULL OR policy.endDate >= :date)";
+
+        Query query = createQuery(context, sqlQuery);
+        query.setParameter("dsoIds", dsoIds);
+        query.setParameter("actionId", actionID);
+        query.setParameter("date", new Date());
+        return query.getResultList();
+
     }
 }

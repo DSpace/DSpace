@@ -521,6 +521,12 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     }
 
     @Override
+    public List<ResourcePolicyOwnerVO> getValidPolicyOwnersActionFilter(Context c, List<UUID> dsoIds, int actionID)
+        throws SQLException {
+        return resourcePolicyService.findValidPolicyOwners(c, dsoIds, actionID);
+    }
+
+    @Override
     public void inheritPolicies(Context c, DSpaceObject src,
                                 DSpaceObject dest) throws SQLException, AuthorizeException {
         // find all policies for the source object

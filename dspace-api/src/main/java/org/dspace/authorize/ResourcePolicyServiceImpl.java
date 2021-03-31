@@ -409,4 +409,10 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
         }
         return isMy;
     }
+
+    @Override
+    public List<ResourcePolicyOwnerVO> findValidPolicyOwners(Context c, List<UUID> dsoIds, int actionID)
+        throws SQLException {
+        return resourcePolicyDAO.findValidPolicyOwners(c, dsoIds, actionID);
+    }
 }

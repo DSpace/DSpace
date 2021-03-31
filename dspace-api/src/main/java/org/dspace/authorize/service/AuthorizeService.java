@@ -10,9 +10,11 @@ package org.dspace.authorize.service;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.ResourcePolicyOwnerVO;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
@@ -333,13 +335,27 @@ public interface AuthorizeService {
     public List<ResourcePolicy> getPoliciesActionFilter(Context c, DSpaceObject o, int actionID) throws SQLException;
 
     /**
-     * Return a list of policies for an object that match the action except the record labeled with the rpType
+     * Return a list of date valid policy owners for a list of object that match the
+     * action.
      *
-     * @param c        context
-     * @param o        DSpaceObject policies relate to
-     * @param actionID action (defined in class Constants)
-     * @param rpType   the resource policy type
-     * @return list of resource policies
+     * @param  c            context
+     * @param  dsoIds       DSpaceObject ids policies relate to
+     * @param  actionID     action (defined in class Constants)
+     * @return              list of resource policies
+     * @throws SQLException if there's a database problem
+     */
+    public List<ResourcePolicyOwnerVO> getValidPolicyOwnersActionFilter(Context c, List<UUID> dsoIds, int actionID)
+        throws SQLException;
+
+    /**
+     * Return a list of policies for an object that match the action except the
+     * record labeled with the rpType
+     *
+     * @param  c            context
+     * @param  o            DSpaceObject policies relate to
+     * @param  actionID     action (defined in class Constants)
+     * @param  rpType       the resource policy type
+     * @return              list of resource policies
      * @throws SQLException if there's a database problem
      */
     public List<ResourcePolicy> getPoliciesActionFilterExceptRpType(Context c, DSpaceObject o, int actionID,
