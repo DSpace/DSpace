@@ -83,4 +83,16 @@ public class SearchResultMatcher {
             ))
         );
     }
+
+    public static Matcher<? super Object> matchEmbeddedFacetValues(String label, int count,
+                                                                   String type,
+                                                                   String search_href) {
+        return allOf(
+            hasJsonPath("$.label", is(label)),
+            hasJsonPath("$.count", is(count)),
+            hasJsonPath("$.type", is(type)),
+            hasJsonPath("$._links.search.href", containsString(search_href))
+        );
+    }
+
 }
