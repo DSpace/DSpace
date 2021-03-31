@@ -259,6 +259,14 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
         List<MetadataValue> relationshipMetadataList = itemService
             .getMetadata(leftItem, MetadataSchemaEnum.RELATION.getName(), "isAuthorOfPublication", null, Item.ANY);
         assertThat(relationshipMetadataList.size(), equalTo(0));
+
+        //verify there's relation.isPublicationOfAuthor actual metadata on the author
+        assertThat(rightItem.getMetadata().stream()
+                .filter(metadataValue -> metadataValue.getMetadataField().getElement().equals("isPublicationOfAuthor"))
+                .collect(Collectors.toList()).size(), equalTo(1));
+        assertThat(itemService
+                .getMetadata(rightItem, MetadataSchemaEnum.RELATION.getName(), "isPublicationOfAuthor", null, Item.ANY)
+                .size(), equalTo(1));
     }
 
     @Test
@@ -507,6 +515,14 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
         List<MetadataValue> relationshipMetadataList = itemService
             .getMetadata(leftItem, MetadataSchemaEnum.RELATION.getName(), "isAuthorOfPublication", null, Item.ANY);
         assertThat(relationshipMetadataList.size(), equalTo(0));
+
+        //verify there's relation.isPublicationOfAuthor actual metadata on the author
+        assertThat(rightItem.getMetadata().stream()
+                .filter(metadataValue -> metadataValue.getMetadataField().getElement().equals("isPublicationOfAuthor"))
+                .collect(Collectors.toList()).size(), equalTo(1));
+        assertThat(itemService
+                .getMetadata(rightItem, MetadataSchemaEnum.RELATION.getName(), "isPublicationOfAuthor", null, Item.ANY)
+                .size(), equalTo(1));
     }
 
     @Test
@@ -550,15 +566,20 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
         assertThat(authorList.get(0).getMetadataField().getQualifier(), equalTo("author"));
         assertNull(authorList.get(0).getAuthority());
 
-        //verify there's relation.isAuthorOfPublication actual metadata
-        plainRelationshipMetadataList = leftItem.getMetadata().stream()
+        //verify there's relation.isAuthorOfPublication actual metadata on the publication
+        assertThat(leftItem.getMetadata().stream()
                 .filter(metadataValue -> metadataValue.getMetadataField().getElement().equals("isAuthorOfPublication"))
-                .collect(Collectors.toList());
-        assertThat(plainRelationshipMetadataList.size(), equalTo(1));
-        //verify there's relation.isAuthorOfPublication actual metadata
-        List<MetadataValue> relationshipMetadataList = itemService
-            .getMetadata(leftItem, MetadataSchemaEnum.RELATION.getName(), "isAuthorOfPublication", null, Item.ANY);
-        assertThat(relationshipMetadataList.size(), equalTo(1));
+                .collect(Collectors.toList()).size(), equalTo(1));
+        assertThat(itemService
+                .getMetadata(leftItem, MetadataSchemaEnum.RELATION.getName(), "isAuthorOfPublication", null, Item.ANY)
+                .size(), equalTo(1));
+        //verify there's relation.isPublicationOfAuthor actual metadata on the author
+        assertThat(rightItem.getMetadata().stream()
+                .filter(metadataValue -> metadataValue.getMetadataField().getElement().equals("isPublicationOfAuthor"))
+                .collect(Collectors.toList()).size(), equalTo(1));
+        assertThat(itemService
+                .getMetadata(rightItem, MetadataSchemaEnum.RELATION.getName(), "isPublicationOfAuthor", null, Item.ANY)
+                .size(), equalTo(1));
     }
 
     @Test
