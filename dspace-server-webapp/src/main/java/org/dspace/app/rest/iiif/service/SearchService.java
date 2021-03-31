@@ -204,10 +204,10 @@ public class SearchService extends AbstractResourceService {
     private AnnotationGenerator getAnnotation(JsonElement highlight, String pageId, UUID uuid) {
         JsonObject hcoords = highlight.getAsJsonObject();
         String text = (hcoords.get("text").getAsString());
-        Integer ulx = hcoords.get("ulx").getAsInt();
-        Integer uly = hcoords.get("uly").getAsInt();
-        Integer lrx = hcoords.get("lrx").getAsInt();
-        Integer lry = hcoords.get("lry").getAsInt();
+        int ulx = hcoords.get("ulx").getAsInt();
+        int uly = hcoords.get("uly").getAsInt();
+        int lrx = hcoords.get("lrx").getAsInt();
+        int lry = hcoords.get("lry").getAsInt();
         String w = Integer.toString(lrx - ulx);
         String h = Integer.toString(lry - uly);
         String params = ulx + "," + uly + "," + w + "," + h;
