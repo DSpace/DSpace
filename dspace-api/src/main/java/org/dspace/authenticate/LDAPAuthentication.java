@@ -141,6 +141,15 @@ public class LDAPAuthentication
         // Prevents anonymous users from being added to this group, and the second check
         // ensures they are LDAP users
         try {
+            // without a logged in user, this method should return an empty list
+            if (context.getCurrentUser() == null) {
+                return Collections.EMPTY_LIST;
+            }
+            // if the logged in user does not have a netid, it's not an LDAP user
+            // and this method should return an empty list
+            if (context.getCurrentUser().getNetid() == null) {
+                return Collections.EMPTY_LIST;
+            }
             if (!context.getCurrentUser().getNetid().equals("")) {
                 String groupName = configurationService.getProperty("authentication-ldap.login.specialgroup");
                 if ((groupName != null) && (!groupName.trim().equals(""))) {
@@ -681,7 +690,7 @@ public class LDAPAuthentication
         if (StringUtils.isNotBlank(dn)) {
             System.out.println("dn:" + dn);
             int i = 1;
-            String groupMap = configurationService.getProperty("authentication-ldap", "login.groupmap." + i);
+            String groupMap = configurationService.getProperty("authentication-ldap.login.groupmap." + i);
 
             boolean cmp;
 
@@ -721,7 +730,7 @@ public class LDAPAuthentication
                     }
                 }
 
-                groupMap = configurationService.getProperty("authentication-ldap", "login.groupmap." + ++i);
+                groupMap = configurationService.getProperty("authentication-ldap.login.groupmap." + ++i);
             }
         }
     }

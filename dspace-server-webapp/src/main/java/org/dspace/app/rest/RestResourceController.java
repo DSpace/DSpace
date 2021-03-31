@@ -11,7 +11,6 @@ import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFI
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG;
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -916,14 +915,12 @@ public class RestResourceController implements InitializingBean {
     @RequestMapping(method = RequestMethod.GET)
     @SuppressWarnings("unchecked")
     public <T extends RestAddressableModel> PagedModel<DSpaceResource<T>> findAll(@PathVariable String apiCategory,
-                                                                                      @PathVariable String model,
-                                                                                      Pageable page,
-                                                                                      PagedResourcesAssembler assembler,
-                                                                                      HttpServletResponse response) {
+            @PathVariable String model, Pageable page, PagedResourcesAssembler assembler, HttpServletResponse response,
+            @RequestParam MultiValueMap<String, Object> parameters) {
+
+        String encodedParameterString = getEncodedParameterStringFromRequestParams(parameters);
         DSpaceRestRepository<T, ?> repository = utils.getResourceRepository(apiCategory, model);
-        Link link = linkTo(methodOn(this.getClass(), apiCategory, model).findAll(apiCategory, model,
-                                                                                 page, assembler, response))
-            .withSelfRel();
+        Link link = linkTo(this.getClass(), apiCategory, model).slash(encodedParameterString).withSelfRel();
 
         Page<DSpaceResource<T>> resources;
         try {
@@ -951,6 +948,7 @@ public class RestResourceController implements InitializingBean {
 
     @RequestMapping(method = RequestMethod.GET, value = "/search")
     public RepresentationModel listSearchMethods(@PathVariable String apiCategory, @PathVariable String model) {
+        checkModelPluralForm(apiCategory, model);
         RepresentationModel root = new RepresentationModel();
         DSpaceRestRepository repository = utils.getResourceRepository(apiCategory, model);
 

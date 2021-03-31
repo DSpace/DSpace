@@ -36,7 +36,7 @@
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
                 <configuration>
-                    <!--Exclude license check for XMLUI files which don't need it-->
+                    <!--Exclude license check for third-party files which don't need it-->
                     <excludes>
                         <exclude>**/static/reports/spin.js</exclude>
                         <exclude>**/static/reports/README.md</exclude>

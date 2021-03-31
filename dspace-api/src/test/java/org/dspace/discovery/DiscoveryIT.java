@@ -19,11 +19,13 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.ClaimedTaskBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.PoolTaskBuilder;
 import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -238,6 +240,39 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         assertSearchQuery(IndexableItem.TYPE, 1);
     }
 
+    @Test
+    public void solrRecordAfterDeleteTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context)
+                                              .withName("Parent Community")
+                                              .build();
+        Collection col = CollectionBuilder.createCollection(context, community)
+                                          .withName("Collection")
+                                          .build();
+
+        Item item1 = ItemBuilder.createItem(context, col)
+                               .withTitle("Publication 1")
+                               .build();
+
+        Item item2 = ItemBuilder.createItem(context, col)
+                                .withTitle("Publication 2")
+                                .build();
+
+        context.restoreAuthSystemState();
+
+        // we start with 2 items
+        assertSearchQuery(IndexableItem.TYPE, 2);
+        // simulate the delete of item2
+        deleteItem(item2);
+        // now we should have 1 item
+        assertSearchQuery(IndexableItem.TYPE, 1);
+        // simulate the delete of item1
+        deleteItem(item1);
+        // now we should have 0 item
+        assertSearchQuery(IndexableItem.TYPE, 0);
+
+    }
+
     private void assertSearchQuery(String resourceType, int size) throws SearchServiceException {
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setQuery("*:*");
@@ -254,6 +289,15 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
         workspaceItem = context.reloadEntity(workspaceItem);
         XmlWorkflowItem workflowItem = workflowService.startWithoutNotify(context, workspaceItem);
+        context.commit();
+        indexer.commit();
+        context.restoreAuthSystemState();
+    }
+
+    private void deleteItem(Item item) throws SQLException, AuthorizeException, IOException, SearchServiceException {
+        context.turnOffAuthorisationSystem();
+        item = context.reloadEntity(item);
+        itemService.delete(context, item);
         context.commit();
         indexer.commit();
         context.restoreAuthSystemState();
