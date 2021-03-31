@@ -775,6 +775,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                          .andExpect(status().isCreated())
                    .andDo(result -> idRef2.set(read(result.getResponse().getContentAsString(), "$.id")));
 
+        publication1 = itemService.find(context, publication1.getID());
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
         // Ensure that we now have three dc.contributor.author mdv ("Smith, Donald", "plain text", "Smith, Maria"
         // In that order which will be checked below the rest call
@@ -801,6 +802,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         itemService.update(context, publication1);
 
         context.restoreAuthSystemState();
+        publication1 = itemService.find(context, publication1.getID());
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
 
         // Assert that the list of dc.contributor.author mdv is now of size 4 in the following order:
@@ -838,6 +840,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                          .andExpect(status().isCreated())
                    .andDo(result -> idRef3.set(read(result.getResponse().getContentAsString(), "$.id")));
 
+        publication1 = itemService.find(context, publication1.getID());
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
         // Assert that our dc.contributor.author mdv list is now of size 5
         assertEquals(5, list.size());
@@ -901,6 +904,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         itemService.update(context, publication1);
 
         context.restoreAuthSystemState();
+        publication1 = itemService.find(context, publication1.getID());
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
 
         assertEquals(10, list.size());
