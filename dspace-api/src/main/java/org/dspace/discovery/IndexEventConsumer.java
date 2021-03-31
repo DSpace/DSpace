@@ -160,7 +160,8 @@ public class IndexEventConsumer implements Consumer {
 
                     // If the event subject is a Collection and the event object is an Item,
                     // also update the object in order to index mapped/unmapped Items
-                    if (subject.getType() == Constants.COLLECTION && object.getType() == Constants.ITEM) {
+                    if (subject != null &&
+                        subject.getType() == Constants.COLLECTION && object.getType() == Constants.ITEM) {
                         objectsToUpdate.addAll(indexObjectServiceFactory.getIndexableObjects(ctx, object));
                     }
                 }
