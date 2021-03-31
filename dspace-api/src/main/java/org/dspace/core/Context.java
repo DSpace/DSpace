@@ -112,7 +112,7 @@ public class Context implements AutoCloseable {
     /**
      * Context mode
      */
-    private Mode mode = Mode.READ_WRITE;
+    private Mode mode;
 
     /**
      * Cache that is only used the context is in READ_ONLY mode
@@ -130,7 +130,6 @@ public class Context implements AutoCloseable {
     }
 
     protected Context(EventService eventService, DBConnection dbConnection) {
-        this.mode = Mode.READ_WRITE;
         this.eventService = eventService;
         this.dbConnection = dbConnection;
         init();
@@ -142,7 +141,6 @@ public class Context implements AutoCloseable {
      * No user is authenticated.
      */
     public Context() {
-        this.mode = Mode.READ_WRITE;
         init();
     }
 
@@ -187,7 +185,10 @@ public class Context implements AutoCloseable {
 
         authStateChangeHistory = new Stack<>();
         authStateClassCallHistory = new Stack<>();
-        setMode(this.mode);
+
+        if (this.mode != null) {
+            setMode(this.mode);
+        }
     }
 
     /**
