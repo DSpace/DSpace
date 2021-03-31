@@ -352,7 +352,6 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         ArrayList<BulkEditChange> changes = new ArrayList<BulkEditChange>();
 
         // Make the changes
-        Context.Mode originalMode = c.getCurrentMode();
         c.setMode(Context.Mode.BATCH_EDIT);
 
         // Process each change
@@ -607,9 +606,6 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             // keep track of current rows processed
             rowCount++;
         }
-
-        c.setMode(originalMode);
-
 
         // Return the changes
         if (!change) {

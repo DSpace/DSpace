@@ -794,15 +794,6 @@ public class Context implements AutoCloseable {
     }
 
     /**
-     * The current database mode of this context.
-     *
-     * @return The current mode
-     */
-    public Mode getCurrentMode() {
-        return mode;
-    }
-
-    /**
      * Enable or disable "batch processing mode" for this context.
      *
      * Enabling batch processing mode means that the database connection is configured so that it is optimized to

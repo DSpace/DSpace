@@ -69,7 +69,6 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
 
     @Override
     public DSpaceCSV export(Context context, Iterator<Item> toExport, boolean exportAll) throws Exception {
-        Context.Mode originalMode = context.getCurrentMode();
         context.setMode(Context.Mode.READ_ONLY);
 
         // Process each item
@@ -80,7 +79,6 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
             context.uncacheEntity(item);
         }
 
-        context.setMode(originalMode);
         // Return the results
         return csv;
     }
