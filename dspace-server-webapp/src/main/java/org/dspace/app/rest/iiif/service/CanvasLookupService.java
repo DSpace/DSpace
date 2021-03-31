@@ -22,7 +22,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 
 /**
- * Canvases may be dereferenced separately from the manifest via their URIs.
+ * Canvases may be dereferenced separately from the manifest via their IDs.
  */
 @Component
 public class CanvasLookupService extends AbstractResourceService {
@@ -45,8 +45,6 @@ public class CanvasLookupService extends AbstractResourceService {
         }
         Info info =
                 utils.validateInfoForSingleCanvas(utils.getInfo(context, item, IIIF_BUNDLE), canvasPosition);
-        ArrayList<Bitstream> bitstreams = new ArrayList<>();
-        bitstreams.add(bitstream);
         UUID bitstreamID = bitstream.getID();
         String mimeType = utils.getBitstreamMimeType(bitstream, context);
         CanvasGenerator canvas = canvasService.getCanvas(item.getID().toString(), info, canvasPosition);
