@@ -25,9 +25,11 @@ import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ClaimedTaskRest;
 import org.dspace.app.rest.model.PoolTaskRest;
+import org.dspace.app.rest.repository.handler.service.UriListHandlerService;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -42,8 +44,10 @@ import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.state.actions.Action;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
+import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -86,6 +90,12 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
     @Autowired
     DiscoverableEndpointsService discoverableEndpointsService;
 
+    @Autowired
+    private UriListHandlerService uriListHandlerService;
+
+    @Autowired
+    XmlWorkflowItemService xmlWorkflowItemService;
+
     @Override
     @PreAuthorize("hasPermission(#id, 'CLAIMEDTASK', 'READ')")
     public ClaimedTaskRest findOne(Context context, Integer id) {
@@ -125,6 +135,54 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
         }
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @SearchRestMethod(name = "findAllByItem")
+    public Page<ClaimedTaskRest> findAllByItem(@Parameter(value = "uuid", required = true) UUID itemUUID,
+           Pageable pageable) {
+        List<ClaimedTask> tasks = null;
+        try {
+            Context context = obtainContext();
+            Item item = itemService.find(context, itemUUID);
+            if (item == null) {
+                throw new UnprocessableEntityException("There is no Item with uuid provided, uuid:" + itemUUID);
+            }
+            XmlWorkflowItem xmlWFI = xmlWorkflowItemService.findByItem(context, item);
+            if (xmlWFI == null) {
+                return null;
+            } else {
+                tasks = claimedTaskService.findByWorkflowItem(context, xmlWFI);
+            }
+            return converter.toRestPage(tasks, pageable, utils.obtainProjection());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @SearchRestMethod(name = "findByItem")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    public ClaimedTaskRest findByItem(@Parameter(value = "uuid", required = true) UUID itemUUID) {
+        ClaimedTask claimedTask = null;
+        try {
+            Context context = obtainContext();
+            Item item = itemService.find(context, itemUUID);
+            if (item == null) {
+                throw new UnprocessableEntityException("There is no Item with uuid provided, uuid:" + itemUUID);
+            }
+            XmlWorkflowItem xmlWFI = xmlWorkflowItemService.findByItem(context, item);
+            if (xmlWFI == null) {
+                return null;
+            } else {
+                claimedTask = claimedTaskService.findByWorkflowIdAndEPerson(context, xmlWFI, context.getCurrentUser());
+            }
+            if (claimedTask == null) {
+                return null;
+            }
+            return converter.toRest(claimedTask, utils.obtainProjection());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
     @Override
     public Class<ClaimedTaskRest> getDomainClass() {
         return ClaimedTaskRest.class;
@@ -139,7 +197,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
         if (task == null) {
             throw new ResourceNotFoundException("ClaimedTask ID " + id + " not found");
         }
-        XmlWorkflowServiceFactory factory = (XmlWorkflowServiceFactory) XmlWorkflowServiceFactory.getInstance();
+        XmlWorkflowServiceFactory factory = XmlWorkflowServiceFactory.getInstance();
         Workflow workflow;
         try {
             workflow = factory.getWorkflowFactory().getWorkflow(task.getWorkflowItem().getCollection());
@@ -198,9 +256,36 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
     }
 
     @Override
+    protected ClaimedTaskRest createAndReturn(Context context, List<String> list)
+            throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
+        HttpServletRequest request = getRequestService().getCurrentRequest().getHttpServletRequest();
+        ClaimedTask claimedTask = null;
+        try {
+            PoolTask task = uriListHandlerService.handle(context, request, list, PoolTask.class);
+            if (task == null) {
+                throw new UnprocessableEntityException(
+                        "No PoolTask record found, the uri-list does not contait a resource");
+            }
+            XmlWorkflowServiceFactory factory = (XmlWorkflowServiceFactory) XmlWorkflowServiceFactory.getInstance();
+            Workflow workflow = factory.getWorkflowFactory().getWorkflow(task.getWorkflowItem().getCollection());
+            Step step = workflow.getStep(task.getStepID());
+            WorkflowActionConfig currentActionConfig = step.getActionConfig(task.getActionID());
+            workflowService.doState(context, context.getCurrentUser(), request, task.getWorkflowItem().getID(),
+                    workflow, currentActionConfig);
+            claimedTask = claimedTaskService.findByWorkflowIdAndEPerson(context,
+                                             task.getWorkflowItem(), context.getCurrentUser());
+        } catch (AuthorizeException e) {
+            throw new RESTAuthorizationException(e);
+        } catch (WorkflowConfigurationException | MessagingException | WorkflowException | IOException e) {
+            throw new UnprocessableEntityException(e.getMessage(), e);
+        }
+        return converter.toRest(claimedTask, utils.obtainProjection());
+    }
+
+    @Override
     public void afterPropertiesSet() throws Exception {
         discoverableEndpointsService.register(this, Arrays.asList(
-                new Link("/api/" + ClaimedTaskRest.CATEGORY + "/" + ClaimedTaskRest.NAME + "/search",
-                        ClaimedTaskRest.NAME + "-search")));
+                new Link("/api/" + ClaimedTaskRest.CATEGORY + "/" + ClaimedTaskRest.PLURAL_NAME + "/search",
+                        ClaimedTaskRest.PLURAL_NAME + "-search")));
     }
 }

@@ -7,6 +7,21 @@
  */
 package org.dspace.submit.model;
 
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.util.Date;
+
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.Bitstream;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.service.GroupService;
+import org.dspace.util.DateMathParser;
+import org.springframework.beans.factory.annotation.Autowired;
+
 /**
  * This class represents an option available in the submission upload section to
  * set permission on a file. An option is defined by a name such as "open
@@ -18,6 +33,15 @@ package org.dspace.submit.model;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class AccessConditionOption {
+
+    @Autowired
+    AuthorizeService authorizeService;
+
+    @Autowired
+    GroupService groupService;
+
+    DateMathParser dateMathParser = new DateMathParser();
+
     /** An unique name identifying the access contion option **/
     private String name;
 
@@ -26,16 +50,6 @@ public class AccessConditionOption {
      * such option is used
      */
     private String groupName;
-
-    /**
-     * this is in alternative to the {@link #groupName}. The sub-groups listed in
-     * the DSpace group identified by the name here specified will be available to
-     * the user to personalize the access condition. They can be for instance
-     * University Staff, University Students, etc. so that a "restricted access"
-     * option can be further specified without the need to create separate access
-     * condition options for each group
-     */
-    private String selectGroupName;
 
     /**
      * set to <code>true</code> if this option requires a start date to be indicated
@@ -95,6 +109,10 @@ public class AccessConditionOption {
         this.hasEndDate = hasEndDate;
     }
 
+    /**
+     * Explanation see: {@link #startDateLimit}
+     * @return startDateLimit
+     */
     public String getStartDateLimit() {
         return startDateLimit;
     }
@@ -103,6 +121,10 @@ public class AccessConditionOption {
         this.startDateLimit = startDateLimit;
     }
 
+    /**
+     * Explanation see: {@link #endDateLimit}
+     * @return endDateLimit
+     */
     public String getEndDateLimit() {
         return endDateLimit;
     }
@@ -111,11 +133,62 @@ public class AccessConditionOption {
         this.endDateLimit = endDateLimit;
     }
 
-    public String getSelectGroupName() {
-        return selectGroupName;
-    }
+    /**
+     * Create a new resource policy for a bitstream
+     * @param context DSpace context
+     * @param b bitstream for which resource policy is created
+     * @param name name of the resource policy
+     * @param description description of the resource policy
+     * @param startDate start date of the resource policy. If {@link #getHasStartDate()} returns false,
+     *                  startDate should be null. Otherwise startDate may not be null.
+     * @param endDate end date of the resource policy. If {@link #getHasEndDate()} returns false,
+     *                endDate should be null. Otherwise endDate may not be null.
+     */
+    public void createResourcePolicy(Context context, Bitstream b, String name, String description,
+                                     Date startDate, Date endDate)
+            throws SQLException, AuthorizeException, ParseException {
+        if (getHasStartDate() && startDate == null) {
+            throw new IllegalStateException("The access condition " + getName() + " requires a start date.");
+        }
+        if (getHasEndDate() && endDate == null) {
+            throw new IllegalStateException("The access condition " + getName() + " requires an end date.");
+        }
+        if (!getHasStartDate() && startDate != null) {
+            throw new IllegalStateException("The access condition " + getName() + " cannot contain a start date.");
+        }
+        if (!getHasEndDate() && endDate != null) {
+            throw new IllegalStateException("The access condition " + getName() + " cannot contain an end date.");
+        }
 
-    public void setSelectGroupName(String selectGroupName) {
-        this.selectGroupName = selectGroupName;
+        Date latestStartDate = null;
+        if (getStartDateLimit() != null) {
+            latestStartDate = dateMathParser.parseMath(getStartDateLimit());
+        }
+
+        Date latestEndDate = null;
+        if (getEndDateLimit() != null) {
+            latestEndDate = dateMathParser.parseMath(getEndDateLimit());
+        }
+
+        // throw if startDate after latestStartDate
+        if (startDate != null && latestStartDate != null && startDate.after(latestStartDate)) {
+            throw new IllegalStateException(String.format(
+                "The start date of access condition %s should be earlier than %s from now.",
+                getName(), getStartDateLimit()
+            ));
+        }
+
+        // throw if endDate after latestEndDate
+        if (endDate != null && latestEndDate != null && endDate.after(latestEndDate)) {
+            throw new IllegalStateException(String.format(
+                "The end date of access condition %s should be earlier than %s from now.",
+                getName(), getEndDateLimit()
+            ));
+        }
+
+        Group group = groupService.findByName(context, getGroupName());
+        authorizeService.createResourcePolicy(context, b, group, null, Constants.READ,
+                ResourcePolicy.TYPE_CUSTOM, name, description, startDate,
+                endDate);
     }
 }

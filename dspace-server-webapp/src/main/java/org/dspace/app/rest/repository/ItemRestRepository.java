@@ -63,9 +63,9 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
 
     private static final Logger log = Logger.getLogger(ItemRestRepository.class);
 
-    private static final String[] COPYVIRTUAL_ALL = {"all"};
-    private static final String[] COPYVIRTUAL_CONFIGURED = {"configured"};
-    private static final String REQUESTPARAMETER_COPYVIRTUALMETADATA = "copyVirtualMetadata";
+    public static final String[] COPYVIRTUAL_ALL = {"all"};
+    public static final String[] COPYVIRTUAL_CONFIGURED = {"configured"};
+    public static final String REQUESTPARAMETER_COPYVIRTUALMETADATA = "copyVirtualMetadata";
 
     @Autowired
     MetadataConverter metadataConverter;
@@ -206,7 +206,14 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
             //           of the item's relationships and copy their data depending on the
             //           configuration.
             for (Relationship relationship : relationshipService.findByItem(context, item)) {
-                relationshipService.delete(obtainContext(), relationship);
+                boolean copyToLeft = relationship.getRelationshipType().isCopyToLeft();
+                boolean copyToRight = relationship.getRelationshipType().isCopyToRight();
+                if (relationship.getLeftItem().getID().equals(item.getID())) {
+                    copyToLeft = false;
+                } else {
+                    copyToRight = false;
+                }
+                relationshipService.forceDelete(obtainContext(), relationship, copyToLeft, copyToRight);
             }
         } else {
             // Option 3: Copy the virtual metadata of selected types of this item to its related items. The copyVirtual
@@ -256,7 +263,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
             copyToRight = false;
         }
 
-        relationshipService.delete(obtainContext(), relationshipToDelete, copyToLeft, copyToRight);
+        relationshipService.forceDelete(obtainContext(), relationshipToDelete, copyToLeft, copyToRight);
     }
 
     @Override
