@@ -26,14 +26,6 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  */
 public interface XmlWorkflowCuratorService {
     /**
-     * Does this workflow item need curation now?
-     *
-     * @param wfi the item in question.
-     * @return true if the item is in a state needing curation.
-     */
-    public boolean needsCuration(XmlWorkflowItem wfi);
-
-    /**
      * Determines and executes curation on a Workflow item.
      *
      * @param c the context
@@ -54,7 +46,7 @@ public interface XmlWorkflowCuratorService {
      * @param curator the curation context
      * @param c the user context
      * @param wfId the workflow item's ID
-     * @return true if TODO
+     * @return true if curation failed.
      * @throws AuthorizeException if authorization error
      * @throws IOException if IO error
      * @throws SQLException if database error
@@ -68,7 +60,7 @@ public interface XmlWorkflowCuratorService {
      * @param curator the curation context
      * @param c the user context
      * @param wfi the workflow item
-     * @return true if TODO
+     * @return true if curation failed.
      * @throws AuthorizeException if authorization error
      * @throws IOException if IO error
      * @throws SQLException if database error
