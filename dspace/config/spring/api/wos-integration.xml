@@ -37,6 +37,7 @@
         <entry key-ref="wos.orcid" value-ref="wosOrcidContrib"/>
         <entry key-ref="wos.contributorEditor" value-ref="wosContributorEditorContrib"/>
         <entry key-ref="wos.wosId" value-ref="wosIdContrib"/>
+        <entry key-ref="wos.rid" value-ref="wosRidContrib"/>
     </util:map>
  
     <bean id="wosCitationEditionContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
@@ -270,6 +271,16 @@
 
     <bean id="wos.contributorEditor" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.contributor.editor"/>
+    </bean>
+
+    <bean id="wosRidContrib" class="org.dspace.importer.external.metadatamapping.contributor.WosIdentifierRidContributor">
+        <property name="field" ref="wos.rid"/>
+        <property name="query" value="static_data/contributors/contributor"/>
+        <property name="prefixToNamespaceMapping" ref="wosNs"/>
+    </bean>
+
+    <bean id="wos.rid" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="person.identifier.rid"/>
     </bean>
 
     <util:map id="wosNs" map-class="java.util.HashMap"
