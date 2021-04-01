@@ -81,4 +81,9 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.nbevent.NBEventsRunnableCli"/>
     </bean>
 
+    <bean id="create-wsi" class="org.dspace.perucris.externalservices.CreateWorkspaceItemWithExternalSourceCliScriptConfiguration">
+        <property name="description" value="Perform the creating of workspace item using external source"/>
+        <property name="dspaceRunnableClass" value="org.dspace.perucris.externalservices.CreateWorkspaceItemWithExternalSourceCli"/>
+    </bean>
+
 </beans>

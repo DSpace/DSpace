@@ -167,6 +167,13 @@
 
     <dc-type>
         <schema>oairecerif</schema>
+        <element>citation</element>
+        <qualifier>number</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
         <element>funding</element>
         <qualifier>endDate</qualifier>
         <scope_note></scope_note>
