@@ -7,6 +7,7 @@
  */
 package org.dspace.perucris.externalservices;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -23,6 +24,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.CollectionServiceImpl;
 import org.dspace.content.Item;
 import org.dspace.content.ItemServiceImpl;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
@@ -79,6 +81,8 @@ public class CreateWorkspaceItemWithExternalSource extends DSpaceRunnable<
                              .getServiceByName(ExternalDataServiceImpl.class.getName(), ExternalDataServiceImpl.class);
         nameToProvider.put("scopus", new DSpace().getServiceManager().getServiceByName("scopusLiveImportDataProvider",
                                          LiveImportDataProvider.class));
+        nameToProvider.put("wos", new DSpace().getServiceManager().getServiceByName("wosLiveImportDataProvider",
+                                      LiveImportDataProvider.class));
         this.service = commandLine.getOptionValue('s');
     }
 
@@ -139,7 +143,7 @@ public class CreateWorkspaceItemWithExternalSource extends DSpaceRunnable<
                 if (StringUtils.isNotBlank(id)) {
                     int recordsFound = dataProvider.getNumberOfResults(id);
                     while (recordsFound == -1 || totalRecordWorked < recordsFound) {
-                        totalRecordWorked += fillWorkspaceItems(context, currentRecord, dataProvider, id);
+                        totalRecordWorked += fillWorkspaceItems(context, currentRecord, dataProvider, item, id);
                         currentRecord += LIMIT;
                     }
                 }
@@ -168,57 +172,93 @@ public class CreateWorkspaceItemWithExternalSource extends DSpaceRunnable<
                     id.append("AU-ID(").append(scopusId).append(")");
                 }
                 break;
+            case "wos":
+                String orcidId = itemService.getMetadataFirstValue(item, "person", "identifier", "orcid", Item.ANY);
+                String rid = itemService.getMetadataFirstValue(item, "person", "identifier", "rid", Item.ANY);
+                if (StringUtils.isNotBlank(orcidId) && StringUtils.isNotBlank(rid)) {
+                    id.append("AI=(").append(orcidId).append(" OR ").append(rid).append(")");
+                } else if (StringUtils.isNotBlank(orcidId)) {
+                    id.append("AI=(").append(orcidId).append(")");
+                } else if (StringUtils.isNotBlank(rid)) {
+                    id.append("AI=(").append(rid).append(")");
+                }
+                break;
             default:
         }
         return id.toString();
     }
 
-    private int fillWorkspaceItems(Context context, int record, LiveImportDataProvider dataProvider, String id)
-            throws SQLException {
+    private int fillWorkspaceItems(Context context, int record, LiveImportDataProvider dataProvider,
+            Item item, String id) throws SQLException {
         int countDataObjects = 0;
         try {
             for (ExternalDataObject dataObject : dataProvider.searchExternalDataObjects(id, record, LIMIT)) {
                 if (!exist(dataObject.getMetadata())) {
-                    externalDataService.createWorkspaceItemFromExternalDataObject(context, dataObject, this.collection);
+                    WorkspaceItem wsItem = externalDataService.createWorkspaceItemFromExternalDataObject(context,
+                                                               dataObject, this.collection);
+                    for (MetadataValueDTO mv : metadataValueToAdd(item)) {
+                        itemService.addMetadata(context, wsItem.getItem(), mv.getSchema(), mv.getElement(),
+                                                mv.getQualifier(), null, mv.getValue());
+                    }
                 }
                 countDataObjects++;
             }
         } catch (AuthorizeException e) {
             log.error(e.getMessage(), e);
-        } catch (SearchServiceException e1) {
-            log.error(e1.getMessage(), e1);
         }
         return countDataObjects;
     }
 
-    private boolean exist(List<MetadataValueDTO> metadatas) throws SQLException, SearchServiceException {
-        boolean exist = false;
-        if (metadatas.size() > 0) {
-            switch (this.service) {
-                case "scopus":
-                    exist = checkScopus(metadatas);
-                    break;
-                default:
-            }
+    private boolean exist(List<MetadataValueDTO> metadatas) throws SQLException {
+        if (metadatas.size() == 0) {
+            return false;
         }
-        return exist;
-    }
-
-    private boolean checkScopus(List<MetadataValueDTO> metadatas) throws SQLException, SearchServiceException {
+        MetadataValueDTO metadata = getMetadaToChech();
         for (MetadataValueDTO mv : metadatas) {
+            String schema = mv.getSchema();
             String element = mv.getElement();
             String qualifier = mv.getQualifier();
-            if (StringUtils.equals(element, "identifier") && StringUtils.equals(qualifier, "scopus")) {
+            if (StringUtils.equals(schema, metadata.getSchema()) && StringUtils.equals(element, metadata.getElement())
+                    && StringUtils.equals(qualifier, metadata.getQualifier())) {
+
+                String value = (mv.getValue()).replaceAll(":", "");
                 StringBuilder filter = new StringBuilder();
-                filter.append("dc.identifier.scopus:").append(mv.getValue());
-                Iterator<Item> itemIterator = findItemsByCollection(context, filter.toString());
-                if (itemIterator.hasNext()) {
-                    return true;
+                filter.append(metadata.getSchema()).append(".").append(metadata.getElement());
+                if (StringUtils.isNotBlank(metadata.getQualifier())) {
+                    filter.append(".").append(metadata.getQualifier()).append(":").append(value);
+                } else {
+                    filter.append(":").append(value);
+                }
+                try {
+                    Iterator<Item> itemIterator = findItemsByCollection(context, filter.toString());
+                    if (itemIterator.hasNext()) {
+                        return true;
+                    }
+                } catch (SearchServiceException e) {
+                    log.error(e.getMessage(), e);
                 }
                 return false;
             }
         }
         return false;
+    }
+
+    private MetadataValueDTO getMetadaToChech() {
+        MetadataValueDTO metadata = new MetadataValueDTO();
+        switch (this.service) {
+            case "scopus":
+                metadata.setSchema("dc");
+                metadata.setElement("identifier");
+                metadata.setQualifier("scopus");
+                break;
+            case "wos":
+                metadata.setSchema("dc");
+                metadata.setElement("identifier");
+                metadata.setQualifier("other");
+                break;
+            default:
+        }
+        return metadata;
     }
 
     private Iterator<Item> findItemsByCollection(Context context, String filter)
@@ -245,6 +285,36 @@ public class CreateWorkspaceItemWithExternalSource extends DSpaceRunnable<
         if ("scopus".equals(service)) {
             discoverQuery.addFilterQueries("person.identifier.scopus-author-id:*");
         }
+        if ("wos".equals(service)) {
+            discoverQuery.addFilterQueries("relationship.type:Person");
+            discoverQuery.addFilterQueries("person.identifier.orcid:*");
+            discoverQuery.addFilterQueries("person.identifier.rid:*");
+        }
+    }
+
+    private List<MetadataValueDTO> metadataValueToAdd(Item item) {
+        List<MetadataValueDTO> list = new ArrayList<MetadataValueDTO>();
+        switch (this.service) {
+            case "scopus":
+                String scopusId = itemService.getMetadataFirstValue(item, "person", "identifier",
+                                          "scopus-author-id", Item.ANY);
+                if (StringUtils.isNotBlank(scopusId)) {
+                    list.add(new MetadataValueDTO("perucris", "author", "scopus-author-id", null, scopusId));
+                }
+                break;
+            case "wos":
+                String orcid = itemService.getMetadataFirstValue(item, "person", "identifier", "orcid", Item.ANY);
+                String rid = itemService.getMetadataFirstValue(item, "person", "identifier", "rid", Item.ANY);
+                if (StringUtils.isNotBlank(orcid)) {
+                    list.add(new MetadataValueDTO("perucris", "author", "orcid", null, orcid));
+                }
+                if (StringUtils.isNotBlank(rid)) {
+                    list.add(new MetadataValueDTO("perucris", "author", "rid ", null, rid));
+                }
+                break;
+            default:
+        }
+        return list;
     }
 
     @Override
