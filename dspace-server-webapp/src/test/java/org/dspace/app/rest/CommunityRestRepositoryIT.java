@@ -734,7 +734,22 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                                                               child1.getHandle())
                        )
                    )))
-                   .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
+                   .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/communities?"),
+                           Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/communities?"),
+                           Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/communities?"),
+                           Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/communities?"),
+                           Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$.page.size", is(1)))
+                   .andExpect(jsonPath("$.page.totalPages", is(2)))
+                   .andExpect(jsonPath("$.page.number", is(0)))
+                   .andExpect(jsonPath("$.page.totalElements", is(2)))
         ;
 
         getClient().perform(get("/api/core/communities")
@@ -754,7 +769,20 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                                                               parentCommunity.getHandle())
                        )
                    )))
-                   .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
+                   .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/communities?"),
+                           Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$._links.prev.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/communities?"),
+                           Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/communities?"),
+                           Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/communities?"),
+                           Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$.page.number", is(1)))
+                   .andExpect(jsonPath("$.page.totalPages", is(2)))
                    .andExpect(jsonPath("$.page.size", is(1)))
                    .andExpect(jsonPath("$.page.totalElements", is(2)))
         ;

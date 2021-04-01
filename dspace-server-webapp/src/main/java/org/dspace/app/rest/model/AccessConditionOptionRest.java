@@ -38,22 +38,6 @@ public class AccessConditionOptionRest {
     @JsonInclude(Include.NON_NULL)
     private Date maxEndDate;
 
-    public UUID getGroupUUID() {
-        return groupUUID;
-    }
-
-    public void setGroupUUID(UUID groupUuid) {
-        this.groupUUID = groupUuid;
-    }
-
-    public UUID getSelectGroupUUID() {
-        return selectGroupUUID;
-    }
-
-    public void setSelectGroupUUID(UUID selectGroupUuid) {
-        this.selectGroupUUID = selectGroupUuid;
-    }
-
     public Date getMaxEndDate() {
         return maxEndDate;
     }

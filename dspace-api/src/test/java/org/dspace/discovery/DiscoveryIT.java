@@ -19,12 +19,17 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.ClaimedTaskBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.PoolTaskBuilder;
 import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
+import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
@@ -34,6 +39,7 @@ import org.dspace.discovery.indexobject.IndexablePoolTask;
 import org.dspace.discovery.indexobject.IndexableWorkflowItem;
 import org.dspace.discovery.indexobject.IndexableWorkspaceItem;
 import org.dspace.eperson.EPerson;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
@@ -71,6 +77,10 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
                                                    .getServiceByName(IndexingService.class.getName(),
                                                                      IndexingService.class);
 
+    ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory.getInstance()
+                                                                                      .getMetadataAuthorityService();
 
     @Test
     public void solrRecordsAfterDepositOrDeletionOfWorkspaceItemTest() throws Exception {
@@ -238,6 +248,74 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         assertSearchQuery(IndexableItem.TYPE, 1);
     }
 
+    @Test
+    public void solrRecordAfterDeleteTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context)
+                                              .withName("Parent Community")
+                                              .build();
+        Collection col = CollectionBuilder.createCollection(context, community)
+                                          .withName("Collection")
+                                          .build();
+
+        Item item1 = ItemBuilder.createItem(context, col)
+                               .withTitle("Publication 1")
+                               .build();
+
+        Item item2 = ItemBuilder.createItem(context, col)
+                                .withTitle("Publication 2")
+                                .build();
+
+        context.restoreAuthSystemState();
+
+        // we start with 2 items
+        assertSearchQuery(IndexableItem.TYPE, 2);
+        // simulate the delete of item2
+        deleteItem(item2);
+        // now we should have 1 item
+        assertSearchQuery(IndexableItem.TYPE, 1);
+        // simulate the delete of item1
+        deleteItem(item1);
+        // now we should have 0 item
+        assertSearchQuery(IndexableItem.TYPE, 0);
+
+    }
+
+    @Test
+    public void solrRecordFromMessyItemTest() throws Exception {
+        configurationService.setProperty("authority.controlled.dc.subject", "true");
+        metadataAuthorityService.clearCache();
+        try {
+            context.turnOffAuthorisationSystem();
+
+            parentCommunity = CommunityBuilder.createCommunity(context)
+                                              .withName("Parent Community").build();
+
+            Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                               .withName("Collection 1").build();
+
+            context.restoreAuthSystemState();
+
+            assertSearchQuery(IndexableItem.TYPE, 0);
+
+            context.turnOffAuthorisationSystem();
+
+           ItemBuilder.createItem(context, col1)
+                      .withTitle("Public item 1")
+                      .withIssueDate("2021-01-21")
+                      .withAuthor("Smith, Donald")
+                      .withSubject("Test Value", "NOT-EXISTING", Choices.CF_ACCEPTED)
+                      .build();
+
+            context.restoreAuthSystemState();
+            assertSearchQuery(IndexableItem.TYPE, 1);
+        } finally {
+            configurationService.setProperty("authority.controlled.dc.subject", "false");
+            metadataAuthorityService.clearCache();
+        }
+
+    }
+
     private void assertSearchQuery(String resourceType, int size) throws SearchServiceException {
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setQuery("*:*");
@@ -254,6 +332,15 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
         workspaceItem = context.reloadEntity(workspaceItem);
         XmlWorkflowItem workflowItem = workflowService.startWithoutNotify(context, workspaceItem);
+        context.commit();
+        indexer.commit();
+        context.restoreAuthSystemState();
+    }
+
+    private void deleteItem(Item item) throws SQLException, AuthorizeException, IOException, SearchServiceException {
+        context.turnOffAuthorisationSystem();
+        item = context.reloadEntity(item);
+        itemService.delete(context, item);
         context.commit();
         indexer.commit();
         context.restoreAuthSystemState();

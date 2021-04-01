@@ -36,7 +36,6 @@ import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -362,7 +361,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 SolrQuery countQuery = new SolrQuery("*:*");
                 countQuery.setRows(0);  // don't actually request any data
                 // Get the total amount of results
-                QueryResponse totalResponse = solrSearchCore.getSolr().query(countQuery, SolrRequest.METHOD.POST);
+                QueryResponse totalResponse = solrSearchCore.getSolr().query(countQuery,
+                                                                             solrSearchCore.REQUEST_METHOD);
                 long total = totalResponse.getResults().getNumFound();
 
                 int start = 0;
@@ -378,7 +378,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 // Keep looping until we hit the total number of Solr docs
                 while (start < total) {
                     query.setStart(start);
-                    QueryResponse rsp = solrSearchCore.getSolr().query(query, SolrRequest.METHOD.POST);
+                    QueryResponse rsp = solrSearchCore.getSolr().query(query, solrSearchCore.REQUEST_METHOD);
                     SolrDocumentList docs = rsp.getResults();
 
                     for (SolrDocument doc : docs) {
@@ -439,7 +439,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             SolrQuery solrQuery = new SolrQuery();
             solrQuery.set("spellcheck", true);
             solrQuery.set(SpellingParams.SPELLCHECK_BUILD, true);
-            solrSearchCore.getSolr().query(solrQuery, SolrRequest.METHOD.POST);
+            solrSearchCore.getSolr().query(solrQuery, solrSearchCore.REQUEST_METHOD);
         } catch (SolrServerException e) {
             //Make sure to also log the exception since this command is usually run from a crontab.
             log.error(e, e);
@@ -519,7 +519,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             if (solrSearchCore.getSolr() == null) {
                 return false;
             }
-            rsp = solrSearchCore.getSolr().query(query, SolrRequest.METHOD.POST);
+            rsp = solrSearchCore.getSolr().query(query, solrSearchCore.REQUEST_METHOD);
         } catch (SolrServerException e) {
             throw new SearchServiceException(e.getMessage(), e);
         }
@@ -721,7 +721,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             SolrQuery solrQuery = resolveToSolrQuery(context, discoveryQuery);
 
 
-            QueryResponse queryResponse = solrSearchCore.getSolr().query(solrQuery, SolrRequest.METHOD.POST);
+            QueryResponse queryResponse = solrSearchCore.getSolr().query(solrQuery,
+                                                                         solrSearchCore.REQUEST_METHOD);
             return retrieveResult(context, discoveryQuery, queryResponse);
 
         } catch (Exception e) {
@@ -1048,7 +1049,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             if (filterquery != null) {
                 solrQuery.addFilterQuery(filterquery);
             }
-            QueryResponse rsp = solrSearchCore.getSolr().query(solrQuery, SolrRequest.METHOD.POST);
+            QueryResponse rsp = solrSearchCore.getSolr().query(solrQuery, solrSearchCore.REQUEST_METHOD);
             SolrDocumentList docs = rsp.getResults();
 
             Iterator iter = docs.iterator();
@@ -1152,7 +1153,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             if (solrSearchCore.getSolr() == null) {
                 return Collections.emptyList();
             }
-            QueryResponse rsp = solrSearchCore.getSolr().query(solrQuery, SolrRequest.METHOD.POST);
+            QueryResponse rsp = solrSearchCore.getSolr().query(solrQuery, solrSearchCore.REQUEST_METHOD);
             NamedList mltResults = (NamedList) rsp.getResponse().get("moreLikeThis");
             if (mltResults != null && mltResults.get(item.getType() + "-" + item.getID()) != null) {
                 SolrDocumentList relatedDocs = (SolrDocumentList) mltResults.get(item.getType() + "-" + item.getID());
