@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -315,6 +316,9 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     private String getNodeLabel(String key, boolean useHierarchy) {
         try {
             Node node = getNode(key);
+            if (Objects.isNull(node)) {
+                return null;
+            }
             if (useHierarchy) {
                 return this.buildString(node);
             } else {
