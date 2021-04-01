@@ -157,6 +157,13 @@ public class IndexEventConsumer implements Consumer {
                 } else {
                     log.debug("consume() adding event to update queue: " + event.toString());
                     objectsToUpdate.addAll(indexObjectServiceFactory.getIndexableObjects(ctx, subject));
+
+                    // If the event subject is a Collection and the event object is an Item,
+                    // also update the object in order to index mapped/unmapped Items
+                    if (subject != null &&
+                        subject.getType() == Constants.COLLECTION && object.getType() == Constants.ITEM) {
+                        objectsToUpdate.addAll(indexObjectServiceFactory.getIndexableObjects(ctx, object));
+                    }
                 }
                 break;
 
