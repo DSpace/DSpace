@@ -406,6 +406,7 @@
     <bean id="administrativeView" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
         <property name="id" value="administrativeView"/>
         <!--Which sidebar facets are to be displayed-->
+        <property name="id" value="administrativeView" />
         <property name="sidebarFacets">
             <list>
                 <ref bean="searchFilterDiscoverable" />

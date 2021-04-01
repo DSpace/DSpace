@@ -269,7 +269,23 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                            CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col2.getName(), col2.getID(),
                                                                                 col2.getHandle())
                        )
-                   )));
+                   )))
+                   .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                              Matchers.containsString("/api/core/collections?"),
+                              Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                              Matchers.containsString("/api/core/collections?"),
+                              Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                              Matchers.containsString("/api/core/collections?"),
+                              Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                              Matchers.containsString("/api/core/collections?"),
+                              Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$.page.size", is(1)))
+                   .andExpect(jsonPath("$.page.totalElements", is(2)))
+                   .andExpect(jsonPath("$.page.number", is(0)))
+                   ;
 
         getClient().perform(get("/api/core/collections")
                                 .param("size", "1")
@@ -287,7 +303,22 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                            CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col1.getName(), col1.getID(),
                                                                                 col1.getHandle())
                        )
-                   )));
+                   )))
+                   .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                              Matchers.containsString("/api/core/collections?"),
+                              Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$._links.prev.href", Matchers.allOf(
+                              Matchers.containsString("/api/core/collections?"),
+                              Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                              Matchers.containsString("/api/core/collections?"),
+                              Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                              Matchers.containsString("/api/core/collections?"),
+                              Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$.page.size", is(1)))
+                   .andExpect(jsonPath("$.page.totalElements", is(2)))
+                   .andExpect(jsonPath("$.page.number", is(1)));
     }
 
 
@@ -1887,6 +1918,18 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                             CollectionMatcher.matchProperties(col2.getName(), col2.getID(), col2.getHandle())
                             )))
                  .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(2)))
+                 .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                         Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                         Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
+                 .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                         Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                         Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
+                 .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                         Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                         Matchers.containsString("page=1"), Matchers.containsString("size=2"))))
+                 .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                         Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                         Matchers.containsString("page=3"), Matchers.containsString("size=2"))))
                  .andExpect(jsonPath("$.page.size", is(2)))
                  .andExpect(jsonPath("$.page.totalPages", is(4)))
                  .andExpect(jsonPath("$.page.number", is(0)))
@@ -1902,6 +1945,21 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                            CollectionMatcher.matchProperties(col4.getName(), col4.getID(), col4.getHandle())
                            )))
                 .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(2)))
+                .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.prev.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=1"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=2"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=3"), Matchers.containsString("size=2"))))
                 .andExpect(jsonPath("$.page.size", is(2)))
                 .andExpect(jsonPath("$.page.totalPages", is(4)))
                 .andExpect(jsonPath("$.page.number", is(1)))
@@ -1917,6 +1975,21 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                            CollectionMatcher.matchProperties(col6.getName(), col6.getID(), col6.getHandle())
                            )))
                 .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(2)))
+                .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.prev.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=1"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=2"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=3"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=3"), Matchers.containsString("size=2"))))
                 .andExpect(jsonPath("$.page.size", is(2)))
                 .andExpect(jsonPath("$.page.totalPages", is(4)))
                 .andExpect(jsonPath("$.page.number", is(2)))
@@ -1933,6 +2006,21 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                            CollectionMatcher.matchProperties(col6.getName(), col6.getID(), col6.getHandle())
                            )))
                 .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(3)))
+                .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=0"), Matchers.containsString("size=3"))))
+                .andExpect(jsonPath("$._links.prev.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=0"), Matchers.containsString("size=3"))))
+                .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=1"), Matchers.containsString("size=3"))))
+                .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=2"), Matchers.containsString("size=3"))))
+                .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=2"), Matchers.containsString("size=3"))))
                 .andExpect(jsonPath("$.page.size", is(3)))
                 .andExpect(jsonPath("$.page.totalPages", is(3)))
                 .andExpect(jsonPath("$.page.number", is(1)))
@@ -1983,6 +2071,22 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                         hasJsonPath("$.type", is("collection")))
                         ))
                 .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(2)))
+                .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("query=sample"),
+                        Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("query=sample"),
+                        Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("query=sample"),
+                        Matchers.containsString("page=1"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("query=sample"),
+                        Matchers.containsString("page=2"), Matchers.containsString("size=2"))))
                 .andExpect(jsonPath("$.page.size", is(2)))
                 .andExpect(jsonPath("$.page.totalPages", is(3)))
                 .andExpect(jsonPath("$.page.number", is(0)))
@@ -1998,6 +2102,26 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                         hasJsonPath("$.type", is("collection")))
                         ))
                 .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(2)))
+                .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("query=sample"),
+                        Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.prev.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("query=sample"),
+                        Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("query=sample"),
+                        Matchers.containsString("page=1"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("query=sample"),
+                        Matchers.containsString("page=2"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("query=sample"),
+                        Matchers.containsString("page=2"), Matchers.containsString("size=2"))))
                 .andExpect(jsonPath("$.page.size", is(2)))
                 .andExpect(jsonPath("$.page.totalPages", is(3)))
                 .andExpect(jsonPath("$.page.number", is(1)))
@@ -2013,6 +2137,22 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                         hasJsonPath("$.type", is("collection")))
                         ))
                 .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(1)))
+                .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("query=sample"),
+                        Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.prev.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("query=sample"),
+                        Matchers.containsString("page=1"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("query=sample"),
+                        Matchers.containsString("page=2"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("query=sample"),
+                        Matchers.containsString("page=2"), Matchers.containsString("size=2"))))
                 .andExpect(jsonPath("$.page.size", is(2)))
                 .andExpect(jsonPath("$.page.totalPages", is(3)))
                 .andExpect(jsonPath("$.page.number", is(2)))

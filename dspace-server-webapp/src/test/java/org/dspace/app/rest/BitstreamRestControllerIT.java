@@ -826,6 +826,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
     public void getBitstreamFormatUnauthorized() throws Exception {
 
         resourcePolicyService.removePolicies(context, bitstream, READ);
+        resourcePolicyService.removePolicies(context, bitstream.getBundles().get(0), READ);
 
         getClient()
                 .perform(get("/api/core/bitstreams/" + bitstream.getID() + "/format"))
@@ -836,6 +837,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
     public void getBitstreamFormatForbidden() throws Exception {
 
         resourcePolicyService.removePolicies(context, bitstream, READ);
+        resourcePolicyService.removePolicies(context, bitstream.getBundles().get(0), READ);
 
         getClient(getAuthToken(eperson.getEmail(), password))
                 .perform(get("/api/core/bitstreams/" + bitstream.getID() + "/format"))
