@@ -628,12 +628,14 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                     String authority = metadataValue.getAuthority();
                     String relationshipId = StringUtils.split(authority, "::")[1];
                     Relationship relationship = relationshipService.find(context, Integer.parseInt(relationshipId));
-                    if (relationship.getLeftItem() == (Item) dso) {
-                        relationship.setLeftPlace(mvPlace);
-                    } else {
-                        relationship.setRightPlace(mvPlace);
+                    if (relationship != null) {
+                        if (relationship.getLeftItem() == (Item) dso) {
+                            relationship.setLeftPlace(mvPlace);
+                        } else {
+                            relationship.setRightPlace(mvPlace);
+                        }
+                        relationshipService.update(context, relationship);
                     }
-                    relationshipService.update(context, relationship);
 
                 } else if (!StringUtils.startsWith(metadataValue.getAuthority(),
                                                    Constants.VIRTUAL_AUTHORITY_PREFIX)) {
