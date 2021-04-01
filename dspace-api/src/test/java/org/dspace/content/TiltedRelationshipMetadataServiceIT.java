@@ -12,6 +12,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
 
+import org.dspace.builder.EntityTypeBuilder;
+import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.RelationshipBuilder;
+import org.dspace.builder.RelationshipTypeBuilder;
 import org.junit.Test;
 
 /**
@@ -24,12 +28,25 @@ public class TiltedRelationshipMetadataServiceIT extends RelationshipMetadataSer
      */
     @Override
     protected void initPublicationAuthor() throws Exception {
-        super.initPublicationAuthor();
-
         context.turnOffAuthorisationSystem();
+
+        EntityType publicationEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType authorEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Author").build();
+        leftItem = ItemBuilder.createItem(context, col).withRelationshipType("Publication").build();
+        rightItem = ItemBuilder.createItem(context, col).withRelationshipType("Author")
+                .withPersonIdentifierLastName("familyName")
+                .withPersonIdentifierFirstName("firstName").build();
+        isAuthorOfPublicationRelationshipType =
+                RelationshipTypeBuilder.createRelationshipTypeBuilder(context, publicationEntityType, authorEntityType,
+                        "isAuthorOfPublication", "isPublicationOfAuthor",
+                        null, null, null, null).build();
 
         isAuthorOfPublicationRelationshipType.setTilted(RelationshipType.Tilted.LEFT);
         relationshipTypeService.update(context, isAuthorOfPublicationRelationshipType);
+
+        relationship =
+                RelationshipBuilder.createRelationshipBuilder(context, leftItem, rightItem,
+                        isAuthorOfPublicationRelationshipType).build();
 
         context.restoreAuthSystemState();
     }
