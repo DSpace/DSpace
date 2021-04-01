@@ -261,6 +261,7 @@
 
     <!--The configuration settings for discovery of withdrawn and indiscoverable items (admin only)-->
     <bean id="unDiscoverableItems" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
+        <property name="id" value="undiscoverable"/>
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
             <list>
@@ -403,6 +404,7 @@
 
     <!--The configuration settings for discovery of withdrawn and undiscoverable items (admin only) and regular items-->
     <bean id="administrativeView" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
+        <property name="id" value="administrativeView"/>
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
             <list>
