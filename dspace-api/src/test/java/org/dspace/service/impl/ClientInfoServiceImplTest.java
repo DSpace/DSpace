@@ -97,13 +97,13 @@ public class ClientInfoServiceImplTest extends AbstractDSpaceTest {
         clientInfoService = new ClientInfoServiceImpl(configurationService);
 
         String remoteIp = "1.2.3.4";
-        String xForwardedFor = "10.24.64.14,192.168.1.24";
+        String xForwardedFor = "10.24.64.14, 192.168.1.24";
 
         // Ensure first X-Forwarded-For value is returned
         assertEquals("10.24.64.14",
                 clientInfoService.getClientIp(remoteIp, xForwardedFor));
 
-        xForwardedFor = "192.168.1.24,10.24.64.14";
+        xForwardedFor = "192.168.1.24, 10.24.64.14";
 
         // Ensure second X-Forwarded-For value is returned (as first is listed as a trusted proxy & is ignored)
         assertEquals("10.24.64.14",
