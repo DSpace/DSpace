@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.SolrInputDocument;
@@ -118,6 +119,7 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                                     fieldValue = "e" + resourcePolicy.getEPerson().getID();
                                 }
                                 document.addField("read", fieldValue);
+                                document.addField("admin", fieldValue);
                             }
 
                             // remove the policy from the cache to save memory
@@ -159,14 +161,15 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
 
                 resourceQuery.append(")");
 
-                if (authorizeService.isCommunityAdmin(context)
-                    || authorizeService.isCollectionAdmin(context)) {
+                String locations = DSpaceServicesFactory.getInstance()
+                                                          .getServiceManager()
+                                                          .getServiceByName(SearchService.class.getName(),
+                                                                            SearchService.class)
+                                                          .createLocationQueryForAdministrableItems(context);
+
+                if (StringUtils.isNotBlank(locations)) {
                     resourceQuery.append(" OR ");
-                    resourceQuery.append(DSpaceServicesFactory.getInstance()
-                                                              .getServiceManager()
-                                                              .getServiceByName(SearchService.class.getName(),
-                                                                                SearchService.class)
-                                                              .createLocationQueryForAdministrableItems(context));
+                    resourceQuery.append(locations);
                 }
 
                 solrQuery.addFilterQuery(resourceQuery.toString());
