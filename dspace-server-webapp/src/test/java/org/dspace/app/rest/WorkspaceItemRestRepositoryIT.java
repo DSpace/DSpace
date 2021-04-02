@@ -4972,19 +4972,19 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                   .withAuthor("Smith, Donald")
                                   .withPersonIdentifierLastName("Smith")
                                   .withPersonIdentifierFirstName("Donald")
-                                  .withRelationshipType("Person")
+                                  .withEntityType("Person")
                                   .build();
 
         Item author2 = ItemBuilder.createItem(context, col1)
                                   .withTitle("Author2")
                                   .withIssueDate("2016-02-13")
                                   .withAuthor("Smith, Maria")
-                                  .withRelationshipType("Person")
+                                  .withEntityType("Person")
                                   .build();
 
         //2. One workspace item.
         WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
-                                                          .withRelationshipType("Publication")
+                                                          .withEntityType("Publication")
                                                           .build();
 
         EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();

@@ -143,14 +143,14 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                              .withAuthor("Smith, Donald")
                              .withPersonIdentifierLastName("Smith")
                              .withPersonIdentifierFirstName("Donald")
-                             .withRelationshipType("Person")
+                             .withEntityType("Person")
                              .build();
 
         author2 = ItemBuilder.createItem(context, col2)
                              .withTitle("Author2")
                              .withIssueDate("2016-02-13")
                              .withAuthor("Smith, Maria")
-                             .withRelationshipType("Person")
+                             .withEntityType("Person")
                              .build();
 
         author3 = ItemBuilder.createItem(context, col2)
@@ -158,49 +158,49 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                              .withIssueDate("2016-02-13")
                              .withPersonIdentifierFirstName("Maybe")
                              .withPersonIdentifierLastName("Maybe")
-                             .withRelationshipType("Person")
+                             .withEntityType("Person")
                              .build();
 
         publication1 = ItemBuilder.createItem(context, col3)
                                   .withTitle("Publication1")
                                   .withAuthor("Testy, TEst")
                                   .withIssueDate("2015-01-01")
-                                  .withRelationshipType("Publication")
+                                  .withEntityType("Publication")
                                   .build();
 
         publication2 = ItemBuilder.createItem(context, col3)
                                   .withTitle("Publication2")
                                   .withAuthor("Testy, TEst")
                                   .withIssueDate("2015-01-01")
-                                  .withRelationshipType("Publication")
+                                  .withEntityType("Publication")
                                   .build();
 
         orgUnit1 = ItemBuilder.createItem(context, col3)
                               .withTitle("OrgUnit1")
                               .withAuthor("Testy, TEst")
                               .withIssueDate("2015-01-01")
-                              .withRelationshipType("OrgUnit")
+                              .withEntityType("OrgUnit")
                               .build();
 
         orgUnit2 = ItemBuilder.createItem(context, col3)
                 .withTitle("OrgUnit2")
                 .withAuthor("Testy, TEst")
                 .withIssueDate("2015-01-01")
-                .withRelationshipType("OrgUnit")
+                .withEntityType("OrgUnit")
                 .build();
 
         orgUnit3 = ItemBuilder.createItem(context, col3)
                               .withTitle("OrgUnit3")
                               .withAuthor("Test, Testy")
                               .withIssueDate("2015-02-01")
-                              .withRelationshipType("OrgUnit")
+                              .withEntityType("OrgUnit")
                               .build();
 
         project1 = ItemBuilder.createItem(context, col3)
                               .withTitle("Project1")
                               .withAuthor("Testy, TEst")
                               .withIssueDate("2015-01-01")
-                              .withRelationshipType("Project")
+                              .withEntityType("Project")
                               .build();
 
         isAuthorOfPublicationRelationshipType = relationshipTypeService
@@ -665,7 +665,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                   .withIssueDate("2017-10-17")
                                   .withPersonIdentifierFirstName("Donald")
                                   .withPersonIdentifierLastName("Smith")
-                                  .withRelationshipType("Person")
+                                  .withEntityType("Person")
                                   .build();
 
         Item author2 = ItemBuilder.createItem(context, col2)
@@ -673,7 +673,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                   .withIssueDate("2016-02-13")
                                   .withPersonIdentifierFirstName("Maria")
                                   .withPersonIdentifierLastName("Smith")
-                                  .withRelationshipType("Person")
+                                  .withEntityType("Person")
                                   .build();
 
         Item author3 = ItemBuilder.createItem(context, col2)
@@ -681,13 +681,13 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                   .withIssueDate("2016-02-13")
                                   .withPersonIdentifierFirstName("Maybe")
                                   .withPersonIdentifierLastName("Maybe")
-                                  .withRelationshipType("Person")
+                                  .withEntityType("Person")
                                   .build();
 
         Item publication1 = ItemBuilder.createItem(context, col3)
                                        .withTitle("Publication1")
                                        .withIssueDate("2015-01-01")
-                                       .withRelationshipType("Publication")
+                                       .withEntityType("Publication")
                                        .build();
 
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
@@ -775,6 +775,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                          .andExpect(status().isCreated())
                    .andDo(result -> idRef2.set(read(result.getResponse().getContentAsString(), "$.id")));
 
+        publication1 = itemService.find(context, publication1.getID());
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
         // Ensure that we now have three dc.contributor.author mdv ("Smith, Donald", "plain text", "Smith, Maria"
         // In that order which will be checked below the rest call
@@ -801,6 +802,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         itemService.update(context, publication1);
 
         context.restoreAuthSystemState();
+        publication1 = itemService.find(context, publication1.getID());
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
 
         // Assert that the list of dc.contributor.author mdv is now of size 4 in the following order:
@@ -838,6 +840,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                          .andExpect(status().isCreated())
                    .andDo(result -> idRef3.set(read(result.getResponse().getContentAsString(), "$.id")));
 
+        publication1 = itemService.find(context, publication1.getID());
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
         // Assert that our dc.contributor.author mdv list is now of size 5
         assertEquals(5, list.size());
@@ -901,6 +904,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         itemService.update(context, publication1);
 
         context.restoreAuthSystemState();
+        publication1 = itemService.find(context, publication1.getID());
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
 
         assertEquals(10, list.size());
@@ -968,7 +972,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         Item publication1 = ItemBuilder.createItem(context, col3)
                                        .withTitle("Publication1")
                                        .withIssueDate("2015-01-01")
-                                       .withRelationshipType("Publication")
+                                       .withEntityType("Publication")
                                        .build();
 
         Item author2 = ItemBuilder.createItem(context, col2)
@@ -976,7 +980,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                   .withIssueDate("2016-02-13")
                                   .withPersonIdentifierFirstName("Maria")
                                   .withPersonIdentifierLastName("Smith")
-                                  .withRelationshipType("Person")
+                                  .withEntityType("Person")
                                   .build();
 
         Item author3 = ItemBuilder.createItem(context, col2)
@@ -984,7 +988,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                   .withIssueDate("2016-02-13")
                                   .withPersonIdentifierFirstName("Maybe")
                                   .withPersonIdentifierLastName("Maybe")
-                                  .withRelationshipType("Person")
+                                  .withEntityType("Person")
                                   .build();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
@@ -1181,7 +1185,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         Item publication1 = ItemBuilder.createItem(context, col3)
                                        .withTitle("Publication1")
                                        .withIssueDate("2015-01-01")
-                                       .withRelationshipType("Publication")
+                                       .withEntityType("Publication")
                                        .build();
 
         Item author2 = ItemBuilder.createItem(context, col2)
@@ -1189,7 +1193,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                   .withIssueDate("2016-02-13")
                                   .withPersonIdentifierFirstName("Maria")
                                   .withPersonIdentifierLastName("Smith")
-                                  .withRelationshipType("Person")
+                                  .withEntityType("Person")
                                   .build();
 
         Item author3 = ItemBuilder.createItem(context, col2)
@@ -1197,7 +1201,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                   .withIssueDate("2016-02-13")
                                   .withPersonIdentifierFirstName("Maybe")
                                   .withPersonIdentifierLastName("Maybe")
-                                  .withRelationshipType("Person")
+                                  .withEntityType("Person")
                                   .build();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
@@ -1395,7 +1399,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                   .withIssueDate("2016-02-13")
                                   .withPersonIdentifierFirstName("Maria")
                                   .withPersonIdentifierLastName("Smith")
-                                  .withRelationshipType("Person")
+                                  .withEntityType("Person")
                                   .build();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
@@ -2385,7 +2389,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                   .withAuthor("Smith, Donald")
                                   .withPersonIdentifierFirstName("testingFirstName")
                                   .withPersonIdentifierLastName("testingLastName")
-                                  .withRelationshipType("Person")
+                                  .withEntityType("Person")
                                   .build();
 
         Relationship relationship3 = RelationshipBuilder
@@ -2755,15 +2759,15 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         // Create entity items
         Item journal =
-            ItemBuilder.createItem(context, col1).withRelationshipType("Journal").withTitle(journalTitle).build();
+            ItemBuilder.createItem(context, col1).withEntityType("Journal").withTitle(journalTitle).build();
         Item journalVolume =
-            ItemBuilder.createItem(context, col1).withRelationshipType("JournalVolume").withTitle("JournalVolume")
+            ItemBuilder.createItem(context, col1).withEntityType("JournalVolume").withTitle("JournalVolume")
                        .build();
         Item journalIssue =
-            ItemBuilder.createItem(context, col1).withRelationshipType("JournalIssue").withTitle("JournalIssue")
+            ItemBuilder.createItem(context, col1).withEntityType("JournalIssue").withTitle("JournalIssue")
                        .build();
         Item publication =
-            ItemBuilder.createItem(context, col1).withRelationshipType("Publication").withTitle("Publication").build();
+            ItemBuilder.createItem(context, col1).withEntityType("Publication").withTitle("Publication").build();
 
         // Link Publication-Journal Issue
         RelationshipBuilder.createRelationshipBuilder(context, journalIssue, publication, isPublicationOfJournalIssue)
