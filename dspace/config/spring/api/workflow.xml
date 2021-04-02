@@ -20,7 +20,7 @@
 
     <bean class='org.dspace.workflow.CurationTaskConfig'>
         <constructor-arg name='configurationDocument'
-                         value='file:${dspace.dir}config/workflow-curation.xml'/>
+                         value='file:${dspace.dir}/config/workflow-curation.xml'/>
     </bean>
 
     <!--Standard DSpace workflow-->
