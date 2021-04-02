@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,8 @@ import org.xml.sax.SAXException;
  * @author mwood
  */
 public class CurationTaskConfig {
+    private static final String DEFAULT_TASKSET_NAME = "default";
+
     private final Map<String, TaskSet> collectionTasksetMap;
 
     /**
@@ -56,13 +59,16 @@ public class CurationTaskConfig {
      *
      * @param setName name of the sought TaskSet:  collection handle or "default".
      * @return the named TaskSet, or the default TaskSet if not found, or
-     *          {@code null} if there is no default either.
+     *          an empty TaskSet (zero steps) if there is no default either.
      */
+    @NotNull
     public TaskSet findTaskSet(@NotNull String setName) {
         if (collectionTasksetMap.containsKey(setName)) {
             return collectionTasksetMap.get(setName);
+        } else if (collectionTasksetMap.containsKey(DEFAULT_TASKSET_NAME)) {
+            return collectionTasksetMap.get(DEFAULT_TASKSET_NAME);
         } else {
-            return collectionTasksetMap.get("default");
+            return new TaskSet("", Collections.EMPTY_LIST);
         }
     }
 
