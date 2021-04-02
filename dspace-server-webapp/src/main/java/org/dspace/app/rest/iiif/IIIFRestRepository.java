@@ -19,6 +19,7 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -60,6 +61,7 @@ public class IIIFRestRepository {
      * @param id DSpace Item uuid
      * @return manifest as JSON
      */
+    @Cacheable("manifests")
     @PreAuthorize("hasPermission(#id, 'ITEM', 'READ')")
     public String getManifest(Context context, UUID id)
             throws ResourceNotFoundException {
