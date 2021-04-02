@@ -84,19 +84,18 @@ public class SearchService extends AbstractResourceService {
      * @return IIIF json
      */
     public String searchWithinManifest(UUID uuid, String query) {
-        String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
-        String json = getSolrSearchResponse(encodedQuery, getManifestId(uuid));
-        return getAnnotationList(json, uuid, encodedQuery);
+        String json = getSolrSearchResponse(query, getManifestId(uuid));
+        return getAnnotationList(json, uuid, query);
     }
 
     /**
      * Executes the Search API solr query.
-     * @param encodedQuery encoded query terms
+     * @param query encoded query terms
      * @param manifestId the iiif manifest id
      *
      * @return json query response
      */
-    private String getSolrSearchResponse(String encodedQuery, String manifestId) {
+    private String getSolrSearchResponse(String query, String manifestId) {
         String json = "";
         String solrService = DSpaceServicesFactory.getInstance().getConfigurationService()
                 .getProperty("iiif.solr.search.url");
@@ -105,7 +104,7 @@ public class SearchService extends AbstractResourceService {
             HttpSolrClient solrServer = new HttpSolrClient.Builder(solrService).build();
             solrServer.setBaseURL(solrService);
             solrServer.setUseMultiPartPost(true);
-            SolrQuery solrQuery = getSolrQuery(encodedQuery, manifestId);
+            SolrQuery solrQuery = getSolrQuery(query, manifestId);
             QueryRequest req = new QueryRequest(solrQuery);
             req.setResponseParser(new NoOpResponseParser("json"));
             NamedList<Object> resp = null;
@@ -125,13 +124,13 @@ public class SearchService extends AbstractResourceService {
     /**
      * Constructs a solr search URL.
      *
-     * @param encodedQuery the search terms
+     * @param query the search terms
      * @param manifestId the id of the manifest in which to search
      * @return solr query
      */
-    private SolrQuery getSolrQuery(String encodedQuery, String manifestId) {
+    private SolrQuery getSolrQuery(String query, String manifestId) {
         SolrQuery solrQuery = new SolrQuery();
-        solrQuery.setQuery("ocr_text:" + encodedQuery +
+        solrQuery.setQuery("ocr_text:" + query +
                 " AND manifest_url:\"" + manifestId + "\"");
         solrQuery.set(CommonParams.WT, "json");
         solrQuery.set("hl", "true");
@@ -161,11 +160,12 @@ public class SearchService extends AbstractResourceService {
      *
      * @param json solr search result
      * @param uuid DSpace Item uuid
-     * @param encodedQuery the solr query
+     * @param query the solr query
      * @return a search response in JSON
      */
-    private String getAnnotationList(String json, UUID uuid, String encodedQuery) {
-        searchResult.setIdentifier(getManifestId(uuid) + "/search?q=" + encodedQuery);
+    private String getAnnotationList(String json, UUID uuid, String query) {
+        searchResult.setIdentifier(getManifestId(uuid) + "/search?q="
+                + URLEncoder.encode(query, StandardCharsets.UTF_8));
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
         JsonObject body = gson.fromJson(json, JsonObject.class);
