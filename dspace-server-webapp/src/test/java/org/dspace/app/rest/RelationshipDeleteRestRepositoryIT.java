@@ -121,11 +121,11 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
 
         leftItem = ItemBuilder.createItem(context, collection)
             .withTitle("Left item")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .build();
         rightItem = ItemBuilder.createItem(context, collection)
             .withTitle("Right item")
-            .withRelationshipType("Person")
+            .withEntityType("Person")
             .withPersonIdentifierFirstName("firstName")
             .withPersonIdentifierLastName("familyName")
             .build();
@@ -145,12 +145,12 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
 
         leftItem = ItemBuilder.createItem(context, collection)
             .withTitle("Left item")
-            .withRelationshipType("JournalIssue")
+            .withEntityType("JournalIssue")
             .withPublicationIssueNumber("2")
             .build();
         rightItem = ItemBuilder.createItem(context, collection)
             .withTitle("Right item")
-            .withRelationshipType("JournalVolume")
+            .withEntityType("JournalVolume")
             .withPublicationVolumeNumber("30")
             .build();
         relationshipType = relationshipTypeService
@@ -170,15 +170,15 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
             .withTitle("Person 1")
             .withPersonIdentifierFirstName("Donald")
             .withPersonIdentifierLastName("Smith")
-            .withRelationshipType("Person")
+            .withEntityType("Person")
             .build();
         projectItem = ItemBuilder.createItem(context, collection)
             .withTitle("Project 1")
-            .withRelationshipType("Project")
+            .withEntityType("Project")
             .build();
         publicationItem = ItemBuilder.createItem(context, collection)
             .withTitle("Publication 1")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .build();
         personProjectRelationshipType = relationshipTypeService.findbyTypesAndTypeName(context,
             entityTypeService.findByEntityType(context, "Person"),
