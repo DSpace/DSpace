@@ -996,6 +996,25 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
+    public void testShortLivedTokenUsingGet() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        // Verify the main session salt doesn't change
+        String salt = eperson.getSessionSalt();
+
+        getClient(token).perform(get("/api/authn/shortlivedtokens"))
+                .andExpect(jsonPath("$.token", notNullValue()))
+                .andExpect(jsonPath("$.type", is("shortlivedtoken")))
+                .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/authn/shortlivedtokens")))
+                // Verify generating short-lived token doesn't change our CSRF token
+                // (so, neither the CSRF cookie nor header are sent back)
+                .andExpect(cookie().doesNotExist("DSPACE-XSRF-COOKIE"))
+                .andExpect(header().doesNotExist("DSPACE-XSRF-TOKEN"));
+
+        assertEquals(salt, eperson.getSessionSalt());
+    }
+
+    @Test
     public void testShortLivedTokenWithCSRFSentViaParam() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
 
@@ -1013,6 +1032,12 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     public void testShortLivedTokenNotAuthenticated() throws Exception {
         getClient().perform(post("/api/authn/shortlivedtokens"))
             .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void testShortLivedTokenNotAuthenticatedUsingGet() throws Exception {
+        getClient().perform(get("/api/authn/shortlivedtokens"))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -1092,6 +1117,14 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         getClient().perform(post("/api/authn/shortlivedtokens?authentication-token=" + shortLivedToken))
             .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testGenerateShortLivedTokenWithShortLivedTokenUsingGet() throws Exception {
+        String shortLivedToken = getShortLivedToken(eperson);
+
+        getClient().perform(get("/api/authn/shortlivedtokens?authentication-token=" + shortLivedToken))
+                .andExpect(status().isForbidden());
     }
 
     private String getShortLivedToken(EPerson requestUser) throws Exception {

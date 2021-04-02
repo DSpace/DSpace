@@ -165,6 +165,29 @@ public class AuthenticationRestController implements InitializingBean {
     }
 
     /**
+     * This method will generate a short lived token to be used for bitstream downloads among other things.
+     *
+     * For security reasons, this endpoint only responds to a explicitly defined list of ips.
+     *
+     * curl -v -X GET https://{dspace-server.url}/api/authn/shortlivedtokens -H "Authorization: Bearer eyJhbG...COdbo"
+     *
+     * Example:
+     * <pre>
+     * {@code
+     * curl -v -X GET https://{dspace-server.url}/api/authn/shortlivedtokens -H "Authorization: Bearer eyJhbG...COdbo"
+     * }
+     * </pre>
+     * @param request The StandardMultipartHttpServletRequest
+     * @return        The created short lived token
+     */
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @RequestMapping(value = "/shortlivedtokens", method = RequestMethod.GET)
+    public AuthenticationTokenResource shortLivedTokenViaGet(HttpServletRequest request) {
+        // TODO: only allow certain ips
+        return shortLivedToken(request);
+    }
+
+    /**
      * Disables GET/PUT/PATCH on the /login endpoint. You must use POST (see above method)
      * @return ResponseEntity
      */
