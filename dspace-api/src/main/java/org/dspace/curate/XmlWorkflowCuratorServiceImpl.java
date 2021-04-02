@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.PostConstruct;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -33,7 +32,6 @@ import org.dspace.workflow.TaskSet;
 import org.dspace.xmlworkflow.RoleMembers;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
-import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
@@ -63,9 +61,6 @@ public class XmlWorkflowCuratorServiceImpl
     protected XmlWorkflowFactory workflowFactory;
 
     @Autowired(required = true)
-    protected XmlWorkflowServiceFactory workflowServiceFactory;
-
-    @Autowired(required = true)
     protected ConfigurationService configurationService;
 
     @Autowired(required = true)
@@ -83,26 +78,11 @@ public class XmlWorkflowCuratorServiceImpl
     @Autowired(required = true)
     protected CurationTaskConfig curationTaskConfig;
 
+    @Autowired(required = true)
     protected XmlWorkflowService workflowService;
+
+    @Autowired(required = true)
     protected XmlWorkflowItemService workflowItemService;
-
-    /**
-     * Initialize the bean (after dependency injection has already taken place).
-     * Called by "init-method" in Spring configuration.
-     *
-     * @throws Exception passed through.
-     */
-    @PostConstruct
-    public void init()
-            throws Exception {
-        workflowService = workflowServiceFactory.getXmlWorkflowService();
-        workflowItemService = workflowServiceFactory.getXmlWorkflowItemService();
-    }
-
-    @Override
-    public boolean needsCuration(XmlWorkflowItem wfi) {
-        throw new UnsupportedOperationException("Not supported yet."); // TODO
-    }
 
     @Override
     public boolean doCuration(Context c, XmlWorkflowItem wfi)
@@ -186,12 +166,13 @@ public class XmlWorkflowCuratorServiceImpl
     protected FlowStep getFlowStep(Context c, XmlWorkflowItem wfi)
             throws SQLException, IOException {
         Collection coll = wfi.getCollection();
-        String key = curationTaskConfig.containsKey(coll.getHandle()) ? coll.getHandle() : "default";
+        String taskSetName = curationTaskConfig.containsKey(coll.getHandle()) ?
+                coll.getHandle() : "default";
 
         ClaimedTask claimedTask
                 = claimedTaskService.findByWorkflowIdAndEPerson(c, wfi, c.getCurrentUser());
-        TaskSet ts = curationTaskConfig.findTaskSet(key);
-        if (ts != null) {
+        TaskSet ts = curationTaskConfig.findTaskSet(taskSetName);
+        if (claimedTask != null) {
             for (FlowStep fstep : ts.steps) {
                 if (fstep.step.equals(claimedTask.getStepID())) {
                     return fstep;
@@ -250,8 +231,8 @@ public class XmlWorkflowCuratorServiceImpl
                     Workflow workflow = workflowFactory.getWorkflow(wfi.getCollection());
                     step = workflow.getStep(stepID);
                 } catch (WorkflowConfigurationException e) {
-                    LOG.error("Failed to locate current workflow step for workflow item "
-                            + String.valueOf(wfi.getID()), e);
+                    LOG.error("Failed to locate current workflow step for workflow item {}",
+                            String.valueOf(wfi.getID()), e);
                     return epList;
                 }
                 RoleMembers roleMembers = step.getRole().getMembers(c, wfi);
