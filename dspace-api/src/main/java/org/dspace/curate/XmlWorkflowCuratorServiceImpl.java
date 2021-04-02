@@ -165,14 +165,13 @@ public class XmlWorkflowCuratorServiceImpl
      */
     protected FlowStep getFlowStep(Context c, XmlWorkflowItem wfi)
             throws SQLException, IOException {
-        Collection coll = wfi.getCollection();
-        String taskSetName = curationTaskConfig.containsKey(coll.getHandle()) ?
-                coll.getHandle() : "default";
-
         ClaimedTask claimedTask
                 = claimedTaskService.findByWorkflowIdAndEPerson(c, wfi, c.getCurrentUser());
-        TaskSet ts = curationTaskConfig.findTaskSet(taskSetName);
         if (claimedTask != null) {
+            Collection coll = wfi.getCollection();
+            String taskSetName = curationTaskConfig.containsKey(coll.getHandle()) ?
+                    coll.getHandle() : "default";
+            TaskSet ts = curationTaskConfig.findTaskSet(taskSetName);
             for (FlowStep fstep : ts.steps) {
                 if (fstep.step.equals(claimedTask.getStepID())) {
                     return fstep;
