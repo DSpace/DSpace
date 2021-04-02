@@ -571,7 +571,7 @@ it, please enter the types and the actual numbers or codes.</hint>
           <repeatable>false</repeatable>
           <required />
           <hint>The publication where this publication is included. E.g. a book chapter lists here the book, a contribution to a conference lists here the conference proceeding.</hint>
-          <type-bind>book part</type-bind>
+          <type-bind>types:c_3248</type-bind>
         </field>
       </row>
       <row>
@@ -584,7 +584,7 @@ it, please enter the types and the actual numbers or codes.</hint>
           <repeatable>false</repeatable>
           <required />
           <hint>The ISBN of the book/report if it was not found in the system</hint>
-          <type-bind>book part</type-bind>
+          <type-bind>types:c_3248</type-bind>
         </field>
       </row>
       <row>
@@ -597,7 +597,7 @@ it, please enter the types and the actual numbers or codes.</hint>
           <repeatable>false</repeatable>
           <required />
           <hint>The DOI of the book/report if it was not found in the system</hint>
-          <type-bind>book part</type-bind>
+          <type-bind>types:c_3248</type-bind>
         </field>
       </row>
       <row>
@@ -646,7 +646,7 @@ it, please enter the types and the actual numbers or codes.</hint>
           <repeatable>false</repeatable>
           <required />
           <hint>The publication object of the review</hint>
-          <type-bind>review,book review</type-bind>
+          <type-bind>types:c_efa0,types:c_ba08</type-bind>
         </field>
       </row>
       <row>
@@ -659,7 +659,7 @@ it, please enter the types and the actual numbers or codes.</hint>
           <repeatable>false</repeatable>
           <required />
           <hint>The ISBN of the reviewed item if it was not found in the system</hint>
-          <type-bind>review,book review</type-bind>
+          <type-bind>types:c_efa0,types:c_ba08</type-bind>
         </field>
       </row>
       <row>
@@ -672,7 +672,7 @@ it, please enter the types and the actual numbers or codes.</hint>
           <repeatable>false</repeatable>
           <required />
           <hint>The DOI of the reviewed item if it was not found in the system</hint>
-          <type-bind>review,book review</type-bind>
+          <type-bind>types:c_efa0,types:c_ba08</type-bind>
         </field>
       </row>
       <row>
