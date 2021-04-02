@@ -12,6 +12,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,16 +21,21 @@ import java.util.Map;
 
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.content.dto.MetadataValueDTO;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.impl.LiveImportDataProvider;
-import org.dspace.perucris.externalservices.CreateWorkspaceItemWithExternalSource;
+import org.dspace.script2externalservices.CreateWorkspaceItemWithExternalSource;
 import org.dspace.services.ConfigurationService;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
@@ -43,6 +50,10 @@ public class CreateWorkspaceItemFromExternalServiceIT extends AbstractController
 
     @Autowired
     private ConfigurationService configurationService;
+    @Autowired
+    private XmlWorkflowItemService workflowItemService;
+    @Autowired
+    private WorkspaceItemService workspaceItemService;
 
     @SuppressWarnings("unused")
     private Item itemPersonA;
@@ -72,10 +83,12 @@ public class CreateWorkspaceItemFromExternalServiceIT extends AbstractController
 
         this.col2Scopus = CollectionBuilder.createCollection(context, parentCommunity)
                                            .withName("Collection for new WorkspaceItems imported from Scopus")
+                                           .withWorkflowGroup(1, admin)
                                            .build();
 
         this.col2WOS = CollectionBuilder.createCollection(context, parentCommunity)
                                         .withName("Collection for new WorkspaceItems imported from WOS")
+                                        .withWorkflowGroup(1, admin)
                                         .build();
 
         configurationService.setProperty("directorios.community-id", parentCommunity.getID());
@@ -149,7 +162,7 @@ public class CreateWorkspaceItemFromExternalServiceIT extends AbstractController
 
         context.restoreAuthSystemState();
 
-        String[] args = new String[] {"create-wsi", "-s", "scopus"};
+        String[] args = new String[] {"import-publications", "-s", "scopus", "-e", admin.getEmail()};
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
         nameToProvider.put("scopus", mockScopusProvider);
         createWorkspaceItemService.initialize(args, handler, admin);
@@ -158,25 +171,26 @@ public class CreateWorkspaceItemFromExternalServiceIT extends AbstractController
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
 
-        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems"))
+        getClient(tokenAdmin).perform(get("/api/workflow/workflowitems"))
                  .andExpect(status().isOk())
-                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone.['dc.title'][0].value",
+                 .andExpect(jsonPath("$._embedded.workflowitems[0].sections.traditionalpageone.['dc.title'][0].value",
                                   is(title.getValue())))
-                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections"
+                 .andExpect(jsonPath("$._embedded.workflowitems[0].sections"
                                    + ".traditionalpageone['dc.identifier.scopus'][0].value", is(scopus.getValue())))
-                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections"
+                 .andExpect(jsonPath("$._embedded.workflowitems[0].sections"
                                    + ".traditionalpageone['dc.identifier.doi'][0].value", is(doi.getValue())))
-                 .andExpect(jsonPath("$._embedded.workspaceitems[1].sections.traditionalpageone['dc.title'][0].value",
+                 .andExpect(jsonPath("$._embedded.workflowitems[1].sections.traditionalpageone['dc.title'][0].value",
                                      is(title2R.getValue())))
-                 .andExpect(jsonPath("$._embedded.workspaceitems[1].sections"
+                 .andExpect(jsonPath("$._embedded.workflowitems[1].sections"
                                    + ".traditionalpageone['dc.identifier.scopus'][0].value", is(scopus2R.getValue())))
-                 .andExpect(jsonPath("$._embedded.workspaceitems[1].sections"
+                 .andExpect(jsonPath("$._embedded.workflowitems[1].sections"
                                    + ".traditionalpageone['dc.identifier.doi'][0].value", is(doi2R.getValue())))
                  .andExpect(jsonPath("$.page.totalElements", is(2)));
     }
 
+
     @Test
-    public void createOnlyOneWorkspaceItemImpoertedFromScopusTest() throws Exception {
+    public void createOnlyOneWorkspaceItemImportedFromScopusTest() throws Exception {
         context.turnOffAuthorisationSystem();
         //disable file upload mandatory
         configurationService.setProperty("webui.submit.upload.required", false);
@@ -242,7 +256,7 @@ public class CreateWorkspaceItemFromExternalServiceIT extends AbstractController
 
         context.restoreAuthSystemState();
 
-        String[] args = new String[] {"create-wsi", "-s", "scopus"};
+        String[] args = new String[] {"import-publications", "-s", "scopus", "-e", admin.getEmail()};
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
         nameToProvider.put("scopus", mockScopusProvider);
         createWorkspaceItemService.initialize(args, handler, admin);
@@ -250,13 +264,13 @@ public class CreateWorkspaceItemFromExternalServiceIT extends AbstractController
         createWorkspaceItemService.run();
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems"))
+        getClient(tokenAdmin).perform(get("/api/workflow/workflowitems"))
                  .andExpect(status().isOk())
-                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
+                 .andExpect(jsonPath("$._embedded.workflowitems[0].sections.traditionalpageone['dc.title'][0].value",
                                      is(title2R.getValue())))
-                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections"
+                 .andExpect(jsonPath("$._embedded.workflowitems[0].sections"
                                    + ".traditionalpageone['dc.identifier.scopus'][0].value", is(scopus2R.getValue())))
-                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections"
+                 .andExpect(jsonPath("$._embedded.workflowitems[0].sections"
                                    + ".traditionalpageone['dc.identifier.doi'][0].value", is(doi2R.getValue())))
                  .andExpect(jsonPath("$.page.totalElements", is(1)));
     }
@@ -274,7 +288,7 @@ public class CreateWorkspaceItemFromExternalServiceIT extends AbstractController
 
         context.restoreAuthSystemState();
 
-        String[] args = new String[] {"create-wsi", "-s", "scopus"};
+        String[] args = new String[] {"import-publications", "-s", "scopus"};
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
         nameToProvider.put("scopus", mockScopusProvider);
         createWorkspaceItemService.initialize(args, handler, admin);
@@ -282,7 +296,7 @@ public class CreateWorkspaceItemFromExternalServiceIT extends AbstractController
         createWorkspaceItemService.run();
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems"))
+        getClient(tokenAdmin).perform(get("/api/workflow/workflowitems"))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
@@ -297,6 +311,7 @@ public class CreateWorkspaceItemFromExternalServiceIT extends AbstractController
                                       .withPersonIdentifierFirstName("EDWIN")
                                       .withPersonIdentifierLastName("SAUCEDO")
                                       .withOrcidIdentifier("0000-0002-9029-1854")
+                                      .withResearcherIdentifier("123456789")
                                       .build();
 
         //define first record
@@ -304,12 +319,16 @@ public class CreateWorkspaceItemFromExternalServiceIT extends AbstractController
         MetadataValueDTO identifier = new MetadataValueDTO("dc", "identifier", "other", null, "WOS:000439929300064");
         MetadataValueDTO date = new MetadataValueDTO("dc", "date", "issued", null, "2017");
         MetadataValueDTO type = new MetadataValueDTO("dc", "type", null, null, "Book in series");
+        MetadataValueDTO rid = new MetadataValueDTO("person", "identifier", "rid", null, "123456789");
+        MetadataValueDTO orcid = new MetadataValueDTO("person", "identifier", "orcid", null, "0000-0002-9029-1854");
 
         List<MetadataValueDTO> metadataFirstRecord = new ArrayList<MetadataValueDTO>();
         metadataFirstRecord.add(type);
         metadataFirstRecord.add(title);
         metadataFirstRecord.add(date);
         metadataFirstRecord.add(identifier);
+        metadataFirstRecord.add(rid);
+        metadataFirstRecord.add(orcid);
 
         ExternalDataObject firstRecord = new ExternalDataObject();
         firstRecord.setMetadata(metadataFirstRecord);
@@ -321,6 +340,8 @@ public class CreateWorkspaceItemFromExternalServiceIT extends AbstractController
         MetadataValueDTO date2R = new MetadataValueDTO("dc", "date", "issued", null, "2017");
         MetadataValueDTO description2R = new MetadataValueDTO("dc", "description", "abstract", null,
                                                               "In 2013, Directory of Open Access Journals (DOAJ)");
+        MetadataValueDTO rid2R = new MetadataValueDTO("person", "identifier", "rid", null, "123456789");
+        MetadataValueDTO orcid2R = new MetadataValueDTO("person", "identifier", "orcid", null, "0000-0002-9029-1854");
 
         List<MetadataValueDTO> metadataSecondRecord = new ArrayList<MetadataValueDTO>();
         metadataSecondRecord.add(title2R);
@@ -328,6 +349,8 @@ public class CreateWorkspaceItemFromExternalServiceIT extends AbstractController
         metadataSecondRecord.add(type2R);
         metadataSecondRecord.add(date2R);
         metadataSecondRecord.add(description2R);
+        metadataSecondRecord.add(rid2R);
+        metadataSecondRecord.add(orcid2R);
 
         ExternalDataObject secondRecord = new ExternalDataObject();
         secondRecord.setMetadata(metadataSecondRecord);
@@ -342,7 +365,7 @@ public class CreateWorkspaceItemFromExternalServiceIT extends AbstractController
 
         context.restoreAuthSystemState();
 
-        String[] args = new String[] {"create-wsi", "-s", "wos"};
+        String[] args = new String[] {"import-publications", "-s", "wos", "-e", admin.getEmail()};
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
         nameToProvider.put("wos", mockWosProvider);
         createWorkspaceItemService.initialize(args, handler, admin);
@@ -351,25 +374,26 @@ public class CreateWorkspaceItemFromExternalServiceIT extends AbstractController
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
 
-        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems"))
+        getClient(tokenAdmin).perform(get("/api/workflow/workflowitems"))
                  .andExpect(status().isOk())
-                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone.['dc.title'][0].value",
+                 .andExpect(jsonPath("$._embedded.workflowitems[0].sections.traditionalpageone.['dc.title'][0].value",
                                   is(title.getValue())))
-                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections"
+                 .andExpect(jsonPath("$._embedded.workflowitems[0].sections"
                                    + ".traditionalpageone['dc.identifier.other'][0].value", is(identifier.getValue())))
-                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections"
+                 .andExpect(jsonPath("$._embedded.workflowitems[0].sections"
                                    + ".traditionalpageone['dc.date.issued'][0].value", is(date.getValue())))
-                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections"
+                 .andExpect(jsonPath("$._embedded.workflowitems[0].sections"
                                    + ".traditionalpageone['dc.type'][0].value", is(type.getValue())))
-                 .andExpect(jsonPath("$._embedded.workspaceitems[1].sections.traditionalpageone['dc.title'][0].value",
+                 .andExpect(jsonPath("$._embedded.workflowitems[1].sections.traditionalpageone['dc.title'][0].value",
                                   is(title2R.getValue())))
-                 .andExpect(jsonPath("$._embedded.workspaceitems[1].sections"
+                 .andExpect(jsonPath("$._embedded.workflowitems[1].sections"
                                    + ".traditionalpageone['dc.identifier.other'][0].value",is(identifier2R.getValue())))
-                 .andExpect(jsonPath("$._embedded.workspaceitems[1].sections"
+                 .andExpect(jsonPath("$._embedded.workflowitems[1].sections"
                                    + ".traditionalpageone['dc.date.issued'][0].value", is(date2R.getValue())))
-                 .andExpect(jsonPath("$._embedded.workspaceitems[1].sections"
+                 .andExpect(jsonPath("$._embedded.workflowitems[1].sections"
                                    + ".traditionalpageone['dc.type'][0].value", is(type2R.getValue())))
                  .andExpect(jsonPath("$.page.totalElements", is(2)));
+
     }
 
     @Test
@@ -386,7 +410,7 @@ public class CreateWorkspaceItemFromExternalServiceIT extends AbstractController
 
         //define first record
         MetadataValueDTO title = new MetadataValueDTO("dc","title", null,null, "Putting Historical Data in Context");
-        MetadataValueDTO identifier = new MetadataValueDTO("dc", "identifier", "other", null, "WOS:000439929300064");
+        MetadataValueDTO identifier = new MetadataValueDTO("dc", "identifier", "isi", null, "WOS:000439929300064");
         MetadataValueDTO date = new MetadataValueDTO("dc", "date", "issued", null, "2017");
         MetadataValueDTO type = new MetadataValueDTO("dc", "type", null, null, "Book in series");
 
@@ -401,7 +425,7 @@ public class CreateWorkspaceItemFromExternalServiceIT extends AbstractController
 
         //define second record
         MetadataValueDTO title2R = new MetadataValueDTO("dc", "title", null, null, "Regional Portal FVG");
-        MetadataValueDTO identifier2R = new MetadataValueDTO("dc", "identifier", "other", null, "WOS:000348252500018");
+        MetadataValueDTO identifier2R = new MetadataValueDTO("dc", "identifier", "isi", null, "WOS:000348252500018");
         MetadataValueDTO type2R = new MetadataValueDTO("dc", "type", null, null, "Journal");
         MetadataValueDTO date2R = new MetadataValueDTO("dc", "date", "issued", null, "2017");
         MetadataValueDTO description2R = new MetadataValueDTO("dc", "description", "abstract", null,
@@ -422,12 +446,12 @@ public class CreateWorkspaceItemFromExternalServiceIT extends AbstractController
         externalObjects.add(secondRecord);
 
         this.itemPublication = ItemBuilder.createItem(context, this.col2WOS)
-                                          .withIdentifierOther(identifier.getValue())
+                                          .withIsiIdentifier(identifier.getValue())
                                           .withIssueDate(date.getValue())
                                           .withTitle(title.getValue()).build();
 
         this.itemPublication2 = ItemBuilder.createItem(context, this.col2WOS)
-                                           .withIdentifierOther(identifier2R.getValue())
+                                           .withIsiIdentifier(identifier2R.getValue())
                                            .withIssueDate(date2R.getValue())
                                            .withTitle(title2R.getValue()).build();
 
@@ -437,7 +461,7 @@ public class CreateWorkspaceItemFromExternalServiceIT extends AbstractController
 
         context.restoreAuthSystemState();
 
-        String[] args = new String[] {"create-wsi", "-s", "wos"};
+        String[] args = new String[] {"import-publications", "-s", "wos", "-e", admin.getEmail()};
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
         nameToProvider.put("wos", mockWosProvider);
         createWorkspaceItemService.initialize(args, handler, admin);
@@ -449,6 +473,26 @@ public class CreateWorkspaceItemFromExternalServiceIT extends AbstractController
         getClient(tokenAdmin).perform(get("/api/submission/workspaceitems"))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.page.totalElements", is(0)));
+    }
+
+    @After
+    public void destroy() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        workflowItemService.deleteByCollection(context, col2Scopus);
+        workflowItemService.deleteByCollection(context, col2WOS);
+        workspaceItemService.findAll(context).forEach(this::deleteWorkspaceItem);
+        context.restoreAuthSystemState();
+
+        super.destroy();
+    }
+
+    private void deleteWorkspaceItem(WorkspaceItem workspaceItem) {
+        try {
+            workspaceItemService.deleteAll(context, workspaceItem);
+        } catch (SQLException | AuthorizeException | IOException e) {
+            throw new RuntimeException();
+        }
     }
 
 }

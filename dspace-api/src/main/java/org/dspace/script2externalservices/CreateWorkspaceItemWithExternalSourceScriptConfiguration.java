@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.perucris.externalservices;
+package org.dspace.script2externalservices;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -56,6 +56,9 @@ public class CreateWorkspaceItemWithExternalSourceScriptConfiguration<T extends 
             options.addOption("s", "service", true, "the name of the external service to use");
             options.getOption("s").setType(String.class);
             options.getOption("s").setRequired(true);
+
+            options.addOption("e", "eperson", true, "email of the eperson performing the import");
+
             super.options = options;
         }
         return options;

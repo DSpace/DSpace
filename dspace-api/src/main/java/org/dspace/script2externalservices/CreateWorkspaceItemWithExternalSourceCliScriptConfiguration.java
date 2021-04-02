@@ -5,14 +5,15 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.perucris.externalservices;
+package org.dspace.script2externalservices;
 
 /**
  * Extension of {@link CreateWorkspaceItemWithExternalSourceScriptConfiguration} for CLI.
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
-public class CreateWorkspaceItemWithExternalSourceScriptConfigurationCli
-       extends CreateWorkspaceItemWithExternalSourceScriptConfiguration {
+public class CreateWorkspaceItemWithExternalSourceCliScriptConfiguration<T
+        extends CreateWorkspaceItemWithExternalSourceCli>
+         extends CreateWorkspaceItemWithExternalSourceScriptConfiguration<T> {
 
 }
