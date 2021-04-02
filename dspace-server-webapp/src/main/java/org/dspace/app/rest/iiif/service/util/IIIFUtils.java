@@ -59,7 +59,7 @@ public class IIIFUtils {
      */
     public List<Bundle> getIiifBundle(Item item, String iiifBundle) {
         boolean iiif = item.getMetadata().stream()
-                .filter(m -> m.getMetadataField().toString().contentEquals("relationship_type"))
+                .filter(m -> m.getMetadataField().toString().contentEquals("dspace_entity_type"))
                 .anyMatch(m -> m.getValue().contentEquals("IIIF")  ||
                         m.getValue().contentEquals("IIIFSearchable"));
         List<Bundle> bundles;
@@ -116,7 +116,7 @@ public class IIIFUtils {
      */
     public boolean isSearchable(Item item) {
         return item.getMetadata().stream()
-                .filter(m -> m.getMetadataField().toString().contentEquals("relationship_type"))
+                .filter(m -> m.getMetadataField().toString().contentEquals("dspace.entity.type"))
                 .anyMatch(m -> m.getValue().contentEquals("IIIFSearchable"));
     }
 
