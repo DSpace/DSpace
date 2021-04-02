@@ -68,7 +68,7 @@ public class IIIFRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                .withRelationshipType("IIIFSearchable")
+                .withEntityType("IIIFSearchable")
                 .build();
         context.restoreAuthSystemState();
         // Status 500
@@ -89,7 +89,7 @@ public class IIIFRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                .withRelationshipType("IIIFSearchable")
+                .withEntityType("IIIFSearchable")
                 .build();
 
         String bitstreamContent = "ThisIsSomeDummyText";
@@ -131,7 +131,7 @@ public class IIIFRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                .withRelationshipType("IIIFSearchable")
+                .withEntityType("IIIFSearchable")
                 .build();
 
         String bitstreamContent = "ThisIsSomeText";
@@ -176,7 +176,7 @@ public class IIIFRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                .withRelationshipType("IIIFSearchable")
+                .withEntityType("IIIFSearchable")
                 .build();
 
         String bitstreamContent = "ThisIsSomeText";
@@ -222,7 +222,7 @@ public class IIIFRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withMetadata("dc", "rights", "uri", "https://license.org")
-                .withRelationshipType("IIIF")
+                .withEntityType("IIIF")
                 .build();
 
         String bitstreamContent = "ThisIsSomeDummyText";
@@ -283,7 +283,7 @@ public class IIIFRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                .withRelationshipType("IIIFSearchable")
+                .withEntityType("IIIFSearchable")
                 .build();
 
         String bitstreamContent = "ThisIsSomeText";
@@ -346,7 +346,7 @@ public class IIIFRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withMetadata("dc", "rights", "uri", "https://license.org")
-                .withRelationshipType("IIIF")
+                .withEntityType("IIIF")
                 .build();
 
         String bitstreamContent = "ThisIsSomeDummyText";
@@ -384,7 +384,7 @@ public class IIIFRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withMetadata("dc", "rights", "uri", "https://license.org")
-                .withRelationshipType("IIIF")
+                .withEntityType("IIIF")
                 .build();
 
         String bitstreamContent = "ThisIsSomeDummyText";
@@ -474,7 +474,7 @@ public class IIIFRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                .withRelationshipType("IIIF")
+                .withEntityType("IIIF")
                 .build();
 
         String bitstreamContent = "ThisIsSomeDummyText";
@@ -506,7 +506,7 @@ public class IIIFRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                .withRelationshipType("IIIF")
+                .withEntityType("IIIF")
                 .build();
 
         String bitstreamContent = "ThisIsSomeDummyText";
@@ -535,7 +535,7 @@ public class IIIFRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                .withRelationshipType("IIIF")
+                .withEntityType("IIIF")
                 .build();
 
         String bitstreamContent = "ThisIsSomeDummyText";
