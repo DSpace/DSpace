@@ -116,7 +116,7 @@ public class IIIFUtils {
      */
     public boolean isSearchable(Item item) {
         return item.getMetadata().stream()
-                .filter(m -> m.getMetadataField().toString().contentEquals("dspace.entity.type"))
+                .filter(m -> m.getMetadataField().toString().contentEquals("dspace_entity_type"))
                 .anyMatch(m -> m.getValue().contentEquals("IIIFSearchable"));
     }
 
