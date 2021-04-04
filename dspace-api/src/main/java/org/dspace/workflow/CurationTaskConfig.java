@@ -38,7 +38,7 @@ import org.xml.sax.SAXException;
  * @author mwood
  */
 public class CurationTaskConfig {
-    private static final String DEFAULT_TASKSET_NAME = "default";
+    public static final String DEFAULT_TASKSET_NAME = "default";
 
     private final Map<String, TaskSet> collectionTasksetMap;
 

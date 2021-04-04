@@ -16,7 +16,9 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Map;
 
-import org.dspace.AbstractIntegrationTestWithDatabase;
+import org.dspace.AbstractUnitTest;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.builder.AbstractBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.GroupBuilder;
@@ -25,7 +27,9 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
+import org.dspace.core.Context;
 import org.dspace.ctask.general.NoOpCurationTask;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
@@ -40,7 +44,10 @@ import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
+import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
+import org.dspace.xmlworkflow.storedcomponents.ClaimedTaskServiceImpl;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -51,8 +58,8 @@ import org.springframework.context.ApplicationContext;
  *
  * @author mwood
  */
-public class XmlWorkflowCuratorServiceImplIT
-        extends AbstractIntegrationTestWithDatabase {
+public class XmlWorkflowCuratorServiceImplTest
+        extends AbstractUnitTest {
     private static final String GROUP_ONE = "one";
     private static final String TASK_NOOP = "noop";
     private static final String NULL_WORKFLOW = "nullWorkflow";
@@ -109,6 +116,9 @@ public class XmlWorkflowCuratorServiceImplIT
         dspaceConfiguration.setProperty(CURATION_TASK_MAP_NAME, null);
         dspaceConfiguration.addPropertyValue(CURATION_TASK_MAP_NAME,
                 NoOpCurationTask.class.getCanonicalName() + " = " + TASK_NOOP);
+        
+        // XXX Try to make Builders work in unit test.
+        AbstractBuilder.init();
     }
 
     /**
@@ -178,12 +188,17 @@ public class XmlWorkflowCuratorServiceImplIT
                 = (XmlWorkflowFactoryImpl) wsf.getWorkflowFactory();
         workflowFactory.setWorkflowMapping(workflowMapping);
 
+        final String AUTHOR = "JUnit";
+        final String TITLE = "Test Item";
+        final String SUBJECT = "Testing";
+        final String ISSUE_DATE = "2021-02-23";
+
         // Create a dummy WorkflowItem to curate.
         XmlWorkflowItem wfi = WorkflowItemBuilder.createWorkflowItem(context, collection)
-                .withAuthor("JUnit")
-                .withTitle("Test Item")
-                .withSubject("Testing")
-                .withIssueDate("2021-02-23")
+                .withAuthor(AUTHOR)
+                .withTitle(TITLE)
+                .withSubject(SUBJECT)
+                .withIssueDate(ISSUE_DATE)
                 .withSubmitter(eperson)
                 .build();
         context.commit();
@@ -210,7 +225,7 @@ public class XmlWorkflowCuratorServiceImplIT
 
         // Initialize an instance of the Unit Under Test.
         XmlWorkflowCuratorServiceImpl instance = new XmlWorkflowCuratorServiceImpl();
-        instance.claimedTaskService = wsf.getClaimedTaskService();
+        instance.claimedTaskService = new FakeClaimedTaskService(firstStep.getId());
         instance.collectionService = collectionService;
         instance.configurationService = dspaceConfiguration;
         instance.curationTaskConfig = curationTaskConfig;
@@ -221,7 +236,6 @@ public class XmlWorkflowCuratorServiceImplIT
         instance.workflowService = workflowService;
 
         // Test!
-        //XmlWorkflowItem wfi = claimedTask.getWorkflowItem();
         boolean curated = instance.curate(curator, context, wfi);
 
         // Check whether curation completed.
@@ -238,5 +252,37 @@ public class XmlWorkflowCuratorServiceImplIT
         // Check report.
         String report = reporter.toString();
         // TODO assertSomething("", "expected", report);
+    }
+
+    /**
+     * Dummy service that makes up {@link ClaimedTask}s with a known content.
+     */
+    class FakeClaimedTaskService
+            extends ClaimedTaskServiceImpl {
+        private final String stepID;
+
+        /**
+         * Always return a ClaimedTask with the given stepID.
+         *
+         * @param stepID the given stepID.
+         */
+        FakeClaimedTaskService(String stepID) {
+            this.stepID = stepID;
+        }
+
+        @Override
+        public ClaimedTask findByWorkflowIdAndEPerson(Context context,
+                XmlWorkflowItem wfi, EPerson eperson)
+                throws SQLException {
+            ClaimedTaskService cts = beanFactory.getBean(ClaimedTaskServiceImpl.class.getCanonicalName(), ClaimedTaskService.class);
+            ClaimedTask task;
+            try {
+                task = cts.create(context);
+            } catch (AuthorizeException ex) {
+                throw new SQLException(ex);
+            }
+            task.setStepID(stepID);
+            return task;
+        }
     }
 }
