@@ -27,6 +27,8 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.impl.NoOpResponseParser;
 import org.apache.solr.client.solrj.request.QueryRequest;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.util.NamedList;
 import org.dspace.app.rest.iiif.model.generator.AnnotationGenerator;
@@ -35,6 +37,7 @@ import org.dspace.app.rest.iiif.model.generator.ContentAsTextGenerator;
 import org.dspace.app.rest.iiif.model.generator.ManifestGenerator;
 import org.dspace.app.rest.iiif.model.generator.SearchResultGenerator;
 import org.dspace.app.rest.iiif.service.util.IIIFUtils;
+import org.dspace.discovery.SolrSearchCore;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +73,9 @@ public class SearchService extends AbstractResourceService {
     @Autowired
     SearchResultGenerator searchResult;
 
+    @Autowired
+    protected SolrSearchCore solrSearchCore;
+
     public SearchService(ConfigurationService configurationService) {
         setConfiguration(configurationService);
         validationEnabled = configurationService
@@ -102,12 +108,12 @@ public class SearchService extends AbstractResourceService {
         UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS);
         if (urlValidator.isValid(solrService) || this.validationEnabled) {
             HttpSolrClient solrServer = new HttpSolrClient.Builder(solrService).build();
-            solrServer.setBaseURL(solrService);
             solrServer.setUseMultiPartPost(true);
-            SolrQuery solrQuery = getSolrQuery(query, manifestId);
+            SolrQuery solrQuery = getSolrQuery(adjustQuery(query), manifestId);
             QueryRequest req = new QueryRequest(solrQuery);
+            // return raw json response.
             req.setResponseParser(new NoOpResponseParser("json"));
-            NamedList<Object> resp = null;
+            NamedList<Object> resp;
             try {
                 resp = solrServer.request(req);
                 json =  (String) resp.get("response");
@@ -122,6 +128,18 @@ public class SearchService extends AbstractResourceService {
     }
 
     /**
+     * Wraps multi-word queries in parens.
+     * @param query the search query
+     * @return
+     */
+    private String adjustQuery(String query) {
+        if (query.split(" ").length > 1) {
+            return '(' + query + ')';
+        }
+        return query;
+    }
+
+    /**
      * Constructs a solr search URL.
      *
      * @param query the search terms
@@ -130,8 +148,7 @@ public class SearchService extends AbstractResourceService {
      */
     private SolrQuery getSolrQuery(String query, String manifestId) {
         SolrQuery solrQuery = new SolrQuery();
-        solrQuery.setQuery("ocr_text:" + query +
-                " AND manifest_url:\"" + manifestId + "\"");
+        solrQuery.set("q", "ocr_text:" + query + " AND manifest_url:\"" + manifestId + "\"");
         solrQuery.set(CommonParams.WT, "json");
         solrQuery.set("hl", "true");
         solrQuery.set("hl.ocr.fl", "ocr_text");
