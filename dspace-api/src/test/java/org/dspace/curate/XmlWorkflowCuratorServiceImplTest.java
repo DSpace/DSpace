@@ -240,18 +240,6 @@ public class XmlWorkflowCuratorServiceImplTest
 
         // Check whether curation completed.
         assertTrue("Curation did not complete.", curated);
-
-        // Check the run status.
-        int status = curator.getStatus(TASK_NOOP);
-        assertEquals("Task status was not SUCCESS:", Curator.CURATE_SUCCESS, status);
-
-        // Check run's result.
-        String result = curator.getResult(TASK_NOOP);
-        // TODO assertSomething("", "expected", result);
-
-        // Check report.
-        String report = reporter.toString();
-        // TODO assertSomething("", "expected", report);
     }
 
     /**

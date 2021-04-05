@@ -112,7 +112,7 @@ public class XmlWorkflowCuratorServiceImpl
             // assign collection to item in case task needs it
             Item item = wfi.getItem();
             item.setOwningCollection(wfi.getCollection());
-            for (Task task : step.tasks) { // FIXME NONONO, we need a Curator.callback for this per-task stuff.
+            for (Task task : step.tasks) {
                 curator.addTask(task.name);
                 curator.curate(item);
                 int status = curator.getStatus(task.name);
