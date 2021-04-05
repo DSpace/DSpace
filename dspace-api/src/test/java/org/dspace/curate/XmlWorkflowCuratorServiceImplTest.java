@@ -7,7 +7,6 @@
  */
 package org.dspace.curate;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
@@ -116,7 +115,7 @@ public class XmlWorkflowCuratorServiceImplTest
         dspaceConfiguration.setProperty(CURATION_TASK_MAP_NAME, null);
         dspaceConfiguration.addPropertyValue(CURATION_TASK_MAP_NAME,
                 NoOpCurationTask.class.getCanonicalName() + " = " + TASK_NOOP);
-        
+
         // XXX Try to make Builders work in unit test.
         AbstractBuilder.init();
     }
@@ -262,7 +261,9 @@ public class XmlWorkflowCuratorServiceImplTest
         public ClaimedTask findByWorkflowIdAndEPerson(Context context,
                 XmlWorkflowItem wfi, EPerson eperson)
                 throws SQLException {
-            ClaimedTaskService cts = beanFactory.getBean(ClaimedTaskServiceImpl.class.getCanonicalName(), ClaimedTaskService.class);
+            ClaimedTaskService cts
+                = beanFactory.getBean(ClaimedTaskServiceImpl.class.getCanonicalName(),
+                                      ClaimedTaskService.class);
             ClaimedTask task;
             try {
                 task = cts.create(context);
