@@ -90,7 +90,7 @@ public class SHERPAPublisherResponse {
                     for (int itemIndex = 0; itemIndex < items.length(); itemIndex++) {
                         SHERPAPublisher sherpaPublisher = new SHERPAPublisher();
 
-                        JSONObject item = items.getJSONObject(0);
+                        JSONObject item = items.getJSONObject(itemIndex);
 
                         // Parse system metadata (per-item / result information)
                         if (item.has("system_metadata")) {
