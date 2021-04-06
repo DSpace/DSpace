@@ -21,7 +21,7 @@ import org.junit.Test;
 /**
  * This class carries out the same test cases as {@link RelationshipMetadataServiceIT} with a few modifications.
  */
-public class TiltedRelationshipMetadataServiceIT extends RelationshipMetadataServiceIT {
+public class LeftTiltedRelationshipMetadataServiceIT extends RelationshipMetadataServiceIT {
 
     /**
      * Call parent implementation and set the tilted property of {@link #isAuthorOfPublicationRelationshipType}.

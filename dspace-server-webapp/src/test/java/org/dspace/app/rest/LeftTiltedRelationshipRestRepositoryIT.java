@@ -23,7 +23,7 @@ import org.junit.Test;
  * The only difference being that a RelationshipType is set on
  * {@link RelationshipRestRepositoryIT#isAuthorOfPublicationRelationshipType}.
  */
-public class TiltedRelationshipRestRepositoryIT extends RelationshipRestRepositoryIT {
+public class LeftTiltedRelationshipRestRepositoryIT extends RelationshipRestRepositoryIT {
 
     @Before
     public void setUp() throws Exception {
