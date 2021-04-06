@@ -77,7 +77,7 @@
        <property name="metadata">
            <bean class="ar.edu.unlp.sedici.dspace.identifier.doi.filters.MetadataComponentFilter">
                <property name="metadataName" value="sedici.subtype"/>
-               <property name="valueRegexFilter" value="Conjunto de datos|Placa espectrografica|Placa fotografica"/>
+               <property name="valueRegexFilter" value="Conjunto de datos"/>
            </bean>
        </property>
     </bean>

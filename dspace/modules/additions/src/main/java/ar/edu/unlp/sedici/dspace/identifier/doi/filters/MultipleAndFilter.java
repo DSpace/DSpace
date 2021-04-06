@@ -22,11 +22,22 @@ public class MultipleAndFilter extends AbstractDOIFilter {
     @Override
     public boolean evaluate(DSpaceObject dso) {
         for (AbstractDOIFilter filter: filtersToEval) {
-            if(!filter.evaluate(dso)) {
-                return false;
+            if(!negateCondition) {
+                if(!filter.evaluate(dso)) {
+                    return false;
+                }
+            } else {
+                if(!filter.evaluate(dso)) {
+                    return true;
+                }
             }
         }
-        return true;
+        //If reaching this point, then all conditions are true.
+        if(!negateCondition) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }

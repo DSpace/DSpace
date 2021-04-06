@@ -21,13 +21,24 @@ public class MultipleOrFilter extends AbstractDOIFilter {
      */
     @Override
     public boolean evaluate(DSpaceObject dso) {
-        //At first true condition, returns true.
         for( AbstractDOIFilter filter: filtersToEval) {
-            if (filter.evaluate(dso)) {
-                return true;
+            if(!negateCondition) {
+                //At first true condition, returns true.
+                if (filter.evaluate(dso)) {
+                    return true;
+                }
+            } else {
+                if (filter.evaluate(dso)) {
+                    return false;
+                }
             }
         }
-        return false;
+        //If reaching this point, then all conditions are false.
+        if(!negateCondition) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
 }
