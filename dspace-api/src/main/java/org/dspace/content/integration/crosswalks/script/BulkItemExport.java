@@ -125,6 +125,7 @@ public class BulkItemExport extends DSpaceRunnable<BulkItemExportScriptConfigura
     public void internalRun() throws Exception {
         context = new Context();
         assignCurrentUserInContext();
+        assignSpecialGroupsInContext();
 
         if (exportFormat == null) {
             throw new IllegalArgumentException("The export format must be provided");
@@ -354,6 +355,12 @@ public class BulkItemExport extends DSpaceRunnable<BulkItemExportScriptConfigura
         if (uuid != null) {
             EPerson ePerson = EPersonServiceFactory.getInstance().getEPersonService().find(context, uuid);
             context.setCurrentUser(ePerson);
+        }
+    }
+
+    private void assignSpecialGroupsInContext() throws SQLException {
+        for (UUID uuid : handler.getSpecialGroups()) {
+            context.setSpecialGroup(uuid);
         }
     }
 

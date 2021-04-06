@@ -67,6 +67,7 @@ public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration<Ite
 
         context = new Context();
         assignCurrentUserInContext();
+        assignSpecialGroupsInContext();
 
         if (exportFormat == null) {
             throw new IllegalArgumentException("The export format must be provided");
@@ -128,6 +129,12 @@ public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration<Ite
         if (uuid != null) {
             EPerson ePerson = EPersonServiceFactory.getInstance().getEPersonService().find(context, uuid);
             context.setCurrentUser(ePerson);
+        }
+    }
+
+    private void assignSpecialGroupsInContext() throws SQLException {
+        for (UUID uuid : handler.getSpecialGroups()) {
+            context.setSpecialGroup(uuid);
         }
     }
 

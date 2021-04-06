@@ -123,6 +123,7 @@ public class NBEventsRunnable extends DSpaceRunnable<NBEventsScriptConfiguration
     protected InputStream getNBEventsInputStream() throws Exception {
 
         this.assignCurrentUserInContext();
+        this.assignSpecialGroupsInContext();
 
         InputStream inputStream = handler.getFileStream(context, fileLocation)
                 .orElseThrow(() -> new IllegalArgumentException("Error reading file, the file couldn't be "
@@ -138,4 +139,11 @@ public class NBEventsRunnable extends DSpaceRunnable<NBEventsScriptConfiguration
             context.setCurrentUser(ePerson);
         }
     }
+
+    private void assignSpecialGroupsInContext() throws SQLException {
+        for (UUID uuid : handler.getSpecialGroups()) {
+            context.setSpecialGroup(uuid);
+        }
+    }
+
 }
