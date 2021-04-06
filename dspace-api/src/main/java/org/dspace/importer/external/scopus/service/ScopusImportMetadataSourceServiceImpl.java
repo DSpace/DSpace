@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.el.MethodNotFoundException;
 
 import org.apache.axiom.om.OMElement;
@@ -88,30 +90,47 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     @Override
     public int getRecordsCount(String query) throws MetadataSourceException {
+        if (isEID(query)) {
+            return retry(new FindByIdCallable(query)).size();
+        }
         return retry(new SearchNBByQueryCallable(query));
     }
 
     @Override
     public int getRecordsCount(Query query) throws MetadataSourceException {
+        if (isEID(query.toString())) {
+            return retry(new FindByIdCallable(query.toString())).size();
+        }
         return retry(new SearchNBByQueryCallable(query));
     }
 
     @Override
     public Collection<ImportRecord> getRecords(String query, int start,
             int count) throws MetadataSourceException {
+        if (isEID(query)) {
+            return retry(new FindByIdCallable(query));
+        }
         return retry(new SearchByQueryCallable(query, count, start));
     }
 
     @Override
     public Collection<ImportRecord> getRecords(Query query)
             throws MetadataSourceException {
+        if (isEID(query.toString())) {
+            return retry(new FindByIdCallable(query.toString()));
+        }
         return retry(new SearchByQueryCallable(query));
     }
 
 
     @Override
     public ImportRecord getRecord(Query query) throws MetadataSourceException {
-        List<ImportRecord> records = retry(new SearchByQueryCallable(query));
+        List<ImportRecord> records = null;
+        if (isEID(query.toString())) {
+            records = retry(new FindByIdCallable(query.toString()));
+        } else {
+            records = retry(new SearchByQueryCallable(query));
+        }
         return records == null || records.isEmpty() ? null : records.get(0);
     }
 
@@ -130,7 +149,19 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
     @Override
     public Collection<ImportRecord> findMatchingRecords(Query query)
             throws MetadataSourceException {
+        if (isEID(query.toString())) {
+            return retry(new FindByIdCallable(query.toString()));
+        }
         return retry(new FindByQueryCallable(query));
+    }
+
+    private boolean isEID(String query) {
+        Pattern pattern = Pattern.compile("2-s2\\.0-\\d+");
+        Matcher match = pattern.matcher(query);
+        if (match.matches()) {
+            return true;
+        }
+        return false;
     }
 
     public void setApiKey(String apiKey) {
