@@ -157,11 +157,7 @@ public class AuthenticationRestController implements InitializingBean {
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @RequestMapping(value = "/shortlivedtokens", method = RequestMethod.POST)
     public AuthenticationTokenResource shortLivedToken(HttpServletRequest request) {
-        Projection projection = utils.obtainProjection();
-        AuthenticationToken shortLivedToken =
-            restAuthenticationService.getShortLivedAuthenticationToken(ContextUtil.obtainContext(request), request);
-        AuthenticationTokenRest authenticationTokenRest = converter.toRest(shortLivedToken, projection);
-        return converter.toResource(authenticationTokenRest);
+        return shortLivedTokenResponse(request);
     }
 
     /**
@@ -184,7 +180,18 @@ public class AuthenticationRestController implements InitializingBean {
     @RequestMapping(value = "/shortlivedtokens", method = RequestMethod.GET)
     public AuthenticationTokenResource shortLivedTokenViaGet(HttpServletRequest request) {
         // TODO: only allow certain ips
-        return shortLivedToken(request);
+        return shortLivedTokenResponse(request);
+    }
+
+    /**
+     * See {@link #shortLivedToken} and {@link #shortLivedTokenViaGet}
+     */
+    private AuthenticationTokenResource shortLivedTokenResponse(HttpServletRequest request) {
+        Projection projection = utils.obtainProjection();
+        AuthenticationToken shortLivedToken =
+                restAuthenticationService.getShortLivedAuthenticationToken(ContextUtil.obtainContext(request), request);
+        AuthenticationTokenRest authenticationTokenRest = converter.toRest(shortLivedToken, projection);
+        return converter.toResource(authenticationTokenRest);
     }
 
     /**
