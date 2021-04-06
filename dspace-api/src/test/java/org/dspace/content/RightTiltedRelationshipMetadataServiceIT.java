@@ -7,16 +7,16 @@
  */
 package org.dspace.content;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import java.util.List;
+
 import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.RelationshipBuilder;
 import org.dspace.builder.RelationshipTypeBuilder;
 import org.junit.Test;
-
-import java.util.List;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * This class carries out the same test cases as {@link RelationshipMetadataServiceIT} with a few modifications.
@@ -42,6 +42,9 @@ public class RightTiltedRelationshipMetadataServiceIT extends RelationshipMetada
                     "isJournalVolumeOfIssue", "isIssueOfJournalVolume",
                     null, null, null, null).build();
 
+        isIssueOfVolume.setTilted(RelationshipType.Tilted.RIGHT);
+        relationshipTypeService.update(context, isIssueOfVolume);
+
         relationship =
             RelationshipBuilder.createRelationshipBuilder(context, leftItem, rightItem, isIssueOfVolume).build();
         context.restoreAuthSystemState();
@@ -56,8 +59,7 @@ public class RightTiltedRelationshipMetadataServiceIT extends RelationshipMetada
         //verify the publicationvolume.volumeNumber virtual metadata
         List<MetadataValue> volumeList =
             itemService.getMetadata(leftItem, "publicationvolume", "volumeNumber", null, Item.ANY);
-        assertThat(volumeList.size(), equalTo(1));
-        assertThat(volumeList.get(0).getValue(), equalTo("30"));
+        assertThat(volumeList.size(), equalTo(0));
 
         //rightItem is the journal volume item
         //verify the publicationissue.issueNumber virtual metadata
@@ -69,18 +71,7 @@ public class RightTiltedRelationshipMetadataServiceIT extends RelationshipMetada
         //request the virtual metadata of the journal issue
         List<RelationshipMetadataValue> issueRelList =
             relationshipMetadataService.getRelationshipMetadata(leftItem, true);
-        assertThat(issueRelList.size(), equalTo(2));
-        assertThat(issueRelList.get(0).getValue(), equalTo("30"));
-        assertThat(issueRelList.get(0).getMetadataField().getMetadataSchema().getName(), equalTo("publicationvolume"));
-        assertThat(issueRelList.get(0).getMetadataField().getElement(), equalTo("volumeNumber"));
-        assertThat(issueRelList.get(0).getMetadataField().getQualifier(), equalTo(null));
-        assertThat(issueRelList.get(0).getAuthority(), equalTo("virtual::" + relationship.getID()));
-
-        assertThat(issueRelList.get(1).getValue(), equalTo(String.valueOf(rightItem.getID())));
-        assertThat(issueRelList.get(1).getMetadataField().getMetadataSchema().getName(),
-            equalTo(MetadataSchemaEnum.RELATION.getName()));
-        assertThat(issueRelList.get(1).getMetadataField().getElement(), equalTo("isJournalVolumeOfIssue"));
-        assertThat(issueRelList.get(1).getAuthority(), equalTo("virtual::" + relationship.getID()));
+        assertThat(issueRelList.size(), equalTo(0));
 
         //request the virtual metadata of the journal volume
         List<RelationshipMetadataValue> volumeRelList =
