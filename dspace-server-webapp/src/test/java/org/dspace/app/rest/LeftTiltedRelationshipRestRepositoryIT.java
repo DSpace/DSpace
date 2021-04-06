@@ -25,6 +25,7 @@ import org.junit.Test;
  */
 public class LeftTiltedRelationshipRestRepositoryIT extends RelationshipRestRepositoryIT {
 
+    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
