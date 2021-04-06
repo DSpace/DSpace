@@ -133,7 +133,7 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
      * Common function to convert leftItem to a journal issue item, convert rightItem to a journal volume item,
      * and relating them to each other stored in the relationship field
      */
-    private void initJournalVolumeIssue() {
+    protected void initJournalVolumeIssue() throws Exception {
         context.turnOffAuthorisationSystem();
         EntityType journalIssueEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "JournalIssue").build();
         EntityType publicationVolumeEntityType =
@@ -345,7 +345,7 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
     }
 
     @Test
-    public void testGetJournalRelationshipMetadata() {
+    public void testGetJournalRelationshipMetadata() throws Exception {
         initJournalVolumeIssue();
 
         //leftItem is the journal issue item
@@ -396,7 +396,7 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
     }
 
     @Test
-    public void testDeleteJournalRelationshipCopyToLeftItem() throws SQLException, AuthorizeException {
+    public void testDeleteJournalRelationshipCopyToLeftItem() throws Exception {
         initJournalVolumeIssue();
         context.turnOffAuthorisationSystem();
         //leftItem is the journal issue item
@@ -416,7 +416,7 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
     }
 
     @Test
-    public void testJournalDeleteRelationshipCopyToRightItem() throws SQLException, AuthorizeException {
+    public void testJournalDeleteRelationshipCopyToRightItem() throws Exception {
         initJournalVolumeIssue();
         context.turnOffAuthorisationSystem();
         //rightItem is the journal volume item
@@ -436,7 +436,7 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
     }
 
     @Test
-    public void testDeleteJournalRelationshipCopyToBothItems() throws SQLException, AuthorizeException {
+    public void testDeleteJournalRelationshipCopyToBothItems() throws Exception {
         initJournalVolumeIssue();
         context.turnOffAuthorisationSystem();
         //leftItem is the journal issue item
