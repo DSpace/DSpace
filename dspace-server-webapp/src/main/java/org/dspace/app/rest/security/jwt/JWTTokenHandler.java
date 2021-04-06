@@ -99,12 +99,6 @@ public abstract class JWTTokenHandler {
     protected abstract String getTokenExpirationConfigurationKey();
 
     /**
-     * Get the configuration property key for the include ip.
-     * @return the configuration property key
-     */
-    protected abstract String getTokenIncludeIPConfigurationKey();
-
-    /**
      * Get the configuration property key for the encryption enable setting.
      * @return the configuration property key
      */
@@ -227,10 +221,6 @@ public abstract class JWTTokenHandler {
         return secret;
     }
 
-    public boolean getIncludeIP() {
-        return configurationService.getBooleanProperty(getTokenIncludeIPConfigurationKey(), true);
-    }
-
     public long getExpirationPeriod() {
         return configurationService.getLongProperty(getTokenExpirationConfigurationKey(), 1800000);
     }
@@ -288,7 +278,7 @@ public abstract class JWTTokenHandler {
         if (ePerson == null || StringUtils.isBlank(ePerson.getSessionSalt())) {
             return false;
         } else {
-            JWSVerifier verifier = new MACVerifier(buildSigningKey(request, ePerson));
+            JWSVerifier verifier = new MACVerifier(buildSigningKey(ePerson));
 
             //If token is valid and not expired return eperson in token
             Date expirationTime = jwtClaimsSet.getExpirationTime();
@@ -347,7 +337,7 @@ public abstract class JWTTokenHandler {
         SignedJWT signedJWT = new SignedJWT(
             new JWSHeader(JWSAlgorithm.HS256), claimsSet);
 
-        JWSSigner signer = new MACSigner(buildSigningKey(request, ePerson));
+        JWSSigner signer = new MACSigner(buildSigningKey(ePerson));
         signedJWT.sign(signer);
         return signedJWT;
     }
@@ -385,18 +375,18 @@ public abstract class JWTTokenHandler {
      * this way the key is always long enough for the HMAC using SHA-256 algorithm.
      * More information: https://tools.ietf.org/html/rfc7518#section-3.2
      *
-     * @param request
-     * @param ePerson
-     * @return
+     * @param ePerson currently authenticated EPerson
+     * @return signing key for token
      */
-    protected String buildSigningKey(HttpServletRequest request, EPerson ePerson) {
-        String ipAddress = "";
-        if (getIncludeIP()) {
-            ipAddress = getIpAddress(request);
-        }
-        return getJwtKey() + ePerson.getSessionSalt() + ipAddress;
+    protected String buildSigningKey(EPerson ePerson) {
+        return getJwtKey() + ePerson.getSessionSalt();
     }
 
+    /**
+     * Get IP Address of client. Only used for logging purposes at this time
+     * @param request current request
+     * @return IP address of client
+     */
     private String getIpAddress(HttpServletRequest request) {
         return clientInfoService.getClientIp(request);
     }

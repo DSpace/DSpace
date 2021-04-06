@@ -200,6 +200,13 @@ public class IPTable {
         return set;
     }
 
+    /**
+     * Return whether IPTable is empty (having no entries)
+     * @return true if empty, false otherwise
+     */
+    public boolean isEmpty() {
+        return map.isEmpty();
+    }
 
     /**
      * Exception Class to deal with IPFormat errors.
