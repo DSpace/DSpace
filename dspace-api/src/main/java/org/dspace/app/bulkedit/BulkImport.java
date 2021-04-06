@@ -188,7 +188,6 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         context.setMode(Context.Mode.BATCH_EDIT);
         assignCurrentUserInContext();
         assignSpecialGroupsInContext();
-        //FIXME: see https://4science.atlassian.net/browse/CSTPER-236 for final solution
 
         context.turnOffAuthorisationSystem();
 

@@ -65,7 +65,6 @@ public class CollectionExport extends DSpaceRunnable<CollectionExportScriptConfi
         assignCurrentUserInContext();
         assignSpecialGroupsInContext();
 
-        //FIXME: see https://4science.atlassian.net/browse/CSTPER-236 for final solution
         context.turnOffAuthorisationSystem();
 
         Collection collection = getCollection();
