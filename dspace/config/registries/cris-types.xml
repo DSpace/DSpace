@@ -163,4 +163,25 @@
         <scope_note></scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>cris</schema>
+        <element>author</element>
+        <qualifier>scopus-author-id</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>author</element>
+        <qualifier>orcid</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>author</element>
+        <qualifier>rid</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
 </dspace-dc-types>
