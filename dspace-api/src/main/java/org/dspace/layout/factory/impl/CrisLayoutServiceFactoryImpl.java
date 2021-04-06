@@ -10,6 +10,7 @@ package org.dspace.layout.factory.impl;
 import org.dspace.layout.factory.CrisLayoutServiceFactory;
 import org.dspace.layout.service.CrisLayoutBoxService;
 import org.dspace.layout.service.CrisLayoutFieldService;
+import org.dspace.layout.service.CrisLayoutMetadataGroupService;
 import org.dspace.layout.service.CrisLayoutMetric2BoxService;
 import org.dspace.layout.service.CrisLayoutSectionService;
 import org.dspace.layout.service.CrisLayoutTabService;
@@ -33,6 +34,9 @@ public class CrisLayoutServiceFactoryImpl extends CrisLayoutServiceFactory {
     private CrisLayoutFieldService fieldService;
 
     @Autowired(required = true)
+    private CrisLayoutMetadataGroupService metadataGroupService;
+
+    @Autowired(required = true)
     private CrisLayoutMetric2BoxService metric2BoxService;
 
     @Autowired(required = true)
@@ -51,6 +55,11 @@ public class CrisLayoutServiceFactoryImpl extends CrisLayoutServiceFactory {
     @Override
     public CrisLayoutFieldService getFieldService() {
         return this.fieldService;
+    }
+
+    @Override
+    public CrisLayoutMetadataGroupService getMetadataGroupService() {
+        return this.metadataGroupService;
     }
 
     @Override

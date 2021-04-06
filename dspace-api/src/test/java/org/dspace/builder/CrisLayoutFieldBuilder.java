@@ -8,6 +8,8 @@
 package org.dspace.builder;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -17,7 +19,9 @@ import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.CrisLayoutField;
 import org.dspace.layout.CrisLayoutFieldBitstream;
 import org.dspace.layout.CrisLayoutFieldMetadata;
+import org.dspace.layout.CrisMetadataGroup;
 import org.dspace.layout.service.CrisLayoutFieldService;
+import org.dspace.layout.service.CrisLayoutMetadataGroupService;
 
 /**
  * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
@@ -32,6 +36,7 @@ public class CrisLayoutFieldBuilder extends AbstractBuilder<CrisLayoutField, Cri
     public CrisLayoutFieldBuilder(Context context) {
         super(context);
     }
+
     /* (non-Javadoc)
      * @see org.dspace.app.rest.builder.AbstractBuilder#cleanup()
      */
@@ -64,6 +69,7 @@ public class CrisLayoutFieldBuilder extends AbstractBuilder<CrisLayoutField, Cri
         field.setPriority(priority);
         return builder.create(ctx, field);
     }
+
 
     public static CrisLayoutFieldBuilder createMetadataField(Context context, MetadataField mf, int row, int priority) {
         CrisLayoutFieldMetadata metadata = new CrisLayoutFieldMetadata();
@@ -113,7 +119,9 @@ public class CrisLayoutFieldBuilder extends AbstractBuilder<CrisLayoutField, Cri
     protected CrisLayoutFieldService getService() {
         return crisLayoutFieldService;
     }
-
+    protected CrisLayoutMetadataGroupService getNestedService() {
+        return crisLayoutMetadataGroupService;
+    }
     public CrisLayoutFieldBuilder withRendering(String rendering) {
         this.field.setRendering(rendering);
         return this;
@@ -141,6 +149,26 @@ public class CrisLayoutFieldBuilder extends AbstractBuilder<CrisLayoutField, Cri
 
     public CrisLayoutFieldBuilder withValueStyle(String styleValue) {
         this.field.setStyleValue(styleValue);
+        return this;
+    }
+
+    public CrisLayoutFieldBuilder withNestedField(List<MetadataField> metadataFieldList) {
+        int priority = 0;
+        List<CrisMetadataGroup> metadataGroupList = new ArrayList<>();
+        for (MetadataField metadataField : metadataFieldList) {
+            CrisMetadataGroup metadatanested = new CrisMetadataGroup();
+            metadatanested.setMetadataField(metadataField);
+            metadatanested.setCrisLayoutField(this.field);
+            metadatanested.setPriority(priority);
+            try {
+                CrisMetadataGroup nested_field = getNestedService().create(context, metadatanested);
+                metadataGroupList.add(nested_field);
+                priority++;
+            } catch (Exception e) {
+                log.error("Error in CrisLayoutTabBuilder.create(..), error: ", e);
+            }
+        }
+        this.field.setCrisMetadataGroupList(metadataGroupList);
         return this;
     }
 }

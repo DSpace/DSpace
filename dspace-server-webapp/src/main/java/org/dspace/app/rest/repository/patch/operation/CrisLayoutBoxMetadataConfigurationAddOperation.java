@@ -6,7 +6,6 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.repository.patch.operation;
-
 import java.sql.SQLException;
 import java.util.List;
 
@@ -26,7 +25,9 @@ import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.CrisLayoutField;
 import org.dspace.layout.CrisLayoutFieldBitstream;
 import org.dspace.layout.CrisLayoutFieldMetadata;
+import org.dspace.layout.CrisMetadataGroup;
 import org.dspace.layout.service.CrisLayoutFieldService;
+import org.dspace.layout.service.CrisLayoutMetadataGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -55,9 +56,12 @@ public class CrisLayoutBoxMetadataConfigurationAddOperation<D> extends PatchOper
     @Autowired
     private MetadataFieldService metadataService;
 
+
     @Autowired
     private CrisLayoutFieldService fieldService;
 
+    @Autowired
+    private CrisLayoutMetadataGroupService crisLayoutMetadataGroupService;
     /* (non-Javadoc)
      * @see org.dspace.app.rest.repository.patch.operation.PatchOperation#perform
      * (org.dspace.core.Context, java.lang.Object, org.dspace.app.rest.model.patch.Operation)
@@ -72,7 +76,7 @@ public class CrisLayoutBoxMetadataConfigurationAddOperation<D> extends PatchOper
                 if (operation.getValue() instanceof JsonValueEvaluator) {
                     value = ((JsonValueEvaluator) operation.getValue()).getValueNode();
                 } else {
-                    value = objectMapper.readTree((String)operation.getValue());
+                    value = objectMapper.readTree((String) operation.getValue());
                 }
                 Integer row = null;
                 Integer position = null;
@@ -87,15 +91,26 @@ public class CrisLayoutBoxMetadataConfigurationAddOperation<D> extends PatchOper
                     }
                 }
                 if (value.isArray()) {
-                    for (JsonNode v: value) {
+                    for (JsonNode v : value) {
+
                         CrisLayoutField layoutField = getLayoutFieldFromJsonNode(
                                 context, box, row, position, v);
                         layoutField = fieldService.create(context, layoutField);
+                        // if it has nested metadata-group
+                        if (v.get("fieldType").asText().equalsIgnoreCase("metadatagroup")) {
+                                     //save nested metadata
+                            saveNestedMetadata(context, position, v.get("metadatagroup"), layoutField);
+                        }
+
                     }
                 } else {
                     CrisLayoutField layoutField = getLayoutFieldFromJsonNode(
                             context, box, row, position, value);
                     layoutField = fieldService.create(context, layoutField);
+                    if (value.get("fieldType").asText().equalsIgnoreCase("metadatagroup")) {
+                        //save nested metadata
+                        saveNestedMetadata(context, position, value.get("metadatagroup"), layoutField);
+                    }
                 }
             } catch (UnprocessableEntityException e) {
                 throw new UnprocessableEntityException(e.getMessage(), e);
@@ -103,8 +118,8 @@ public class CrisLayoutBoxMetadataConfigurationAddOperation<D> extends PatchOper
                 throw new RuntimeException(e.getMessage(), e);
             }
         } else {
-            throw new DSpaceBadRequestException
-            ("CrisLayoutBoxConfigurationAddOperation does not support this operation");
+            throw new DSpaceBadRequestException("CrisLayoutBoxConfigurationAddOperation " +
+                "does not support this operation");
         }
         return resource;
     }
@@ -122,9 +137,9 @@ public class CrisLayoutBoxMetadataConfigurationAddOperation<D> extends PatchOper
     /**
      * Create new CrisLayoutField from json node
      * @param context DSpace current context
-     * @param boxId
+     * @param
      * @param row
-     * @param priority
+     * @param
      * @param node json value
      * @return
      * @throws JsonProcessingException
@@ -148,25 +163,34 @@ public class CrisLayoutBoxMetadataConfigurationAddOperation<D> extends PatchOper
                 throw new UnprocessableEntityException("Bitstream node cannot be null for a bitstream fieldType");
             }
             JsonNode bundleNode = bitstreamNode.get("bundle");
-            if (bundleNode != null && bundleNode.asText() != null ) {
-                ((CrisLayoutFieldBitstream)field).setBundle(bundleNode.asText());
+            if (bundleNode != null && bundleNode.asText() != null) {
+                ((CrisLayoutFieldBitstream) field).setBundle(bundleNode.asText());
             } else {
                 throw new UnprocessableEntityException("Bundle cannot be null for a bitstream fieldType");
             }
             JsonNode metadataValueNode = bitstreamNode.get("metadataValue");
-            if (bundleNode != null && bundleNode.asText() != null ) {
-                ((CrisLayoutFieldBitstream)field).setMetadataValue(metadataValueNode.asText());
+            if (bundleNode != null && bundleNode.asText() != null) {
+                ((CrisLayoutFieldBitstream) field).setMetadataValue(metadataValueNode.asText());
             }
             JsonNode metadataNode = bitstreamNode.get("metadataField");
-            if (metadataNode != null && metadataNode.asText() != null ) {
+            if (metadataNode != null && metadataNode.asText() != null) {
                 metadataType = metadataNode.asText();
             }
         } else {
-            field = new CrisLayoutFieldMetadata();
-            JsonNode metadataNode = node.get("metadata");
-            if (metadataNode != null && metadataNode.asText() != null ) {
-                metadataType = metadataNode.asText();
+            if (StringUtils.equalsIgnoreCase(fieldType.asText(), "metadatagroup")) {
+                field = new CrisLayoutField();
+                JsonNode metadataNode = node.get("metadatagroup").get("leading");
+                if (metadataNode != null && metadataNode.asText() != null) {
+                    metadataType = metadataNode.asText();
+                }
+            } else {
+                field = new CrisLayoutFieldMetadata();
+                JsonNode metadataNode = node.get("metadata");
+                if (metadataNode != null && metadataNode.asText() != null) {
+                    metadataType = metadataNode.asText();
+                }
             }
+
         }
 
         field.setRow(row);
@@ -179,27 +203,27 @@ public class CrisLayoutBoxMetadataConfigurationAddOperation<D> extends PatchOper
         field.setMetadataField(metadataField);
 
         JsonNode labelNode = node.get("label");
-        if (labelNode != null && labelNode.asText() != null ) {
+        if (labelNode != null && labelNode.asText() != null) {
             field.setLabel(labelNode.asText());
         }
 
         JsonNode renderingNode = node.get("rendering");
-        if (renderingNode != null && renderingNode.asText() != null ) {
+        if (renderingNode != null && renderingNode.asText() != null) {
             field.setRendering(renderingNode.asText());
         }
 
         JsonNode styleNode = node.get("style");
-        if (styleNode != null && styleNode.asText() != null ) {
+        if (styleNode != null && styleNode.asText() != null) {
             field.setStyle(styleNode.asText());
         }
 
         JsonNode styleLabelNode = node.get("styleLabel");
-        if (styleLabelNode != null && styleLabelNode.asText() != null ) {
+        if (styleLabelNode != null && styleLabelNode.asText() != null) {
             field.setStyleLabel(styleLabelNode.asText());
         }
 
         JsonNode styleValueNode = node.get("styleValue");
-        if (styleValueNode != null && styleValueNode.asText() != null ) {
+        if (styleValueNode != null && styleValueNode.asText() != null) {
             field.setStyleValue(styleValueNode.asText());
         }
 
@@ -211,7 +235,7 @@ public class CrisLayoutBoxMetadataConfigurationAddOperation<D> extends PatchOper
             }
             priority = position;
             fields.add(position, field);
-            for ( int i = position + 1; i < fields.size(); i++ ) {
+            for (int i = position + 1; i < fields.size(); i++) {
                 fields.get(i).setPriority(
                         fields.get(i).getPriority() + 1);
             }
@@ -234,9 +258,82 @@ public class CrisLayoutBoxMetadataConfigurationAddOperation<D> extends PatchOper
         Integer value = null;
         try {
             value = Integer.valueOf(val);
-        } catch ( Exception e ) {
+        } catch (Exception e) {
             value = null;
         }
         return value;
+    }
+
+    private void saveNestedMetadata( Context context, Integer position,
+                                     JsonNode metadatagroup, CrisLayoutField crisLayoutField)
+        throws SQLException, AuthorizeException {
+        if (metadatagroup.get("elements") != null  && metadatagroup.get("elements").isArray() ) {
+            // search if nested metadata exists
+            for (JsonNode v : metadatagroup.get("elements")) {
+                CrisMetadataGroup nestedField = new CrisMetadataGroup();
+                // it is a metadata
+                //control if metadata exists in database
+                String metadata = null;
+                JsonNode metadataNode = v.get("metadata");
+                if (metadataNode != null && metadataNode.asText() != null) {
+
+                    metadata = metadataNode.asText();
+                }
+                MetadataField metadataField = metadataService.findByString(context, metadata, '.');
+                if (metadataField == null) {
+                    throw new UnprocessableEntityException("MetadataField <" + metadata + "> not exsists!");
+                }
+                nestedField.setMetadataField(metadataField);
+                //else new cris layout field nested will be added in database
+                JsonNode labelNode = v.get("label");
+                if (labelNode != null && labelNode.asText() != null) {
+                    nestedField.setLabel(labelNode.asText());
+                }
+
+                JsonNode renderingNode = v.get("rendering");
+                if (renderingNode != null && renderingNode.asText() != null) {
+                    nestedField.setRendering(renderingNode.asText());
+                }
+
+                JsonNode styleNode = v.get("style");
+                if (styleNode != null && styleNode.asText() != null) {
+                    nestedField.setStyle(styleNode.asText());
+                }
+
+                JsonNode styleLabelNode = v.get("styleLabel");
+                if (styleLabelNode != null && styleLabelNode.asText() != null) {
+                    nestedField.setStyleLabel(styleLabelNode.asText());
+                }
+
+                JsonNode styleValueNode = v.get("styleValue");
+                if (styleValueNode != null && styleValueNode.asText() != null) {
+                    nestedField.setStyleValue(styleValueNode.asText());
+                }
+                Integer priority = 0;
+                List<CrisMetadataGroup> nested_fields = crisLayoutMetadataGroupService.
+                    findNestedFieldByFieldId(context,crisLayoutField.getID()) ;
+                if (nested_fields != null && !nested_fields.isEmpty()) {
+                    if (position == null || position > nested_fields.size()) {
+                        position = nested_fields.size();
+                    }
+                    priority = position;
+                    nested_fields.add(position, nestedField);
+                    for (int i = position + 1; i < nested_fields.size(); i++) {
+
+
+                        nested_fields.get(i).setPriority(
+                            nested_fields.get(i).getPriority() + 1);
+                    }
+                    crisLayoutMetadataGroupService
+                        .update(context, nested_fields.subList(position + 1, nested_fields.size()));
+                } else {
+                    priority = 0;
+                }
+                nestedField.setPriority(priority);
+                nestedField.setCrisLayoutField(crisLayoutField);
+                crisLayoutMetadataGroupService.create(context, nestedField);
+            }
+
+        }
     }
 }
