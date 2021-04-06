@@ -53,7 +53,8 @@ public class CreateWorkspaceItemWithExternalSourceScriptConfiguration<T extends 
     public Options getOptions() {
         if (options == null) {
             Options options = new Options();
-            options.addOption("s", "service", true, "the name of the external service to use");
+            options.addOption("s", "service", true, "the name of the external service to be " +
+                "queried (\"scopus\" or \"wos\")");
             options.getOption("s").setType(String.class);
             options.getOption("s").setRequired(true);
 
