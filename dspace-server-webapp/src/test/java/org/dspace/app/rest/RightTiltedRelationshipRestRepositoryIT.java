@@ -52,10 +52,11 @@ public class RightTiltedRelationshipRestRepositoryIT extends RelationshipRestRep
                 get("/api/core/items/{uuid}", author1.getID())
             )
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.metadata", matchMetadata(
-                String.format("%s.isOrgUnitOfPerson", MetadataSchemaEnum.RELATION.getName()),
-                orgUnit1.getID().toString()
-            )));
+            .andExpect(
+                jsonPath(
+                    String.format("$.metadata['%s.isOrgUnitOfPerson']", MetadataSchemaEnum.RELATION.getName())
+                ).doesNotExist()
+            );
 
         // get org unit metadata using REST
         getClient(adminToken)
