@@ -17,6 +17,7 @@ import javax.persistence.criteria.Root;
 import org.dspace.content.Item;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
+import org.dspace.content.RelationshipType_;
 import org.dspace.content.Relationship_;
 import org.dspace.content.dao.RelationshipDAO;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -27,22 +28,46 @@ import org.dspace.core.Context;
 public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> implements RelationshipDAO {
 
     @Override
-    public List<Relationship> findByItem(Context context, Item item) throws SQLException {
-
-        return findByItem(context, item, -1, -1);
+    public List<Relationship> findByItem(Context context, Item item, boolean excludeTilted) throws SQLException {
+        return findByItem(context, item, -1, -1, excludeTilted);
     }
 
     @Override
-    public List<Relationship> findByItem(Context context, Item item, Integer limit, Integer offset)
-            throws SQLException {
+    public List<Relationship> findByItem(Context context, Item item, Integer limit, Integer offset,
+                                         boolean excludeTilted) throws SQLException {
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
         criteriaQuery.select(relationshipRoot);
-        criteriaQuery
-            .where(criteriaBuilder.or(criteriaBuilder.equal(relationshipRoot.get(Relationship_.leftItem), item),
-                                      criteriaBuilder.equal(relationshipRoot.get(Relationship_.rightItem), item)));
+        if (excludeTilted) {
+            // If this item is the left item,
+            //    return relationships for types which are not tilted right (tilted is either left nor null)
+            // If this item is the right item,
+            //    return relationships for types which are not tilted left (tilted is either right nor null)
+            criteriaQuery
+                    .where(criteriaBuilder.or(
+                            criteriaBuilder.and(
+                                    criteriaBuilder.equal(relationshipRoot.get(Relationship_.leftItem), item),
+                                    criteriaBuilder.or(
+                                            criteriaBuilder.isNull(relationshipRoot.get(Relationship_.relationshipType)
+                                                    .get(RelationshipType_.tilted)),
+                                            criteriaBuilder.notEqual(relationshipRoot
+                                                .get(Relationship_.relationshipType)
+                                                .get(RelationshipType_.tilted), RelationshipType.Tilted.RIGHT))),
+                            criteriaBuilder.and(
+                                    criteriaBuilder.equal(relationshipRoot.get(Relationship_.rightItem), item),
+                                    criteriaBuilder.or(
+                                            criteriaBuilder.isNull(relationshipRoot.get(Relationship_.relationshipType)
+                                                    .get(RelationshipType_.tilted)),
+                                            criteriaBuilder.notEqual(relationshipRoot
+                                                    .get(Relationship_.relationshipType)
+                                                    .get(RelationshipType_.tilted), RelationshipType.Tilted.LEFT)))));
+        } else {
+            criteriaQuery
+                    .where(criteriaBuilder.or(criteriaBuilder.equal(relationshipRoot.get(Relationship_.leftItem), item),
+                            criteriaBuilder.equal(relationshipRoot.get(Relationship_.rightItem), item)));
+        }
         return list(context, criteriaQuery, false, Relationship.class, limit, offset);
     }
 
