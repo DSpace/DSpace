@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.LateObjectEvaluator;
 import org.dspace.authorize.AuthorizeException;
@@ -75,6 +77,12 @@ import org.springframework.util.Assert;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOperation<Item> {
+
+    /**
+     * log4j category
+     */
+    private static final Logger log =
+            org.apache.logging.log4j.LogManager.getLogger(ItemMetadataValueAddPatchOperation.class);
 
     @Autowired
     ItemService itemService;
@@ -154,20 +162,21 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
 
         // if a virtual value is present in the list, it must be present in preExistentRelationships too.
         // (with this operator virtual value can only be moved or deleted).
-        // a not present virtual value will be discarded
         int idx = 0;
         for (MetadataValueRest ll : list) {
             if (StringUtils.startsWith(ll.getAuthority(), Constants.VIRTUAL_AUTHORITY_PREFIX)) {
 
-                Optional<MetadataValue> preExistentMvr = preExistentMetadata.stream().filter(mvr ->
+                Optional<MetadataValue> preExistentMv = preExistentMetadata.stream().filter(mvr ->
                     StringUtils.equals(ll.getAuthority(), mvr.getAuthority())).findFirst();
 
-                if (!preExistentMvr.isPresent()) {
-                    idx++;
-                    continue;
+                if (!preExistentMv.isPresent()) {
+                    throw new UnprocessableEntityException(
+                            "Relationship with authority=" + ll.getAuthority() + " not found");
                 }
 
-                this.itemService.moveSingleMetadataValue(context, source, idx, preExistentMvr.get());
+                final RelationshipMetadataValue rmv = (RelationshipMetadataValue) preExistentMv.get();
+                final Relationship rel = preExistentRelationships.get(rmv.getRelationshipId());
+                this.updateRelationshipPlace(context, source, idx, rel);
 
             } else {
                 getDSpaceObjectService()
@@ -199,6 +208,22 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
     private Integer getRelId(String authority) {
         final int relId = Integer.parseInt(authority.split(Constants.VIRTUAL_AUTHORITY_PREFIX)[1]);
         return relId;
+    }
+
+    private void updateRelationshipPlace(Context context, Item dso, int place, Relationship rs) {
+
+        try {
+            if (rs.getLeftItem() == dso) {
+                rs.setLeftPlace(place);
+            } else {
+                rs.setRightPlace(place);
+            }
+            relationshipService.update(context, rs);
+        } catch (Exception e) {
+            //should not occur, otherwise metadata can't be updated either
+            log.error("An error occurred while moving " + rs.getID() + " for item " + dso.getID(), e);
+        }
+
     }
 
     @Override

@@ -1363,7 +1363,7 @@ prevent the generation of resource policy entry values with null dspace_object a
      * Supports moving metadata by adding the metadata value or updating the place of the relationship
      */
     @Override
-    public void moveSingleMetadataValue(Context context, Item dso, int place, MetadataValue rr) {
+    protected void moveSingleMetadataValue(Context context, Item dso, int place, MetadataValue rr) {
         if (rr instanceof RelationshipMetadataValue) {
             try {
                 //Retrieve the applicable relationship

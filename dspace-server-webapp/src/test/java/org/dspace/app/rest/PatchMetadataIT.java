@@ -1192,6 +1192,36 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     }
 
     /**
+     * This test will overwrite all authors (dc.contributor.author) of a workspace publication's "traditionalpageone"
+     * section using a PATCH add with an array composed by only a not existent virtual metadata.
+     */
+    @Test
+    public void patchAddAllAuthorsOnTraditionalPageNotExistentRelationTest() throws  Exception {
+
+        initPersonPublicationWorkspace();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        List<MetadataValueRest> value = new ArrayList<MetadataValueRest>();
+
+        MetadataValueRest mrv = new MetadataValueRest();
+        value.add(mrv);
+        mrv.setValue("Dumbar, John");
+        mrv.setAuthority("virtual::" + Integer.MAX_VALUE);
+
+        AddOperation add = new AddOperation("/sections/traditionalpageone/dc.contributor.author", value);
+        ops.add(add);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(patch("/api/submission/workspaceitems/" + publicationItem.getID())
+                                         .content(patchBody)
+                                         .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isUnprocessableEntity());
+
+    }
+
+    /**
      * This method moves an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
      * section from position "from" to "path" using a PATCH request and verifies the order of the authors within the
      * section using an ordered list of expected author names.
