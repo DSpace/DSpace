@@ -222,4 +222,12 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
         }
         return copy;
     }
+
+    @Override
+    public void clearCache() {
+        controlled.clear();
+        minConfidence.clear();
+
+        isAuthorityRequired = null;
+    }
 }

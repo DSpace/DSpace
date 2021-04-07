@@ -30,4 +30,11 @@
         <scope_note>Stores the cookie preferences of an EPerson, as selected in last session. Value will be an array of cookieName/boolean pairs, specifying which cookies are allowed or not allowed.</scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>dspace</schema>
+        <element>entity</element>
+        <qualifier>type</qualifier>
+        <scope_note>Stores the type of Entity that a specific Item represents</scope_note>
+    </dc-type>
+
 </dspace-dc-types>

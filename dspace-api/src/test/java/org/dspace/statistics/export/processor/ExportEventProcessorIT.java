@@ -135,7 +135,7 @@ public class ExportEventProcessorIT extends AbstractIntegrationTestWithDatabase 
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, community).build();
-        Item item = ItemBuilder.createItem(context, collection).withRelationshipType(otherEntity.getLabel()).build();
+        Item item = ItemBuilder.createItem(context, collection).withEntityType(otherEntity.getLabel()).build();
         context.restoreAuthSystemState();
 
         context.setCurrentUser(admin);
@@ -157,7 +157,7 @@ public class ExportEventProcessorIT extends AbstractIntegrationTestWithDatabase 
         Collection collection = CollectionBuilder.createCollection(context, community).build();
         Item item = ItemBuilder.createItem(context, collection)
                                .withType("Excluded type")
-                               .withRelationshipType(publication.getLabel())
+                               .withEntityType(publication.getLabel())
                                .build();
 
         context.restoreAuthSystemState();
@@ -177,7 +177,7 @@ public class ExportEventProcessorIT extends AbstractIntegrationTestWithDatabase 
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, community).build();
-        Item item = ItemBuilder.createItem(context, collection).withRelationshipType(otherEntity.getLabel()).build();
+        Item item = ItemBuilder.createItem(context, collection).withEntityType(otherEntity.getLabel()).build();
         context.restoreAuthSystemState();
 
         ExportEventProcessor exportEventProcessor = new ItemEventProcessor(context, request, item);
@@ -195,7 +195,7 @@ public class ExportEventProcessorIT extends AbstractIntegrationTestWithDatabase 
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, community).build();
-        Item item = ItemBuilder.createItem(context, collection).withRelationshipType(publication.getLabel()).build();
+        Item item = ItemBuilder.createItem(context, collection).withEntityType(publication.getLabel()).build();
         context.restoreAuthSystemState();
 
         ExportEventProcessor exportEventProcessor = new ItemEventProcessor(context, request, item);
@@ -214,7 +214,7 @@ public class ExportEventProcessorIT extends AbstractIntegrationTestWithDatabase 
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, community).build();
-        Item item = ItemBuilder.createItem(context, collection).withRelationshipType(publication.getLabel()).build();
+        Item item = ItemBuilder.createItem(context, collection).withEntityType(publication.getLabel()).build();
         context.restoreAuthSystemState();
 
         ExportEventProcessor exportEventProcessor = new ItemEventProcessor(context, request, item);
@@ -232,7 +232,7 @@ public class ExportEventProcessorIT extends AbstractIntegrationTestWithDatabase 
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, community).build();
-        Item item = ItemBuilder.createItem(context, collection).withRelationshipType(otherEntity.getLabel()).build();
+        Item item = ItemBuilder.createItem(context, collection).withEntityType(otherEntity.getLabel()).build();
         context.restoreAuthSystemState();
 
         ExportEventProcessor exportEventProcessor = new ItemEventProcessor(context, request, item);

@@ -51,7 +51,7 @@ public class ItemConverter
         item.setLastModified(obj.getLastModified());
 
         List<MetadataValue> entityTypes =
-            itemService.getMetadata(obj, "relationship", "type", null, Item.ANY, false);
+            itemService.getMetadata(obj, "dspace", "entity", "type", Item.ANY, false);
         if (CollectionUtils.isNotEmpty(entityTypes) && StringUtils.isNotBlank(entityTypes.get(0).getValue())) {
             item.setEntityType(entityTypes.get(0).getValue());
         }
