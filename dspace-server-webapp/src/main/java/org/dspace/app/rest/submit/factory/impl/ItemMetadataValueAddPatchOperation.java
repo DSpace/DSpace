@@ -8,15 +8,25 @@
 package org.dspace.app.rest.submit.factory.impl;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.LateObjectEvaluator;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.Relationship;
+import org.dspace.content.RelationshipMetadataValue;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.Utils;
 import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
@@ -69,9 +79,12 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
     @Autowired
     ItemService itemService;
 
+    @Autowired
+    RelationshipService relationshipService;
+
     @Override
     void add(Context context, Request currentRequest, InProgressSubmission source, String path, Object value)
-        throws SQLException {
+            throws SQLException {
         String[] split = getAbsolutePath(path).split("/");
         // if split size is one so we have a call to initialize or replace
         if (split.length == 1) {
@@ -84,7 +97,7 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
             MetadataValueRest object = evaluateSingleObject((LateObjectEvaluator) value);
             // check if is not empty
             List<MetadataValue> metadataByMetadataString = itemService.getMetadataByMetadataString(source.getItem(),
-                                                                                                   split[0]);
+                    split[0]);
             Assert.notEmpty(metadataByMetadataString);
             if (split.length > 1) {
                 String controlChar = split[1];
@@ -98,7 +111,7 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
                         int index = Integer.parseInt(controlChar);
                         if (index > metadataByMetadataString.size()) {
                             throw new IllegalArgumentException(
-                                "The specified index MUST NOT be greater than the number of elements in the array");
+                                    "The specified index MUST NOT be greater than the number of elements in the array");
                         }
                         addValue(context, source.getItem(), split[0], object, index);
 
@@ -109,8 +122,88 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
 
     }
 
+    protected void replaceValue(Context context, Item source, String target, List<MetadataValueRest> list)
+            throws SQLException {
+        String[] metadata = Utils.tokenize(target);
+
+        // fetch pre-existent metadata
+        List<MetadataValue> preExistentMetadata =
+                getDSpaceObjectService().getMetadata(source, metadata[0], metadata[1], metadata[2], Item.ANY);
+
+        // fetch pre-existent relationships
+        Map<Integer, Relationship> preExistentRelationships = preExistentRelationships(context, preExistentMetadata);
+
+        // clear all plain metadata
+        getDSpaceObjectService().clearMetadata(context, source, metadata[0], metadata[1], metadata[2], Item.ANY);
+        // remove all deleted relationships
+        for (Relationship rel : preExistentRelationships.values()) {
+            try {
+                Optional<MetadataValueRest> stillPresent = list.stream()
+                    .filter(ll -> ll.getAuthority() != null &&  rel.getID().equals(getRelId(ll.getAuthority())))
+                    .findAny();
+                if (stillPresent.isEmpty()) {
+                    relationshipService.delete(context, rel);
+                }
+            } catch (AuthorizeException e) {
+                e.printStackTrace();
+                throw new RuntimeException("Authorize Exception during relationship deletion.");
+            }
+        }
+
+        // create plain metadata / move relationships in the list order
+
+        // if a virtual value is present in the list, it must be present in preExistentRelationships too.
+        // (with this operator virtual value can only be moved or deleted).
+        // a not present virtual value will be discarded
+        int idx = 0;
+        for (MetadataValueRest ll : list) {
+            if (StringUtils.startsWith(ll.getAuthority(), Constants.VIRTUAL_AUTHORITY_PREFIX)) {
+
+                Optional<MetadataValue> preExistentMvr = preExistentMetadata.stream().filter(mvr ->
+                    StringUtils.equals(ll.getAuthority(), mvr.getAuthority())).findFirst();
+
+                if (!preExistentMvr.isPresent()) {
+                    idx++;
+                    continue;
+                }
+
+                this.itemService.moveSingleMetadataValue(context, source, idx, preExistentMvr.get());
+
+            } else {
+                getDSpaceObjectService()
+                        .addMetadata(context, source, metadata[0], metadata[1], metadata[2],
+                                ll.getLanguage(), ll.getValue(), ll.getAuthority(), ll.getConfidence(), idx);
+            }
+            idx++;
+        }
+    }
+
+    /**
+     * Retrieve Relationship Objects from a List of MetadataValue.
+     */
+    private Map<Integer, Relationship> preExistentRelationships(Context context,
+            List<MetadataValue> preExistentMetadata) throws SQLException {
+        Map<Integer, Relationship> relationshipsMap = new HashMap<Integer, Relationship>();
+        for (MetadataValue ll : preExistentMetadata) {
+            if (ll instanceof RelationshipMetadataValue) {
+                Relationship relationship = relationshipService
+                        .find(context, ((RelationshipMetadataValue) ll).getRelationshipId());
+                if (relationship != null) {
+                    relationshipsMap.put(relationship.getID(), relationship);
+                }
+            }
+        }
+        return relationshipsMap;
+    }
+
+    private Integer getRelId(String authority) {
+        final int relId = Integer.parseInt(authority.split(Constants.VIRTUAL_AUTHORITY_PREFIX)[1]);
+        return relId;
+    }
+
     @Override
     protected ItemService getDSpaceObjectService() {
         return itemService;
     }
+
 }
