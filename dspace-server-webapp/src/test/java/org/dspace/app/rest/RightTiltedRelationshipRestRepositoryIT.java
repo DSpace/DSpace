@@ -7,8 +7,16 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import org.dspace.builder.RelationshipBuilder;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.RelationshipType;
 import org.junit.Before;
+import org.junit.Test;
 
 public class RightTiltedRelationshipRestRepositoryIT extends RelationshipRestRepositoryIT {
 
@@ -25,6 +33,40 @@ public class RightTiltedRelationshipRestRepositoryIT extends RelationshipRestRep
         context.restoreAuthSystemState();
     }
 
-    // TODO create new test in parent class to test tilted right, then override here
+    @Override
+    @Test
+    public void testIsOrgUnitOfPersonRelationshipMetadataViaREST() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        RelationshipBuilder.createRelationshipBuilder(
+            context, author1, orgUnit1, isOrgUnitOfPersonRelationshipType
+        ).build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        // get author metadata using REST
+        getClient(adminToken)
+            .perform(
+                get("/api/core/items/{uuid}", author1.getID())
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.metadata", matchMetadata(
+                String.format("%s.isOrgUnitOfPerson", MetadataSchemaEnum.RELATION.getName()),
+                orgUnit1.getID().toString()
+            )));
+
+        // get org unit metadata using REST
+        getClient(adminToken)
+            .perform(
+                get("/api/core/items/{uuid}", orgUnit1.getID())
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.metadata", matchMetadata(
+                String.format("%s.isPersonOfOrgUnit", MetadataSchemaEnum.RELATION.getName()),
+                author1.getID().toString()
+            )));
+    }
 
 }
