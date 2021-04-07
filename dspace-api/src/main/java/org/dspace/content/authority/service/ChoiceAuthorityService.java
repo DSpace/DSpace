@@ -89,9 +89,6 @@ public interface ChoiceAuthorityService {
     public Choices getMatches(String fieldKey, String query, Collection collection,
                               int start, int limit, String locale);
 
-    public Choices getMatches(String fieldKey, String query, Collection collection, int start, int limit, String locale,
-                              boolean externalInput);
-
     /**
      * Wrapper that calls getBestMatch method of the plugin corresponding to
      * the metadata field defined by single field key.

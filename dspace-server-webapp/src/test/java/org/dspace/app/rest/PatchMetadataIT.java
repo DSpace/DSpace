@@ -139,17 +139,17 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
                 .withTitle("Person 1")
                 .withPersonIdentifierFirstName("Sarah")
                 .withPersonIdentifierLastName("Dahlen")
-                .withRelationshipType("Person")
+                .withEntityType("Person")
                 .build();
         personItem2 = ItemBuilder.createItem(context, collection)
                 .withTitle("Person 2")
                 .withPersonIdentifierFirstName("Oliver")
                 .withPersonIdentifierLastName("Linton")
-                .withRelationshipType("Person")
+                .withEntityType("Person")
                 .build();
         publicationItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
                 .withTitle("Publication 1")
-                .withRelationshipType("Publication")
+                .withEntityType("Publication")
                 .build();
         publicationPersonRelationshipType = relationshipTypeService.findbyTypesAndTypeName(context,
                 entityTypeService.findByEntityType(context, "Publication"),
@@ -257,7 +257,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
 
         publicationItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
                                               .withTitle("Publication 1")
-                                              .withRelationshipType("Publication")
+                                              .withEntityType("Publication")
                                               .build();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
