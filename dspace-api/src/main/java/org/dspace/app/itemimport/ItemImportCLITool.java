@@ -73,7 +73,6 @@ public class ItemImportCLITool {
             Options options = new Options();
 
             options.addOption("a", "add", false, "add items to DSpace");
-            options.addOption("b", "add-bte", false, "add items to DSpace via Biblio-Transformation-Engine (BTE)");
             options.addOption("r", "replace", false, "replace items in mapfile");
             options.addOption("d", "delete", false,
                               "delete items listed in mapfile");
@@ -388,8 +387,6 @@ public class ItemImportCLITool {
                     myloader.replaceItems(c, mycollections, sourcedir, mapfile, template);
                 } else if ("delete".equals(command)) {
                     myloader.deleteItems(c, mapfile);
-                } else if ("add-bte".equals(command)) {
-                    myloader.addBTEItems(c, mycollections, sourcedir, mapfile, template, bteInputType, null);
                 }
 
                 // complete all transactions

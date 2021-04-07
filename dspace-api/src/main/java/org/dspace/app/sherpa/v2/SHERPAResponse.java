@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.dspace.core.I18nUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -98,7 +97,7 @@ public class SHERPAResponse {
                         SHERPAPublisher sherpaPublisher = new SHERPAPublisher();
                         SHERPAJournal sherpaJournal = new SHERPAJournal();
 
-                        JSONObject item = items.getJSONObject(0);
+                        JSONObject item = items.getJSONObject(itemIndex);
 
                         // Parse system metadata (per-item / result information)
                         if (item.has("system_metadata")) {
@@ -415,17 +414,6 @@ public class SHERPAResponse {
             permittedVersion.setArticleVersion(articleVersion);
             log.debug("Added allowed version: " + articleVersion + " to list");
         }
-
-        // Add labels for this particular article version
-        if ("submitted".equals(articleVersion)) {
-            versionLabel = I18nUtil.getMessage("jsp.sherpa.submitted-version-label");
-        } else if ("accepted".equals(articleVersion)) {
-            versionLabel = I18nUtil.getMessage("jsp.sherpa.accepted-version-label");
-        } else if ("published".equals(articleVersion)) {
-            versionLabel = I18nUtil.getMessage("jsp.sherpa.published-version-label");
-        }
-        // Set the article version label based on the i18n text set above
-        permittedVersion.setArticleVersionLabel(versionLabel);
 
         // These are now child arrays, in old API they were explicit like
         // "preprint restrictions", etc., and just contained text rather than data
