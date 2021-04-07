@@ -27,7 +27,9 @@ import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.security.RestAuthenticationService;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.service.ClientInfoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -68,6 +70,9 @@ public class AuthenticationRestController implements InitializingBean {
 
     @Autowired
     private RestAuthenticationService restAuthenticationService;
+
+    @Autowired
+    private ClientInfoService clientInfoService;
 
     @Autowired
     private Utils utils;
@@ -178,8 +183,13 @@ public class AuthenticationRestController implements InitializingBean {
      */
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @RequestMapping(value = "/shortlivedtokens", method = RequestMethod.GET)
-    public AuthenticationTokenResource shortLivedTokenViaGet(HttpServletRequest request) {
-        // TODO: only allow certain ips
+    public AuthenticationTokenResource shortLivedTokenViaGet(HttpServletRequest request) throws AuthorizeException {
+        String clientIp = clientInfoService.getClientIp(request);
+
+        if (!clientInfoService.isRequestFromTrustedProxy(clientIp)) {
+            throw new AuthorizeException("Requests to this endpoint should be made from a trusted IP address.");
+        }
+
         return shortLivedTokenResponse(request);
     }
 
