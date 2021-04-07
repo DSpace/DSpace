@@ -10,6 +10,7 @@ package org.dspace.layout;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Cacheable;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
@@ -67,7 +68,7 @@ public class CrisLayoutField implements ReloadableEntity<Integer> {
     private String styleLabel;
     @Column(name = "style_value")
     private String styleValue;
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "crisLayoutField")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "crisLayoutField", cascade = CascadeType.ALL)
     @OrderBy(value = "priority")
     private List<CrisMetadataGroup> crisMetadataGroupList = new ArrayList<>();
     @Override

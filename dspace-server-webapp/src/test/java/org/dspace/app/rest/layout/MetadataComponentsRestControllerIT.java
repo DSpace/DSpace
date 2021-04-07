@@ -61,7 +61,7 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         // get metadata field
         MetadataSchema schema = mdss.find(context, "dc");
-        MetadataSchema schema_oaire = mdss.find(context, "oairecerif");
+        MetadataSchema schemaOaire = mdss.find(context, "oairecerif");
         MetadataField isbn = mfss.findByElement(context, schema, "identifier", "isbn");
         MetadataField uri = mfss.findByElement(context, schema, "identifier", "uri");
         MetadataField abs = mfss.findByElement(context, schema, "description", "abstract");
@@ -70,7 +70,7 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
         MetadataField extent = mfss.findByElement(context, schema, "format", "extent");
         // nested metadata
         MetadataField author = mfss.findByElement(context, schema, "contributor", "author");
-        MetadataField affiliation = mfss.findByElement(context, schema_oaire, "author", "affiliation");
+        MetadataField affiliation = mfss.findByElement(context, schemaOaire, "author", "affiliation");
         List<MetadataField> nestedMetadata = new ArrayList<>();
         nestedMetadata.add(author);
         nestedMetadata.add(affiliation);
@@ -510,7 +510,7 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
         Map<String, String> values1 = new HashMap<String, String>();
         Map<String, String> values2 = new HashMap<String, String>();
         Map<String, Object> metadataGroup = new HashMap<String, Object>();
-        Map<String, Object> values_row_nested = new HashMap<String, Object>();
+        Map<String, Object> valuesRowNested = new HashMap<String, Object>();
         List<Map<String, Object>> metadataValuesNested = new ArrayList<Map<String, Object>>();
 
         // second nested metadata
@@ -537,15 +537,15 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
         metadataGroup.put("elements", metadataValues);
         metadataGroup.put("leading", "dc.contributor.author");
 
-        values_row_nested.put("label", "Authors");
-        values_row_nested.put("rendering", "table");
-        values_row_nested.put("fieldType", "metadatagroup");
-        values_row_nested.put("style", "row");
-        values_row_nested.put("styleLabel", "col");
-        values_row_nested.put("styleValue", "col");
-        values_row_nested.put("metadatagroup", metadataGroup);
+        valuesRowNested.put("label", "Authors");
+        valuesRowNested.put("rendering", "table");
+        valuesRowNested.put("fieldType", "metadatagroup");
+        valuesRowNested.put("style", "row");
+        valuesRowNested.put("styleLabel", "col");
+        valuesRowNested.put("styleValue", "col");
+        valuesRowNested.put("metadatagroup", metadataGroup);
 
-        metadataValuesNested.add(values_row_nested);
+        metadataValuesNested.add(valuesRowNested);
         operations.add(new AddOperation("/rows/0/fields/0", metadataValuesNested));
         String patchBody = getPatchContent(operations);
 
