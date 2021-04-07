@@ -21,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public interface UploadableStep extends ListenerProcessingStep {
+public interface UploadableStep extends RestProcessingStep {
 
     /**
      * The method to implement to support upload of a file in the submission section (aka panel / step)

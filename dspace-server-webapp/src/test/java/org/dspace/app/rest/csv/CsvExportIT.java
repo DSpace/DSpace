@@ -60,7 +60,7 @@ public class CsvExportIT extends AbstractControllerIntegrationTest {
         Item article = ItemBuilder.createItem(context, col1)
                                   .withTitle("Article")
                                   .withIssueDate("2017-10-17")
-                                  .withRelationshipType("Publication")
+                                  .withEntityType("Publication")
                                   .build();
 
         AtomicReference<Integer> idRef = new AtomicReference<>();
@@ -111,7 +111,7 @@ public class CsvExportIT extends AbstractControllerIntegrationTest {
         Item article = ItemBuilder.createItem(context, col1)
                                   .withTitle("Article")
                                   .withIssueDate("2017-10-17")
-                                  .withRelationshipType("Publication")
+                                  .withEntityType("Publication")
                                   .build();
 
         AtomicReference<Integer> idRef = new AtomicReference<>();

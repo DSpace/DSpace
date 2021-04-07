@@ -7,22 +7,23 @@
  */
 package org.dspace.app.rest.submit.step;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.step.DataCCLicense;
-import org.dspace.app.rest.submit.AbstractRestProcessingStep;
+import org.dspace.app.rest.submit.AbstractProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.submit.factory.PatchOperationFactory;
 import org.dspace.app.rest.submit.factory.impl.PatchOperation;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.core.Context;
-import org.dspace.services.model.Request;
 
 /**
  * CC License step for DSpace Spring Rest. Expose the creative commons license information about the in progress
  * submission.
  */
-public class CCLicenseStep extends org.dspace.submit.step.CCLicenseStep implements AbstractRestProcessingStep {
+public class CCLicenseStep extends AbstractProcessingStep {
 
     /**
      * Retrieves the CC License data of the in progress submission
@@ -51,8 +52,8 @@ public class CCLicenseStep extends org.dspace.submit.step.CCLicenseStep implemen
      * @throws Exception
      */
     @Override
-    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op,
-            SubmissionStepConfig stepConf) throws Exception {
+    public void doPatchProcessing(Context context, HttpServletRequest currentRequest, InProgressSubmission source,
+            Operation op, SubmissionStepConfig stepConf) throws Exception {
 
         if (op.getPath().endsWith(CCLICENSE_STEP_OPERATION_ENTRY)) {
 

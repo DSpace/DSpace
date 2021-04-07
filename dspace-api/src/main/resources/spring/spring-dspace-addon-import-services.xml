@@ -19,7 +19,9 @@
 
     <context:annotation-config/> <!-- allows us to use spring annotations in beans -->
 
-    <bean id="importService" class="org.dspace.importer.external.service.ImportService" lazy-init="false" autowire="byType" destroy-method="destroy">
+    <bean id="org.dspace.importer.external.service.ImportService"
+        class="org.dspace.importer.external.service.ImportService"
+        lazy-init="false" autowire="byType" destroy-method="destroy">
         <property name="importSources">
             <list>
                 <ref bean="pubmedImportService" />

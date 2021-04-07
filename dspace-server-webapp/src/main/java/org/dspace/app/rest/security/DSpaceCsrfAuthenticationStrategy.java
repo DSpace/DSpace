@@ -48,8 +48,10 @@ public class DSpaceCsrfAuthenticationStrategy implements SessionAuthenticationSt
      * <P>
      * Therefore, for DSpace, we've customized this method to ensure a new CSRF Token is NOT generated each time a new
      * Authentication object is created -- doing so causes the CSRF Token to change with every request. Instead, we
-     * check to see if the client also passed a CSRF token via a header or parameter. If so, this means the client
-     * has used (or attempted to use) the token & it must then be regenerated.
+     * check to see if the client also passed a CSRF token via a querystring parameter (i.e. "_csrf"). If so, this means
+     * the client has sent the token in a less secure manner & it must then be regenerated.
+     * <P>
+     * NOTE: We also automatically regenerate CSRF token on login/logout via JWTTokenRestAuthenticationServiceImpl.
      */
     @Override
     public void onAuthentication(Authentication authentication,
@@ -62,15 +64,17 @@ public class DSpaceCsrfAuthenticationStrategy implements SessionAuthenticationSt
         boolean containsToken = token != null;
 
         if (containsToken) {
-            // Check for header or parameter in request
-            boolean containsHeader = StringUtils.hasLength(request.getHeader(token.getHeaderName()));
+            // Check for CSRF token sent as param in request
             boolean containsParameter = StringUtils.hasLength(request.getParameter(token.getParameterName()));
 
-            // If token exists & we've also been sent either the header or parameter
-            // then we need to reset our token (as it's been used)
-            if (containsHeader || containsParameter) {
+            // If token exists was sent in a parameter, then we need to reset our token
+            // (as sending token in a param is insecure)
+            if (containsParameter) {
+                // Note: We first set the token to null & then set a new one. This results in 2 cookies sent,
+                // the first being empty and the second having the new token.
+                // This behavior is borrowed from Spring Security's CsrfAuthenticationStrategy, see
+                // https://github.com/spring-projects/spring-security/blob/5.4.x/web/src/main/java/org/springframework/security/web/csrf/CsrfAuthenticationStrategy.java
                 this.csrfTokenRepository.saveToken(null, request, response);
-
                 CsrfToken newToken = this.csrfTokenRepository.generateToken(request);
                 this.csrfTokenRepository.saveToken(newToken, request, response);
 
