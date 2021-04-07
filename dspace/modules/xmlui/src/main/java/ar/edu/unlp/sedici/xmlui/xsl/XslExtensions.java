@@ -7,17 +7,23 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.xpath.NodeSet;
+import org.dspace.app.xmlui.aspect.administrative.FlowItemUtils;
+import org.dspace.app.xmlui.aspect.administrative.FlowResult;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -172,5 +178,44 @@ public class XslExtensions {
 	public static int availableItemsCount() throws SQLException {
 		return Utils.countAvailableItems();
 	}
-	
+
+	/*
+	 * Método que retorna los handles de las colecciones y comunidades de un item
+	 * separados por coma
+	 */
+	public static String getItemContainersList(String handle) throws SQLException {
+		Context context;
+		try {
+			context = new Context();
+		} catch (SQLException e) {
+			log.error("No se pudo instanciar el Context", e);
+			throw new RuntimeException(e);
+		}
+		List<String> handlesList = new ArrayList<String>();
+		FlowResult result = FlowItemUtils.resolveItemIdentifier(context, handle);
+		if (result != null && result.getParameter("itemID") != null) {
+			int itemID = (int) (result.getParameter("itemID"));
+			Item item = Item.find(context, itemID);
+			Collection[] collections = item.getCollections();
+			Community[] communities = item.getCommunities();
+			for (Collection col : collections) {
+				if (!handlesList.contains(col.getHandle())) {
+					handlesList.add(col.getHandle());
+				}
+			}
+			for (Community com : communities) {
+				if (!handlesList.contains(com.getHandle())) {
+					handlesList.add(com.getHandle());
+				}
+			}
+			try {
+				context.complete();
+			} catch (SQLException e) {
+				log.error("No se pudo cerrar el Context", e);
+				throw new RuntimeException(e);
+			}
+		}
+		return String.join(",", handlesList);
+	}
+
 }

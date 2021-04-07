@@ -14,7 +14,8 @@
                 xmlns="http://www.w3.org/1999/xhtml"
                 exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc confman"
                 xmlns:date="http://exslt.org/dates-and-times" 
-                extension-element-prefixes="date">
+                extension-element-prefixes="date"
+                xmlns:ex="ar.edu.unlp.sedici.xmlui.xsl.XslExtensions">
 
     <xsl:output indent="yes"/>
 
@@ -624,9 +625,10 @@ placeholders for header images -->
 
 				ga('create', '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']"/><xsl:text>', 'auto');
 				</xsl:text>
-				<xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='focus'][@qualifier='containerType']/text() = 'type:item'"><xsl:text>
-					ga('set', 'dimension1', '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='focus'][@qualifier='object']/text()"/><xsl:text>')
-					ga('set', 'dimension2', '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='focus'][@qualifier='container']/text()"/><xsl:text>')
+				<xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='focus'][@qualifier='containerType']/text() = 'type:item'">
+					<xsl:variable name="itemHandle" select="substring(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='focus'][@qualifier='object']/text(), 5)"/><xsl:text>
+					ga('set', 'dimension1', '</xsl:text><xsl:value-of select="$itemHandle"/><xsl:text>')
+					ga('set', 'dimension2', '</xsl:text><xsl:value-of select="ex:getItemContainersList($itemHandle)"/><xsl:text>')
 				</xsl:text>
 				</xsl:if><xsl:text>
 				ga('send', 'pageview');
