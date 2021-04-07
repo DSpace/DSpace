@@ -451,7 +451,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
-    // This test is verifying that Spring Security's CORS settings are working as we expect
+    // This test (and next) is verifying that Spring Security's CORS settings are working as we expect
     public void testCannotReuseTokenFromUntrustedOrigin() throws Exception {
         // First, get a valid login token
         String token = getAuthToken(eperson.getEmail(), password);
@@ -476,42 +476,18 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void testReuseTokenWithDifferentIPWhenIPStored() throws Exception {
-        // Enable IP storage in JWT login token
-        configurationService.setProperty("jwt.login.token.include.ip", true);
-
-        String token = getAuthToken(eperson.getEmail(), password);
-
-        getClient(token).perform(get("/api/authn/status"))
-
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.okay", is(true)))
-                .andExpect(jsonPath("$.authenticated", is(true)))
-                .andExpect(jsonPath("$.type", is("status")));
-
-        // Verify a different IP address (behind a proxy, i.e. X-FORWARDED-FOR)
-        // is *not* able to authenticate with same token
-        getClient(token).perform(get("/api/authn/status")
-                                     .header("X-FORWARDED-FOR", "1.1.1.1"))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.okay", is(true)))
-                        .andExpect(jsonPath("$.authenticated", is(false)))
-                        .andExpect(jsonPath("$.type", is("status")));
-
-        // Verify a different IP address is *not* able to authenticate with same token
-        getClient(token).perform(get("/api/authn/status")
-                                    .with(ip("1.1.1.1")))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.okay", is(true)))
-                .andExpect(jsonPath("$.authenticated", is(false)))
-                .andExpect(jsonPath("$.type", is("status")));
+    // This test (and previous) is verifying that Spring Security's CORS settings are working as we expect
+    public void testCannotAuthenticateFromUntrustedOrigin() throws Exception {
+        // Post a valid username & password from an *untrusted* Origin
+        getClient().perform(post("/api/authn/login").header("Origin", "https://example.org")
+                                .param("user", eperson.getEmail())
+                                .param("password", password))
+                   // should result in a 403 error as Spring Security returns that for untrusted origins
+                   .andExpect(status().isForbidden());
     }
 
     @Test
-    public void testReuseTokenWithDifferentIPWhenIPNotStored() throws Exception {
-        // Disable IP storage in JWT login token
-        configurationService.setProperty("jwt.login.token.include.ip", false);
-
+    public void testReuseTokenWithDifferentIP() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
 
         getClient(token).perform(get("/api/authn/status"))
@@ -523,6 +499,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         // Verify a different IP address (behind a proxy, i.e. X-FORWARDED-FOR)
         // is able to authenticate with same token
+        // NOTE: We allow tokens to be used across several IPs to support environments where your IP is not static.
+        // Also keep in mind that if a token is used from an untrusted Origin, it will be blocked (see prior test).
         getClient(token).perform(get("/api/authn/status")
                                      .header("X-FORWARDED-FOR", "1.1.1.1"))
                         .andExpect(status().isOk())

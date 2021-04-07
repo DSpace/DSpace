@@ -19,6 +19,7 @@
     <submission-map>
         <name-map collection-handle="default" submission-name="traditional"/>
         <name-map collection-handle="123456789/language-test-1" submission-name="languagetestprocess"/>
+        <name-map collection-handle="123456789/extraction-test" submission-name="extractiontestprocess"/>
     </submission-map>
 
 
@@ -32,11 +33,11 @@
     <!-- @id - The unique identifier for this step -->
     <!-- -->
     <!-- <processing-class> - The class which will process all information for -->
-    <!-- this step. The class must extend -->
-    <!-- 'org.dspace.submit.AbstractProcessingStep' -->
-    <!-- (or one of the org.dspace.submit.step.* classes) -->
+    <!-- this step. The class must implement -->
+    <!-- 'org.dspace.app.rest.submit.RestProcessingStep' -->
+    <!-- (or one of the org.dspace.rest.submit.step.* classes) -->
     <!-- This property should reference the full path of the class -->
-    <!-- (e.g. org.dspace.submit.step.MyCustomStep) -->
+    <!-- (e.g. org.dspace.app.rest.submit.step.MyCustomStep) -->
     <!-- -->
     <!-- The following properties are OPTIONAL for each <step-definition>: -->
     <!-- <heading> - References the message key, from the -->
@@ -81,20 +82,16 @@
 
 
         <!--Step will be to select a Creative Commons License -->
-        <!-- Uncomment this step to allow the user to select a Creative Commons
-            license -->
-         <step-definition id="cclicense"> <heading>submit.progressbar.CClicense</heading>
+        <step-definition id="cclicense"> <heading>submit.progressbar.CClicense</heading>
             <processing-class>org.dspace.app.rest.submit.step.CCLicenseStep</processing-class>
-            <type>cclicense</type> </step-definition>
+            <type>cclicense</type> 
+        </step-definition>
 
-        <!--Step will be to Check for potential duplicate -->
-        <!-- <step-definition id="detect-duplicate"> <heading>submit.progressbar.detect.duplicate</heading>
-            <processing-class>org.dspace.submit.step.DetectPotentialDuplicate</processing-class>
-            <type>duplicate</type> </step-definition> -->
-
-        <!--Step will be to Verify/Review everything -->
-        <!-- <step-definition id="verify"> <heading>submit.progressbar.verify</heading> <processing-class>org.dspace.submit.step.VerifyStep</processing-class>
-            <type>verify</type> </step-definition> -->
+        <step-definition id="extractionstep"> 
+            <heading>submit.progressbar.ExtractMetadataStep</heading>
+            <processing-class>org.dspace.app.rest.submit.step.ExtractMetadataStep</processing-class>
+            <type>extract</type>
+        </step-definition>
 
         <!-- Fake Steps to test parsing of all options -->
         <!-- <step-definition mandatory="false"> <heading>fake.submission.readonly</heading>
@@ -148,18 +145,28 @@
             <!--Step will be to Upload the item -->
             <step id="upload"/>
             <!-- <step id="upload-with-embargo"/> -->
-            <!-- <step id="detect-duplicate"/> -->
+            <!-- <step id="extractionstep"/> -->
 
             <!--Step will be to Sign off on the License -->
             <step id="license"/>
             <step id="cclicense"/>
-            <!-- <step id="verify"/> -->
         </submission-process>
 
         <submission-process name="languagetestprocess">
             <step id="collection"/>
             <step id="languagetest"/>
         </submission-process>
+
+        <submission-process name="extractiontestprocess">
+            <step id="collection"/>
+            <step id="traditionalpageone"/>
+            <step id="traditionalpagetwo"/>
+            <step id="upload"/>
+            <step id="extractionstep"/>
+            <step id="license"/>
+            <step id="cclicense"/>
+        </submission-process>
+
     </submission-definitions>
 
 </item-submission>

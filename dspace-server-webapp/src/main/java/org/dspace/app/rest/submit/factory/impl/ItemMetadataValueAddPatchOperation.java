@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -29,7 +30,6 @@ import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
-import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
@@ -91,7 +91,7 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
     RelationshipService relationshipService;
 
     @Override
-    void add(Context context, Request currentRequest, InProgressSubmission source, String path, Object value)
+    void add(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path, Object value)
             throws SQLException {
         String[] split = getAbsolutePath(path).split("/");
         // if split size is one so we have a call to initialize or replace
@@ -105,7 +105,7 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
             MetadataValueRest object = evaluateSingleObject((LateObjectEvaluator) value);
             // check if is not empty
             List<MetadataValue> metadataByMetadataString = itemService.getMetadataByMetadataString(source.getItem(),
-                    split[0]);
+                                                                                                   split[0]);
             Assert.notEmpty(metadataByMetadataString);
             if (split.length > 1) {
                 String controlChar = split[1];
@@ -119,7 +119,7 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
                         int index = Integer.parseInt(controlChar);
                         if (index > metadataByMetadataString.size()) {
                             throw new IllegalArgumentException(
-                                    "The specified index MUST NOT be greater than the number of elements in the array");
+                                "The specified index MUST NOT be greater than the number of elements in the array");
                         }
                         addValue(context, source.getItem(), split[0], object, index);
 
@@ -230,5 +230,4 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
     protected ItemService getDSpaceObjectService() {
         return itemService;
     }
-
 }

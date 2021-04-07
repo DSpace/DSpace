@@ -32,11 +32,11 @@
     <!-- @id - The unique identifier for this step -->
     <!-- -->
     <!-- <processing-class> - The class which will process all information for -->
-    <!-- this step. The class must extend -->
-    <!-- 'org.dspace.submit.AbstractProcessingStep' -->
-    <!-- (or one of the org.dspace.submit.step.* classes) -->
+    <!-- this step. The class must implement -->
+    <!-- 'org.dspace.app.rest.submit.RestProcessingStep' -->
+    <!-- (or one of the org.dspace.rest.submit.step.* classes) -->
     <!-- This property should reference the full path of the class -->
-    <!-- (e.g. org.dspace.submit.step.MyCustomStep) -->
+    <!-- (e.g. org.dspace.app.rest.submit.step.MyCustomStep) -->
     <!-- -->
     <!-- The following properties are OPTIONAL for each <step-definition>: -->
     <!-- <heading> - References the message key, from the -->
@@ -119,14 +119,18 @@
             <processing-class>org.dspace.app.rest.submit.step.CCLicenseStep</processing-class>
 	       <type>cclicense</type> </step-definition> -->
 
-        <!--Step will be to Check for potential duplicate -->
-        <!-- <step-definition id="detect-duplicate"> <heading>submit.progressbar.detect.duplicate</heading>
-            <processing-class>org.dspace.submit.step.DetectPotentialDuplicate</processing-class> 
-            <type>duplicate</type> </step-definition> -->
-
-        <!--Step will be to Verify/Review everything -->
-        <!-- <step-definition id="verify"> <heading>submit.progressbar.verify</heading> <processing-class>org.dspace.submit.step.VerifyStep</processing-class>
-            <type>verify</type> </step-definition> -->
+        <!--Step will be to enrich the current submission querying external providers or processing the uploaded file -->
+        <!-- Uncomment this step to enrich the current submission using information extracted
+            from uploaded files or metadata. Please note that this step will be triggered only when a request is performed that mean
+            the file to be uploaded or the metadata saved. Angular allows to configure an autosave feature based on a timer or the input
+            of specific metadata such as identifiers used by this step, see the submission.autosave settings in the environment.common.ts
+            Check also config/spring/api/step-processing-listener.xml for further server side configuration
+             -->
+        <!-- <step-definition id="extractionstep"> 
+            <heading>submit.progressbar.ExtractMetadataStep</heading>
+            <processing-class>org.dspace.app.rest.submit.step.ExtractMetadataStep</processing-class>
+            <type>extract</type> 
+        </step-definition> -->
 
         <!-- Fake Steps to test parsing of all options -->
         <!-- <step-definition mandatory="false"> <heading>fake.submission.readonly</heading>
@@ -201,7 +205,7 @@
             <!--Step will be to Upload the item -->
             <step id="upload"/>
             <!-- <step id="upload-with-embargo"/> -->
-            <!-- <step id="detect-duplicate"/> -->
+            <!-- <step id="extractionstep"/> -->
 
             <!--Step will be to select a Creative Commons License -->
             <!-- Uncomment this step to allow the user to select a Creative Commons -->

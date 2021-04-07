@@ -55,8 +55,11 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
     @Autowired
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
 
+    // TODO: findOne() currently requires site ADMIN permissions as all scripts are admin-only at this time.
+    // If scripts ever need to be accessible to Comm/Coll Admins, we would likely need to create a new GrantedAuthority
+    // for Comm/Coll Admins in EPersonRestAuthenticationProvider to use on this endpoint
     @Override
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ScriptRest findOne(Context context, String name) {
 
         ScriptConfiguration scriptConfiguration = scriptService.getScriptConfiguration(name);
@@ -70,7 +73,11 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
         throw new DSpaceBadRequestException("The script with name: " + name + " could not be found");
     }
 
+    // TODO: findAll() currently requires site ADMIN permissions as all scripts are admin-only at this time.
+    // If scripts ever need to be accessible to Comm/Coll Admins, we would likely need to create a new GrantedAuthority
+    // for Comm/Coll Admins in EPersonRestAuthenticationProvider to use on this endpoint
     @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
     public Page<ScriptRest> findAll(Context context, Pageable pageable) {
         List<ScriptConfiguration> scriptConfigurations = scriptService.getScriptConfigurations(context);
         return converter.toRestPage(scriptConfigurations, pageable, utils.obtainProjection());
