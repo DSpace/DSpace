@@ -32,9 +32,9 @@ public class RightTiltedRelationshipMetadataServiceIT extends RelationshipMetada
         EntityType journalIssueEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "JournalIssue").build();
         EntityType publicationVolumeEntityType =
             EntityTypeBuilder.createEntityTypeBuilder(context, "JournalVolume").build();
-        leftItem = ItemBuilder.createItem(context, col).withRelationshipType("JournalIssue")
+        leftItem = ItemBuilder.createItem(context, col).withEntityType("JournalIssue")
             .withPublicationIssueNumber("2").build();
-        rightItem = ItemBuilder.createItem(context, col).withRelationshipType("JournalVolume")
+        rightItem = ItemBuilder.createItem(context, col).withEntityType("JournalVolume")
             .withPublicationVolumeNumber("30").build();
         RelationshipType isIssueOfVolume =
             RelationshipTypeBuilder

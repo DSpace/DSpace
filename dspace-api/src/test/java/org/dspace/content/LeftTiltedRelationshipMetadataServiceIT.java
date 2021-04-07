@@ -33,8 +33,8 @@ public class LeftTiltedRelationshipMetadataServiceIT extends RelationshipMetadat
 
         EntityType publicationEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         EntityType authorEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Author").build();
-        leftItem = ItemBuilder.createItem(context, col).withRelationshipType("Publication").build();
-        rightItem = ItemBuilder.createItem(context, col).withRelationshipType("Author")
+        leftItem = ItemBuilder.createItem(context, col).withEntityType("Publication").build();
+        rightItem = ItemBuilder.createItem(context, col).withEntityType("Author")
                 .withPersonIdentifierLastName("familyName")
                 .withPersonIdentifierFirstName("firstName").build();
         isAuthorOfPublicationRelationshipType =
