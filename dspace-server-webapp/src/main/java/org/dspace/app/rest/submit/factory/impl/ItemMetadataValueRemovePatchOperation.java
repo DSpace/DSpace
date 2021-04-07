@@ -7,11 +7,12 @@
  */
 package org.dspace.app.rest.submit.factory.impl;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -43,8 +44,8 @@ public class ItemMetadataValueRemovePatchOperation extends MetadataValueRemovePa
     ItemService itemService;
 
     @Override
-    void remove(Context context, Request currentRequest, InProgressSubmission source, String path, Object value)
-        throws Exception {
+    void remove(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path,
+            Object value) throws Exception {
         String[] split = getAbsolutePath(path).split("/");
         if (split.length == 1) {
             deleteValue(context, source.getItem(), split[0], -1);
