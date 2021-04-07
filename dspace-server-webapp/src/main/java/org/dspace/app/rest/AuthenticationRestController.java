@@ -184,9 +184,7 @@ public class AuthenticationRestController implements InitializingBean {
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @RequestMapping(value = "/shortlivedtokens", method = RequestMethod.GET)
     public AuthenticationTokenResource shortLivedTokenViaGet(HttpServletRequest request) throws AuthorizeException {
-        String clientIp = clientInfoService.getClientIp(request);
-
-        if (!clientInfoService.isRequestFromTrustedProxy(clientIp)) {
+        if (!clientInfoService.isRequestFromTrustedProxy(request.getRemoteAddr())) {
             throw new AuthorizeException("Requests to this endpoint should be made from a trusted IP address.");
         }
 
