@@ -12,5 +12,5 @@ services:
   dspacedb:
     image: dspace/dspace-postgres-pgcrypto:loadsql
     environment:
-      # Double underbars in env names will be replaced with periods for apache commons
-      - LOADSQL=https://www.dropbox.com/s/4ap1y6deseoc8ws/dspace7-entities-2019-11-28.sql?dl=1
+      # This SQL is available from https://github.com/DSpace-Labs/AIP-Files/releases/tag/demo-entities-data
+      - LOADSQL=https://github.com/DSpace-Labs/AIP-Files/releases/download/demo-entities-data/dspace7-entities-2021-04-07.sql
