@@ -8,15 +8,20 @@
 package org.dspace.importer.external.metadatamapping.contributor;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import au.com.bytecode.opencsv.CSVReader;
+import com.opencsv.CSVParser;
+import com.opencsv.CSVParserBuilder;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.exceptions.CsvException;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.dspace.importer.external.service.components.dto.PlainMetadataKeyValueItem;
 import org.dspace.importer.external.service.components.dto.PlainMetadataSourceDto;
+
 
 
 /**
@@ -33,7 +38,9 @@ public class EnhancedSimpleMetadataContributor extends SimpleMetadataContributor
 
     private char delimiter = ',';
 
-    private char escape = '"';
+    private char quote = '"';
+
+    private char escape = '\\';
 
     /**
      * This method could be used to set the delimiter used during parse
@@ -51,11 +58,24 @@ public class EnhancedSimpleMetadataContributor extends SimpleMetadataContributor
     }
 
     /**
-     * Method to inject the escape character.
-     * This must be the ASCII integer
-     * related to the char.
-     * In example, 9 for tab, 44 for comma
-     * If no escape is set, double quote will be used
+     * This method could be used to get the quote char used in this class
+     */
+    public char getQuote() {
+        return quote;
+    }
+
+    /**
+     * This method could be used to set the quote char used during parse
+     * If no quote char is set, " will be used
+     */
+    public void setQuote(char quote) {
+        this.quote = quote;
+    }
+
+    /**
+     * Method to inject the escape character, usually the ". This must be the ASCII
+     * integer related to the char.
+     * In example, 9 for tab, 44 for comma If no escape is set, double quote will be used
      */
     public void setEscape(char escape) {
         this.escape = escape;
@@ -94,10 +114,12 @@ public class EnhancedSimpleMetadataContributor extends SimpleMetadataContributor
         // For example, list of author must be: Author 1, author 2, author 3
         // if author name contains comma, is important to escape its in
         // this way: Author 1, \"Author 2, something\", Author 3
-        try (CSVReader csvReader = new CSVReader(new StringReader(value),
-            delimiter, escape);) {
+        CSVParser parser = new CSVParserBuilder().withSeparator(delimiter).withQuoteChar(quote).withEscapeChar(escape)
+                .build();
+        try (   Reader inputReader = new StringReader(value);
+                com.opencsv.CSVReader csvReader = new CSVReaderBuilder(inputReader).withCSVParser(parser).build()) {
             rows = csvReader.readAll();
-        } catch (IOException e) {
+        } catch (IOException | CsvException e) {
             //fallback, use the inpu as value
             return new String[] { value };
         }
