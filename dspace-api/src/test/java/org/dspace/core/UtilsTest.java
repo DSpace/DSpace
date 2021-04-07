@@ -7,13 +7,19 @@
  */
 package org.dspace.core;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mockStatic;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import org.dspace.AbstractUnitTest;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.Test;
+import org.mockito.MockedStatic;
 
 /**
  * Perform some basic unit tests for Utils Class
@@ -71,6 +77,31 @@ public class UtilsTest extends AbstractUnitTest {
 
         // This uses a bunch of reserved URI characters
         assertNull("Test invalid URI returns null", Utils.getHostName("&+,?/@="));
+    }
+
+    /**
+     * Test of getIPAddresses method, of class Utils
+     */
+    @Test
+    public void testGetIPAddresses() throws UnknownHostException {
+        // Fake a URL & two fake corresponding IP addresses as an InetAddress
+        String fakeUrl = "https://dspace.org";
+        String fakeHostname = "dspace.org";
+        InetAddress[] fakeInetAddresses =
+            new InetAddress[] { InetAddress.getByName("1.2.3.4"), InetAddress.getByName("5.6.7.8") };
+
+        // Mock responses from InetAddress
+        try (MockedStatic<InetAddress> mockedInetAddress = mockStatic(InetAddress.class)) {
+            // When fakeHostname is passed to InetAddress, return fakeInetAddresses
+            mockedInetAddress.when(() -> InetAddress.getAllByName(fakeHostname)).thenReturn(fakeInetAddresses);
+
+            assertNull("Test invalid URL returns null",
+                       Utils.getIPAddresses("not/a-real;url"));
+
+            assertArrayEquals("Test fake URL returns fake IPs converted to String Array",
+                              new String[] {"1.2.3.4", "5.6.7.8"},
+                              Utils.getIPAddresses(fakeUrl));
+        }
     }
 
     /**

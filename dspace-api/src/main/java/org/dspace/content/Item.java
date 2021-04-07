@@ -113,6 +113,16 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
     private transient ItemService itemService;
 
     /**
+     * True if anything else was changed since last metadata retrieval()
+     * (to drive metadata cache)
+     */
+    @Transient
+    private boolean modifiedMetadataCache = true;
+
+    @Transient
+    private List<MetadataValue> cachedMetadata = new ArrayList<>();
+
+    /**
      * Protected constructor, create object using:
      * {@link org.dspace.content.service.ItemService#create(Context, WorkspaceItem)}
      */
@@ -372,5 +382,24 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
             itemService = ContentServiceFactory.getInstance().getItemService();
         }
         return itemService;
+    }
+
+    @Override
+    protected void setMetadataModified() {
+        super.setMetadataModified();
+        modifiedMetadataCache = true;
+    }
+
+    public boolean isModifiedMetadataCache() {
+        return modifiedMetadataCache;
+    }
+
+    protected List<MetadataValue> getCachedMetadata() {
+        return cachedMetadata;
+    }
+
+    protected void setCachedMetadata(List<MetadataValue> cachedMetadata) {
+        this.cachedMetadata = cachedMetadata;
+        modifiedMetadataCache = false;
     }
 }

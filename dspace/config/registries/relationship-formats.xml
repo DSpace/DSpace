@@ -1,24 +1,13 @@
 <dspace-dc-types>
 
     <dspace-header>
-        <title>DSpace Relationship</title>
+        <title>DSpace Entity Relationships</title>
     </dspace-header>
-
-    <dc-schema>
-        <name>relationship</name>
-        <namespace>http://dspace.org/relationship</namespace>
-    </dc-schema>
 
     <dc-schema>
         <name>relation</name>
         <namespace>http://dspace.org/relation</namespace>
     </dc-schema>
-
-    <dc-type>
-        <schema>relationship</schema>
-        <element>type</element>
-        <scope_note>Metadata field used for the type of entity, stored in the item</scope_note>
-    </dc-type>
 
     <dc-type>
         <schema>relation</schema>
@@ -124,7 +113,7 @@
 
     <!--
       OpenAIRE4 Guidelines
-      required relationships -->  
+      required relationships -->
     <dc-type>
         <schema>relation</schema>
         <element>isContributorOfPublication</element>

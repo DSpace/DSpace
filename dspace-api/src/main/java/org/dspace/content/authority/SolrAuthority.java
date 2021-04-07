@@ -53,8 +53,6 @@ public class SolrAuthority implements ChoiceAuthority {
 
     private static final Logger log = LogManager.getLogger(SolrAuthority.class);
 
-    protected boolean externalResults = false;
-
     protected final AuthorityValueService authorityValueService
             = AuthorityServiceFactory.getInstance().getAuthorityValueService();
 
@@ -95,9 +93,6 @@ public class SolrAuthority implements ChoiceAuthority {
         queryArgs.set(CommonParams.START, start);
         //We add one to our facet limit so that we know if there are more matches
         int maxNumberOfSolrResults = limit + 1;
-        if (externalResults) {
-            maxNumberOfSolrResults = configurationService.getIntProperty("xmlui.lookup.select.size", 12);
-        }
         queryArgs.set(CommonParams.ROWS, maxNumberOfSolrResults);
 
         String sortField = "value";
@@ -135,13 +130,15 @@ public class SolrAuthority implements ChoiceAuthority {
                     }
                 }
 
-                if (externalResults && StringUtils.isNotBlank(text)) {
+                if (StringUtils.isNotBlank(text)) {
                     int sizeFromSolr = alreadyPresent.size();
-                    int maxExternalResults = limit <= 10 ? Math.max(limit - sizeFromSolr, 2) : Math
-                        .max(limit - 10 - sizeFromSolr, 2) + limit - 10;
+                    int maxExternalResults = sizeFromSolr < limit ? limit + 1 : sizeFromSolr + 1;
+                    // force an upper limit for external results
+                    if (maxExternalResults > 10) {
+                        maxExternalResults = 10;
+                    }
                     addExternalResults(text, choices, alreadyPresent, maxExternalResults);
                 }
-
 
                 // hasMore = (authDocs.size() == (limit + 1));
                 hasMore = true;
@@ -171,8 +168,9 @@ public class SolrAuthority implements ChoiceAuthority {
                                       int max) {
         if (source != null) {
             try {
+             // max has been already adapted to consider the need to filter already found entries
                 List<AuthorityValue> values = source
-                    .queryAuthorities(text, max * 2); // max*2 because results get filtered
+                    .queryAuthorities(text, max);
 
                 // filtering loop
                 Iterator<AuthorityValue> iterator = values.iterator();
@@ -196,7 +194,6 @@ public class SolrAuthority implements ChoiceAuthority {
             } catch (Exception e) {
                 log.error("Error", e);
             }
-            this.externalResults = false;
         } else {
             log.warn("external source for authority not configured");
         }
@@ -286,10 +283,6 @@ public class SolrAuthority implements ChoiceAuthority {
         org.dspace.kernel.ServiceManager manager = DSpaceServicesFactory.getInstance().getServiceManager();
 
         return manager.getServiceByName(AuthoritySearchService.class.getName(), AuthoritySearchService.class);
-    }
-
-    public void addExternalResultsInNextMatches() {
-        this.externalResults = true;
     }
 
     @Override
