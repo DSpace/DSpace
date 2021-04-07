@@ -40,7 +40,7 @@ public class LeftTiltedRelationshipRestRepositoryIT extends RelationshipRestRepo
 
     @Override
     @Test
-    public void testRelationshipMetadataViaREST() throws Exception {
+    public void testIsAuthorOfPublicationRelationshipMetadataViaREST() throws Exception {
         context.turnOffAuthorisationSystem();
 
         RelationshipBuilder.createRelationshipBuilder(
