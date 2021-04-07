@@ -368,7 +368,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
                              String lang, String value) throws SQLException;
 
     /**
-     * Add a single metadata field at the given place position.
+     * Add a single metadata value at the given place position.
      *
      * @param context    DSpace context
      * @param dso        DSpaceObject

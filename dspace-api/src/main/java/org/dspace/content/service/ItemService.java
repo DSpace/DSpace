@@ -741,13 +741,4 @@ public interface ItemService
     public List<MetadataValue> getMetadata(Item item, String schema, String element, String qualifier,
                                            String lang, boolean enableVirtualMetadata);
 
-    /**
-     * 
-     * @param context DSpace context object
-     * @param item Item
-     * @param place new metadata position
-     * @param rr MetadataValue to move
-     */
-    public void moveSingleMetadataValue(Context context, Item item, int place, MetadataValue rr);
-
 }
