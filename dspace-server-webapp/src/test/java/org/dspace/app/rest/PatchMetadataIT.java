@@ -25,7 +25,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.dspace.app.rest.matcher.MetadataMatcher;
@@ -1184,27 +1183,11 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         // "Linton, Oliver" (virtual)
         initPersonPublicationWorkspace();
 
-        // "Linton, Oliver" (virtual)
-        // "Perotti, Enrico"
-        // "Peterson, Karrie"
-        // "Dahlen, Sarah" (virtual)
-        // "Whyte, William"
-        List<MetadataValue> reverse = new ArrayList<MetadataValue>();
-        reverse.add(this.authorsMetadataOriginalOrder.get(4));
-        reverse.add(this.authorsMetadataOriginalOrder.get(3));
-        reverse.add(this.authorsMetadataOriginalOrder.get(2));
-        reverse.add(this.authorsMetadataOriginalOrder.get(1));
-        reverse.add(this.authorsMetadataOriginalOrder.get(0));
-        patchAddEntireArray(reverse);
-
-        // "Peterson, Karrie"
-        // "Linton, Oliver" (virtual)
-        // "Whyte, William"
-        List<MetadataValue> deletionAndReorder = new ArrayList<MetadataValue>();
-        deletionAndReorder.add(this.authorsMetadataOriginalOrder.get(2));
-        deletionAndReorder.add(this.authorsMetadataOriginalOrder.get(4));
-        deletionAndReorder.add(this.authorsMetadataOriginalOrder.get(0));
-        patchAddEntireArray(deletionAndReorder);
+        List<MetadataValue> expectedValues = new ArrayList<MetadataValue>();
+        expectedValues.add(this.authorsMetadataOriginalOrder.get(2)); // "Peterson, Karrie"
+        expectedValues.add(this.authorsMetadataOriginalOrder.get(4)); // "Linton, Oliver" (virtual)
+        expectedValues.add(this.authorsMetadataOriginalOrder.get(0)); // "Whyte, William"
+        patchAddEntireArray(expectedValues);
 
     }
 
@@ -1383,7 +1366,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         final String authorField = "dc.contributor.author";
         final List<Matcher<? super Object>> matchers = new ArrayList<>();
         IntStream.range(0, metadataValues.size()).forEach((i) -> {
-            matchers.add(Matchers.is(MetadataMatcher.matchMetadata(authorField, metadataValues.get(i).getValue(), 0)));
+            matchers.add(Matchers.is(MetadataMatcher.matchMetadata(authorField, metadataValues.get(i).getValue(), i)));
         });
 
 
