@@ -14,8 +14,10 @@ import java.util.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
@@ -208,30 +210,6 @@ public interface AuthorizeService {
      * @throws SQLException if database error
      */
     public boolean isAdmin(Context c, EPerson e) throws SQLException;
-
-    public boolean isCommunityAdmin(Context c) throws SQLException;
-
-    public boolean isCollectionAdmin(Context c) throws SQLException;
-
-    /**
-     * Check to see if a specific user is Community admin
-     * 
-     * @param c current context
-     * @param e the user to check
-     * @return true if user is an admin of some community
-     * @throws SQLException
-     */
-    public boolean isCommunityAdmin(Context c, EPerson e) throws SQLException;
-
-    /**
-     * Check to see if a specific user is Collection admin
-     * 
-     * @param c current context
-     * @param e the user to check
-     * @return true if user is an admin of some collection
-     * @throws SQLException if database error
-     */
-    public boolean isCollectionAdmin(Context c, EPerson e) throws SQLException;
 
     ///////////////////////////////////////////////
     // policy manipulation methods
@@ -536,4 +514,82 @@ public interface AuthorizeService {
     void switchPoliciesAction(Context context, DSpaceObject dso, int fromAction, int toAction)
         throws SQLException, AuthorizeException;
 
+    /**
+     * Checks that the context's current user is a community admin in the site by querying the solr database.
+     *
+     * @param context   context with the current user
+     * @return          true if the current user is a community admin in the site
+     *                  false when this is not the case, or an exception occurred
+     */
+    boolean isCommunityAdmin(Context context) throws SQLException;
+
+    /**
+     * Checks that the context's current user is a collection admin in the site by querying the solr database.
+     *
+     * @param context   context with the current user
+     * @return          true if the current user is a collection admin in the site
+     *                  false when this is not the case, or an exception occurred
+     */
+    boolean isCollectionAdmin(Context context) throws SQLException;
+
+    /**
+     * Checks that the context's current user is a community or collection admin in the site.
+     *
+     * @param context   context with the current user
+     * @return          true if the current user is a community or collection admin in the site
+     *                  false when this is not the case, or an exception occurred
+     */
+    boolean isComColAdmin(Context context) throws SQLException;
+
+    /**
+     * Finds communities for which the current user is admin, AND which match the query.
+     *
+     * @param context   context with the current user
+     * @param query     the query for which to filter the results more
+     * @param offset    used for pagination of the results
+     * @param limit     used for pagination of the results
+     * @return          the number of matching communities
+     * @throws SearchServiceException
+     * @throws SQLException
+     */
+    List<Community> findAdminAuthorizedCommunity(Context context, String query, int offset, int limit)
+        throws SearchServiceException, SQLException;
+
+    /**
+     * Counts communities for which the current user is admin, AND which match the query.
+     *
+     * @param context   context with the current user
+     * @param query     the query for which to filter the results more
+     * @return          the matching communities
+     * @throws SearchServiceException
+     * @throws SQLException
+     */
+    long countAdminAuthorizedCommunity(Context context, String query)
+        throws SearchServiceException, SQLException;
+
+    /**
+     * Finds collections for which the current user is admin, AND which match the query.
+     *
+     * @param context   context with the current user
+     * @param query     the query for which to filter the results more
+     * @param offset    used for pagination of the results
+     * @param limit     used for pagination of the results
+     * @return          the matching collections
+     * @throws SearchServiceException
+     * @throws SQLException
+     */
+    List<Collection> findAdminAuthorizedCollection(Context context, String query, int offset, int limit)
+        throws SearchServiceException, SQLException;
+
+    /**
+     * Counts collections for which the current user is admin, AND which match the query.
+     *
+     * @param context   context with the current user
+     * @param query     the query for which to filter the results more
+     * @return          the number of matching collections
+     * @throws SearchServiceException
+     * @throws SQLException
+     */
+    long countAdminAuthorizedCollection(Context context, String query)
+        throws SearchServiceException, SQLException;
 }

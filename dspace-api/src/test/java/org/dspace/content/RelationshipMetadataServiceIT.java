@@ -90,8 +90,8 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
         context.turnOffAuthorisationSystem();
         EntityType publicationEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         EntityType authorEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Author").build();
-        leftItem = ItemBuilder.createItem(context, col).withRelationshipType("Publication").build();
-        rightItem = ItemBuilder.createItem(context, col).withRelationshipType("Author")
+        leftItem = ItemBuilder.createItem(context, col).withEntityType("Publication").build();
+        rightItem = ItemBuilder.createItem(context, col).withEntityType("Author")
                                .withPersonIdentifierLastName("familyName")
                                .withPersonIdentifierFirstName("firstName").build();
         isAuthorOfPublicationRelationshipType =
@@ -114,8 +114,8 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
         context.turnOffAuthorisationSystem();
         EntityType publicationEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         EntityType authorEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Author").build();
-        leftItem = ItemBuilder.createItem(context, col).withRelationshipType("Publication").build();
-        rightItem = ItemBuilder.createItem(context, col).withRelationshipType("Author")
+        leftItem = ItemBuilder.createItem(context, col).withEntityType("Publication").build();
+        rightItem = ItemBuilder.createItem(context, col).withEntityType("Author")
                                .withPersonIdentifierLastName("familyName")
                                .withPersonIdentifierFirstName("firstName").build();
         RelationshipType isAuthorOfPublication =
@@ -138,9 +138,9 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
         EntityType journalIssueEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "JournalIssue").build();
         EntityType publicationVolumeEntityType =
             EntityTypeBuilder.createEntityTypeBuilder(context, "JournalVolume").build();
-        leftItem = ItemBuilder.createItem(context, col).withRelationshipType("JournalIssue")
+        leftItem = ItemBuilder.createItem(context, col).withEntityType("JournalIssue")
                               .withPublicationIssueNumber("2").build();
-        rightItem = ItemBuilder.createItem(context, col).withRelationshipType("JournalVolume")
+        rightItem = ItemBuilder.createItem(context, col).withEntityType("JournalVolume")
                                .withPublicationVolumeNumber("30").build();
         RelationshipType isIssueOfVolume =
             RelationshipTypeBuilder
@@ -593,7 +593,7 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
         Community community = CommunityBuilder.createCommunity(context).build();
 
         Collection col = CollectionBuilder.createCollection(context, community).build();
-        Item secondItem = ItemBuilder.createItem(context, col).withRelationshipType("Publication").build();
+        Item secondItem = ItemBuilder.createItem(context, col).withEntityType("Publication").build();
         RelationshipBuilder.createRelationshipBuilder(context, secondItem, rightItem,
             isAuthorOfPublicationRelationshipType).build();
         context.restoreAuthSystemState();
@@ -612,7 +612,7 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
         Community community = CommunityBuilder.createCommunity(context).build();
         Collection col = CollectionBuilder.createCollection(context, community).build();
 
-        Item secondAuthor = ItemBuilder.createItem(context, col).withRelationshipType("Author")
+        Item secondAuthor = ItemBuilder.createItem(context, col).withEntityType("Author")
                                        .withPersonIdentifierFirstName("firstName")
                                        .withPersonIdentifierLastName("familyName").build();
 
@@ -652,13 +652,13 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
         Community community = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, community).build();
 
-        Item journalIssue = ItemBuilder.createItem(context, collection).withRelationshipType("JournalIssue").build();
+        Item journalIssue = ItemBuilder.createItem(context, collection).withEntityType("JournalIssue").build();
         Item journalVolume = ItemBuilder.createItem(context, collection)
                                         .withPublicationVolumeNumber("30")
-                                        .withRelationshipType("JournalVolume").build();
+                                        .withEntityType("JournalVolume").build();
         Item journal = ItemBuilder.createItem(context, collection)
                                   .withMetadata("creativeworkseries", "issn", null, "issn journal")
-                                  .withRelationshipType("Journal").build();
+                                  .withEntityType("Journal").build();
         RelationshipBuilder.createRelationshipBuilder(context, journalIssue, journalVolume,
             isJournalVolumeOfIssueRelationshipType).build();
         RelationshipBuilder.createRelationshipBuilder(context, journalVolume, journal,
@@ -666,7 +666,7 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
 
         Item publication = ItemBuilder.createItem(context, collection)
                                       .withTitle("Pub 1")
-                                      .withRelationshipType("Publication").build();
+                                      .withEntityType("Publication").build();
 
         RelationshipBuilder.createRelationshipBuilder(context, publication, journalIssue,
             isJournalIssueOfPublicationRelationshipType).build();

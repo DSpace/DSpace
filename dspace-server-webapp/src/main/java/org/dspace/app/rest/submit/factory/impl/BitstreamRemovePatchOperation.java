@@ -8,6 +8,7 @@
 package org.dspace.app.rest.submit.factory.impl;
 
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -17,7 +18,6 @@ import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -34,8 +34,8 @@ public class BitstreamRemovePatchOperation extends RemovePatchOperation<String> 
     BundleService bundleService;
 
     @Override
-    void remove(Context context, Request currentRequest, InProgressSubmission source, String path, Object value)
-        throws Exception {
+    void remove(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path,
+            Object value) throws Exception {
 
         String absPath = getAbsolutePath(path);
         String[] split = absPath.split("/");

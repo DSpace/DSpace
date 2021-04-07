@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.patch.LateObjectEvaluator;
@@ -24,7 +25,6 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.services.model.Request;
 import org.dspace.submit.model.UploadConfiguration;
 import org.dspace.submit.model.UploadConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,8 +48,8 @@ public class BitstreamResourcePolicyReplacePatchOperation extends ReplacePatchOp
     UploadConfigurationService uploadConfigurationService;
 
     @Override
-    void replace(Context context, Request currentRequest, InProgressSubmission source, String path, Object value)
-        throws Exception {
+    void replace(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path,
+            Object value) throws Exception {
         // "path": "/sections/upload/files/0/accessConditions/0"
         // "abspath": "/files/0/accessConditions/0"
         String[] split = getAbsolutePath(path).split("/");
