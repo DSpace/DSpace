@@ -13,6 +13,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -2337,6 +2338,110 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
         ;
 
+    }
+
+    /**
+     * This test verifies that
+     * {@link org.dspace.discovery.indexobject.InprogressSubmissionIndexFactoryImpl#storeInprogressItemFields}
+     * indexes the owning collection of workspace items
+     */
+    @Test
+    public void discoverSearchObjectsTestForWorkspaceItemInCollectionScope() throws Exception {
+        // in-progress submissions are only visible to the person who created them
+        context.setCurrentUser(eperson);
+
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context)
+                .withName("Community")
+                .build();
+
+        Collection collection1 = CollectionBuilder.createCollection(context, community)
+                .withName("Collection 1")
+                .build();
+
+        Collection collection2 = CollectionBuilder.createCollection(context, community)
+                .withName("Collection 2")
+                .build();
+
+        WorkspaceItem wsi1 = WorkspaceItemBuilder.createWorkspaceItem(context, collection1)
+                .withTitle("Workspace Item 1")
+                .build();
+
+        WorkspaceItem wsi2 = WorkspaceItemBuilder.createWorkspaceItem(context, collection2)
+                .withTitle("Workspace Item 2")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String ePersonToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(ePersonToken).perform(
+            get("/api/discover/search/objects")
+                // The workspace configuration returns all items (workspace, workflow, archived) of the current user
+                // see: https://github.com/DSpace/RestContract/blob/main/search-endpoint.md#workspace
+                .param("configuration", "workspace")
+                .param("scope", collection1.getID().toString())
+        )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.scope", is(collection1.getID().toString())))
+            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", allOf(
+                hasSize(1),
+                hasJsonPath("$[0]._embedded.indexableObject", WorkspaceItemMatcher.matchProperties(wsi1))
+            )));
+    }
+
+    /**
+     * This test verifies that
+     * {@link org.dspace.discovery.indexobject.InprogressSubmissionIndexFactoryImpl#storeInprogressItemFields}
+     * indexes the owning collection of workflow items
+     */
+    @Test
+    public void discoverSearchObjectsTestForWorkflowItemInCollectionScope() throws Exception {
+        // in-progress submissions are only visible to the person who created them
+        context.setCurrentUser(eperson);
+
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context)
+            .withName("Community")
+            .build();
+
+        Collection collection1 = CollectionBuilder.createCollection(context, community)
+            .withName("Collection 1")
+            .withWorkflowGroup(1, admin) // enable the workflow, otherwise the item would be archived immediately
+            .build();
+
+        Collection collection2 = CollectionBuilder.createCollection(context, community)
+            .withName("Collection 2")
+            .withWorkflowGroup(1, admin) // enable the workflow, otherwise the item would be archived immediately
+            .build();
+
+        XmlWorkflowItem wfi1 = WorkflowItemBuilder.createWorkflowItem(context, collection1)
+            .withTitle("Workflow Item 1")
+            .build();
+
+        XmlWorkflowItem wfi2 = WorkflowItemBuilder.createWorkflowItem(context, collection2)
+            .withTitle("Workflow Item 2")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String ePersonToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(ePersonToken).perform(
+            get("/api/discover/search/objects")
+                // The workspace configuration returns all items (workspace, workflow, archived) of the current user
+                // see: https://github.com/DSpace/RestContract/blob/main/search-endpoint.md#workspace
+                .param("configuration", "workspace")
+                .param("scope", collection1.getID().toString())
+        )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.scope", is(collection1.getID().toString())))
+            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", allOf(
+                hasSize(1),
+                hasJsonPath("$[0]._embedded.indexableObject", WorkflowItemMatcher.matchProperties(wfi1))
+            )));
     }
 
     @Test
