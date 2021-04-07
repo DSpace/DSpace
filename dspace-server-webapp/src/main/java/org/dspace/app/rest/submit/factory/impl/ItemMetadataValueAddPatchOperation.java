@@ -9,6 +9,7 @@ package org.dspace.app.rest.submit.factory.impl;
 
 import java.sql.SQLException;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.LateObjectEvaluator;
@@ -17,7 +18,6 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
@@ -70,8 +70,8 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
     ItemService itemService;
 
     @Override
-    void add(Context context, Request currentRequest, InProgressSubmission source, String path, Object value)
-        throws SQLException {
+    void add(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path, Object value)
+            throws SQLException {
         String[] split = getAbsolutePath(path).split("/");
         // if split size is one so we have a call to initialize or replace
         if (split.length == 1) {
