@@ -152,7 +152,7 @@ public class ClientInfoServiceImpl implements ClientInfoService {
      * @param ipAddress IP address to check for
      * @return true if trusted, false otherwise
      */
-    private boolean isRequestFromTrustedProxy(String ipAddress) {
+    public boolean isRequestFromTrustedProxy(String ipAddress) {
         try {
             return trustedProxies != null && trustedProxies.contains(ipAddress);
         } catch (IPTable.IPFormatException e) {
