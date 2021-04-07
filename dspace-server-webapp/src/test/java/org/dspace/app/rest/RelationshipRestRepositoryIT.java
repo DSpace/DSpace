@@ -2842,7 +2842,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     }
 
     @Test
-    public void testRelationshipMetadataViaREST() throws Exception {
+    public void testIsAuthorOfPublicationRelationshipMetadataViaREST() throws Exception {
         context.turnOffAuthorisationSystem();
 
         RelationshipBuilder.createRelationshipBuilder(
