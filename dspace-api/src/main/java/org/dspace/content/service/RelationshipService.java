@@ -35,14 +35,18 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
     /**
      * Retrieves the list of Relationships currently in the system for which the given Item is either
      * a leftItem or a rightItem object
-     * @param context   The relevant DSpace context
-     * @param item      The Item that has to be the left or right item for the relationship to be included in the list
-     * @param limit     paging limit
-     * @param offset    paging offset
-     * @return          The list of relationships for which each relationship adheres to the above listed constraint
-     * @throws SQLException If something goes wrong
+     * @param context         The relevant DSpace context
+     * @param item            The Item that has to be the left or right item for the relationship to be
+     *                        included in the list
+     * @param limit           paging limit
+     * @param offset          paging offset
+     * @param excludeTilted   If true, excludes tilted relationships
+     * @return                The list of relationships for which each relationship adheres to the above
+     *                        listed constraint
+     * @throws SQLException   If something goes wrong
      */
-    List<Relationship> findByItem(Context context, Item item, Integer limit, Integer offset) throws SQLException;
+    List<Relationship> findByItem(Context context, Item item, Integer limit, Integer offset, boolean excludeTilted)
+            throws SQLException;
 
     /**
      * Retrieves the full list of relationships currently in the system
@@ -317,6 +321,7 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      */
     void delete(Context context, Relationship relationship, boolean copyToLeftItem, boolean copyToRightItem)
         throws SQLException, AuthorizeException;
+
     /**
      * This method is used to delete a Relationship whilst given the possibility to copy the Virtual Metadata created
      * by this relationship to the left and/or right item.

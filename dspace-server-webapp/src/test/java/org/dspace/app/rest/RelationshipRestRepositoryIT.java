@@ -57,6 +57,7 @@ import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
@@ -78,47 +79,47 @@ import org.springframework.test.web.servlet.MvcResult;
 public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest {
 
     @Autowired
-    private RelationshipTypeService relationshipTypeService;
+    protected RelationshipTypeService relationshipTypeService;
 
     @Autowired
-    private EntityTypeService entityTypeService;
+    protected EntityTypeService entityTypeService;
 
     @Autowired
-    private AuthorizeService authorizeService;
+    protected AuthorizeService authorizeService;
 
     @Autowired
-    private ItemService itemService;
+    protected ItemService itemService;
 
     @Autowired
-    private MetadataFieldService metadataFieldService;
+    protected MetadataFieldService metadataFieldService;
 
     @Autowired
-    private MetadataSchemaService metadataSchemaService;
+    protected MetadataSchemaService metadataSchemaService;
 
     @Autowired
     MockSolrSearchCore mockSolrSearchCore;
-    private Community parentCommunity;
-    private Community child1;
+    protected Community parentCommunity;
+    protected Community child1;
 
-    private Collection col1;
-    private Collection col2;
-    private Collection col3;
+    protected Collection col1;
+    protected Collection col2;
+    protected Collection col3;
 
-    private Item author1;
-    private Item author2;
-    private Item author3;
+    protected Item author1;
+    protected Item author2;
+    protected Item author3;
 
-    private Item orgUnit1;
-    private Item orgUnit2;
-    private Item orgUnit3;
-    private Item project1;
+    protected Item orgUnit1;
+    protected Item orgUnit2;
+    protected Item orgUnit3;
+    protected Item project1;
 
-    private Item publication1;
-    private Item publication2;
+    protected Item publication1;
+    protected Item publication2;
 
-    private RelationshipType isAuthorOfPublicationRelationshipType;
-    private RelationshipType isOrgUnitOfPersonRelationshipType;
-    private EPerson user1;
+    protected RelationshipType isAuthorOfPublicationRelationshipType;
+    protected RelationshipType isOrgUnitOfPersonRelationshipType;
+    protected EPerson user1;
 
     @Before
     public void setUp() throws Exception {
@@ -2839,4 +2840,85 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         getClient().perform(get("/api/core/relationships/" + 1000))
                 .andExpect(status().isNotFound());
     }
+
+    /**
+     * Verify whether the relationship metadata appears correctly on both members.
+     * {@link #isAuthorOfPublicationRelationshipType} is tested again in
+     * {@link LeftTiltedRelationshipRestRepositoryIT} with tilted set to left.
+     */
+    @Test
+    public void testIsAuthorOfPublicationRelationshipMetadataViaREST() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        RelationshipBuilder.createRelationshipBuilder(
+                context, publication1, author1, isAuthorOfPublicationRelationshipType
+        ).build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        // get author metadata using REST
+        getClient(adminToken)
+            .perform(
+                get("/api/core/items/{uuid}", author1.getID())
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.metadata", matchMetadata(
+                String.format("%s.isPublicationOfAuthor", MetadataSchemaEnum.RELATION.getName()),
+                publication1.getID().toString()
+            )));
+
+        // get publication metadata using REST
+        getClient(adminToken)
+            .perform(
+                get("/api/core/items/{uuid}", publication1.getID())
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.metadata", matchMetadata(
+                String.format("%s.isAuthorOfPublication", MetadataSchemaEnum.RELATION.getName()),
+                author1.getID().toString()
+            )));
+    }
+
+    /**
+     * Verify whether the relationship metadata appears correctly on both members.
+     * {@link #isOrgUnitOfPersonRelationshipType} is tested again in
+     * {@link RightTiltedRelationshipRestRepositoryIT} with tilted set to right.
+     */
+    @Test
+    public void testIsOrgUnitOfPersonRelationshipMetadataViaREST() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        RelationshipBuilder.createRelationshipBuilder(
+            context, author1, orgUnit1, isOrgUnitOfPersonRelationshipType
+        ).build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        // get author metadata using REST
+        getClient(adminToken)
+            .perform(
+                get("/api/core/items/{uuid}", author1.getID())
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.metadata", matchMetadata(
+                String.format("%s.isOrgUnitOfPerson", MetadataSchemaEnum.RELATION.getName()),
+                orgUnit1.getID().toString()
+            )));
+
+        // get org unit metadata using REST
+        getClient(adminToken)
+            .perform(
+                get("/api/core/items/{uuid}", orgUnit1.getID())
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.metadata", matchMetadata(
+                String.format("%s.isPersonOfOrgUnit", MetadataSchemaEnum.RELATION.getName()),
+                author1.getID().toString()
+            )));
+    }
+
 }
