@@ -77,10 +77,10 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
             WorkspaceItem authorIs = workspaceItemService.create(context, col, false);
 
             item = installItemService.installItem(context, is);
-            itemService.addMetadata(context, item, "relationship", "type", null, null, "Publication");
+            itemService.addMetadata(context, item, "dspace", "entity", "type", null, "Publication");
 
             authorItem = installItemService.installItem(context, authorIs);
-            itemService.addMetadata(context, authorItem, "relationship", "type", null, null, "Person");
+            itemService.addMetadata(context, authorItem, "dspace", "entity", "type", null, "Person");
             itemService.addMetadata(context, authorItem, "person", "familyName", null, null, "familyName");
             itemService.addMetadata(context, authorItem, "person", "givenName", null, null, "firstName");
 
@@ -156,7 +156,7 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
         // Here we create an Item so that we can create another relationship with this item
         WorkspaceItem authorIs = workspaceItemService.create(context, col, false);
         Item secondAuthorItem = installItemService.installItem(context, authorIs);
-        itemService.addMetadata(context, secondAuthorItem, "relationship", "type", null, null, "Person");
+        itemService.addMetadata(context, secondAuthorItem, "dspace", "entity", "type", null, "Person");
         itemService.addMetadata(context, secondAuthorItem, "person", "familyName", null, null, "familyNameTwo");
         itemService.addMetadata(context, secondAuthorItem, "person", "givenName", null, null, "firstNameTwo");
         Relationship relationshipTwo = relationshipService
@@ -222,7 +222,7 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
         // Relationship a specific place as well
         WorkspaceItem authorIs = workspaceItemService.create(context, col, false);
         Item secondAuthorItem = installItemService.installItem(context, authorIs);
-        itemService.addMetadata(context, secondAuthorItem, "relationship", "type", null, null, "Person");
+        itemService.addMetadata(context, secondAuthorItem, "dspace", "entity", "type", null, "Person");
         itemService.addMetadata(context, secondAuthorItem, "person", "familyName", null, null, "familyNameTwo");
         itemService.addMetadata(context, secondAuthorItem, "person", "givenName", null, null, "firstNameTwo");
         Relationship relationshipTwo = relationshipService
@@ -334,7 +334,7 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
         // Create an additional item for another relationship
         WorkspaceItem authorIs = workspaceItemService.create(context, col, false);
         Item secondAuthorItem = installItemService.installItem(context, authorIs);
-        itemService.addMetadata(context, secondAuthorItem, "relationship", "type", null, null, "Person");
+        itemService.addMetadata(context, secondAuthorItem, "dspace", "entity", "type", null, "Person");
         itemService.addMetadata(context, secondAuthorItem, "person", "familyName", null, null, "familyNameTwo");
         itemService.addMetadata(context, secondAuthorItem, "person", "givenName", null, null, "firstNameTwo");
         Relationship relationshipTwo = relationshipService

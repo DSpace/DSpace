@@ -257,8 +257,8 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     private boolean verifyEntityTypes(Item itemToProcess, EntityType entityTypeToProcess) {
-        List<MetadataValue> list = itemService.getMetadata(itemToProcess, "relationship", "type",
-                null, Item.ANY, false);
+        List<MetadataValue> list = itemService.getMetadata(itemToProcess, "dspace", "entity",
+                "type", Item.ANY, false);
         if (list.isEmpty()) {
             return false;
         }
