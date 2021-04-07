@@ -46,7 +46,7 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
         try {
             String entityType = getEntityTypeStringFromMetadata(item);
             if (StringUtils.isNotBlank(entityType)) {
-                List<Relationship> relationships = relationshipService.findByItem(context, item);
+                List<Relationship> relationships = relationshipService.findByItem(context, item, -1, -1, true);
                 for (Relationship relationship : relationships) {
                     fullMetadataValueList
                         .addAll(findRelationshipMetadataValueForItemRelationship(context, item, entityType,

@@ -273,15 +273,14 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     @Override
     public List<Relationship> findByItem(Context context, Item item) throws SQLException {
-
-        return findByItem(context, item, -1, -1);
+        return findByItem(context, item, -1, -1, false);
     }
 
     @Override
-    public List<Relationship> findByItem(Context context, Item item, Integer limit, Integer offset)
-            throws SQLException {
+    public List<Relationship> findByItem(Context context, Item item, Integer limit, Integer offset,
+                                         boolean excludeTilted) throws SQLException {
 
-        List<Relationship> list = relationshipDAO.findByItem(context, item, limit, offset);
+        List<Relationship> list = relationshipDAO.findByItem(context, item, limit, offset, excludeTilted);
 
         list.sort((o1, o2) -> {
             int relationshipType = o1.getRelationshipType().getLeftwardType()
