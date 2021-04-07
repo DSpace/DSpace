@@ -22,6 +22,7 @@ import org.dspace.app.rest.RestResourceController;
         @LinkRest(name = VocabularyEntryDetailsRest.CHILDREN, method = "getChildren")
         })
 public class VocabularyEntryDetailsRest extends BaseObjectRest<String> {
+    public static final String PLURAL_NAME = "vocabularyEntryDetails";
     public static final String NAME = "vocabularyEntryDetail";
     public static final String PARENT = "parent";
     public static final String CHILDREN = "children";

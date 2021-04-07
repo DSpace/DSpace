@@ -948,6 +948,7 @@ public class RestResourceController implements InitializingBean {
 
     @RequestMapping(method = RequestMethod.GET, value = "/search")
     public RepresentationModel listSearchMethods(@PathVariable String apiCategory, @PathVariable String model) {
+        checkModelPluralForm(apiCategory, model);
         RepresentationModel root = new RepresentationModel();
         DSpaceRestRepository repository = utils.getResourceRepository(apiCategory, model);
 

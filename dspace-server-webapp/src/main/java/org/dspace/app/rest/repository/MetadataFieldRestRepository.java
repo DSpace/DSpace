@@ -249,6 +249,10 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
             throw new UnprocessableEntityException("metadata element (in request body) cannot be blank");
         }
 
+        if (isBlank(metadataFieldRest.getQualifier())) {
+            metadataFieldRest.setQualifier(null);
+        }
+
         // create
         MetadataField metadataField;
         try {

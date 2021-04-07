@@ -177,7 +177,7 @@
             <SchemaLocation>http://irdb.nii.ac.jp/oai/junii2-3-1.xsd</SchemaLocation>
         </Format>
         <!-- Metadata format based on the OpenAIRE 4.0 guidelines
-             https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/use_of_oai_pmh.html 
+             https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/use_of_oai_pmh.html
         -->
         <Format id="oaiopenaire">
             <Prefix>oai_openaire</Prefix>
@@ -323,8 +323,8 @@
              By default, return an Item record:
                 * If it is publicly accessible
                 * * OR it has been withdrawn (in order to display a tombstone record).
-                * AND doesn't have a relationship.type field
-                * * OR the relationship.type is a Publication
+                * AND doesn't have a dspace.entity.type field
+                * * OR the dspace.entity.type is a Publication
                 * limiting the results only to Publications as expected
              This filter is used by the default context ([oai]/request).
         -->
@@ -363,8 +363,8 @@
              By default, return an Item record:
                 * If it is publicly accessible
                 * * OR it has been withdrawn (in order to display a tombstone record).
-                * AND doesn't have a relationship.type field
-                * * OR the relationship.type is a Publication
+                * AND doesn't have a dspace.entity.type field
+                * * OR the dspace.entity.type is a Publication
                 * limiting the results only to Publications as expected
              This filter is used by the default context ([oai]/request).
         -->
@@ -493,20 +493,20 @@
             </Configuration>
         </CustomCondition>
 
-        <!-- This condition determines if an Item has a "relationship.type" -->
+        <!-- This condition determines if an Item has a "dspace.entity.type" -->
         <CustomCondition id="relationshipTypeExistsCondition">
             <Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
             <Configuration>
-                <string name="field">relationship.type</string>
+                <string name="field">dspace.entity.type</string>
             </Configuration>
         </CustomCondition>
 
-        <!-- This condition determines if an Item has a "relationship.type" field
+        <!-- This condition determines if an Item has a "dspace.entity.type" field
              specifying one of the valid DRIVER document types. -->
         <CustomCondition id="isPublicationEntityCondition">
             <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
             <Configuration>
-                <string name="field">relationship.type</string>
+                <string name="field">dspace.entity.type</string>
                 <string name="operator">equal</string>
                 <list name="values">
                     <string>Publication</string>

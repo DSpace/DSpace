@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
+
+    <!-- Authority control -->
+    <bean class="org.dspace.authority.AuthoritySolrServiceImpl" id="org.dspace.authority.AuthoritySearchService"/>
+    <alias name="org.dspace.authority.AuthoritySearchService" alias="org.dspace.authority.indexer.AuthorityIndexingService"/>
+
+    <bean id="dspace.DSpaceAuthorityIndexer" class="org.dspace.authority.indexer.DSpaceAuthorityIndexer"/>
+
+    <alias name="OrcidSource" alias="AuthoritySource"/>
+    <bean name="OrcidSource" class="org.dspace.authority.orcid.MockOrcid" />
+ 
+    <bean name="AuthorityTypes" class="org.dspace.authority.AuthorityTypes">
+        <property name="types">
+            <list>
+                <bean class="org.dspace.authority.orcid.Orcidv3AuthorityValue"/>
+                <bean class="org.dspace.authority.PersonAuthorityValue"/>
+            </list>
+        </property>
+        <property name="fieldDefaults">
+            <map>
+                <entry key="dc_contributor_author">
+                    <bean class="org.dspace.authority.PersonAuthorityValue"/>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+</beans>

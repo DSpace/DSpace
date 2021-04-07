@@ -17,7 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import au.com.bytecode.opencsv.CSVWriter;
+import com.opencsv.CSVWriterBuilder;
+import com.opencsv.ICSVWriter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -232,7 +233,7 @@ public class Dataset {
 
     public ByteArrayOutputStream exportAsCSV() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        CSVWriter ecsvp = new CSVWriter(new OutputStreamWriter(baos), ';');
+        ICSVWriter ecsvp = new CSVWriterBuilder(new OutputStreamWriter(baos)).withSeparator(';').build();
         //Generate the item row
         List<String> colLabels = getColLabels();
         colLabels.add(0, "");
