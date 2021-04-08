@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static org.hamcrest.Matchers.is;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
 import static org.springframework.http.MediaType.parseMediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -17,6 +18,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
+import org.dspace.app.rest.matcher.PageMatcher;
+import org.dspace.app.rest.matcher.SearchResultMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -442,7 +445,7 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
         getClient(adminToken)
                 .perform(post("/api/core/items/" + publicItem1.getID() + "/mappedCollections/")
                         .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
-                        .content("https://localhost:8080/spring-rest/api/core/collections/" + col1.getID()                        )
+                        .content("https://localhost:8080/spring-rest/api/core/collections/" + col1.getID())
                 )
                 .andExpect(status().isUnprocessableEntity());
     }
@@ -502,7 +505,7 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
         getClient(adminToken)
                 .perform(post("/api/core/items/" + templateItem.getID() + "/mappedCollections/")
                         .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
-                        .content("https://localhost:8080/spring-rest/api/core/collections/" + col2.getID()                        )
+                        .content("https://localhost:8080/spring-rest/api/core/collections/" + col2.getID())
                 )
                 .andExpect(status().is(405));
     }
@@ -697,4 +700,125 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
 
     }
 
+    @Test
+    public void mappedItemAppearsInCollectionBrowseTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection source = CollectionBuilder.createCollection(context, parentCommunity).withName("Source").build();
+        Collection sink = CollectionBuilder.createCollection(context, parentCommunity).withName("Sink").build();
+
+        //2. An item in the source collection
+        Item item = ItemBuilder.createItem(context, source)
+                                 .withTitle("Mapped item")
+                                 .withIssueDate("2020")
+                                 .build();
+
+        context.restoreAuthSystemState();
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        // Source collection browse is empty
+        getClient().perform(
+            get("/api/discover/search/objects")
+                .param("dsoType", "ITEM")
+                .param("scope", sink.getID().toString()))
+                   // should return with 200 OK
+                   .andExpect(status().isOk())
+                   // should contain no search results
+                   .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                       PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 0, 0)
+                   )));
+
+        // Map the item to the sink collection
+        getClient(adminToken).perform(
+            post("/api/core/items/" + item.getID() + "/mappedCollections/")
+                .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                .content(
+                    "https://localhost:8080/spring-rest/api/core/collections/" + sink.getID() + "\n"
+                )
+        );
+
+        // Source collection browse contains mapped item
+        getClient().perform(
+            get("/api/discover/search/objects")
+                .param("dsoType", "ITEM")
+                .param("scope", sink.getID().toString()))
+                   // should return with 200 OK
+                   .andExpect(status().isOk())
+                   // should contain no search results
+                   .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                       PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
+                   )))
+                   // should match mapped item title
+                   .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                       SearchResultMatcher.matchOnItemName("item", "items", "Mapped item")
+                   )));
+    }
+
+    @Test
+    public void unmappedItemIsRemovedFromCollectionBrowseTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection source = CollectionBuilder.createCollection(context, parentCommunity).withName("Source").build();
+        Collection sink = CollectionBuilder.createCollection(context, parentCommunity).withName("Sink").build();
+
+        //2. An item in the source collection
+        Item item = ItemBuilder.createItem(context, source)
+                               .withTitle("Mapped item")
+                               .withIssueDate("2020")
+                               .build();
+
+        context.restoreAuthSystemState();
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        //3. The item mapped to the sink collection
+        getClient(adminToken).perform(
+            post("/api/core/items/" + item.getID() + "/mappedCollections/")
+                .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                .content(
+                    "https://localhost:8080/spring-rest/api/core/collections/" + sink.getID() + "\n"
+                )
+        );
+
+        // Source collection browse contains mapped item
+        getClient().perform(
+            get("/api/discover/search/objects")
+                .param("dsoType", "ITEM")
+                .param("scope", sink.getID().toString()))
+                   // should return with 200 OK
+                   .andExpect(status().isOk())
+                   // should contain no search results
+                   .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                       PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
+                   )))
+                   // should match mapped item title
+                   .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                       SearchResultMatcher.matchOnItemName("item", "items", "Mapped item")
+                   )));
+
+        // Unmap item from sink collection
+        getClient(adminToken).perform(
+            delete("/api/core/items/" + item.getID() + "/mappedCollections/" + sink.getID()));
+
+        // Source collection browse is empty
+        getClient().perform(
+            get("/api/discover/search/objects")
+                .param("dsoType", "ITEM")
+                .param("scope", sink.getID().toString()))
+                   // should return with 200 OK
+                   .andExpect(status().isOk())
+                   // should contain no search results
+                   .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                       PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 0, 0)
+                   )));
+    }
 }

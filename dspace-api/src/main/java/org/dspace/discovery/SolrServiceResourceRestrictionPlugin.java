@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.SolrInputDocument;
@@ -78,7 +79,7 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                 .getValidPolicyOwnersActionFilter(context, List.of(dso.getID()), Constants.READ);
 
             for (ResourcePolicyOwnerVO resourcePolicy : policies) {
-                addReadField(document, resourcePolicy);
+                addReadField(document, resourcePolicy, false);
             }
 
             // also index ADMIN policies as ADMIN permissions provides READ access
@@ -99,7 +100,7 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                     .getValidPolicyOwnersActionFilter(context, dsoIds, Constants.ADMIN);
 
                 for (ResourcePolicyOwnerVO resourcePolicy : policiesAdmin) {
-                    addReadField(document, resourcePolicy);
+                    addReadField(document, resourcePolicy, true);
                 }
 
             }
@@ -136,14 +137,15 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
 
                 resourceQuery.append(")");
 
-                if (authorizeService.isCommunityAdmin(context)
-                    || authorizeService.isCollectionAdmin(context)) {
+                String locations = DSpaceServicesFactory.getInstance()
+                                                          .getServiceManager()
+                                                          .getServiceByName(SearchService.class.getName(),
+                                                                            SearchService.class)
+                                                          .createLocationQueryForAdministrableItems(context);
+
+                if (StringUtils.isNotBlank(locations)) {
                     resourceQuery.append(" OR ");
-                    resourceQuery.append(DSpaceServicesFactory.getInstance()
-                                                              .getServiceManager()
-                                                              .getServiceByName(SearchService.class.getName(),
-                                                                                SearchService.class)
-                                                              .createLocationQueryForAdministrableItems(context));
+                    resourceQuery.append(locations);
                 }
 
                 solrQuery.addFilterQuery(resourceQuery.toString());
@@ -169,7 +171,7 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
         return null;
     }
 
-    private void addReadField(SolrInputDocument document, ResourcePolicyOwnerVO resourcePolicy) {
+    private void addReadField(SolrInputDocument document, ResourcePolicyOwnerVO resourcePolicy, boolean addAdminField) {
 
         String fieldValue;
         if (resourcePolicy.getGroupId() != null) {
@@ -181,5 +183,8 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
         }
 
         document.addField("read", fieldValue);
+        if (addAdminField) {
+            document.addField("admin", fieldValue);
+        }
     }
 }

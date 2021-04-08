@@ -161,8 +161,9 @@ db.schema = public
 #######################
 # PROXY CONFIGURATION #
 #######################
-# uncomment and specify both properties if proxy server required
-# proxy server for external http requests - use regular hostname without port number
+# Uncomment and specify both properties if proxy server is required for external http requests
+# (e.g. requests from DSpace to third party services like Creative Commons use this setting when enabled)
+# Use regular hostname without port number
 #http.proxy.host =
 
 # port number of proxy server
@@ -198,6 +199,15 @@ db.schema = public
 # Enabled by default in authentication.cfg
 #plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.PasswordAuthentication
 
+#####################
+# REST API SETTINGS #
+#####################
+# Allowed Cross-Origin-Resource-Sharing (CORS) origins (in "Access-Control-Allow-Origin" header).
+# Only these origins (client URLs) can successfully authenticate with your REST API.
+# Defaults to ${dspace.ui.url} if unspecified (as the UI must have access to the REST API).
+# Multiple allowed origin URLs may be comma separated. Wildcard value (*) is NOT SUPPORTED.
+# (Requires reboot of servlet container, e.g. Tomcat, to reload)
+#rest.cors.allowed-origins = ${dspace.ui.url}
 
 #################################################
 # SPRING BOOT SETTINGS (Used by Server Webapp)  #

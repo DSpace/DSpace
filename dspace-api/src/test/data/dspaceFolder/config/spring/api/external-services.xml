@@ -108,6 +108,23 @@
         </property>
     </bean>
 
+    <bean id="pubmedLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="mockPubmedImportService"/>
+        <property name="sourceIdentifier" value="pubmed"/>
+        <property name="recordIdMetadata" value="dc.identifier.other"/>
+    </bean>
+
+    <bean id="mockPubmedImportService"
+          class="org.dspace.external.provider.impl.MockPubmedImportMetadataSourceServiceImpl">
+        <property name="metadataFieldMapping" ref="pubmedMetadataFieldMapping"/>
+        <property name="baseAddress" value="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"/>
+        <property name="supportedExtensions">
+            <list>
+                 <value>xml</value>
+            </list>
+        </property>
+    </bean>
+
     <bean class="org.dspace.app.suggestion.MockSuggestionExternalDataSource" />
     
     <bean id="openaireLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
@@ -117,4 +134,5 @@
     </bean>
     
 </beans>
+
 

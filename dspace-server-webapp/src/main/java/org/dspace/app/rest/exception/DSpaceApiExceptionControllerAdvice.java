@@ -11,6 +11,7 @@ import static org.springframework.web.servlet.DispatcherServlet.EXCEPTION_ATTRIB
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -56,6 +57,11 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionHandler {
     private static final Logger log = LogManager.getLogger(DSpaceApiExceptionControllerAdvice.class);
+
+    /**
+     * Set of HTTP error codes to log as ERROR with full stacktrace.
+     */
+    private static final Set<Integer> LOG_AS_ERROR = Set.of(422);
 
     @Autowired
     private RestAuthenticationService restAuthenticationService;
@@ -196,7 +202,10 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     }
 
     /**
-     * Send the error to the response. Some errors may also be logged.
+     * Send the error to the response.
+     * 5xx errors will be logged as ERROR with a full stack trace, 4xx errors will be logged as WARN without a
+     * stacktrace. Specific 4xx errors where an ERROR log with full stacktrace is more appropriate are configured in
+     * {@link #LOG_AS_ERROR}
      * @param request current request
      * @param response current response
      * @param ex Exception thrown
@@ -209,11 +218,13 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         //Make sure Spring picks up this exception
         request.setAttribute(EXCEPTION_ATTRIBUTE, ex);
 
-        // For now, just logging server errors.
         // We don't want to fill logs with bad/invalid REST API requests.
-        if (statusCode == HttpServletResponse.SC_INTERNAL_SERVER_ERROR) {
+        if (HttpStatus.valueOf(statusCode).is5xxServerError() || LOG_AS_ERROR.contains(statusCode)) {
             // Log the full error and status code
             log.error("{} (status:{})", message, statusCode, ex);
+        } else if (HttpStatus.valueOf(statusCode).is4xxClientError()) {
+            // Log the error as a single-line WARN
+            log.warn("{} (status:{})", message, statusCode);
         }
 
         //Exception properties will be set by org.springframework.boot.web.support.ErrorPageFilter

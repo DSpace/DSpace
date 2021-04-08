@@ -36,5 +36,13 @@
         <qualifier>ignore</qualifier>
         <scope_note>Stores whether the EPerson is allowed to ignore the user agreement, useful for user account used by third party application. Valid values; true, false</scope_note>
     </dc-type>
+    
+    
+    <dc-type>
+        <schema>dspace</schema>
+        <element>entity</element>
+        <qualifier>type</qualifier>
+        <scope_note>Stores the type of Entity that a specific Item represents</scope_note>
+    </dc-type>
 
 </dspace-dc-types>

@@ -8,6 +8,7 @@
 package org.dspace.app.rest.submit.factory.impl;
 
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.deduplication.model.DuplicateDecisionObjectRest;
 import org.dspace.app.deduplication.model.DuplicateDecisionType;
@@ -17,7 +18,6 @@ import org.dspace.app.rest.model.patch.LateObjectEvaluator;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
-import org.dspace.services.model.Request;
 import org.dspace.utils.DSpace;
 import org.dspace.workflow.WorkflowItem;
 
@@ -35,7 +35,7 @@ import org.dspace.workflow.WorkflowItem;
 public class DetectDuplicateAddPatchOperation extends AddPatchOperation<DuplicateDecisionObjectRest> {
 
     @Override
-    void add(Context context, Request currentRequest, InProgressSubmission source, String path, Object value)
+    void add(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path, Object value)
             throws Exception {
         String[] split = getAbsolutePath(path).split("/");
         if ((split.length != 3) || (split[0].compareTo("matches") != 0)) {

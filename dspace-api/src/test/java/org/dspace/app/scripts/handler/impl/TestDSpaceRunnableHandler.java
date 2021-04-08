@@ -57,19 +57,19 @@ public class TestDSpaceRunnableHandler extends CommandLineDSpaceRunnableHandler 
 
     @Override
     public void logInfo(String message) {
-        System.out.println(message);
+        super.logInfo(message);
         infoMessages.add(message);
     }
 
     @Override
     public void logWarning(String message) {
-        System.out.println(message);
+        super.logWarning(message);
         warningMessages.add(message);
     }
 
     @Override
     public void logError(String message) {
-        System.err.println(message);
+        super.logError(message);
         errorMessages.add(message);
     }
 

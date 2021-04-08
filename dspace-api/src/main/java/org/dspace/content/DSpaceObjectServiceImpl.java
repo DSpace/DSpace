@@ -313,6 +313,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 //            metadataValueService.update(context, metadataValue);
             dso.addDetails(metadataField.toString());
         }
+        setMetadataModified(dso);
         return newMetadata;
     }
 

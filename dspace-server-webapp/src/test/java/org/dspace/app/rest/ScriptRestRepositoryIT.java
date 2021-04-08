@@ -11,7 +11,6 @@ import static com.jayway.jsonpath.JsonPath.read;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -32,7 +31,6 @@ import com.google.gson.Gson;
 import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
 import org.dspace.app.rest.matcher.BitstreamMatcher;
-import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.matcher.ProcessMatcher;
 import org.dspace.app.rest.matcher.ScriptMatcher;
 import org.dspace.app.rest.model.ParameterValueRest;
@@ -119,13 +117,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         String token = getAuthToken(eperson.getEmail(), password);
 
         getClient(token).perform(get("/api/system/scripts"))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$._embedded.scripts", hasSize(2)))
-                        .andExpect(jsonPath("$._embedded.scripts", containsInAnyOrder(
-                            ScriptMatcher.matchScript("item-export", "Perform the item export in the given format"),
-                            ScriptMatcher.matchScript("bulk-item-export",
-                                    "Perform the multiple items export in the given format")
-                            )));
+                        .andExpect(status().isForbidden());
 
     }
 
@@ -137,27 +129,60 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(get("/api/system/scripts").param("size", "1"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$._embedded.scripts", Matchers.not(Matchers.hasItem(
-                                ScriptMatcher.matchScript(scriptConfigurations.get(10).getName(),
-                                                          scriptConfigurations.get(10).getDescription())
+                                ScriptMatcher.matchScript(scriptConfigurations.get(2).getName(),
+                                                          scriptConfigurations.get(2).getDescription())
                         ))))
                         .andExpect(jsonPath("$._embedded.scripts", hasItem(
-                                ScriptMatcher.matchScript(scriptConfigurations.get(7).getName(),
-                                                          scriptConfigurations.get(7).getDescription())
+                                ScriptMatcher.matchScript(scriptConfigurations.get(5).getName(),
+                                                          scriptConfigurations.get(5).getDescription())
                         )))
-                        .andExpect(jsonPath("$.page",is(PageMatcher.pageEntry(0, 1))));
+                        .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                                Matchers.containsString("/api/system/scripts?"),
+                                Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                        .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                                Matchers.containsString("/api/system/scripts?"),
+                                Matchers.containsString("size=1"))))
+                        .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                                Matchers.containsString("/api/system/scripts?"),
+                                Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                        .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                                Matchers.containsString("/api/system/scripts?"),
+                                Matchers.containsString("page=7"), Matchers.containsString("size=1"))))
+                        .andExpect(jsonPath("$.page.size", is(1)))
+                        .andExpect(jsonPath("$.page.number", is(0)))
+                        .andExpect(jsonPath("$.page.totalPages", is(8)))
+                        .andExpect(jsonPath("$.page.totalElements", is(8)));
 
 
         getClient(token).perform(get("/api/system/scripts").param("size", "1").param("page", "1"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$._embedded.scripts", hasItem(
-                                ScriptMatcher.matchScript(scriptConfigurations.get(10).getName(),
-                                                          scriptConfigurations.get(10).getDescription())
+                                ScriptMatcher.matchScript(scriptConfigurations.get(2).getName(),
+                                                          scriptConfigurations.get(2).getDescription())
                         )))
                         .andExpect(jsonPath("$._embedded.scripts", Matchers.not(hasItem(
-                                ScriptMatcher.matchScript(scriptConfigurations.get(7).getName(),
-                                                          scriptConfigurations.get(7).getDescription())
+                                ScriptMatcher.matchScript(scriptConfigurations.get(5).getName(),
+                                                          scriptConfigurations.get(5).getDescription())
                         ))))
-                        .andExpect(jsonPath("$.page",is(PageMatcher.pageEntry(1, 1))));
+                        .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                                Matchers.containsString("/api/system/scripts?"),
+                                Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                        .andExpect(jsonPath("$._links.prev.href", Matchers.allOf(
+                                Matchers.containsString("/api/system/scripts?"),
+                                Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                        .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                                Matchers.containsString("/api/system/scripts?"),
+                                Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                        .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                                Matchers.containsString("/api/system/scripts?"),
+                                Matchers.containsString("page=2"), Matchers.containsString("size=1"))))
+                        .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                                Matchers.containsString("/api/system/scripts?"),
+                                Matchers.containsString("page=7"), Matchers.containsString("size=1"))))
+                        .andExpect(jsonPath("$.page.size", is(1)))
+                        .andExpect(jsonPath("$.page.number", is(1)))
+                        .andExpect(jsonPath("$.page.totalPages", is(8)))
+                        .andExpect(jsonPath("$.page.totalElements", is(8)));
     }
 
     @Test
@@ -181,7 +206,9 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findOneScriptByInvalidNameBadRequestExceptionTest() throws Exception {
-        getClient().perform(get("/api/system/scripts/mock-script-invalid"))
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/scripts/mock-script-invalid"))
                    .andExpect(status().isBadRequest());
     }
 

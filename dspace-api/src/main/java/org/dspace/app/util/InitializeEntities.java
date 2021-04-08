@@ -146,6 +146,14 @@ public class InitializeEntities {
                         copyToRight = Boolean.valueOf(copyToRightNode.getTextContent());
                     }
 
+                    Node tiltedNode = eElement.getElementsByTagName("tilted").item(0);
+                    RelationshipType.Tilted tilted;
+                    if (tiltedNode == null) {
+                        tilted = RelationshipType.Tilted.NONE;
+                    } else {
+                        tilted = RelationshipType.Tilted.valueOf(tiltedNode.getTextContent().toUpperCase());
+                    }
+
                     NodeList leftCardinalityList = eElement.getElementsByTagName("leftCardinality");
                     NodeList rightCardinalityList = eElement.getElementsByTagName("rightCardinality");
 
@@ -170,7 +178,8 @@ public class InitializeEntities {
                     }
                     populateRelationshipType(context, leftType, rightType, leftwardType, rightwardType,
                                              leftCardinalityMin, leftCardinalityMax,
-                                             rightCardinalityMin, rightCardinalityMax, copyToLeft, copyToRight);
+                                             rightCardinalityMin, rightCardinalityMax, copyToLeft, copyToRight,
+                                             tilted);
 
 
                 }
@@ -190,7 +199,7 @@ public class InitializeEntities {
     private void populateRelationshipType(Context context, String leftType, String rightType, String leftwardType,
                                           String rightwardType, String leftCardinalityMin, String leftCardinalityMax,
                                           String rightCardinalityMin, String rightCardinalityMax,
-                                          Boolean copyToLeft, Boolean copyToRight)
+                                          Boolean copyToLeft, Boolean copyToRight, RelationshipType.Tilted tilted)
         throws SQLException, AuthorizeException {
 
         EntityType leftEntityType = entityTypeService.findByEntityType(context,leftType);
@@ -231,10 +240,11 @@ public class InitializeEntities {
             relationshipTypeService.create(context, leftEntityType, rightEntityType, leftwardType, rightwardType,
                                            leftCardinalityMinInteger, leftCardinalityMaxInteger,
                                            rightCardinalityMinInteger, rightCardinalityMaxInteger,
-                                           copyToLeft, copyToRight);
+                                           copyToLeft, copyToRight, tilted);
         } else {
             relationshipType.setCopyToLeft(copyToLeft);
             relationshipType.setCopyToRight(copyToRight);
+            relationshipType.setTilted(tilted);
             relationshipType.setLeftMinCardinality(leftCardinalityMinInteger);
             relationshipType.setLeftMaxCardinality(leftCardinalityMaxInteger);
             relationshipType.setRightMinCardinality(rightCardinalityMinInteger);
