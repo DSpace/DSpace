@@ -183,7 +183,7 @@ public class XslExtensions {
 	 * Método que retorna los handles de las colecciones y comunidades de un item
 	 * separados por coma
 	 */
-	public static String getItemContainersList(String handle) throws SQLException {
+	public static String getItemCollsAndComms(String handle) throws SQLException {
 		Context context;
 		try {
 			context = new Context();

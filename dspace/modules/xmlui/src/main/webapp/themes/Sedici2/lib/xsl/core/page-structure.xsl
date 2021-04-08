@@ -627,8 +627,8 @@ placeholders for header images -->
 				</xsl:text>
 				<xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='focus'][@qualifier='containerType']/text() = 'type:item'">
 					<xsl:variable name="itemHandle" select="substring(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='focus'][@qualifier='object']/text(), 5)"/><xsl:text>
-					ga('set', 'dimension1', '</xsl:text><xsl:value-of select="$itemHandle"/><xsl:text>')
-					ga('set', 'dimension2', '</xsl:text><xsl:value-of select="ex:getItemContainersList($itemHandle)"/><xsl:text>')
+					ga('set', 'dimension1', '</xsl:text><xsl:value-of select="$itemHandle"/><xsl:text>');
+					ga('set', 'dimension2', '</xsl:text><xsl:value-of select="ex:getItemCollsAndComms($itemHandle)"/><xsl:text>');
 				</xsl:text>
 				</xsl:if><xsl:text>
 				ga('send', 'pageview');
