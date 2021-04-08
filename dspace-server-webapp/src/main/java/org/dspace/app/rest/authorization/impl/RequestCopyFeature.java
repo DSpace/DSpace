@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.model.BaseObjectRest;
@@ -37,7 +38,7 @@ import org.springframework.stereotype.Component;
  * in an item.
  *
  * Authorization is granted for a bitstream if the user has no access to the bitstream
- * and the bistream is part of an archived item.
+ * and the bitstream is part of an archived item.
  * Authorization is granted for an item if the user has no access to a bitstream in the item, and the item is archived.
  */
 @Component
@@ -45,7 +46,7 @@ import org.springframework.stereotype.Component;
         description = "It can be used to verify if the user can request a copy of a bitstream")
 public class RequestCopyFeature implements AuthorizationFeature {
 
-    Logger log = Logger.getLogger(RequestCopyFeature.class);
+    Logger log = LogManager.getLogger();
 
     public final static String NAME = "canRequestACopy";
 
