@@ -204,4 +204,21 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
     public int countRows(Context context) throws SQLException {
         return count(createQuery(context, "SELECT count(*) FROM EPerson"));
     }
+
+    @Override
+    public List<EPerson> findByMetadaField(Context context, MetadataField metadataField, String value)
+        throws SQLException {
+
+        String hqlQueryString = ""
+            + " SELECT ePerson "
+            + "   FROM EPerson ePerson Join ePerson.metadata metadatavalue "
+            + "  WHERE metadatavalue.metadataField = :metadata_field"
+            + "    AND STR(metadatavalue.value) = :text_value";
+
+        Query query = createQuery(context, hqlQueryString);
+        query.setParameter("metadata_field", metadataField);
+        query.setParameter("text_value", value);
+
+        return list(query);
+    }
 }

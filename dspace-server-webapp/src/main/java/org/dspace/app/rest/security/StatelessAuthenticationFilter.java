@@ -16,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -96,7 +97,9 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
         }
         if (authentication != null) {
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            restAuthenticationService.invalidateAuthenticationCookie(res);
+            if (StringUtils.contains(req.getRequestURI(), "/api/authn/login")) {
+                restAuthenticationService.invalidateAuthenticationCookie(res);
+            }
         }
         chain.doFilter(req, res);
     }

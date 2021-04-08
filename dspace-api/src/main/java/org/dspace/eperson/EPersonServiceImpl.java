@@ -30,9 +30,12 @@ import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.DSpaceObjectServiceImpl;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataFieldName;
+import org.dspace.content.MetadataSchema;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -96,6 +99,8 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     protected VersionDAO versionDAO;
     @Autowired(required = true)
     protected ClaimedTaskService claimedTaskService;
+    @Autowired(required = true)
+    protected MetadataSchemaService metadataSchemaService;
 
     protected EPersonServiceImpl() {
         super();
@@ -568,5 +573,34 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     @Override
     public int countTotal(Context context) throws SQLException {
         return ePersonDAO.countRows(context);
+    }
+
+    @Override
+    public List<EPerson> findByMetadaField(Context context, String schema, String element, String qualifier,
+        String value) throws SQLException {
+
+        MetadataSchema metadataSchema = metadataSchemaService.find(context, schema);
+        if (metadataSchema == null) {
+            throw new IllegalArgumentException("No such metadata schema: " + schema);
+        }
+        MetadataField metadataField = metadataFieldService.findByElement(context, metadataSchema, element, qualifier);
+        if (metadataField == null) {
+            throw new IllegalArgumentException(
+                "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
+        }
+
+        return ePersonDAO.findByMetadaField(context, metadataField, value);
+    }
+
+    @Override
+    public List<EPerson> findByMetadaField(Context context, MetadataFieldName metadataFieldName, String value)
+        throws SQLException {
+        return findByMetadaField(context, metadataFieldName.SCHEMA, metadataFieldName.ELEMENT,
+            metadataFieldName.QUALIFIER, value);
+    }
+
+    @Override
+    public List<EPerson> findByOrcid(Context context, String orcid) throws SQLException {
+        return findByMetadaField(context, MD_ORCID, orcid);
     }
 }

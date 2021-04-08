@@ -8,6 +8,7 @@
 package org.dspace.app.orcid.client;
 
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
+import org.orcid.jaxb.model.v3.release.record.Person;
 import org.orcid.jaxb.model.v3.release.record.Record;
 
 /**
@@ -28,7 +29,16 @@ public interface OrcidClient {
     OrcidTokenResponseDTO getAccessToken(String code);
 
     /**
-     * Retrieves a summary of the full ORCID record related to the given orcid.
+     * Retrieves a summary of the ORCID person related to the given orcid.
+     *
+     * @param  accessToken the access token
+     * @param  orcid       the orcid id of the record to retrieve
+     * @return             the Person
+     */
+    Person getPerson(String accessToken, String orcid);
+
+    /**
+     * Retrieves a summary of the ORCID record related to the given orcid.
      *
      * @param  accessToken the access token
      * @param  orcid       the orcid id of the record to retrieve
