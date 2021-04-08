@@ -31,6 +31,7 @@ import com.google.gson.Gson;
 import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
 import org.dspace.app.rest.matcher.BitstreamMatcher;
+import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.matcher.ProcessMatcher;
 import org.dspace.app.rest.matcher.ScriptMatcher;
 import org.dspace.app.rest.model.ParameterValueRest;
@@ -117,7 +118,9 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         String token = getAuthToken(eperson.getEmail(), password);
 
         getClient(token).perform(get("/api/system/scripts"))
-                        .andExpect(status().isForbidden());
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.page",
+                                            is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 0, 0))));
 
     }
 
@@ -206,9 +209,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findOneScriptByInvalidNameBadRequestExceptionTest() throws Exception {
-        String token = getAuthToken(admin.getEmail(), password);
-
-        getClient(token).perform(get("/api/system/scripts/mock-script-invalid"))
+        getClient().perform(get("/api/system/scripts/mock-script-invalid"))
                    .andExpect(status().isBadRequest());
     }
 
