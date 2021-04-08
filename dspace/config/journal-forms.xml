@@ -1,0 +1,165 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE forms [
+  <!ATTLIST form-definitions id ID #IMPLIED>
+  <!ATTLIST form id ID #IMPLIED>
+  ]>
+  <form-definitions id='journals'>
+    <form id='journalStep'
+          name="journalStep">
+        <row>
+            <field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>title</dc-element>
+                <label>Name</label>
+                <input-type>onebox</input-type>
+                <hint>Enter the name of the journal</hint>
+            </field>
+        </row>
+        <row>
+            <field>
+                <dc-schema>creativework</dc-schema>
+                <dc-element>editor</dc-element>
+                <label>Editor</label>
+                <input-type>name</input-type>
+                <hint>Enter the editor of the journal</hint>
+            </field>
+        </row>
+        <row>
+            <field>
+                <dc-schema>creativeworkseries</dc-schema>
+                <dc-element>issn</dc-element>
+                <label>ISSN</label>
+                <input-type>onebox</input-type>
+                <hint>Enter the issn of the journal</hint>
+            </field>
+        </row>
+        <row>
+            <field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>description</dc-element>
+                <label>Description</label>
+                <input-type>textarea</input-type>
+                <hint>Enter the description of the journal</hint>
+            </field>
+        </row>
+        <row>
+            <field>
+                <dc-schema>creativework</dc-schema>
+                <dc-element>publisher</dc-element>
+                <label>Publisher</label>
+                <input-type>onebox</input-type>
+                <hint>Enter the publisher of the journal</hint>
+            </field>
+        </row>
+
+    </form>
+
+    <form id='journalVolumeStep'
+          name="journalVolumeStep">
+        <row>
+            <relation-field>
+                <relationship-type>isVolumeOfJournal</relationship-type>
+                <search-configuration>journal</search-configuration>
+                <!-- example of filtering Discovery search for Journal by a specific publisher -->
+                <!--<filter>creativework.publisher:somepublishername</filter>-->
+                <label>Journal</label>
+                <hint>Select the journal related to this volume.</hint>
+                <externalsources>sherpaJournal</externalsources>
+            </relation-field>
+        </row>
+        <row>
+            <field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>title</dc-element>
+                <label>Name</label>
+                <input-type>onebox</input-type>
+                <hint>Enter the name of the journal volume</hint>
+            </field>
+        </row>
+        <row>
+            <field>
+                <dc-schema>publicationVolume</dc-schema>
+                <dc-element>volumeNumber</dc-element>
+                <label>Volume</label>
+                <input-type>onebox</input-type>
+                <hint>Enter the volume of the journal volume</hint>
+            </field>
+        </row>
+        <row>
+            <field>
+                <dc-schema>creativework</dc-schema>
+                <dc-element>datePublished</dc-element>
+                <label>Issue date</label>
+                <input-type>date</input-type>
+                <hint>Enter the issue date of the journal volume</hint>
+            </field>
+        </row>
+        <row>
+            <field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>description</dc-element>
+                <label>Description</label>
+                <input-type>textarea</input-type>
+                <hint>Enter the description of the journal volume</hint>
+            </field>
+        </row>
+    </form>
+
+    <form id='journalIssueStep'
+          name="journalIssueStep">
+        <row>
+            <relation-field>
+                <relationship-type>isJournalVolumeOfIssue</relationship-type>
+                <search-configuration>journalvolume</search-configuration>
+                <label>Journal Volume</label>
+                <hint>Select the journal volume related to this issue.</hint>
+            </relation-field>
+        </row>
+        <row>
+            <field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>title</dc-element>
+                <label>Name</label>
+                <input-type>onebox</input-type>
+                <hint>Enter the name of the journal issue</hint>
+            </field>
+        </row>
+        <row>
+            <field>
+                <dc-schema>publicationissue</dc-schema>
+                <dc-element>issueNumber</dc-element>
+                <label>Number</label>
+                <input-type>onebox</input-type>
+                <hint>Enter the number of the journal issue</hint>
+            </field>
+        </row>
+        <row>
+            <field>
+                <dc-schema>creativework</dc-schema>
+                <dc-element>datePublished</dc-element>
+                <label>Issue date</label>
+                <input-type>date</input-type>
+                <hint>Enter the issue date of the journal issue</hint>
+            </field>
+        </row>
+        <row>
+            <field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>description</dc-element>
+                <label>Description</label>
+                <input-type>textarea</input-type>
+                <hint>Enter the description of the journal issue</hint>
+            </field>
+        </row>
+        <row>
+            <field>
+                <dc-schema>creativework</dc-schema>
+                <dc-element>keywords</dc-element>
+                <repeatable>true</repeatable>
+                <label>Keywords</label>
+                <input-type>onebox</input-type>
+                <hint>Enter the keywords of the journal issue</hint>
+            </field>
+        </row>
+    </form>
+</form-definitions>

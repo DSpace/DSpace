@@ -8,51 +8,61 @@
 package org.dspace.app.util;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.ServletException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Collection;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.core.Utils;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 /**
  * Submission form generator for DSpace. Reads and parses the installation
- * form definitions file, submission-forms.xml, from the configuration directory.
+ * form definitions file, {@code submission-forms.xml}, from the configuration directory.
  * A forms definition details the page and field layout of the metadata
  * collection pages used by the submission process. Each forms definition
  * starts with a unique name that gets associated with that form set.
  *
+ * <p>
  * The file also specifies which collections use which form sets. At a
  * minimum, the definitions file must define a default mapping from the
  * placeholder collection #0 to the distinguished form 'default'. Any
  * collections that use a custom form set are listed paired with the name
  * of the form set they use.
  *
+ * <p>
  * The definitions file also may contain sets of value pairs. Each value pair
  * will contain one string that the user reads, and a paired string that will
  * supply the value stored in the database if its sibling display value gets
  * selected from a choice list.
  *
  * @author Brian S. Hughes
- * @version $Revision$
  */
 
 public class DCInputsReader {
+    /** Logging sink */
+    private static final Logger LOG
+            = LoggerFactory.getLogger(DCInputsReader.class);
+
     /**
      * The ID of the default collection. Will never be the ID of a named
      * collection
@@ -88,8 +98,8 @@ public class DCInputsReader {
     private DCInputSet lastInputSet = null;
 
     /**
-     * Parse an XML encoded submission forms template file, and create a hashmap
-     * containing all the form information. This hashmap will contain three top
+     * Parse an XML encoded submission forms template file, and create a Map
+     * containing all the form information. This Map will contain three top
      * level structures: a map between collections and forms, the definition for
      * each page of each form, and lists of pairs of values that populate
      * selection boxes.
@@ -115,8 +125,8 @@ public class DCInputsReader {
 
     private void buildInputs(String fileName)
         throws DCInputsReaderException {
-        formDefns = new HashMap<String, List<List<Map<String, String>>>>();
-        valuePairs = new HashMap<String, List<String>>();
+        formDefns = new HashMap<>();
+        valuePairs = new HashMap<>();
 
         String uri = "file:" + new File(fileName).getAbsolutePath();
 
@@ -125,14 +135,22 @@ public class DCInputsReader {
             factory.setValidating(false);
             factory.setIgnoringComments(true);
             factory.setIgnoringElementContentWhitespace(true);
+            factory.setNamespaceAware(true);
+            factory.setXIncludeAware(true);
 
             DocumentBuilder db = factory.newDocumentBuilder();
+            if (!db.isXIncludeAware()) {
+                throw new IllegalStateException("XInclude could not be enabled.");
+            }
+            db.setErrorHandler(new DCInputsErrorHandler());
+
             Document doc = db.parse(uri);
             doNodes(doc);
             checkValues();
         } catch (FactoryConfigurationError fe) {
             throw new DCInputsReaderException("Cannot create Submission form parser", fe);
-        } catch (Exception e) {
+        } catch (IOException | ParserConfigurationException
+                | DCInputsReaderException | SAXException e) {
             throw new DCInputsReaderException("Error creating submission forms: " + e);
         }
     }
@@ -152,7 +170,6 @@ public class DCInputsReader {
      * @param collectionHandle collection's unique Handle
      * @return DC input set
      * @throws DCInputsReaderException if no default set defined
-     * @throws ServletException
      */
     public List<DCInputSet> getInputsByCollectionHandle(String collectionHandle)
         throws DCInputsReaderException {
@@ -163,7 +180,7 @@ public class DCInputsReader {
             if (formName == null) {
                 throw new DCInputsReaderException("No form designated as default");
             }
-            List<DCInputSet> results = new ArrayList<DCInputSet>();
+            List<DCInputSet> results = new ArrayList<>();
             for (int idx = 0; idx < config.getNumberOfSteps(); idx++) {
                 SubmissionStepConfig step = config.getStep(idx);
                 if (SubmissionStepConfig.INPUT_FORM_STEP_NAME.equals(step.getType())) {
@@ -185,7 +202,7 @@ public class DCInputsReader {
             if (formName == null) {
                 throw new DCInputsReaderException("No form designated as default");
             }
-            List<DCInputSet> results = new ArrayList<DCInputSet>();
+            List<DCInputSet> results = new ArrayList<>();
             for (int idx = 0; idx < config.getNumberOfSteps(); idx++) {
                 SubmissionStepConfig step = config.getStep(idx);
                 if (SubmissionStepConfig.INPUT_FORM_STEP_NAME.equals(step.getType())) {
@@ -240,7 +257,7 @@ public class DCInputsReader {
     public List<DCInputSet> getAllInputs(Integer limit, Integer offset) throws DCInputsReaderException {
         int idx = 0;
         int count = 0;
-        List<DCInputSet> subConfigs = new LinkedList<DCInputSet>();
+        List<DCInputSet> subConfigs = new LinkedList<>();
         for (String key : formDefns.keySet()) {
             if (offset == null || idx >= offset) {
                 count++;
@@ -311,7 +328,7 @@ public class DCInputsReader {
                 if (formName == null) {
                     throw new SAXException("form element has no name attribute");
                 }
-                List<List<Map<String, String>>> rows = new ArrayList<List<Map<String, String>>>(); // the form
+                List<List<Map<String, String>>> rows = new ArrayList<>(); // the form
                 // contains rows of fields
                 formDefns.put(formName, rows);
                 NodeList pl = nd.getChildNodes();
@@ -319,8 +336,7 @@ public class DCInputsReader {
                 for (int j = 0; j < lenpg; j++) {
                     Node npg = pl.item(j);
                     if (npg.getNodeName().equals("row")) {
-                        List<Map<String, String>> fields = new ArrayList<Map<String, String>>(); // the fields in the
-                        // row
+                        List<Map<String, String>> fields = new ArrayList<>(); // the fields in the row
                         // process each row definition
                         processRow(formName, j, npg, fields);
                         rows.add(fields);
@@ -350,7 +366,7 @@ public class DCInputsReader {
 
             if (npg.getNodeName().equals("field")) {
                 // process each field definition
-                Map<String, String> field = new HashMap<String, String>();
+                Map<String, String> field = new HashMap<>();
                 processField(formName, npg, field);
                 fields.add(field);
                 String key = field.get(PAIR_TYPE_NAME);
@@ -534,7 +550,7 @@ public class DCInputsReader {
      * For each value-pairs element, create a new vector, and extract all
      * the pairs contained within it. Put the display and storage values,
      * respectively, in the next slots in the vector. Store the vector
-     * in the passed in hashmap.
+     * in the Map field of value-pairs vectors.
      */
     private void processValuePairs(Node e)
         throws SAXException {
@@ -553,7 +569,7 @@ public class DCInputsReader {
                         "Missing name attribute for value-pairs for DC term " + dcTerm;
                     throw new SAXException(errString);
                 }
-                List<String> pairs = new ArrayList<String>();
+                List<String> pairs = new ArrayList<>();
                 valuePairs.put(pairsName, pairs);
                 NodeList cl = nd.getChildNodes();
                 int lench = cl.getLength();
@@ -705,4 +721,27 @@ public class DCInputsReader {
         throw new DCInputsReaderException("No field configuration found!");
     }
 
+    /**
+     * Report XML parsing errors.
+     */
+    private class DCInputsErrorHandler
+            implements ErrorHandler {
+        @Override
+        public void warning(SAXParseException saxpe)
+                throws SAXException {
+            LOG.warn(saxpe.getMessage(), saxpe);
+        }
+
+        @Override
+        public void error(SAXParseException saxpe)
+                throws SAXException {
+            LOG.error(saxpe.getMessage(), saxpe);
+        }
+
+        @Override
+        public void fatalError(SAXParseException saxpe)
+                throws SAXException {
+            LOG.error("Fatal:  {}", saxpe.getMessage(), saxpe);
+        }
+    }
 }

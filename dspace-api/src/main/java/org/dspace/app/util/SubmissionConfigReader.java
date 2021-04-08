@@ -8,6 +8,7 @@
 package org.dspace.app.util;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,8 +18,10 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
@@ -46,7 +49,6 @@ import org.xml.sax.SAXException;
  * the name of the item submission process they use.
  *
  * @author Tim Donohue based on DCInputsReader by Brian S. Hughes
- * @version $Revision$
  * @see org.dspace.app.util.SubmissionConfig
  * @see org.dspace.app.util.SubmissionStepConfig
  */
@@ -71,17 +73,17 @@ public class SubmissionConfigReader {
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(SubmissionConfigReader.class);
+    private static final Logger log = LogManager.getLogger();
 
     /**
      * The fully qualified pathname of the directory containing the Item Submission Configuration file
      */
-    private String configDir = DSpaceServicesFactory.getInstance()
+    private final String configDir = DSpaceServicesFactory.getInstance()
                                                     .getConfigurationService().getProperty("dspace.dir")
         + File.separator + "config" + File.separator;
 
     /**
-     * Hashmap which stores which submission process configuration is used by
+     * Stores which submission process configuration is used by
      * which collection, computed from the item submission config file
      * (specifically, the 'submission-map' tag)
      */
@@ -125,17 +127,17 @@ public class SubmissionConfigReader {
     /**
      * Parse an XML encoded item submission configuration file.
      * <P>
-     * Creates two main hashmaps:
+     * Creates two main Maps:
      * <ul>
-     * <li>Hashmap of Collection to Submission definition mappings -
+     * <li>Map of Collection to Submission definition mappings -
      * defines which Submission process a particular collection uses
-     * <li>Hashmap of all Submission definitions.  List of all valid
-     * Submision Processes by name.
+     * <li>Map of all Submission definitions.  List of all valid
+     * Submission Processes by name.
      * </ul>
      */
     private void buildInputs(String fileName) throws SubmissionConfigReaderException {
-        collectionToSubmissionConfig = new HashMap<String, String>();
-        submitDefns = new HashMap<String, List<Map<String, String>>>();
+        collectionToSubmissionConfig = new HashMap<>();
+        submitDefns = new HashMap<>();
 
         String uri = "file:" + new File(fileName).getAbsolutePath();
 
@@ -145,6 +147,8 @@ public class SubmissionConfigReader {
             factory.setValidating(false);
             factory.setIgnoringComments(true);
             factory.setIgnoringElementContentWhitespace(true);
+            factory.setNamespaceAware(true);
+            factory.setXIncludeAware(true);
 
             DocumentBuilder db = factory.newDocumentBuilder();
             Document doc = db.parse(uri);
@@ -152,7 +156,8 @@ public class SubmissionConfigReader {
         } catch (FactoryConfigurationError fe) {
             throw new SubmissionConfigReaderException(
                 "Cannot create Item Submission Configuration parser", fe);
-        } catch (Exception e) {
+        } catch (IOException | ParserConfigurationException
+                | SubmissionConfigReaderException | SAXException e) {
             throw new SubmissionConfigReaderException(
                 "Error creating Item Submission Configuration: " + e);
         }
@@ -175,7 +180,7 @@ public class SubmissionConfigReader {
     public List<SubmissionConfig> getAllSubmissionConfigs(Integer limit, Integer offset) {
         int idx = 0;
         int count = 0;
-        List<SubmissionConfig> subConfigs = new LinkedList<SubmissionConfig>();
+        List<SubmissionConfig> subConfigs = new LinkedList<>();
         for (String key : submitDefns.keySet()) {
             if (offset == null || idx >= offset) {
                 count++;
@@ -199,7 +204,6 @@ public class SubmissionConfigReader {
      *
      * @param collectionHandle collection's unique Handle
      * @return the SubmissionConfig representing the item submission config
-     * @throws SubmissionConfigReaderException if no default submission process configuration defined
      */
     public SubmissionConfig getSubmissionConfigByCollection(String collectionHandle) {
         // get the name of the submission process config for this collection
@@ -330,8 +334,8 @@ public class SubmissionConfigReader {
 
     /**
      * Process the submission-map section of the XML file. Each element looks
-     * like: <name-map collection-handle="hdl" submission-name="name" /> Extract
-     * the collection handle and item submission name, put name in hashmap keyed
+     * like: {@code <name-map collection-handle="hdl" submission-name="name" />}.
+     * Extract the collection handle and item submission name, put name in Map keyed
      * by the collection handle.
      */
     private void processMap(Node e) throws SAXException {
@@ -370,7 +374,7 @@ public class SubmissionConfigReader {
      */
     private void processStepDefinition(Node e) throws SAXException,
         SubmissionConfigReaderException {
-        stepDefns = new HashMap<String, Map<String, String>>();
+        stepDefns = new HashMap<>();
 
         NodeList nl = e.getChildNodes();
         int len = nl.getLength();
@@ -416,7 +420,7 @@ public class SubmissionConfigReader {
     private void processSubmissionDefinition(Node e) throws SAXException,
         SubmissionConfigReaderException {
         int numSubmitProcesses = 0;
-        List<String> submitNames = new ArrayList<String>();
+        List<String> submitNames = new ArrayList<>();
 
         // find all child nodes of the 'submission-definition' node and loop
         // through
@@ -440,7 +444,7 @@ public class SubmissionConfigReader {
                 submitNames.add(submitName);
 
                 // the 'submission-process' definition contains steps
-                List<Map<String, String>> steps = new ArrayList<Map<String, String>>();
+                List<Map<String, String>> steps = new ArrayList<>();
                 submitDefns.put(submitName, steps);
 
                 // loop through all the 'step' nodes of the 'submission-process'
@@ -510,7 +514,7 @@ public class SubmissionConfigReader {
     private Map<String, String> processStepChildNodes(String configSection, Node nStep)
         throws SubmissionConfigReaderException {
         // initialize the HashMap of step Info
-        Map<String, String> stepInfo = new HashMap<String, String>();
+        Map<String, String> stepInfo = new HashMap<>();
 
         NodeList flds = nStep.getChildNodes();
         int lenflds = flds.getLength();
