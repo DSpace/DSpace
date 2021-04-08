@@ -11,7 +11,8 @@ import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.SearchFacetEntryRest;
 import org.dspace.app.rest.model.SearchFacetValueRest;
 import org.dspace.app.rest.model.SearchResultsRest;
@@ -31,9 +32,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class DiscoverFacetsConverter {
 
-    private static final Logger log = Logger.getLogger(DiscoverFacetsConverter.class);
+    private static final Logger log = LogManager.getLogger(DiscoverFacetsConverter.class);
 
-    private DiscoverFacetValueConverter facetValueConverter = new DiscoverFacetValueConverter();
+    private final DiscoverFacetValueConverter facetValueConverter = new DiscoverFacetValueConverter();
 
     @Autowired
     private SearchService searchService;
@@ -56,7 +57,7 @@ public class DiscoverFacetsConverter {
     /**
      * Fill the facet values information in the SearchResultsRest using the information in the api DiscoverResult object
      * according to the configuration applied to the discovery query
-     * 
+     *
      * @param context
      *            The relevant DSpace context
      * @param searchResult
@@ -104,7 +105,7 @@ public class DiscoverFacetsConverter {
 
     /**
      * This method will fill the facetEntry with the appropriate min and max values if they're not empty
-     * 
+     *
      * @param context
      *            The relevant DSpace context
      * @param field

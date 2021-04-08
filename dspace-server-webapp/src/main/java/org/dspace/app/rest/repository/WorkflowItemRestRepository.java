@@ -15,7 +15,8 @@ import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
@@ -70,7 +71,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
 
     public static final String OPERATION_PATH_SECTIONS = "sections";
 
-    private static final Logger log = Logger.getLogger(WorkflowItemRestRepository.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     XmlWorkflowItemService wis;

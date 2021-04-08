@@ -16,7 +16,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.statistics.export.OpenURLTracker;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class OpenUrlServiceImpl implements OpenUrlService {
 
-    private Logger log = Logger.getLogger(OpenUrlService.class);
+    private final Logger log = LogManager.getLogger();
 
     @Autowired
     protected FailedOpenURLTrackerService failedOpenUrlTrackerService;
@@ -38,6 +39,7 @@ public class OpenUrlServiceImpl implements OpenUrlService {
      * @param urlStr - the url to be processed
      * @throws SQLException
      */
+    @Override
     public void processUrl(Context c, String urlStr) throws SQLException {
         log.debug("Prepared to send url to tracker URL: " + urlStr);
 
@@ -107,6 +109,7 @@ public class OpenUrlServiceImpl implements OpenUrlService {
      * @param context
      * @throws SQLException
      */
+    @Override
     public void reprocessFailedQueue(Context context) throws SQLException {
         if (failedOpenUrlTrackerService == null) {
             log.error("Error retrieving the \"failedOpenUrlTrackerService\" instance, aborting the processing");
@@ -124,6 +127,7 @@ public class OpenUrlServiceImpl implements OpenUrlService {
      * @param url
      * @throws SQLException
      */
+    @Override
     public void logfailed(Context context, String url) throws SQLException {
         Date now = new Date();
         if (StringUtils.isBlank(url)) {
