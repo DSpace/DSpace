@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
@@ -388,15 +387,5 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
     void forceDelete(Context context, Relationship relationship, boolean copyToLeftItem, boolean copyToRightItem)
         throws SQLException, AuthorizeException;
 
-    /**
-     * Check if the specified dspaceObject has the requested entity type (or support
-     * it - for collection)
-     *
-     * @param dsObject         the dspace object ot check
-     * @param relationshipType the entity type to check
-     * @return true if the specified dspaceObject has the requested entity type (or
-     *         support it - for collection)
-     */
-    boolean hasRelationshipType(DSpaceObject dsObject, String relationshipType);
 
 }

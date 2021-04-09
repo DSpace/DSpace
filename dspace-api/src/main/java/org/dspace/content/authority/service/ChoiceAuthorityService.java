@@ -190,12 +190,12 @@ public interface ChoiceAuthorityService {
     public void clearCache();
 
     /**
-     * Get the relationship type starting from the metadata field.
+     * Get the entity type starting from the metadata field.
      *
-     * @param field single string identifying metadata field
-     * @return the relationshipType as a String
+     * @param  field single string identifying metadata field
+     * @return       the entity type as a String
      */
-    String getRelationshipType(String fieldKey);
+    String getLinkedEntityType(String fieldKey);
 
     /**
      * Should we store the authority key (if any) for such field key and collection?
@@ -231,10 +231,10 @@ public interface ChoiceAuthorityService {
 
     /**
      * Returns all the configured metadata field that are authority controlled
-     * related to the given relationship type.
+     * related to the given entity type.
      *
-     * @param  relationshipType the relationship type
-     * @return                  the metadata fields
+     * @param  entityType the entity type
+     * @return            the metadata fields
      */
-    public List<String> getAuthorityControlledFieldsByRelationshipType(String relationshipType);
+    public List<String> getAuthorityControlledFieldsByEntityType(String entityType);
 }

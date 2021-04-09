@@ -152,7 +152,7 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
         Iterator<Item> items = itemService.findByAuthorityValue(context, "cris", "owner", null, id.toString());
         while (items.hasNext()) {
             Item item = items.next();
-            if (hasRelationshipTypeMetadataEqualsTo(item, profileType)) {
+            if (hasEntityTypeMetadataEqualsTo(item, profileType)) {
                 return item;
             }
         }
@@ -207,10 +207,10 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
         return item;
     }
 
-    private boolean hasRelationshipTypeMetadataEqualsTo(Item item, String relationshipType) {
+    private boolean hasEntityTypeMetadataEqualsTo(Item item, String entityType) {
         return item.getMetadata().stream().anyMatch(metadataValue -> {
             return "dspace.entity.type".equals(metadataValue.getMetadataField().toString('.')) &&
-                relationshipType.equals(metadataValue.getValue());
+                entityType.equals(metadataValue.getValue());
         });
     }
 

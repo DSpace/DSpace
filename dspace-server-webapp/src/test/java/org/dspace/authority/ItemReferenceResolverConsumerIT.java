@@ -555,10 +555,10 @@ public class ItemReferenceResolverConsumerIT extends AbstractControllerIntegrati
             .andExpect(jsonPath("$.metadata['dc.contributor.author'][0].authority", is(authorUUID)));
     }
 
-    private Collection createCollection(String name, String relationshipType) throws Exception {
+    private Collection createCollection(String name, String entityType) throws Exception {
         return CollectionBuilder.createCollection(context, parentCommunity)
             .withName(name)
-            .withEntityType(relationshipType)
+            .withEntityType(entityType)
             .withSubmitterGroup(submitter)
             .build();
     }

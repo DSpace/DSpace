@@ -484,8 +484,8 @@ public class ReferCrosswalk implements ItemExportCrosswalk {
     }
 
     private boolean hasExpectedEntityType(Item item) {
-        String relationshipType = itemService.getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY);
-        return Objects.equals(relationshipType, entityType);
+        String itemEntityType = itemService.getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY);
+        return Objects.equals(itemEntityType, entityType);
     }
 
     public void setConverter(Converter<String, String> converter) {

@@ -47,11 +47,11 @@ public class EmbeddableGoogleScholarProvider extends AbstractEmbeddableMetricPro
     @Override
     public String innerHtml(Context context, Item item) {
 
-        String relationshipType = this.getRelationshipType(item);
+        String entityType = this.getEntityType(item);
 
         String searchText = calculateSearchText(item);
 
-        String innerHtml = this.getTemplate(relationshipType).replace("{{searchText}}",
+        String innerHtml = this.getTemplate(entityType).replace("{{searchText}}",
             URLEncoder.encode(searchText, Charset.defaultCharset()));
 
         return innerHtml;
@@ -74,8 +74,8 @@ public class EmbeddableGoogleScholarProvider extends AbstractEmbeddableMetricPro
         throw new IllegalStateException();
     }
 
-    protected String getTemplate(String relationshipType) {
-        return relationshipType.equals("Publication") ? PUBLICATION_TEMPLATE : PERSON_TEMPLATE;
+    protected String getTemplate(String entityType) {
+        return entityType.equals("Publication") ? PUBLICATION_TEMPLATE : PERSON_TEMPLATE;
     }
 
     public String getField() {

@@ -20,22 +20,19 @@ import org.dspace.content.authority.service.ItemAuthorityService;
  */
 public class ItemAuthorityServiceFactory {
 
-    private Map<String, ItemAuthorityService> itemAthorityRelationshipTypeMap;
+    private Map<String, ItemAuthorityService> itemAthorityEntityTypeMap;
 
-    public Map<String, ItemAuthorityService> getItemAthorityRelationshipTypeMap() {
-        return itemAthorityRelationshipTypeMap;
+    public Map<String, ItemAuthorityService> getItemAthorityEntityTypeMap() {
+        return itemAthorityEntityTypeMap;
     }
 
-    public void setItemAthorityRelationshipTypeMap(
-            Map<String, ItemAuthorityService> itemAthorityRelationshipTypeMap
-    ) {
-        this.itemAthorityRelationshipTypeMap = itemAthorityRelationshipTypeMap;
+    public void setItemAthorityEntityTypeMap(Map<String, ItemAuthorityService> itemAthorityEntityTypeMap) {
+        this.itemAthorityEntityTypeMap = itemAthorityEntityTypeMap;
     }
 
     public ItemAuthorityService getInstance(String entityType) {
-        return (entityType != null
-                && itemAthorityRelationshipTypeMap.containsKey(entityType))
-                    ? itemAthorityRelationshipTypeMap.get(entityType) :
-                        itemAthorityRelationshipTypeMap.get("default");
+        return (entityType != null && itemAthorityEntityTypeMap.containsKey(entityType))
+            ? itemAthorityEntityTypeMap.get(entityType)
+            : itemAthorityEntityTypeMap.get("default");
     }
 }
