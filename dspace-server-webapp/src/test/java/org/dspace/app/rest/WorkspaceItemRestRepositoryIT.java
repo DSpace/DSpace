@@ -872,7 +872,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmitterGroup(eperson)
                                            .build();
         Collection col2 = CollectionBuilder.createCollection(context, child1)
@@ -941,13 +941,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
                                            .withSubmitterGroup(eperson)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .build();
         Collection col2 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 2")
                                            .withSubmitterGroup(eperson)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .build();
 
@@ -1036,13 +1036,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
         Collection col2 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 2")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
@@ -1156,13 +1156,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
         Collection col2 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 2")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
@@ -1238,13 +1238,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
         Collection col2 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 2")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
@@ -1318,13 +1318,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
         Collection col2 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 2")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
@@ -1400,13 +1400,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
         Collection col2 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 2")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
@@ -1482,13 +1482,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
         Collection col2 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 2")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
@@ -1564,13 +1564,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
         Collection col2 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 2")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
@@ -1722,13 +1722,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
         Collection col2 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 2")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
@@ -1823,7 +1823,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                 .withName("Collection 1")
-                .withRelationshipType("Publication")
+                .withEntityType("Publication")
                 .withSubmissionDefinition("traditional")
                 .withSubmitterGroup(eperson)
                 .build();
@@ -1884,7 +1884,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withTemplateItem()
                                            .withSubmitterGroup(eperson)
@@ -5574,12 +5574,12 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                 .withName("Collection 1")
-                .withRelationshipType("Publication")
+                .withEntityType("Publication")
                 .withSubmitterGroup(eperson)
                 .build();
         Collection col2 = CollectionBuilder.createCollection(context, child1)
                 .withName("Collection 2")
-                .withRelationshipType("Journal")
+                .withEntityType("Journal")
                 .withSubmissionDefinition("traditional")
                 .withSubmitterGroup(eperson)
                 .build();
@@ -5597,7 +5597,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                     .param("projection", "full")
                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
                     .andExpect(status().isCreated())
-                    .andExpect(jsonPath("$._embedded.collection.metadata.['relationship.type'][0].value",
+                    .andExpect(jsonPath("$._embedded.collection.metadata.['dspace.entity.type'][0].value",
                             equalTo("Publication")))
                     .andDo(result -> idRef1.set(read(result.getResponse().getContentAsString(), "$.id")));
 
@@ -5607,7 +5607,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                     .param("entityType", "Journal")
                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
                     .andExpect(status().isCreated())
-                    .andExpect(jsonPath("$._embedded.collection.metadata.['relationship.type'][0].value",
+                    .andExpect(jsonPath("$._embedded.collection.metadata.['dspace.entity.type'][0].value",
                             equalTo("Journal")))
                     .andDo(result -> idRef2.set(read(result.getResponse().getContentAsString(), "$.id")));
 
@@ -5631,7 +5631,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                 .withName("Collection 1")
-                .withRelationshipType("Publication")
+                .withEntityType("Publication")
                 .build();
 
         context.restoreAuthSystemState();
@@ -5667,7 +5667,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                 .withName("Collection 1")
-                .withRelationshipType("Publication")
+                .withEntityType("Publication")
                 .build();
 
         context.restoreAuthSystemState();
@@ -5709,7 +5709,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
             .withName("Collection")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withSubmitterGroup(submitter1, submitter2)
             .withSharedWorkspace()
             .build();
@@ -5788,7 +5788,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
             .withName("Collection")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withSubmitterGroup(submitter1, submitter2)
             .build();
 

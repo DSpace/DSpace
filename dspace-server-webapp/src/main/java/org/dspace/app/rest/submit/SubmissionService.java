@@ -142,16 +142,15 @@ public class SubmissionService {
             } else if (StringUtils.isNotBlank(entityType))  {
                 final String type = entityType;
                 collection = collectionService.findAuthorizedOptimized(context,Constants.ADD).stream()
-                        .filter(coll ->
-                                StringUtils.isBlank(type) ? true : type.equalsIgnoreCase(coll.getRelationshipType()))
-                        .findFirst().orElse(null);
+                    .filter(coll -> StringUtils.isBlank(type) ? true : type.equalsIgnoreCase(coll.getEntityType()))
+                    .findFirst().orElse(null);
             }
 
             if (collection == null) {
                 throw new RESTAuthorizationException("No collection suitable for submission for the current user");
             }
 
-            if (StringUtils.isNotEmpty(entityType) && !collection.getRelationshipType().equalsIgnoreCase(entityType)) {
+            if (StringUtils.isNotEmpty(entityType) && !collection.getEntityType().equalsIgnoreCase(entityType)) {
                 throw new UnprocessableEntityException("Collection relationship type does not match with entity type");
             }
 

@@ -76,7 +76,7 @@ public class XlsCollectionCrosswalkIT extends AbstractIntegrationTestWithDatabas
             .build();
 
         Item firstItem = ItemBuilder.createItem(context, collection)
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withHandle("123456789/001")
             .withTitle("Test Publication")
             .withAlternativeTitle("Alternative publication title")
@@ -109,7 +109,7 @@ public class XlsCollectionCrosswalkIT extends AbstractIntegrationTestWithDatabas
             .build();
 
         Item secondItem = ItemBuilder.createItem(context, collection)
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withHandle("123456789/002")
             .withTitle("Second Publication")
             .withIsbnIdentifier("ISBN-002")
@@ -245,7 +245,7 @@ public class XlsCollectionCrosswalkIT extends AbstractIntegrationTestWithDatabas
             xlsCollectionCrosswalk.setReader(reader);
 
             Item firstPublication = ItemBuilder.createItem(context, collection)
-                .withRelationshipType("Publication")
+                .withEntityType("Publication")
                 .withTitle("First publication")
                 .withTitleForLanguage("Prima pubblicazione", "it")
                 .withTitleForLanguage("Primera publicacion", "es")
@@ -257,13 +257,13 @@ public class XlsCollectionCrosswalkIT extends AbstractIntegrationTestWithDatabas
                 .build();
 
             Item secondPublication = ItemBuilder.createItem(context, collection)
-                .withRelationshipType("Publication")
+                .withEntityType("Publication")
                 .withTitleForLanguage("Second publication", "en")
                 .withIssueDate("2019-01-01")
                 .build();
 
             Item thirdPublication = ItemBuilder.createItem(context, collection)
-                .withRelationshipType("Publication")
+                .withEntityType("Publication")
                 .withTitle("Third publication")
                 .withTitleForLanguage("Terza pubblicazione", "it")
                 .withIssueDate("2018-01-01")
@@ -271,7 +271,7 @@ public class XlsCollectionCrosswalkIT extends AbstractIntegrationTestWithDatabas
                 .build();
 
             Item fourthPublication = ItemBuilder.createItem(context, collection)
-                .withRelationshipType("Publication")
+                .withEntityType("Publication")
                 .withTitle("Fourth publication")
                 .withIssueDate("2017-01-01")
                 .withAuthor("Carl Johnson")

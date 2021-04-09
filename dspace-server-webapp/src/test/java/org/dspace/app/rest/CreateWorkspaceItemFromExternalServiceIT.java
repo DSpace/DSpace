@@ -78,7 +78,7 @@ public class CreateWorkspaceItemFromExternalServiceIT extends AbstractController
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
 
         this.col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                     .withRelationshipType("Person")
+                                     .withEntityType("Person")
                                      .withName("Collection 1").build();
 
         this.col2Scopus = CollectionBuilder.createCollection(context, parentCommunity)

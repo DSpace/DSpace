@@ -197,7 +197,7 @@ public class CrisLayoutTabServiceImpl implements CrisLayoutTabService {
         Item item = Objects.requireNonNull(itemService.find(context, UUID.fromString(itemUuid)),
                                            "The itemUuid entered does not match with any item");
 
-        String entityType  = itemService.getMetadata(item, "relationship.type");
+        String entityType  = itemService.getMetadata(item, "dspace.entity.type");
         if (entityType == null) {
             return Collections.emptyList();
         }

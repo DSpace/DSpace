@@ -2000,7 +2000,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
         Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
             .withName("Collection")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withSubmitterGroup(eperson)
             .withWorkflowGroup(1, admin)
             .withSharedWorkspace()
@@ -2094,7 +2094,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
         Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
             .withName("Collection")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withSubmitterGroup(eperson)
             .withWorkflowGroup(1, admin)
             .build();
@@ -2176,7 +2176,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
         Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
             .withName("Collection")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withSubmitterGroup(eperson)
             .withWorkflowGroup(1, eperson)
             .withSharedWorkspace()
@@ -2270,7 +2270,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
         Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
             .withName("Collection")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withSubmitterGroup(eperson)
             .withWorkflowGroup(1, eperson)
             .build();

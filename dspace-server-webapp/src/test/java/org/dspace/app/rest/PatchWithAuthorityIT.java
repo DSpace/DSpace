@@ -50,7 +50,7 @@ public class PatchWithAuthorityIT extends AbstractControllerIntegrationTest {
 
         Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
             .withName("collection")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .build();
 
         workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection).build();

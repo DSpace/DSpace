@@ -199,8 +199,8 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
         return addMetadataValue("dc", "identifier", "patentno", patentNo);
     }
 
-    public WorkflowItemBuilder withRelationshipType(String entityType) {
-        return addMetadataValue("relationship", "type", null, entityType);
+    public WorkflowItemBuilder withEntityType(String entityType) {
+        return addMetadataValue("dspace", "entity", "type", entityType);
     }
 
     public WorkflowItemBuilder withIdentifierIsi(String isi) {

@@ -5473,7 +5473,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         Collection col1 = CollectionBuilder.createCollection(context, child1)
             .withName("Collection 1")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .build();
 
         Item publicItem1 = ItemBuilder.createItem(context, col1)

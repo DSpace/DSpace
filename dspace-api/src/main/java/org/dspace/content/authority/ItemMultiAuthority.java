@@ -94,7 +94,7 @@ public class ItemMultiAuthority implements ChoiceAuthority {
         String relationshipType = configurationService.getProperty("cris.ItemAuthority."
                 + field + ".relationshipType");
         if (StringUtils.isNotBlank(relationshipType)) {
-            String filter = "relationship.type:" + relationshipType;
+            String filter = "dspace.entity.type:" + relationshipType;
             solrQuery.addFilterQuery(filter);
         }
 

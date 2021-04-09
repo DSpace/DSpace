@@ -356,7 +356,7 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1").build();
 
         Item itemA = ItemBuilder.createItem(context, col1)

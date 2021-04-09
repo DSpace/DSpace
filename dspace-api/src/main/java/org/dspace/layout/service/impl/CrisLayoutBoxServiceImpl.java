@@ -202,7 +202,7 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
         Item item = Objects.requireNonNull(itemService.find(context, itemUuid),
                                            "The item uuid entered does not match with any item");
 
-        String entityType = itemService.getMetadata(item, "relationship.type");
+        String entityType = itemService.getMetadata(item, "dspace.entity.type");
 
         List<CrisLayoutBox> boxes = dao.findByEntityType(context, entityType, tabId, null, null);
         if (CollectionUtils.isEmpty(boxes)) {

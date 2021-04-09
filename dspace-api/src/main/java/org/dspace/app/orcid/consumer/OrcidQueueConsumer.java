@@ -79,7 +79,7 @@ public class OrcidQueueConsumer implements Consumer {
 
     private void consumeItem(Context context, Item item) throws SQLException {
 
-        String relationshipType = getMetadataValue(item, "relationship.type");
+        String relationshipType = getMetadataValue(item, "dspace.entity.type");
         if (relationshipType == null) {
             return;
         }
@@ -120,7 +120,7 @@ public class OrcidQueueConsumer implements Consumer {
             }
 
             Item ownerItem = itemService.findByIdOrLegacyId(context, relatedItemUuid.toString());
-            String ownerType = getMetadataValue(ownerItem, "relationship.type");
+            String ownerType = getMetadataValue(ownerItem, "dspace.entity.type");
             String orcidId = getMetadataValue(ownerItem, "person.identifier.orcid");
             if (!"Person".equals(ownerType) || StringUtils.isEmpty(orcidId)) {
                 continue;

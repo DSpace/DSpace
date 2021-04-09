@@ -7,6 +7,7 @@
  */
 package org.dspace.administer;
 
+import static org.dspace.content.Item.ANY;
 import static org.dspace.content.MetadataSchemaEnum.CRIS;
 import static org.dspace.content.service.DSpaceObjectService.MD_COPYRIGHT_TEXT;
 import static org.dspace.content.service.DSpaceObjectService.MD_INTRODUCTORY_TEXT;
@@ -393,8 +394,7 @@ public class StructBuilder {
             element.addContent(new Element("provenance")
                     .setText(value.getValue()));
         }
-        String entityType = collectionService.getMetadataFirstValue(collection,
-                MetadataSchemaEnum.RELATIONSHIP.getName(), "type", null, Item.ANY);
+        String entityType = collectionService.getMetadataFirstValue(collection, "dspace", "entity", "type", Item.ANY);
         if (StringUtils.isNotBlank(entityType)) {
             element.addContent(new Element("entity-type").setText(entityType));
         }
@@ -841,9 +841,7 @@ public class StructBuilder {
                 element.addContent(sidebarElement);
             }
 
-            String entityType = collectionService.getMetadataFirstValue(collection,
-                    MetadataSchemaEnum.RELATIONSHIP.getName(),
-                    "type", null, Item.ANY);
+            String entityType = collectionService.getMetadataFirstValue(collection, "dspace", "entity", "type", ANY);
             if (StringUtils.isNotBlank(entityType)) {
                 element.addContent(new Element("entity-type").setText(entityType));
             }

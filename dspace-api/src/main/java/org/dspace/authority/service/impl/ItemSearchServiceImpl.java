@@ -108,7 +108,7 @@ public class ItemSearchServiceImpl implements ItemSearchService {
         if (relationshipType == null) {
             return true;
         }
-        return relationshipType.equals(itemService.getMetadataFirstValue(item, "relationship", "type", null, ANY));
+        return relationshipType.equals(itemService.getMetadataFirstValue(item, "dspace", "entity", "type", ANY));
     }
 
 }

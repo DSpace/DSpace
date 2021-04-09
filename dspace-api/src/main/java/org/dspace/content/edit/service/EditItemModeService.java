@@ -23,7 +23,7 @@ import org.dspace.core.Context;
 public interface EditItemModeService {
 
     static final String EDITMODECONF_PREFIX = "edititem.mode.";
-    static final String ETYPE_METADATA = "relationship.type";
+    static final String ETYPE_METADATA = "dspace.entity.type";
 
     /**
      * Finds all edit mode for the given item filtered by logged user privileges

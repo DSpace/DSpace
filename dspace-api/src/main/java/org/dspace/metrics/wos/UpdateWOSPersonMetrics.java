@@ -32,7 +32,7 @@ public class UpdateWOSPersonMetrics extends AbstractUpdateWOSMetrics {
 
     @Override
     public List<String> getFilters() {
-        return Arrays.asList("relationship.type:Person", "person.identifier.orcid:*");
+        return Arrays.asList("dspace.entity.type:Person", "person.identifier.orcid:*");
     }
 
     @Override

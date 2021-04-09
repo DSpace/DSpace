@@ -60,7 +60,7 @@ public class LogicalStatementValidatorIT extends AbstractIntegrationTestWithData
         context.turnOffAuthorisationSystem();
         community = createCommunity(context).build();
         collection = createCollection(context, community)
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withSubmissionDefinition("publication")
             .withAdminGroup(eperson)
             .build();

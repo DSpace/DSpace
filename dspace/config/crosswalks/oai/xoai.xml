@@ -567,7 +567,7 @@
         <CustomCondition id="crisObjectTypeCondition">
             <Class>org.dspace.xoai.filter.DSpaceEntityTypeFilter</Class>
             <Configuration>
-            	<string name="relationShipType">relationship.type</string>
+            	<string name="relationShipType">dspace.entity.type</string>
                 <list name="values">
                     <string>item</string>
                     <string>project</string>
@@ -659,7 +659,7 @@
         <CustomCondition id="publicationSetFilter">
             <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
             <Configuration>
-                <string name="field">relationship.type</string>
+                <string name="field">dspace.entity.type</string>
                 <string name="operator">equal</string>
 				<string name="value">Publications</string>
 			</Configuration>
@@ -667,7 +667,7 @@
         <CustomCondition id="productSetFilter">
             <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
             <Configuration>
-                <string name="field">relationship.type</string>
+                <string name="field">dspace.entity.type</string>
                 <string name="operator">equal</string>
 				<string name="value">Products</string>
             </Configuration>
@@ -675,7 +675,7 @@
         <CustomCondition id="patentSetFilter">
             <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
             <Configuration>
-                <string name="field">relationship.type</string>
+                <string name="field">dspace.entity.type</string>
                 <string name="operator">equal</string>
 				<string name="value">Patents</string>
             </Configuration>
@@ -683,49 +683,49 @@
         <CustomCondition id="researcherSetFilter">
             <Class>org.dspace.xoai.filter.DSpaceEntityTypeFilter</Class>
             <Configuration>
-            	<string name="relationShipType">relationship.type</string>
+            	<string name="relationShipType">dspace.entity.type</string>
                 <string name="value">rp</string>
             </Configuration>
         </CustomCondition>
         <CustomCondition id="orgUnitSetFilter">
             <Class>org.dspace.xoai.filter.DSpaceEntityTypeFilter</Class>
             <Configuration>
-            	<string name="relationShipType">relationship.type</string>
+            	<string name="relationShipType">dspace.entity.type</string>
                 <string name="value">ou</string>
             </Configuration>
         </CustomCondition>
         <CustomCondition id="projectSetFilter">
             <Class>org.dspace.xoai.filter.DSpaceEntityTypeFilter</Class>
             <Configuration>
-            	<string name="relationShipType">relationship.type</string>
+            	<string name="relationShipType">dspace.entity.type</string>
                 <string name="value">project</string>
             </Configuration>
 		</CustomCondition>
         <CustomCondition id="journalSetFilter">
             <Class>org.dspace.xoai.filter.DSpaceEntityTypeFilter</Class>
             <Configuration>
-            	<string name="relationShipType">relationship.type</string>
+            	<string name="relationShipType">dspace.entity.type</string>
                 <string name="value">journals</string>
             </Configuration>
 		</CustomCondition>
         <CustomCondition id="eventSetFilter">
             <Class>org.dspace.xoai.filter.DSpaceEntityTypeFilter</Class>
             <Configuration>
-            	<string name="relationShipType">relationship.type</string>
+            	<string name="relationShipType">dspace.entity.type</string>
                 <string name="value">events</string>
             </Configuration>
 		</CustomCondition>
         <CustomCondition id="equipmentSetFilter">
             <Class>org.dspace.xoai.filter.DSpaceEntityTypeFilter</Class>
             <Configuration>
-            	<string name="relationShipType">relationship.type</string>
+            	<string name="relationShipType">dspace.entity.type</string>
                 <string name="value">equipment</string>
             </Configuration>
 		</CustomCondition>
         <CustomCondition id="fundingSetFilter">
             <Class>org.dspace.xoai.filter.DSpaceEntityTypeFilter</Class>
             <Configuration>
-            	<string name="relationShipType">relationship.type</string>
+            	<string name="relationShipType">dspace.entity.type</string>
                 <string name="value">funding</string>
             </Configuration>
 		</CustomCondition>

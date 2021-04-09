@@ -119,7 +119,7 @@ public class DefaultWorkflowIT extends AbstractControllerIntegrationTest {
 
         Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
             .withName("Collection")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withWorkflowGroup(2, eperson)
             .withSubmitterGroup(eperson)
             .build();
@@ -186,7 +186,7 @@ public class DefaultWorkflowIT extends AbstractControllerIntegrationTest {
 
         Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
             .withName("Collection")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withWorkflowGroup(2, eperson)
             .withSubmitterGroup(eperson)
             .build();
@@ -254,7 +254,7 @@ public class DefaultWorkflowIT extends AbstractControllerIntegrationTest {
 
         Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
             .withName("Collection")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withSubmitterGroup(eperson)
             .build();
 

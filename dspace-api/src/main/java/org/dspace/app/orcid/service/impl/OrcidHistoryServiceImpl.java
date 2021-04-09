@@ -166,7 +166,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         }
 
         Item entity = orcidQueue.getEntity();
-        String entityType = getMetadataValue(entity, "relationship.type");
+        String entityType = getMetadataValue(entity, "dspace.entity.type");
         if (entityType == null) {
             throw new IllegalArgumentException("The related entity item does not have a relationship type");
         }

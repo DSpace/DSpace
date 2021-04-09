@@ -170,7 +170,7 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
 
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
-        discoverQuery.addFilterQueries("relationship.type:" + profileType);
+        discoverQuery.addFilterQueries("dspace.entity.type:" + profileType);
 
         DiscoverResult discoverResult = searchService.search(context, discoverQuery);
         List<IndexableObject> indexableObjects = discoverResult.getIndexableObjects();
@@ -209,7 +209,7 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
 
     private boolean hasRelationshipTypeMetadataEqualsTo(Item item, String relationshipType) {
         return item.getMetadata().stream().anyMatch(metadataValue -> {
-            return "relationship.type".equals(metadataValue.getMetadataField().toString('.')) &&
+            return "dspace.entity.type".equals(metadataValue.getMetadataField().toString('.')) &&
                 relationshipType.equals(metadataValue.getValue());
         });
     }

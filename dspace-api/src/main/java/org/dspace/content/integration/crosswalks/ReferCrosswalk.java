@@ -430,9 +430,9 @@ public class ReferCrosswalk implements ItemExportCrosswalk {
     }
 
     private Iterator<Item> findByRelation(Context context, Item item, String relationName) {
-        String entityType = itemService.getMetadataFirstValue(item, "relationship", "type", null, Item.ANY);
+        String entityType = itemService.getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY);
         if (entityType == null) {
-            log.warn("The item with id " + item.getID() + " has no relationship.type. No related items is found.");
+            log.warn("The item with id " + item.getID() + " has no dspace.entity.type. No related items is found.");
             return emptyIterator();
         }
 
@@ -484,7 +484,7 @@ public class ReferCrosswalk implements ItemExportCrosswalk {
     }
 
     private boolean hasExpectedEntityType(Item item) {
-        String relationshipType = itemService.getMetadataFirstValue(item, "relationship", "type", null, Item.ANY);
+        String relationshipType = itemService.getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY);
         return Objects.equals(relationshipType, entityType);
     }
 

@@ -897,7 +897,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .build();
 
             Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                    .withRelationshipType(entityType)
+                    .withEntityType(entityType)
                     .withName("Collection 1")
                     .withSubmitterGroup(eperson)
                     .build();
@@ -913,7 +913,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.page.totalElements", equalTo(1)))
-                .andExpect(jsonPath("$._embedded.collections[0].metadata['relationship.type'][0].value",
+                .andExpect(jsonPath("$._embedded.collections[0].metadata['dspace.entity.type'][0].value",
                     equalTo(entityType)));
         } finally {
 
@@ -934,12 +934,12 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .build();
 
             Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                    .withRelationshipType(entityType)
+                    .withEntityType(entityType)
                     .withName("Collection 1")
                     .withSubmitterGroup(eperson)
                     .build();
             Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
-                    .withRelationshipType(entityType)
+                    .withEntityType(entityType)
                     .withName("Collection 2")
                     .withSubmitterGroup(eperson)
                     .build();
@@ -2484,17 +2484,17 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                            .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, child1)
-                                           .withRelationshipType(entityType)
+                                           .withEntityType(entityType)
                                            .withName("Test Collection 1")
                                            .withSubmitterGroup(eperson)
                                            .build();
         Collection col2 = CollectionBuilder.createCollection(context, child2)
-                                           .withRelationshipType(entityType)
+                                           .withEntityType(entityType)
                                            .withName("Publication Collection 2")
                                            .withSubmitterGroup(eperson)
                                            .build();
         Collection col3 = CollectionBuilder.createCollection(context, child2)
-                                           .withRelationshipType(entityType)
+                                           .withEntityType(entityType)
                                            .withName("Publication Collection 3")
                                            .withSubmitterGroup(eperson)
                                            .build();
@@ -2530,17 +2530,17 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                            .withName("Parent Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType(entityType)
+                                           .withEntityType(entityType)
                                            .withName("Test Collection 1")
                                            .withSubmitterGroup(eperson)
                                            .build();
         Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType(entityType)
+                                           .withEntityType(entityType)
                                            .withName("Publication Collection 2")
                                            .withSubmitterGroup(eperson)
                                            .build();
         Collection col3 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType(entityType2)
+                                           .withEntityType(entityType2)
                                            .withName("Publication Collection 3")
                                            .withSubmitterGroup(eperson)
                                            .build();
@@ -2601,7 +2601,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
             .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                .withRelationshipType(entityType)
+                .withEntityType(entityType)
                 .withName("Collection 1")
                 .withSubmitterGroup(eperson)
                 .build();

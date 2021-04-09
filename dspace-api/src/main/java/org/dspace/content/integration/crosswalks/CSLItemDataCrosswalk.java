@@ -141,7 +141,7 @@ public class CSLItemDataCrosswalk implements ItemExportCrosswalk {
     }
 
     private boolean isPublication(Item item) {
-        String relationshipType = itemService.getMetadataFirstValue(item, "relationship", "type", null, Item.ANY);
+        String relationshipType = itemService.getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY);
         return Objects.equals(relationshipType, "Publication");
     }
 

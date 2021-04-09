@@ -67,7 +67,7 @@ public class ItemCorrectionFeatureRestIT extends AbstractControllerIntegrationTe
 
         collection = CollectionBuilder.createCollection(context, parentCommunity)
             .withName("Test collection")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .build();
 
         context.restoreAuthSystemState();

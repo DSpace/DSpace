@@ -60,30 +60,30 @@ public class ItemAuthorityIT extends AbstractControllerIntegrationTest {
 
         Item orgUnit_1 = ItemBuilder.createItem(context, col1)
                 .withTitle("OrgUnit_1")
-                .withRelationshipType("orgunit")
+                .withEntityType("orgunit")
                 .build();
 
         Item orgUnit_2 = ItemBuilder.createItem(context, col1)
                 .withTitle("OrgUnit_2")
-                .withRelationshipType("orgunit")
+                .withEntityType("orgunit")
                 .build();
 
         Item author_1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Author 1")
-                .withRelationshipType("person")
+                .withEntityType("person")
                 .withPersonMainAffiliation(orgUnit_1.getName(), orgUnit_1.getID().toString())
                 .build();
 
         Item author_2 = ItemBuilder.createItem(context, col1)
                 .withTitle("Author 2")
                 .withPersonMainAffiliation(orgUnit_1.getName(), orgUnit_1.getID().toString())
-                .withRelationshipType("person")
+                .withEntityType("person")
                 .build();
 
         Item author_3 = ItemBuilder.createItem(context, col1)
                 .withTitle("Author 3")
                 .withPersonMainAffiliation(orgUnit_2.getName(), orgUnit_2.getID().toString())
-                .withRelationshipType("person")
+                .withEntityType("person")
                 .build();
 
         context.restoreAuthSystemState();
@@ -140,25 +140,25 @@ public class ItemAuthorityIT extends AbstractControllerIntegrationTest {
 
        Item orgUnit_1 = ItemBuilder.createItem(context, col1)
                                    .withTitle("OrgUnit_1")
-                                   .withRelationshipType("orgunit")
+                                   .withEntityType("orgunit")
                                    .build();
 
        Item orgUnit_2 = ItemBuilder.createItem(context, col1)
                                    .withTitle("OrgUnit_2")
-                                   .withRelationshipType("orgunit")
+                                   .withEntityType("orgunit")
                                    .build();
 
        Item author_1 = ItemBuilder.createItem(context, col1)
                                   .withTitle("Author 1")
                                   .withPersonMainAffiliation(orgUnit_1.getName(), orgUnit_1.getID().toString())
                                   .withPersonMainAffiliation(orgUnit_2.getName(), orgUnit_2.getID().toString())
-                                  .withRelationshipType("person")
+                                  .withEntityType("person")
                                   .build();
 
        Item author_2 = ItemBuilder.createItem(context, col1)
                                   .withTitle("Author 2")
                                   .withPersonMainAffiliation(orgUnit_2.getName(), orgUnit_2.getID().toString())
-                                  .withRelationshipType("person")
+                                  .withEntityType("person")
                                   .build();
 
        context.restoreAuthSystemState();
@@ -200,7 +200,7 @@ public class ItemAuthorityIT extends AbstractControllerIntegrationTest {
 
        Item author_1 = ItemBuilder.createItem(context, col1)
                                   .withTitle("Author 1")
-                                  .withRelationshipType("person")
+                                  .withEntityType("person")
                                   .build();
 
        context.restoreAuthSystemState();

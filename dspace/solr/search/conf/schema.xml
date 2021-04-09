@@ -377,6 +377,6 @@
  <copyField source="lastModified" dest="lastModified_dt"/>
  <copyField source="title" dest="itemauthoritylookup"/>
  <copyField source="title" dest="itemauthoritylookupexactmatch"/>
- <copyField source="relationship.type" dest="search.entitytype"/>
+ <copyField source="dspace.entity.type" dest="search.entitytype"/>
 
 </schema>

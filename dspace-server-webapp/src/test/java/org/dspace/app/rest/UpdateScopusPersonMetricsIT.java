@@ -83,7 +83,7 @@ public class UpdateScopusPersonMetricsIT extends AbstractControllerIntegrationTe
                                               .withName("Parent Community").build();
 
             Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                               .withRelationshipType("Person")
+                                               .withEntityType("Person")
                                                .withName("Collection 1").build();
 
             itemA = ItemBuilder.createItem(context, col1)
@@ -174,7 +174,7 @@ public class UpdateScopusPersonMetricsIT extends AbstractControllerIntegrationTe
                                               .withName("Parent Community").build();
 
             Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                               .withRelationshipType("Person")
+                                               .withEntityType("Person")
                                                .withName("Collection 1").build();
 
             itemA = ItemBuilder.createItem(context, col1)
@@ -266,7 +266,7 @@ public class UpdateScopusPersonMetricsIT extends AbstractControllerIntegrationTe
                                               .withName("Parent Community").build();
 
             Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                               .withRelationshipType("Person")
+                                               .withEntityType("Person")
                                                .withName("Collection 1").build();
 
             itemA = ItemBuilder.createItem(context, col1)
@@ -326,7 +326,7 @@ public class UpdateScopusPersonMetricsIT extends AbstractControllerIntegrationTe
                                               .withName("Parent Community").build();
 
             Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                               .withRelationshipType("Person")
+                                               .withEntityType("Person")
                                                .withName("Collection 1").build();
 
             itemA = ItemBuilder.createItem(context, col1)
@@ -386,7 +386,7 @@ public class UpdateScopusPersonMetricsIT extends AbstractControllerIntegrationTe
                                               .withName("Parent Community").build();
 
             Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                               .withRelationshipType("Person")
+                                               .withEntityType("Person")
                                                .withName("Collection 1").build();
 
             itemA = ItemBuilder.createItem(context, col1)
@@ -445,7 +445,7 @@ public class UpdateScopusPersonMetricsIT extends AbstractControllerIntegrationTe
                                               .withName("Parent Community").build();
 
             Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                               .withRelationshipType("Person")
+                                               .withEntityType("Person")
                                                .withName("Collection 1").build();
 
             itemA = ItemBuilder.createItem(context, col1)
@@ -500,7 +500,7 @@ public class UpdateScopusPersonMetricsIT extends AbstractControllerIntegrationTe
                                               .withName("Parent Community").build();
 
             Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                               .withRelationshipType("Person")
+                                               .withEntityType("Person")
                                                .withName("Collection 1").build();
 
             itemA = ItemBuilder.createItem(context, col1)
@@ -554,7 +554,7 @@ public class UpdateScopusPersonMetricsIT extends AbstractControllerIntegrationTe
                                               .withName("Parent Community").build();
 
             Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                               .withRelationshipType("Person")
+                                               .withEntityType("Person")
                                                .withName("Collection 1").build();
 
             itemA = ItemBuilder.createItem(context, col1)

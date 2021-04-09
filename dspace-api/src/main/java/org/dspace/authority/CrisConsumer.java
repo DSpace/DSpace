@@ -61,11 +61,11 @@ public class CrisConsumer implements Consumer {
 
     public static final String CONSUMER_NAME = "crisconsumer";
 
-    private final static String NO_RELATIONSHIP_TYPE_FOUND_MSG = "No relationship.type found for field {}";
+    private final static String NO_RELATIONSHIP_TYPE_FOUND_MSG = "No dspace.entity.type found for field {}";
 
-    private final static String ITEM_CREATION_MSG = "Creation of item with relationship.type = {} related to item {}";
+    private final static String ITEM_CREATION_MSG = "Creation of item with dspace.entity.type = {} related to item {}";
 
-    private final static String NO_COLLECTION_FOUND_MSG = "No collection found with relationship.type = {} "
+    private final static String NO_COLLECTION_FOUND_MSG = "No collection found with dspace.entity.type = {} "
             + "for item = {}. No related item will be created.";
 
     private final static String NO_ITEM_FOUND_BY_AUTHORITY_MSG = "No related item found by authority {}";

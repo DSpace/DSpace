@@ -204,7 +204,7 @@ public class CERIFIngestionCrosswalk implements IngestionCrosswalk {
     }
 
     private String getRelationshipType(Item item) {
-        String relationshipType = itemService.getMetadataFirstValue(item, "relationship", "type", null, Item.ANY);
+        String relationshipType = itemService.getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY);
         return StringUtils.isNotBlank(relationshipType) ? relationshipType : "Publication";
     }
 

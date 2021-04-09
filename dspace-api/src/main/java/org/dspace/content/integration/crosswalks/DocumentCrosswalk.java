@@ -137,7 +137,7 @@ public class DocumentCrosswalk implements ItemExportCrosswalk {
     }
 
     private boolean hasExpectedEntityType(Item item) {
-        String relationshipType = itemService.getMetadataFirstValue(item, "relationship", "type", null, Item.ANY);
+        String relationshipType = itemService.getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY);
         return Objects.equals(relationshipType, entityType);
     }
 

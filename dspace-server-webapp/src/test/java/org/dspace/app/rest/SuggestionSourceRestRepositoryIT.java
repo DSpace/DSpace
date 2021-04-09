@@ -41,7 +41,7 @@ public class SuggestionSourceRestRepositoryIT extends AbstractControllerIntegrat
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
         colPeople = CollectionBuilder.createCollection(context, parentCommunity).withName("People")
-                .withRelationshipType("Person").build();
+                .withEntityType("Person").build();
         context.restoreAuthSystemState();
     }
 

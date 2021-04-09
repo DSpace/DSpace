@@ -173,22 +173,22 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
                 .build();
             Collection col1 =
                 CollectionBuilder.createCollection(context, parentCommunity)
-                        .withRelationshipType("JournalIssue")
+                        .withEntityType("JournalIssue")
                         .withSubmitterGroup(eperson)
                         .withName("Collection 1")
                         .build();
             Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
-                    .withRelationshipType("Publication")
+                    .withEntityType("Publication")
                     .withSubmitterGroup(eperson)
                      .withName("Collection 2")
                     .build();
             Collection col3 = CollectionBuilder.createCollection(context, parentCommunity)
-                    .withRelationshipType("Project")
+                    .withEntityType("Project")
                     .withSubmitterGroup(eperson)
                     .withName("Collection 3")
                     .build();
             Collection col4 = CollectionBuilder.createCollection(context, parentCommunity)
-                    .withRelationshipType("Journal")
+                    .withEntityType("Journal")
                     .withSubmitterGroup(eperson)
                     .withName("Collection 4")
                     .build();

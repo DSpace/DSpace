@@ -121,7 +121,7 @@ public class ItemSearcherByMetadata implements ItemSearcher, ItemReferenceResolv
     private void resolveReferences(Context context, List<MetadataValue> metadataValues, Item item)
         throws SQLException, AuthorizeException {
 
-        String relationshipType = itemService.getMetadataFirstValue(item, "relationship", "type", null, Item.ANY);
+        String relationshipType = itemService.getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY);
 
         List<String> authorities = metadataValues.stream()
             .map(MetadataValue::getValue)

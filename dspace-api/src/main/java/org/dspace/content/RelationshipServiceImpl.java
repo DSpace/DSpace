@@ -753,7 +753,7 @@ public class RelationshipServiceImpl implements RelationshipService {
     @Override
     public boolean hasRelationshipType(DSpaceObject dsObject, String relationshipType) {
         return dsObject.getMetadata().stream().anyMatch(metadataValue -> {
-            return "relationship.type".equals(metadataValue.getMetadataField().toString('.')) &&
+            return "dspace.entity.type".equals(metadataValue.getMetadataField().toString('.')) &&
                     relationshipType.equals(metadataValue.getValue());
         });
     }

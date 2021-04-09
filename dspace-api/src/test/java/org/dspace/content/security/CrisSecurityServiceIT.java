@@ -57,7 +57,7 @@ public class CrisSecurityServiceIT extends AbstractIntegrationTestWithDatabase {
 
         collection = CollectionBuilder.createCollection(context, parentCommunity)
             .withName("Test collection")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .build();
 
         owner = EPersonBuilder.createEPerson(context)

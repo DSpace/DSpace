@@ -53,17 +53,17 @@ public class DiscoveryRelatedBoxComponentIT extends AbstractControllerIntegratio
                 .withName("Sub Community")
                 .build();
         Collection colPeople = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withRelationshipType("Person").build();
+                .withEntityType("Person").build();
         Collection colPub = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
-                .withRelationshipType("Publication").build();
+                .withEntityType("Publication").build();
 
         Item firstPerson = createItem(context, colPeople)
-                .withRelationshipType("Person")
+                .withEntityType("Person")
                 .withTitle("Smith, Donald")
                 .build();
 
         Item secondPerson = createItem(context, colPeople)
-                .withRelationshipType("Person")
+                .withEntityType("Person")
                 .withTitle("Smith, Maria")
                 .build();
 

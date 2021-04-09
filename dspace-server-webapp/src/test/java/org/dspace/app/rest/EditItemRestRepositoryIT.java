@@ -59,7 +59,7 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1")
                                            .build();
 
@@ -113,7 +113,7 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1")
                                            .build();
 
@@ -148,7 +148,7 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                                           .withName("Parent Community").build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1").build();
 
         Item itemA = ItemBuilder.createItem(context, col1)
@@ -195,7 +195,7 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                                           .withName("Parent Community").build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1").build();
 
         Item itemA = ItemBuilder.createItem(context, col1)
@@ -242,7 +242,7 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                                           .withName("Parent Community").build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1").build();
 
         Item itemA = ItemBuilder.createItem(context, col1)
@@ -295,7 +295,7 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                                           .withName("Parent Community").build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1").build();
 
         Item itemA = ItemBuilder.createItem(context, col1)
@@ -337,7 +337,7 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                                           .withName("Parent Community").build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1").build();
 
         Item itemA = ItemBuilder.createItem(context, col1)
@@ -379,7 +379,7 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                                           .withName("Parent Community").build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1").build();
 
         Item itemA = ItemBuilder.createItem(context, col1)
@@ -421,7 +421,7 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                                           .withName("Parent Community").build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1").build();
 
         Item itemA = ItemBuilder.createItem(context, col1)
@@ -459,7 +459,7 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                                           .withName("Parent Community").build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1").build();
 
         Item itemA = ItemBuilder.createItem(context, col1)
@@ -497,7 +497,7 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                                           .withName("Parent Community").build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1").build();
 
         Item itemA = ItemBuilder.createItem(context, col1)
@@ -536,7 +536,7 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1")
                                            .build();
 
@@ -566,7 +566,7 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1")
                                            .build();
 
@@ -599,7 +599,7 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1")
                                            .build();
 
@@ -639,7 +639,7 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1")
                                            .build();
 
@@ -673,7 +673,7 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1")
                                            .build();
 
@@ -723,7 +723,7 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1")
                                            .build();
 
@@ -770,7 +770,7 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                                           .withName("Parent Community").build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1").build();
 
         Item itemA = ItemBuilder.createItem(context, col1)
@@ -819,7 +819,7 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                                           .withName("Parent Community").build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1").build();
 
         Item itemA = ItemBuilder.createItem(context, col1)
@@ -878,7 +878,7 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                                           .withName("Parent Community").build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1").build();
 
         Item itemA = ItemBuilder.createItem(context, col1)
@@ -943,7 +943,7 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                                           .withName("Parent Community").build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1").build();
 
         Item itemA = ItemBuilder.createItem(context, col1)

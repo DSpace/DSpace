@@ -46,7 +46,7 @@ public class UpdateScopusMetrics implements MetricsExternalServices {
 
     @Override
     public List<String> getFilters() {
-        return Arrays.asList("relationship.type:Publication", "dc.identifier.doi:* OR dc.identifier.pmid:*");
+        return Arrays.asList("dspace.entity.type:Publication", "dc.identifier.doi:* OR dc.identifier.pmid:*");
     }
 
     @Override

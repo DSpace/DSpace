@@ -226,7 +226,7 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         Item project = ItemBuilder.createItem(context, collection)
-            .withRelationshipType("Project")
+            .withEntityType("Project")
             .withTitle("Test Project")
             .withInternalId("111-222-333")
             .withAcronym("TP")
@@ -235,7 +235,7 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .build();
 
         ItemBuilder.createItem(context, collection)
-            .withRelationshipType("Funding")
+            .withEntityType("Funding")
             .withTitle("Test Funding")
             .withType("Internal Funding")
             .withFunder("Test Funder")
@@ -243,7 +243,7 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .build();
 
         Item funding = ItemBuilder.createItem(context, collection)
-            .withRelationshipType("Funding")
+            .withEntityType("Funding")
             .withTitle("Another Test Funding")
             .withType("Contract")
             .withFunder("Another Test Funder")
@@ -251,7 +251,7 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .build();
 
         Item publication = ItemBuilder.createItem(context, collection)
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withTitle("Test Publication")
             .withAlternativeTitle("Alternative publication title")
             .withRelationPublication("Published in publication")
@@ -298,13 +298,13 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         Item coordinator = ItemBuilder.createItem(context, collection)
-            .withRelationshipType("OrgUnit")
+            .withEntityType("OrgUnit")
             .withTitle("Coordinator OrgUnit")
             .withAcronym("COU")
             .build();
 
         Item project = ItemBuilder.createItem(context, collection)
-            .withRelationshipType("Project")
+            .withEntityType("Project")
             .withAcronym("TP")
             .withTitle("Test Project")
             .withOpenaireId("11-22-33")
@@ -332,7 +332,7 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .build();
 
         ItemBuilder.createItem(context, collection)
-            .withRelationshipType("Funding")
+            .withEntityType("Funding")
             .withTitle("Test funding")
             .withType("Award")
             .withFunder("OrgUnit Funder")
@@ -340,7 +340,7 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .build();
 
         ItemBuilder.createItem(context, collection)
-            .withRelationshipType("Funding")
+            .withEntityType("Funding")
             .withTitle("Another Test funding")
             .withType("Award")
             .withFunder("Another OrgUnit Funder")
@@ -367,7 +367,7 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         Item equipment = ItemBuilder.createItem(context, collection)
-            .withRelationshipType("Equipment")
+            .withEntityType("Equipment")
             .withAcronym("T-EQ")
             .withTitle("Test Equipment")
             .withInternalId("ID-01")
@@ -396,13 +396,13 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         Item parent = ItemBuilder.createItem(context, collection)
-            .withRelationshipType("OrgUnit")
+            .withEntityType("OrgUnit")
             .withAcronym("POU")
             .withTitle("Parent OrgUnit")
             .build();
 
         Item orgUnit = ItemBuilder.createItem(context, collection)
-            .withRelationshipType("OrgUnit")
+            .withEntityType("OrgUnit")
             .withAcronym("TOU")
             .withTitle("Test OrgUnit")
             .withOrgUnitLegalName("Test OrgUnit LegalName")
@@ -415,13 +415,13 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .build();
 
         ItemBuilder.createItem(context, collection)
-            .withRelationshipType("Person")
+            .withEntityType("Person")
             .withTitle("Walter White")
             .withPersonAffiliationName("Test OrgUnit", orgUnit.getID().toString())
             .build();
 
         ItemBuilder.createItem(context, collection)
-            .withRelationshipType("Person")
+            .withEntityType("Person")
             .withTitle("Jesse Pinkman")
             .withPersonAffiliationName("Test OrgUnit", orgUnit.getID().toString())
             .build();
@@ -446,7 +446,7 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         Item funding = ItemBuilder.createItem(context, collection)
-            .withRelationshipType("Funding")
+            .withEntityType("Funding")
             .withAcronym("T-FU")
             .withTitle("Test Funding")
             .withType("Gift")
@@ -478,7 +478,7 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
     private Item buildPersonItem() {
         Item item = createItem(context, collection)
-            .withRelationshipType("Person")
+            .withEntityType("Person")
             .withTitle("John Smith")
             .withFullName("John Smith")
             .withVariantName("J.S.")

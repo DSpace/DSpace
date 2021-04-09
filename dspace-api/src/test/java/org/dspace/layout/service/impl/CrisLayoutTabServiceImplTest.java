@@ -109,7 +109,7 @@ public class CrisLayoutTabServiceImplTest {
         when(itemService.find(context, UUID.fromString(itemUuid)))
             .thenReturn(item);
 
-        when(itemService.getMetadata(item, "relationship.type"))
+        when(itemService.getMetadata(item, "dspace.entity.type"))
             .thenReturn(entityType);
 
         when(item.getMetadata()).thenReturn(itemMetadata);
@@ -134,7 +134,7 @@ public class CrisLayoutTabServiceImplTest {
         when(itemService.find(context, UUID.fromString(itemUuid)))
             .thenReturn(item);
 
-        when(itemService.getMetadata(item, "relationship.type"))
+        when(itemService.getMetadata(item, "dspace.entity.type"))
             .thenReturn(entityType);
 
         when(tabDao.findByEntityType(context, entityType)).thenReturn(emptyList());
@@ -154,7 +154,7 @@ public class CrisLayoutTabServiceImplTest {
         when(itemService.find(context, UUID.fromString(itemUuid)))
             .thenReturn(item);
 
-        when(itemService.getMetadata(item, "relationship.type"))
+        when(itemService.getMetadata(item, "dspace.entity.type"))
             .thenReturn(entityType);
 
         when(tabDao.findByEntityType(context, entityType)).thenReturn(null);

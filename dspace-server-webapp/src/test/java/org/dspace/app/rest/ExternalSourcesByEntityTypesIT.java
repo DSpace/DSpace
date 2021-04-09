@@ -81,11 +81,11 @@ public class ExternalSourcesByEntityTypesIT extends AbstractControllerIntegratio
         // 1. A community-collection structure with one parent community with
         // sub-community and one collection.
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
-        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withRelationshipType("OrgUnit")
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withEntityType("OrgUnit")
                 .withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
-                .withRelationshipType("Publication").withSubmitterGroup(eperson).withName("Collection 2").build();
-        Collection col3 = CollectionBuilder.createCollection(context, parentCommunity).withRelationshipType("Project")
+                .withEntityType("Publication").withSubmitterGroup(eperson).withName("Collection 2").build();
+        Collection col3 = CollectionBuilder.createCollection(context, parentCommunity).withEntityType("Project")
                 .withSubmitterGroup(eperson).withName("Collection 3").build();
 
         context.restoreAuthSystemState();
