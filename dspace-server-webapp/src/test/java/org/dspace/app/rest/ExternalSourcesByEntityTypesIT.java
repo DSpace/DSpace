@@ -54,9 +54,10 @@ public class ExternalSourcesByEntityTypesIT extends AbstractControllerIntegratio
             .andExpect(jsonPath("$._embedded.externalsources", Matchers.contains(
                 ExternalSourceMatcher.matchExternalSource("mock", "mock", false),
                 ExternalSourceMatcher.matchExternalSource("orcid", "orcid", false),
-                ExternalSourceMatcher.matchExternalSource("suggestion", "suggestion", false)
+                ExternalSourceMatcher.matchExternalSource("suggestion", "suggestion", false),
+                ExternalSourceMatcher.matchExternalSource("openaire", "openaire", false)
             )))
-            .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
+            .andExpect(jsonPath("$.page.totalElements", Matchers.is(4)));
     }
 
     @Test
