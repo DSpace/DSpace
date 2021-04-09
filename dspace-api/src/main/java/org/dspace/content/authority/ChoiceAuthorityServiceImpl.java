@@ -162,9 +162,11 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
                                 String locale) {
         ChoiceAuthority ma = getAuthorityByFieldKeyCollection(fieldKey, collection);
         if (ma == null) {
-            throw new IllegalArgumentException(
-                "No choices plugin was configured for  field \"" + fieldKey
-                    + "\", collection=" + collection.getID().toString() + ".");
+            String errorMessage = "No choices plugin was configured for  field \"" + fieldKey + "\"";
+            if (collection != null) {
+                errorMessage = errorMessage + ", collection=" + collection.getID().toString();
+            }
+            throw new IllegalArgumentException(errorMessage);
         }
         return ma.getBestMatch(query, locale);
     }

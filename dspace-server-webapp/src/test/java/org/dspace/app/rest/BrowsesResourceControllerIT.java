@@ -36,6 +36,7 @@ import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.hamcrest.Matchers;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -236,6 +237,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
     }
 
     @Test
+    @Ignore
     public void findBrowseBySubjectEntriesWithAuthority() throws Exception {
         configurationService.setProperty("choices.plugin.dc.subject",
                                          "SolrSubjectAuthority");

@@ -54,6 +54,17 @@
 
     <!-- Settings for how updates are done internally -->
     <updateHandler class="solr.DirectUpdateHandler2">
+    	
+    	<!-- Enables a transaction log, used for real-time get, durability, and
+         and solr cloud replica recovery.  The log can grow as big as
+         uncommitted changes to the index, so use of a hard autoCommit
+         is recommended (see below).
+         "dir" - the target directory for transaction logs, defaults to the
+                solr data directory.  --> 
+	    <updateLog>
+	      <str name="dir">${solr.ulog.dir:}</str>
+	    </updateLog>
+    
         <!-- How often should commits be done automatically -->
         <autoCommit>
             <maxDocs>10000</maxDocs> <!--Commit every 10.000 documents-->

@@ -16,6 +16,7 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
+@Ignore
 public class OpenAIREProjectAuthorityIT extends AbstractControllerIntegrationTest {
 
     @Autowired
