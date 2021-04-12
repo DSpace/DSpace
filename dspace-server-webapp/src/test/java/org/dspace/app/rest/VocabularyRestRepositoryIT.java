@@ -57,11 +57,7 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
     public void setup() throws Exception {
         super.setUp();
         configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority",
-                new String[] {
-                        "org.dspace.content.authority.SolrAuthority = SolrAuthorAuthority",
-                        "org.dspace.content.authority.SHERPARoMEOPublisher = SRPublisher",
-                        "org.dspace.content.authority.SHERPARoMEOJournalTitle = SRJournalTitle"
-                });
+                "org.dspace.content.authority.SolrAuthority = SolrAuthorAuthority");
 
         configurationService.setProperty("solr.authority.server",
                 "${solr.server}/authority");

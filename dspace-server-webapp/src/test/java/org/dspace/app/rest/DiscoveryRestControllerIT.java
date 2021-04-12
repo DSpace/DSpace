@@ -286,7 +286,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                    .andExpect(jsonPath("$.name", is("author")))
                    //Because we've constructed such a structure so that we have more than 2 (size) subjects, there
                    // needs to be a next link
-                   .andExpect(jsonPath("$._links.next.href", containsString("api/discover/facets/author?page")))
+                   .andExpect(jsonPath("$._links.next.href",
+                       containsString("api/discover/facets/author?configuration=defaultConfiguration&page")))
                    //There always needs to be a self link
                    .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets/author")))
                    //Because there are more subjects than is represented (because of the size param), hasMore has to
@@ -774,7 +775,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets/author?scope=testScope")))
                 .andExpect(jsonPath("$._links.next.href",
-                     containsString("api/discover/facets/author?scope=testScope&page=1&size=2")))
+                    containsString(
+                        "api/discover/facets/author?scope=testScope&configuration=defaultConfiguration&page=1&size=2")))
                 //These are the values that need to be present as it's ordered by count and these authors are the
                 // most common ones in the items that we've created
                 .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
@@ -5869,11 +5871,14 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                    .andExpect(jsonPath("$.name", is("author")))
                    .andExpect(jsonPath("$.facetType", is("text")))
                    .andExpect(jsonPath("$.scope", is(emptyOrNullString())))
-                   .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets/author?query=Donald")))
+                   .andExpect(jsonPath("$._links.self.href",
+                       containsString("api/discover/facets/author?query=Donald&configuration=defaultConfiguration")))
                    .andExpect(jsonPath("$._embedded.values[0].label", is("Smith, Donald")))
                    .andExpect(jsonPath("$._embedded.values[0].count", is(1)))
                    .andExpect(jsonPath("$._embedded.values[0]._links.search.href",
-                        containsString("api/discover/search/objects?query=Donald&f.author=Smith, Donald,equals")))
+                        containsString(
+                            "api/discover/search/objects?query=Donald&configuration=defaultConfiguration"
+                            + "&f.author=Smith, Donald,equals")))
                    .andExpect(jsonPath("$._embedded.values").value(Matchers.hasSize(1)));
 
     }
@@ -5922,11 +5927,14 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                    .andExpect(jsonPath("$.facetType", is("date")))
                    .andExpect(jsonPath("$.scope", is(emptyOrNullString())))
                    .andExpect(jsonPath("$._links.self.href",
-                        containsString("api/discover/facets/dateIssued?dsoType=Item")))
+                        containsString(
+                            "api/discover/facets/dateIssued?dsoType=Item&configuration=defaultConfiguration")))
                    .andExpect(jsonPath("$._embedded.values[0].label", is("2017 - 2020")))
                    .andExpect(jsonPath("$._embedded.values[0].count", is(3)))
                    .andExpect(jsonPath("$._embedded.values[0]._links.search.href",
-                        containsString("api/discover/search/objects?dsoType=Item&f.dateIssued=[2017 TO 2020],equals")))
+                        containsString(
+                            "api/discover/search/objects?dsoType=Item&configuration=defaultConfiguration"
+                                + "&f.dateIssued=[2017 TO 2020],equals")))
                    .andExpect(jsonPath("$._embedded.values").value(Matchers.hasSize(1)));
 
     }

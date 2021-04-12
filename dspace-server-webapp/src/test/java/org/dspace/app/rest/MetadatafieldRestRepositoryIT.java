@@ -1014,7 +1014,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
                    .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItems(
                               MetadataFieldMatcher.matchMetadataFieldByKeys("creativework","publisher", null),
                               MetadataFieldMatcher.matchMetadataFieldByKeys("creativeworkseries", "issn", null),
-                              MetadataFieldMatcher.matchMetadataFieldByKeys("dc", "contributor", null)
+                              MetadataFieldMatcher.matchMetadataFieldByKeys("cris", "author", "orcid")
                               )))
                    .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
                            Matchers.containsString("/api/core/metadatafields?"),
