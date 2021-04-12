@@ -76,6 +76,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.RestMediaTypes;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -2350,9 +2351,11 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(status().isOk())
             .andDo(r -> taskId.set(read(r.getResponse().getContentAsString(), "$._embedded.pooltasks[0].id")));
 
-        getClient(authToken).perform(post("/api/workflow/pooltasks/{id}", taskId.get())
-            .contentType("application/x-www-form-urlencoded"))
-            .andExpect(status().isNoContent());
+        getClient(authToken).perform(post("/api/workflow/claimedtasks")
+            .contentType(RestMediaTypes.TEXT_URI_LIST)
+            .content("/api/workflow/pooltasks/" + taskId.get()))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$", Matchers.allOf(hasJsonPath("$.type", is("claimedtask")))));
 
         getClient(authToken).perform(get("/api/workflow/claimedtasks/search/findByUser")
             .param("uuid", user.getID().toString()))

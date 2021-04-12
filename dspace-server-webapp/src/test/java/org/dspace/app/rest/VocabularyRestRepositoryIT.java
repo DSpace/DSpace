@@ -57,7 +57,11 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
     public void setup() throws Exception {
         super.setUp();
         configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority",
-                "org.dspace.content.authority.SolrAuthority = SolrAuthorAuthority");
+                new String[] {
+                        "org.dspace.content.authority.SolrAuthority = SolrAuthorAuthority",
+                        "org.dspace.content.authority.SHERPARoMEOPublisher = SRPublisher",
+                        "org.dspace.content.authority.SHERPARoMEOJournalTitle = SRJournalTitle"
+                });
 
         configurationService.setProperty("solr.authority.server",
                 "${solr.server}/authority");
@@ -139,11 +143,13 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                      VocabularyMatcher.matchProperties("SolrAuthorAuthority", "SolrAuthorAuthority", false , false),
                      VocabularyMatcher.matchProperties("patent_types", "patent_types", true , false),
                      VocabularyMatcher.matchProperties("types", "types", false , true),
-                     VocabularyMatcher.matchProperties("gender", "gender", true , false)
+                     VocabularyMatcher.matchProperties("gender", "gender", true , false),
+                     VocabularyMatcher.matchProperties("SRPublisher", "SRPublisher", false , false),
+                     VocabularyMatcher.matchProperties("SRJournalTitle", "SRJournalTitle", false , false)
                  )))
         .andExpect(jsonPath("$._links.self.href",
             Matchers.containsString("api/submission/vocabularies")))
-        .andExpect(jsonPath("$.page.totalElements", is(7)));
+        .andExpect(jsonPath("$.page.totalElements", is(9)));
     }
 
     @Test

@@ -371,7 +371,7 @@ public class StatisticsRestSearchByCategoryRepositoryIT extends AbstractControll
                             TOP_COUNTRIES_REPORT_ID),
                 UsageReportMatcher
                     .matchUsageReport(publicationItem.getID() + "_" + TOP_CITIES_REPORT_ID,
-                            TOP_CITIES_REPORT_ID, "chart.bar"),
+                            TOP_CITIES_REPORT_ID, "table"),
                 UsageReportMatcher
                     .matchUsageReport(publicationItem.getID() + "_" + TOTAL_DOWNLOADS_REPORT_ID,
                             TOTAL_DOWNLOADS_REPORT_ID, Arrays.asList(getDownloadPoint(bitstreamVisited, 3)))
