@@ -17,8 +17,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.function.Supplier;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -238,6 +240,21 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     public List<MetadataValue> addMetadata(Context context, T dso, MetadataField metadataField, String lang,
                                            List<String> values, List<String> authorities, List<Integer> confidences)
         throws SQLException {
+
+        //Set place to list length of all metadatavalues for the given schema.element.qualifier combination.
+        // Subtract one to adhere to the 0 as first element rule
+        final Supplier<Integer> placeSupplier =  () ->
+            this.getMetadata(dso, metadataField.getMetadataSchema().getName(), metadataField.getElement(),
+                metadataField.getQualifier(), Item.ANY).size() - 1;
+
+        return addMetadata(context, dso, metadataField, lang, values, authorities, confidences, placeSupplier);
+
+    }
+
+    public List<MetadataValue> addMetadata(Context context, T dso, MetadataField metadataField, String lang,
+            List<String> values, List<String> authorities, List<Integer> confidences, Supplier<Integer> placeSupplier)
+                    throws SQLException {
+
         boolean authorityControlled = metadataAuthorityService.isAuthorityControlled(metadataField);
         boolean authorityRequired = metadataAuthorityService.isAuthorityRequired(metadataField);
         List<MetadataValue> newMetadata = new ArrayList<>(values.size());
@@ -252,11 +269,8 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             }
             MetadataValue metadataValue = metadataValueService.create(context, dso, metadataField);
             newMetadata.add(metadataValue);
-            //Set place to list length of all metadatavalues for the given schema.element.qualifier combination.
-            // Subtract one to adhere to the 0 as first element rule
-            metadataValue.setPlace(
-                this.getMetadata(dso, metadataField.getMetadataSchema().getName(), metadataField.getElement(),
-                                 metadataField.getQualifier(), Item.ANY).size() - 1);
+
+            metadataValue.setPlace(placeSupplier.get());
 
             metadataValue.setLanguage(lang == null ? null : lang.trim());
 
@@ -359,7 +373,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     public MetadataValue addMetadata(Context context, T dso, String schema, String element, String qualifier,
                             String lang, String value, String authority, int confidence) throws SQLException {
         return addMetadata(context, dso, schema, element, qualifier, lang, Arrays.asList(value),
-                Arrays.asList(authority), Arrays.asList(confidence)).get(0);
+                Arrays.asList(authority), Arrays.asList(confidence)).stream().findFirst().orElse(null);
     }
 
     @Override
@@ -803,6 +817,14 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     @Override
     public void setMetadataModified(T dso) {
         dso.setMetadataModified();
+    }
+
+    @Override
+    public MetadataValue addMetadata(Context context, T dso, String schema, String element, String qualifier,
+            String lang, String value, String authority, int confidence, int place) throws SQLException {
+
+        throw new NotImplementedException();
+
     }
 
 }
