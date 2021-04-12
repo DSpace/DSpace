@@ -33,7 +33,6 @@
              If you are using that demo dataset, you can simply uncomment the below configuration to enable Entity
              submission into all of the above Collections.
         -->
-        <!--
         <name-map collection-handle="123456789/3" submission-name="Publication"/>
         <name-map collection-handle="123456789/4" submission-name="Publication"/>
         <name-map collection-handle="123456789/281" submission-name="Publication"/>
@@ -46,7 +45,6 @@
         <name-map collection-handle="123456789/28" submission-name="Journal"/>
         <name-map collection-handle="123456789/29" submission-name="JournalVolume"/>
         <name-map collection-handle="123456789/30" submission-name="JournalIssue"/>
-        -->
     </submission-map>
 
 
