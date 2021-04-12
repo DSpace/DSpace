@@ -17,6 +17,15 @@ public class PlainMetadataKeyValueItem {
     private String key;
     private String value;
 
+    public PlainMetadataKeyValueItem(String key, String value) {
+        this.key = key;
+        this.value = value;
+    }
+
+    public PlainMetadataKeyValueItem() {
+
+    }
+
     /*
      * In a key-value items, like PlainMetadata, this method get the item's key
      */
