@@ -73,7 +73,7 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
         context.turnOffAuthorisationSystem();
         Item item = createItem(context, collection)
             .withTitle("Publication title")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withIssueDate("2018-05-17")
             .withAuthor("John Smith")
             .withAuthor("Edward Red")
@@ -96,7 +96,7 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
 
         Item firstItem = createItem(context, collection)
             .withTitle("Publication title")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withIssueDate("2018-05-17")
             .withAuthor("John Smith")
             .withAuthor("Edward Red")
@@ -105,7 +105,7 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
 
         Item secondItem = createItem(context, collection)
             .withTitle("Test publication")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withIssueDate("2020-01-31")
             .withAuthor("Walter White")
             .build();
@@ -127,7 +127,7 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
         context.turnOffAuthorisationSystem();
 
         Item item = createItem(context, collection)
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withType("Controlled Vocabulary for Resource Type Genres::text::periodical::journal")
             .withLanguage("en")
             .withDoiIdentifier("10.1000/182")
@@ -165,7 +165,7 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
         context.turnOffAuthorisationSystem();
 
         Item item = createItem(context, collection)
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withType("Controlled Vocabulary for Resource Type Genres::text::periodical::journal")
             .withLanguage("en")
             .withDoiIdentifier("10.1000/182")
@@ -203,7 +203,7 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
         context.turnOffAuthorisationSystem();
 
         Item item = createItem(context, collection)
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withType("Controlled Vocabulary for Resource Type Genres::text::periodical::journal")
             .withLanguage("en")
             .withDoiIdentifier("10.1000/182")
@@ -223,7 +223,7 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
             .build();
 
         Item anotherItem = createItem(context, collection)
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withType("Controlled Vocabulary for Resource Type Genres::text::book")
             .withLanguage("en")
             .withDoiIdentifier("10.1000/183")
@@ -244,6 +244,55 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
         try (FileInputStream fis = getFileInputStream("publications.json")) {
             String expectedJson = IOUtils.toString(fis, Charset.defaultCharset());
             compareEachLine(out.toString(), expectedJson, true);
+        }
+    }
+
+    @Test
+    public void testMutlipleItemsApaDisseminate() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Item item = createItem(context, collection)
+            .withEntityType("Publication")
+            .withType("Controlled Vocabulary for Resource Type Genres::text::periodical::journal")
+            .withLanguage("en")
+            .withDoiIdentifier("10.1000/182")
+            .withIsbnIdentifier("11-22-33")
+            .withIssnIdentifier("0002")
+            .withSubject("publication")
+            .withPublisher("Publisher")
+            .withVolume("V01")
+            .withIssue("03")
+            .withRelationConference("Conference")
+            .withTitle("Publication title")
+            .withIssueDate("2018-05-17")
+            .withAuthor("Smith, John")
+            .withAuthor("Red, Edward")
+            .withEditor("Editor")
+            .withHandle("123456789/0001")
+            .build();
+
+        Item anotherItem = createItem(context, collection)
+            .withEntityType("Publication")
+            .withType("Controlled Vocabulary for Resource Type Genres::text::book")
+            .withLanguage("en")
+            .withDoiIdentifier("10.1000/183")
+            .withTitle("Another Publication title")
+            .withIssueDate("2020-01-01")
+            .withAuthor("White, Walter")
+            .withHandle("123456789/0002")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        StreamDisseminationCrosswalk crosswalk = crosswalkMapper.getByType("publication-apa");
+        assertThat(crosswalk, notNullValue());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        crosswalk.disseminate(context, Arrays.asList(item, anotherItem).iterator(), out);
+
+        try (FileInputStream fis = getFileInputStream("apa.txt")) {
+            String expectedContent = IOUtils.toString(fis, Charset.defaultCharset());
+            compareEachLine(out.toString(), expectedContent, true);
         }
     }
 

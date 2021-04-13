@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -27,6 +28,7 @@ public class RegistrationRest extends RestAddressableModel {
     private String email;
     private UUID user;
 
+    private List<UUID> groups;
     /**
      * Generic getter for the email
      * @return the email value of this RegisterRest
@@ -57,6 +59,14 @@ public class RegistrationRest extends RestAddressableModel {
      */
     public void setUser(UUID user) {
         this.user = user;
+    }
+
+    public List<UUID> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<UUID> groups) {
+        this.groups = groups;
     }
 
     @Override

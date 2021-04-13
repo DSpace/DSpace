@@ -40,13 +40,11 @@ import org.dspace.batch.ImpBitstream;
 import org.dspace.batch.ImpBitstreamMetadatavalue;
 import org.dspace.batch.ImpMetadatavalue;
 import org.dspace.batch.ImpRecord;
-import org.dspace.batch.ImpRecordToItem;
 import org.dspace.batch.ImpWorkflowNState;
 import org.dspace.batch.service.ImpBitstreamMetadatavalueService;
 import org.dspace.batch.service.ImpBitstreamService;
 import org.dspace.batch.service.ImpMetadatavalueService;
 import org.dspace.batch.service.ImpRecordService;
-import org.dspace.batch.service.ImpRecordToItemService;
 import org.dspace.batch.service.ImpServiceFactory;
 import org.dspace.batch.service.ImpWorkflowNStateService;
 import org.dspace.content.AdditionalMetadataUpdateProcessPlugin;
@@ -68,7 +66,6 @@ import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
-import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -143,7 +140,6 @@ public class ItemImportOA {
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    private MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
     private MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance()
             .getMetadataSchemaService();
     private BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
@@ -170,7 +166,6 @@ public class ItemImportOA {
     private ImpMetadatavalueService impMetadatavalueService = ImpServiceFactory.getInstance()
             .getImpMetadatavalueService();
     private ImpRecordService impRecordService = ImpServiceFactory.getInstance().getImpRecordService();
-    private ImpRecordToItemService impRecordToItemService = ImpServiceFactory.getInstance().getImpRecordToItemService();
     private ImpWorkflowNStateService impWorkflowNStateService = ImpServiceFactory.getInstance()
             .getImpWorkflowNStateService();
     private InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
@@ -403,30 +398,12 @@ public class ItemImportOA {
             context.turnOffAuthorisationSystem();
             if (command.equals("add")) {
                 item_id = myLoader.addItem(context, mycollections, impRecord, handle, clearOldBitstream);
-                ImpRecordToItem impRecordToItem = null;
-
-                if (StringUtils.isNotBlank(myLoader.getSourceRef())) {
-                    impRecordToItem = new ImpRecordToItem();
-                    impRecordToItem.setImpRecordId(imp_record_id);
-                    impRecordToItem.setImpItemId(item_id);
-                    impRecordToItem.setImpSourceref(myLoader.getSourceRef());
-                } else {
-                    impRecordToItem = new ImpRecordToItem();
-                    impRecordToItem.setImpRecordId(imp_record_id);
-                    impRecordToItem.setImpItemId(item_id);
-                }
-                impRecordToItem = impRecordToItemService.create(context, impRecordToItem);
             } else if (command.equals("replace")) {
                 myLoader.replaceItems(context, mycollections, imp_record_id, item_id, impRecord, clearOldBitstream);
             } else if (command.equals("delete")) {
                 Item item = itemService.find(context, item_id);
                 if (item != null) {
                     ItemUtils.removeOrWithdrawn(context, item);
-                }
-                if (command.equals("delete") && (item == null || !item.isWithdrawn())) {
-                    ImpRecordToItem impRecordToItem = impRecordToItemService.findByPK(context, imp_record_id);
-                    impRecordToItemService.delete(context, impRecordToItem);
-                    impRecordToItem = null;
                 }
             }
             impRecord.setLastModified(new Date());
@@ -653,7 +630,7 @@ public class ItemImportOA {
     }
 
     private void addCrisSourceId(Context c, Item item, ImpRecord impRecord) throws SQLException {
-        String sourceId = impRecord.getImpRecordId() + AuthorityValueService.SPLIT + impRecord.getImpSourceref();
+        String sourceId = impRecord.getImpSourceref() + AuthorityValueService.SPLIT + impRecord.getImpRecordId();
         itemService.addMetadata(c, item, CRIS.getName(), "sourceId", null, null, sourceId);
     }
 

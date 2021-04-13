@@ -76,7 +76,7 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1")
                                            .build();
 
@@ -159,7 +159,7 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1")
                                            .build();
 
@@ -251,7 +251,7 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1")
                                            .build();
 
@@ -359,7 +359,7 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1")
                                            .build();
 
@@ -472,7 +472,7 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1")
                                            .build();
 
@@ -610,7 +610,7 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1")
                                            .build();
 
@@ -702,7 +702,7 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1")
                                            .build();
 
@@ -814,7 +814,7 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1")
                                            .build();
 
@@ -912,7 +912,7 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1")
                                            .build();
 
@@ -1013,7 +1013,7 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1")
                                            .build();
 
@@ -1120,7 +1120,7 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1")
                                            .build();
 
@@ -1234,7 +1234,7 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1")
                                            .build();
 
@@ -1379,7 +1379,7 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1")
                                            .build();
 
@@ -1490,7 +1490,7 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1")
                                            .build();
 
@@ -1603,7 +1603,7 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1")
                                            .build();
 
@@ -1733,7 +1733,7 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1").build();
 
         Item itemA = ItemBuilder.createItem(context, col1)
@@ -1886,7 +1886,7 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1").build();
 
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
@@ -1929,8 +1929,19 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                                 hasJsonPath("$['dc.contributor.author'][0].value", is("Smith, Donald")),
                                 hasJsonPath("$['dc.contributor.author'][1].value", is("Doe, John")),
                                 hasJsonPath("$['dc.date.issued'][0].value", is("2017-10-17")),
-                                hasJsonPath("$['dc.title'][0].value", is("Title Workspace 1"))
+                                hasJsonPath("$['dc.title'][0].value", is("Title Workspace 1")),
+                                hasJsonPath("$['dspace.entity.type'][0].value", is("Publication"))
                                 )));
+
+        Item item = witem.getItem();
+        // dc.date.issued should be hidden
+        getClient(token).perform(get("/api/core/items/" + item.getID()))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$.metadata['dc.title'].[0].value",
+                                       is ("Title Workspace 1")))
+                               .andExpect(jsonPath("$.metadata['dspace.entity.type'].[0].value",
+                                       is ("Publication")))
+                               .andExpect(jsonPath("$.metadata['dc.date.issued']").doesNotExist());
     }
 
     @Test
@@ -1946,7 +1957,7 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1")
                                            .withWorkflowGroup(1, admin).build();
 
@@ -1990,8 +2001,19 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                                     hasJsonPath("$['dc.contributor.author'][0].value", is("Smith, Donald")),
                                     hasJsonPath("$['dc.contributor.author'][1].value", is("Doe, John")),
                                     hasJsonPath("$['dc.date.issued'][0].value", is("2017-10-17")),
-                                    hasJsonPath("$['dc.title'][0].value", is("Workflow Item 1"))
+                                    hasJsonPath("$['dc.title'][0].value", is("Workflow Item 1")),
+                                    hasJsonPath("$['dspace.entity.type'][0].value", is("Publication"))
                                     )));
+
+        Item item = witem.getItem();
+        // dc.date.issued should be hidden
+        getClient(authToken).perform(get("/api/core/items/" + item.getID()))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$.metadata['dc.title'].[0].value",
+                                       is ("Workflow Item 1")))
+                               .andExpect(jsonPath("$.metadata['dspace.entity.type'].[0].value",
+                                       is ("Publication")))
+                               .andExpect(jsonPath("$.metadata['dc.date.issued']").doesNotExist());
     }
 
     @Test
@@ -2004,7 +2026,7 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1")
                                            .build();
 

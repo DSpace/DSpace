@@ -1,5 +1,5 @@
 <Fundings>
-	<Funding id="mock-id">
+	<Funding xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
 		<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#Gift</Type>	
 		<Name>Test Funding</Name>
 		<Acronym>T-FU</Acronym>
@@ -23,7 +23,7 @@
 			URL="www.mandate.url" 
 		/>
 	</Funding>
-	<Funding id="mock-id">
+	<Funding xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
 		<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#Grant</Type>	
 		<Name>Another Test Funding</Name>
 		<Acronym>AT-FU</Acronym>

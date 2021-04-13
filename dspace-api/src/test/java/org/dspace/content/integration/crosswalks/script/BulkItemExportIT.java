@@ -10,6 +10,7 @@ package org.dspace.content.integration.crosswalks.script;
 import static org.dspace.app.launcher.ScriptLauncher.handleScript;
 import static org.dspace.builder.CollectionBuilder.createCollection;
 import static org.dspace.builder.CommunityBuilder.createCommunity;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasItem;
@@ -17,7 +18,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,9 +31,13 @@ import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.WorkflowItemBuilder;
+import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
+import org.dspace.workflow.WorkflowItem;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -55,7 +59,7 @@ public class BulkItemExportIT extends AbstractIntegrationTestWithDatabase {
     public void beforeTests() throws SQLException, AuthorizeException {
         context.turnOffAuthorisationSystem();
         community = createCommunity(context).build();
-        collection = createCollection(context, community).withAdminGroup(eperson).build();
+        collection = createCollection(context, community).withAdminGroup(eperson).withWorkflowGroup(1, eperson).build();
         context.restoreAuthSystemState();
     }
 
@@ -235,19 +239,19 @@ public class BulkItemExportIT extends AbstractIntegrationTestWithDatabase {
 
         ItemBuilder.createItem(context, collection)
             .withTitle("Edward Red")
-            .withRelationshipType("Person")
+            .withEntityType("Person")
             .withPersonMainAffiliation("4Science", orgUnitId)
             .build();
 
         ItemBuilder.createItem(context, collection)
             .withTitle("John Smith")
-            .withRelationshipType("Person")
+            .withEntityType("Person")
             .withPersonMainAffiliation("4Science", orgUnitId)
             .build();
 
         ItemBuilder.createItem(context, collection)
             .withTitle("Walter White")
-            .withRelationshipType("Person")
+            .withEntityType("Person")
             .withPersonMainAffiliation("Company")
             .build();
 
@@ -431,11 +435,96 @@ public class BulkItemExportIT extends AbstractIntegrationTestWithDatabase {
         assertThat(errorMessages.get(0), containsString("The entity type must be provided"));
     }
 
+    @Test
+    public void testBulkItemExportWithWorkspaceAndWorkflowItemsAndDefaultConfiguration() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        createItem(collection, "Edward Red", "Science", "Person");
+        createItem(collection, "Company", "", "OrgUnit");
+        createWorkspaceItem(collection, "Edward Smith", "Science", "Person");
+        createItem(collection, "John Smith", "Software", "Person");
+        createWorkflowItem(collection, "Edward White", "Science", "Person");
+        context.restoreAuthSystemState();
+        context.commit();
+
+        File xml = new File("person.xml");
+        xml.deleteOnExit();
+
+        String[] args = new String[] { "bulk-item-export", "-t", "Person", "-f", "person-xml", "-q", "Edward" };
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+
+        handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
+
+        assertThat(handler.getErrorMessages(), empty());
+        assertThat(handler.getInfoMessages(), hasItem("Found 1 items to export"));
+        assertThat("The xml file should be created", xml.exists(), is(true));
+
+        try (FileInputStream fis = new FileInputStream(xml)) {
+            String content = IOUtils.toString(fis, Charset.defaultCharset());
+            assertThat(content, containsString("<preferred-name>Edward Red</preferred-name>"));
+            assertThat(content, not(containsString("<preferred-name>Edward Smith</preferred-name>")));
+            assertThat(content, not(containsString("<preferred-name>Edward White</preferred-name>")));
+            assertThat(content, not(containsString("<preferred-name>John Smith</preferred-name>")));
+            assertThat(content, not(containsString("<preferred-name>Company</preferred-name>")));
+        }
+    }
+
+    @Test
+    public void testBulkItemExportWithWorkspaceAndWorkflowItemsAndWorkspaceConfiguration() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        createItem(collection, "Edward Red", "Science", "Person");
+        createItem(collection, "Company", "", "OrgUnit");
+        createWorkspaceItem(collection, "Edward Smith", "Science", "Person");
+        createItem(collection, "John Smith", "Software", "Person");
+        createWorkflowItem(collection, "Edward White", "Science", "Person");
+        context.restoreAuthSystemState();
+        context.commit();
+
+        File xml = new File("person.xml");
+        xml.deleteOnExit();
+
+        String[] args = new String[] { "bulk-item-export", "-t", "Person", "-f", "person-xml",
+            "-q", "Edward", "-c", "workspace" };
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+
+        handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
+
+        assertThat(handler.getErrorMessages(), empty());
+        assertThat(handler.getInfoMessages(), hasItem("Found 3 items to export"));
+        assertThat("The xml file should be created", xml.exists(), is(true));
+
+        try (FileInputStream fis = new FileInputStream(xml)) {
+            String content = IOUtils.toString(fis, Charset.defaultCharset());
+            assertThat(content, containsString("<preferred-name>Edward Red</preferred-name>"));
+            assertThat(content, containsString("<preferred-name>Edward Smith</preferred-name>"));
+            assertThat(content, containsString("<preferred-name>Edward White</preferred-name>"));
+            assertThat(content, not(containsString("<preferred-name>John Smith</preferred-name>")));
+            assertThat(content, not(containsString("<preferred-name>Company</preferred-name>")));
+        }
+    }
+
     private Item createItem(Collection collection, String title, String subject, String entityType) {
         return ItemBuilder.createItem(context, collection)
             .withTitle(title)
             .withSubject(subject)
-            .withRelationshipType(entityType)
+            .withEntityType(entityType)
+            .build();
+    }
+
+    private WorkspaceItem createWorkspaceItem(Collection collection, String title, String subject, String entityType) {
+        return WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+            .withTitle(title)
+            .withSubject(subject)
+            .withEntityType(entityType)
+            .build();
+    }
+
+    private WorkflowItem createWorkflowItem(Collection collection, String title, String subject, String entityType) {
+        return WorkflowItemBuilder.createWorkflowItem(context, collection)
+            .withTitle(title)
+            .withSubject(subject)
+            .withEntityType(entityType)
             .build();
     }
 }

@@ -22,24 +22,27 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataExportCli"/>
     </bean>
 
-    <bean id="curate" class="org.dspace.curate.CurationCliScriptConfiguration">
-        <property name="description" value="Curation tasks"/>
-        <property name="dspaceRunnableClass" value="org.dspace.curate.CurationCli"/>
+    <bean id="curate"
+          class="org.dspace.curate.CurationCliScriptConfiguration">
+        <property name="description"
+                  value="Curation tasks"/>
+        <property name="dspaceRunnableClass"
+                  value="org.dspace.curate.CurationCli"/>
     </bean>
 
     <bean id="retry-tracker" class="org.dspace.statistics.export.RetryFailedOpenUrlTrackerScriptConfiguration" scope="prototype">
         <property name="description" value="Retry all failed commits to the OpenURLTracker"/>
         <property name="dspaceRunnableClass" value="org.dspace.statistics.export.RetryFailedOpenUrlTracker"/>
     </bean>
+    
+    <bean id="metadata-deletion" class="org.dspace.app.bulkedit.MetadataDeletionCliScriptConfiguration">
+        <property name="description" value="Delete all the values of the specified metadata field"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataDeletionCli"/>
+    </bean>
 
     <bean id="another-mock-script" class="org.dspace.scripts.MockDSpaceRunnableScriptConfiguration" scope="prototype">
         <property name="description" value="Mocking a script for testing purposes" />
         <property name="dspaceRunnableClass" value="org.dspace.scripts.impl.MockDSpaceRunnableScript"/>
-    </bean>
-
-    <bean id="metadata-deletion" class="org.dspace.app.bulkedit.MetadataDeletionCliScriptConfiguration">
-        <property name="description" value="Delete all the values of the specified metadata field"/>
-        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataDeletionCli"/>
     </bean>
     
     <bean id="bulk-import" class="org.dspace.app.bulkedit.BulkImportCliScriptConfiguration">
@@ -56,11 +59,31 @@
         <property name="description" value="Perform the multiple items export in the given format"/>
         <property name="dspaceRunnableClass" value="org.dspace.content.integration.crosswalks.script.BulkItemExportCli"/>
     </bean>
+    
+    <bean id="collection-export" class="org.dspace.app.bulkedit.CollectionExportCliScriptConfiguration">
+        <property name="description" value="Perform the export of all the archived items of the given collection in xls format"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.CollectionExportCli"/>
+    </bean>
+
+    <bean id="update-metrics" class="org.dspace.metrics.UpdateCrisMetricsWithExternalSourceCliScriptConfiguration">
+        <property name="description" value="Perform the metrics update using external source"/>
+        <property name="dspaceRunnableClass" value="org.dspace.metrics.UpdateCrisMetricsWithExternalSourceCli"/>
+    </bean>
+
+    <bean id="update-metrics-in-solr" class="org.dspace.metrics.UpdateCrisMetricsInSolrDocCliScriptConfiguration">
+        <property name="description" value="Perform the metrics update in SOLR documents"/>
+        <property name="dspaceRunnableClass" value="org.dspace.metrics.UpdateCrisMetricsInSolrDocCli"/>
+    </bean>
+
+    <bean id="import-publications" class="org.dspace.script2externalservices.CreateWorkspaceItemWithExternalSourceCliScriptConfiguration">
+        <property name="description" value="Perform the creating of workspace item using external source"/>
+        <property name="dspaceRunnableClass" value="org.dspace.script2externalservices.CreateWorkspaceItemWithExternalSourceCli"/>
+    </bean>
 
     <!-- Keep as last script; for test ScriptRestRepository#findOneScriptByNameTest -->
     <bean id="mock-script" class="org.dspace.scripts.MockDSpaceRunnableScriptConfiguration" scope="prototype">
         <property name="description" value="Mocking a script for testing purposes" />
         <property name="dspaceRunnableClass" value="org.dspace.scripts.impl.MockDSpaceRunnableScript"/>
     </bean>
-    
+
 </beans>

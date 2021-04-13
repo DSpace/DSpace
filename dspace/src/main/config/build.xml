@@ -63,6 +63,7 @@ Common usage:
     <property name="local-config" value="config/local.cfg" />
     <!-- Next, the default dspace.cfg -->
     <property name="config" value="config/dspace.cfg" />
+    <property name="irus-config" value="config/modules/irus-statistics.cfg" />
 
     <!-- Give user a chance to override without editing this file
        (and without typing -D each time s/he compiles it) -->
@@ -73,6 +74,7 @@ Common usage:
          we load the local.cfg FIRST, so that its settings are used by default. -->
     <property file="${local-config}" />
     <property file="${config}" />
+    <property file="${irus-config}" />
 
     <!-- Timestamp date used when creating backup directories -->
     <tstamp>

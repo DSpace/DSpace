@@ -112,7 +112,7 @@ public class Context implements AutoCloseable {
     /**
      * Context mode
      */
-    private Mode mode = Mode.READ_WRITE;
+    private Mode mode;
 
     /**
      * Cache that is only used the context is in READ_ONLY mode
@@ -130,7 +130,6 @@ public class Context implements AutoCloseable {
     }
 
     protected Context(EventService eventService, DBConnection dbConnection) {
-        this.mode = Mode.READ_WRITE;
         this.eventService = eventService;
         this.dbConnection = dbConnection;
         init();
@@ -142,7 +141,6 @@ public class Context implements AutoCloseable {
      * No user is authenticated.
      */
     public Context() {
-        this.mode = Mode.READ_WRITE;
         init();
     }
 
@@ -187,7 +185,10 @@ public class Context implements AutoCloseable {
 
         authStateChangeHistory = new Stack<>();
         authStateClassCallHistory = new Stack<>();
-        setMode(this.mode);
+
+        if (this.mode != null) {
+            setMode(this.mode);
+        }
     }
 
     /**
@@ -528,6 +529,36 @@ public class Context implements AutoCloseable {
     }
 
     /**
+     * Rollback the current transaction with the database, without persisting any
+     * pending changes. The database connection is not closed and can be reused
+     * afterwards.
+     *
+     * <b>WARNING: After calling this method all previously fetched entities are
+     * "detached" (pending changes are not tracked anymore). You have to reload all
+     * entities you still want to work with manually after this method call (see
+     * {@link Context#reloadEntity(ReloadableEntity)}).</b>
+     *
+     * @throws SQLException When rollbacking the transaction in the database fails.
+     */
+    public void rollback() throws SQLException {
+        // If Context is no longer open/valid, just note that it has already been closed
+        if (!isValid()) {
+            log.info("abort() was called on a closed Context object. No changes to abort.");
+            return;
+        }
+
+        try {
+            // Rollback ONLY if we have a database transaction, and it is NOT Read Only
+            if (!isReadOnly() && isTransactionAlive()) {
+                dbConnection.rollback();
+                reloadContextBoundEntities();
+            }
+        } finally {
+            events = null;
+        }
+    }
+
+    /**
      * Close the context, without committing any of the changes performed using
      * this context. The database connection is freed. No exception is thrown if
      * there is an error freeing the database connection, since this method may
@@ -760,15 +791,6 @@ public class Context implements AutoCloseable {
 
         //save the new mode
         mode = newMode;
-    }
-
-    /**
-     * The current database mode of this context.
-     *
-     * @return The current mode
-     */
-    public Mode getCurrentMode() {
-        return mode;
     }
 
     /**

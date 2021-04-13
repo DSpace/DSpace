@@ -95,7 +95,7 @@ public class CrisLayoutMetadataConfigurationRest extends BaseObjectRest<Integer>
         private String style;
         private String styleLabel;
         private String styleValue;
-
+        private MetadataGroup metadataGroup;
         public String getMetadata() {
             return metadata;
         }
@@ -190,6 +190,13 @@ public class CrisLayoutMetadataConfigurationRest extends BaseObjectRest<Integer>
         public void setStyleValue(String styleValue) {
             this.styleValue = styleValue;
         }
+
+        public void setMetadataGroup(MetadataGroup metadataGroup) {
+            this.metadataGroup = metadataGroup;
+        }
+        public MetadataGroup getMetadataGroup() {
+            return this.metadataGroup;
+        }
     }
 
     public static final class Bitstream {
@@ -214,5 +221,26 @@ public class CrisLayoutMetadataConfigurationRest extends BaseObjectRest<Integer>
         public void setMetadataValue(String metadataValue) {
             this.metadataValue = metadataValue;
         }
+    }
+    public static final class MetadataGroup {
+        private String leading;
+        private List<Field> elements;
+
+        public String getLeading() {
+            return leading;
+        }
+
+        public List<Field> getElements() {
+            return elements;
+        }
+
+        public void setElements(List<Field> elements) {
+            this.elements = elements;
+        }
+
+        public void setLeading(String leading) {
+            this.leading = leading;
+        }
+
     }
 }

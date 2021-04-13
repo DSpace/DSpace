@@ -45,6 +45,7 @@ public class CrisLayoutBoxRest extends BaseObjectRest<Integer> {
     private Integer security;
     private String boxType;
     private Boolean clear;
+    private Integer maxColumns;
 
     /* (non-Javadoc)
      * @see org.dspace.app.rest.model.RestModel#getType()
@@ -186,5 +187,13 @@ public class CrisLayoutBoxRest extends BaseObjectRest<Integer> {
 
     public void setClear(Boolean clear) {
         this.clear = clear;
+    }
+
+    public Integer getMaxColumns() {
+        return maxColumns;
+    }
+
+    public void setMaxColumns(Integer maxColumns) {
+        this.maxColumns = maxColumns;
     }
 }

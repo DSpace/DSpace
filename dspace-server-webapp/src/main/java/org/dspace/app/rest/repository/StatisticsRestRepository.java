@@ -53,7 +53,7 @@ public class StatisticsRestRepository extends DSpaceRestRepository<UsageReportRe
         try {
             DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, uuidObject);
             if (dso == null) {
-                throw new IllegalArgumentException("No DSO found with uuid: " + uuidObject);
+                return null;
             }
             usageReportRest = usageReportUtils.createUsageReport(context, dso, reportId);
 
@@ -66,16 +66,19 @@ public class StatisticsRestRepository extends DSpaceRestRepository<UsageReportRe
     @PreAuthorize("hasPermission(#uri, 'usagereportsearch', 'READ')")
     @SearchRestMethod(name = "object")
     public Page<UsageReportRest> findByObject(@Parameter(value = "uri", required = true) String uri,
-                                              Pageable pageable) {
+            @Parameter(value = "category") String category, Pageable pageable) {
         UUID uuid = UUID.fromString(StringUtils.substringAfterLast(uri, "/"));
         List<UsageReportRest> usageReportsOfItem = null;
         try {
             Context context = obtainContext();
             DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, uuid);
             if (dso == null) {
-                throw new IllegalArgumentException("No DSO found with uuid: " + uuid);
+                return null;
             }
-            usageReportsOfItem = usageReportUtils.getUsageReportsOfDSO(context, dso);
+            if (category != null && !usageReportUtils.categoryExists(dso, category)) {
+                throw new IllegalArgumentException("The specified category doesn't exists: " + category);
+            }
+            usageReportsOfItem = usageReportUtils.getUsageReportsOfDSO(context, dso, category);
         } catch (SQLException | ParseException | SolrServerException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

@@ -31,19 +31,21 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
+import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.CrosswalkMode;
 import org.dspace.content.crosswalk.CrosswalkObjectNotSupported;
-import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
 import org.dspace.content.integration.crosswalks.model.TabularTemplateLine;
 import org.dspace.content.integration.crosswalks.virtualfields.VirtualField;
 import org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldMapper;
+import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -52,13 +54,13 @@ import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Abstract class that implements {@StreamDisseminationCrosswalk} that provided common logic to
- * export items in tabular format.
+ * Abstract class that implements {@link ItemExportCrosswalk} that provided
+ * common logic to export items in tabular format.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public abstract class TabularCrosswalk implements StreamDisseminationCrosswalk, FileNameDisseminator {
+public abstract class TabularCrosswalk implements ItemExportCrosswalk {
 
     private static Logger log = Logger.getLogger(TabularCrosswalk.class);
 
@@ -67,6 +69,9 @@ public abstract class TabularCrosswalk implements StreamDisseminationCrosswalk, 
 
     @Autowired
     protected ItemService itemService;
+
+    @Autowired
+    protected CollectionService collectionService;
 
     @Autowired
     protected VirtualFieldMapper virtualFieldMapper;
@@ -192,7 +197,7 @@ public abstract class TabularCrosswalk implements StreamDisseminationCrosswalk, 
             .collect(Collectors.toList());
     }
 
-    private List<String> getRow(Context context, DSpaceObject dso) throws CrosswalkObjectNotSupported {
+    private List<String> getRow(Context context, DSpaceObject dso) throws CrosswalkObjectNotSupported, SQLException {
         if (dso.getType() != Constants.ITEM) {
             throw new CrosswalkObjectNotSupported("Can only crosswalk an Item.");
         }
@@ -211,7 +216,8 @@ public abstract class TabularCrosswalk implements StreamDisseminationCrosswalk, 
             .collect(Collectors.toList());
     }
 
-    private List<String> getMetadataValuesForLine(Context context, TabularTemplateLine line, Item item) {
+    private List<String> getMetadataValuesForLine(Context context, TabularTemplateLine line, Item item)
+        throws SQLException {
         if (line.isVirtualField()) {
             return getVirtualFieldValues(context, line, item);
         } else if (line.isMetadataGroupField()) {
@@ -227,10 +233,12 @@ public abstract class TabularCrosswalk implements StreamDisseminationCrosswalk, 
         return values != null ? Arrays.asList(values) : Collections.emptyList();
     }
 
-    private List<String> getMetadataGroupValues(Context context, TabularTemplateLine line, Item item) {
+    private List<String> getMetadataGroupValues(Context context, TabularTemplateLine line, Item item)
+        throws SQLException {
+
         String metadataGroupFieldName = line.getMetadataGroupFieldName();
 
-        List<String> metadataGroup = getMetadataGroup(item, metadataGroupFieldName);
+        List<String> metadataGroup = getMetadataGroup(context, item, metadataGroupFieldName);
         if (CollectionUtils.isEmpty(metadataGroup)) {
             return new ArrayList<>();
         }
@@ -278,11 +286,15 @@ public abstract class TabularCrosswalk implements StreamDisseminationCrosswalk, 
         return newValue.equals(value) ? value : removeLastSeparators(newValue, separator);
     }
 
-    private List<String> getMetadataGroup(Item item, String groupName) {
+    private List<String> getMetadataGroup(Context context, Item item, String groupName) throws SQLException {
         try {
-            String submissionName = this.submissionConfigReader
-                .getSubmissionConfigByCollection(item.getOwningCollection()).getSubmissionName();
-            String formName = submissionName + "-" + groupName.replaceAll("\\.", "-");
+            Collection collection = collectionService.findByItem(context, item);
+            if (collection == null) {
+                throw new IllegalArgumentException("No collection found for item " + item.getID());
+            }
+
+            SubmissionConfig submissionConfig = this.submissionConfigReader.getSubmissionConfigByCollection(collection);
+            String formName = submissionConfig.getSubmissionName() + "-" + groupName.replaceAll("\\.", "-");
 
             if (!this.dcInputsReader.hasFormWithName(formName)) {
                 return new ArrayList<String>();
@@ -307,8 +319,8 @@ public abstract class TabularCrosswalk implements StreamDisseminationCrosswalk, 
     }
 
     private boolean hasExpectedEntityType(Item item) {
-        String relationshipType = itemService.getMetadataFirstValue(item, "relationship", "type", null, Item.ANY);
-        return Objects.equals(relationshipType, entityType);
+        String itemEntityType = itemService.getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY);
+        return Objects.equals(itemEntityType, entityType);
     }
 
     public void setTemplateFileName(String templateFileName) {
@@ -332,6 +344,6 @@ public abstract class TabularCrosswalk implements StreamDisseminationCrosswalk, 
     }
 
     public CrosswalkMode getCrosswalkMode() {
-        return this.crosswalkMode != null ? this.crosswalkMode : StreamDisseminationCrosswalk.super.getCrosswalkMode();
+        return Optional.ofNullable(this.crosswalkMode).orElse(ItemExportCrosswalk.super.getCrosswalkMode());
     }
 }

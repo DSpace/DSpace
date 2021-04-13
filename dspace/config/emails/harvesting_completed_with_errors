@@ -1,0 +1,15 @@
+## E-mail sent to designated address when a harvest process concluded with errors
+##
+## Parameters: {0} Collection id
+##             {1} Date & time
+##             {2} Status flag
+##
+## See org.dspace.core.Email for information on the format of this file.
+##
+#set($subject = 'DSpace: Harvesting completed with errors')
+Collection ${params[0]} concluded with some errors on harvest:
+
+Date:       	${params[1]}
+Status Flag: 	${params[2]}
+
+See the attachment for details on occured errors.

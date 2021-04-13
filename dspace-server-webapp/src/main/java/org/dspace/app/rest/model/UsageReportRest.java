@@ -24,6 +24,8 @@ public class UsageReportRest extends BaseObjectRest<String> {
 
     @JsonProperty(value = "report-type")
     private String reportType;
+    @JsonProperty(value = "view-mode")
+    private String viewMode;
     private List<UsageReportPointRest> points;
 
     /**
@@ -80,6 +82,24 @@ public class UsageReportRest extends BaseObjectRest<String> {
      */
     public void setReportType(String reportType) {
         this.reportType = reportType;
+    }
+
+    /**
+     * Get the suggested view mode to use for this report
+     *
+     */
+    public String getViewMode() {
+        return viewMode;
+    }
+
+    /**
+     * Set the suggested view mode to use for this report
+     * 
+     * @param viewMode suggest to the client to visualize the report in a specific
+     *                 mode (table, map, bar chart, etc)
+     */
+    public void setViewMode(String viewMode) {
+        this.viewMode = viewMode;
     }
 
     /**

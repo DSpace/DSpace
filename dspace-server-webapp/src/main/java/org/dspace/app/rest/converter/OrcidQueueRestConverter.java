@@ -27,7 +27,7 @@ public class OrcidQueueRestConverter implements DSpaceConverter<OrcidQueue, Orci
         OrcidQueueRest rest = new OrcidQueueRest();
         rest.setEntityId(modelObject.getEntity().getID());
         rest.setEntityName(getMetadataValueFromItem(modelObject.getEntity(), "dc.title"));
-        rest.setEntityType(getMetadataValueFromItem(modelObject.getEntity(), "relationship.type"));
+        rest.setEntityType(getMetadataValueFromItem(modelObject.getEntity(), "dspace.entity.type"));
         rest.setId(modelObject.getId());
         rest.setOwnerId(modelObject.getOwner().getID());
         rest.setProjection(projection);

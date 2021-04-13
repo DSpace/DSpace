@@ -16,10 +16,6 @@ import org.dspace.submit.lookup.MapConverterModifier;
  */
 public class SimpleMapConverter extends MapConverterModifier {
 
-    public SimpleMapConverter(String name) {
-        super(name);
-    }
-
     public String getValue(String key) {
         boolean matchEmpty = false;
         String stringValue = key;

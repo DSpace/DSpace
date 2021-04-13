@@ -89,9 +89,6 @@ public interface ChoiceAuthorityService {
     public Choices getMatches(String fieldKey, String query, Collection collection,
                               int start, int limit, String locale);
 
-    public Choices getMatches(String fieldKey, String query, Collection collection, int start, int limit, String locale,
-                              boolean externalInput);
-
     /**
      * Wrapper that calls getBestMatch method of the plugin corresponding to
      * the metadata field defined by single field key.
@@ -193,12 +190,12 @@ public interface ChoiceAuthorityService {
     public void clearCache();
 
     /**
-     * Get the relationship type starting from the metadata field.
+     * Get the entity type starting from the metadata field.
      *
-     * @param field single string identifying metadata field
-     * @return the relationshipType as a String
+     * @param  field single string identifying metadata field
+     * @return       the entity type as a String
      */
-    String getRelationshipType(String fieldKey);
+    String getLinkedEntityType(String fieldKey);
 
     /**
      * Should we store the authority key (if any) for such field key and collection?
@@ -231,4 +228,13 @@ public interface ChoiceAuthorityService {
      * @return the parent Choice object if any
      */
     public Choice getParentChoice(String authorityName, String vocabularyId, String locale);
+
+    /**
+     * Returns all the configured metadata field that are authority controlled
+     * related to the given entity type.
+     *
+     * @param  entityType the entity type
+     * @return            the metadata fields
+     */
+    public List<String> getAuthorityControlledFieldsByEntityType(String entityType);
 }

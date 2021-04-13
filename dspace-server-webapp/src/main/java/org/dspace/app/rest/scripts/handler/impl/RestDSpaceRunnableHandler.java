@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,6 +28,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.scripts.DSpaceCommandLineParameter;
@@ -298,5 +300,25 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
         } catch (SQLException | IOException | AuthorizeException e) {
             log.error("RestDSpaceRunnableHandler with process: " + processId + " could not write log to process", e);
         }
+    }
+
+    @Override
+    public List<UUID> getSpecialGroups() {
+        Context context = new Context();
+        List<UUID> specialGroups = new ArrayList<UUID>();
+        try {
+            Process process = processService.find(context, processId);
+            for (Group group : process.getGroups()) {
+                context.setSpecialGroup(group.getID());
+                specialGroups.add(group.getID());
+            }
+        } catch (SQLException e) {
+            log.error("RestDSpaceRunnableHandler with process: " + processId + " could not find the proccess", e);
+        } finally {
+            if (context.isValid()) {
+                context.abort();
+            }
+        }
+        return specialGroups;
     }
 }

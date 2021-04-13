@@ -1,0 +1,8 @@
+{
+    "service-error": {
+        "status": {
+            "statusCode": "AUTHENTICATION_ERROR",
+            "statusText": "Institution Token is not associated with API Key"
+        }
+    }
+}

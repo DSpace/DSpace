@@ -161,7 +161,7 @@ public class SearchFilterMatcher {
         return allOf(
                 hasJsonPath("$.filter", is("itemtype")),
                 hasJsonPath("$.hasFacets", is(true)),
-                hasJsonPath("$.type", is("text")),
+                hasJsonPath("$.type", is("hierarchical")),
                 hasJsonPath("$.openByDefault", is(false)),
                 checkOperators()
         );
@@ -169,7 +169,7 @@ public class SearchFilterMatcher {
 
     public static Matcher<? super Object> pieItemtypeFilter() {
         return allOf(
-                hasJsonPath("$.filter", is("chart.pie.itemtype_filter")),
+                hasJsonPath("$.filter", is("graphitemtype")),
                 hasJsonPath("$.hasFacets", is(true)),
                 hasJsonPath("$.type", is("chart.pie")),
                 hasJsonPath("$.openByDefault", is(false)),
@@ -179,7 +179,7 @@ public class SearchFilterMatcher {
 
     public static Matcher<? super Object> barDateIssuedYearFilter() {
         return allOf(
-                hasJsonPath("$.filter", is("chart.bar.dateIssued.year")),
+                hasJsonPath("$.filter", is("graphpubldate")),
                 hasJsonPath("$.hasFacets", is(true)),
                 hasJsonPath("$.type", is("chart.bar")),
                 hasJsonPath("$.openByDefault", is(false)),

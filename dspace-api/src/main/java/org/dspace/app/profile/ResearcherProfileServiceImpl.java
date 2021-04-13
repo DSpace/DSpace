@@ -11,6 +11,7 @@ import static org.dspace.content.authority.Choices.CF_ACCEPTED;
 import static org.dspace.core.Constants.READ;
 import static org.dspace.eperson.Group.ANONYMOUS;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
@@ -122,8 +123,12 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
             return;
         }
 
-        List<MetadataValue> metadata = itemService.getMetadata(profileItem, "cris", "owner", null, Item.ANY);
-        itemService.removeMetadataValues(context, profileItem, metadata);
+        if (isHardDeleteEnabled()) {
+            deleteItem(context, profileItem);
+        } else {
+            removeCrisOwnerMetadata(context, profileItem);
+        }
+
     }
 
     @Override
@@ -152,7 +157,7 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
         Iterator<Item> items = itemService.findByAuthorityValue(context, "cris", "owner", null, id.toString());
         while (items.hasNext()) {
             Item item = items.next();
-            if (hasRelationshipTypeMetadataEqualsTo(item, profileType)) {
+            if (hasEntityTypeMetadataEqualsTo(item, profileType)) {
                 return item;
             }
         }
@@ -170,7 +175,7 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
 
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
-        discoverQuery.addFilterQueries("relationship.type:" + profileType);
+        discoverQuery.addFilterQueries("dspace.entity.type:" + profileType);
 
         DiscoverResult discoverResult = searchService.search(context, discoverQuery);
         List<IndexableObject> indexableObjects = discoverResult.getIndexableObjects();
@@ -207,11 +212,31 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
         return item;
     }
 
-    private boolean hasRelationshipTypeMetadataEqualsTo(Item item, String relationshipType) {
+    private boolean hasEntityTypeMetadataEqualsTo(Item item, String entityType) {
         return item.getMetadata().stream().anyMatch(metadataValue -> {
-            return "relationship.type".equals(metadataValue.getMetadataField().toString('.')) &&
-                relationshipType.equals(metadataValue.getValue());
+            return "dspace.entity.type".equals(metadataValue.getMetadataField().toString('.')) &&
+                entityType.equals(metadataValue.getValue());
         });
+    }
+
+    private boolean isHardDeleteEnabled() {
+        return configurationService.getBooleanProperty("researcher-profile.hard-delete.enabled");
+    }
+
+    private void removeCrisOwnerMetadata(Context context, Item profileItem) throws SQLException {
+        List<MetadataValue> metadata = itemService.getMetadata(profileItem, "cris", "owner", null, Item.ANY);
+        itemService.removeMetadataValues(context, profileItem, metadata);
+    }
+
+    private void deleteItem(Context context, Item profileItem) throws SQLException, AuthorizeException {
+        try {
+            context.turnOffAuthorisationSystem();
+            itemService.delete(context, profileItem);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            context.restoreAuthSystemState();
+        }
     }
 
     private String getProfileType() {

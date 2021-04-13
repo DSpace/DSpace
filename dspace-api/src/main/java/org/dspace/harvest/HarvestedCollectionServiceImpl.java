@@ -11,25 +11,34 @@ import static org.dspace.harvest.OAIHarvester.OAI_ADDRESS_ERROR;
 import static org.dspace.harvest.OAIHarvester.OAI_DMD_ERROR;
 import static org.dspace.harvest.OAIHarvester.OAI_ORE_ERROR;
 import static org.dspace.harvest.OAIHarvester.OAI_SET_ERROR;
+import static org.dspace.harvest.util.NamespaceUtils.getORENamespace;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import ORG.oclc.oai.harvester2.verb.Identify;
 import ORG.oclc.oai.harvester2.verb.ListIdentifiers;
 import org.dspace.content.Collection;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.harvest.dao.HarvestedCollectionDAO;
 import org.dspace.harvest.service.HarvestedCollectionService;
+import org.dspace.harvest.service.OAIHarvesterClient;
+import org.dspace.harvest.util.NamespaceUtils;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.input.DOMBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.w3c.dom.DOMException;
+import org.xml.sax.SAXException;
 
 /**
  * Service implementation for the HarvestedCollection object.
@@ -45,6 +54,9 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
 
     @Autowired(required = true)
     protected HarvestedCollectionDAO harvestedCollectionDAO;
+
+    @Autowired(required = true)
+    protected OAIHarvesterClient oaiHarvesterClient;
 
     protected HarvestedCollectionServiceImpl() {
     }
@@ -65,19 +77,15 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
 
     @Override
     public boolean isHarvestable(Context context, Collection collection) throws SQLException {
-        HarvestedCollection hc = find(context, collection);
-        if (hc != null && hc.getHarvestType() > 0 && hc.getOaiSource() != null && hc.getOaiSetId() != null &&
-            hc.getHarvestStatus() != HarvestedCollection.STATUS_UNKNOWN_ERROR) {
-            return true;
-        }
-        return false;
+        return isHarvestable(find(context, collection));
     }
 
     @Override
     public boolean isHarvestable(HarvestedCollection harvestedCollection) throws SQLException {
-        if (harvestedCollection.getHarvestType() > 0 && harvestedCollection
-            .getOaiSource() != null && harvestedCollection.getOaiSetId() != null &&
-            harvestedCollection.getHarvestStatus() != HarvestedCollection.STATUS_UNKNOWN_ERROR) {
+        if (harvestedCollection.getHarvestType() > 0 && harvestedCollection.getOaiSource() != null &&
+            harvestedCollection.getOaiSetId() != null && harvestedCollection.getCollection() != null &&
+            harvestedCollection.getHarvestStatus() != HarvestedCollection.STATUS_UNKNOWN_ERROR &&
+            harvestedCollection.getHarvestStatus() != HarvestedCollection.STATUS_BUSY) {
             return true;
         }
 
@@ -108,12 +116,14 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
 
     @Override
     public List<HarvestedCollection> findReady(Context context) throws SQLException {
-        int harvestInterval = ConfigurationManager.getIntProperty("oai", "harvester.harvestFrequency");
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        int harvestInterval = configurationService.getIntProperty("oai.harvester.harvestFrequency");
         if (harvestInterval == 0) {
             harvestInterval = 720;
         }
 
-        int expirationInterval = ConfigurationManager.getIntProperty("oai", "harvester.threadTimeout");
+        int expirationInterval = configurationService.getIntProperty("oai.harvester.threadTimeout");
         if (expirationInterval == 0) {
             expirationInterval = 24;
         }
@@ -182,20 +192,21 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
      * @param testORE    whether the method should also check the PMH provider for ORE support
      * @return list of errors encountered during verification. Empty list indicates a "success" condition.
      */
+    @Override
     public List<String> verifyOAIharvester(String oaiSource,
                                                   String oaiSetId, String metaPrefix, boolean testORE) {
-        List<String> errorSet = new ArrayList<String>();
+        List<String> errorSet = new ArrayList<>();
 
         // First, see if we can contact the target server at all.
         try {
             new Identify(oaiSource);
-        } catch (Exception ex) {
+        } catch (IOException | ParserConfigurationException | TransformerException | SAXException ex) {
             errorSet.add(OAI_ADDRESS_ERROR + ": OAI server could not be reached.");
             return errorSet;
         }
 
         // Next, make sure the metadata we need is supported by the target server
-        Namespace DMD_NS = OAIHarvester.getDMDNamespace(metaPrefix);
+        Namespace DMD_NS = NamespaceUtils.getMetadataFormatNamespace(metaPrefix);
         if (null == DMD_NS) {
             errorSet.add(OAI_DMD_ERROR + ":  " + metaPrefix);
             return errorSet;
@@ -204,17 +215,8 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
         String OREOAIPrefix = null;
         String DMDOAIPrefix = null;
 
-        try {
-            OREOAIPrefix = OAIHarvester.oaiResolveNamespaceToPrefix(oaiSource, OAIHarvester.getORENamespace().getURI());
-            DMDOAIPrefix = OAIHarvester.oaiResolveNamespaceToPrefix(oaiSource, DMD_NS.getURI());
-        } catch (Exception ex) {
-            errorSet.add(OAI_ADDRESS_ERROR
-                + ": OAI did not respond to ListMetadataFormats query  ("
-                + ORE_NS.getPrefix() + ":" + OREOAIPrefix + " ; "
-                + DMD_NS.getPrefix() + ":" + DMDOAIPrefix + "):  "
-                + ex.getMessage());
-            return errorSet;
-        }
+        OREOAIPrefix = oaiHarvesterClient.resolveNamespaceToPrefix(oaiSource, getORENamespace().getURI());
+        DMDOAIPrefix = oaiHarvesterClient.resolveNamespaceToPrefix(oaiSource, DMD_NS.getURI());
 
         if (testORE && OREOAIPrefix == null) {
             errorSet.add(OAI_ORE_ERROR + ": The OAI server does not support ORE dissemination");
@@ -251,11 +253,11 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
                     }
                 }
             }
-        } catch (RuntimeException re) {
-            throw re;
-        } catch (Exception e) {
+        } catch (IOException | ParserConfigurationException | TransformerException | DOMException | SAXException e) {
             errorSet.add(OAI_ADDRESS_ERROR + ": OAI server could not be reached");
             return errorSet;
+        } catch (RuntimeException re) {
+            throw re;
         }
 
         return errorSet;

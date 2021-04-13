@@ -16,6 +16,13 @@ import org.dspace.core.Context;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Script configuration for {@link BulkImport}.
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ * @param  <T> the {@link BulkImport} type
+ */
 public class BulkImportScriptConfiguration<T extends BulkImport> extends ScriptConfiguration<T> {
 
     @Autowired
@@ -44,10 +51,6 @@ public class BulkImportScriptConfiguration<T extends BulkImport> extends ScriptC
             options.addOption("f", "file", true, "source file");
             options.getOption("f").setType(InputStream.class);
             options.getOption("f").setRequired(true);
-
-            options.addOption("w", "workflow", false, "when adding new items, use collection workflow");
-            options.getOption("w").setType(boolean.class);
-            options.getOption("w").setRequired(false);
 
             options.addOption("e", "concludeOnError", false, "conclude the import at the first error");
             options.getOption("e").setType(boolean.class);

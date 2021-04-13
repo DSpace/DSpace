@@ -104,21 +104,15 @@ public class CrisLayoutBoxRepository extends DSpaceRestRepository<CrisLayoutBoxR
             Pageable pageable) {
         Context context = obtainContext();
         List<CrisLayoutBox> boxList = null;
-        Long totalRow = null;
         try {
             boxList = service.findByItem(
                     context,
                     UUID.fromString(itemUuid),
                     tabId);
-            totalRow = Long.valueOf(boxList.size());
-            int lastIndex = (pageable.getPageNumber() + 1) * pageable.getPageSize();
-            boxList = boxList.subList(
-                    pageable.getPageNumber() * pageable.getPageSize(),
-                    (boxList.size() < lastIndex) ? boxList.size() : lastIndex );
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        return converter.toRestPage(boxList, pageable, totalRow, utils.obtainProjection());
+        return converter.toRestPage(boxList, pageable, utils.obtainProjection());
     }
 
     @Override

@@ -1,4 +1,4 @@
-<Publication id="mock-id">
+<Publication xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
 	<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/COAR_Publication_Types">http://purl.org/coar/resource_type/c_efa0</Type>
 	<Language>en</Language>
    	<Title>Test Publication</Title>
@@ -11,9 +11,8 @@
    	</PublishedIn>
    	<Publishers>
    		<Publisher>
-   			<OrgUnit>
-				<Name>Publication publisher</Name>
-     		</OrgUnit>
+			<DisplayName>Publication publisher</DisplayName>
+			<OrgUnit />
    		</Publisher>
    	</Publishers>
    	<PublicationDate>2020-01-01</PublicationDate>
@@ -36,6 +35,7 @@
       	</Author>
       	<Author>
         	<DisplayName>Walter White</DisplayName>
+			<Person id="6c36b2b0-b2cf-41a5-8241-11d0ea56ed97" />
          	<Affiliation>
          		<OrgUnit>
          			<Name>Company</Name>
@@ -46,6 +46,7 @@
    	<Editors>
    	  	<Editor>
         	<DisplayName>Editor</DisplayName>
+			<Person id="25887329-a648-46f9-a2ac-99319b8e9766" />
 	   	  	<Affiliation>
 	      		<OrgUnit>
 	     			<Name>Editor Affiliation</Name>
@@ -54,7 +55,7 @@
    	  	</Editor>
 	</Editors>
    	<OriginatesFrom>
-      	<Project>
+      	<Project id="mock-id">
 			<Acronym>TP</Acronym>
          	<Title>Test Project</Title>
          	<StartDate>2020-01-01</StartDate>
@@ -86,14 +87,6 @@
 			</Funder>
 		</Funding>
    	</OriginatesFrom>
-	<OutputFrom>
-		<Event>
-			<Name>The best Conference</Name>
-		</Event>
-	</OutputFrom>
-	<References>
-		<Product>
-			<Name>DataSet</Name>
-		</Product>
-	</References>
+	<PresentedAt> <Event> <Name>The best Conference</Name> </Event> </PresentedAt>
+	<References> <Product> <Name>DataSet</Name> </Product> </References>
 </Publication>

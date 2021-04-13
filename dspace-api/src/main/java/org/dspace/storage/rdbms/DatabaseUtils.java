@@ -191,6 +191,13 @@ public class DatabaseUtils {
                             // Update the database to latest version, but set "outOfOrder=true"
                             // This will ensure any old migrations in the "ignored" state are now run
                             updateDatabase(dataSource, connection, null, true);
+                        } else if (argv[1].equalsIgnoreCase("ignore-missing")) {
+                            System.out.println(
+                                    "Migrating database to latest version ignoring \"Missing\" " +
+                                        "migrations... (Check logs for details)");
+                            // Update the database to latest version, but set "outOfOrder=true"
+                            // This will ensure any old migrations in the "ignored" state are now run
+                            updateDatabase(dataSource, connection, null, false, true);
                         } else {
                             // Otherwise, we assume "argv[1]" is a valid migration version number
                             // This is only for testing! Never specify for Production!
@@ -201,14 +208,11 @@ public class DatabaseUtils {
                                 "You've specified to migrate your database ONLY to version " + migrationVersion + " " +
                                     "...");
                             System.out.println(
-                                "\nWARNING: It is highly likely you will see errors in your logs when the Metadata");
-                            System.out.println(
-                                "or Bitstream Format Registry auto-update. This is because you are attempting to");
-                            System.out.println(
-                                "use an OLD version " + migrationVersion + " Database with a newer DSpace API. NEVER " +
-                                    "do this in a");
-                            System.out.println(
-                                "PRODUCTION scenario. The resulting old DB is only useful for migration testing.\n");
+                                "\nWARNING: In this mode, we DISABLE all callbacks, which means that you will need " +
+                                    "to manually update registries and manually run a reindex. This is because you " +
+                                    "are attempting to use an OLD version (" + migrationVersion + ") Database with " +
+                                    "a newer DSpace API. NEVER do this in a PRODUCTION scenario. The resulting " +
+                                    "database is only useful for migration testing.\n");
 
                             System.out.print(
                                 "Are you SURE you only want to migrate your database to version " + migrationVersion
@@ -635,6 +639,11 @@ public class DatabaseUtils {
         updateDatabase(datasource, connection, null, false);
     }
 
+    protected static synchronized void updateDatabase(DataSource datasource, Connection connection,
+            String targetVersion, boolean outOfOrder) throws SQLException {
+        updateDatabase(datasource, connection, targetVersion, outOfOrder, false);
+    }
+
     /**
      * Ensures the current database is up-to-date with regards
      * to the latest DSpace DB schema. If the scheme is not up-to-date,
@@ -647,19 +656,24 @@ public class DatabaseUtils {
      * @param datasource    DataSource object (retrieved from DatabaseManager())
      * @param connection    Database connection
      * @param targetVersion If specified, only migrate the database to a particular *version* of DSpace. This is
-     *                      mostly just useful for testing.
+     *                      just useful for testing migrations, and should NOT be used in Production.
      *                      If null, the database is migrated to the latest version.
      * @param outOfOrder    If true, Flyway will run any lower version migrations that were previously "ignored".
      *                      If false, Flyway will only run new migrations with a higher version number.
+     * @param missing       If true, Flyway will ignore any missing previous migration
      * @throws SQLException if database error
      *                      If database cannot be upgraded.
      */
     protected static synchronized void updateDatabase(DataSource datasource,
-                                                      Connection connection, String targetVersion, boolean outOfOrder)
+            Connection connection, String targetVersion, boolean outOfOrder, boolean missing)
         throws SQLException {
         if (null == datasource) {
             throw new SQLException("The datasource is a null reference -- cannot continue.");
         }
+
+        // Whether to reindex all content in Solr after successfully updating database
+        boolean reindexAfterUpdate = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                          .getBooleanProperty("discovery.autoReindex", true);
 
         try {
             // Setup Flyway API against our database
@@ -668,11 +682,18 @@ public class DatabaseUtils {
             // Set whether Flyway will run migrations "out of order". By default, this is false,
             // and Flyway ONLY runs migrations that have a higher version number.
             flywayConfiguration.outOfOrder(outOfOrder);
+            flywayConfiguration.ignoreMissingMigrations(missing);
 
             // If a target version was specified, tell Flyway to ONLY migrate to that version
             // (i.e. all later migrations are left as "pending"). By default we always migrate to latest version.
+            // This mode is only useful for testing migrations & should NEVER be used in Production.
             if (!StringUtils.isBlank(targetVersion)) {
                 flywayConfiguration.target(targetVersion);
+                // Disable all callbacks. Most callbacks use the Context object which triggers a full database update,
+                // bypassing this target version.
+                flywayConfiguration.callbacks(new Callback[]{});
+                // Also disable reindex after update for this migration mode (as reindex also uses Context object)
+                reindexAfterUpdate = false;
             }
 
             // Initialized Flyway object (will be created by flywayConfiguration.load() below)
@@ -722,7 +743,7 @@ public class DatabaseUtils {
                 flyway.migrate();
 
                 // Flag that Discovery will need reindexing, since database was updated
-                setReindexDiscovery(true);
+                setReindexDiscovery(reindexAfterUpdate);
             } else {
                 log.info("DSpace database schema is up to date");
             }
@@ -1221,7 +1242,7 @@ public class DatabaseUtils {
      * Discovery/Solr needs reindexing.
      * @return whether reindexing should happen.
      */
-    public static boolean getReindexDiscovery() {
+    public static synchronized boolean getReindexDiscovery() {
         boolean autoReindex = DSpaceServicesFactory.getInstance()
             .getConfigurationService()
             .getBooleanProperty("discovery.autoReindex", true);

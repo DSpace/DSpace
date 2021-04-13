@@ -7,7 +7,10 @@
  */
 package org.dspace.layout;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Cacheable;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
@@ -19,12 +22,15 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.dspace.content.MetadataField;
 import org.dspace.core.ReloadableEntity;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 
 @Entity
 @Table(name = "cris_layout_field")
@@ -62,7 +68,9 @@ public class CrisLayoutField implements ReloadableEntity<Integer> {
     private String styleLabel;
     @Column(name = "style_value")
     private String styleValue;
-
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "crisLayoutField", cascade = CascadeType.ALL)
+    @OrderBy(value = "priority")
+    private List<CrisMetadataGroup> crisMetadataGroupList = new ArrayList<>();
     @Override
     public Integer getID() {
         return id;
@@ -143,5 +151,11 @@ public class CrisLayoutField implements ReloadableEntity<Integer> {
     public void setStyleValue(String styleValue) {
         this.styleValue = styleValue;
     }
+    public List<CrisMetadataGroup> getCrisMetadataGroupList() {
+        return crisMetadataGroupList;
+    }
 
+    public void setCrisMetadataGroupList(List<CrisMetadataGroup> crisMetadataGroupList) {
+        this.crisMetadataGroupList = crisMetadataGroupList;
+    }
 }

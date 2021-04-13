@@ -1,5 +1,5 @@
 <Persons>
-	<Person id="mock-id">
+	<Person xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
 		<PersonName>
 			<FamilyNames>Smith</FamilyNames>
 			<FirstNames>John</FirstNames>
@@ -35,7 +35,7 @@
 			</OrgUnit> 
 		</Affiliation>
 	</Person>
-	<Person id="mock-id">
+	<Person xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
 		<PersonName>
 			<FamilyNames>White</FamilyNames>
 			<FirstNames>Walter</FirstNames>

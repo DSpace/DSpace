@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href='static/style.xsl' type='text/xsl'?>
+<OAI-PMH
+    xmlns="http://www.openarchives.org/OAI/2.0/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+    <responseDate>2020-11-23T15:56:46Z</responseDate>
+    <request verb="ListRecords" metadataPrefix="oai_cerif_openaire" set="openaire_cris_persons">https://test-harvest/oai/openairecris</request>
+    <ListRecords>
+        <record>
+            <header>
+                <identifier>oai:test-harvest:Persons/123</identifier>
+                <datestamp>2019-09-05T21:52:21Z</datestamp>
+                <setSpec>com_123456789_1</setSpec>
+                <setSpec>col_123456789_2</setSpec>
+                <setSpec>openaire_cris_publications</setSpec>
+            </header>
+            <metadata>
+                <oai_cerif:Person 
+                	xmlns:oai_cerif="https://www.openaire.eu/cerif-profile/1.1/"
+                    xmlns:doc="http://www.lyncode.com/xoai"
+                    xmlns:dc="http://purl.org/dc/elements/1.1/"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                	id="123">
+					<oai_cerif:PersonName>
+						<oai_cerif:FamilyNames>Manghi</oai_cerif:FamilyNames>
+						<oai_cerif:FirstNames>Paolo</oai_cerif:FirstNames>
+					</oai_cerif:PersonName>
+					<oai_cerif:Gender>M</oai_cerif:Gender>
+					<oai_cerif:ORCID>0000-0002-9079-5932</oai_cerif:ORCID>
+				</oai_cerif:Person>
+            </metadata>
+        </record>
+    </ListRecords>
+</OAI-PMH>

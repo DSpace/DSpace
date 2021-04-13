@@ -1,4 +1,4 @@
-<Equipment id="mock-id">
+<Equipment xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
 	<Name>Test Equipment</Name>
 	<Acronym>T-EQ</Acronym>
 	<Identifier type="Institution assigned unique equipment identifier">ID-01</Identifier>

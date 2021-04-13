@@ -18,10 +18,12 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.core.Context;
+import org.dspace.versioning.ItemCorrectionService;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Processing class of an action that allows users to
@@ -39,6 +41,9 @@ public class AcceptEditRejectAction extends ProcessingAction {
     private static final String SUBMITTER_IS_DELETED_PAGE = "submitter_deleted";
 
     //TODO: rename to AcceptAndEditMetadataAction
+
+    @Autowired
+    protected ItemCorrectionService itemCorrectionService;
 
     @Override
     public void activate(Context c, XmlWorkflowItem wf) {
@@ -120,8 +125,14 @@ public class AcceptEditRejectAction extends ProcessingAction {
         String usersName = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
                 .getEPersonName(c.getCurrentUser());
 
-        String provDescription = getProvenanceStartId() + " Approved for entry into archive by "
+        String provDescription;
+        if (itemCorrectionService.checkIfIsCorrectionItem(c, wfi.getItem())) {
+            provDescription = getProvenanceStartId() + " Correction approved for entry into archive by "
                 + usersName + " on " + now + " (GMT) ";
+        } else {
+            provDescription = getProvenanceStartId() + " Approved for entry into archive by "
+                + usersName + " on " + now + " (GMT) ";
+        }
 
         // Add to item as a DC field
         itemService.addMetadata(c, wfi.getItem(), MetadataSchemaEnum.DC.getName(), "description", "provenance", "en",

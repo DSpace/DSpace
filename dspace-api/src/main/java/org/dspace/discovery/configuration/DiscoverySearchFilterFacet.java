@@ -22,6 +22,11 @@ public class DiscoverySearchFilterFacet extends DiscoverySearchFilter {
     private DiscoveryConfigurationParameters.SORT sortOrderFilterPage = DiscoveryConfigurationParameters.SORT.COUNT;
     public static final String FILTER_TYPE_FACET = "facet";
     private boolean exposeMinMax = false;
+    private boolean exposeMissing = true;
+    private boolean exposeMore = false;
+    private boolean exposeTotalElements = false;
+    private boolean fillDateGaps = false;
+    private boolean inverseDirection = false;
 
     public int getFacetLimit() {
         if (facetLimit == -1) {
@@ -73,5 +78,45 @@ public class DiscoverySearchFilterFacet extends DiscoverySearchFilter {
      */
     public void setExposeMinAndMaxValue(boolean exposeMinMax) {
         this.exposeMinMax = exposeMinMax;
+    }
+
+    public boolean exposeMissing() {
+        return exposeMissing;
+    }
+
+    public void setExposeMissing(boolean exposeMissing) {
+        this.exposeMissing = exposeMissing;
+    }
+
+    public boolean exposeMore() {
+        return exposeMore;
+    }
+
+    public void setExposeMore(boolean exposeMore) {
+        this.exposeMore = exposeMore;
+    }
+
+    public boolean exposeTotalElements() {
+        return exposeTotalElements;
+    }
+
+    public void setExposeTotalElements(boolean exposeTotalElements) {
+        this.exposeTotalElements = exposeTotalElements;
+    }
+
+    public boolean fillDateGaps() {
+        return fillDateGaps;
+    }
+
+    public void setFillDateGaps(boolean fillDateGaps) {
+        this.fillDateGaps = fillDateGaps;
+    }
+
+    public boolean inverseDirection() {
+        return inverseDirection;
+    }
+
+    public void setInverseDirection(boolean inverseDirection) {
+        this.inverseDirection = inverseDirection;
     }
 }

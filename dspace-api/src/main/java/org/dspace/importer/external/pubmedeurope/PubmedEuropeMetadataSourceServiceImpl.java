@@ -36,7 +36,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.log4j.Logger;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.exception.MetadataSourceException;
@@ -194,8 +193,8 @@ public class PubmedEuropeMetadataSourceServiceImpl
     }
 
     public Integer count(String query) throws URISyntaxException, ClientProtocolException, IOException, JaxenException {
-        String proxyHost = ConfigurationManager.getProperty("http.proxy.host");
-        String proxyPort = ConfigurationManager.getProperty("http.proxy.port");
+        String proxyHost = configurationService.getProperty("http.proxy.host");
+        String proxyPort = configurationService.getProperty("http.proxy.port");
         HttpGet method = null;
         HttpHost proxy = null;
         HttpClient client = new DefaultHttpClient();
@@ -268,8 +267,8 @@ public class PubmedEuropeMetadataSourceServiceImpl
 
     public List<ImportRecord> search(String query, Integer count, Integer start) throws IOException, HttpException {
         List<ImportRecord> results = new ArrayList<>();
-        String proxyHost = ConfigurationManager.getProperty("http.proxy.host");
-        String proxyPort = ConfigurationManager.getProperty("http.proxy.port");
+        String proxyHost = configurationService.getProperty("http.proxy.host");
+        String proxyPort = configurationService.getProperty("http.proxy.port");
         HttpGet method = null;
         HttpHost proxy = null;
         try {
@@ -282,7 +281,8 @@ public class PubmedEuropeMetadataSourceServiceImpl
             uriBuilder.addParameter("pageSize", String.valueOf(count));
             uriBuilder.addParameter("query", query);
             boolean lastPage = false;
-            while (!lastPage) {
+            int skipped = 0;
+            while (!lastPage || results.size() < count) {
                 method = new HttpGet(uriBuilder.build());
                 if (StringUtils.isNotBlank(proxyHost) && StringUtils.isNotBlank(proxyPort)) {
                     proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort), "http");
@@ -303,8 +303,20 @@ public class PubmedEuropeMetadataSourceServiceImpl
                 try {
                     xpath = new AXIOMXPath("//responseWrapper/resultList/result");
                     List<OMElement> recordsList = xpath.selectNodes(element);
-                    for (OMElement item : recordsList) {
-                        results.add(transformSourceRecords(item));
+                    if (recordsList != null && recordsList.size() > 0) {
+                        for (OMElement item : recordsList) {
+                            if (start > skipped) {
+                                skipped++;
+                            } else {
+                                results.add(transformSourceRecords(item));
+                            }
+                            if (results.size() == count) {
+                                break;
+                            }
+                        }
+                    } else {
+                        lastPage = true;
+                        break;
                     }
                 } catch (JaxenException e) {
                     return null;
@@ -320,7 +332,6 @@ public class PubmedEuropeMetadataSourceServiceImpl
                         lastPage = true;
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
                     log.error(e.getMessage(), e);
                     throw new RuntimeException();
                 }

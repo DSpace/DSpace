@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="https://www.openaire.eu/cerif-profile/vocab/COAR_Patent_Types"
+           xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+           xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+           xmlns:skosxl="http://www.w3.org/2008/05/skos-xl#"
+           xmlns:cf="urn:xmlns:org.eurocris.cerif"
+           xmlns:dc-term="http://purl.org/dc/terms/"
+           xmlns:vocbench="http://art.uniroma2.it/ontologies/vocbench#"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           targetNamespace="https://www.openaire.eu/cerif-profile/vocab/COAR_Patent_Types"
+           xsi:schemaLocation="http://www.w3.org/2001/XMLSchema https://www.w3.org/2012/04/XMLSchema.xsd">
+   <xs:annotation>
+      <xs:documentation>Patent types extracted from the COAR Resource Types concept scheme: Types of patents as extracted from the COAR Resource Types concept scheme (http://vocabularies.coar-repositories.org/documentation/resource_types/, the term 'patent' only).</xs:documentation>
+      <xs:appinfo>
+         <cf:ClassScheme id="https://www.openaire.eu/cerif-profile/vocab/COAR_Patent_Types">
+            <cf:Term xmlns="en">Patent types extracted from the COAR Resource Types concept scheme</cf:Term>
+            <cf:Description xmlns="en">Types of patents as extracted from the COAR Resource Types concept scheme (http://vocabularies.coar-repositories.org/documentation/resource_types/, the term 'patent' only).</cf:Description>
+         </cf:ClassScheme>
+      </xs:appinfo>
+   </xs:annotation>
+   
+   <xs:include schemaLocation="../includes/cerif-commons.xsd"/>
+   <xs:element name="Type">
+      <xs:complexType>
+         <xs:simpleContent>
+            <xs:extension base="Enum">
+               <xs:attributeGroup ref="cfExtension__AttributeGroup"/>
+            </xs:extension>
+         </xs:simpleContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:simpleType name="Enum">
+      <xs:restriction base="xs:string">
+         <xs:enumeration value="http://purl.org/coar/resource_type/c_15cd">
+            <xs:annotation>
+               <xs:documentation xml:lang="en">patent</xs:documentation>
+               <xs:documentation xml:lang="zh">专利</xs:documentation>
+               <xs:documentation xml:lang="es">patente</xs:documentation>
+               <xs:documentation xml:lang="ru">патент</xs:documentation>
+               <xs:documentation xml:lang="fr">brevet</xs:documentation>
+               <xs:documentation xml:lang="it">brevetto</xs:documentation>
+               <xs:documentation xml:lang="de">Patent</xs:documentation>
+               <xs:documentation xml:lang="ca">patent</xs:documentation>
+               <xs:documentation xml:lang="pt">patente</xs:documentation>
+               <xs:documentation xml:lang="nl">patent</xs:documentation>
+               <xs:documentation xml:lang="ja">特許</xs:documentation>
+               <xs:documentation xml:lang="tr">patent</xs:documentation>
+               <xs:appinfo>
+                  <cf:Class id="http://purl.org/coar/resource_type/c_15cd"
+                            classSchemeId="https://www.openaire.eu/cerif-profile/vocab/COAR_Patent_Types">
+                     <cf:Term xml:lang="en" trans="o">patent</cf:Term>
+                     <cf:Term xml:lang="zh" trans="h">专利</cf:Term>
+                     <cf:Term xml:lang="es" trans="h">patente</cf:Term>
+                     <cf:Term xml:lang="ru" trans="h">патент</cf:Term>
+                     <cf:Term xml:lang="fr" trans="h">brevet</cf:Term>
+                     <cf:Term xml:lang="it" trans="h">brevetto</cf:Term>
+                     <cf:Term xml:lang="de" trans="h">Patent</cf:Term>
+                     <cf:Term xml:lang="ca" trans="h">patent</cf:Term>
+                     <cf:Term xml:lang="pt" trans="h">patente</cf:Term>
+                     <cf:Term xml:lang="nl" trans="h">patent</cf:Term>
+                     <cf:Term xml:lang="ja" trans="h">特許</cf:Term>
+                     <cf:Term xml:lang="tr" trans="h">patent</cf:Term>
+                     <cf:Definition xml:lang="en">A patent or patent application.</cf:Definition>
+                     <cf:Definition xml:lang="ru">Патент или заявка на изобретение. Предоставление эксклюзивного права на эксплуатацию изобретения.</cf:Definition>
+                     
+                  </cf:Class>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+      </xs:restriction>
+   </xs:simpleType>
+</xs:schema>

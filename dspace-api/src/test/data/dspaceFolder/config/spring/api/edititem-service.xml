@@ -17,7 +17,7 @@
                         <bean class="org.dspace.content.edit.EditItemMode">
                             <property name="name" value="MODE1" />
                             <property name="security">
-                              <value type="org.dspace.content.edit.EditItemModeSecurity">
+                              <value type="org.dspace.content.security.CrisSecurity">
                                 ADMIN
                               </value>
                             </property>
@@ -26,7 +26,7 @@
                         <bean class="org.dspace.content.edit.EditItemMode">
                             <property name="name" value="FIRST" />
                             <property name="security">
-                              <value type="org.dspace.content.edit.EditItemModeSecurity">
+                              <value type="org.dspace.content.security.CrisSecurity">
                                 ADMIN
                               </value>
                             </property>
@@ -35,7 +35,7 @@
                         <bean class="org.dspace.content.edit.EditItemMode">
                             <property name="name" value="SECOND" />
                             <property name="security">
-                              <value type="org.dspace.content.edit.EditItemModeSecurity">
+                              <value type="org.dspace.content.security.CrisSecurity">
                                 ADMIN
                               </value>
                             </property>
@@ -44,7 +44,7 @@
                         <bean class="org.dspace.content.edit.EditItemMode">
                             <property name="name" value="FIRST-OWNER" />
                             <property name="security">
-                              <value type="org.dspace.content.edit.EditItemModeSecurity">
+                              <value type="org.dspace.content.security.CrisSecurity">
                                 OWNER
                               </value>
                             </property>
@@ -53,7 +53,7 @@
                         <bean class="org.dspace.content.edit.EditItemMode">
                             <property name="name" value="FIRST-CUSTOM" />
                             <property name="security">
-                              <value type="org.dspace.content.edit.EditItemModeSecurity">
+                              <value type="org.dspace.content.security.CrisSecurity">
                                 CUSTOM
                               </value>
                             </property>

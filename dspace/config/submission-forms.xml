@@ -26,6 +26,17 @@
           <hint />
         </field>
       </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>type</dc-element>
+          <label>File type</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint>Personal picture, logo, main article, etc.</hint>
+        </field>
+      </row>
     </form>
     <form name="publication-dc-contributor-author">
       <row>
@@ -420,7 +431,7 @@
           <label>Description</label>
           <input-type>textarea</input-type>
           <repeatable>false</repeatable>
-          <required>Enter the description of the journal</required>
+          <required />
           <hint />
         </field>
       </row>
@@ -560,7 +571,7 @@ it, please enter the types and the actual numbers or codes.</hint>
           <repeatable>false</repeatable>
           <required />
           <hint>The publication where this publication is included. E.g. a book chapter lists here the book, a contribution to a conference lists here the conference proceeding.</hint>
-          <type-bind>book part</type-bind>
+          <type-bind>types:c_3248</type-bind>
         </field>
       </row>
       <row>
@@ -573,7 +584,7 @@ it, please enter the types and the actual numbers or codes.</hint>
           <repeatable>false</repeatable>
           <required />
           <hint>The ISBN of the book/report if it was not found in the system</hint>
-          <type-bind>book part</type-bind>
+          <type-bind>types:c_3248</type-bind>
         </field>
       </row>
       <row>
@@ -586,7 +597,7 @@ it, please enter the types and the actual numbers or codes.</hint>
           <repeatable>false</repeatable>
           <required />
           <hint>The DOI of the book/report if it was not found in the system</hint>
-          <type-bind>book part</type-bind>
+          <type-bind>types:c_3248</type-bind>
         </field>
       </row>
       <row>
@@ -599,6 +610,18 @@ it, please enter the types and the actual numbers or codes.</hint>
           <repeatable>false</repeatable>
           <required />
           <hint>The journal or Serie where this publication has been published</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>relation</dc-element>
+          <dc-qualifier>ispartofseries</dc-qualifier>
+          <label>Series/Report No.</label>
+          <input-type>series</input-type>
+          <repeatable>true</repeatable>
+          <required />
+          <hint>Enter the series and number assigned to this item by your community.</hint>
         </field>
       </row>
       <row>
@@ -623,7 +646,7 @@ it, please enter the types and the actual numbers or codes.</hint>
           <repeatable>false</repeatable>
           <required />
           <hint>The publication object of the review</hint>
-          <type-bind>review,book review</type-bind>
+          <type-bind>types:c_efa0,types:c_ba08</type-bind>
         </field>
       </row>
       <row>
@@ -636,7 +659,7 @@ it, please enter the types and the actual numbers or codes.</hint>
           <repeatable>false</repeatable>
           <required />
           <hint>The ISBN of the reviewed item if it was not found in the system</hint>
-          <type-bind>review,book review</type-bind>
+          <type-bind>types:c_efa0,types:c_ba08</type-bind>
         </field>
       </row>
       <row>
@@ -649,7 +672,7 @@ it, please enter the types and the actual numbers or codes.</hint>
           <repeatable>false</repeatable>
           <required />
           <hint>The DOI of the reviewed item if it was not found in the system</hint>
-          <type-bind>review,book review</type-bind>
+          <type-bind>types:c_efa0,types:c_ba08</type-bind>
         </field>
       </row>
       <row>
@@ -1534,7 +1557,7 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <label>Director</label>
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
-          <required>You must enter the director name.</required>
+          <required />
           <hint />
         </field>
       </row>
@@ -1573,6 +1596,18 @@ You can leave out the day and/or month if they aren't applicable.</hint>
       </row>
       <row>
         <field>
+          <dc-schema>oairecerif</dc-schema>
+          <dc-element>identifier</dc-element>
+          <dc-qualifier>url</dc-qualifier>
+          <label>Website(s)</label>
+          <input-type>onebox</input-type>
+          <repeatable>true</repeatable>
+          <required />
+          <hint />
+        </field>
+      </row>
+      <row>
+        <field>
           <dc-schema>dc</dc-schema>
           <dc-element>description</dc-element>
           <dc-qualifier>abstract</dc-qualifier>
@@ -1591,11 +1626,9 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <label>City</label>
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
-          <required>You must enter the city name.</required>
+          <required />
           <hint />
         </field>
-      </row>
-      <row>
         <field>
           <dc-schema>organization</dc-schema>
           <dc-element>address</dc-element>
@@ -1603,16 +1636,18 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <label>Country</label>
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
-          <required>You must enter the city name.</required>
+          <required />
           <hint />
         </field>
+      </row>
+      <row>
         <field>
           <dc-schema>dc</dc-schema>
           <dc-element>type</dc-element>
-          <label>Country</label>
+          <label>Type</label>
           <input-type value-pairs-name="orgunit_types">dropdown</input-type>
           <repeatable>false</repeatable>
-          <required>You must enter the city name.</required>
+          <required>You must specify the organisation type</required>
           <hint />
         </field>
       </row>
@@ -1687,18 +1722,6 @@ You can leave out the day and/or month if they aren't applicable.</hint>
       <row>
         <field>
           <dc-schema>crispj</dc-schema>
-          <dc-element>award</dc-element>
-          <dc-qualifier>url</dc-qualifier>
-          <label>Award URL</label>
-          <input-type>onebox</input-type>
-          <repeatable>true</repeatable>
-          <required />
-          <hint />
-        </field>
-      </row>
-      <row>
-        <field>
-          <dc-schema>crispj</dc-schema>
           <dc-element>openaireid</dc-element>
           <label>OpenAIRE ID</label>
           <input-type>onebox</input-type>
@@ -1747,7 +1770,7 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <label>OA Policy URL</label>
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
-          <required>The Open Access policy that applies to the project</required>
+          <required />
           <hint />
         </field>
       </row>
@@ -1802,7 +1825,7 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <dc-element>description</dc-element>
           <dc-qualifier>abstract</dc-qualifier>
           <label>Abstract</label>
-          <input-type>onebox</input-type>
+          <input-type>textarea</input-type>
           <repeatable>false</repeatable>
           <required />
           <hint />
@@ -1868,7 +1891,7 @@ You can leave out the day and/or month if they aren't applicable.</hint>
         <field>
           <dc-schema>oairecerif</dc-schema>
           <dc-element>internalid</dc-element>
-          <label>Funding code</label>
+          <label>Internal Funding code</label>
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
           <required />
@@ -1883,7 +1906,7 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <label>Funded project</label>
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
-          <required>The project that receive the funding</required>
+          <required />
           <hint />
         </field>
       </row>
@@ -1899,11 +1922,23 @@ You can leave out the day and/or month if they aren't applicable.</hint>
         </field>
         <field>
           <dc-schema>oairecerif</dc-schema>
-          <dc-element>fundingProgram</dc-element>
-          <label>Owner (Persons)</label>
+          <dc-element>fundingParent</dc-element>
+          <label>Program</label>
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
           <required />
+          <hint>Link this funding with its upper level if applicable</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>crisfund</dc-schema>
+          <dc-element>award</dc-element>
+          <dc-qualifier>url</dc-qualifier>
+          <label>Award Url</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required>The url preferably on the funder website of the award notice</required>
           <hint />
         </field>
       </row>
@@ -1924,7 +1959,7 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <label>OA Policy URL</label>
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
-          <required>The Open Access policy that applies to the project</required>
+          <required />
           <hint />
         </field>
       </row>
@@ -1932,9 +1967,8 @@ You can leave out the day and/or month if they aren't applicable.</hint>
         <field>
           <dc-schema>oairecerif</dc-schema>
           <dc-element>amount</dc-element>
-          <dc-qualifier>currency</dc-qualifier>
-          <label>Currency</label>
-          <input-type value-pairs-name="currency">dropdown</input-type>
+          <label>Amount</label>
+          <input-type>onebox</input-type>
           <repeatable>false</repeatable>
           <required />
           <hint />
@@ -1942,8 +1976,9 @@ You can leave out the day and/or month if they aren't applicable.</hint>
         <field>
           <dc-schema>oairecerif</dc-schema>
           <dc-element>amount</dc-element>
-          <label>Amount</label>
-          <input-type>onebox</input-type>
+          <dc-qualifier>currency</dc-qualifier>
+          <label>Currency</label>
+          <input-type value-pairs-name="currency">dropdown</input-type>
           <repeatable>false</repeatable>
           <required />
           <hint />
@@ -1960,8 +1995,6 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <required />
           <hint />
         </field>
-      </row>
-      <row>
         <field>
           <dc-schema>oairecerif</dc-schema>
           <dc-element>funding</dc-element>
@@ -1998,7 +2031,7 @@ You can leave out the day and/or month if they aren't applicable.</hint>
         <field>
           <dc-schema>dc</dc-schema>
           <dc-element>description</dc-element>
-          <label>Equipment Description</label>
+          <label>Funding Description</label>
           <input-type>textarea</input-type>
           <repeatable>false</repeatable>
           <required />

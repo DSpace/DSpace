@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+           xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+           xmlns:skosxl="http://www.w3.org/2008/05/skos-xl#"
+           xmlns:cf="urn:xmlns:org.eurocris.cerif"
+           xmlns:dc-term="http://purl.org/dc/terms/"
+           xmlns:sch="http://purl.oclc.org/dsdl/schematron"
+           xmlns="http://purl.org/coar/access_right"
+           xsi:schemaLocation="http://www.w3.org/2001/XMLSchema https://www.w3.org/2012/04/XMLSchema.xsd http://purl.oclc.org/dsdl/schematron https://raw.githubusercontent.com/schematron-quickfix/sqf/master/schemas/iso-schematron.xsd"
+           targetNamespace="http://purl.org/coar/access_right">
+   <xs:annotation>
+      <xs:appinfo>
+         <cf:ClassScheme id="http://purl.org/coar/access_right"/>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:include schemaLocation="../includes/cerif-commons.xsd"/>
+   <xs:element name="Access">
+      <xs:complexType>
+         <xs:annotation>
+            <xs:appinfo>
+               <sch:ns prefix="coar-access-right" uri="http://purl.org/coar/access_right"/>
+            </xs:appinfo>
+            <xs:appinfo>
+               <sch:pattern>
+                  <sch:title>Occurrence of "startDate" and "endDate" with the COAR Access Rights vocabulary</sch:title>
+                  <sch:rule context="coar-access-right:Access">
+                     <sch:report test="@startDate">No "startDate" shall be specified for an access item</sch:report>
+                     <sch:assert test="@endDate or not ( string(.) = 'http://purl.org/coar/access_right/c_f1cf' )">An "endDate" may only be specified for an embargoed access item</sch:assert>
+                     <sch:assert test="not( @endDate ) or ( string(.) = 'http://purl.org/coar/access_right/c_f1cf' )">No "endDate" may be specified for an item with other than embargoed access</sch:assert>
+                  </sch:rule>
+               </sch:pattern>
+            </xs:appinfo>
+         </xs:annotation>
+         <xs:simpleContent>
+            <xs:extension base="Enum">
+               <xs:attributeGroup ref="cfStartDateEndDate__AttributeGroup"/>
+               <xs:attributeGroup ref="cfExtension__AttributeGroup"/>
+            </xs:extension>
+         </xs:simpleContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:simpleType name="Enum">
+      <xs:restriction base="xs:string">
+         <xs:enumeration value="http://purl.org/coar/access_right/c_abf2">
+            <xs:annotation>
+               <xs:documentation xml:lang="en">open access</xs:documentation>
+               <xs:documentation xml:lang="es">acceso abierto</xs:documentation>
+               <xs:documentation xml:lang="tr">açık erişim</xs:documentation>
+               <xs:documentation xml:lang="fr">libre accès</xs:documentation>
+               <xs:documentation xml:lang="ja">オープンアクセス</xs:documentation>
+               <xs:documentation xml:lang="de">offener Zugang</xs:documentation>
+               <xs:documentation xml:lang="ru">открытый доступ</xs:documentation>
+               <xs:documentation xml:lang="pt">acesso aberto</xs:documentation>
+               <xs:documentation xml:lang="ar">الوصول الحر</xs:documentation>
+               <xs:documentation xml:lang="ca">accés obert </xs:documentation>
+               <xs:documentation xml:lang="sl">odprti dostop</xs:documentation>
+               <xs:documentation xml:lang="nl">vrij toegankelijk</xs:documentation>
+               <xs:documentation xml:lang="it">accesso aperto</xs:documentation>
+               <xs:appinfo>
+                  <cf:Class id="http://purl.org/coar/access_right/c_abf2"
+                            classSchemeId="http://purl.org/coar/access_right">
+                     <cf:Term xml:lang="en" trans="o">open access</cf:Term>
+                     <cf:Term xml:lang="es" trans="h">acceso abierto</cf:Term>
+                     <cf:Term xml:lang="tr" trans="h">açık erişim</cf:Term>
+                     <cf:Term xml:lang="fr" trans="h">libre accès</cf:Term>
+                     <cf:Term xml:lang="ja" trans="h">オープンアクセス</cf:Term>
+                     <cf:Term xml:lang="de" trans="h">offener Zugang</cf:Term>
+                     <cf:Term xml:lang="ru" trans="h">открытый доступ</cf:Term>
+                     <cf:Term xml:lang="pt" trans="h">acesso aberto</cf:Term>
+                     <cf:Term xml:lang="ar" trans="h">الوصول الحر</cf:Term>
+                     <cf:Term xml:lang="ca" trans="h">accés obert </cf:Term>
+                     <cf:Term xml:lang="sl" trans="h">odprti dostop</cf:Term>
+                     <cf:Term xml:lang="nl" trans="h">vrij toegankelijk</cf:Term>
+                     <cf:Term xml:lang="it" trans="h">accesso aperto</cf:Term>
+                     <cf:Definition xml:lang="en">Open access refers to a resource that is immediately and permanently online, and free for all on the Web, without financial and technical barriers.The resource is either stored in the repository or referenced to an external journal or trustworthy archive.</cf:Definition>
+                  </cf:Class>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="http://purl.org/coar/access_right/c_f1cf">
+            <xs:annotation>
+               <xs:documentation xml:lang="en">embargoed access</xs:documentation>
+               <xs:documentation xml:lang="es">acceso embargado</xs:documentation>
+               <xs:documentation xml:lang="tr">ambargolu erişim</xs:documentation>
+               <xs:documentation xml:lang="fr">sous embargo</xs:documentation>
+               <xs:documentation xml:lang="ja">エンバーゴ有</xs:documentation>
+               <xs:documentation xml:lang="de">Zugang unterliegt Embargo</xs:documentation>
+               <xs:documentation xml:lang="ru">доступ с эмбарго</xs:documentation>
+               <xs:documentation xml:lang="pt">acesso embargado</xs:documentation>
+               <xs:documentation xml:lang="ar">الوصول المحظور</xs:documentation>
+               <xs:documentation xml:lang="ca">accés embargat </xs:documentation>
+               <xs:documentation xml:lang="sl">odlog javne objave</xs:documentation>
+               <xs:documentation xml:lang="it">accesso sottoposto a periodo di embargo</xs:documentation>
+               <xs:documentation xml:lang="nl">onder embargo</xs:documentation>
+               <xs:appinfo>
+                  <cf:Class id="http://purl.org/coar/access_right/c_f1cf"
+                            classSchemeId="http://purl.org/coar/access_right">
+                     <cf:Term xml:lang="en" trans="o">embargoed access</cf:Term>
+                     <cf:Term xml:lang="es" trans="h">acceso embargado</cf:Term>
+                     <cf:Term xml:lang="tr" trans="h">ambargolu erişim</cf:Term>
+                     <cf:Term xml:lang="fr" trans="h">sous embargo</cf:Term>
+                     <cf:Term xml:lang="ja" trans="h">エンバーゴ有</cf:Term>
+                     <cf:Term xml:lang="de" trans="h">Zugang unterliegt Embargo</cf:Term>
+                     <cf:Term xml:lang="ru" trans="h">доступ с эмбарго</cf:Term>
+                     <cf:Term xml:lang="pt" trans="h">acesso embargado</cf:Term>
+                     <cf:Term xml:lang="ar" trans="h">الوصول المحظور</cf:Term>
+                     <cf:Term xml:lang="ca" trans="h">accés embargat </cf:Term>
+                     <cf:Term xml:lang="sl" trans="h">odlog javne objave</cf:Term>
+                     <cf:Term xml:lang="it" trans="h">accesso sottoposto a periodo di embargo</cf:Term>
+                     <cf:Term xml:lang="nl" trans="h">onder embargo</cf:Term>
+                     <cf:Definition xml:lang="en">Embargoed access refers to a resource that is metadata only access until released for open access on a certain date. Embargoes can be required by publishers and funders policies, or set by the author (e.g such as in the case of theses and dissertations).</cf:Definition>
+                  </cf:Class>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="http://purl.org/coar/access_right/c_16ec">
+            <xs:annotation>
+               <xs:documentation xml:lang="en">restricted access</xs:documentation>
+               <xs:documentation xml:lang="es">acceso restringido</xs:documentation>
+               <xs:documentation xml:lang="tr">sınırlı erişim</xs:documentation>
+               <xs:documentation xml:lang="fr">accès réservé</xs:documentation>
+               <xs:documentation xml:lang="ja">アクセス制限有</xs:documentation>
+               <xs:documentation xml:lang="de">eingeschränkter Zugang</xs:documentation>
+               <xs:documentation xml:lang="ru">ограниченный доступ</xs:documentation>
+               <xs:documentation xml:lang="pt">acesso restrito</xs:documentation>
+               <xs:documentation xml:lang="ar">الوصول المقيد</xs:documentation>
+               <xs:documentation xml:lang="ca">accés restringit </xs:documentation>
+               <xs:documentation xml:lang="sl">omejen dostop</xs:documentation>
+               <xs:documentation xml:lang="it">accesso riservato</xs:documentation>
+               <xs:documentation xml:lang="nl">beperkt toegankelijk</xs:documentation>
+               <xs:appinfo>
+                  <cf:Class id="http://purl.org/coar/access_right/c_16ec"
+                            classSchemeId="http://purl.org/coar/access_right">
+                     <cf:Term xml:lang="en" trans="o">restricted access</cf:Term>
+                     <cf:Term xml:lang="es" trans="h">acceso restringido</cf:Term>
+                     <cf:Term xml:lang="tr" trans="h">sınırlı erişim</cf:Term>
+                     <cf:Term xml:lang="fr" trans="h">accès réservé</cf:Term>
+                     <cf:Term xml:lang="ja" trans="h">アクセス制限有</cf:Term>
+                     <cf:Term xml:lang="de" trans="h">eingeschränkter Zugang</cf:Term>
+                     <cf:Term xml:lang="ru" trans="h">ограниченный доступ</cf:Term>
+                     <cf:Term xml:lang="pt" trans="h">acesso restrito</cf:Term>
+                     <cf:Term xml:lang="ar" trans="h">الوصول المقيد</cf:Term>
+                     <cf:Term xml:lang="ca" trans="h">accés restringit </cf:Term>
+                     <cf:Term xml:lang="sl" trans="h">omejen dostop</cf:Term>
+                     <cf:Term xml:lang="it" trans="h">accesso riservato</cf:Term>
+                     <cf:Term xml:lang="nl" trans="h">beperkt toegankelijk</cf:Term>
+                     <cf:Definition xml:lang="en">Restricted access refers to a resource that is available in a system but with some type of restriction for full open access. This type of access can occur in a number of different situations. Some examples are described below:
+The user must log-in to the system in order to access the resource
+The user must send an email to the author or system administrator to access the resource
+Access to the resource is restricted to a specific community (e.g. limited to a university community)</cf:Definition>
+                  </cf:Class>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="http://purl.org/coar/access_right/c_14cb">
+            <xs:annotation>
+               <xs:documentation xml:lang="en">metadata only access</xs:documentation>
+               <xs:documentation xml:lang="es">registro bibliográfico</xs:documentation>
+               <xs:documentation xml:lang="tr">sadece üstveri erişimi</xs:documentation>
+               <xs:documentation xml:lang="fr">accès aux seules métadonnées</xs:documentation>
+               <xs:documentation xml:lang="ja">メタデータのみ</xs:documentation>
+               <xs:documentation xml:lang="de">nur Metadaten</xs:documentation>
+               <xs:documentation xml:lang="ru"> доступ к метаданным</xs:documentation>
+               <xs:documentation xml:lang="pt">acesso a metadados</xs:documentation>
+               <xs:documentation xml:lang="ar">الوصول المحدود بالميتاداتا</xs:documentation>
+               <xs:documentation xml:lang="ca">accés només a metadades </xs:documentation>
+               <xs:documentation xml:lang="sl">samo metapodatki</xs:documentation>
+               <xs:documentation xml:lang="it">accesso limitato ai metadati</xs:documentation>
+               <xs:documentation xml:lang="nl">alleen metadata beschikbaar</xs:documentation>
+               <xs:appinfo>
+                  <cf:Class id="http://purl.org/coar/access_right/c_14cb"
+                            classSchemeId="http://purl.org/coar/access_right">
+                     <cf:Term xml:lang="en" trans="o">metadata only access</cf:Term>
+                     <cf:Term xml:lang="es" trans="h">registro bibliográfico</cf:Term>
+                     <cf:Term xml:lang="tr" trans="h">sadece üstveri erişimi</cf:Term>
+                     <cf:Term xml:lang="fr" trans="h">accès aux seules métadonnées</cf:Term>
+                     <cf:Term xml:lang="ja" trans="h">メタデータのみ</cf:Term>
+                     <cf:Term xml:lang="de" trans="h">nur Metadaten</cf:Term>
+                     <cf:Term xml:lang="ru" trans="h"> доступ к метаданным</cf:Term>
+                     <cf:Term xml:lang="pt" trans="h">acesso a metadados</cf:Term>
+                     <cf:Term xml:lang="ar" trans="h">الوصول المحدود بالميتاداتا</cf:Term>
+                     <cf:Term xml:lang="ca" trans="h">accés només a metadades </cf:Term>
+                     <cf:Term xml:lang="sl" trans="h">samo metapodatki</cf:Term>
+                     <cf:Term xml:lang="it" trans="h">accesso limitato ai metadati</cf:Term>
+                     <cf:Term xml:lang="nl" trans="h">alleen metadata beschikbaar</cf:Term>
+                     <cf:Definition xml:lang="en">Metadata only access refers to a resource in which access is limited to metadata only. The resource itself is described by the metadata, but neither is directly available through the system or platform nor can be referenced to an open access copy in an external journal or trustworthy archive.</cf:Definition>
+                  </cf:Class>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+      </xs:restriction>
+   </xs:simpleType>
+</xs:schema>

@@ -263,7 +263,7 @@ public class ItemArchive {
         this.addUndoMetadataField(dtom);  //seed the undo list with the identifier field
 
         Iterator<Item> itr = itemService
-            .findByMetadataField(context, dtom.schema, dtom.element, dtom.qualifier, dtom.value);
+            .findArchivedByMetadataField(context, dtom.schema, dtom.element, dtom.qualifier, dtom.value);
         int count = 0;
         while (itr.hasNext()) {
             item = itr.next();

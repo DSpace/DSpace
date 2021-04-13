@@ -34,7 +34,7 @@ public interface HarvestedItemService {
     public HarvestedItem find(Context context, Item item) throws SQLException;
 
     /**
-     * Retrieve a DSpace Item that corresponds to this particular combination of owning collection and OAI ID.
+     * Retrieve a HarvestedItem that corresponds to this particular combination of owning collection and OAI ID.
      *
      * @param context    The relevant DSpace Context.
      * @param itemOaiID  the string used by the OAI-PMH provider to identify the item
@@ -42,7 +42,7 @@ public interface HarvestedItemService {
      * @return DSpace Item or null if no item was found
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public Item getItemByOAIId(Context context, String itemOaiID, Collection collection) throws SQLException;
+    public HarvestedItem findByOAIId(Context context, String itemOaiID, Collection collection) throws SQLException;
 
     /**
      * Create a new harvested item row for a specified item id.

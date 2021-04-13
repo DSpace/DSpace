@@ -25,8 +25,6 @@ public abstract class ImpServiceFactory {
 
     public abstract ImpRecordService getImpRecordService();
 
-    public abstract ImpRecordToItemService getImpRecordToItemService();
-
     public abstract ImpWorkflowNStateService getImpWorkflowNStateService();
 
     public static ImpServiceFactory getInstance() {

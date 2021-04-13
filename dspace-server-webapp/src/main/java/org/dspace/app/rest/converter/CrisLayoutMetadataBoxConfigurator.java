@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.converter;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +27,7 @@ import org.dspace.layout.CrisLayoutBoxTypes;
 import org.dspace.layout.CrisLayoutField;
 import org.dspace.layout.CrisLayoutFieldBitstream;
 import org.dspace.layout.CrisLayoutFieldMetadata;
+import org.dspace.layout.CrisMetadataGroup;
 import org.springframework.stereotype.Component;
 
 /**
@@ -65,7 +67,7 @@ public class CrisLayoutMetadataBoxConfigurator implements CrisLayoutBoxConfigura
                 if (layoutField instanceof CrisLayoutFieldMetadata) {
                     field.setMetadata(composeMetadataFieldIdentifier(layoutField.getMetadataField()));
                     field.setFieldType("METADATA");
-                } else if (layoutField instanceof CrisLayoutFieldBitstream) {
+                } else if  (layoutField instanceof CrisLayoutFieldBitstream) {
                     CrisLayoutFieldBitstream bitstream = (CrisLayoutFieldBitstream) layoutField;
                     field.setFieldType("BITSTREAM");
                     Bitstream bits = new Bitstream();
@@ -74,8 +76,32 @@ public class CrisLayoutMetadataBoxConfigurator implements CrisLayoutBoxConfigura
                     bits.setMetadataField(composeMetadataFieldIdentifier(bitstream.getMetadataField()));
                     field.setBitstream(bits);
                 }
+                // if it has metadatagroup
+                if (!layoutField.getCrisMetadataGroupList().isEmpty()) {
+                    CrisLayoutMetadataConfigurationRest.MetadataGroup metadataGroup =
+                            new CrisLayoutMetadataConfigurationRest.MetadataGroup();
+                    metadataGroup.setLeading(composeMetadataFieldIdentifier(layoutField.getMetadataField()));
+                    List<CrisMetadataGroup> crisMetadataGroupList = layoutField.getCrisMetadataGroupList();
+                    List<Field> nestedFieldList = new ArrayList<>();
+
+                    for (CrisMetadataGroup crisMetadataGroup : crisMetadataGroupList) {
+                        Field nestedField = new Field();
+                        nestedField.setMetadata(composeMetadataFieldIdentifier(crisMetadataGroup.getMetadataField()));
+                        nestedField.setLabel(crisMetadataGroup.getLabel());
+                        nestedField.setRendering(crisMetadataGroup.getRendering());
+                        nestedField.setStyle(crisMetadataGroup.getStyle());
+                        nestedField.setStyleLabel(crisMetadataGroup.getStyleLabel());
+                        nestedField.setStyleValue(crisMetadataGroup.getStyleValue());
+                        nestedField.setFieldType("METADATA");
+                        nestedFieldList.add(nestedField);
+                    }
+                    metadataGroup.setElements(nestedFieldList);
+                    field.setMetadataGroup(metadataGroup);
+                    field.setFieldType("METADATAGROUP");
+                }
                 row.addField(field);
             }
+
             Set<Integer> keySet = rows.keySet();
             for (Integer position : keySet) {
                 rest.addRow(rows.get(position));

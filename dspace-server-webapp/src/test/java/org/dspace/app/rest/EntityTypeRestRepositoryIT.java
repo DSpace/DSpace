@@ -22,6 +22,7 @@ import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.EntityType;
 import org.dspace.content.service.EntityTypeService;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -172,22 +173,22 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
                 .build();
             Collection col1 =
                 CollectionBuilder.createCollection(context, parentCommunity)
-                        .withRelationshipType("JournalIssue")
+                        .withEntityType("JournalIssue")
                         .withSubmitterGroup(eperson)
                         .withName("Collection 1")
                         .build();
             Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
-                    .withRelationshipType("Publication")
+                    .withEntityType("Publication")
                     .withSubmitterGroup(eperson)
                      .withName("Collection 2")
                     .build();
             Collection col3 = CollectionBuilder.createCollection(context, parentCommunity)
-                    .withRelationshipType("Project")
+                    .withEntityType("Project")
                     .withSubmitterGroup(eperson)
                     .withName("Collection 3")
                     .build();
             Collection col4 = CollectionBuilder.createCollection(context, parentCommunity)
-                    .withRelationshipType("Journal")
+                    .withEntityType("Journal")
                     .withSubmitterGroup(eperson)
                     .withName("Collection 4")
                     .build();
@@ -210,4 +211,63 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
             CommunityBuilder.deleteCommunity(parentCommunity.getID());
         }
     }
+
+    @Test
+    public void findAllPaginationTest() throws Exception {
+        getClient().perform(get("/api/core/entitytypes")
+                   .param("page", "0")
+                   .param("size", "3"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.entitytypes", containsInAnyOrder(
+                    EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Publication")),
+                    EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Person")),
+                    EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Project"))
+                    )))
+                   .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/entitytypes?"),
+                           Matchers.containsString("page=0"), Matchers.containsString("size=3"))))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/entitytypes?"),
+                           Matchers.containsString("page=0"), Matchers.containsString("size=3"))))
+                   .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/entitytypes?"),
+                           Matchers.containsString("page=1"), Matchers.containsString("size=3"))))
+                   .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/entitytypes?"),
+                           Matchers.containsString("page=2"), Matchers.containsString("size=3"))))
+                   .andExpect(jsonPath("$.page.size", is(3)))
+                   .andExpect(jsonPath("$.page.totalElements", is(7)))
+                   .andExpect(jsonPath("$.page.totalPages", is(3)))
+                   .andExpect(jsonPath("$.page.number", is(0)));
+
+        getClient().perform(get("/api/core/entitytypes")
+                   .param("page", "1")
+                   .param("size", "3"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.entitytypes", containsInAnyOrder(
+                    EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "OrgUnit")),
+                    EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Journal")),
+                    EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "JournalVolume"))
+                    )))
+                   .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/entitytypes?"),
+                           Matchers.containsString("page=0"), Matchers.containsString("size=3"))))
+                   .andExpect(jsonPath("$._links.prev.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/entitytypes?"),
+                           Matchers.containsString("page=0"), Matchers.containsString("size=3"))))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/entitytypes?"),
+                           Matchers.containsString("page=1"), Matchers.containsString("size=3"))))
+                   .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/entitytypes?"),
+                           Matchers.containsString("page=2"), Matchers.containsString("size=3"))))
+                   .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/entitytypes?"),
+                           Matchers.containsString("page=2"), Matchers.containsString("size=3"))))
+                   .andExpect(jsonPath("$.page.size", is(3)))
+                   .andExpect(jsonPath("$.page.totalElements", is(7)))
+                   .andExpect(jsonPath("$.page.totalPages", is(3)))
+                   .andExpect(jsonPath("$.page.number", is(1)));
+    }
+
 }

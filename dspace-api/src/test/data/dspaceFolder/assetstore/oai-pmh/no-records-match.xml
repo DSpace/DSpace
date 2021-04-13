@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href='static/style.xsl' type='text/xsl'?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+   <responseDate>2020-11-24T11:41:39Z</responseDate>
+   <request verb="ListRecords" metadataPrefix="oai_cerif_openaire" from="2021-01-01T00:00:00Z">https://www.openstarts.units.it/dspace-oai/openairecris</request>
+   <error code="noRecordsMatch">No matches for the query</error>
+</OAI-PMH>

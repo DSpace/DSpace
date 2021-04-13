@@ -30,9 +30,17 @@
     <!-- Statistics services are both lazy loaded (by name), as you are likely just using ONE of them and not both -->
     <bean id="solrLoggerService" class="org.dspace.statistics.SolrLoggerServiceImpl" lazy-init="true"/>
 
+    <bean class="org.dspace.statistics.SolrStatisticsCore" autowire-candidate="true"/>
+
 	<!-- deduplication -->
 	<bean class="org.dspace.app.deduplication.service.impl.SolrDedupServiceImpl" id="org.dspace.app.deduplication.service.DedupService"/>
-	
+
 	<!-- audit -->
 	<bean id="org.dspace.app.audit.AuditService" class="org.dspace.app.audit.AuditService"/>
+
+	<!-- notification broker service -->
+	<bean id="org.dspace.app.nbevent.service.NBEventService" class="org.dspace.app.nbevent.service.impl.NBEventServiceImpl" />
+
+    <!-- suggestion service for solr providers -->	
+	<bean id="org.dspace.app.suggestion.SolrSuggestionStorageService" class="org.dspace.app.suggestion.SolrSuggestionStorageServiceImpl" />
 </beans>

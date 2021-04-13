@@ -10,11 +10,11 @@ package org.dspace.content.integration.crosswalks.script;
 import static org.dspace.app.launcher.ScriptLauncher.handleScript;
 import static org.dspace.builder.CollectionBuilder.createCollection;
 import static org.dspace.builder.CommunityBuilder.createCommunity;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -59,7 +59,7 @@ public class ItemExportIT extends AbstractIntegrationTestWithDatabase {
 
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context, collection)
-            .withRelationshipType("Person")
+            .withEntityType("Person")
             .withTitle("Edward White")
             .withJobTitle("Researcher")
             .withOrcidIdentifier("0000-0002-9077-5939")
@@ -92,7 +92,7 @@ public class ItemExportIT extends AbstractIntegrationTestWithDatabase {
 
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context, collection)
-            .withRelationshipType("Person")
+            .withEntityType("Person")
             .withTitle("Edward White")
             .withJobTitle("Researcher")
             .withOrcidIdentifier("0000-0002-9077-5939")

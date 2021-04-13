@@ -1,4 +1,4 @@
-<OrgUnit id="@virtual.id@">
+<OrgUnit xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="@virtual.id@">
 	<Name>@dc.title@</Name>
 	<Name>@organization.legalName@</Name>
 	<Acronym>@oairecerif.acronym@</Acronym>

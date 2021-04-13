@@ -19,8 +19,9 @@ import org.dspace.content.service.InProgressSubmissionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
-import org.dspace.workflowbasic.factory.BasicWorkflowServiceFactory;
-import org.dspace.workflowbasic.service.BasicWorkflowItemService;
+import org.dspace.workflow.WorkflowItemService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 public class ItemUtils {
     public final static int UNKNOWN = -1;
@@ -38,8 +39,8 @@ public class ItemUtils {
         InProgressSubmissionService inprogressService = getWorkspaceItemService();
         InProgressSubmission inprogress = /* WorkspaceItem */getWorkspaceItemService().findByItem(context, item);
         if (inprogress == null) {
-            inprogressService = getBasicWorkflowService();
-            inprogress = /* WorkflowItem */getBasicWorkflowService().findByItem(context, item);
+            inprogressService = getWorkflowService();
+            inprogress = /* WorkflowItem */getWorkflowService().findByItem(context, item);
         }
         // if we have an item that has been public at some time, better to keep
         // it for history
@@ -90,8 +91,8 @@ public class ItemUtils {
         return ContentServiceFactory.getInstance().getWorkspaceItemService();
     }
 
-    private static BasicWorkflowItemService getBasicWorkflowService() {
-        return BasicWorkflowServiceFactory.getInstance().getBasicWorkflowItemService();
+    private static WorkflowItemService<XmlWorkflowItem> getWorkflowService() {
+        return WorkflowServiceFactory.getInstance().getWorkflowItemService();
     }
 
     private static ItemService getItemService() {

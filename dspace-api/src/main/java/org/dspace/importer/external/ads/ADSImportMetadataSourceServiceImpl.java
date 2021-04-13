@@ -35,7 +35,6 @@ import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreConnectionPNames;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.exception.MetadataSourceException;
@@ -229,8 +228,8 @@ public class ADSImportMetadataSourceServiceImpl
 
     public Integer count(String query, String token) {
         List<ImportRecord> adsResults = new ArrayList<>();
-        String proxyHost = ConfigurationManager.getProperty("http.proxy.host");
-        String proxyPort = ConfigurationManager.getProperty("http.proxy.port");
+        String proxyHost = configurationService.getProperty("http.proxy.host");
+        String proxyPort = configurationService.getProperty("http.proxy.port");
         HttpGet method = null;
         HttpHost proxy = null;
         try {
@@ -276,8 +275,8 @@ public class ADSImportMetadataSourceServiceImpl
 
     public List<ImportRecord> search(String query, Integer start, Integer count, String token) {
         List<ImportRecord> adsResults = new ArrayList<>();
-        String proxyHost = ConfigurationManager.getProperty("http.proxy.host");
-        String proxyPort = ConfigurationManager.getProperty("http.proxy.port");
+        String proxyHost = configurationService.getProperty("http.proxy.host");
+        String proxyPort = configurationService.getProperty("http.proxy.port");
         HttpGet method = null;
         HttpHost proxy = null;
         try {

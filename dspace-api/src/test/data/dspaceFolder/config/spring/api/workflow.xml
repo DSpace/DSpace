@@ -23,6 +23,7 @@
                 <ref bean="reviewstep"/>
                 <ref bean="editstep"/>
                 <ref bean="finaleditstep"/>
+                <ref bean="checkcorrectionstep"/>
             </util:list>
         </property>
     </bean>
@@ -76,6 +77,12 @@
     <bean name="finaleditstep" class="org.dspace.xmlworkflow.state.Step">
         <property name="userSelectionMethod" ref="claimaction"/>
         <property name="role" ref="finaleditor" />
+        <property name="outcomes">
+            <util:map>
+                <entry key="#{ T(org.dspace.xmlworkflow.state.actions.ActionResult).OUTCOME_COMPLETE}"
+                       value-ref="checkcorrectionstep"/>
+            </util:map>
+        </property>
         <property name="actions">
             <list>
                 <ref bean="finaleditaction"/>
@@ -88,6 +95,15 @@
         <property name="name" value="Final Editor"/>
         <property name="description"
                   value="The people responsible for this step are able to edit the metadata of incoming submissions, but will not be able to reject them."/>
+    </bean>
+    
+    <bean name="checkcorrectionstep" class="org.dspace.xmlworkflow.state.Step">
+        <property name="userSelectionMethod" ref="noUserSelectionAction"/>
+        <property name="actions">
+            <list>
+                <ref bean="checkcorrectionaction"/>
+            </list>
+        </property>
     </bean>
 
     <!--Workflow where a reviewManager can select a single review who will then either accept/reject the item-->

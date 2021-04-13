@@ -45,13 +45,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import gr.ekt.bte.core.DataLoader;
-import gr.ekt.bte.core.TransformationEngine;
-import gr.ekt.bte.core.TransformationResult;
-import gr.ekt.bte.core.TransformationSpec;
-import gr.ekt.bte.dataloader.FileDataLoader;
-import gr.ekt.bteio.generators.DSpaceOutputGenerator;
-import gr.ekt.bteio.loaders.OAIPMHDataLoader;
 import org.apache.commons.collections4.ComparatorUtils;
 import org.apache.commons.io.FileDeleteStrategy;
 import org.apache.commons.io.FileUtils;
@@ -85,7 +78,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
@@ -96,7 +88,7 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.handle.service.HandleService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.ConfigurationService;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowService;
 import org.springframework.beans.factory.InitializingBean;
@@ -157,8 +149,11 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     protected WorkspaceItemService workspaceItemService;
     @Autowired(required = true)
     protected WorkflowService workflowService;
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
 
-    protected final String tempWorkDir = ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir");
+    protected final String tempWorkDir
+            = configurationService.getProperty("org.dspace.app.batchitemimport.work.dir");
 
     protected boolean isTest = false;
     protected boolean isResume = false;
@@ -196,100 +191,6 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         //Protected consumer to ensure that we use spring to create a bean, NEVER make this public
     }
 
-
-    /**
-     * In this method, the BTE is instantiated. THe workflow generates the DSpace files
-     * necessary for the upload, and the default item import method is called
-     *
-     * @param c             The contect
-     * @param mycollections The collections the items are inserted to
-     * @param sourceDir     The filepath to the file to read data from
-     * @param mapFile       The filepath to mapfile to be generated
-     * @param template      whether to use collection template item as starting point
-     * @param inputType     The type of the input data (bibtex, csv, etc.)
-     * @param workingDir    The path to create temporary files (for command line or UI based)
-     * @throws Exception if error occurs
-     */
-    @Override
-    public void addBTEItems(Context c, List<Collection> mycollections,
-                            String sourceDir, String mapFile, boolean template, String inputType, String workingDir)
-        throws Exception {
-        //Determine the folder where BTE will output the results
-        String outputFolder = null;
-        if (workingDir == null) { //This indicates a command line import, create a random path
-            File importDir = new File(ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir"));
-            if (!importDir.exists()) {
-                boolean success = importDir.mkdir();
-                if (!success) {
-                    log.info("Cannot create batch import directory!");
-                    throw new Exception("Cannot create batch import directory!");
-                }
-            }
-            //Get a random folder in case two admins batch import data at the same time
-            outputFolder = importDir + File.separator + generateRandomFilename(true);
-        } else { //This indicates a UI import, working dir is preconfigured
-            outputFolder = workingDir;
-        }
-
-        BTEBatchImportService dls = new DSpace().getSingletonService(BTEBatchImportService.class);
-        DataLoader dataLoader = dls.getDataLoaders().get(inputType);
-        Map<String, String> outputMap = dls.getOutputMap();
-        TransformationEngine te = dls.getTransformationEngine();
-
-        if (dataLoader == null) {
-            System.out.println(
-                "ERROR: The key used in -i parameter must match a valid DataLoader in the BTE Spring XML " +
-                    "configuration file!");
-            return;
-        }
-
-        if (outputMap == null) {
-            System.out.println(
-                "ERROR: The key used in -i parameter must match a valid outputMapping in the BTE Spring XML " +
-                    "configuration file!");
-            return;
-        }
-
-        if (dataLoader instanceof FileDataLoader) {
-            FileDataLoader fdl = (FileDataLoader) dataLoader;
-            if (!StringUtils.isBlank(sourceDir)) {
-                System.out.println(
-                    "INFO: Dataloader will load data from the file specified in the command prompt (and not from the " +
-                        "Spring XML configuration file)");
-                fdl.setFilename(sourceDir);
-            }
-        } else if (dataLoader instanceof OAIPMHDataLoader) {
-            OAIPMHDataLoader fdl = (OAIPMHDataLoader) dataLoader;
-            System.out.println(sourceDir);
-            if (!StringUtils.isBlank(sourceDir)) {
-                System.out.println(
-                    "INFO: Dataloader will load data from the address specified in the command prompt (and not from " +
-                        "the Spring XML configuration file)");
-                fdl.setServerAddress(sourceDir);
-            }
-        }
-        if (dataLoader != null) {
-            System.out.println("INFO: Dataloader " + dataLoader.toString() + " will be used for the import!");
-
-            te.setDataLoader(dataLoader);
-
-            DSpaceOutputGenerator outputGenerator = new DSpaceOutputGenerator(outputMap);
-            outputGenerator.setOutputDirectory(outputFolder);
-
-            te.setOutputGenerator(outputGenerator);
-
-            try {
-                TransformationResult res = te.transform(new TransformationSpec());
-                List<String> output = res.getOutput();
-                outputGenerator.writeOutput(output);
-            } catch (Exception e) {
-                System.err.println("Exception");
-                e.printStackTrace();
-                throw e;
-            }
-            addItems(c, mycollections, outputFolder, mapFile, template);
-        }
-    }
 
     @Override
     public void addItemsAtomic(Context c, List<Collection> mycollections, String sourceDir, String mapFile,
@@ -1481,7 +1382,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
         File tempdir = new File(destinationDir);
         if (!tempdir.isDirectory()) {
-            log.error("'" + ConfigurationManager.getProperty("org.dspace.app.itemexport.work.dir") +
+            log.error("'" + configurationService.getProperty("org.dspace.app.itemexport.work.dir") +
                           "' as defined by the key 'org.dspace.app.itemexport.work.dir' in dspace.cfg " +
                           "is not a valid directory");
         }
@@ -1506,60 +1407,54 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     log.error("Unable to create contents directory: " + zipDir + entry.getName());
                 }
             } else {
-                System.out.println("Extracting file: " + entry.getName());
-                log.info("Extracting file: " + entry.getName());
-
-                int index = entry.getName().lastIndexOf('/');
-                if (index == -1) {
-                    // Was it created on Windows instead?
-                    index = entry.getName().lastIndexOf('\\');
-                }
-                if (index > 0) {
-                    File dir = new File(zipDir + entry.getName().substring(0, index));
-                    if (!dir.exists() && !dir.mkdirs()) {
-                        log.error("Unable to create directory: " + dir.getAbsolutePath());
-                    }
-                    // Verify that the directory the entry is using is a subpath of zipDir (and not somewhere else!)
-                    if (!dir.toPath().normalize().startsWith(zipDir)) {
-                        throw new IOException("Bad zip entry: '" + entry.getName()
-                                                  + "' in file '" + zipfile.getAbsolutePath() + "'!"
-                                                  + " Cannot process this file.");
-                    }
-
-                    //Entries could have too many directories, and we need to adjust the sourcedir
-                    // file1.zip (SimpleArchiveFormat / item1 / contents|dublin_core|...
-                    //            SimpleArchiveFormat / item2 / contents|dublin_core|...
-                    // or
-                    // file2.zip (item1 / contents|dublin_core|...
-                    //            item2 / contents|dublin_core|...
-
-                    //regex supports either windows or *nix file paths
-                    String[] entryChunks = entry.getName().split("/|\\\\");
-                    if (entryChunks.length > 2) {
-                        if (StringUtils.equals(sourceDirForZip, sourcedir)) {
-                            sourceDirForZip = sourcedir + "/" + entryChunks[0];
-                        }
-                    }
-
-
-                }
-                byte[] buffer = new byte[1024];
-                int len;
-                File outFile = new File(zipDir + entry.getName());
-                // Verify that this file will be created in our zipDir (and not somewhere else!)
+                String entryName = entry.getName();
+                File outFile = new File(zipDir + entryName);
+                // Verify that this file will be extracted into our zipDir (and not somewhere else!)
                 if (!outFile.toPath().normalize().startsWith(zipDir)) {
-                    throw new IOException("Bad zip entry: '" + entry.getName()
+                    throw new IOException("Bad zip entry: '" + entryName
                                               + "' in file '" + zipfile.getAbsolutePath() + "'!"
                                               + " Cannot process this file.");
+                } else {
+                    System.out.println("Extracting file: " + entryName);
+                    log.info("Extracting file: " + entryName);
+
+                    int index = entryName.lastIndexOf('/');
+                    if (index == -1) {
+                        // Was it created on Windows instead?
+                        index = entryName.lastIndexOf('\\');
+                    }
+                    if (index > 0) {
+                        File dir = new File(zipDir + entryName.substring(0, index));
+                        if (!dir.exists() && !dir.mkdirs()) {
+                            log.error("Unable to create directory: " + dir.getAbsolutePath());
+                        }
+
+                        //Entries could have too many directories, and we need to adjust the sourcedir
+                        // file1.zip (SimpleArchiveFormat / item1 / contents|dublin_core|...
+                        //            SimpleArchiveFormat / item2 / contents|dublin_core|...
+                        // or
+                        // file2.zip (item1 / contents|dublin_core|...
+                        //            item2 / contents|dublin_core|...
+
+                        //regex supports either windows or *nix file paths
+                        String[] entryChunks = entryName.split("/|\\\\");
+                        if (entryChunks.length > 2) {
+                            if (StringUtils.equals(sourceDirForZip, sourcedir)) {
+                                sourceDirForZip = sourcedir + "/" + entryChunks[0];
+                            }
+                        }
+                    }
+                    byte[] buffer = new byte[1024];
+                    int len;
+                    InputStream in = zf.getInputStream(entry);
+                    BufferedOutputStream out = new BufferedOutputStream(
+                        new FileOutputStream(outFile));
+                    while ((len = in.read(buffer)) >= 0) {
+                        out.write(buffer, 0, len);
+                    }
+                    in.close();
+                    out.close();
                 }
-                InputStream in = zf.getInputStream(entry);
-                BufferedOutputStream out = new BufferedOutputStream(
-                    new FileOutputStream(outFile));
-                while ((len = in.read(buffer)) >= 0) {
-                    out.write(buffer, 0, len);
-                }
-                in.close();
-                out.close();
             }
         }
 
@@ -1652,7 +1547,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                         }
                     }
 
-                    importDir = ConfigurationManager.getProperty(
+                    importDir = configurationService.getProperty(
                         "org.dspace.app.batchitemimport.work.dir") + File.separator + "batchuploads" + File.separator
                         + context
                         .getCurrentUser()
@@ -1742,9 +1637,6 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     if (theInputType.equals("saf") || theInputType
                         .equals("safupload")) { //In case of Simple Archive Format import
                         addItems(context, finalCollections, dataDir, mapFilePath, template);
-                    } else { // For all other imports (via BTE)
-                        addBTEItems(context, finalCollections, theFilePath, mapFilePath, useTemplateItem, theInputType,
-                                    dataDir);
                     }
 
                     // email message letting user know the file is ready for
@@ -1810,7 +1702,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "bte_batch_import_error"));
             email.addRecipient(eperson.getEmail());
             email.addArgument(error);
-            email.addArgument(ConfigurationManager.getProperty("dspace.ui.url") + "/feedback");
+            email.addArgument(configurationService.getProperty("dspace.ui.url") + "/feedback");
 
             email.send();
         } catch (Exception e) {
@@ -1848,7 +1740,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     @Override
     public String getImportUploadableDirectory(EPerson ePerson)
         throws Exception {
-        String uploadDir = ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir");
+        String uploadDir = configurationService.getProperty("org.dspace.app.batchitemimport.work.dir");
         if (uploadDir == null) {
             throw new Exception(
                 "A dspace.cfg entry for 'org.dspace.app.batchitemimport.work.dir' does not exist.");

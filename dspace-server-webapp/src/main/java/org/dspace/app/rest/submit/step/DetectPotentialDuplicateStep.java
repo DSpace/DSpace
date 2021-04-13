@@ -22,7 +22,7 @@ import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.step.DataDetectDuplicate;
 import org.dspace.app.rest.model.step.DuplicateMatch;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.submit.AbstractRestProcessingStep;
+import org.dspace.app.rest.submit.AbstractProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.submit.factory.PatchOperationFactory;
 import org.dspace.app.rest.submit.factory.impl.PatchOperation;
@@ -36,7 +36,6 @@ import org.dspace.core.Context;
 import org.dspace.services.RequestService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.services.model.Request;
-import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.utils.DSpace;
 
 /**
@@ -45,7 +44,7 @@ import org.dspace.utils.DSpace;
  *
  * @author Giuseppe Digilio (giuseppe.digilio at 4science.it)
  */
-public class DetectPotentialDuplicateStep extends AbstractProcessingStep implements AbstractRestProcessingStep {
+public class DetectPotentialDuplicateStep extends AbstractProcessingStep {
 
     public static final String DETECT_DUPLICATE_STEP_ADD_OPERATION_ENTRY = "detectduplicateadd";
 
@@ -102,18 +101,8 @@ public class DetectPotentialDuplicateStep extends AbstractProcessingStep impleme
     }
 
     @Override
-    public void doPreProcessing(Context context, InProgressSubmission wsi) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void doPostProcessing(Context context, InProgressSubmission wsi) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op,
+    public void doPatchProcessing(Context context, HttpServletRequest currentRequest, InProgressSubmission source,
+        Operation op,
         SubmissionStepConfig stepConf) throws Exception {
         PatchOperation<MetadataValueRest> patchOperation = new PatchOperationFactory()
                 .instanceOf(DETECT_DUPLICATE_STEP_ADD_OPERATION_ENTRY, op.getOp());

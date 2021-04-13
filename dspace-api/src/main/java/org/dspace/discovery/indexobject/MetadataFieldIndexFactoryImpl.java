@@ -62,8 +62,12 @@ public class MetadataFieldIndexFactoryImpl extends IndexFactoryImpl<IndexableMet
         }
         addNamedResourceTypeIndex(doc, indexableObject.getTypeText());
         Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
-        // add read permission on doc for anonymous group
-        doc.addField("read", "g" + anonymousGroup.getID());
+        // this happen during the first initialization as the metadata registry is loaded
+        // before than the default groups are created
+        if (anonymousGroup != null) {
+            // add read permission on doc for anonymous group
+            doc.addField("read", "g" + anonymousGroup.getID());
+        }
         return doc;
     }
 

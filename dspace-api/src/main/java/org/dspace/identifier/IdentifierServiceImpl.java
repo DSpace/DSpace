@@ -12,15 +12,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
+import org.dspace.identifier.doi.DOIIdentifierNotApplicableException;
 import org.dspace.identifier.service.IdentifierService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * The main service class used to reserve, register and resolve identifiers
@@ -36,7 +37,7 @@ public class IdentifierServiceImpl implements IdentifierService {
     /**
      * log4j category
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(IdentifierServiceImpl.class);
+    private static final Logger log = LogManager.getLogger(IdentifierServiceImpl.class);
 
     @Autowired(required = true)
     protected ContentServiceFactory contentServiceFactory;
@@ -47,8 +48,7 @@ public class IdentifierServiceImpl implements IdentifierService {
 
     }
 
-    @Autowired
-    @Required
+    @Autowired(required = true)
     public void setProviders(List<IdentifierProvider> providers) {
         this.providers = providers;
 
@@ -67,9 +67,13 @@ public class IdentifierServiceImpl implements IdentifierService {
     public void reserve(Context context, DSpaceObject dso)
         throws AuthorizeException, SQLException, IdentifierException {
         for (IdentifierProvider service : providers) {
-            String identifier = service.mint(context, dso);
-            if (!StringUtils.isEmpty(identifier)) {
-                service.reserve(context, dso, identifier);
+            try {
+                String identifier = service.mint(context, dso);
+                if (!StringUtils.isEmpty(identifier)) {
+                    service.reserve(context, dso, identifier);
+                }
+            } catch (DOIIdentifierNotApplicableException e) {
+                log.warn("DOI Identifier not reserved (inapplicable): " + e.getMessage());
             }
         }
         //Update our item
@@ -82,7 +86,11 @@ public class IdentifierServiceImpl implements IdentifierService {
         // Next resolve all other services
         for (IdentifierProvider service : providers) {
             if (service.supports(identifier)) {
-                service.reserve(context, dso, identifier);
+                try {
+                    service.reserve(context, dso, identifier);
+                } catch (DOIIdentifierNotApplicableException e) {
+                    log.warn("DOI Identifier not reserved (inapplicable): " + e.getMessage());
+                }
             }
         }
         //Update our item
@@ -95,9 +103,13 @@ public class IdentifierServiceImpl implements IdentifierService {
         //We need to commit our context because one of the providers might require the handle created above
         // Next resolve all other services
         for (IdentifierProvider service : providers) {
-            service.register(context, dso);
+            try {
+                service.register(context, dso);
+            } catch (DOIIdentifierNotApplicableException e) {
+                log.warn("DOI Identifier not registered (inapplicable): " + e.getMessage());
+            }
         }
-        //Update our item
+        //Update our item / collection / community
         contentServiceFactory.getDSpaceObjectService(dso).update(context, dso);
     }
 
@@ -109,15 +121,19 @@ public class IdentifierServiceImpl implements IdentifierService {
         boolean registered = false;
         for (IdentifierProvider service : providers) {
             if (service.supports(identifier)) {
-                service.register(context, object, identifier);
-                registered = true;
+                try {
+                    service.register(context, object, identifier);
+                    registered = true;
+                } catch (DOIIdentifierNotApplicableException e) {
+                    log.warn("DOI Identifier not registered (inapplicable): " + e.getMessage());
+                }
             }
         }
         if (!registered) {
             throw new IdentifierException("Cannot register identifier: Didn't "
                                               + "find a provider that supports this identifier.");
         }
-        //Update our item
+        //Update our item / collection / community
         contentServiceFactory.getDSpaceObjectService(object).update(context, object);
     }
 
@@ -153,8 +169,7 @@ public class IdentifierServiceImpl implements IdentifierService {
                 if (!StringUtils.isEmpty(result)) {
                     if (log.isDebugEnabled()) {
                         try {
-                            log.debug("Got an identifier from "
-                                          + service.getClass().getCanonicalName() + ".");
+                            log.debug("Got an identifier from " + service.getClass().getCanonicalName() + ".");
                         } catch (NullPointerException ex) {
                             log.debug(ex.getMessage(), ex);
                         }
@@ -177,9 +192,9 @@ public class IdentifierServiceImpl implements IdentifierService {
             String handle = dso.getHandle();
             if (!StringUtils.isEmpty(handle)) {
                 if (!identifiers.contains(handle)
-                    && !identifiers.contains("hdl:" + handle)
-                    && !identifiers.contains(handleService.getCanonicalForm(handle))) {
-                    // The VerionedHandleIdentifierProvider gets loaded by default
+                        && !identifiers.contains("hdl:" + handle)
+                        && !identifiers.contains(handleService.getCanonicalForm(handle))) {
+                    // The VersionedHandleIdentifierProvider gets loaded by default
                     // it returns handles without any scheme (neither hdl: nor http:).
                     // If the VersionedHandleIdentifierProvider is not loaded,
                     // we adds the handle in way it would.
@@ -225,8 +240,7 @@ public class IdentifierServiceImpl implements IdentifierService {
     }
 
     @Override
-    public void delete(Context context, DSpaceObject dso)
-        throws AuthorizeException, SQLException, IdentifierException {
+    public void delete(Context context, DSpaceObject dso) throws AuthorizeException, SQLException, IdentifierException {
         for (IdentifierProvider service : providers) {
             try {
                 service.delete(context, dso);

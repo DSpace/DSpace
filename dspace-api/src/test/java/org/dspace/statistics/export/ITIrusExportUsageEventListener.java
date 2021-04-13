@@ -9,7 +9,7 @@ package org.dspace.statistics.export;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -123,14 +123,14 @@ public class ITIrusExportUsageEventListener extends AbstractIntegrationTestWithD
             community = CommunityBuilder.createCommunity(context).build();
             collection = CollectionBuilder.createCollection(context, community).build();
             item = ItemBuilder.createItem(context, collection)
-                              .withRelationshipType(entityType.getLabel())
+                              .withEntityType(entityType.getLabel())
                               .build();
 
             File f = new File(testProps.get("test.bitstream").toString());
             bitstream = BitstreamBuilder.createBitstream(context, item, new FileInputStream(f)).build();
 
             itemNotToBeProcessed = ItemBuilder.createItem(context, collection)
-                                              .withRelationshipType(entityType.getLabel())
+                                              .withEntityType(entityType.getLabel())
                                               .withType("Excluded type")
                                               .build();
             File itemNotToBeProcessedFile = new File(testProps.get("test.bitstream").toString());
@@ -263,8 +263,8 @@ public class ITIrusExportUsageEventListener extends AbstractIntegrationTestWithD
         when(usageEvent.getRequest()).thenReturn(request);
         when(usageEvent.getContext()).thenReturn(new Context());
 
-        itemService.clearMetadata(context, item, "relationship", "type", null, Item.ANY);
-        itemService.addMetadata(context, item, "relationship", "type", null, null, "OrgUnit");
+        itemService.clearMetadata(context, item, "dspace", "entity", "type", Item.ANY);
+        itemService.addMetadata(context, item, "dspace", "entity", "type", null, "OrgUnit");
         itemService.update(context, item);
 
         context.restoreAuthSystemState();
@@ -359,8 +359,8 @@ public class ITIrusExportUsageEventListener extends AbstractIntegrationTestWithD
         when(usageEvent.getRequest()).thenReturn(request);
         when(usageEvent.getContext()).thenReturn(new Context());
 
-        itemService.clearMetadata(context, item, "relationship", "type", null, Item.ANY);
-        itemService.addMetadata(context, item, "relationship", "type", null, null, "OrgUnit");
+        itemService.clearMetadata(context, item, "dspace", "entity", "type", Item.ANY);
+        itemService.addMetadata(context, item, "dspace", "entity", "type", null, "OrgUnit");
         itemService.update(context, item);
 
         context.restoreAuthSystemState();

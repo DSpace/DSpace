@@ -1,4 +1,4 @@
-<Publication id="@virtual.id@">
+<Publication xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="@virtual.id@">
 	<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/COAR_Publication_Types">@virtual.mapConverter.coarTypes.dc-type@</Type>
 	<Language>@dc.language.iso@</Language>
    	<Title>@dc.title@</Title>
@@ -14,9 +14,8 @@
    	</PublishedIn>
    	<Publishers>
    		<Publisher>
-   			<OrgUnit>
-				<Name>@dc.publisher@</Name>
-     		</OrgUnit>
+			<DisplayName>@dc.publisher@</DisplayName>
+			<OrgUnit />
    		</Publisher>
    	</Publishers>
    	<PublicationDate>@dc.date.issued@</PublicationDate>
@@ -34,6 +33,7 @@
    		@group.dc-contributor-author.start@
       	<Author>
         	<DisplayName>@dc.contributor.author@</DisplayName>
+			<Person id="@virtual.authority.dc-contributor-author@" />
          	<Affiliation>
          		<OrgUnit>
          			<Name>@oairecerif.author.affiliation@</Name>
@@ -46,6 +46,7 @@
    		@group.dc-contributor-editor.start@
    	  	<Editor>
         	<DisplayName>@dc.contributor.editor@</DisplayName>
+			<Person id="@virtual.authority.dc-contributor-editor@" />
 	   	  	<Affiliation>
 	      		<OrgUnit>
 	     			<Name>@oairecerif.editor.affiliation@</Name>
@@ -57,7 +58,7 @@
    	<Abstract>@dc.description.abstract@</Abstract>
    	@relation.dc-relation-project.start@
    	<OriginatesFrom>
-      	<Project>
+      	<Project id="@virtual.id@">
 			<Acronym>@oairecerif.acronym@</Acronym>
          	<Title>@dc.title@</Title>
          	<StartDate>@oairecerif.project.startDate@</StartDate>
@@ -102,14 +103,6 @@
 		</Funding>
    	</OriginatesFrom>
    	@relation.dc-relation-funding.end@
-	<OutputFrom>
-		<Event>
-			<Name>@dc.relation.conference@</Name>
-		</Event>
-	</OutputFrom>
-	<References>
-		<Product>
-			<Name>@dc.relation.dataset@</Name>
-		</Product>
-	</References>
+	<PresentedAt> <Event> <Name>@dc.relation.conference@</Name> </Event> </PresentedAt>
+	<References> <Product> <Name>@dc.relation.dataset@</Name> </Product> </References>
 </Publication>

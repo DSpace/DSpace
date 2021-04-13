@@ -14,11 +14,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.authorize.AuthorizeConfiguration;
@@ -265,7 +265,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             Boolean cachedGroupMembership = context.getCachedGroupMembership(group, ePerson);
 
             if (cachedGroupMembership != null) {
-                return cachedGroupMembership.booleanValue();
+                return cachedGroupMembership;
 
             } else {
                 boolean isMember = false;
@@ -303,7 +303,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     }
 
     private boolean isAuthenticatedUser(final Context context, final EPerson ePerson) {
-        return ObjectUtils.equals(context.getCurrentUser(), ePerson);
+        return Objects.equals(context.getCurrentUser(), ePerson);
     }
 
     @Override
@@ -715,7 +715,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                     // admins can eventually manage it
                     List<CollectionRole> collectionRoles = collectionRoleService.findByGroup(context, group);
                     if (collectionRoles != null && collectionRoles.size() > 0) {
-                        Set<Collection> colls = new HashSet<Collection>();
+                        Set<Collection> colls = new HashSet<>();
                         for (CollectionRole cr : collectionRoles) {
                             colls.add(cr.getCollection());
                         }
@@ -731,7 +731,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                         if (AuthorizeConfiguration.canCollectionAdminManagePolicies()
                             || AuthorizeConfiguration.canCommunityAdminManagePolicies()
                             || AuthorizeConfiguration.canCommunityAdminManageCollectionWorkflows()) {
-                            List<Group> groups = new ArrayList<Group>();
+                            List<Group> groups = new ArrayList<>();
                             groups.add(group);
                             List<ResourcePolicy> policies = resourcePolicyService.find(context, null, groups,
                                                             Constants.DEFAULT_ITEM_READ, Constants.COLLECTION);

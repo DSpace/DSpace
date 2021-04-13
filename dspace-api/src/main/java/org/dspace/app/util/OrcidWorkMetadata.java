@@ -186,10 +186,4 @@ public class OrcidWorkMetadata extends MappingMetadata {
         return null;
     }
 
-    public String getCitationType() {
-        if (!configuredFields.get(CITATION).isEmpty()) {
-            return configuredFields.get(CITATION);
-        }
-        return null;
-    }
 }

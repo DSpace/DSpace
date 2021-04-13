@@ -9,12 +9,15 @@ package org.dspace.content.edit;
 
 import java.util.List;
 
+import org.dspace.content.security.AccessItemMode;
+import org.dspace.content.security.CrisSecurity;
+
 /**
  * This Class representing a modality of edit an item
  * 
  * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
  */
-public class EditItemMode {
+public class EditItemMode implements AccessItemMode {
 
     public static final String NONE = "none";
     /**
@@ -28,7 +31,7 @@ public class EditItemMode {
     /**
      * Defines the users enabled to use this edit configuration
      */
-    private EditItemModeSecurity security;
+    private CrisSecurity security;
     /**
      * Defines the Submission Definition used from this edit configuration
      */
@@ -60,29 +63,30 @@ public class EditItemMode {
             // set the security mode
             switch (config[0]) {
                 case "1":
-                    this.setSecurity(EditItemModeSecurity.ADMIN);
+                    this.setSecurity(CrisSecurity.ADMIN);
                     break;
                 case "2":
-                    this.setSecurity(EditItemModeSecurity.OWNER);
+                    this.setSecurity(CrisSecurity.OWNER);
                     break;
                 case "3":
-                    this.setSecurity(EditItemModeSecurity.ADMIN_OWNER);
+                    this.setSecurity(CrisSecurity.ADMIN_OWNER);
                     break;
                 case "4":
-                    this.setSecurity(EditItemModeSecurity.CUSTOM);
+                    this.setSecurity(CrisSecurity.CUSTOM);
                     break;
                 default:
-                    this.setSecurity(EditItemModeSecurity.NONE);
+                    this.setSecurity(CrisSecurity.NONE);
             }
             // set the submissionDefinition name
             this.setSubmissionDefinition(config[1]);
         }
     }
 
-    public EditItemModeSecurity getSecurity() {
+    public CrisSecurity getSecurity() {
         return security;
     }
-    public void setSecurity(EditItemModeSecurity security) {
+
+    public void setSecurity(CrisSecurity security) {
         this.security = security;
     }
     public String getSubmissionDefinition() {

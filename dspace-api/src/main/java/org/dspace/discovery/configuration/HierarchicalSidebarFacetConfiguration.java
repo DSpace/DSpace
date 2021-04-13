@@ -7,7 +7,7 @@
  */
 package org.dspace.discovery.configuration;
 
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Special sidebar facet configuration used for hierarchical facets
@@ -20,6 +20,7 @@ public class HierarchicalSidebarFacetConfiguration extends DiscoverySearchFilter
 
     private String splitter;
     private boolean skipFirstNodeLevel = true;
+    private boolean onlyLastNodeRelevant = false;
 
 
     public HierarchicalSidebarFacetConfiguration() {
@@ -31,7 +32,7 @@ public class HierarchicalSidebarFacetConfiguration extends DiscoverySearchFilter
         return splitter;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setSplitter(String splitter) {
         this.splitter = splitter;
     }
@@ -42,6 +43,14 @@ public class HierarchicalSidebarFacetConfiguration extends DiscoverySearchFilter
 
     public void setSkipFirstNodeLevel(boolean skipFirstNodeLevel) {
         this.skipFirstNodeLevel = skipFirstNodeLevel;
+    }
+
+    public boolean isOnlyLastNodeRelevant() {
+        return onlyLastNodeRelevant;
+    }
+
+    public void setOnlyLastNodeRelevant(boolean onlyLastNodeRelevant) {
+        this.onlyLastNodeRelevant = onlyLastNodeRelevant;
     }
 
     @Override

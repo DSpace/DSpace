@@ -7,6 +7,7 @@
  */
 package org.dspace.content;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.core.Constants;
 
 /**
@@ -58,6 +59,11 @@ public class RelationshipMetadataValue extends MetadataValue {
             return false;
         }
         return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(getID()).append(isUseForPlace()).toHashCode();
     }
 
     /**

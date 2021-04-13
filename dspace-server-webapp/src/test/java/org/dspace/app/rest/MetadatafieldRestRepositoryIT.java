@@ -8,11 +8,11 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -32,6 +32,7 @@ import org.dspace.builder.MetadataSchemaBuilder;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataFieldServiceImpl;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataSchemaService;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -592,6 +593,41 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
+    public void createBlankQualifier() throws Exception {
+
+        MetadataFieldRest metadataFieldRest = new MetadataFieldRest();
+        metadataFieldRest.setElement(ELEMENT);
+        metadataFieldRest.setQualifier("");
+        metadataFieldRest.setScopeNote(SCOPE_NOTE);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        Integer id = null;
+        try {
+            assertThat(metadataFieldService.findByElement(context, metadataSchema, ELEMENT, null), nullValue());
+
+            id = read(
+                    getClient(authToken)
+                            .perform(post("/api/core/metadatafields")
+                                    .param("schemaId", metadataSchema.getID() + "")
+                                    .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                                    .contentType(contentType))
+                            .andExpect(status().isCreated())
+                            .andReturn().getResponse().getContentAsString(),
+                    "$.id"
+            );
+
+            getClient(authToken).perform(get("/api/core/metadatafields/" + id))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$", MetadataFieldMatcher.matchMetadataFieldByKeys(
+                            metadataSchema.getName(), ELEMENT, null)));
+        } finally {
+            if (id != null) {
+                MetadataFieldBuilder.deleteMetadataField(id);
+            }
+        }
+    }
+
+    @Test
     public void create_checkAddedToIndex() throws Exception {
 
         MetadataFieldRest metadataFieldRest = new MetadataFieldRest();
@@ -929,5 +965,106 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
 
     }
 
+    @Test
+    public void findAllPaginationTest() throws Exception {
+
+        // Determine number of metadata fields from database
+        int numberOfMdFields = ContentServiceFactory.getInstance().getMetadataFieldService().findAll(context).size();
+
+        // If we return 3 fields per page, determine number of pages we expect
+        int pageSize = 3;
+        int numberOfPages = (int) Math.ceil((double) numberOfMdFields / pageSize);
+
+        // Check first page
+        getClient().perform(get("/api/core/metadatafields")
+                   .param("size", String.valueOf(pageSize))
+                   .param("page", "0"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   // Metadata fields are returned alphabetically. So, look for the first 3 alphabetically
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItems(
+                              MetadataFieldMatcher.matchMetadataFieldByKeys("creativework","datePublished", null),
+                              MetadataFieldMatcher.matchMetadataFieldByKeys("creativework", "editor", null),
+                              MetadataFieldMatcher.matchMetadataFieldByKeys("creativework", "keywords", null)
+                              )))
+                   .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadatafields?"),
+                           Matchers.containsString("page=0"), Matchers.containsString("size=" + pageSize))))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadatafields?"),
+                           Matchers.containsString("page=0"), Matchers.containsString("size=" + pageSize))))
+                   .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadatafields?"),
+                           Matchers.containsString("page=1"), Matchers.containsString("size=" + pageSize))))
+                   .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadatafields?"),
+                           Matchers.containsString("page=" + (numberOfPages - 1)),
+                           Matchers.containsString("size=" + pageSize))))
+                   .andExpect(jsonPath("$.page.totalElements", is(numberOfMdFields)))
+                   .andExpect(jsonPath("$.page.totalPages", is(numberOfPages)))
+                   .andExpect(jsonPath("$.page.size", is(pageSize)));
+
+        // Check second page
+        getClient().perform(get("/api/core/metadatafields")
+                   .param("size", String.valueOf(pageSize))
+                   .param("page", "1"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   // Metadata fields are returned alphabetically. So, look for the next 3 alphabetically
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItems(
+                              MetadataFieldMatcher.matchMetadataFieldByKeys("creativework","publisher", null),
+                              MetadataFieldMatcher.matchMetadataFieldByKeys("creativeworkseries", "issn", null),
+                              MetadataFieldMatcher.matchMetadataFieldByKeys("cris", "author", "orcid")
+                              )))
+                   .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadatafields?"),
+                           Matchers.containsString("page=0"), Matchers.containsString("size=" + pageSize))))
+                   .andExpect(jsonPath("$._links.prev.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadatafields?"),
+                           Matchers.containsString("page=0"), Matchers.containsString("size=" + pageSize))))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadatafields?"),
+                           Matchers.containsString("page=1"), Matchers.containsString("size=" + pageSize))))
+                   .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadatafields?"),
+                           Matchers.containsString("page=2"), Matchers.containsString("size=" + pageSize))))
+                   .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadatafields?"),
+                           Matchers.containsString("page=" + (numberOfPages - 1)),
+                           Matchers.containsString("size=" + pageSize))))
+                   .andExpect(jsonPath("$.page.totalElements", is(numberOfMdFields)))
+                   .andExpect(jsonPath("$.page.totalPages", is(numberOfPages)))
+                   .andExpect(jsonPath("$.page.size", is(pageSize)));
+
+        // Check last page
+        getClient().perform(get("/api/core/metadatafields")
+                   .param("size", String.valueOf(pageSize))
+                   .param("page", String.valueOf(numberOfPages - 1)))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   // Metadata fields are returned alphabetically.
+                   // So, on the last page we'll just ensure it *at least* includes the last field alphabetically
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItems(
+                              MetadataFieldMatcher.matchMetadataFieldByKeys("workflow", "score", null)
+                              )))
+                   .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadatafields?"),
+                           Matchers.containsString("page=0"), Matchers.containsString("size=" + pageSize))))
+                   .andExpect(jsonPath("$._links.prev.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadatafields?"),
+                           Matchers.containsString("page=" + (numberOfPages - 2)),
+                           Matchers.containsString("size=" + pageSize))))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadatafields?"),
+                           Matchers.containsString("page=" + (numberOfPages - 1)),
+                           Matchers.containsString("size=" + pageSize))))
+                   .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                           Matchers.containsString("/api/core/metadatafields?"),
+                           Matchers.containsString("page=" + (numberOfPages - 1)),
+                           Matchers.containsString("size=" + pageSize))))
+                   .andExpect(jsonPath("$.page.totalElements", is(numberOfMdFields)))
+                   .andExpect(jsonPath("$.page.totalPages", is(numberOfPages)))
+                   .andExpect(jsonPath("$.page.size", is(pageSize)));
+    }
 
 }

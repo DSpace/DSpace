@@ -1,5 +1,5 @@
 <OrgUnits>
-	<OrgUnit id="mock-id">
+	<OrgUnit xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
 		<Name>Test OrgUnit</Name>
 		<Name>Test OrgUnit LegalName</Name>
 		<Acronym>TOU</Acronym>
@@ -14,7 +14,7 @@
 		<People>
 		</People>
 	</OrgUnit>
-	<OrgUnit id="mock-id">
+	<OrgUnit xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
 		<Name>Another Test OrgUnit</Name>
 		<Acronym>ATOU</Acronym>
 		<Type scheme="https://w3id.org/cerif/vocab/OrganisationTypes">https://w3id.org/cerif/vocab/OrganisationTypes#Privatenonprofit</Type>

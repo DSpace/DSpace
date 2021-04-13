@@ -29,7 +29,6 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.CrosswalkObjectNotSupported;
-import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -37,13 +36,13 @@ import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Implementation of {@link StreamDisseminationCrosswalk} to produce a document
- * in a specific format (pdf, rtf etc...) from an item.
+ * Implementation of {@link ItemExportCrosswalk} to produce a document in a
+ * specific format (pdf, rtf etc...) from an item.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public class DocumentCrosswalk implements StreamDisseminationCrosswalk, FileNameDisseminator {
+public class DocumentCrosswalk implements ItemExportCrosswalk {
 
     @Autowired
     private ConfigurationService configurationService;
@@ -138,8 +137,8 @@ public class DocumentCrosswalk implements StreamDisseminationCrosswalk, FileName
     }
 
     private boolean hasExpectedEntityType(Item item) {
-        String relationshipType = itemService.getMetadataFirstValue(item, "relationship", "type", null, Item.ANY);
-        return Objects.equals(relationshipType, entityType);
+        String itemEntityType = itemService.getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY);
+        return Objects.equals(itemEntityType, entityType);
     }
 
     public void setFileName(String fileName) {

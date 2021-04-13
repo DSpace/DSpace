@@ -1,4 +1,4 @@
-<Publication id="mock-id">
+<Publication xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
 	<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/COAR_Publication_Types">http://purl.org/coar/resource_type/c_3248</Type>
    	<Title>Test Publication</Title>
    	<PublishedIn>
@@ -8,8 +8,7 @@
    	</PublishedIn>
    	<Publishers>
    		<Publisher>
-   			<OrgUnit>
-     		</OrgUnit>
+			<OrgUnit />
    		</Publisher>
    	</Publishers>
    	<PublicationDate>2020-01-01</PublicationDate>
@@ -21,6 +20,7 @@
    	<Authors>
       	<Author>
         	<DisplayName>John Smith</DisplayName>
+			<Person id="6c36b2b0-b2cf-41a5-8241-11d0ea56ed97" />
          	<Affiliation>
          		<OrgUnit>
          		</OrgUnit>
@@ -46,7 +46,7 @@
    	  	</Editor>
 	</Editors>
    	<OriginatesFrom>
-      	<Project>
+      	<Project id="mock-id">
 			<Acronym>TP</Acronym>
          	<Title>Test Project</Title>
          	<StartDate>2020-01-01</StartDate>
@@ -79,14 +79,6 @@
 			</Funder>
 		</Funding>
    	</OriginatesFrom>
-	<OutputFrom>
-		<Event>
-			<Name>The best Conference</Name>
-		</Event>
-	</OutputFrom>
-	<References>
-		<Product>
-			<Name>DataSet</Name>
-		</Product>
-	</References>
+	<PresentedAt> <Event> <Name>The best Conference</Name> </Event> </PresentedAt>
+	<References> <Product> <Name>DataSet</Name> </Product> </References>
 </Publication>

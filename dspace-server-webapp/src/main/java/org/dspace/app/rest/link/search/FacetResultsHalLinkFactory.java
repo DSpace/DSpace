@@ -7,15 +7,20 @@
  */
 package org.dspace.app.rest.link.search;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.dspace.app.rest.model.FacetResultsRest;
+import org.dspace.app.rest.model.SearchFacetEntryRest;
+import org.dspace.app.rest.model.SearchFacetValueRest;
 import org.dspace.app.rest.model.hateoas.EmbeddedPageHeader;
 import org.dspace.app.rest.model.hateoas.FacetResultsResource;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  * This factory provides a means to add links to the FacetResultsResource class. This method will be called when the
@@ -34,7 +39,24 @@ public class FacetResultsHalLinkFactory extends DiscoveryRestHalLinkFactory<Face
                                            pageable.getOffset() + data.getFacetResultList().size() + (data
                                                .getFacetEntry().isHasMore() ? 1 : 0));
 
-            halResource.setPageHeader(new EmbeddedPageHeader(buildFacetBaseLink(data), page, false));
+            UriComponentsBuilder uriBuilder = buildFacetBaseLink(data);
+            halResource.setPageHeader(new EmbeddedPageHeader(uriBuilder, page, false));
+            SearchFacetEntryRest facetData = halResource.getContent().getFacetEntry();
+            if (facetData.exposeMore()) {
+                UriComponentsBuilder moreBuilder = uriBuilder.cloneBuilder();
+                List<String> values = new ArrayList<String>();
+                for (SearchFacetValueRest fv : facetData.getValues()) {
+                    values.add(fv.getFilterValue() + ",notequals");
+                }
+                moreBuilder.queryParam("f." + facetData.getName(), values);
+                list.add(buildLink("more", moreBuilder.toUriString()));
+            }
+            if (facetData.exposeMissing()) {
+                UriComponentsBuilder moreBuilder = uriBuilder.cloneBuilder();
+                moreBuilder.queryParam("f." + facetData.getName(), "[* TO *],notequals");
+                list.add(buildLink("missing", moreBuilder.toUriString()));
+            }
+
         }
 
     }

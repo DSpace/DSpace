@@ -15,6 +15,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.indexobject.factory.CollectionIndexFactory;
 import org.dspace.discovery.indexobject.factory.InprogressSubmissionIndexFactory;
 import org.dspace.discovery.indexobject.factory.ItemIndexFactory;
@@ -47,7 +48,7 @@ public abstract class InprogressSubmissionIndexFactoryImpl
 
     @Override
     public void storeInprogressItemFields(Context context, SolrInputDocument doc,
-                                          InProgressSubmission inProgressSubmission) throws SQLException {
+                                          InProgressSubmission inProgressSubmission) throws SQLException, IOException {
         final Item item = inProgressSubmission.getItem();
         doc.addField("lastModified", SolrUtils.getDateFormatter().format(item.getLastModified()));
         EPerson submitter = inProgressSubmission.getSubmitter();
@@ -61,6 +62,13 @@ public abstract class InprogressSubmissionIndexFactoryImpl
         // get the location string (for searching by collection & community)
         List<String> locations = indexableCollectionService.
                 getCollectionLocations(context, inProgressSubmission.getCollection());
+
+        // add the item's owning collection to the location list
+        // NOTE: inProgressSubmission.getItem().getCollections() is empty while the item is in-progress.
+        locations.add("l" + inProgressSubmission.getCollection().getID());
+
+        // Add item metadata
+        indexableItemService.addDiscoveryFields(doc, context, item, SearchUtils.getAllDiscoveryConfigurations(item));
         indexableCollectionService.storeCommunityCollectionLocations(doc, locations);
     }
 }

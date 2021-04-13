@@ -104,6 +104,11 @@ public class AbstractEntityIntegrationTest extends AbstractControllerIntegration
                                                               "isJournalIssueOfPublication", 0, null, 0,
                                                               1).build();
 
+        RelationshipTypeBuilder.createRelationshipTypeBuilder(context, orgUnit, orgUnit, "isParentOrgUnitOf",
+                                                              "isChildOrgUnitOf", null,
+                                                              1, null, null)
+                               .build();
+
         context.restoreAuthSystemState();
     }
 

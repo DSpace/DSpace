@@ -10,6 +10,7 @@ package org.dspace.app.bulkedit;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.split;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.dspace.app.bulkimport.utils.WorkbookUtils.getCellValue;
 import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
@@ -44,18 +45,16 @@ import org.dspace.app.bulkimport.exception.BulkImportException;
 import org.dspace.app.bulkimport.model.EntityRow;
 import org.dspace.app.bulkimport.model.ImportAction;
 import org.dspace.app.bulkimport.model.MetadataGroup;
-import org.dspace.app.bulkimport.model.MetadataValueVO;
-import org.dspace.app.bulkimport.service.ItemSearcherMapper;
 import org.dspace.app.bulkimport.utils.WorkbookUtils;
-import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
-import org.dspace.app.util.SubmissionConfigReader;
-import org.dspace.app.util.SubmissionConfigReaderException;
+import org.dspace.authority.service.ItemSearchService;
+import org.dspace.authority.service.ItemSearcherMapper;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
+import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
@@ -66,13 +65,18 @@ import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.content.vo.MetadataValueVO;
 import org.dspace.core.Context;
+import org.dspace.core.exception.SQLRuntimeException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.util.UUIDUtils;
 import org.dspace.utils.DSpace;
+import org.dspace.validation.service.ValidationService;
+import org.dspace.validation.service.factory.ValidationServiceFactory;
 import org.dspace.workflow.WorkflowException;
+import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.WorkflowService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
@@ -90,28 +94,28 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BulkImport.class);
 
+    public static final String AUTHORITY_SEPARATOR = "$$";
+
+    public static final String METADATA_SEPARATOR = "||";
+
+    public static final String LANGUAGE_SEPARATOR_PREFIX = "[";
+
+    public static final String LANGUAGE_SEPARATOR_SUFFIX = "]";
+
+    public static final String ID_CELL = "ID";
+
+    public static final String PARENT_ID_CELL = "PARENT-ID";
+
+    public static final String ROW_ID = "ROW-ID";
+
+    public static final String ID_SEPARATOR = "::";
+
 
     private static final int ID_CELL_INDEX = 0;
 
     private static final int ACTION_CELL_INDEX = 1;
 
-    private static final String ID_CELL = "ID";
-
     private static final String ACTION_CELL = "ACTION";
-
-    private static final String PARENT_ID_CELL = "PARENT-ID";
-
-    private static final String UUID_PREFIX = "UUID";
-
-    private static final String ID_SEPARATOR = "::";
-
-    private static final String AUTHORITY_SEPARATOR = "::";
-
-    private static final String METADATA_SEPARATOR = "\\|\\|";
-
-    private static final String LANGUAGE_SEPARATOR = "/";
-
-    private static final String ROW_ID = "ROW-ID";
 
 
     private CollectionService collectionService;
@@ -122,24 +126,26 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
     private WorkspaceItemService workspaceItemService;
 
+    private WorkflowItemService<?> workflowItemService;
+
     private InstallItemService installItemService;
 
     private WorkflowService<XmlWorkflowItem> workflowService;
 
     private ItemSearcherMapper itemSearcherMapper;
 
+    private ItemSearchService itemSearchService;
+
     private AuthorizeService authorizeService;
 
-    private DCInputsReader reader;
+    private ValidationService validationService;
 
-    private SubmissionConfigReader submissionConfigReader;
+    private DCInputsReader reader;
 
 
     private String collectionId;
 
     private String filename;
-
-    private boolean useWorkflow;
 
     private boolean abortOnError;
 
@@ -157,22 +163,19 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         this.installItemService = ContentServiceFactory.getInstance().getInstallItemService();
         this.workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
         this.authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
-        this.itemSearcherMapper = new DSpace().getServiceManager().getServiceByName("itemSearcherMapper",
-            ItemSearcherMapper.class);
+        this.itemSearcherMapper = new DSpace().getSingletonService(ItemSearcherMapper.class);
+        this.itemSearchService = new DSpace().getSingletonService(ItemSearchService.class);
+        this.validationService = ValidationServiceFactory.getInstance().getValidationService();
+        this.workflowItemService = WorkflowServiceFactory.getInstance().getWorkflowItemService();
 
         try {
             this.reader = new DCInputsReader();
-            this.submissionConfigReader = new SubmissionConfigReader();
-        } catch (DCInputsReaderException | SubmissionConfigReaderException e) {
+        } catch (DCInputsReaderException e) {
             throw new RuntimeException(e);
         }
 
         collectionId = commandLine.getOptionValue('c');
         filename = commandLine.getOptionValue('f');
-
-        if (commandLine.hasOption('w')) {
-            useWorkflow = true;
-        }
 
         if (commandLine.hasOption('e')) {
             abortOnError = true;
@@ -181,11 +184,9 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
     @Override
     public void internalRun() throws Exception {
-        context = new Context();
-        context.setMode(Context.Mode.BATCH_EDIT);
+        context = new Context(Context.Mode.BATCH_EDIT);
         assignCurrentUserInContext();
-
-        //FIXME: see https://4science.atlassian.net/browse/CSTPER-236 for final solution
+        assignSpecialGroupsInContext();
 
         context.turnOffAuthorisationSystem();
 
@@ -232,7 +233,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
             throw new BulkImportException("The Workbook should have at least one sheet");
         }
 
-        List<String> groups = getSubmissionFormMetadata(true);
+        List<String> groups = getSubmissionFormMetadataGroups();
 
         for (Sheet sheet : workbook) {
             String name = sheet.getSheetName();
@@ -254,7 +255,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
     }
 
     private void validateHeaders(Sheet sheet) {
-        List<String> headers = getAllHeaders(sheet);
+        List<String> headers = WorkbookUtils.getAllHeaders(sheet);
         validateMainHeaders(sheet, headers);
         validateMetadataFields(sheet, headers);
     }
@@ -291,7 +292,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         List<String> metadataFields = headers.subList(getFirstMetadataIndex(sheet), headers.size());
         List<String> invalidMetadataMessages = new ArrayList<>();
 
-        List<String> submissionMetadata = isEntityRowSheet ? getSubmissionFormMetadata(false)
+        List<String> submissionMetadata = isEntityRowSheet ? getSubmissionFormMetadata()
             : getSubmissionFormMetadataGroup(sheetName);
 
         for (String metadataField : metadataFields) {
@@ -327,33 +328,27 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
     private List<String> getSubmissionFormMetadataGroup(String groupName) {
         try {
-            String submissionName = this.submissionConfigReader.getSubmissionConfigByCollection(getCollection())
-                .getSubmissionName();
-            String formName = submissionName + "-" + groupName.replaceAll("\\.", "-");
-            return this.reader.getAllFieldNamesByFormName(formName);
+            return this.reader.getAllNestedMetadataByGroupName(getCollection(), groupName);
         } catch (DCInputsReaderException e) {
             throw new BulkImportException("An error occurs reading the input configuration "
                 + "by group name " + groupName, e);
         }
     }
 
-    private List<String> getSubmissionFormMetadata(boolean group) {
-
+    private List<String> getSubmissionFormMetadata() {
         try {
-            return this.reader.getInputsByCollection(getCollection()).stream()
-                .flatMap(dcInputSet -> Arrays.stream(dcInputSet.getFields()))
-                .flatMap(dcInputs -> Arrays.stream(dcInputs))
-                .filter(dcInput -> group ? isGroupType(dcInput) : !isGroupType(dcInput))
-                .map(dcInput -> dcInput.getFieldName())
-                .collect(Collectors.toList());
+            return this.reader.getSubmissionFormMetadata(getCollection());
         } catch (DCInputsReaderException e) {
             throw new BulkImportException("An error occurs reading the input configuration by collection", e);
         }
-
     }
 
-    private boolean isGroupType(DCInput dcInput) {
-        return "group".equals(dcInput.getInputType());
+    private List<String> getSubmissionFormMetadataGroups() {
+        try {
+            return this.reader.getSubmissionFormMetadataGroups(getCollection());
+        } catch (DCInputsReaderException e) {
+            throw new BulkImportException("An error occurs reading the input configuration by collection", e);
+        }
     }
 
     private List<EntityRow> getValidEntityRows(Workbook workbook) {
@@ -406,12 +401,6 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
             .map(row -> buildMetadataGroup(row, headers));
     }
 
-    private List<String> getAllHeaders(Sheet sheet) {
-        return WorkbookUtils.getCells(sheet.getRow(0))
-            .map(cell -> getCellValue(cell))
-            .collect(Collectors.toList());
-    }
-
     private Map<String, Integer> getHeaderMap(Sheet sheet) {
         return WorkbookUtils.getCells(sheet.getRow(0))
             .filter(cell -> StringUtils.isNotBlank(getCellValue(cell)))
@@ -452,9 +441,13 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
             switch (entityRow.getAction()) {
                 case ADD:
+                case ADD_ARCHIVE:
+                case ADD_WORKSPACE:
                     item = addItem(entityRow);
                     break;
                 case UPDATE:
+                case UPDATE_WORKFLOW:
+                case UPDATE_ARCHIVE:
                     item = updateItem(entityRow);
                     break;
                 case DELETE:
@@ -486,17 +479,59 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
         WorkspaceItem workspaceItem = workspaceItemService.create(context, getCollection(), false);
 
-        if (useWorkflow) {
-            workflowService.start(context, workspaceItem);
-        } else {
-            installItemService.installItem(context, workspaceItem);
-        }
-
         Item item = workspaceItem.getItem();
         addMetadata(item, entityRow, false);
 
-        handler.logInfo("Row " + entityRow.getRow() + " - Item created successfully - ID: " + item.getID());
+        String itemId = item.getID().toString();
+        int row = entityRow.getRow();
+
+        switch (entityRow.getAction()) {
+            case ADD:
+                startWorkflow(entityRow, workspaceItem);
+                break;
+            case ADD_ARCHIVE:
+                installItem(entityRow, workspaceItem);
+                break;
+            case ADD_WORKSPACE:
+                handler.logInfo("Row " + row + " - WorkspaceItem created successfully - ID: " + itemId);
+                break;
+            default:
+                break;
+        }
+
         return item;
+
+    }
+
+    private void installItem(EntityRow entityRow, InProgressSubmission<?> inProgressItem)
+        throws SQLException, AuthorizeException {
+
+        String itemId = inProgressItem.getItem().getID().toString();
+        int row = entityRow.getRow();
+
+        if (authorizeService.isAdmin(context)) {
+            installItemService.installItem(context, inProgressItem);
+            handler.logInfo("Row " + row + " - Item archived successfully - ID: " + itemId);
+        } else {
+            handler.logWarning("Row " + row + " - Current user can't deposit an item directly bypassing the workflow");
+        }
+
+    }
+
+    private void startWorkflow(EntityRow entityRow, WorkspaceItem workspaceItem)
+        throws SQLException, AuthorizeException, IOException, WorkflowException {
+
+        String itemId = workspaceItem.getItem().getID().toString();
+        int row = entityRow.getRow();
+
+        List<String> validationErrors = validateItem(workspaceItem);
+        if (CollectionUtils.isEmpty(validationErrors)) {
+            workflowService.start(context, workspaceItem);
+            handler.logInfo("Row " + row + " - WorkflowItem created successfully - ID: " + itemId);
+        } else {
+            handler.logWarning("Row " + row + " - Invalid item left in workspace - ID: " + itemId
+                + " - validation errors: " + validationErrors);
+        }
 
     }
 
@@ -509,18 +544,53 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         return updateItem(entityRow, item);
     }
 
-    private Item updateItem(EntityRow entityRow, Item item) throws SQLException {
+    private Item updateItem(EntityRow entityRow, Item item)
+        throws SQLException, AuthorizeException, IOException, WorkflowException {
 
-        if (!getCollection().equals(item.getOwningCollection())) {
+        if (!isInSpecifiedCollection(item)) {
             throw new BulkImportException("The item related to the entity with id " + entityRow.getId()
-                + " have a different own collection");
+                + " have a different collection");
         }
 
         addMetadata(item, entityRow, true);
 
         handler.logInfo("Row " + entityRow.getRow() + " - Item updated successfully - ID: " + item.getID());
+
+        switch (entityRow.getAction()) {
+            case UPDATE_WORKFLOW:
+                startWorkflow(entityRow, item);
+                break;
+            case UPDATE_ARCHIVE:
+                installItem(entityRow, item);
+                break;
+            default:
+                break;
+        }
+
         return item;
 
+    }
+
+    private void installItem(EntityRow entityRow, Item item) throws SQLException, AuthorizeException {
+
+        InProgressSubmission<Integer> inProgressItem = findInProgressSubmission(item);
+        if (inProgressItem != null) {
+            installItem(entityRow, inProgressItem);
+        } else {
+            handler.logInfo("Row " + entityRow.getRow() + " - No workspace/workflow item to archive found");
+        }
+
+    }
+
+    private void startWorkflow(EntityRow entityRow, Item item)
+        throws SQLException, AuthorizeException, IOException, WorkflowException {
+
+        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, item);
+        if (workspaceItem != null) {
+            startWorkflow(entityRow, workspaceItem);
+        } else {
+            handler.logInfo("Row " + entityRow.getRow() + " - No workspace item to start found");
+        }
     }
 
     private void deleteItem(EntityRow entityRow) throws Exception {
@@ -546,18 +616,13 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
     }
 
     private Item findItem(EntityRow entityRow) throws Exception {
+        return entityRow.getId() != null ? itemSearchService.search(context, entityRow.getId()) : null;
+    }
 
-        String id = entityRow.getId();
-        if (id == null) {
-            return null;
-        }
-
-        if (UUIDUtils.fromString(id) != null) {
-            return itemSearcherMapper.search(context, UUID_PREFIX, id);
-        }
-
-        String[] idSections = entityRow.getId().split(ID_SEPARATOR);
-        return itemSearcherMapper.search(context, idSections[0].toUpperCase(), idSections[1]);
+    private List<String> validateItem(WorkspaceItem workspaceItem) {
+        return validationService.validate(context, workspaceItem).stream()
+            .map(error -> error.getMessage() + ": " + error.getPaths())
+            .collect(Collectors.toList());
     }
 
     private void addMetadata(Item item, EntityRow entityRow, boolean replace) throws SQLException {
@@ -586,7 +651,9 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
                 String authority = metadataValue.getAuthority();
                 int confidence = metadataValue.getConfidence();
                 String value = metadataValue.getValue();
-                itemService.addMetadata(context, item, metadataField, language, value, authority, confidence);
+                if (StringUtils.isNotEmpty(value)) {
+                    itemService.addMetadata(context, item, metadataField, language, value, authority, confidence);
+                }
             }
         }
 
@@ -622,11 +689,14 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
     }
 
     private String getMetadataField(String field) {
-        return field.split(LANGUAGE_SEPARATOR)[0];
+        return field.contains(LANGUAGE_SEPARATOR_PREFIX) ? split(field, LANGUAGE_SEPARATOR_PREFIX)[0] : field;
     }
 
     private String getMetadataLanguage(String field) {
-        return field.contains(LANGUAGE_SEPARATOR) ? field.split(LANGUAGE_SEPARATOR)[1] : null;
+        if (field.contains(LANGUAGE_SEPARATOR_PREFIX)) {
+            return split(field, LANGUAGE_SEPARATOR_PREFIX)[1].replace(LANGUAGE_SEPARATOR_SUFFIX, "");
+        }
+        return null;
     }
 
     private String getIdFromRow(Row row) {
@@ -649,7 +719,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
             if (index >= firstMetadataIndex) {
 
                 String cellValue = WorkbookUtils.getCellValue(row, index);
-                String[] values = isNotBlank(cellValue) ? cellValue.split(METADATA_SEPARATOR) : new String[] { "" };
+                String[] values = isNotBlank(cellValue) ? split(cellValue, METADATA_SEPARATOR) : new String[] { "" };
 
                 List<MetadataValueVO> metadataValues = Arrays.stream(values)
                     .map(value -> buildMetadataValueVO(row, value, isEntityRowSheet))
@@ -672,7 +742,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
             return new MetadataValueVO(metadataValue, null, -1);
         }
 
-        String[] valueSections = metadataValue.split(AUTHORITY_SEPARATOR);
+        String[] valueSections = StringUtils.split(metadataValue, AUTHORITY_SEPARATOR);
 
         String value = valueSections[0];
         String authority = valueSections[1];
@@ -722,13 +792,13 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
             return false;
         }
 
-        if (isBlank(id) && ImportAction.valueOf(action) != ImportAction.ADD) {
-            handleValidationErrorOnRow(row, "Only ADD action can have an empty ID");
+        if (isBlank(id) && !ImportAction.valueOf(action).isAddAction()) {
+            handleValidationErrorOnRow(row, "Only adding actions can have an empty ID");
             return false;
         }
 
-        if (isNotBlank(id) && ImportAction.valueOf(action) == ImportAction.ADD) {
-            handleValidationErrorOnRow(row, "ADD action can not have an ID set");
+        if (isNotBlank(id) && ImportAction.valueOf(action).isAddAction()) {
+            handleValidationErrorOnRow(row, "Adding actions can not have an ID set");
             return false;
         }
 
@@ -752,7 +822,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         for (int index = firstMetadataIndex; index < row.getLastCellNum(); index++) {
 
             String cellValue = WorkbookUtils.getCellValue(row, index);
-            String[] values = isNotBlank(cellValue) ? cellValue.split(METADATA_SEPARATOR) : new String[] { "" };
+            String[] values = isNotBlank(cellValue) ? split(cellValue, METADATA_SEPARATOR) : new String[] { "" };
             if (values.length > 1) {
                 handleValidationErrorOnRow(row, "Multiple metadata value on the same cell not allowed "
                     + "in the metadata group sheets: " + cellValue);
@@ -762,7 +832,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
             String value = values[0];
             if (value.contains(AUTHORITY_SEPARATOR)) {
 
-                String[] valueSections = value.split(AUTHORITY_SEPARATOR);
+                String[] valueSections = StringUtils.split(value, AUTHORITY_SEPARATOR);
                 if (valueSections.length > 3) {
                     handleValidationErrorOnRow(row, "Invalid metadata value " + value + ": too many sections "
                         + "splitted by " + AUTHORITY_SEPARATOR);
@@ -804,13 +874,32 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         return validPrefixes.contains(idSections[0]);
     }
 
+    private boolean isInSpecifiedCollection(Item item) throws SQLException {
+        Collection collection = getCollection();
+        if (item.getOwningCollection() != null) {
+            return item.getOwningCollection().equals(collection);
+        }
+
+        InProgressSubmission<Integer> inProgressSubmission = findInProgressSubmission(item);
+        return collection.equals(inProgressSubmission.getCollection());
+    }
+
+    private InProgressSubmission<Integer> findInProgressSubmission(Item item) throws SQLException {
+        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, item);
+        return workspaceItem != null ? workspaceItem : workflowItemService.findByItem(context, item);
+    }
+
     private void handleException(EntityRow entityRow, BulkImportException bie) {
+
+        rollback();
+
         if (abortOnError) {
             throw bie;
-        } else {
-            String message = "Row " + entityRow.getRow() + " - " + getRootCauseMessage(bie);
-            handler.logError(message);
         }
+
+        String message = "Row " + entityRow.getRow() + " - " + getRootCauseMessage(bie);
+        handler.logError(message);
+
     }
 
     private void handleValidationErrorOnRow(Row row, String message) {
@@ -823,11 +912,25 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         }
     }
 
+    private void rollback() {
+        try {
+            context.rollback();
+        } catch (SQLException e) {
+            throw new SQLRuntimeException(e);
+        }
+    }
+
     private void assignCurrentUserInContext() throws SQLException {
         UUID uuid = getEpersonIdentifier();
         if (uuid != null) {
             EPerson ePerson = EPersonServiceFactory.getInstance().getEPersonService().find(context, uuid);
             context.setCurrentUser(ePerson);
+        }
+    }
+
+    private void assignSpecialGroupsInContext() throws SQLException {
+        for (UUID uuid : handler.getSpecialGroups()) {
+            context.setSpecialGroup(uuid);
         }
     }
 

@@ -11,7 +11,6 @@ import org.dspace.batch.service.ImpBitstreamMetadatavalueService;
 import org.dspace.batch.service.ImpBitstreamService;
 import org.dspace.batch.service.ImpMetadatavalueService;
 import org.dspace.batch.service.ImpRecordService;
-import org.dspace.batch.service.ImpRecordToItemService;
 import org.dspace.batch.service.ImpServiceFactory;
 import org.dspace.batch.service.ImpWorkflowNStateService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +28,6 @@ public class ImpServiceFactoryImpl extends ImpServiceFactory {
 
     @Autowired(required = true)
     private ImpRecordService impRecordService;
-
-    @Autowired(required = true)
-    private ImpRecordToItemService impRecordToItemService;
 
     @Autowired(required = true)
     private ImpWorkflowNStateService impWorkflowNStateService;
@@ -54,11 +50,6 @@ public class ImpServiceFactoryImpl extends ImpServiceFactory {
     @Override
     public ImpRecordService getImpRecordService() {
         return impRecordService;
-    }
-
-    @Override
-    public ImpRecordToItemService getImpRecordToItemService() {
-        return impRecordToItemService;
     }
 
     @Override

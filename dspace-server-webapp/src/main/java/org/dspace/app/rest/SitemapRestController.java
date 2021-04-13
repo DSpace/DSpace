@@ -19,11 +19,14 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.connector.ClientAbortException;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
-import org.dspace.app.rest.utils.MultipartFileSender;
+import org.dspace.app.rest.utils.HttpHeadersInitializer;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -62,10 +65,11 @@ public class SitemapRestController {
      * @param request  the HTTP request
      * @throws SQLException if db error while completing DSpace context
      * @throws IOException  if IO error surrounding sitemap file
+     * @return
      */
     @GetMapping("/{name}")
-    public void retrieve(@PathVariable String name, HttpServletResponse response,
-        HttpServletRequest request) throws IOException, SQLException {
+    public ResponseEntity retrieve(@PathVariable String name, HttpServletResponse response,
+                                                       HttpServletRequest request) throws IOException, SQLException {
         // Find sitemap with given name in dspace/sitemaps
         File foundSitemapFile = null;
         File sitemapOutputDir = new File(configurationService.getProperty("sitemap.dir"));
@@ -94,7 +98,7 @@ public class SitemapRestController {
                 "Could not find sitemap file with name " + name + " in " + sitemapOutputDir.getAbsolutePath());
         } else {
             // return found sitemap file
-            this.returnSitemapFile(foundSitemapFile, response, request);
+            return this.returnSitemapFile(foundSitemapFile, response, request);
         }
     }
 
@@ -107,12 +111,13 @@ public class SitemapRestController {
      * @param request          the HTTP request
      * @throws SQLException if db error while completing DSpace context
      * @throws IOException  if IO error surrounding sitemap file
+     * @return
      */
-    private void returnSitemapFile(File foundSitemapFile, HttpServletResponse response, HttpServletRequest request)
-        throws SQLException, IOException {
+    private ResponseEntity returnSitemapFile(File foundSitemapFile, HttpServletResponse response,
+                                             HttpServletRequest request) throws SQLException, IOException {
         // Pipe the bits
         try (InputStream is = new FileInputStream(foundSitemapFile)) {
-            MultipartFileSender sender = MultipartFileSender
+            HttpHeadersInitializer sender = HttpHeadersInitializer
                 .fromInputStream(is)
                 .withBufferSize(BUFFER_SIZE)
                 .withFileName(foundSitemapFile.getName())
@@ -126,7 +131,7 @@ public class SitemapRestController {
             // Determine if we need to send the file as a download or if the browser can open it inline
             long dispositionThreshold = configurationService.getLongProperty("webui.content_disposition_threshold");
             if (dispositionThreshold >= 0 && foundSitemapFile.length() > dispositionThreshold) {
-                sender.withDisposition(MultipartFileSender.CONTENT_DISPOSITION_ATTACHMENT);
+                sender.withDisposition(HttpHeadersInitializer.CONTENT_DISPOSITION_ATTACHMENT);
             }
 
             Context context = ContextUtil.obtainContext(request);
@@ -137,12 +142,15 @@ public class SitemapRestController {
 
             // Send the data
             if (sender.isValid()) {
-                sender.serveResource();
+                HttpHeaders httpHeaders = sender.initialiseHeaders();
+                return ResponseEntity.ok().headers(httpHeaders).body(new FileSystemResource(foundSitemapFile));
+
             }
 
         } catch (ClientAbortException e) {
             log.debug("Client aborted the request before the download was completed. " +
                       "Client is probably switching to a Range request.", e);
         }
+        return null;
     }
 }

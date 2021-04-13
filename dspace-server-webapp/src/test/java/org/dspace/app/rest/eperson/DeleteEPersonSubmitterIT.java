@@ -33,6 +33,7 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -52,9 +53,9 @@ import org.dspace.versioning.service.VersioningService;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.hamcrest.Matchers;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -68,6 +69,8 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance()
                                                                                .getWorkspaceItemService();
     protected XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
+    protected XmlWorkflowItemService xmlWorkflowItemService = XmlWorkflowServiceFactory.getInstance()
+                                                                                       .getXmlWorkflowItemService();
     protected VersioningService versioningService = VersionServiceFactory.getInstance().getVersionService();
 
     protected RequestItemAuthorExtractor requestItemAuthorExtractor =
@@ -303,11 +306,7 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
                         .andExpect(status().isNotFound());
     }
 
-    @Ignore
     @Test
-    /**
-     * TODO: This test currently fails with a status 500
-     */
     public void testWorkflowItemSubmitterDelete() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -316,14 +315,12 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
                                                  .withWorkflowGroup(1, workflowUser)
                                                  .build();
 
-        WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
-                                                .withSubmitter(submitter)
-                                                .withTitle("Test Item")
-                                                .withIssueDate("2019-03-06")
-                                                .withSubject("ExtraEntry")
-                                                .build();
-
-        XmlWorkflowItem workflowItem = xmlWorkflowService.startWithoutNotify(context, wsi);
+        XmlWorkflowItem workflowItem = WorkflowItemBuilder.createWorkflowItem(context, collection)
+                                                   .withSubmitter(submitter)
+                                                   .withTitle("Test Item")
+                                                   .withIssueDate("2019-03-06")
+                                                   .withSubject("ExtraEntry")
+                                                   .build();
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/workflow/workflowitems/" + workflowItem.getID()))

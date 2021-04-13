@@ -7,6 +7,8 @@
  */
 package org.dspace.content;
 
+import static org.apache.commons.lang3.BooleanUtils.toBoolean;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -19,6 +21,7 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -35,8 +38,8 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
@@ -55,6 +58,10 @@ import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.Event;
 import org.dspace.harvest.HarvestedCollection;
 import org.dspace.harvest.service.HarvestedCollectionService;
+import org.dspace.identifier.IdentifierException;
+import org.dspace.identifier.service.IdentifierService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
@@ -92,6 +99,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     protected CommunityService communityService;
     @Autowired(required = true)
     protected GroupService groupService;
+    @Autowired(required = true)
+    protected IdentifierService identifierService;
 
     @Autowired(required = true)
     protected LicenseService licenseService;
@@ -110,6 +119,15 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Autowired(required = true)
     protected SearchService searchService;
+
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
+
+    @Autowired(required = true)
+    protected RelationshipService relationshipService;
+
+    @Autowired(required = true)
+    protected WorkflowItemService<?> workflowItemService;
 
     protected CollectionServiceImpl() {
         super();
@@ -131,13 +149,6 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         //Add our newly created collection to our community, authorization checks occur in THIS method
         communityService.addCollection(context, community, newCollection);
 
-        //Update our community so we have a collection identifier
-        if (handle == null) {
-            handleService.createHandle(context, newCollection);
-        } else {
-            handleService.createHandle(context, newCollection, handle);
-        }
-
         // create the default authorization policy for collections
         // of 'anonymous' READ
         Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
@@ -150,6 +161,18 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         authorizeService
             .createResourcePolicy(context, newCollection, anonymousGroup, null, Constants.DEFAULT_BITSTREAM_READ, null);
 
+        collectionDAO.save(context, newCollection);
+
+        //Update our collection so we have a collection identifier
+        try {
+            if (handle == null) {
+                identifierService.register(context, newCollection);
+            } else {
+                identifierService.register(context, newCollection, handle);
+            }
+        } catch (IllegalStateException | IdentifierException ex) {
+            throw new IllegalStateException(ex);
+        }
 
         context.addEvent(new Event(Event.CREATE, Constants.COLLECTION,
                                    newCollection.getID(), newCollection.getHandle(),
@@ -159,7 +182,6 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                                       "collection_id=" + newCollection.getID())
                      + ",handle=" + newCollection.getHandle());
 
-        collectionDAO.save(context, newCollection);
         return newCollection;
     }
 
@@ -189,7 +211,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public List<Collection> findAuthorizedOptimized(Context context, int actionID) throws SQLException {
-        if (!ConfigurationManager
+        if (!configurationService
             .getBooleanProperty("org.dspace.content.Collection.findAuthorizedPerformanceOptimize", false)) {
             // Fallback to legacy query if config says so. The rationale could be that a site found a bug.
             return findAuthorized(context, null, actionID);
@@ -290,9 +312,10 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
-    public void setMetadata(Context context, Collection collection, String field, String value)
-        throws MissingResourceException, SQLException {
-        if ((field.trim()).equals("name") && (value == null || value.trim().equals(""))) {
+    public void setMetadataSingleValue(Context context, Collection collection,
+            MetadataFieldName field, String language, String value)
+            throws MissingResourceException, SQLException {
+        if (field.equals(MD_NAME) && (value == null || value.trim().equals(""))) {
             try {
                 value = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
             } catch (MissingResourceException e) {
@@ -300,21 +323,19 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             }
         }
 
-        String[] MDValue = getMDValueByLegacyField(field);
-
         /*
          * Set metadata field to null if null
          * and trim strings to eliminate excess
          * whitespace.
          */
         if (value == null) {
-            clearMetadata(context, collection, MDValue[0], MDValue[1], MDValue[2], Item.ANY);
+            clearMetadata(context, collection, field.SCHEMA, field.ELEMENT, field.QUALIFIER, Item.ANY);
             collection.setMetadataModified();
         } else {
-            setMetadataSingleValue(context, collection, MDValue[0], MDValue[1], MDValue[2], null, value);
+            super.setMetadataSingleValue(context, collection, field, null, value);
         }
 
-        collection.addDetails(field);
+        collection.addDetails(field.toString());
     }
 
     @Override
@@ -454,22 +475,6 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         }
     }
 
-    /**
-     * Get the value of a metadata field
-     *
-     * @param collection which collection to operate on
-     * @param field      the name of the metadata field to get
-     * @return the value of the metadata field
-     * @throws IllegalArgumentException if the requested metadata field doesn't exist
-     */
-    @Override
-    @Deprecated
-    public String getMetadata(Collection collection, String field) {
-        String[] MDValue = getMDValueByLegacyField(field);
-        String value = getMetadataFirstValue(collection, MDValue[0], MDValue[1], MDValue[2], Item.ANY);
-        return value == null ? "" : value;
-    }
-
     @Override
     public Group createSubmitters(Context context, Collection collection) throws SQLException, AuthorizeException {
         // Check authorisation - Must be an Admin to create Submitters Group
@@ -550,7 +555,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public String getLicense(Collection collection) {
-        String license = getMetadata(collection, "license");
+        String license = getMetadataFirstValue(collection, CollectionService.MD_LICENSE, Item.ANY);
 
         if (license == null || license.trim().equals("")) {
             // Fallback to site-wide default
@@ -920,15 +925,15 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public List<Collection> findCollectionsWithSubmit(String q, Context context, Community community,
-        String metadata, String metadataValue, int offset, int limit) throws SQLException, SearchServiceException {
+        String entityType, int offset, int limit) throws SQLException, SearchServiceException {
 
-        List<Collection> collections = new ArrayList<Collection>();
+        List<Collection> collections = new ArrayList<>();
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
         discoverQuery.setStart(offset);
         discoverQuery.setMaxResults(limit);
         DiscoverResult resp = retrieveCollectionsWithSubmit(context, discoverQuery,
-                                             metadata, metadataValue, community, q);
+                entityType, community, q);
         for (IndexableObject solrCollections : resp.getIndexableObjects()) {
             Collection c = ((IndexableCollection) solrCollections).getIndexedObject();
             collections.add(c);
@@ -937,16 +942,19 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
-    public int countCollectionsWithSubmit(String q, Context context, Community community, String metadata,
-            String metadataValue)
+    public int countCollectionsWithSubmit(String q, Context context, Community community, String entityType)
         throws SQLException, SearchServiceException {
 
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setMaxResults(0);
         discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
-        DiscoverResult resp = retrieveCollectionsWithSubmit(context, discoverQuery, metadata, metadataValue,
-                community, q);
+        DiscoverResult resp = retrieveCollectionsWithSubmit(context, discoverQuery, entityType, community, q);
         return (int)resp.getTotalSearchResults();
+    }
+
+    @Override
+    public boolean isSharedWorkspace(Context context, Collection collection) {
+        return toBoolean(getMetadataFirstValue(collection, "cris", "workspace", "shared", Item.ANY));
     }
 
     /**
@@ -956,6 +964,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
      * 
      * @param context                    DSpace context
      * @param discoverQuery
+     * @param entityType                 limit the returned collection to those related to given entity type
      * @param community                  parent community, could be null
      * @param q                          limit the returned collection to those with metadata values matching the query
      *                                   terms. The terms are used to make also a prefix query on SOLR
@@ -965,7 +974,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
      * @throws SearchServiceException    if search error
      */
     private DiscoverResult retrieveCollectionsWithSubmit(Context context, DiscoverQuery discoverQuery,
-        String metadata, String metadataValue, Community community, String q)
+        String entityType, Community community, String q)
         throws SQLException, SearchServiceException {
 
         StringBuilder query = new StringBuilder();
@@ -976,9 +985,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                 userId = currentUser.getID().toString();
             }
             query.append("submit:(e").append(userId);
-            if (StringUtils.isNotBlank(metadata)) {
-                query.append(" OR ").append(metadata);
-            }
+
             Set<Group> groups = groupService.allMemberGroupsSet(context, currentUser);
             for (Group group : groups) {
                 query.append(" OR g").append(group.getID());
@@ -990,16 +997,11 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         if (community != null) {
             buildFilter.append("location.comm:").append(community.getID().toString());
         }
-        if (StringUtils.isNotBlank(metadata)) {
+        if (StringUtils.isNotBlank(entityType)) {
             if (buildFilter.length() > 0) {
                 buildFilter.append(" AND ");
             }
-            buildFilter.append(metadata).append(":");
-            if (StringUtils.isNotBlank(metadataValue)) {
-                buildFilter.append("\"").append(metadataValue).append("\"");
-            } else {
-                buildFilter.append("*");
-            }
+            buildFilter.append("search.entitytype:").append(entityType);
         }
         if (StringUtils.isNotBlank(q)) {
             StringBuilder buildQuery = new StringBuilder();
@@ -1011,4 +1013,115 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         DiscoverResult resp = searchService.search(context, discoverQuery);
         return resp;
     }
+
+    @Override
+    public Collection retrieveCollectionByEntityType(Context context, Item item, String entityType)
+            throws SQLException {
+        Collection ownCollection = item.getOwningCollection();
+        return retrieveCollectionByEntityType(context, ownCollection.getCommunities(), entityType);
+    }
+
+    private Collection retrieveCollectionByEntityType(Context context, List<Community> communities, String entityType) {
+
+        for (Community community : communities) {
+            Collection collection = retriveCollectionByEntityType(context, community, entityType);
+            if (collection != null) {
+                return collection;
+            }
+        }
+
+        for (Community community : communities) {
+            List<Community> parentCommunities = community.getParentCommunities();
+            Collection collection = retrieveCollectionByEntityType(context, parentCommunities, entityType);
+            if (collection != null) {
+                return collection;
+            }
+        }
+
+        return retriveCollectionByEntityType(context, null, entityType);
+    }
+
+    @Override
+    public Collection retriveCollectionByEntityType(Context context, Community community, String entityType) {
+        context.turnOffAuthorisationSystem();
+        List<Collection> collections;
+        try {
+            collections = findCollectionsWithSubmit(null, context, community, entityType, 0, 1);
+        } catch (SQLException | SearchServiceException e) {
+            throw new RuntimeException(e);
+        }
+        context.restoreAuthSystemState();
+        if (collections != null && collections.size() > 0) {
+            return collections.get(0);
+        }
+        if (community != null) {
+            for (Community subCommunity : community.getSubcommunities()) {
+                Collection collection = retriveCollectionByEntityType(context, subCommunity, entityType);
+                if (collection != null) {
+                    return collection;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Collection findByItem(Context context, Item item) throws SQLException {
+        if (item.getOwningCollection() != null) {
+            return item.getOwningCollection();
+        }
+
+        InProgressSubmission<Integer> inProgressSubmission = findInProgressSubmission(context, item);
+        return inProgressSubmission != null ? inProgressSubmission.getCollection() : null;
+    }
+
+    private InProgressSubmission<Integer> findInProgressSubmission(Context context, Item item) throws SQLException {
+        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, item);
+        return workspaceItem != null ? workspaceItem : workflowItemService.findByItem(context, item);
+    }
+
+    @Override
+    public List<Collection> findCollectionsAdministered(String query, Context context, int offset, int limit)
+        throws SQLException, SearchServiceException {
+
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
+        discoverQuery.setStart(offset);
+        discoverQuery.setMaxResults(limit);
+
+        return retrieveCollectionsAdministered(context, discoverQuery, query).getIndexableObjects().stream()
+            .map(indexableObject -> ((IndexableCollection) indexableObject).getIndexedObject())
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public int countCollectionsAdministered(String query, Context context) throws SQLException, SearchServiceException {
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.setMaxResults(0);
+        discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
+        return (int) retrieveCollectionsAdministered(context, discoverQuery, query).getTotalSearchResults();
+    }
+
+    private DiscoverResult retrieveCollectionsAdministered(Context context, DiscoverQuery discoverQuery, String query)
+        throws SQLException, SearchServiceException {
+
+        if (!authorizeService.isAdmin(context)) {
+
+            String filterQuery = groupService.allMemberGroupsSet(context, context.getCurrentUser()).stream()
+                .map(group -> "g" + group.getID())
+                .collect(Collectors.joining(" OR ", "admin:(", ")"));
+
+            discoverQuery.addFilterQueries(filterQuery);
+        }
+
+        if (StringUtils.isNotBlank(query)) {
+            StringBuilder buildQuery = new StringBuilder();
+            String escapedQuery = ClientUtils.escapeQueryChars(query);
+            buildQuery.append(escapedQuery).append(" OR ").append(escapedQuery).append("*");
+            discoverQuery.setQuery(buildQuery.toString());
+        }
+
+        return searchService.search(context, discoverQuery);
+    }
+
 }

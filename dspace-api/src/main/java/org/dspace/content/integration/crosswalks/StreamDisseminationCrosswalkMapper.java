@@ -7,9 +7,10 @@
  */
 package org.dspace.content.integration.crosswalks;
 
+import static java.util.stream.Collectors.toMap;
+
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
 
@@ -35,9 +36,14 @@ public class StreamDisseminationCrosswalkMapper {
         return map.keySet();
     }
 
-    public Map<String, StreamDisseminationCrosswalk> getAll() {
+    public Map<String, ItemExportCrosswalk> getAllItemExportCrosswalks() {
         return map.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            .filter(entry -> isItemExportCrosswalk(entry.getValue()))
+            .collect(toMap(Map.Entry::getKey, entry -> (ItemExportCrosswalk) entry.getValue()));
+    }
+
+    private boolean isItemExportCrosswalk(StreamDisseminationCrosswalk crosswalk) {
+        return crosswalk instanceof ItemExportCrosswalk;
     }
 
 }

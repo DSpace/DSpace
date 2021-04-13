@@ -1,4 +1,4 @@
-<Funding id="@virtual.id@">
+<Funding xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="@virtual.id@">
 	<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">@virtual.mapConverter.fundingTypes.dc-type@</Type>	
 	<Name>@dc.title@</Name>
 	<Acronym>@oairecerif.acronym@</Acronym>

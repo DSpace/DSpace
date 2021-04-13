@@ -8,11 +8,10 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -100,7 +99,15 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 ScriptMatcher.matchScript(scriptConfigurations.get(9).getName(),
                                                           scriptConfigurations.get(9).getDescription()),
                                 ScriptMatcher.matchScript(scriptConfigurations.get(10).getName(),
-                                                          scriptConfigurations.get(10).getDescription())
+                                                          scriptConfigurations.get(10).getDescription()),
+                                ScriptMatcher.matchScript(scriptConfigurations.get(11).getName(),
+                                                          scriptConfigurations.get(11).getDescription()),
+                                ScriptMatcher.matchScript(scriptConfigurations.get(12).getName(),
+                                                          scriptConfigurations.get(12).getDescription()),
+                                ScriptMatcher.matchScript(scriptConfigurations.get(13).getName(),
+                                                          scriptConfigurations.get(13).getDescription()),
+                                ScriptMatcher.matchScript(scriptConfigurations.get(14).getName(),
+                                                          scriptConfigurations.get(14).getDescription())
                         )));
 
     }
@@ -112,12 +119,8 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient(token).perform(get("/api/system/scripts"))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$._embedded.scripts", hasSize(2)))
-                        .andExpect(jsonPath("$._embedded.scripts", containsInAnyOrder(
-                            ScriptMatcher.matchScript("item-export", "Perform the item export in the given format"),
-                            ScriptMatcher.matchScript("bulk-item-export",
-                                    "Perform the multiple items export in the given format")
-                            )));
+                        .andExpect(jsonPath("$.page",
+                                            is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2))));
 
     }
 
@@ -129,27 +132,60 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(get("/api/system/scripts").param("size", "1"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$._embedded.scripts", Matchers.not(Matchers.hasItem(
-                                ScriptMatcher.matchScript(scriptConfigurations.get(6).getName(),
-                                                          scriptConfigurations.get(6).getDescription())
+                                ScriptMatcher.matchScript(scriptConfigurations.get(10).getName(),
+                                                          scriptConfigurations.get(10).getDescription())
                         ))))
                         .andExpect(jsonPath("$._embedded.scripts", hasItem(
                                 ScriptMatcher.matchScript(scriptConfigurations.get(7).getName(),
                                                           scriptConfigurations.get(7).getDescription())
                         )))
-                        .andExpect(jsonPath("$.page",is(PageMatcher.pageEntry(0, 1))));
+                        .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                                Matchers.containsString("/api/system/scripts?"),
+                                Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                        .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                                Matchers.containsString("/api/system/scripts?"),
+                                Matchers.containsString("size=1"))))
+                        .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                                Matchers.containsString("/api/system/scripts?"),
+                                Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                        .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                                Matchers.containsString("/api/system/scripts?"),
+                                Matchers.containsString("page=14"), Matchers.containsString("size=1"))))
+                        .andExpect(jsonPath("$.page.size", is(1)))
+                        .andExpect(jsonPath("$.page.number", is(0)))
+                        .andExpect(jsonPath("$.page.totalPages", is(15)))
+                        .andExpect(jsonPath("$.page.totalElements", is(15)));
 
 
         getClient(token).perform(get("/api/system/scripts").param("size", "1").param("page", "1"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$._embedded.scripts", hasItem(
-                                ScriptMatcher.matchScript(scriptConfigurations.get(6).getName(),
-                                                          scriptConfigurations.get(6).getDescription())
+                                ScriptMatcher.matchScript(scriptConfigurations.get(10).getName(),
+                                                          scriptConfigurations.get(10).getDescription())
                         )))
                         .andExpect(jsonPath("$._embedded.scripts", Matchers.not(hasItem(
                                 ScriptMatcher.matchScript(scriptConfigurations.get(7).getName(),
                                                           scriptConfigurations.get(7).getDescription())
                         ))))
-                        .andExpect(jsonPath("$.page",is(PageMatcher.pageEntry(1, 1))));
+                        .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                                Matchers.containsString("/api/system/scripts?"),
+                                Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                        .andExpect(jsonPath("$._links.prev.href", Matchers.allOf(
+                                Matchers.containsString("/api/system/scripts?"),
+                                Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                        .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                                Matchers.containsString("/api/system/scripts?"),
+                                Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                        .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                                Matchers.containsString("/api/system/scripts?"),
+                                Matchers.containsString("page=2"), Matchers.containsString("size=1"))))
+                        .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                                Matchers.containsString("/api/system/scripts?"),
+                                Matchers.containsString("page=14"), Matchers.containsString("size=1"))))
+                        .andExpect(jsonPath("$.page.size", is(1)))
+                        .andExpect(jsonPath("$.page.number", is(1)))
+                        .andExpect(jsonPath("$.page.totalPages", is(15)))
+                        .andExpect(jsonPath("$.page.totalElements", is(15)));
     }
 
     @Test

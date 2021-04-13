@@ -157,7 +157,7 @@ public class ItemMetadataImportFillerTest {
     }
 
     /**
-     * Verify that the fillItem method does not add any metadata to the item if the
+     * Verify that the fillItem method does not add metadata does other than the dc.title to the item if the
      * given metadata configuration is empty.
      *
      * @throws SQLException not expected
@@ -172,6 +172,7 @@ public class ItemMetadataImportFillerTest {
         cut.setConfigurations(configurations);
 
         cut.fillItem(context, metadataValue, itemToFill);
+        verify(itemService).addMetadata(context, itemToFill, "dc", "title", null, null, "Mario Rossi", null, -1);
         verifyNoMoreInteractions(context, itemService);
     }
 
@@ -207,7 +208,9 @@ public class ItemMetadataImportFillerTest {
         cut.fillItem(context, metadataValue, itemToFill);
 
         verify(itemService).getMetadataByMetadataString(sourceItem, "oairecerif.author.affiliation");
+        verify(itemService).addMetadata(context, itemToFill, "dc", "title", null, null, "Mario Rossi", null, -1);
         verify(itemService).clearMetadata(context, itemToFill, "oairecerif", "author", "affiliation", ANY);
+
         verify(itemService).addMetadata(context, itemToFill, "oairecerif", "author", "affiliation",
                                         null, "4Science", null, -1);
         verify(itemService).addMetadata(context, itemToFill, "oairecerif", "author", "affiliation",
@@ -250,6 +253,7 @@ public class ItemMetadataImportFillerTest {
 
         verify(itemService).getMetadataByMetadataString(sourceItem, "oairecerif.author.affiliation");
         verify(itemService).clearMetadata(context, itemToFill, "oairecerif", "author", "affiliation", ANY);
+        verify(itemService).addMetadata(context, itemToFill, "dc", "title", null, null, "Mario Rossi", null, -1);
         verify(itemService).addMetadata(context, itemToFill, "oairecerif", "author", "affiliation",
                                         null, "Affiliation", null, -1);
         verifyNoMoreInteractions(context, itemService);
@@ -284,6 +288,7 @@ public class ItemMetadataImportFillerTest {
         cut.fillItem(context, metadataValue, itemToFill);
 
         verify(itemService).getMetadataByMetadataString(sourceItem, "oairecerif.author.affiliation");
+        verify(itemService).addMetadata(context, itemToFill, "dc", "title", null, null, "Mario Rossi", null, -1);
         verifyNoMoreInteractions(context, itemService);
     }
 

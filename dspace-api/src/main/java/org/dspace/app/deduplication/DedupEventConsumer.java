@@ -15,7 +15,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.deduplication.service.DedupService;
 import org.dspace.app.deduplication.utils.Signature;
 import org.dspace.content.Bundle;
@@ -34,7 +35,7 @@ public class DedupEventConsumer implements Consumer {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(DedupEventConsumer.class);
+    private static Logger log = LogManager.getLogger(DedupEventConsumer.class);
 
     // collect Items, Collections, Communities that need indexing
     private Set<Item> objectsToUpdate = null;

@@ -7,22 +7,27 @@
  */
 package org.dspace.builder;
 
+import static org.dspace.content.LicenseUtils.getLicenseText;
 import static org.dspace.content.MetadataSchemaEnum.CRIS;
 import static org.dspace.content.MetadataSchemaEnum.DC;
 import static org.dspace.content.authority.Choices.CF_ACCEPTED;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
+import org.dspace.content.LicenseUtils;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
+import org.dspace.core.CrisConstants;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
@@ -86,6 +91,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     public ItemBuilder withAuthor(final String authorName) {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "contributor", "author", authorName);
     }
+    public ItemBuilder withAuthor(final String authorName, final String authority, final int confidence) {
+        return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "contributor", "author",
+                                null, authorName, authority, confidence);
+    }
 
     public ItemBuilder withAuthor(final String authorName, final String authority) {
         return addMetadataValue(item, DC.getName(), "contributor", "author", null, authorName, authority, 600);
@@ -95,8 +104,22 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "oairecerif", "author", "affiliation", affiliation);
     }
 
+    public ItemBuilder withAuthorAffiliationPlaceholder() {
+        return addMetadataValue(item, "oairecerif", "author", "affiliation",
+                CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE);
+    }
+
     public ItemBuilder withEditor(final String editorName) {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "contributor", "editor", editorName);
+    }
+
+    public ItemBuilder withEditorAffiliationPlaceholder() {
+        return addMetadataValue(item, "oairecerif", "editor", "affiliation",
+                CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE);
+    }
+
+    public ItemBuilder withEditor(final String editorName, final String authority) {
+        return addMetadataValue(item, DC.getName(), "contributor", "editor", null, editorName, authority, 600);
     }
 
     public ItemBuilder withEditorAffiliation(String affiliation) {
@@ -115,8 +138,13 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "subject", null, subject);
     }
 
-    public ItemBuilder withRelationshipType(final String relationshipType) {
-        return addMetadataValue(item, "relationship", "type", null, relationshipType);
+    public ItemBuilder withSubject(final String subject, final String authority, final int confidence) {
+        return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "subject", null, null,
+                                subject, authority, confidence);
+    }
+
+    public ItemBuilder withEntityType(final String entityType) {
+        return addMetadataValue(item, "dspace", "entity", "type", entityType);
     }
 
     public ItemBuilder withPublicationIssueNumber(final String issueNumber) {
@@ -129,6 +157,11 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withProvenanceData(final String provenanceData) {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "description", "provenance", provenanceData);
+    }
+
+    public ItemBuilder withMetadata(final String schema, final String element, final String qualifier,
+        final String value) {
+        return addMetadataValue(item, schema, element, qualifier, value);
     }
 
     public ItemBuilder withCrisOwner(String value, String authority) {
@@ -175,6 +208,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "dc", "identifier", "patentno", patentNo);
     }
 
+    public ItemBuilder withCitationIdentifier(String citation) {
+        return addMetadataValue(item, "dc", "identifier", "citation", citation);
+    }
+
     public ItemBuilder withFullName(String fullname) {
         return setMetadataSingleValue(item, "crisrp", "name", null, fullname);
     }
@@ -208,7 +245,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     }
 
     public ItemBuilder withPersonMainAffiliation(String affiliation) {
-        return setMetadataSingleValue(item, "person", "affiliation", "name", affiliation);
+        return addMetadataValue(item, "person", "affiliation", "name", affiliation);
     }
 
     public ItemBuilder withPersonMainAffiliation(final String affiliation, final String authority) {
@@ -335,8 +372,16 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "crispj", "investigator", null, investigator);
     }
 
+    public ItemBuilder withProjectInvestigator(String investigator, String authority) {
+        return addMetadataValue(item, "crispj", "investigator", null, null, investigator, authority, 600);
+    }
+
     public ItemBuilder withProjectCoinvestigators(String coinvestigators) {
         return addMetadataValue(item, "crispj", "coinvestigators", null, coinvestigators);
+    }
+
+    public ItemBuilder withProjectCoinvestigators(String coinvestigators, String authority) {
+        return addMetadataValue(item, "crispj", "coinvestigators", null, null, coinvestigators, authority, 600);
     }
 
     public ItemBuilder withProjectCoordinator(String coordinator) {
@@ -373,6 +418,22 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withRelationDoi(String doi) {
         return addMetadataValue(item, "dc", "relation", "doi", doi);
+    }
+
+    public ItemBuilder withRelationIsbn(String isbn) {
+        return addMetadataValue(item, "dc", "relation", "isbn", isbn);
+    }
+
+    public ItemBuilder withRelationProject(String project) {
+        return addMetadataValue(item, "dc", "relation", "project", project);
+    }
+
+    public ItemBuilder withRelationGrantno(String grantno) {
+        return addMetadataValue(item, "dc", "relation", "grantno", grantno);
+    }
+
+    public ItemBuilder withRelationFunding(String funding) {
+        return addMetadataValue(item, "dc", "relation", "funding", funding);
     }
 
     public ItemBuilder withRelationConference(String conference) {
@@ -472,6 +533,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "oairecerif", "funding", "endDate", endDate);
     }
 
+    public ItemBuilder withCrisSourceId(String sourceId) {
+        return addMetadataValue(item, "cris", "sourceId", null, sourceId);
+    }
+
     public ItemBuilder withHandle(String handle) {
         this.handle = handle;
         return this;
@@ -507,6 +572,30 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
      */
     public ItemBuilder withAdminUser(EPerson ePerson) throws SQLException, AuthorizeException {
         return setAdminPermission(item, ePerson, null);
+    }
+
+    public ItemBuilder grantLicense() {
+        String license;
+        try {
+            EPerson submitter = workspaceItem.getSubmitter();
+            submitter = context.reloadEntity(submitter);
+            license = getLicenseText(context.getCurrentLocale(), workspaceItem.getCollection(), item, submitter);
+            LicenseUtils.grantLicense(context, item, license, null);
+        } catch (Exception e) {
+            handleException(e);
+        }
+        return this;
+    }
+
+    public ItemBuilder withFulltext(String name, String source, InputStream is) {
+        try {
+            Bitstream b = itemService.createSingleBitstream(context, is, item);
+            b.setName(context, name);
+            b.setSource(context, source);
+        } catch (Exception e) {
+            handleException(e);
+        }
+        return this;
     }
 
 
@@ -572,4 +661,5 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
             c.complete();
         }
     }
+
 }

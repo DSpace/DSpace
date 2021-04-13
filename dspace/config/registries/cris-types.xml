@@ -38,6 +38,13 @@
 	</dc-type>
 
     <dc-type>
+		<schema>cris</schema>
+		<element>workflow</element>
+		<qualifier>name</qualifier>
+        <scope_note>Metadata to link a collection with a workflow type</scope_note>
+	</dc-type>
+
+    <dc-type>
         <schema>cris</schema>
         <element>owner</element>
         <qualifier></qualifier>
@@ -90,6 +97,90 @@
         <schema>cris</schema>
         <element>orcid</element>
         <qualifier>sync-profile</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>harvesting</element>
+        <qualifier>email</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>harvesting</element>
+        <qualifier>preTransform</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>harvesting</element>
+        <qualifier>postTransform</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>harvesting</element>
+        <qualifier>itemValidationEnabled</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>harvesting</element>
+        <qualifier>recordValidationEnabled</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>harvesting</element>
+        <qualifier>forceSynchronization</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>harvesting</element>
+        <qualifier>ccAddress</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>cris</schema>
+        <element>identifier</element>
+        <qualifier>gscholar</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>cris</schema>
+        <element>workspace</element>
+        <qualifier>shared</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>author</element>
+        <qualifier>scopus-author-id</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>author</element>
+        <qualifier>orcid</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>author</element>
+        <qualifier>rid</qualifier>
         <scope_note></scope_note>
     </dc-type>
 

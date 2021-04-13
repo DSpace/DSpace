@@ -8,16 +8,20 @@
 package org.dspace.app.rest;
 
 import static java.lang.Thread.sleep;
+import static org.dspace.app.rest.utils.RegexUtils.REGEX_UUID;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -82,21 +86,18 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     @Before
     public void setup() throws Exception {
         super.setUp();
+        // Default all tests to Password Authentication only
         configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", PASS_ONLY);
     }
 
     @Test
-    @Ignore
-    // Ignored until an endpoint is added to return all groups. Anonymous is not considered a direct group.
-    public void testStatusAuthenticated() throws Exception {
-        String token = getAuthToken(eperson.getEmail(), password);
+    public void testStatusAuthenticatedAsAdmin() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
 
         getClient(token).perform(get("/api/authn/status").param("projection", "full"))
-
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchFullEmbeds()))
                         .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchLinks()))
-                        //We expect the content type to be "application/hal+json;charset=UTF-8"
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$.okay", is(true)))
                         .andExpect(jsonPath("$.authenticated", is(true)))
@@ -104,23 +105,51 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
                         .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
                         .andExpect(jsonPath("$._embedded.eperson",
-                                EPersonMatcher.matchEPersonWithGroups(eperson.getEmail(), "Anonymous")))
-        ;
+                                EPersonMatcher.matchEPersonWithGroups(admin.getEmail(), "Administrator")));
+
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()));
+
+        // Logout
+        getClient(token).perform(post("/api/authn/logout"))
+                        .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @Ignore
+    // Ignored until an endpoint is added to return all groups. Anonymous is not considered a direct group.
+    public void testStatusAuthenticatedAsNormalUser() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/authn/status").param("projection", "full"))
+
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchFullEmbeds()))
+                        .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchLinks()))
+                        .andExpect(content().contentType(contentType))
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")))
+
+                        .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
+                        .andExpect(jsonPath("$._embedded.eperson",
+                                EPersonMatcher.matchEPersonWithGroups(eperson.getEmail(), "Anonymous")));
 
         getClient(token).perform(get("/api/authn/status"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
-        ;
+                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()));
+
+        //Logout
+        getClient(token).perform(post("/api/authn/logout"))
+                        .andExpect(status().isNoContent());
     }
 
     @Test
     public void testStatusNotAuthenticated() throws Exception {
 
         getClient().perform(get("/api/authn/status"))
-
                    .andExpect(status().isOk())
-
-                   //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$.okay", is(true)))
                    .andExpect(jsonPath("$.authenticated", is(false)))
@@ -130,7 +159,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void testStatusAuthenticatedWithCookie() throws Exception {
+    public void testStatusShibAuthenticatedWithCookie() throws Exception {
         //Enable Shibboleth login
         configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
 
@@ -156,7 +185,34 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$.type", is("status")));
 
         //Logout
-        getClient(token).perform(get("/api/authn/logout"))
+        getClient(token).perform(post("/api/authn/logout"))
+                        .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void testStatusPasswordAuthenticatedWithCookie() throws Exception {
+        // Login via password to retrieve a valid token
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        // Remove "Bearer " from that token, so that we are left with the token itself
+        token = token.replace("Bearer ", "");
+
+        // Save token to an Authorization cookie
+        Cookie[] cookies = new Cookie[1];
+        cookies[0] = new Cookie(AUTHORIZATION_COOKIE, token);
+
+        //Check if we are authenticated with a status request using authorization cookie
+        getClient().perform(get("/api/authn/status")
+                                .secure(true)
+                                .cookie(cookies))
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json"
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.okay", is(true)))
+                   .andExpect(jsonPath("$.authenticated", is(true)))
+                   .andExpect(jsonPath("$.type", is("status")));
+        //Logout
+        getClient(token).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
     }
 
@@ -249,17 +305,34 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         getClient(token).perform(get("/api/authn/status"))
                         .andExpect(status().isOk())
-
                         .andExpect(jsonPath("$.okay", is(true)))
                         .andExpect(jsonPath("$.authenticated", is(true)))
                         .andExpect(jsonPath("$.type", is("status")));
 
+        // Verify logout via GET does NOT work (throws a 405)
         getClient(token).perform(get("/api/authn/logout"))
-                        .andExpect(status().isNoContent());
+                        .andExpect(status().isMethodNotAllowed())
+                        // Verify CSRF token has NOT been changed (as neither the cookie nor header are sent back)
+                        .andExpect(cookie().doesNotExist("DSPACE-XSRF-COOKIE"))
+                        .andExpect(header().doesNotExist("DSPACE-XSRF-TOKEN"));
 
+        // Verify we are still logged in
         getClient(token).perform(get("/api/authn/status"))
                         .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
 
+        // Verify logout via POST works
+        getClient(token).perform(post("/api/authn/logout"))
+                        .andExpect(status().isNoContent())
+                        // New/updated CSRF token should be returned (as both a cookie and header)
+                        .andExpect(cookie().exists("DSPACE-XSRF-COOKIE"))
+                        .andExpect(header().exists("DSPACE-XSRF-TOKEN"));
+
+        // Verify we are now logged out (authenticated=false)
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
                         .andExpect(jsonPath("$.okay", is(true)))
                         .andExpect(jsonPath("$.authenticated", is(false)))
                         .andExpect(jsonPath("$.type", is("status")));
@@ -276,7 +349,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         assertNotEquals(token1, token2);
 
-        getClient(token1).perform(get("/api/authn/logout"));
+        getClient(token1).perform(post("/api/authn/logout"));
 
         getClient(token1).perform(get("/api/authn/status"))
                          .andExpect(status().isOk())
@@ -303,6 +376,18 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         String newToken = getClient(token).perform(post("/api/authn/login"))
                                           .andExpect(status().isOk())
+                                          // An auth token refresh should also refresh the CSRF token
+                                          // (which should be returned in both a cookie & header).
+                                          .andExpect(cookie().exists("DSPACE-XSRF-COOKIE"))
+                                          .andExpect(header().exists("DSPACE-XSRF-TOKEN"))
+                                          // Whenever our token is changed, we send back 2 cookies
+                                          // First cookie will always be empty (removing old value)
+                                          // Second cookie has the new token (but unfortunately there's no way to get
+                                          // a second cookie of the same name using cookie().value())
+                                          // We adopted this behavior from Spring Security's CSRFAuthenticationStrategy
+                                          .andExpect(cookie().value("DSPACE-XSRF-COOKIE", ""))
+                                          // CSRF Tokens generated by Spring Security are UUIDs
+                                          .andExpect(header().string("DSPACE-XSRF-TOKEN", matchesPattern(REGEX_UUID)))
                                           .andReturn().getResponse().getHeader("Authorization");
 
         assertNotEquals(token, newToken);
@@ -316,30 +401,120 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
+    // This test is verifying that Spring Security's CSRF protection is working as we expect
+    // We must test this using a simple non-GET request, as CSRF Tokens are not validated in a GET request
+    public void testRefreshTokenWithInvalidCSRF() throws Exception {
+        // Login via password to retrieve a valid token
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        // Remove "Bearer " from that token, so that we are left with the token itself
+        token = token.replace("Bearer ", "");
+
+        // Save token to an Authorization cookie
+        Cookie[] cookies = new Cookie[1];
+        cookies[0] = new Cookie(AUTHORIZATION_COOKIE, token);
+
+        // POSTing to /login should be a valid request...it just refreshes your token (see testRefreshToken())
+        // However, in this case, we are POSTing with an *INVALID* CSRF Token in Header.
+        getClient().perform(post("/api/authn/login").with(csrf().useInvalidToken().asHeader())
+                                                    .secure(true)
+                                                    .cookie(cookies))
+                   // Should return a 403 Forbidden, for an invalid CSRF token
+                   .andExpect(status().isForbidden())
+                   // Verify it includes our custom error reason (from DSpaceApiExceptionControllerAdvice)
+                   .andExpect(status().reason(containsString("Invalid CSRF token")))
+                   // And, a new/updated token should be returned (as both server-side cookie and header)
+                   // This is handled by DSpaceAccessDeniedHandler
+                   .andExpect(cookie().exists("DSPACE-XSRF-COOKIE"))
+                   .andExpect(header().exists("DSPACE-XSRF-TOKEN"));
+
+        //Logout
+        getClient(token).perform(post("/api/authn/logout"))
+                        .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void testLoginChangesCSRFToken() throws Exception {
+        // Login via POST, checking the response for a new CSRF Token
+        String token = getClient().perform(post("/api/authn/login")
+                                          .param("user", eperson.getEmail())
+                                          .param("password", password))
+                                      // Verify that the CSRF token has been changed
+                                      // (as both cookie and header should be sent back)
+                                      .andExpect(cookie().exists("DSPACE-XSRF-COOKIE"))
+                                      .andExpect(header().exists("DSPACE-XSRF-TOKEN"))
+                                      .andReturn().getResponse().getHeader("Authorization");
+
+        //Logout
+        getClient(token).perform(post("/api/authn/logout"))
+                        .andExpect(status().isNoContent());
+    }
+
+    @Test
+    // This test (and next) is verifying that Spring Security's CORS settings are working as we expect
+    public void testCannotReuseTokenFromUntrustedOrigin() throws Exception {
+        // First, get a valid login token
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        // Verify token works
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
+
+        // Test token cannot be used from an *untrusted* Origin
+        // (NOTE: this Origin is NOT listed in our 'rest.cors.allowed-origins' configuration)
+        getClient(token).perform(get("/api/authn/status")
+                                     .header("Origin", "https://example.org"))
+                        // should result in a 403 error as Spring Security returns that for untrusted origins
+                        .andExpect(status().isForbidden());
+
+        //Logout
+        getClient(token).perform(post("/api/authn/logout"))
+                        .andExpect(status().isNoContent());
+    }
+
+    @Test
+    // This test (and previous) is verifying that Spring Security's CORS settings are working as we expect
+    public void testCannotAuthenticateFromUntrustedOrigin() throws Exception {
+        // Post a valid username & password from an *untrusted* Origin
+        getClient().perform(post("/api/authn/login").header("Origin", "https://example.org")
+                                .param("user", eperson.getEmail())
+                                .param("password", password))
+                   // should result in a 403 error as Spring Security returns that for untrusted origins
+                   .andExpect(status().isForbidden());
+    }
+
+    @Test
     public void testReuseTokenWithDifferentIP() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
 
         getClient(token).perform(get("/api/authn/status"))
 
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.okay", is(true)))
-                .andExpect(jsonPath("$.authenticated", is(true)))
-                .andExpect(jsonPath("$.type", is("status")));
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
 
+        // Verify a different IP address (behind a proxy, i.e. X-FORWARDED-FOR)
+        // is able to authenticate with same token
+        // NOTE: We allow tokens to be used across several IPs to support environments where your IP is not static.
+        // Also keep in mind that if a token is used from an untrusted Origin, it will be blocked (see prior test).
         getClient(token).perform(get("/api/authn/status")
                                      .header("X-FORWARDED-FOR", "1.1.1.1"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.okay", is(true)))
-                        .andExpect(jsonPath("$.authenticated", is(false)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
                         .andExpect(jsonPath("$.type", is("status")));
 
-
+        // Verify a different IP address is able to authenticate with same token
         getClient(token).perform(get("/api/authn/status")
-                                    .with(ip("1.1.1.1")))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.okay", is(true)))
-                .andExpect(jsonPath("$.authenticated", is(false)))
-                .andExpect(jsonPath("$.type", is("status")));
+                                     .with(ip("1.1.1.1")))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
     }
 
     @Test
@@ -376,7 +551,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(jsonPath("$.type", is("status")));
 
         //Logout
-        getClient(token).perform(get("/api/authn/logout"))
+        getClient(token).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
 
         //Check if we are actually logged out
@@ -403,7 +578,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     public void testLoginEmptyRequest() throws Exception {
         getClient().perform(post("/api/authn/login"))
                    .andExpect(status().isUnauthorized())
-                   .andExpect(status().reason(containsString("Login failed")));
+                   .andExpect(status().reason(containsString("Authentication failed")));
     }
 
     @Test
@@ -439,7 +614,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void testShibbolethLoginURLWithServerlURLConteiningPort() throws Exception {
+    public void testShibbolethLoginURLWithServerURLContainingPort() throws Exception {
         context.turnOffAuthorisationSystem();
         //Enable Shibboleth login
         configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
@@ -646,7 +821,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(jsonPath("$.type", is("status")));
 
         //Logout
-        getClient(token).perform(get("/api/authn/logout"))
+        getClient(token).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
 
         //Check if we are actually logged out
@@ -671,7 +846,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(jsonPath("$.type", is("status")));
 
         //Logout
-        getClient(token).perform(get("/api/authn/logout"))
+        getClient(token).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
 
         //Check if we are actually logged out (again)
@@ -705,7 +880,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(jsonPath("$.type", is("status")));
 
         //Logout
-        getClient(token).perform(get("/api/authn/logout"))
+        getClient(token).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
 
         //Check if we are actually logged out
@@ -756,7 +931,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
             .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER);
 
         //Logout
-        getClient(token).perform(get("/api/authn/logout"))
+        getClient(token).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
 
         //Check if we are actually logged out
@@ -789,10 +964,28 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         getClient(token).perform(post("/api/authn/shortlivedtokens"))
             .andExpect(jsonPath("$.token", notNullValue()))
             .andExpect(jsonPath("$.type", is("shortlivedtoken")))
-            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/authn/shortlivedtokens")));
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/authn/shortlivedtokens")))
+            // Verify generating short-lived token doesn't change our CSRF token
+            // (so, neither the CSRF cookie nor header are sent back)
+            .andExpect(cookie().doesNotExist("DSPACE-XSRF-COOKIE"))
+            .andExpect(header().doesNotExist("DSPACE-XSRF-TOKEN"));
 
         assertEquals(salt, eperson.getSessionSalt());
     }
+
+    @Test
+    public void testShortLivedTokenWithCSRFSentViaParam() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        // Same request as prior method, but this time we are sending the CSRF token as a querystring param.
+        // NOTE: getClient() method defaults to sending CSRF tokens as Headers, so we are overriding its behavior here
+        getClient(token).perform(post("/api/authn/shortlivedtokens").with(csrf()))
+            // BECAUSE we sent the CSRF token on querystring, it should be regenerated & a new token
+            // is sent back (in cookie and header).
+            .andExpect(cookie().exists("DSPACE-XSRF-COOKIE"))
+            .andExpect(header().exists("DSPACE-XSRF-TOKEN"));
+    }
+
 
     @Test
     public void testShortLivedTokenNotAuthenticated() throws Exception {
@@ -801,7 +994,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void testShortLivedTokenToDowloadBitstream() throws Exception {
+    public void testShortLivedTokenToDownloadBitstream() throws Exception {
         Bitstream bitstream = createPrivateBitstream();
         String shortLivedToken = getShortLivedToken(eperson);
 
@@ -811,7 +1004,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void testShortLivedTokenToDowloadBitstreamUnauthorized() throws Exception {
+    public void testShortLivedTokenToDownloadBitstreamUnauthorized() throws Exception {
         Bitstream bitstream = createPrivateBitstream();
 
         context.turnOffAuthorisationSystem();
@@ -829,7 +1022,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void testLoginTokenToDowloadBitstream() throws Exception {
+    public void testLoginTokenToDownloadBitstream() throws Exception {
         Bitstream bitstream = createPrivateBitstream();
 
         String loginToken = getAuthToken(eperson.getEmail(), password);
@@ -839,7 +1032,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void testExpiredShortLivedTokenToDowloadBitstream() throws Exception {
+    public void testExpiredShortLivedTokenToDownloadBitstream() throws Exception {
         Bitstream bitstream = createPrivateBitstream();
         configurationService.setProperty("jwt.shortLived.token.expiration", "1");
         String shortLivedToken = getShortLivedToken(eperson);

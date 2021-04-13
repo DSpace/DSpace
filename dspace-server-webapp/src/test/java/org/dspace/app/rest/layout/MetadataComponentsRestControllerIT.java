@@ -43,9 +43,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * This test class verify the REST Services for the Layout Metadata Component functionality
  * (endpoint /api/layout/boxmetadataconfiguration/<:string>)
- * 
- * @author Danilo Di Nuzzo (danilo dot dinuzzo at 4science dot it)
  *
+ * @author Danilo Di Nuzzo (danilo dot dinuzzo at 4science dot it)
  */
 public class MetadataComponentsRestControllerIT extends AbstractControllerIntegrationTest {
 
@@ -62,12 +61,19 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         // get metadata field
         MetadataSchema schema = mdss.find(context, "dc");
+        MetadataSchema schemaOaire = mdss.find(context, "oairecerif");
         MetadataField isbn = mfss.findByElement(context, schema, "identifier", "isbn");
         MetadataField uri = mfss.findByElement(context, schema, "identifier", "uri");
         MetadataField abs = mfss.findByElement(context, schema, "description", "abstract");
         MetadataField provenance = mfss.findByElement(context, schema, "description", "provenance");
         MetadataField sponsorship = mfss.findByElement(context, schema, "description", "sponsorship");
         MetadataField extent = mfss.findByElement(context, schema, "format", "extent");
+        // nested metadata
+        MetadataField author = mfss.findByElement(context, schema, "contributor", "author");
+        MetadataField affiliation = mfss.findByElement(context, schemaOaire, "author", "affiliation");
+        List<MetadataField> nestedMetadata = new ArrayList<>();
+        nestedMetadata.add(author);
+        nestedMetadata.add(affiliation);
         // Create boxes
         CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
                 .withShortname("box-shortname-one")
@@ -123,19 +129,39 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
                 .withValueStyle("col-6")
                 .withBox(box)
                 .build();
+        //nested field
+        CrisLayoutFieldBuilder.createMetadataField(context, author, 0, 1)
+                .withLabel("Authors")
+                .withRendering("table")
+                .withStyle("row")
+                .withLabelStyle("col-6")
+                .withValueStyle("col-6")
+                .withNestedField(nestedMetadata)
+                .withBox(box)
+                .build();
         CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
                 .withShortname("box-shortname-three")
                 .build();
         context.restoreAuthSystemState();
         // Test WS endpoint
         getClient().perform(get("/api/layout/boxmetadataconfigurations/" + box.getID()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(contentType))
-            .andExpect(jsonPath("$.id", Matchers.is(box.getID())))
-            .andExpect(jsonPath("$.rows.length()", Matchers.is(3)))
-            .andExpect(jsonPath("$.rows[0].fields.length()", Matchers.is(2)))
-            .andExpect(jsonPath("$.rows[1].fields.length()", Matchers.is(3)))
-            .andExpect(jsonPath("$.rows[2].fields.length()", Matchers.is(1)));
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.id", Matchers.is(box.getID())))
+                .andExpect(jsonPath("$.rows.length()", Matchers.is(3)))
+                .andExpect(jsonPath("$.rows[0].fields.length()", Matchers.is(3)))
+                .andExpect(jsonPath("$.rows[1].fields.length()", Matchers.is(3)))
+                .andExpect(jsonPath("$.rows[2].fields.length()", Matchers.is(1)))
+                .andExpect(jsonPath("$.rows[0].fields[2].metadata", is("dc.contributor.author")))
+                .andExpect(jsonPath("$.rows[0].fields[2].label", is("Authors")))
+                .andExpect(jsonPath("$.rows[0].fields[2].rendering", is("table")))
+                .andExpect(jsonPath("$.rows[0].fields[2].style", is("row")))
+                .andExpect(jsonPath("$.rows[0].fields[2].styleLabel", is("col-6")))
+                .andExpect(jsonPath("$.rows[0].fields[2].styleValue", is("col-6")))
+                .andExpect(jsonPath("$.rows[0].fields[2].metadataGroup.leading", is("dc.contributor.author")))
+                .andExpect(jsonPath("$.rows[0].fields[2].metadataGroup.elements.length()", Matchers.is(2)))
+                .andExpect(jsonPath("$.rows[0].fields[2].metadataGroup.elements[1].metadata",
+                    is("oairecerif.author.affiliation")));
     }
 
     @Test
@@ -144,12 +170,10 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
 
         CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
-                                                .withShortname("box-shortname-test")
-                                                .build();
-
+                .withShortname("box-shortname-test")
+                .build();
         context.restoreAuthSystemState();
         String authToken = getAuthToken(admin.getEmail(), password);
-
         List<Operation> operations = new ArrayList<Operation>();
         List<Map<String, String>> metadataValues = new ArrayList<Map<String, String>>();
         Map<String, String> values = new HashMap<String, String>();
@@ -179,9 +203,98 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
                         hasJsonPath("$.rows[0].fields[0].style", is("row")),
                         hasJsonPath("$.rows[0].fields[0].styleLabel", is("col-3")),
                         hasJsonPath("$.rows[0].fields[0].styleValue", is("col-9"))
-                       )));
+                )));
 
     }
+
+    @Test
+    public void patchAddMetadataNestedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+                .withShortname("box-shortname-test")
+                .build();
+        context.restoreAuthSystemState();
+        String authToken = getAuthToken(admin.getEmail(), password);
+        List<Operation> operations = new ArrayList<Operation>();
+        List<Map<String, String>> metadataValues = new ArrayList<Map<String, String>>();
+        Map<String, String> values1 = new HashMap<String, String>();
+        Map<String, String> values2 = new HashMap<String, String>();
+        Map<String, Object> metadataGroup = new HashMap<String, Object>();
+        Map<String, Object> values_row_nested = new HashMap<String, Object>();
+        List<Map<String, Object>> metadataValuesNested = new ArrayList<Map<String, Object>>();
+
+        // second nested metadata
+        values2.put("metadata", "oairecerif.author.affiliation");
+        values2.put("label", "Affiliation");
+        values2.put("rendering", "crisref");
+        values2.put("fieldType", "metadata");
+        values2.put("style", "row");
+        values2.put("styleLabel", "col");
+        values2.put("styleValue", "col");
+        metadataValues.add(values2);
+
+
+        // first nested metadata
+        values1.put("metadata", "dc.contributor.author");
+        values1.put("label", "Name");
+        values1.put("rendering", "crisref");
+        values1.put("fieldType", "metadata");
+        values1.put("style", "row");
+        values1.put("styleLabel", "col");
+        values1.put("styleValue", "col");
+        metadataValues.add(values1);
+
+        metadataGroup.put("elements", metadataValues);
+        metadataGroup.put("leading", "dc.contributor.author");
+
+        values_row_nested.put("label", "Authors");
+        values_row_nested.put("rendering", "table");
+        values_row_nested.put("fieldType", "metadatagroup");
+        values_row_nested.put("style", "row");
+        values_row_nested.put("styleLabel", "col");
+        values_row_nested.put("styleValue", "col");
+        values_row_nested.put("metadatagroup", metadataGroup);
+
+        metadataValuesNested.add(values_row_nested);
+        operations.add(new AddOperation("/rows/0/fields/0", metadataValuesNested));
+        String patchBody = getPatchContent(operations);
+
+        getClient(authToken).perform(patch("/api/layout/boxmetadataconfigurations/" + box.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.allOf(
+                        hasJsonPath("$.id", is(box.getID())),// now the configuration id is a number (box id)
+                        hasJsonPath("$.type", is("boxmetadataconfiguration")),
+                        hasJsonPath("$.rows[0].fields[0].label", is("Authors")),
+                        hasJsonPath("$.rows[0].fields[0].fieldType", is("METADATAGROUP")),
+                        hasJsonPath("$.rows[0].fields[0].rendering", is("table")),
+                        hasJsonPath("$.rows[0].fields[0].style", is("row")),
+                        hasJsonPath("$.rows[0].fields[0].styleValue", is("col")),
+                        hasJsonPath("$.rows[0].fields[0].styleLabel", is("col")),
+                        // nested
+                        hasJsonPath("$.rows[0].fields[0].metadataGroup.leading", is("dc.contributor.author")),
+                        hasJsonPath("$.rows[0].fields[0].metadataGroup.elements[0].metadata",
+                            is("dc.contributor.author")),
+                        hasJsonPath("$.rows[0].fields[0].metadataGroup.elements[0].label", is("Name")),
+                        hasJsonPath("$.rows[0].fields[0].metadataGroup.elements[0].fieldType", is("METADATA")),
+                        hasJsonPath("$.rows[0].fields[0].metadataGroup.elements[0].rendering", is("crisref")),
+                        hasJsonPath("$.rows[0].fields[0].metadataGroup.elements[0].style", is("row")),
+                        hasJsonPath("$.rows[0].fields[0].metadataGroup.elements[0].styleValue", is("col")),
+                        hasJsonPath("$.rows[0].fields[0].metadataGroup.elements[0].styleLabel", is("col")),
+                        hasJsonPath("$.rows[0].fields[0].metadataGroup.leading", is("dc.contributor.author")),
+                        hasJsonPath("$.rows[0].fields[0].metadataGroup.elements[1].metadata",
+                            is("oairecerif.author.affiliation")),
+                        hasJsonPath("$.rows[0].fields[0].metadataGroup.elements[1].label", is("Affiliation")),
+                        hasJsonPath("$.rows[0].fields[0].metadataGroup.elements[1].fieldType", is("METADATA")),
+                        hasJsonPath("$.rows[0].fields[0].metadataGroup.elements[1].rendering", is("crisref")),
+                        hasJsonPath("$.rows[0].fields[0].metadataGroup.elements[1].style", is("row")),
+                        hasJsonPath("$.rows[0].fields[0].metadataGroup.elements[1].styleValue", is("col")),
+                        hasJsonPath("$.rows[0].fields[0].metadataGroup.elements[1].styleLabel", is("col"))
+                )));
+    }
+
 
     @Test
     public void patchRemoveMetadataTest() throws Exception {
@@ -193,10 +306,10 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
         MetadataField contributor = mfss.findByElement(context, schema, "identifier", "name");
 
         CrisLayoutField fieldContributor = CrisLayoutFieldBuilder.createMetadataField(context, contributor, 0, 0)
-                                                                 .withLabel("Author")
-                                                                 .withRendering("")
-                                                                 .withStyle("STYLE")
-                                                                 .build();
+                .withLabel("Author")
+                .withRendering("")
+                .withStyle("STYLE")
+                .build();
 
         schema = mdss.find(context, "person");
         MetadataField firstName = mfss.findByElement(context, schema, "givenName", null);
@@ -231,14 +344,78 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
         getClient(authToken).perform(patch("/api/layout/boxmetadataconfigurations/" + box.getID())
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                            .andExpect(status().isOk());
+                .andExpect(status().isOk());
 
         getClient(authToken).perform(get("/api/layout/boxmetadataconfigurations/" + box.getID()))
-                            .andExpect(status().isOk())
-                            .andExpect(content().contentType(contentType))
-                            .andExpect(jsonPath("$.id", Matchers.is(box.getID())))
-                            .andExpect(jsonPath("$.rows.length()", Matchers.is(1)))
-                            .andExpect(jsonPath("$.rows[0].fields.length()", Matchers.is(1)));
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.id", Matchers.is(box.getID())))
+                .andExpect(jsonPath("$.rows.length()", Matchers.is(1)))
+                .andExpect(jsonPath("$.rows[0].fields.length()", Matchers.is(1)));
+    }
+
+
+    @Test
+    public void patchRemoveMetadataNestedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+        MetadataSchema schema = mdss.find(context, "orgunit");
+        MetadataField contributor = mfss.findByElement(context, schema, "identifier", "name");
+
+
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+                .withShortname("box-shortname-test")
+                .build();
+
+        // first cris layout
+
+        CrisLayoutFieldBuilder.createMetadataField(context, contributor, 0, 0)
+                .withLabel("Author")
+                .withRendering("")
+                .withStyle("STYLE")
+                .withBox(box)
+                .build();
+
+
+        //second cris layout -> nested
+
+        MetadataField author = mfss.findByString(context, "dc.contributor.author", '.');
+        MetadataField affiliation = mfss.findByString(context, "oairecerif.author.affiliation", '.');
+        List<MetadataField> metadataFieldList = new ArrayList<>();
+        metadataFieldList.add(author);
+        metadataFieldList.add(affiliation);
+
+
+        CrisLayoutFieldBuilder.createMetadataField(context, author, 0, 1)
+                .withLabel("Author")
+                .withRendering("table")
+                .withNestedField(metadataFieldList)
+                .withBox(box)
+                .build();
+
+
+        context.restoreAuthSystemState();
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> operations = new ArrayList<Operation>();
+        operations.add(new RemoveOperation("/rows/0/fields/1"));
+
+
+
+        String patchBody = getPatchContent(operations);
+        getClient(authToken).perform(patch("/api/layout/boxmetadataconfigurations/" + box.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+
+        getClient(authToken).perform(get("/api/layout/boxmetadataconfigurations/" + box.getID()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.id", Matchers.is(box.getID())))
+                .andExpect(jsonPath("$.rows.length()", Matchers.is(1)))
+                .andExpect(jsonPath("$.rows[0].fields.length()", Matchers.is(1)));
     }
 
     @Test
@@ -248,8 +425,8 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
 
         CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
-                                                .withShortname("box-shortname-test")
-                                                .build();
+                .withShortname("box-shortname-test")
+                .build();
 
         context.restoreAuthSystemState();
         String authToken = getAuthToken(admin.getEmail(), password);
@@ -267,7 +444,7 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
         getClient(authToken).perform(patch("/api/layout/boxmetadataconfigurations/" + box.getID())
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                            .andExpect(status().isUnprocessableEntity());
+                .andExpect(status().isUnprocessableEntity());
 
     }
 
@@ -277,8 +454,8 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
 
         CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
-                                                .withShortname("box-shortname-test")
-                                                .build();
+                .withShortname("box-shortname-test")
+                .build();
 
         context.restoreAuthSystemState();
         String authToken = getAuthToken(admin.getEmail(), password);
@@ -313,7 +490,69 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
                         hasJsonPath("$.rows[0].fields[0].label", is("Department Logo")),
                         hasJsonPath("$.rows[0].fields[0].fieldType", is("BITSTREAM")),
                         hasJsonPath("$.rows[0].fields[0].rendering", is("thumbnail"))
-                       )));
+                )));
+
+    }
+
+    @Test
+    public void patchAddMetadataNestedNotExistTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+                .withShortname("box-shortname-test")
+                .build();
+        context.restoreAuthSystemState();
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+
+        List<Operation> operations = new ArrayList<Operation>();
+        List<Map<String, String>> metadataValues = new ArrayList<Map<String, String>>();
+        Map<String, String> values1 = new HashMap<String, String>();
+        Map<String, String> values2 = new HashMap<String, String>();
+        Map<String, Object> metadataGroup = new HashMap<String, Object>();
+        Map<String, Object> valuesRowNested = new HashMap<String, Object>();
+        List<Map<String, Object>> metadataValuesNested = new ArrayList<Map<String, Object>>();
+
+        // second nested metadata
+        values2.put("metadata", "dc.not.exist");
+        values2.put("label", "Affiliation");
+        values2.put("rendering", "crisref");
+        values2.put("fieldType", "metadata");
+        values2.put("style", "row");
+        values2.put("styleLabel", "col");
+        values2.put("styleValue", "col");
+        metadataValues.add(values2);
+
+
+        // first nested metadata
+        values1.put("metadata", "dc.contributor.author");
+        values1.put("label", "Name");
+        values1.put("rendering", "crisref");
+        values1.put("fieldType", "metadata");
+        values1.put("style", "row");
+        values1.put("styleLabel", "col");
+        values1.put("styleValue", "col");
+        metadataValues.add(values1);
+
+        metadataGroup.put("elements", metadataValues);
+        metadataGroup.put("leading", "dc.contributor.author");
+
+        valuesRowNested.put("label", "Authors");
+        valuesRowNested.put("rendering", "table");
+        valuesRowNested.put("fieldType", "metadatagroup");
+        valuesRowNested.put("style", "row");
+        valuesRowNested.put("styleLabel", "col");
+        valuesRowNested.put("styleValue", "col");
+        valuesRowNested.put("metadatagroup", metadataGroup);
+
+        metadataValuesNested.add(valuesRowNested);
+        operations.add(new AddOperation("/rows/0/fields/0", metadataValuesNested));
+        String patchBody = getPatchContent(operations);
+
+        getClient(authToken).perform(patch("/api/layout/boxmetadataconfigurations/" + box.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isUnprocessableEntity());
 
     }
 

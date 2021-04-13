@@ -9,11 +9,11 @@ package org.dspace.builder;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.CharEncoding;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -78,9 +78,8 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
         return setMetadataSingleValue(collection, MetadataSchemaEnum.DC.getName(), "title", null, name);
     }
 
-
-    public CollectionBuilder withRelationshipType(final String name) {
-        return setMetadataSingleValue(collection, MetadataSchemaEnum.RELATIONSHIP.getName(), "type", null, name);
+    public CollectionBuilder withEntityType(final String name) {
+        return setMetadataSingleValue(collection, "dspace", "entity", "type", name);
     }
 
     public CollectionBuilder withNameForLanguage(final String name, final String language) {
@@ -91,9 +90,33 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
         return addMetadataValue(collection, "cris", "submission", "definition", null, name);
     }
 
+    public CollectionBuilder withWorkflow(final String name) {
+        return addMetadataValue(collection, "cris", "workflow", "name", null, name);
+    }
+
+    public CollectionBuilder withHarvestingPreTrasform(String preTransform) {
+        return addMetadataValue(collection, "cris", "harvesting", "preTransform", null, preTransform);
+    }
+
+    public CollectionBuilder withHarvestingPostTrasform(String postTransform) {
+        return addMetadataValue(collection, "cris", "harvesting", "postTransform", null, postTransform);
+    }
+
+    public CollectionBuilder withHarvestingEmail(String email) {
+        return addMetadataValue(collection, "cris", "harvesting", "email", null, email);
+    }
+
+    public CollectionBuilder withHarvestingItemValidationEnabled() {
+        return addMetadataValue(collection, "cris", "harvesting", "itemValidationEnabled", null, "true");
+    }
+
+    public CollectionBuilder withHarvestingRecordValidationEnabled() {
+        return addMetadataValue(collection, "cris", "harvesting", "recordValidationEnabled", null, "true");
+    }
+
     public CollectionBuilder withLogo(final String content) throws AuthorizeException, IOException, SQLException {
 
-        InputStream is = IOUtils.toInputStream(content, CharEncoding.UTF_8);
+        InputStream is = IOUtils.toInputStream(content, StandardCharsets.UTF_8);
         try {
             collectionService.setLogo(context, collection, is);
             return this;
@@ -157,6 +180,10 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
         }
         groupService.update(context, g);
         return this;
+    }
+
+    public CollectionBuilder withSharedWorkspace() {
+        return setMetadataSingleValue(collection, "cris", "workspace", "shared", "true");
     }
 
     @Override

@@ -16,21 +16,26 @@ import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.submit.AbstractRestProcessingStep;
+import org.dspace.app.rest.submit.DataProcessingStep;
+import org.dspace.app.rest.submit.RestProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
+import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.Collection;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.RequestService;
+import org.dspace.services.model.Request;
+import org.dspace.validation.service.ValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Abstract implementation providing the common functionalities for all the inprogressSubmission Converter
- * 
+ *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  * @param <T>
@@ -58,10 +63,14 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
     @Autowired
     RequestService requestService;
 
+    @Autowired
+    private ValidationService validationService;
+
     public AInprogressItemConverter() throws SubmissionConfigReaderException {
         submissionConfigReader = new SubmissionConfigReader();
     }
 
+    @SuppressWarnings("unchecked")
     protected void fillFromModel(T obj, R witem, Projection projection) {
         Collection collection = obj.getCollection();
         Item item = obj.getItem();
@@ -69,12 +78,15 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
         submitter = obj.getSubmitter();
 
         witem.setId(obj.getID());
-
-        // 1. retrieve the submission definition
-        // 2. iterate over the submission section to allow to plugin additional
-        // info
+        witem.setCollection(collection != null ? converter.toRest(collection, projection) : null);
+        if (submitter != null) {
+            witem.setSubmitter(converter.toRest(submitter, projection));
+        }
 
         if (collection != null) {
+
+            addValidationErrorsToItem(obj, witem);
+
             SubmissionDefinitionRest def = converter.toRest(
                     submissionConfigReader.getSubmissionConfigByCollection(collection), projection);
             witem.setSubmissionDefinition(def);
@@ -93,18 +105,14 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
 
                     Object stepInstance = stepClass.newInstance();
 
-                    if (stepInstance instanceof AbstractRestProcessingStep) {
+                    if (stepInstance instanceof DataProcessingStep) {
                         // load the interface for this step
-                        AbstractRestProcessingStep stepProcessing =
-                            (AbstractRestProcessingStep) stepClass.newInstance();
-                        for (ErrorRest error : stepProcessing.validate(submissionService, obj, stepConfig)) {
-                            addError(witem.getErrors(), error);
-                        }
+                        DataProcessingStep stepProcessing = (DataProcessingStep) stepClass.newInstance();
                         witem.getSections()
                             .put(sections.getId(), stepProcessing.getData(submissionService, obj, stepConfig));
-                    } else {
+                    } else if (!(stepInstance instanceof RestProcessingStep)) {
                         log.warn("The submission step class specified by '" + stepConfig.getProcessingClassName() +
-                                 "' does not extend the class org.dspace.app.rest.submit.AbstractRestProcessingStep!" +
+                                 "' does not implement the interface org.dspace.app.rest.submit.RestProcessingStep!" +
                                  " Therefore it cannot be used by the Configurable Submission as the " +
                                  "<processing-class>!");
                     }
@@ -116,10 +124,18 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
 
             }
         }
-
-        witem.setCollection(collection != null ? converter.toRest(collection, projection) : null);
+        // need to be after to have stored the submission-name in the request attribute
         witem.setItem(converter.toRest(item, projection));
-        witem.setSubmitter(converter.toRest(submitter, projection));
+    }
+
+    @SuppressWarnings("unchecked")
+    private void addValidationErrorsToItem(T obj, R witem) {
+        Request currentRequest = requestService.getCurrentRequest();
+        Context context = ContextUtil.obtainContext(currentRequest.getServletRequest());
+
+        validationService.validate(context, obj).stream()
+            .map(ErrorRest::fromValidationError)
+            .forEach(error -> addError(witem.getErrors(), error));
     }
 
     void storeSubmissionName(final String name) {

@@ -185,6 +185,7 @@ public abstract class ExportEventProcessor {
 
     /**
      * Checks if the item's entity type should be processed
+     * When no entity type is present, the check will not be performed and true will be returned.
      *
      * @param item to be checked
      * @return whether the item should be processed
@@ -193,6 +194,10 @@ public abstract class ExportEventProcessor {
     protected boolean shouldProcessEntityType(Item item) throws SQLException {
         Entity entity = entityService.findByItemId(context, item.getID());
         EntityType type = entityService.getType(context, entity);
+
+        if (type == null) {
+            return true;
+        }
 
         String[] entityTypeStrings = configurationService.getArrayProperty("irus.statistics.tracker.entity-types");
         List<String> entityTypes = new ArrayList<>();
@@ -203,7 +208,7 @@ public abstract class ExportEventProcessor {
             entityTypes.add(ENTITY_TYPE_DEFAULT);
         }
 
-        if (type != null && entityTypes.contains(type.getLabel())) {
+        if (entityTypes.contains(type.getLabel())) {
             return true;
         }
         return false;

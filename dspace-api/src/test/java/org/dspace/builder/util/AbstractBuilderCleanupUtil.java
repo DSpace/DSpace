@@ -15,11 +15,14 @@ import java.util.Map;
 import org.dspace.builder.AbstractBuilder;
 import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.BitstreamFormatBuilder;
+import org.dspace.builder.BundleBuilder;
 import org.dspace.builder.ClaimedTaskBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.CrisLayoutBoxBuilder;
+import org.dspace.builder.CrisLayoutMetric2BoxBuilder;
 import org.dspace.builder.CrisLayoutTabBuilder;
+import org.dspace.builder.CrisMetricsBuilder;
 import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.GroupBuilder;
@@ -32,6 +35,7 @@ import org.dspace.builder.PoolTaskBuilder;
 import org.dspace.builder.ProcessBuilder;
 import org.dspace.builder.RelationshipBuilder;
 import org.dspace.builder.RelationshipTypeBuilder;
+import org.dspace.builder.ResourcePolicyBuilder;
 import org.dspace.builder.SiteBuilder;
 import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
@@ -47,20 +51,25 @@ public class AbstractBuilderCleanupUtil {
             = new LinkedHashMap<>();
 
     /**
-     * Constructor that will initialize the Map with a predefined order for deletion
+     * Constructor that will initialize the Map with a predefined order for deletion.
+     * <P>
+     * Objects are deleted top-to-bottom in this Map. Objects that need to be removed *first*
+     * should appear at the top. Objects that may be deleted later, appear at the bottom.
      */
     public AbstractBuilderCleanupUtil() {
         initMap();
-
     }
 
     private void initMap() {
         //map.put(CrisLayoutBitstreamBuilder.class.getName(), new LinkedList<>());
         //map.put(CrisLayoutFieldBuilder.class.getName(), new LinkedList<>());
+        map.put(CrisMetricsBuilder.class.getName(), new LinkedList<>());
         map.put(OrcidHistoryBuilder.class.getName(), new LinkedList<>());
         map.put(OrcidQueueBuilder.class.getName(), new LinkedList<>());
+        map.put(CrisLayoutMetric2BoxBuilder.class.getName(), new LinkedList<>());
         map.put(CrisLayoutBoxBuilder.class.getName(), new LinkedList<>());
         map.put(CrisLayoutTabBuilder.class.getName(), new LinkedList<>());
+        map.put(ResourcePolicyBuilder.class.getName(), new LinkedList<>());
         map.put(RelationshipBuilder.class.getName(), new LinkedList<>());
         map.put(RelationshipTypeBuilder.class.getName(), new LinkedList<>());
         map.put(EntityTypeBuilder.class.getName(), new LinkedList<>());
@@ -74,6 +83,7 @@ public class AbstractBuilderCleanupUtil {
         map.put(CommunityBuilder.class.getName(), new LinkedList<>());
         map.put(EPersonBuilder.class.getName(), new LinkedList<>());
         map.put(GroupBuilder.class.getName(), new LinkedList<>());
+        map.put(BundleBuilder.class.getName(), new LinkedList<>());
         map.put(ItemBuilder.class.getName(), new LinkedList<>());
         map.put(MetadataFieldBuilder.class.getName(), new LinkedList<>());
         map.put(MetadataSchemaBuilder.class.getName(), new LinkedList<>());

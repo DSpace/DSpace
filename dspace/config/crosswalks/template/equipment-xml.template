@@ -1,4 +1,4 @@
-<Equipment id="@virtual.id@">
+<Equipment xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="@virtual.id@">
 	<Name>@dc.title@</Name>
 	<Acronym>@oairecerif.acronym@</Acronym>
 	<Identifier type="Institution assigned unique equipment identifier">@oairecerif.internalid@</Identifier>

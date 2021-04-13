@@ -7,8 +7,12 @@
  */
 package org.dspace.app.rest;
 
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+import static org.dspace.content.Item.ANY;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.startsWith;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -117,11 +121,11 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
 
         leftItem = ItemBuilder.createItem(context, collection)
             .withTitle("Left item")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .build();
         rightItem = ItemBuilder.createItem(context, collection)
             .withTitle("Right item")
-            .withRelationshipType("Person")
+            .withEntityType("Person")
             .withPersonIdentifierFirstName("firstName")
             .withPersonIdentifierLastName("familyName")
             .build();
@@ -141,12 +145,12 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
 
         leftItem = ItemBuilder.createItem(context, collection)
             .withTitle("Left item")
-            .withRelationshipType("JournalIssue")
+            .withEntityType("JournalIssue")
             .withPublicationIssueNumber("2")
             .build();
         rightItem = ItemBuilder.createItem(context, collection)
             .withTitle("Right item")
-            .withRelationshipType("JournalVolume")
+            .withEntityType("JournalVolume")
             .withPublicationVolumeNumber("30")
             .build();
         relationshipType = relationshipTypeService
@@ -166,15 +170,15 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
             .withTitle("Person 1")
             .withPersonIdentifierFirstName("Donald")
             .withPersonIdentifierLastName("Smith")
-            .withRelationshipType("Person")
+            .withEntityType("Person")
             .build();
         projectItem = ItemBuilder.createItem(context, collection)
             .withTitle("Project 1")
-            .withRelationshipType("Project")
+            .withEntityType("Project")
             .build();
         publicationItem = ItemBuilder.createItem(context, collection)
             .withTitle("Publication 1")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .build();
         personProjectRelationshipType = relationshipTypeService.findbyTypesAndTypeName(context,
             entityTypeService.findByEntityType(context, "Person"),
@@ -221,6 +225,35 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
     public void testDeleteAuthorRelationshipCopyToLeftItem() throws Exception {
         initPublicationAuthor();
 
+        // Verify the dc.contributor.author virtual metadata of the left item
+        assertEquals(
+                1,
+                itemService
+                        .getMetadata(leftItem, "dc", "contributor", "author", Item.ANY)
+                        .size()
+        );
+
+        // Verify there's no dc.contributor.author actual metadata on the left item
+        assertEquals(
+                0,
+                leftItem.getMetadata()
+                        .stream()
+                        .filter(metadataValue -> "author".equals(metadataValue.getMetadataField().getQualifier()))
+                        .collect(toList())
+                        .size()
+        );
+
+        // Verify there's no relation.isAuthorOfPublication actual metadata on the left item
+        assertEquals(
+                0,
+                leftItem.getMetadata()
+                        .stream()
+                        .filter(metadataValue -> "isAuthorOfPublication"
+                                .equals(metadataValue.getMetadataField().getElement()))
+                        .collect(toList())
+                        .size()
+        );
+
         getClient(adminAuthToken).perform(
             delete("/api/core/relationships/" + relationship.getID() + "?copyVirtualMetadata=left"))
             .andExpect(status().isNoContent());
@@ -235,12 +268,35 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         assertThat(authorList.get(0).getMetadataField().getQualifier(), equalTo("author"));
         assertNull(authorList.get(0).getAuthority());
 
-
-        // Check that the relation metadata values are gone because the relationship is gone
         List<MetadataValue> relationshipMetadataList = itemService
             .getMetadata(leftItem, "relation", "isAuthorOfPublication", null, Item.ANY);
-        assertThat(relationshipMetadataList.size(), equalTo(0));
+        assertThat(relationshipMetadataList.size(), equalTo(1));
 
+        // Verify there's dc.contributor.author actual metadata on the left item
+        assertEquals(
+                1,
+                leftItem.getMetadata()
+                        .stream()
+                        .filter(metadataValue -> metadataValue.getMetadataField().getQualifier() != null &&
+                                metadataValue.getMetadataField().getQualifier().equals("author"))
+                        .collect(toList())
+                        .size()
+        );
+
+        // Verify there's relation.isAuthorOfPublication actual metadata on the left item
+        assertEquals(
+                1,
+                leftItem.getMetadata()
+                        .stream()
+                        .filter(metadataValue -> "isAuthorOfPublication"
+                                .equals(metadataValue.getMetadataField().getElement()))
+                        .collect(toList())
+                        .size()
+        );
+
+        // Check right item to ensure that no metadata is copied
+
+        rightItem = context.reloadEntity(rightItem);
         relationshipMetadataList = itemService
             .getMetadata(rightItem, "relation", "isPublicationOfAuthor", null, Item.ANY);
         assertThat(relationshipMetadataList.size(), equalTo(0));
@@ -249,6 +305,27 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
     @Test
     public void testAuthorDeleteRelationshipCopyToRightItem() throws Exception {
         initPublicationAuthor();
+
+        // Verify there's no dc.contributor.author actual metadata on the right item
+        assertEquals(
+                0,
+                rightItem.getMetadata()
+                        .stream()
+                        .filter(metadataValue -> "author".equals(metadataValue.getMetadataField().getQualifier()))
+                        .collect(toList())
+                        .size()
+        );
+
+        // Verify there's no relation.isPublicationOfAuthor actual metadata on the right item
+        assertEquals(
+                0,
+                rightItem.getMetadata()
+                        .stream()
+                        .filter(metadataValue -> "isPublicationOfAuthor"
+                                .equals(metadataValue.getMetadataField().getElement()))
+                        .collect(toList())
+                        .size()
+        );
 
         getClient(adminAuthToken).perform(
             delete("/api/core/relationships/" + relationship.getID() + "?copyVirtualMetadata=right"))
@@ -259,14 +336,27 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         List<MetadataValue> authorList = itemService.getMetadata(leftItem, "dc", "contributor", "author", Item.ANY);
         assertThat(authorList.size(), equalTo(0));
 
-        // Check that the relation metadata values are gone because the relationship is gone
         List<MetadataValue> relationshipMetadataList = itemService
             .getMetadata(leftItem, "relation", "isAuthorOfPublication", null, Item.ANY);
         assertThat(relationshipMetadataList.size(), equalTo(0));
 
+        // Check right item to ensure that the metadata is copied
+
+        rightItem = itemService.find(context, rightItem.getID());
         relationshipMetadataList = itemService
             .getMetadata(rightItem, "relation", "isPublicationOfAuthor", null, Item.ANY);
-        assertThat(relationshipMetadataList.size(), equalTo(0));
+        assertThat(relationshipMetadataList.size(), equalTo(1));
+
+        // Verify there's relation.isPublicationOfAuthor actual metadata on the right item
+        assertEquals(
+                1,
+                rightItem.getMetadata()
+                        .stream()
+                        .filter(metadataValue -> "isPublicationOfAuthor"
+                                .equals(metadataValue.getMetadataField().getElement()))
+                        .collect(toList())
+                        .size()
+        );
 
         // There is no additional Metadata to check on the rightItem because the configuration of the virtual
         // metadata holds no config to display virtual metadata on the author of the publication
@@ -291,11 +381,44 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
 
         List<MetadataValue> relationshipMetadataList = itemService
             .getMetadata(leftItem, "relation", "isAuthorOfPublication", null, Item.ANY);
-        assertThat(relationshipMetadataList.size(), equalTo(0));
+        assertThat(relationshipMetadataList.size(), equalTo(1));
 
+        // Verify there's dc.contributor.author actual metadata on the left item
+        assertEquals(
+                1,
+                leftItem.getMetadata()
+                        .stream()
+                        .filter(metadataValue -> "author".equals(metadataValue.getMetadataField().getQualifier()))
+                        .collect(toList())
+                        .size()
+        );
+
+        // Verify there's relation.isAuthorOfPublication actual metadata on the left item
+        assertEquals(
+                1,
+                leftItem.getMetadata()
+                        .stream()
+                        .filter(metadataValue -> "isAuthorOfPublication"
+                                .equals(metadataValue.getMetadataField().getElement()))
+                        .collect(toList())
+                        .size()
+        );
+
+        rightItem = itemService.find(context, rightItem.getID());
         relationshipMetadataList = itemService
             .getMetadata(rightItem, "relation", "isPublicationOfAuthor", null, Item.ANY);
-        assertThat(relationshipMetadataList.size(), equalTo(0));
+        assertThat(relationshipMetadataList.size(), equalTo(1));
+
+        // Verify there's relation.isPublicationOfAuthor actual metadata on the right item
+        assertEquals(
+                1,
+                rightItem.getMetadata()
+                        .stream()
+                        .filter(metadataValue -> "isPublicationOfAuthor"
+                                .equals(metadataValue.getMetadataField().getElement()))
+                        .collect(toList())
+                        .size()
+        );
 
         // There is no additional Metadata to check on the rightItem because the configuration of the virtual
         // metadata holds no config to display virtual metadata on the author of the publication
@@ -375,6 +498,32 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
     public void deleteItemCopyVirtualMetadataAll() throws Exception {
         initPersonProjectPublication();
 
+        for (Item item : asList(publicationItem, projectItem)) {
+
+            // Verify the dc.contributor.author virtual metadata
+            assertEquals(
+                    1,
+                    itemService.getMetadata(item, "dc", "contributor", "author", ANY).size()
+            );
+
+            // Verify there's no dc.contributor.author actual metadata on the item
+            assertEquals(
+                    0,
+                    item.getMetadata().stream()
+                            .filter(metadataValue -> "author".equals(metadataValue.getMetadataField().getQualifier()))
+                            .collect(toList()).size()
+            );
+
+            // Verify there's no relation.isAuthorOfPublication actual metadata on the item
+            assertEquals(
+                    0,
+                    item.getMetadata().stream()
+                            .filter(metadataValue -> "isAuthorOfPublication"
+                                    .equals(metadataValue.getMetadataField().getElement()))
+                            .collect(toList()).size()
+            );
+        }
+
         getClient(adminAuthToken).perform(
             delete("/api/core/items/" + personItem.getID() + "?copyVirtualMetadata=all"))
             .andExpect(status().isNoContent());
@@ -387,7 +536,26 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         assertNull(publicationAuthorList.get(0).getAuthority());
         List<MetadataValue> publicationRelationships = itemService.getMetadata(publicationItem,
             "relation", "isAuthorOfPublication", Item.ANY, Item.ANY);
-        assertThat(publicationRelationships.size(), equalTo(0));
+        assertThat(publicationRelationships.size(), equalTo(1));
+
+        // Verify there's dc.contributor.author actual metadata on the publication item
+        assertEquals(
+                1,
+                publicationItem.getMetadata().stream()
+                        .filter(metadataValue -> "author".equals(metadataValue.getMetadataField().getQualifier()))
+                        .collect(toList())
+                        .size()
+        );
+
+        // Verify there's relation.isAuthorOfPublication actual metadata on the publication item
+        assertEquals(
+                1,
+                publicationItem.getMetadata().stream()
+                        .filter(metadataValue -> "isAuthorOfPublication"
+                                .equals(metadataValue.getMetadataField().getElement()))
+                        .collect(toList())
+                        .size()
+        );
 
         projectItem = itemService.find(context, projectItem.getID());
         List<MetadataValue> projectAuthorList = itemService.getMetadata(projectItem,
@@ -397,12 +565,57 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         assertNull(projectAuthorList.get(0).getAuthority());
         List<MetadataValue> projectRelationships = itemService.getMetadata(projectItem,
             "relation", "isPersonOfProject", Item.ANY, Item.ANY);
-        assertThat(projectRelationships.size(), equalTo(0));
+        assertThat(projectRelationships.size(), equalTo(1));
+
+        // Verify there's dc.contributor.author actual metadata on the project item
+        assertEquals(
+                1,
+                projectItem.getMetadata().stream()
+                        .filter(metadataValue -> "author".equals(metadataValue.getMetadataField().getQualifier()))
+                        .collect(toList())
+                        .size()
+        );
+
+        // Verify there's relation.isPersonOfProject actual metadata on the project item
+        assertEquals(
+                1,
+                projectItem.getMetadata().stream()
+                        .filter(metadataValue -> "isPersonOfProject"
+                                .equals(metadataValue.getMetadataField().getElement()))
+                        .collect(toList())
+                        .size()
+        );
     }
 
     @Test
     public void deleteItemCopyVirtualMetadataOneType() throws Exception {
         initPersonProjectPublication();
+
+        for (Item item : asList(publicationItem, projectItem)) {
+
+            // Verify the dc.contributor.author virtual metadata
+            assertEquals(
+                    1,
+                    itemService.getMetadata(item, "dc", "contributor", "author", ANY).size()
+            );
+
+            // Verify there's no dc.contributor.author actual metadata on the item
+            assertEquals(
+                    0,
+                    item.getMetadata().stream()
+                            .filter(metadataValue -> "author".equals(metadataValue.getMetadataField().getQualifier()))
+                            .collect(toList()).size()
+            );
+
+            // Verify there's no relation.isAuthorOfPublication actual metadata on the item
+            assertEquals(
+                    0,
+                    item.getMetadata().stream()
+                            .filter(metadataValue -> "isAuthorOfPublication"
+                                    .equals(metadataValue.getMetadataField().getElement()))
+                            .collect(toList()).size()
+            );
+        }
 
         getClient(adminAuthToken).perform(
             delete("/api/core/items/" + personItem.getID() + "?copyVirtualMetadata="
@@ -417,7 +630,26 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         assertNull(publicationAuthorList.get(0).getAuthority());
         List<MetadataValue> publicationRelationships = itemService.getMetadata(publicationItem,
             "relation", "isAuthorOfPublication", Item.ANY, Item.ANY);
-        assertThat(publicationRelationships.size(), equalTo(0));
+        assertThat(publicationRelationships.size(), equalTo(1));
+
+        // Verify there's dc.contributor.author actual metadata on the publication item
+        assertEquals(
+                1,
+                publicationItem.getMetadata().stream()
+                        .filter(metadataValue -> "author".equals(metadataValue.getMetadataField().getQualifier()))
+                        .collect(toList())
+                        .size()
+        );
+
+        // Verify there's relation.isAuthorOfPublication actual metadata on the publication item
+        assertEquals(
+                1,
+                publicationItem.getMetadata().stream()
+                        .filter(metadataValue -> "isAuthorOfPublication"
+                                .equals(metadataValue.getMetadataField().getElement()))
+                        .collect(toList())
+                        .size()
+        );
 
         projectItem = itemService.find(context, projectItem.getID());
         List<MetadataValue> projectAuthorList = itemService.getMetadata(projectItem,
@@ -431,6 +663,32 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
     @Test
     public void deleteItemCopyVirtualMetadataTwoTypes() throws Exception {
         initPersonProjectPublication();
+
+        for (Item item : asList(publicationItem, projectItem)) {
+
+            // Verify the dc.contributor.author virtual metadata
+            assertEquals(
+                    1,
+                    itemService.getMetadata(item, "dc", "contributor", "author", ANY).size()
+            );
+
+            // Verify there's no dc.contributor.author actual metadata on the item
+            assertEquals(
+                    0,
+                    item.getMetadata().stream()
+                            .filter(metadataValue -> "author".equals(metadataValue.getMetadataField().getQualifier()))
+                            .collect(toList()).size()
+            );
+
+            // Verify there's no relation.isAuthorOfPublication actual metadata on the item
+            assertEquals(
+                    0,
+                    item.getMetadata().stream()
+                            .filter(metadataValue -> "isAuthorOfPublication"
+                                    .equals(metadataValue.getMetadataField().getElement()))
+                            .collect(toList()).size()
+            );
+        }
 
         getClient(adminAuthToken).perform(
             delete("/api/core/items/" + personItem.getID()
@@ -446,7 +704,26 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         assertNull(publicationAuthorList.get(0).getAuthority());
         List<MetadataValue> publicationRelationships = itemService.getMetadata(publicationItem,
             "relation", "isAuthorOfPublication", Item.ANY, Item.ANY);
-        assertThat(publicationRelationships.size(), equalTo(0));
+        assertThat(publicationRelationships.size(), equalTo(1));
+
+        // Verify there's dc.contributor.author actual metadata on the publication item
+        assertEquals(
+                1,
+                publicationItem.getMetadata().stream()
+                        .filter(metadataValue -> "author".equals(metadataValue.getMetadataField().getQualifier()))
+                        .collect(toList())
+                        .size()
+        );
+
+        // Verify there's relation.isAuthorOfPublication actual metadata on the publication item
+        assertEquals(
+                1,
+                publicationItem.getMetadata().stream()
+                        .filter(metadataValue -> "isAuthorOfPublication"
+                                .equals(metadataValue.getMetadataField().getElement()))
+                        .collect(toList())
+                        .size()
+        );
 
         projectItem = itemService.find(context, projectItem.getID());
         List<MetadataValue> projectAuthorList = itemService.getMetadata(projectItem,
@@ -456,7 +733,26 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         assertNull(projectAuthorList.get(0).getAuthority());
         List<MetadataValue> projectRelationships = itemService.getMetadata(projectItem,
             "relation", "isPersonOfProject", Item.ANY, Item.ANY);
-        assertThat(projectRelationships.size(), equalTo(0));
+        assertThat(projectRelationships.size(), equalTo(1));
+
+        // Verify there's dc.contributor.author actual metadata on the project item
+        assertEquals(
+                1,
+                projectItem.getMetadata().stream()
+                        .filter(metadataValue -> "author".equals(metadataValue.getMetadataField().getQualifier()))
+                        .collect(toList())
+                        .size()
+        );
+
+        // Verify there's relation.isPersonOfProject actual metadata on the project item
+        assertEquals(
+                1,
+                projectItem.getMetadata().stream()
+                        .filter(metadataValue -> "isPersonOfProject"
+                                .equals(metadataValue.getMetadataField().getElement()))
+                        .collect(toList())
+                        .size()
+        );
     }
 
     @Test
@@ -519,6 +815,32 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
     @Test
     public void deleteItemCopyVirtualMetadataAllNoPermissions() throws Exception {
         initPersonProjectPublication();
+
+        for (Item item : asList(publicationItem, projectItem)) {
+
+            // Verify the dc.contributor.author virtual metadata
+            assertEquals(
+                    1,
+                    itemService.getMetadata(item, "dc", "contributor", "author", ANY).size()
+            );
+
+            // Verify there's no dc.contributor.author actual metadata on the item
+            assertEquals(
+                    0,
+                    item.getMetadata().stream()
+                            .filter(metadataValue -> "author".equals(metadataValue.getMetadataField().getQualifier()))
+                            .collect(toList()).size()
+            );
+
+            // Verify there's no relation.isAuthorOfPublication actual metadata on the item
+            assertEquals(
+                    0,
+                    item.getMetadata().stream()
+                            .filter(metadataValue -> "isAuthorOfPublication"
+                                    .equals(metadataValue.getMetadataField().getElement()))
+                            .collect(toList()).size()
+            );
+        }
 
         getClient(getAuthToken(eperson.getEmail(), password)).perform(
             delete("/api/core/items/" + personItem.getID()))
@@ -608,6 +930,32 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
     public void deleteItemCopyVirtualMetadataConfigured() throws Exception {
         initPersonProjectPublication();
 
+        for (Item item : asList(publicationItem, projectItem)) {
+
+            // Verify the dc.contributor.author virtual metadata
+            assertEquals(
+                    1,
+                    itemService.getMetadata(item, "dc", "contributor", "author", ANY).size()
+            );
+
+            // Verify there's no dc.contributor.author actual metadata on the item
+            assertEquals(
+                    0,
+                    item.getMetadata().stream()
+                            .filter(metadataValue -> "author".equals(metadataValue.getMetadataField().getQualifier()))
+                            .collect(toList()).size()
+            );
+
+            // Verify there's no relation.isAuthorOfPublication actual metadata on the item
+            assertEquals(
+                    0,
+                    item.getMetadata().stream()
+                            .filter(metadataValue -> "isAuthorOfPublication"
+                                    .equals(metadataValue.getMetadataField().getElement()))
+                            .collect(toList()).size()
+            );
+        }
+
         getClient(adminAuthToken).perform(
             delete("/api/core/items/" + personItem.getID() + "?copyVirtualMetadata=configured"))
                                  .andExpect(status().isNoContent());
@@ -629,7 +977,26 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         assertNull(projectAuthorList.get(0).getAuthority());
         List<MetadataValue> projectRelationships = itemService.getMetadata(projectItem,
             "relation", "isPersonOfProject", Item.ANY, Item.ANY);
-        assertThat(projectRelationships.size(), equalTo(0));
+        assertThat(projectRelationships.size(), equalTo(1));
+
+        // Verify there's dc.contributor.author actual metadata on the project item
+        assertEquals(
+                1,
+                projectItem.getMetadata().stream()
+                        .filter(metadataValue -> "author".equals(metadataValue.getMetadataField().getQualifier()))
+                        .collect(toList())
+                        .size()
+        );
+
+        // Verify there's relation.isPersonOfProject actual metadata on the project item
+        assertEquals(
+                1,
+                projectItem.getMetadata().stream()
+                        .filter(metadataValue -> "isPersonOfProject"
+                                .equals(metadataValue.getMetadataField().getElement()))
+                        .collect(toList())
+                        .size()
+        );
     }
 
     @Test
@@ -653,7 +1020,7 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         assertNull(publicationAuthorList.get(0).getAuthority());
         List<MetadataValue> publicationRelationships = itemService.getMetadata(publicationItem,
                                                 "relation", "isAuthorOfPublication", Item.ANY, Item.ANY);
-        assertThat(publicationRelationships.size(), equalTo(0));
+        assertThat(publicationRelationships.size(), equalTo(1));
 
         projectItem = itemService.find(context, projectItem.getID());
         List<MetadataValue> projectAuthorList = itemService.getMetadata(projectItem,

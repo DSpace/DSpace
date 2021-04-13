@@ -44,9 +44,22 @@
           class="org.dspace.statistics.MockSolrLoggerServiceImpl"
           lazy-init="true"/>
 
+    <bean id="org.dspace.statistics.SolrStatisticsCore"
+          class="org.dspace.statistics.MockSolrStatisticsCore"
+          autowire-candidate="true"/>
+
     <!-- deduplication -->
     <bean class="org.dspace.deduplication.MockSolrDedupCore" id="org.dspace.app.deduplication.service.DedupService"/>
     
     <!-- audit -->
     <bean id="org.dspace.app.audit.AuditService" class="org.dspace.app.audit.MockAuditService"/>
+
+    <!-- nb events -->
+    <bean class="org.dspace.app.nbevent.MockNBEventService"
+          id="org.dspace.app.nbevent.service.NBEventService" />
+          
+    <!-- suggestion service for solr providers -->  
+    <bean id="org.dspace.app.suggestion.SolrSuggestionStorageService" 
+          class="org.dspace.app.suggestion.MockSolrSuggestionStorageService" />
+
 </beans>

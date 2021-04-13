@@ -10,10 +10,13 @@ package org.dspace.importer.external.scopus.service;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.el.MethodNotFoundException;
 
 import org.apache.axiom.om.OMElement;
@@ -63,7 +66,9 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     int itemPerPage = 25;
 
-    private static final String ENDPOINT_SEARCH_SCOPUS = "http://api.elsevier.com/content/search/scopus";
+    private static final String ENDPOINT_SEARCH_SCOPUS = "https://api.elsevier.com/content/search/scopus";
+    private String apiKey;
+    private String instKey;
 
     /**
      * Initialize the class
@@ -85,30 +90,47 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     @Override
     public int getRecordsCount(String query) throws MetadataSourceException {
+        if (isEID(query)) {
+            return retry(new FindByIdCallable(query)).size();
+        }
         return retry(new SearchNBByQueryCallable(query));
     }
 
     @Override
     public int getRecordsCount(Query query) throws MetadataSourceException {
+        if (isEID(query.toString())) {
+            return retry(new FindByIdCallable(query.toString())).size();
+        }
         return retry(new SearchNBByQueryCallable(query));
     }
 
     @Override
     public Collection<ImportRecord> getRecords(String query, int start,
             int count) throws MetadataSourceException {
+        if (isEID(query)) {
+            return retry(new FindByIdCallable(query));
+        }
         return retry(new SearchByQueryCallable(query, count, start));
     }
 
     @Override
     public Collection<ImportRecord> getRecords(Query query)
             throws MetadataSourceException {
+        if (isEID(query.toString())) {
+            return retry(new FindByIdCallable(query.toString()));
+        }
         return retry(new SearchByQueryCallable(query));
     }
 
 
     @Override
     public ImportRecord getRecord(Query query) throws MetadataSourceException {
-        List<ImportRecord> records = retry(new SearchByQueryCallable(query));
+        List<ImportRecord> records = null;
+        if (isEID(query.toString())) {
+            records = retry(new FindByIdCallable(query.toString()));
+        } else {
+            records = retry(new SearchByQueryCallable(query));
+        }
         return records == null || records.isEmpty() ? null : records.get(0);
     }
 
@@ -127,10 +149,30 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
     @Override
     public Collection<ImportRecord> findMatchingRecords(Query query)
             throws MetadataSourceException {
+        if (isEID(query.toString())) {
+            return retry(new FindByIdCallable(query.toString()));
+        }
         return retry(new FindByQueryCallable(query));
     }
 
-/**
+    private boolean isEID(String query) {
+        Pattern pattern = Pattern.compile("2-s2\\.0-\\d+");
+        Matcher match = pattern.matcher(query);
+        if (match.matches()) {
+            return true;
+        }
+        return false;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
+    }
+
+    public void setInstKey(String instKey) {
+        this.instKey = instKey;
+    }
+
+    /**
  * 
  * This class implements a callable to get the numbers of result
  * @author pasquale
@@ -151,11 +193,11 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
         @Override
         public Integer call() throws Exception {
-            List<ImportRecord> results = new ArrayList<>();
             String proxyHost = configurationService.getProperty("http.proxy.host");
             String proxyPort = configurationService.getProperty("http.proxy.port");
-            String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
-            if (apiKey != null && !apiKey.equals("")) {
+//            String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
+//            String instKey = configurationService.getProperty("submission.lookup.scopus.instkey");
+            if (StringUtils.isNotBlank(apiKey)) {
                 HttpGet method = null;
                 try {
                     HttpClientBuilder hcBuilder = HttpClients.custom();
@@ -172,7 +214,9 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
                     HttpClient client = hcBuilder.build();
                     // open session
                     method = new HttpGet(
-                        ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey=" + apiKey + query);
+                        ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey=" + apiKey +
+                        (instKey != null ? "&insttoken=" + instKey : "") +
+                            "&query=" + URLEncoder.encode(query, Charset.defaultCharset()));
                     method.setConfig(requestConfigBuilder.build());
                         // Execute the method.
                     HttpResponse httpResponse = client.execute(method);
@@ -209,20 +253,21 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     private class FindByIdCallable implements Callable<List<ImportRecord>> {
 
-        private String doi;
+        private String eid;
 
         private FindByIdCallable(String doi) {
-            this.doi = doi;
+            this.eid = doi;
         }
 
 
         @Override
         public List<ImportRecord> call() throws Exception {
             List<ImportRecord> results = new ArrayList<>();
-            String queryString = "DOI(" + doi.replace("!", "/") + ")";
+            String queryString = "EID(" + eid.replace("!", "/") + ")";
             String proxyHost = configurationService.getProperty("http.proxy.host");
             String proxyPort = configurationService.getProperty("http.proxy.port");
-            String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
+//            String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
+//            String instKey = configurationService.getProperty("submission.lookup.scopus.instkey");
             if (apiKey != null && !apiKey.equals("")) {
                 HttpGet method = null;
                 try {
@@ -241,6 +286,7 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
                     // open session
                     method = new HttpGet(
                         ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey=" + apiKey +
+                            (instKey != null ? "&insttoken=" + instKey : "") +
                             "&view=COMPLETE&query=" + URLEncoder
                             .encode(queryString));
                     method.setConfig(requestConfigBuilder.build());
@@ -321,8 +367,8 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
             String proxyHost = configurationService.getProperty("http.proxy.host");
             String proxyPort = configurationService.getProperty("http.proxy.port");
-            String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
-
+//            String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
+//            String instKey = configurationService.getProperty("submission.lookup.scopus.instkey");
             if (apiKey != null && !apiKey.equals("")) {
                 HttpGet method = null;
                 try {
@@ -341,6 +387,7 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
                     // open session
                     method = new HttpGet(
                         ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey=" + apiKey +
+                            (instKey != null ? "&insttoken=" + instKey : "") +
                             "&view=COMPLETE&start=" + start + "&count=" + count + "&query=" + URLEncoder
                             .encode(queryString));
                     method.setConfig(requestConfigBuilder.build());
@@ -398,8 +445,8 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
             Integer count = query.getParameterAsClass("count", Integer.class);
             String proxyHost = configurationService.getProperty("http.proxy.host");
             String proxyPort = configurationService.getProperty("http.proxy.port");
-            String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
-
+//            String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
+//            String instKey = configurationService.getProperty("submission.lookup.scopus.instkey");
             if (apiKey != null && !apiKey.equals("")) {
                 HttpGet method = null;
                 try {
@@ -416,9 +463,10 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
                     HttpClient client = hcBuilder.build();
                     // open session
-                    method = new HttpGet(
-                        ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey=" + apiKey +
-                            "&start=" + (start != null ? start : 0) + "&count=" + (count != null ? count : 20) +
+                    method = new HttpGet(ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey=" +
+                             apiKey + (instKey != null ? "&insttoken=" + instKey : "") +
+                            "&view=COMPLETE&start=" + (start != null ? start : 0) +
+                            "&count=" + (count != null ? count : 20) +
                             "&query=" + URLEncoder.encode(queryString));
                     method.setConfig(requestConfigBuilder.build());
                         // Execute the method.
@@ -429,7 +477,7 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
                                                            + statusCode);
                     }
                     InputStream is = httpResponse.getEntity().getContent();
-                    String response = IOUtils.toString(is, Charsets.UTF_8);
+                    String response = IOUtils.toString(is, Charset.defaultCharset());
                     List<OMElement> omElements = splitToRecords(response);
                     for (OMElement record : omElements) {
                         results.add(transformSourceRecords(record));

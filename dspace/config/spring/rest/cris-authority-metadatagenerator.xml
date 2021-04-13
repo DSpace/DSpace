@@ -39,4 +39,16 @@
         <property name="singleResultOnAggregate" value="false"/>
      </bean>
 
+     <bean id="org.dspace.content.authority.ZDBExtraIssnMetadataGenerator" 
+    	class="org.dspace.content.authority.ZDBExtraIssnMetadataGenerator">
+    	<property name="relatedInputformMetadata" value="dc_relation_issn"/>
+     </bean>
+     <bean id="org.dspace.content.authority.ZDBExtraTitleMetadataGenerator" 
+    	class="org.dspace.content.authority.ZDBExtraTitleMetadataGenerator">
+    	<property name="relatedInputformMetadata" value="dc_relation_ispartof"/>
+     </bean>
+
+     <bean id="org.dspace.content.authority.OpenAIRECodeExtraMetadataGenerator" 
+    	class="org.dspace.content.authority.OpenAIRECodeExtraMetadataGenerator">
+     </bean>
 </beans>

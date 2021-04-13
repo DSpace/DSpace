@@ -76,9 +76,17 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
+    private List<CrisLayoutMetric2Box> metric2box;
+    @OneToMany(
+            mappedBy = "box",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     private List<CrisLayoutTab2Box> tab2box = new ArrayList<>();
     @Column(name = "clear")
     private Boolean clear;
+    @Column(name = "max_columns")
+    private Integer maxColumns = null;
 
     @Override
     public Integer getID() {
@@ -225,6 +233,22 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
 
     public void setClear(Boolean clear) {
         this.clear = clear;
+    }
+
+    public Integer getMaxColumns() {
+        return maxColumns;
+    }
+
+    public void setMaxColumns(Integer maxColumns) {
+        this.maxColumns = maxColumns;
+    }
+
+    public List<CrisLayoutMetric2Box> getMetric2box() {
+        return metric2box;
+    }
+
+    public void setMetric2box(List<CrisLayoutMetric2Box> box2metric) {
+        this.metric2box = box2metric;
     }
 
     public List<CrisLayoutTab2Box> getTab2box() {

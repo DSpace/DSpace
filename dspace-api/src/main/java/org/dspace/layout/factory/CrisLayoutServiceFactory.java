@@ -9,6 +9,8 @@ package org.dspace.layout.factory;
 
 import org.dspace.layout.service.CrisLayoutBoxService;
 import org.dspace.layout.service.CrisLayoutFieldService;
+import org.dspace.layout.service.CrisLayoutMetadataGroupService;
+import org.dspace.layout.service.CrisLayoutMetric2BoxService;
 import org.dspace.layout.service.CrisLayoutSectionService;
 import org.dspace.layout.service.CrisLayoutTabService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -32,6 +34,10 @@ public abstract class CrisLayoutServiceFactory {
 
     public abstract CrisLayoutFieldService getFieldService();
 
+    public abstract CrisLayoutMetric2BoxService getMetric2BoxService();
+
     public abstract CrisLayoutSectionService getSectionService();
+
+    public abstract CrisLayoutMetadataGroupService getMetadataGroupService();
 
 }

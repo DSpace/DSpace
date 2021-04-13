@@ -7,7 +7,7 @@
  */
 package org.dspace.discovery.configuration;
 
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -24,7 +24,7 @@ public class DiscoveryRecentSubmissionsConfiguration {
         return metadataSortField;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setMetadataSortField(String metadataSortField) {
         this.metadataSortField = metadataSortField;
     }
@@ -33,7 +33,7 @@ public class DiscoveryRecentSubmissionsConfiguration {
         return max;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setMax(int max) {
         this.max = max;
     }

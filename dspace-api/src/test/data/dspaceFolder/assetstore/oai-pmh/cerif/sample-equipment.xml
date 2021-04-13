@@ -1,0 +1,18 @@
+<cerif:Equipment
+	xmlns:sc="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Service_Compatibility"
+	xmlns:ar="http://purl.org/coar/access_right"
+	xmlns:prot="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types"
+	xmlns:pubt="https://www.openaire.eu/cerif-profile/vocab/COAR_Publication_Types"
+	xmlns:funt="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types"
+	xmlns:patt="https://www.openaire.eu/cerif-profile/vocab/COAR_Patent_Types"
+	xmlns:cerif="https://www.openaire.eu/cerif-profile/1.1/"
+	id="f3e39333-5c82-40c2-aa3d-103def9abd97">
+	<cerif:Type scheme="/dk/atira/pure/equipment/equipmenttypes/equipment/equipment">Equipment</cerif:Type>
+	<cerif:Name xml:lang="en">Microflown Scan&amp;Paint</cerif:Name>
+	<cerif:Description xml:lang="en">A unique tool for acoustic trouble shooting and sound source localization</cerif:Description>
+	<cerif:Owner>
+		<cerif:OrgUnit id="17905644-5d13-43c3-a849-024ec83694d3">
+			<cerif:Name xml:lang="en">BA2E09 Machinery noise</cerif:Name>
+		</cerif:OrgUnit>
+	</cerif:Owner>
+</cerif:Equipment>

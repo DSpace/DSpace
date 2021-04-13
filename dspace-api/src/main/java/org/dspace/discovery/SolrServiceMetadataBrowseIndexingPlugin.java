@@ -88,13 +88,13 @@ public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndex
                 bi.generateMdBits();
 
                 // values to show in the browse list
-                Set<String> distFValues = new HashSet<String>();
+                Set<String> distFValues = new HashSet<>();
                 // value for lookup without authority
-                Set<String> distFVal = new HashSet<String>();
+                Set<String> distFVal = new HashSet<>();
                 // value for lookup with authority
-                Set<String> distFAuths = new HashSet<String>();
+                Set<String> distFAuths = new HashSet<>();
                 // value for lookup when partial search (the item mapper tool use it)
-                Set<String> distValuesForAC = new HashSet<String>();
+                Set<String> distValuesForAC = new HashSet<>();
 
                 // now index the new details - but only if it's archived or
                 // withdrawn
@@ -118,9 +118,8 @@ public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndex
                                                        DSpaceServicesFactory.getInstance()
                                                                             .getConfigurationService()
                                                                             .getPropertyAsType(
-                                                                                "discovery.browse.authority.ignore",
-                                                                                new Boolean(false)
-                                                                            ),
+                                                                                    "discovery.browse.authority.ignore",
+                                                                                    Boolean.FALSE),
                                                        true);
 
                             for (int x = 0; x < values.size(); x++) {
@@ -161,19 +160,14 @@ public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndex
                                         distValuesForAC.add(values.get(x).getValue());
 
                                         String preferedLabel = null;
-                                        boolean ignorePrefered =
-                                            DSpaceServicesFactory
-                                                .getInstance()
-                                                .getConfigurationService()
-                                                .getPropertyAsType("discovery.browse.authority.ignore-prefered."
-                                                                       + bi.getName(),
-                                                                   DSpaceServicesFactory
-                                                                       .getInstance()
-                                                                       .getConfigurationService()
-                                                                       .getPropertyAsType(
-                                                                           "discovery.browse.authority.ignore-prefered",
-                                                                           new Boolean(false)),
-                                                                   true);
+                                        Boolean generalSetting = DSpaceServicesFactory.getInstance()
+                                                .getConfigurationService().getPropertyAsType(
+                                                        "discovery.browse.authority.ignore-preferred",
+                                                        Boolean.FALSE);
+                                        boolean ignorePrefered = DSpaceServicesFactory.getInstance()
+                                                .getConfigurationService().getPropertyAsType(
+                                                        "discovery.browse.authority.ignore-preferred." + bi.getName(),
+                                                        generalSetting, true);
                                         if (!ignorePrefered) {
                                             preferedLabel = choiceAuthorityService
                                                 .getLabel(values.get(x), collection, values.get(x).getLanguage());
@@ -191,7 +185,7 @@ public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndex
                                                                        .getConfigurationService()
                                                                        .getPropertyAsType(
                                                                            "discovery.browse.authority.ignore-variants",
-                                                                           new Boolean(false)),
+                                                                           Boolean.FALSE),
                                                                    true);
                                         if (!ignoreVariants) {
                                             variants = choiceAuthorityService

@@ -55,9 +55,6 @@
     <bean class="org.dspace.versioning.dao.impl.VersionDAOImpl"/>
     <bean class="org.dspace.versioning.dao.impl.VersionHistoryDAOImpl"/>
 
-    <bean class="org.dspace.workflowbasic.dao.impl.BasicWorkflowItemDAOImpl"/>
-    <bean class="org.dspace.workflowbasic.dao.impl.TaskListItemDAOImpl"/>
-
     <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.ClaimedTaskDAOImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.CollectionRoleDAOImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.InProgressUserDAOImpl"/>
@@ -69,7 +66,6 @@
     <bean class="org.dspace.batch.dao.impl.ImpBitstreamDAOImpl"/>
     <bean class="org.dspace.batch.dao.impl.ImpMetadatavalueDAOImpl"/>
     <bean class="org.dspace.batch.dao.impl.ImpRecordDAOImpl"/>
-    <bean class="org.dspace.batch.dao.impl.ImpRecordToItemDAOImpl"/>
 	<bean class="org.dspace.batch.dao.impl.ImpBitstreamMetadatavalueDAOImpl"/>
 	<bean class="org.dspace.batch.dao.impl.ImpWorkflowNStateDAOImpl"/>
 
@@ -77,9 +73,13 @@
     <bean class="org.dspace.layout.dao.impl.CrisLayoutTabDAOImpl" />
     <bean class="org.dspace.layout.dao.impl.CrisLayoutBoxDAOImpl" />
     <bean class="org.dspace.layout.dao.impl.CrisLayoutFieldDAOImpl" />
+    <bean class="org.dspace.layout.dao.impl.CrisLayoutMetadataGroupDAOImpl" />
+    <bean class="org.dspace.layout.dao.impl.CrisLayoutMetric2BoxDAOImpl" />
     
     <!-- Orcid DAO --> 
     <bean class="org.dspace.app.orcid.dao.impl.OrcidQueueDAOImpl" />
     <bean class="org.dspace.app.orcid.dao.impl.OrcidHistoryDAOImpl" />
+
+    <bean class="org.dspace.app.metrics.dao.CrisMetricsDAOImpl" />
 
 </beans>

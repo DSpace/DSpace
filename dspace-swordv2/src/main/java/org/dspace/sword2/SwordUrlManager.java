@@ -22,10 +22,11 @@ import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.swordapp.server.SwordError;
 
 /**
@@ -44,15 +45,18 @@ public class SwordUrlManager {
     protected HandleService handleService =
         HandleServiceFactory.getInstance().getHandleService();
 
+    protected ConfigurationService configurationService =
+            DSpaceServicesFactory.getInstance().getConfigurationService();
+
     /**
      * the SWORD configuration
      */
-    private SwordConfigurationDSpace config;
+    private final SwordConfigurationDSpace config;
 
     /**
      * the active DSpace context
      */
-    private Context context;
+    private final Context context;
 
     public SwordUrlManager(SwordConfigurationDSpace config, Context context) {
         this.config = config;
@@ -92,9 +96,9 @@ public class SwordUrlManager {
 
     public String getSwordBaseUrl()
         throws DSpaceSwordException {
-        String sUrl = ConfigurationManager.getProperty("swordv2-server", "url");
+        String sUrl = configurationService.getProperty("swordv2-server.url");
         if (sUrl == null || "".equals(sUrl)) {
-            String dspaceUrl = ConfigurationManager
+            String dspaceUrl = configurationService
                 .getProperty("dspace.server.url");
             if (dspaceUrl == null || "".equals(dspaceUrl)) {
                 throw new DSpaceSwordException(
@@ -299,10 +303,10 @@ public class SwordUrlManager {
      */
     public String getBaseServiceDocumentUrl()
         throws DSpaceSwordException {
-        String sdUrl = ConfigurationManager
-            .getProperty("swordv2-server", "servicedocument.url");
+        String sdUrl = configurationService
+            .getProperty("swordv2-server.servicedocument.url");
         if (sdUrl == null || "".equals(sdUrl)) {
-            String dspaceUrl = ConfigurationManager
+            String dspaceUrl = configurationService
                 .getProperty("dspace.server.url");
             if (dspaceUrl == null || "".equals(dspaceUrl)) {
                 throw new DSpaceSwordException(
@@ -341,10 +345,10 @@ public class SwordUrlManager {
      */
     public String getBaseCollectionUrl()
         throws DSpaceSwordException {
-        String depositUrl = ConfigurationManager
-            .getProperty("swordv2-server", "collection.url");
+        String depositUrl = configurationService
+            .getProperty("swordv2-server.collection.url");
         if (depositUrl == null || "".equals(depositUrl)) {
-            String dspaceUrl = ConfigurationManager
+            String dspaceUrl = configurationService
                 .getProperty("dspace.server.url");
             if (dspaceUrl == null || "".equals(dspaceUrl)) {
                 throw new DSpaceSwordException(
@@ -407,7 +411,7 @@ public class SwordUrlManager {
             }
 
             String handle = item.getHandle();
-            String bsLink = ConfigurationManager.getProperty("dspace.ui.url");
+            String bsLink = configurationService.getProperty("dspace.ui.url");
 
             if (handle != null && !"".equals(handle)) {
                 bsLink = bsLink + "/bitstream/" + handle + "/" +
@@ -485,7 +489,7 @@ public class SwordUrlManager {
 
         // if the item is in the workspace, we need to give it it's own special identifier
         if (wft.isItemInWorkspace(context, item)) {
-            String urlTemplate = ConfigurationManager
+            String urlTemplate = configurationService
                 .getProperty("swordv2-server", "workspace.url-template");
             if (urlTemplate != null) {
                 return urlTemplate.replace("#wsid#", Integer.toString(

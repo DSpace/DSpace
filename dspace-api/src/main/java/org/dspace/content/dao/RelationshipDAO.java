@@ -27,28 +27,31 @@ public interface RelationshipDAO extends GenericDAO<Relationship> {
     /**
      * This method returns a list of Relationship objects that have the given Item object
      * as a leftItem or a rightItem
-     * @param context   The relevant DSpace context
-     * @param item      The item that should be either a leftItem or a rightItem of all
-     *                  the Relationship objects in the returned list
-     * @return          The list of Relationship objects that contain either a left or a
-     *                  right item that is equal to the given item
-     * @throws SQLException If something goes wrong
+     * @param context         The relevant DSpace context
+     * @param item            The item that should be either a leftItem or a rightItem of all
+     *                        the Relationship objects in the returned list
+     * @param excludeTilted   If true, excludes tilted relationships
+     * @return                The list of Relationship objects that contain either a left or a
+     *                        right item that is equal to the given item
+     * @throws SQLException   If something goes wrong
      */
-    List<Relationship> findByItem(Context context, Item item) throws SQLException;
+    List<Relationship> findByItem(Context context, Item item, boolean excludeTilted) throws SQLException;
 
     /**
      * This method returns a list of Relationship objects that have the given Item object
      * as a leftItem or a rightItem
-     * @param context   The relevant DSpace context
-     * @param item      The item that should be either a leftItem or a rightItem of all
-     *                  the Relationship objects in the returned list
-     * @param limit     paging limit
-     * @param offset    paging offset
-     * @return          The list of Relationship objects that contain either a left or a
-     *                  right item that is equal to the given item
-     * @throws SQLException If something goes wrong
+     * @param context         The relevant DSpace context
+     * @param item            The item that should be either a leftItem or a rightItem of all
+     *                        the Relationship objects in the returned list
+     * @param limit           paging limit
+     * @param offset          paging offset
+     * @param excludeTilted   If true, excludes tilted relationships
+     * @return                The list of Relationship objects that contain either a left or a
+     *                        right item that is equal to the given item
+     * @throws SQLException   If something goes wrong
      */
-    List<Relationship> findByItem(Context context, Item item, Integer limit, Integer offset) throws SQLException;
+    List<Relationship> findByItem(Context context, Item item, Integer limit, Integer offset, boolean excludeTilted)
+            throws SQLException;
 
     /**
      * This method returns the next leftplace integer to use for a relationship with this item as the leftItem
@@ -189,15 +192,17 @@ public interface RelationshipDAO extends GenericDAO<Relationship> {
     int countByItem(Context context, Item item) throws SQLException;
 
     /**
-     * Count total number of relationships (rows in relationship table) by an item and a relationship type
+     * Count total number of relationships (rows in relationship table) by an item and a relationship type and a boolean
+     * indicating whether the item should be the leftItem or the rightItem
      *
      * @param context context
      * @param relationshipType relationship type to filter by
      * @param item item to filter by
+     * @param isLeft Indicating whether the counted Relationships should have the given Item on the left side or not
      * @return total count
      * @throws SQLException if database error
      */
-    int countByItemAndRelationshipType(Context context, Item item, RelationshipType relationshipType)
+    int countByItemAndRelationshipType(Context context, Item item, RelationshipType relationshipType, boolean isLeft)
             throws SQLException;
 
     /**

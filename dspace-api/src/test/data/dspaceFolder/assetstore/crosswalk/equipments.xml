@@ -1,5 +1,5 @@
 <Equipments>
-	<Equipment id="mock-id">
+	<Equipment xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
 		<Name>First Test Equipment</Name>
 		<Acronym>FT-EQ</Acronym>
 		<Identifier type="Institution assigned unique equipment identifier">ID-01</Identifier>
@@ -7,7 +7,7 @@
 		<Owner> <OrgUnit> <Name>Test OrgUnit</Name> </OrgUnit> </Owner>
 		<Owner> <Person displayName="Walter White" ></Person> </Owner>
 	</Equipment>
-	<Equipment id="mock-id">
+	<Equipment xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
 		<Name>Second Test Equipment</Name>
 		<Acronym>ST-EQ</Acronym>
 		<Identifier type="Institution assigned unique equipment identifier">ID-02</Identifier>

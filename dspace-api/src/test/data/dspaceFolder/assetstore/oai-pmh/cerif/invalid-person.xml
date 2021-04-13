@@ -1,0 +1,10 @@
+<oai_cerif:Person xmlns:doc="http://www.lyncode.com/xoai" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_cerif="https://www.openaire.eu/cerif-profile/1.1/" id="2b8ec4f5-d1d7-4d90-ae94-3f70b3f15697">
+	<oai_cerif:PersonName>
+		<oai_cerif:FamilyNames>Li-Shiuan</oai_cerif:FamilyNames>
+		<oai_cerif:FirstNames>Peh</oai_cerif:FirstNames>
+	</oai_cerif:PersonName>
+	<oai_cerif:PersonName>
+		<oai_cerif:FamilyNames>Smith</oai_cerif:FamilyNames>
+		<oai_cerif:FirstNames>John</oai_cerif:FirstNames>
+	</oai_cerif:PersonName>
+</oai_cerif:Person>

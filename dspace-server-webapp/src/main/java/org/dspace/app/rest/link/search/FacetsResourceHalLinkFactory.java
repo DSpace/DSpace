@@ -27,16 +27,18 @@ public class FacetsResourceHalLinkFactory extends DiscoveryRestHalLinkFactory<Fa
         List<SearchFacetEntryResource> data = halResource.getFacetResources();
         SearchResultsRest content = halResource.getContent();
 
-
         if (content != null && data != null && pageable != null) {
+            // FIXME this is needed to avoid that the SELF link is set using the search
+            // facet entry resource data that are used to set the pagination and would lead
+            // to a /object endpoint
+            halResource.add(buildLink(IanaLinkRelations.SELF.value(),
+                    buildSearchFacetsBaseLink(content).build().toUriString()));
 
             PageImpl<SearchFacetEntryResource> page = new PageImpl<SearchFacetEntryResource>(
                     data, pageable, data.size());
 
             halResource.setPageHeader(new EmbeddedPageHeader(buildSearchBaseLink(content), page));
 
-            list.add(buildLink(IanaLinkRelations.SELF.value(),
-                               buildSearchFacetsBaseLink(content).build().toUriString()));
         }
     }
 

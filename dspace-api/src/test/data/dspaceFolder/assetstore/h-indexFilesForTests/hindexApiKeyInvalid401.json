@@ -1,0 +1,6 @@
+{
+    "error-response": {
+        "error-code": "APIKEY_INVALID",
+        "error-message": "The provided apiKey is invalid."
+    }
+}

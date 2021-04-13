@@ -87,6 +87,8 @@ public class HarvestedCollection implements ReloadableEntity<Integer> {
     @Transient
     public static final int STATUS_OAI_ERROR = 3;
     @Transient
+    public static final int STATUS_RETRY = 4;
+    @Transient
     public static final int STATUS_UNKNOWN_ERROR = -1;
 
     /**
@@ -203,7 +205,7 @@ public class HarvestedCollection implements ReloadableEntity<Integer> {
         return harvestMessage;
     }
 
-    public Date getHarvestDate() {
+    public Date getLastHarvestDate() {
         return lastHarvested;
     }
 

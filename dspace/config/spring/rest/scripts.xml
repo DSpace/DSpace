@@ -23,6 +23,12 @@
         <property name="dspaceRunnableClass" value="org.dspace.curate.Curation"/>
     </bean>
 
+    <!-- Not runnable from REST -->
+    <bean id="submission-forms-migrate" class="org.dspace.submit.migration.SubmissionFormsMigrationScriptConfiguration">
+        <property name="description" value="Script for migrating submission forms to DSpace 7"/>
+        <property name="dspaceRunnableClass" value="org.dspace.submit.migration.SubmissionFormsMigration"/>
+    </bean>
+    
     <bean id="metadata-deletion" class="org.dspace.app.bulkedit.MetadataDeletionScriptConfiguration" primary="true">
         <property name="description" value="Delete all the values of the specified metadata field"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataDeletion"/>
@@ -41,6 +47,21 @@
     <bean id="bulk-item-export" class="org.dspace.content.integration.crosswalks.script.BulkItemExportScriptConfiguration" primary="true">
         <property name="description" value="Perform the multiple items export in the given format"/>
         <property name="dspaceRunnableClass" value="org.dspace.content.integration.crosswalks.script.BulkItemExport"/>
+    </bean>
+    
+    <bean id="collection-export" class="org.dspace.app.bulkedit.CollectionExportScriptConfiguration" primary="true">
+        <property name="description" value="Perform the export of all the archived items of the given collection in xls format"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.CollectionExport"/>
+    </bean>
+
+    <bean id="import-nbevents" class="org.dspace.app.nbevent.NBEventsScriptConfiguration" primary="true">
+        <property name="description" value="Import new openAIRE notification broker events"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.nbevent.NBEventsRunnable"/>
+     </bean>
+
+    <bean id="import-oaire-suggestions" class="org.dspace.app.suggestion.OAIREPublicationLoaderScriptConfiguration" primary="true">
+        <property name="description" value="Import and store locally metadata from OpenAIRE"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.suggestion.OAIREPublicationLoaderRunnable"/>
     </bean>
 
 </beans>

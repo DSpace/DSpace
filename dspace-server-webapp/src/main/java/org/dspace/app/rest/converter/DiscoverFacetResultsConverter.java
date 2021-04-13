@@ -33,6 +33,9 @@ public class DiscoverFacetResultsConverter {
     private DiscoverFacetValueConverter facetValueConverter;
 
     @Autowired
+    private DiscoverFacetsConverter facetsConverter;
+
+    @Autowired
     private SearchFilterToAppliedFilterConverter searchFilterToAppliedFilterConverter;
 
     public FacetResultsRest convert(Context context, String facetName, String prefix, String query,
@@ -41,6 +44,7 @@ public class DiscoverFacetResultsConverter {
                                     Projection projection) {
         FacetResultsRest facetResultsRest = new FacetResultsRest();
         facetResultsRest.setProjection(projection);
+        facetResultsRest.setConfiguration(configuration.getId());
 
         setRequestInformation(context, facetName, prefix, query, dsoTypes, dsoScope, searchFilters, searchResult,
                 configuration, facetResultsRest, page, projection);
@@ -81,7 +85,9 @@ public class DiscoverFacetResultsConverter {
         facetResultsRest.setPrefix(prefix);
         facetResultsRest.setScope(dsoScope);
         facetResultsRest.setDsoTypes(dsoTypes);
-
+        if (configuration != null) {
+            facetResultsRest.setConfiguration(configuration.getId());
+        }
         facetResultsRest.setFacetEntry(convertFacetEntry(facetName, searchResult, configuration, page, projection));
 
         facetResultsRest.setSort(SearchResultsRest.Sorting.fromPage(page));
@@ -111,7 +117,10 @@ public class DiscoverFacetResultsConverter {
 
         //We requested one extra facet value. Check if that value is present to indicate that there are more results
         facetEntryRest.setHasMore(facetResults.size() > page.getPageSize());
-
+        facetsConverter.handleExposeMissing(field, facetEntryRest, searchResult);
+        facetsConverter.handleExposeMore(field, facetEntryRest, searchResult);
+        facetsConverter.handleExposeTotalValues(field, facetEntryRest, searchResult);
         return facetEntryRest;
     }
+
 }

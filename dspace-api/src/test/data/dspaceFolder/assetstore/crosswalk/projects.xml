@@ -1,5 +1,5 @@
 <Projects>
-	<Project id="mock-id">
+	<Project xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
 		<Acronym>TP</Acronym>
 		<Title>Test Project</Title>
 		<Identifier type="http://namespace.openaire.eu/oaf">11-22-33</Identifier>
@@ -40,7 +40,7 @@
 			URL="oamandate-url" 
 		/>
 	</Project>
-	<Project id="mock-id">
+	<Project xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
 		<Acronym>STP</Acronym>
 		<Title>Second Test Project</Title>
 		<Identifier type="http://namespace.openaire.eu/oaf">55-66-77</Identifier>

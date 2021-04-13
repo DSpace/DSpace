@@ -2,10 +2,11 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:util="http://www.springframework.org/schema/util"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
-	default-lazy-init="true">
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-	<util:constant id="CrisConsumer-SOURCE_INTERNAL" static-field="org.dspace.authority.CrisConsumer.SOURCE_INTERNAL" />
+	<util:constant id="CrisConsumer-SOURCE_INTERNAL" static-field="org.dspace.authority.filler.AuthorityImportFillerService.SOURCE_INTERNAL" />
+
+	<bean class="org.dspace.authority.filler.AuthorityImportFillerServiceImpl"/>
 
 	<bean id="org.dspace.authority.filler.AuthorityImportFillerHolder" class="org.dspace.authority.filler.AuthorityImportFillerHolder">
 		<property name="fillers">
@@ -83,4 +84,44 @@
 		</property>
 	</bean>
 
+	<bean class="org.dspace.authority.service.ItemSearcherMapper" name="org.dspace.authority.service.ItemSearcherMapper">
+		<constructor-arg index="0">
+			<map>
+				<entry key="UUID">
+					<bean class="org.dspace.authority.service.impl.ItemSearcherById"></bean>
+				</entry>
+				<entry key="ORCID" value-ref="itemSearcherByORCID"/>
+				<entry key="RID" value-ref="itemSearcherByRID"/>
+				<entry key="ISNI" value-ref="itemSearcherByISNI"/>
+				<entry key="DOI" value-ref="itemSearcherByDOI"/>
+			</map>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<bean class="org.dspace.authority.service.impl.ItemSearcherById"></bean>
+		</constructor-arg>
+	</bean>
+	
+	<bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata" name="itemSearcherByORCID">
+		<constructor-arg value="person.identifier.orcid"></constructor-arg>
+		<constructor-arg value="ORCID"></constructor-arg>
+	</bean>
+	
+	<bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata" name="itemSearcherByRID">
+		<constructor-arg value="person.identifier.rid"></constructor-arg>
+		<constructor-arg value="RID"></constructor-arg>
+	</bean>
+	
+	<bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata" name="itemSearcherByDOI">
+		<constructor-arg value="dc.identifier.doi"></constructor-arg>
+		<constructor-arg value="DOI"></constructor-arg>
+	</bean>
+	
+	<bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata" name="itemSearcherByISNI">
+		<constructor-arg value="person.identifier.isni"></constructor-arg>
+		<constructor-arg value="ISNI"></constructor-arg>
+	</bean>
+	
+	<bean class="org.dspace.authority.service.impl.ItemSearchServiceImpl" name="org.dspace.authority.service.ItemSearchService"/>
+	<bean class="org.dspace.authority.service.impl.ItemReferenceResolverServiceImpl" name="org.dspace.authority.service.ItemReferenceResolverService"/>
+	
 </beans>

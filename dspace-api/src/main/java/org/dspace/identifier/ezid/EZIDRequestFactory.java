@@ -10,7 +10,7 @@ package org.dspace.identifier.ezid;
 
 import java.net.URISyntaxException;
 
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Create configured EZID requests.
@@ -51,7 +51,7 @@ public class EZIDRequestFactory {
     /**
      * @param aEZID_SCHEME the EZID URL scheme to set.
      */
-    @Required
+    @Autowired(required = true)
     public void setEZID_SCHEME(String aEZID_SCHEME) {
         EZID_SCHEME = aEZID_SCHEME;
     }
@@ -59,7 +59,7 @@ public class EZIDRequestFactory {
     /**
      * @param aEZID_HOST the EZID host to set.
      */
-    @Required
+    @Autowired(required = true)
     public void setEZID_HOST(String aEZID_HOST) {
         EZID_HOST = aEZID_HOST;
     }
@@ -67,7 +67,7 @@ public class EZIDRequestFactory {
     /**
      * @param aEZID_PATH the local path to the EZID API.
      */
-    @Required
+    @Autowired(required = true)
     public void setEZID_PATH(String aEZID_PATH) {
         EZID_PATH = aEZID_PATH;
     }

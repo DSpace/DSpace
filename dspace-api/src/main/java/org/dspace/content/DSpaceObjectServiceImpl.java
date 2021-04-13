@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.StringTokenizer;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -34,6 +35,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.service.IdentifierService;
+import org.dspace.services.RequestService;
 import org.dspace.utils.DSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -65,6 +67,8 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     protected MetadataAuthorityService metadataAuthorityService;
     @Autowired(required = true)
     protected RelationshipService relationshipService;
+    @Autowired
+    private RequestService requestService;
 
     public DSpaceObjectServiceImpl() {
 
@@ -131,7 +135,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     @Override
     public List<MetadataValue> getMetadata(T dso, String schema, String element, String qualifier, String lang) {
         // Build up list of matching values
-        List<MetadataValue> values = new ArrayList<MetadataValue>();
+        List<MetadataValue> values = new ArrayList<>();
         for (MetadataValue dcv : dso.getMetadata()) {
             if (match(schema, element, qualifier, lang, dcv)) {
                 values.add(dcv);
@@ -238,7 +242,11 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     public List<MetadataValue> addMetadata(Context context, T dso, MetadataField metadataField, String lang,
                                            List<String> values, List<String> authorities, List<Integer> confidences)
         throws SQLException {
-        boolean authorityControlled = metadataAuthorityService.isAuthorityControlled(metadataField);
+        boolean storeAuthoritySetForMetadata = Optional.ofNullable(requestService.getCurrentRequest())
+            .map(r -> (Boolean) r.getAttribute("store_authority_" + metadataField.toString('.')))
+            .orElse(false);
+        boolean authorityControlled = storeAuthoritySetForMetadata
+            || metadataAuthorityService.isAuthorityControlled(metadataField);
         boolean authorityRequired = metadataAuthorityService.isAuthorityRequired(metadataField);
         List<MetadataValue> newMetadata = new ArrayList<>(values.size());
         // We will not verify that they are valid entries in the registry
@@ -298,7 +306,6 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                     }
                 }
                 metadataValue.setValue(String.valueOf(dcvalue));
-                ;
             } else {
                 metadataValue.setValue(null);
             }
@@ -306,6 +313,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 //            metadataValueService.update(context, metadataValue);
             dso.addDetails(metadataField.toString());
         }
+        setMetadataModified(dso);
         return newMetadata;
     }
 
@@ -337,8 +345,8 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                 .makeFieldKey(metadataField.getMetadataSchema().getName(), metadataField.getElement(),
                               metadataField.getQualifier());
             if (metadataAuthorityService.isAuthorityControlled(fieldKey)) {
-                List<String> authorities = new ArrayList<String>();
-                List<Integer> confidences = new ArrayList<Integer>();
+                List<String> authorities = new ArrayList<>();
+                List<Integer> confidences = new ArrayList<>();
                 for (int i = 0; i < values.size(); ++i) {
                     if (dso instanceof Item) {
                         getAuthoritiesAndConfidences(fieldKey, ((Item) dso).getOwningCollection(), values, authorities,
@@ -411,6 +419,24 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     }
 
     /**
+     * Retrieve first metadata field value
+     *
+     * @param dso       The DSpaceObject which we ask for metadata.
+     * @param field     {schema, element, qualifier} for the desired field.
+     * @param language  the language to match, or <code>Item.ANY</code>
+     * @return the first metadata field value
+     */
+    @Override
+    public String getMetadataFirstValue(T dso, MetadataFieldName field, String language) {
+        List<MetadataValue> metadataValues
+                = getMetadata(dso, field.SCHEMA, field.ELEMENT, field.QUALIFIER, language);
+        if (CollectionUtils.isNotEmpty(metadataValues)) {
+            return metadataValues.get(0).getValue();
+        }
+        return null;
+    }
+
+    /**
      * Set first metadata field value
      *
      * @throws SQLException if database error
@@ -421,6 +447,21 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         if (value != null) {
             clearMetadata(context, dso, schema, element, qualifier, language);
             addMetadata(context, dso, schema, element, qualifier, language, value);
+            dso.setMetadataModified();
+        }
+    }
+
+    @Override
+    public void setMetadataSingleValue(Context context, T dso, MetadataFieldName field,
+            String language, String value)
+            throws SQLException {
+        if (value != null) {
+            clearMetadata(context, dso, field.SCHEMA, field.ELEMENT, field.QUALIFIER,
+                    language);
+
+            String newValueLanguage = (Item.ANY.equals(language)) ? null : language;
+            addMetadata(context, dso, field.SCHEMA, field.ELEMENT, field.QUALIFIER,
+                    newValueLanguage, value);
             dso.setMetadataModified();
         }
     }
@@ -574,6 +615,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             //RelationshipMetadataValue instance.
             //This is done to ensure that the order is correct.
             metadataValues.sort(new Comparator<MetadataValue>() {
+                @Override
                 public int compare(MetadataValue o1, MetadataValue o2) {
                     int compare = o1.getPlace() - o2.getPlace();
                     if (compare == 0) {
@@ -595,12 +637,14 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                     String authority = metadataValue.getAuthority();
                     String relationshipId = StringUtils.split(authority, "::")[1];
                     Relationship relationship = relationshipService.find(context, Integer.parseInt(relationshipId));
-                    if (relationship.getLeftItem() == (Item) dso) {
-                        relationship.setLeftPlace(mvPlace);
-                    } else {
-                        relationship.setRightPlace(mvPlace);
+                    if (relationship != null) {
+                        if (relationship.getLeftItem() == (Item) dso) {
+                            relationship.setLeftPlace(mvPlace);
+                        } else {
+                            relationship.setRightPlace(mvPlace);
+                        }
+                        relationshipService.update(context, relationship);
                     }
-                    relationshipService.update(context, relationship);
 
                 } else if (!StringUtils.startsWith(metadataValue.getAuthority(),
                                                    Constants.VIRTUAL_AUTHORITY_PREFIX)) {
@@ -650,7 +694,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             case "source":
                 return new String[] {MetadataSchemaEnum.DC.getName(), "source", null};
             case "relationship":
-                return new String[] {"relationship", "type", null};
+                return new String[] {"dspace", "entity", "type"};
             case "firstname":
                 return new String[] {"eperson", "firstname", null};
             case "lastname":
@@ -660,9 +704,13 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             case "language":
                 return new String[] {"eperson", "language", null};
             case "entity-type":
-                return new String[] {MetadataSchemaEnum.RELATIONSHIP.getName(), "type", null};
+                return new String[] { "dspace", "entity", "type" };
             case "submission-type":
                 return new String[] { MetadataSchemaEnum.CRIS.getName(), "submission", "definition" };
+            case "workflow-name":
+                return new String[] { MetadataSchemaEnum.CRIS.getName(), "workflow", "name" };
+            case "shared-workspace":
+                return new String[] { MetadataSchemaEnum.CRIS.getName(), "workspace", "shared" };
             default:
                 return new String[] {null, null, null};
         }
@@ -750,7 +798,12 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     }
 
     /**
-     * Supports moving metadata by updating the place of the metadata value
+     * Supports moving metadata by updating the place of the metadata value.
+     *
+     * @param context current DSpace session.
+     * @param dso     unused.
+     * @param place   ordinal position of the value in the list of that field's values.
+     * @param rr      the value to be placed.
      */
     protected void moveSingleMetadataValue(Context context, T dso, int place, MetadataValue rr) {
         //just move the metadata

@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:util="http://www.springframework.org/schema/util"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
-    default-lazy-init="true">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+       default-lazy-init="true">
 
 
     <!-- ******************** -->
@@ -77,9 +76,6 @@
 		</property>
 	</bean>
 
-    <!-- Ensure WorkflowCuratorService is initialized properly via init() method -->
-    <bean class="org.dspace.curate.WorkflowCuratorServiceImpl" init-method="init"/>
-
     <bean class="org.dspace.disseminate.CitationDocumentServiceImpl"/>
 
     <!-- Ensure EmbargoService is initialized properly via init() method -->
@@ -101,6 +97,12 @@
     <bean class="org.dspace.harvest.HarvestedCollectionServiceImpl"/>
     <bean class="org.dspace.harvest.HarvestedItemServiceImpl"/>
     <bean class="org.dspace.harvest.HarvestSchedulingServiceImpl"/>
+    <bean class="org.dspace.harvest.OAIHarvester"/>
+    <bean class="org.dspace.harvest.OAIHarvesterClientImpl"/>
+    <bean class="org.dspace.harvest.OAIHarvesterValidatorImpl"/>
+    <bean class="org.dspace.harvest.OAIHarvesterEmailSenderImpl"/>
+    <bean class="org.dspace.harvest.OAIHarvesterXlsReportGeneratorImpl"/>
+    
 
     <bean class="org.dspace.identifier.DOIServiceImpl"/>
 
@@ -136,7 +138,6 @@
     <bean class="org.dspace.batch.ImpBitstreamServiceImpl"/>
     <bean class="org.dspace.batch.ImpMetadatavalueServiceImpl"/>
     <bean class="org.dspace.batch.ImpRecordServiceImpl"/>
-    <bean class="org.dspace.batch.ImpRecordToItemServiceImpl"/>
     <bean class="org.dspace.batch.ImpBitstreamMetadatavalueServiceImpl"/>
     <bean class="org.dspace.batch.ImpWorkflowNStateServiceImpl"/>
 
@@ -144,6 +145,8 @@
     <bean class="org.dspace.layout.service.impl.CrisLayoutTabServiceImpl"/>
     <bean class="org.dspace.layout.service.impl.CrisLayoutBoxServiceImpl"/>
     <bean class="org.dspace.layout.service.impl.CrisLayoutFieldServiceImpl"/>
+    <bean class="org.dspace.layout.service.impl.CrisLayoutMetadataGroupServiceImpl"/>
+    <bean class="org.dspace.layout.service.impl.CrisLayoutMetric2BoxServiceImpl"/>
 
     <bean class="org.dspace.layout.service.impl.LayoutSecurityServiceImpl"/>
     <bean class="org.dspace.layout.service.impl.CrisLayoutBoxAccessServiceImpl"/>
@@ -151,7 +154,10 @@
 
     <bean class="org.dspace.app.orcid.service.impl.OrcidQueueServiceImpl" />
     <bean class="org.dspace.app.orcid.service.impl.OrcidHistoryServiceImpl" />
+    
+    <bean class="org.dspace.content.security.CrisSecurityServiceImpl" />
 
+    <bean class="org.dspace.app.metrics.service.CrisMetricsServiceImpl" />
 
 </beans>
 

@@ -225,7 +225,7 @@ public class SubmissionConfigReader {
             }
         }
 
-        submitName = collService.getMetadataFirstValue(collection, "relationship", "type", null, null);
+        submitName = collService.getMetadataFirstValue(collection, "dspace", "entity", "type", null);
         if (submitName != null) {
             SubmissionConfig subConfig = getSubmissionConfigByName(submitName.toLowerCase());
             if (subConfig != null) {
@@ -405,7 +405,7 @@ public class SubmissionConfigReader {
         for (int i = 0; i < len; i++) {
             Node nd = nl.item(i);
             // process each step definition
-            if (nd.getNodeName().equals("step")) {
+            if (StringUtils.equalsIgnoreCase(nd.getNodeName(), "step-definition")) {
                 String stepID = getAttribute(nd, "id");
                 if (stepID == null) {
                     throw new SAXException(

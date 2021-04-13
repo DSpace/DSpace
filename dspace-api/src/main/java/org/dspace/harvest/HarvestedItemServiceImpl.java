@@ -38,13 +38,8 @@ public class HarvestedItemServiceImpl implements HarvestedItemService {
     }
 
     @Override
-    public Item getItemByOAIId(Context context, String itemOaiID, Collection collection) throws SQLException {
-        HarvestedItem harvestedItem = harvestedItemDAO.findByOAIId(context, itemOaiID, collection);
-        if (harvestedItem != null) {
-            return harvestedItem.getItem();
-        } else {
-            return null;
-        }
+    public HarvestedItem findByOAIId(Context context, String itemOaiID, Collection collection) throws SQLException {
+        return harvestedItemDAO.findByOAIId(context, itemOaiID, collection);
     }
 
     @Override

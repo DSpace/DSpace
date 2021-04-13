@@ -1,4 +1,4 @@
-<Person id="@virtual.id@">
+<Person xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="@virtual.id@">
 	<PersonName>
 		<FamilyNames>@virtual.personName.lastName@</FamilyNames>
 		<FirstNames>@virtual.personName.firstName@</FirstNames>
