@@ -36,7 +36,6 @@ import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -237,7 +236,6 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
     }
 
     @Test
-    @Ignore
     public void findBrowseBySubjectEntriesWithAuthority() throws Exception {
         configurationService.setProperty("choices.plugin.dc.subject",
                                          "SolrSubjectAuthority");
@@ -256,8 +254,16 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+            .withName("Collection 1")
+            .withEntityType("Publication")
+            .withSubmissionDefinition("traditional")
+            .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+            .withName("Collection 2")
+            .withEntityType("Publication")
+            .withSubmissionDefinition("traditional")
+            .build();
 
         //2. Three public items that are readable by Anonymous with different subjects
         Item publicItem1 = ItemBuilder.createItem(context, col1)
@@ -305,7 +311,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //Verify that they're sorted alphabetically
                    .andExpect(
                        jsonPath("$._embedded.entries",
-                            contains(
+                           containsInAnyOrder(
                                 BrowseEntryResourceMatcher.matchBrowseEntry("Church studies", "VR110103", 2),
                                 BrowseEntryResourceMatcher.matchBrowseEntry("History of religion", "VR110102", 3),
                                 BrowseEntryResourceMatcher.matchBrowseEntry("Missionary studies", "VR110104", 1)
