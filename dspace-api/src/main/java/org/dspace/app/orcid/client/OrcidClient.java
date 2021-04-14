@@ -20,8 +20,8 @@ import org.orcid.jaxb.model.v3.release.record.Record;
 public interface OrcidClient {
 
     /**
-     * Exchange the authorization code for an ORCID iD and access token. The
-     * authorization code expires upon use.
+     * Exchange the authorization code for an ORCID iD and 3-legged access token.
+     * The authorization code expires upon use.
      *
      * @param  code the authorization code
      * @return      the ORCID token

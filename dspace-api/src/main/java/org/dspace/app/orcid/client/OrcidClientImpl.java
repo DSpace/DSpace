@@ -58,7 +58,6 @@ public class OrcidClientImpl implements OrcidClient {
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("code", code));
         params.add(new BasicNameValuePair("grant_type", "authorization_code"));
-        params.add(new BasicNameValuePair("redirect_uri", orcidConfiguration.getRedirectUri()));
         params.add(new BasicNameValuePair("client_id", orcidConfiguration.getClientId()));
         params.add(new BasicNameValuePair("client_secret", orcidConfiguration.getClientSecret()));
 

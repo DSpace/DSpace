@@ -265,42 +265,4 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     int countTotal(Context context) throws SQLException;
-
-    /**
-     * Returns a list of EPerson possessing the passed metadata field with the given
-     * value.
-     *
-     * @param  context           The relevant DSpace Context.
-     * @param  metadataFieldName the metadata field to match
-     * @param  value             the value of the metadata field to match
-     * @return                   the epersons found
-     * @throws SQLException      if a SQL error occurs
-     */
-    List<EPerson> findByMetadaField(Context context, MetadataFieldName metadataFieldName, String value)
-        throws SQLException;
-
-    /**
-     * Returns a list of EPerson possessing the passed metadata field with the given
-     * value.
-     *
-     * @param  context      The relevant DSpace Context.
-     * @param  schema       the schema of the metadata field to match
-     * @param  element      the element of the metadata field to match
-     * @param  qualifier    the qualifier of the metadata field to match
-     * @param  value        the value of the metadata field to match
-     * @return              the epersons found
-     * @throws SQLException if a SQL error occurs
-     */
-    List<EPerson> findByMetadaField(Context context, String schema, String element, String qualifier, String value)
-        throws SQLException;
-
-    /**
-     * Returns a list of EPerson with the given ORCID id.
-     *
-     * @param  context      The relevant DSpace Context.
-     * @param  orcid        the ORCID id to match
-     * @return              the epersons found
-     * @throws SQLException if a SQL error occurs
-     */
-    List<EPerson> findByOrcid(Context context, String orcid) throws SQLException;
 }

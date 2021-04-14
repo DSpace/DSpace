@@ -8,7 +8,7 @@
 package org.dspace.app.rest.security;
 
 import static java.util.Collections.emptyList;
-import static org.dspace.authenticate.OrcidAuthentication.ORCID_AUTH_ATTRIBUTE;
+import static org.dspace.authenticate.OrcidAuthenticationBean.ORCID_AUTH_ATTRIBUTE;
 
 import java.io.IOException;
 import javax.servlet.FilterChain;
