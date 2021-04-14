@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.Callable;
 import javax.el.MethodNotFoundException;
 import javax.ws.rs.client.Client;
@@ -24,6 +23,7 @@ import com.google.gson.Gson;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
 import net.minidev.json.JSONArray;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpGet;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
@@ -32,7 +32,6 @@ import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.DoiCheck;
 import org.dspace.importer.external.service.components.QuerySource;
-
 
 /**
  * Implements a data source for querying CrossRef
@@ -57,26 +56,31 @@ public class CrossRefImportMetadataSourceServiceImpl
     }
 
     @Override
-    public ImportRecord getRecord(String id) throws MetadataSourceException {
-        List<ImportRecord> records = retry(new SearchByIdCallable(id));
+    public ImportRecord getRecord(String recordId) throws MetadataSourceException {
+        List<ImportRecord> records = null;
+        String id = getID(recordId);
+        if (StringUtils.isNotBlank(id)) {
+            records = retry(new SearchByIdCallable(id));
+        } else {
+            records = retry(new SearchByIdCallable(recordId));
+        }
         return records == null || records.isEmpty() ? null : records.get(0);
     }
 
     @Override
     public int getRecordsCount(String query) throws MetadataSourceException {
-        //TODO if a doi check if exists
-        if (DoiCheck.isDoi(query)) {
-            return retry(new DoiCheckCallable(query));
+        String id = getID(query);
+        if (StringUtils.isNotBlank(id)) {
+            return retry(new DoiCheckCallable(id));
         }
         return retry(new CountByQueryCallable(query));
     }
 
     @Override
     public int getRecordsCount(Query query) throws MetadataSourceException {
-        //TODO if a doi check if exists (making a head http request to the https://api.crossref.org/works/<id>)
-
-        if (isDoi(query)) {
-            return retry(new DoiCheckCallable(query));
+        String id = getID(query.toString());
+        if (StringUtils.isNotBlank(id)) {
+            return retry(new DoiCheckCallable(id));
         }
         return retry(new CountByQueryCallable(query));
     }
@@ -84,34 +88,39 @@ public class CrossRefImportMetadataSourceServiceImpl
 
     @Override
     public Collection<ImportRecord> getRecords(String query, int start, int count) throws MetadataSourceException {
-        //TODO if a doi call SearchByIdCallable
-        if (DoiCheck.isDoi(query)) {
-            return retry(new SearchByIdCallable(query));
+        String id = getID(query.toString());
+        if (StringUtils.isNotBlank(id)) {
+            return retry(new SearchByIdCallable(id));
         }
         return retry(new SearchByQueryCallable(query, count, start));
     }
 
     @Override
     public Collection<ImportRecord> getRecords(Query query) throws MetadataSourceException {
-        //TODO if a doi call SearchByIdCallable
-        final boolean isDoi = isDoi(query);
-        if (isDoi) {
-            return retry(new SearchByIdCallable(query));
+        String id = getID(query.toString());
+        if (StringUtils.isNotBlank(id)) {
+            return retry(new SearchByIdCallable(id));
         }
         return retry(new SearchByQueryCallable(query));
     }
 
     @Override
     public ImportRecord getRecord(Query query) throws MetadataSourceException {
-        List<ImportRecord> records = retry(new SearchByIdCallable(query));
+        List<ImportRecord> records = null;
+        String id = getID(query.toString());
+        if (StringUtils.isNotBlank(id)) {
+            records = retry(new SearchByIdCallable(id));
+        } else {
+            records = retry(new SearchByIdCallable(query));
+        }
         return records == null || records.isEmpty() ? null : records.get(0);
     }
 
     @Override
     public Collection<ImportRecord> findMatchingRecords(Query query) throws MetadataSourceException {
-        //TODO if a doi call SearchByIdCallable
-        if (isDoi(query)) {
-            return retry(new SearchByIdCallable(query));
+        String id = getID(query.toString());
+        if (StringUtils.isNotBlank(id)) {
+            return retry(new SearchByIdCallable(id));
         }
         return retry(new FindMatchingRecordCallable(query));
     }
@@ -122,13 +131,11 @@ public class CrossRefImportMetadataSourceServiceImpl
         throw new MethodNotFoundException("This method is not implemented for CrossRef");
     }
 
-    private boolean isDoi(final Query query) {
-        return Optional.ofNullable(query.getParameter("id"))
-                       .filter(c -> !c.isEmpty())
-                       .map(c -> c.iterator().next())
-                       .map(o -> (String) o)
-                       .filter(value -> DoiCheck.isDoi(value))
-                       .isPresent();
+    public String getID(String query) {
+        if (DoiCheck.isDoi(query)) {
+            return "filter=doi:" + query;
+        }
+        return StringUtils.EMPTY;
     }
 
     private class SearchByQueryCallable implements Callable<List<ImportRecord>> {
