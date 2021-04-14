@@ -11,7 +11,8 @@ version: "3.7"
 services:
   dspace-cli:
     environment:
-      - LOADASSETS=https://www.dropbox.com/s/v3ahfcuatklbmi0/assetstore-2019-11-28.tar.gz?dl=1
+      # This assetstore zip is available from https://github.com/DSpace-Labs/AIP-Files/releases/tag/demo-entities-data
+      - LOADASSETS=https://github.com/DSpace-Labs/AIP-Files/releases/download/demo-entities-data/assetstore.tar.gz
     entrypoint:
       - /bin/bash
       - '-c'
