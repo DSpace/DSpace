@@ -30,11 +30,11 @@ public interface ItemSearchService {
     /**
      * Search an item with the given searchParam and relationship type.
      *
-     * @param context the DSpace context
-     * @param searchParam the searchParam
-     * @param relationshipType the item relationshipType
-     * @return the found item
+     * @param  context     the DSpace context
+     * @param  searchParam the searchParam
+     * @param  entityType  the item entityType
+     * @return             the found item
      */
-    public Item search(Context context, String searchParam, String relationshipType);
+    public Item search(Context context, String searchParam, String entityType);
 
 }

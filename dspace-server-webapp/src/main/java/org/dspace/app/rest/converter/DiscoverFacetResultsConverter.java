@@ -44,6 +44,7 @@ public class DiscoverFacetResultsConverter {
                                     Projection projection) {
         FacetResultsRest facetResultsRest = new FacetResultsRest();
         facetResultsRest.setProjection(projection);
+        facetResultsRest.setConfiguration(configuration.getId());
 
         setRequestInformation(context, facetName, prefix, query, dsoTypes, dsoScope, searchFilters, searchResult,
                 configuration, facetResultsRest, page, projection);

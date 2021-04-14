@@ -10,18 +10,11 @@ package org.dspace.submit.lookup;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import gr.ekt.bte.core.AbstractModifier;
-import gr.ekt.bte.core.MutableRecord;
-import gr.ekt.bte.core.Record;
-import gr.ekt.bte.core.StringValue;
-import gr.ekt.bte.core.Value;
-import org.apache.commons.lang3.StringUtils;
 import org.dspace.services.ConfigurationService;
 
 /**
@@ -30,11 +23,11 @@ import org.dspace.services.ConfigurationService;
  * @author Luigi Andrea Pascarelli
  * @author Panagiotis Koutsourakis
  */
-public class MapConverterModifier extends AbstractModifier {
+public class MapConverterModifier {
 
-    protected String mappingFile; //The properties absolute filename
+    protected String mappingFile; // The properties absolute filename
 
-    protected String converterNameFile; //The properties filename
+    protected String converterNameFile; // The properties filename
 
     protected ConfigurationService configurationService;
 
@@ -103,65 +96,6 @@ public class MapConverterModifier extends AbstractModifier {
             }
         }
     }
-
-    /**
-     * @param name Name of file to load ArXiv data from.
-     */
-    public MapConverterModifier(String name) {
-        super(name);
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * gr.ekt.bte.core.AbstractModifier#modify(gr.ekt.bte.core.MutableRecord)
-     */
-    @Override
-    public Record modify(MutableRecord record) {
-        if (mapping != null && fieldKeys != null) {
-            for (String key : fieldKeys) {
-                List<Value> values = record.getValues(key);
-
-                if (values == null) {
-                    continue;
-                }
-
-                List<Value> newValues = new ArrayList<Value>();
-
-                for (Value value : values) {
-                    String stringValue = value.getAsString();
-
-                    String tmp = "";
-                    if (mapping.containsKey(stringValue)) {
-                        tmp = mapping.get(stringValue);
-                    } else {
-                        tmp = defaultValue;
-                        for (String regex : regexConfig.keySet()) {
-                            if (stringValue != null
-                                && stringValue.matches(regex)) {
-                                tmp = stringValue.replaceAll(regex,
-                                                             regexConfig.get(regex));
-                            }
-                        }
-                    }
-
-                    if ("@@ident@@".equals(tmp)) {
-                        newValues.add(new StringValue(stringValue));
-                    } else if (StringUtils.isNotBlank(tmp)) {
-                        newValues.add(new StringValue(tmp));
-                    } else {
-                        newValues.add(new StringValue(stringValue));
-                    }
-                }
-
-                record.updateField(key, newValues);
-            }
-        }
-
-        return record;
-    }
-
 
     public void setFieldKeys(List<String> fieldKeys) {
         this.fieldKeys = fieldKeys;

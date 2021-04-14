@@ -139,6 +139,7 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport {
     }
 
     boolean contains(EPerson e) {
+
         return getMembers().contains(e);
     }
 

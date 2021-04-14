@@ -105,7 +105,7 @@ public class EntityTypeServiceImpl implements EntityTypeService {
 
     @Override
     public EntityType findByItem(Context context, Item item) throws SQLException {
-        String relationshipType = itemService.getMetadataFirstValue(item, "relationship", "type", null, Item.ANY);
-        return relationshipType != null ? findByEntityType(context, relationshipType) : null;
+        String entityType = itemService.getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY);
+        return entityType != null ? findByEntityType(context, entityType) : null;
     }
 }

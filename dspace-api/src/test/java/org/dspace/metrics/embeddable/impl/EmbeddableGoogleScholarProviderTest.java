@@ -83,13 +83,13 @@ public class EmbeddableGoogleScholarProviderTest {
 
         when(provider.innerHtml(any(), any())).thenCallRealMethod();
 
-        when(provider.getRelationshipType(item)).thenReturn("Publication");
+        when(provider.getEntityType(item)).thenReturn("Publication");
         when(provider.calculateSearchText(item)).thenReturn("calculatedText");
         when(provider.getTemplate("Publication")).thenReturn("TextSearch={{searchText}}");
 
         String innerHtml = this.provider.innerHtml(context, item);
 
-        verify(provider, times(1)).getRelationshipType(item);
+        verify(provider, times(1)).getEntityType(item);
         // should call calculatedSearchText with the item
         verify(provider, times(1)).calculateSearchText(item);
         // should call getTemplate with the relationshipItem
@@ -117,9 +117,9 @@ public class EmbeddableGoogleScholarProviderTest {
     @Test
     public void getTemplate() {
         when(provider.getTemplate(any())).thenCallRealMethod();
-        // should return Publication Template when relationshipType is Publication
+        // should return Publication Template when entityType is Publication
         assertEquals(provider.getTemplate("Publication"), provider.PUBLICATION_TEMPLATE);
-        // should return Person Template when relationshipType is Person
+        // should return Person Template when entityType is Person
         assertEquals(provider.getTemplate("Person"), provider.PERSON_TEMPLATE);
     }
 

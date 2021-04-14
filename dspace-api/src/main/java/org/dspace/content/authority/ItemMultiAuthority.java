@@ -91,15 +91,14 @@ public class ItemMultiAuthority implements ChoiceAuthority {
         solrQuery.setStart(start);
         solrQuery.setRows(limit);
 
-        String relationshipType = configurationService.getProperty("cris.ItemAuthority."
-                + field + ".relationshipType");
-        if (StringUtils.isNotBlank(relationshipType)) {
-            String filter = "relationship.type:" + relationshipType;
+        String entityType = configurationService.getProperty("cris.ItemAuthority." + field + ".entityType");
+        if (StringUtils.isNotBlank(entityType)) {
+            String filter = "dspace.entity.type:" + entityType;
             solrQuery.addFilterQuery(filter);
         }
 
         customAuthorityFilters.stream()
-            .flatMap(caf -> caf.getFilterQueries(relationshipType).stream())
+            .flatMap(caf -> caf.getFilterQueries(entityType).stream())
             .forEach(solrQuery::addFilterQuery);
 
         try {

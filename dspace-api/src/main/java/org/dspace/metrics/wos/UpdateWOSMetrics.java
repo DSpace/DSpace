@@ -31,7 +31,7 @@ public class UpdateWOSMetrics extends AbstractUpdateWOSMetrics {
 
     @Override
     public List<String> getFilters() {
-        return Arrays.asList("relationship.type:Publication", "dc.identifier.doi:*");
+        return Arrays.asList("dspace.entity.type:Publication", "dc.identifier.doi:*");
     }
 
     @Override

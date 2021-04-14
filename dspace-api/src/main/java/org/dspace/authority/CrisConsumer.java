@@ -27,6 +27,7 @@ import org.dspace.authority.filler.AuthorityImportFillerService;
 import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.authority.service.ItemSearchService;
 import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
@@ -37,7 +38,6 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
-import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.core.CrisConstants;
@@ -61,11 +61,11 @@ public class CrisConsumer implements Consumer {
 
     public static final String CONSUMER_NAME = "crisconsumer";
 
-    private final static String NO_RELATIONSHIP_TYPE_FOUND_MSG = "No relationship.type found for field {}";
+    private final static String NO_ENTITY_TYPE_FOUND_MSG = "No dspace.entity.type found for field {}";
 
-    private final static String ITEM_CREATION_MSG = "Creation of item with relationship.type = {} related to item {}";
+    private final static String ITEM_CREATION_MSG = "Creation of item with dspace.entity.type = {} related to item {}";
 
-    private final static String NO_COLLECTION_FOUND_MSG = "No collection found with relationship.type = {} "
+    private final static String NO_COLLECTION_FOUND_MSG = "No collection found with dspace.entity.type = {} "
             + "for item = {}. No related item will be created.";
 
     private final static String NO_ITEM_FOUND_BY_AUTHORITY_MSG = "No related item found by authority {}";
@@ -86,8 +86,6 @@ public class CrisConsumer implements Consumer {
 
     private CollectionService collectionService;
 
-    private RelationshipService relationshipService;
-
     private ConfigurationService configurationService;
 
     private AuthorityImportFillerService authorityImportFillerService;
@@ -106,7 +104,6 @@ public class CrisConsumer implements Consumer {
         workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
         authorityImportFillerService = AuthorityServiceFactory.getInstance().getAuthorityImportFillerService();
         itemSearchService = new DSpace().getSingletonService(ItemSearchService.class);
-        relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
     }
 
     @Override
@@ -156,15 +153,15 @@ public class CrisConsumer implements Consumer {
                 continue;
             }
 
-            String relationshipType = choiceAuthorityService.getRelationshipType(fieldKey);
-            if (relationshipType == null) {
-                log.warn(NO_RELATIONSHIP_TYPE_FOUND_MSG, fieldKey);
+            String entityType = choiceAuthorityService.getLinkedEntityType(fieldKey);
+            if (entityType == null) {
+                log.warn(NO_ENTITY_TYPE_FOUND_MSG, fieldKey);
                 continue;
             }
 
             String crisSourceId = generateCrisSourceId(metadata);
 
-            Item relatedItem = itemSearchService.search(context, crisSourceId, relationshipType);
+            Item relatedItem = itemSearchService.search(context, crisSourceId, entityType);
             boolean relatedItemAlreadyPresent = relatedItem != null;
 
             if (!relatedItemAlreadyPresent && isNotBlank(authority) && isReferenceAuthority(authority)) {
@@ -174,16 +171,15 @@ public class CrisConsumer implements Consumer {
             }
 
             if (!relatedItemAlreadyPresent) {
-                Collection collection = collectionService.retrieveCollectionByRelationshipType(context, item,
-                        relationshipType);
+                Collection collection = collectionService.retrieveCollectionByEntityType(context, item, entityType);
                 if (collection == null) {
-                    log.warn(NO_COLLECTION_FOUND_MSG, relationshipType, item.getID());
+                    log.warn(NO_COLLECTION_FOUND_MSG, entityType, item.getID());
                     continue;
                 }
                 collection = context.reloadEntity(collection);
 
-                log.debug(ITEM_CREATION_MSG, relationshipType, item.getID());
-                relatedItem = buildRelatedItem(context, item, collection, metadata, relationshipType, crisSourceId);
+                log.debug(ITEM_CREATION_MSG, entityType, item.getID());
+                relatedItem = buildRelatedItem(context, item, collection, metadata, entityType, crisSourceId);
 
             }
 
@@ -221,15 +217,15 @@ public class CrisConsumer implements Consumer {
     }
 
     private Item buildRelatedItem(Context context, Item item, Collection collection, MetadataValue metadata,
-            String relationshipType, String crisSourceId) throws Exception {
+        String entityType, String crisSourceId) throws Exception {
 
         WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
         Item relatedItem = workspaceItem.getItem();
         itemService.addMetadata(context, relatedItem, CRIS.getName(), "sourceId", null, null, crisSourceId);
-        if (!relationshipService.hasRelationshipType(relatedItem, relationshipType)) {
+        if (!hasEntityType(relatedItem, entityType)) {
             log.error("Inconstent configuration the related item " + relatedItem.getID().toString() + ", created from "
-                    + item.getID().toString() + " (" + metadata.getMetadataField().toString('.') + ")"
-                    + " hasn't the expected [" + relationshipType + "] relationshipType");
+                + item.getID().toString() + " (" + metadata.getMetadataField().toString('.') + ")"
+                + " hasn't the expected [" + entityType + "] entityType");
         }
 
         if (isSubmissionEnabled(metadata)) {
@@ -277,6 +273,13 @@ public class CrisConsumer implements Consumer {
             itemService.addMetadata(context, relatedItem, "dc", "title", null, null, metadata.getValue());
         }
 
+    }
+
+    private boolean hasEntityType(DSpaceObject dsObject, String entityType) {
+        return dsObject.getMetadata().stream().anyMatch(metadataValue -> {
+            return "dspace.entity.type".equals(metadataValue.getMetadataField().toString('.')) &&
+                entityType.equals(metadataValue.getValue());
+        });
     }
 
 }

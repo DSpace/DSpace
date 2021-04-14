@@ -7,12 +7,13 @@
  */
 package org.dspace.app.rest.submit.factory.impl;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.license.service.CreativeCommonsService;
-import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
@@ -44,10 +45,8 @@ public class CCLicenseAddPatchOperation extends AddPatchOperation<String> {
     }
 
     @Override
-    void add(Context context, Request currentRequest, InProgressSubmission source, String path, Object value)
+    void add(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path, Object value)
             throws Exception {
-
-
         String licenseUri = null;
         if (value instanceof String) {
             licenseUri = (String) value;

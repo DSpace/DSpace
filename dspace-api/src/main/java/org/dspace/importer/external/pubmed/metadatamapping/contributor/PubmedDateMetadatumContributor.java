@@ -130,15 +130,18 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
                     } catch (ParseException e) {
                         // Multiple dateformats can be configured, we don't want to print the entire stacktrace every
                         // time one of those formats fails.
-                        log.info(
+                        log.debug(
                             "Failed parsing " + dateString + " using the following format: " + dateFormat + ", check " +
                                 "the configured dataformats in config/spring/api/pubmed-integration.xml");
                     }
                     j++;
                 }
-
                 if (dcDate != null) {
                     values.add(metadataFieldMapping.toDCValue(field, dcDate.toString()));
+                } else {
+                    log.info(
+                            "Failed parsing " + dateString + ", check " +
+                                "the configured dataformats in config/spring/api/pubmed-integration.xml");
                 }
             }
         } catch (Exception e) {

@@ -44,7 +44,7 @@ public class StatisticsReportsConfiguration {
         } else if (dso instanceof Item) {
             Item item = (Item) dso;
             List<MetadataValue> metadatavalues = item.getItemService().getMetadataByMetadataString(item,
-                    "relationship.type");
+                    "dspace.entity.type");
             if (metadatavalues != null && metadatavalues.size() > 0) {
                 String entityType = metadatavalues.get(0).getValue();
                 List<UsageReportCategoryRest> result = mapping.get("item-" + entityType);

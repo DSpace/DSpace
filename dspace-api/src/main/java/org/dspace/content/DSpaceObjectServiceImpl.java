@@ -313,6 +313,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 //            metadataValueService.update(context, metadataValue);
             dso.addDetails(metadataField.toString());
         }
+        setMetadataModified(dso);
         return newMetadata;
     }
 
@@ -693,7 +694,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             case "source":
                 return new String[] {MetadataSchemaEnum.DC.getName(), "source", null};
             case "relationship":
-                return new String[] {"relationship", "type", null};
+                return new String[] {"dspace", "entity", "type"};
             case "firstname":
                 return new String[] {"eperson", "firstname", null};
             case "lastname":
@@ -703,7 +704,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             case "language":
                 return new String[] {"eperson", "language", null};
             case "entity-type":
-                return new String[] {MetadataSchemaEnum.RELATIONSHIP.getName(), "type", null};
+                return new String[] { "dspace", "entity", "type" };
             case "submission-type":
                 return new String[] { MetadataSchemaEnum.CRIS.getName(), "submission", "definition" };
             case "workflow-name":

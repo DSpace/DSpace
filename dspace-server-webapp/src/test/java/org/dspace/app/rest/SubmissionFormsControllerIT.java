@@ -692,4 +692,60 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
         pluginService.clearNamedPluginClasses();
         cas.clearCache();
     }
+
+    @Test
+    public void findAllPaginationTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/config/submissionforms")
+                 .param("size", "2")
+                 .param("page", "0"))
+                 .andExpect(status().isOk())
+                 .andExpect(content().contentType(contentType))
+                 .andExpect(
+                    jsonPath("$._embedded.submissionforms[0].id", is("traditionalpageone-cris-dc-contributor-author")))
+                 .andExpect(jsonPath("$._embedded.submissionforms[1].id", is("patent")))
+                 .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                         Matchers.containsString("/api/config/submissionforms?"),
+                         Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
+                 .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                         Matchers.containsString("/api/config/submissionforms?"),
+                         Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
+                 .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                         Matchers.containsString("/api/config/submissionforms?"),
+                         Matchers.containsString("page=1"), Matchers.containsString("size=2"))))
+                 .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                         Matchers.containsString("/api/config/submissionforms?"),
+                         Matchers.containsString("page=12"), Matchers.containsString("size=2"))))
+                 .andExpect(jsonPath("$.page.size", is(2)))
+                 .andExpect(jsonPath("$.page.totalElements", equalTo(25)))
+                 .andExpect(jsonPath("$.page.totalPages", equalTo(13)))
+                 .andExpect(jsonPath("$.page.number", is(0)));
+
+        getClient(tokenAdmin).perform(get("/api/config/submissionforms")
+                 .param("size", "2")
+                 .param("page", "1"))
+                 .andExpect(status().isOk())
+                 .andExpect(content().contentType(contentType))
+                 .andExpect(jsonPath("$._embedded.submissionforms[0].id", is("publication_references")))
+                 .andExpect(jsonPath("$._embedded.submissionforms[1].id", is("patent_references")))
+                 .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                         Matchers.containsString("/api/config/submissionforms?"),
+                         Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
+                 .andExpect(jsonPath("$._links.prev.href", Matchers.allOf(
+                         Matchers.containsString("/api/config/submissionforms?"),
+                         Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
+                 .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                         Matchers.containsString("/api/config/submissionforms?"),
+                         Matchers.containsString("page=1"), Matchers.containsString("size=2"))))
+                 .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                         Matchers.containsString("/api/config/submissionforms?"),
+                         Matchers.containsString("page=2"), Matchers.containsString("size=2"))))
+                 .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                         Matchers.containsString("/api/config/submissionforms?"),
+                         Matchers.containsString("page=12"), Matchers.containsString("size=2"))))
+                 .andExpect(jsonPath("$.page.size", is(2)))
+                 .andExpect(jsonPath("$.page.totalElements", equalTo(25)))
+                 .andExpect(jsonPath("$.page.totalPages", equalTo(13)))
+                 .andExpect(jsonPath("$.page.number", is(1)));
+    }
 }

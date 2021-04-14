@@ -398,30 +398,28 @@ public interface CollectionService
 
     /**
      * Retrieve the first collection in the community or its descending that support
-     * the provided relationshipType
+     * the provided entityType
      *
-     * @param context    the DSpace context
-     * @param community        the root from where the search start
-     * @param relationshipType the requested entity type
-     * @return the first collection in the community or its descending that support
-     *         the provided relationshipType
+     * @param  context    the DSpace context
+     * @param  community  the root from where the search start
+     * @param  entityType the requested entity type
+     * @return            the first collection in the community or its descending
+     *                    that support the provided entityType
      */
-    public Collection retriveCollectionByRelationshipType(Context context, Community community,
-            String relationshipType);
+    public Collection retriveCollectionByEntityType(Context context, Community community, String entityType);
 
     /**
      * Retrieve the close collection to the item that support the provided
-     * relationshipType. Close mean the collection that can be reach with the
-     * minimum steps starting from the item (owningCollection, brothers collections,
-     * etc)
-     * 
-     * @param context    the DSpace context
-     * @param item        the item from where the search start
-     * @param relationshipType the requested entity type
-     * @return the first collection in the community or its descending that support
-     *         the provided relationshipType
+     * entityType. Close mean the collection that can be reach with the minimum
+     * steps starting from the item (owningCollection, brothers collections, etc)
+     *
+     * @param  context    the DSpace context
+     * @param  item       the item from where the search start
+     * @param  entityType the requested entity type
+     * @return            the first collection in the community or its descending
+     *                    that support the provided entityType
      */
-    public Collection retrieveCollectionByRelationshipType(Context context, Item item, String relationshipType)
+    public Collection retrieveCollectionByEntityType(Context context, Item item, String entityType)
             throws SQLException;
 
     /**

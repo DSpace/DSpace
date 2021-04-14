@@ -37,18 +37,15 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void findAllExternalSources() throws Exception {
         getClient().perform(get("/api/integration/externalsources"))
-                            .andExpect(status().isOk())
-                            .andExpect(jsonPath("$._embedded.externalsources", Matchers.hasItems(
-                                ExternalSourceMatcher.matchExternalSource("mock", "mock", false),
-                                ExternalSourceMatcher.matchExternalSource("orcid", "orcid", false),
-                                ExternalSourceMatcher.matchExternalSource(
-                                    "sherpaJournalIssn", "sherpaJournalIssn", false),
-                                ExternalSourceMatcher.matchExternalSource(
-                                    "sherpaPublisher", "sherpaPublisher", false),
-                                ExternalSourceMatcher.matchExternalSource(
-                                    "sherpaPublisher", "sherpaPublisher", false)
-                            )))
-                            .andExpect(jsonPath("$.page.totalElements", Matchers.is(10)));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.externalsources", Matchers.hasItems(
+                ExternalSourceMatcher.matchExternalSource("mock", "mock", false),
+                ExternalSourceMatcher.matchExternalSource("orcid", "orcid", false),
+                ExternalSourceMatcher.matchExternalSource("sherpaJournalIssn", "sherpaJournalIssn", false),
+                ExternalSourceMatcher.matchExternalSource("sherpaJournal", "sherpaJournal", false),
+                ExternalSourceMatcher.matchExternalSource("sherpaPublisher", "sherpaPublisher", false),
+                ExternalSourceMatcher.matchExternalSource("pubmed", "pubmed", false))))
+            .andExpect(jsonPath("$.page.totalElements", Matchers.is(12)));
     }
 
     @Test

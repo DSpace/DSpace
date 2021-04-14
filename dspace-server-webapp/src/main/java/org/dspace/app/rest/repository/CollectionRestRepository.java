@@ -275,6 +275,22 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         }
     }
 
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @SearchRestMethod(name = "findAdminAuthorized")
+    public Page<CollectionRest> findAdminAuthorized (
+        Pageable pageable, @Parameter(value = "query") String query) {
+        try {
+            Context context = obtainContext();
+            List<Collection> collections = authorizeService.findAdminAuthorizedCollection(context, query,
+                Math.toIntExact(pageable.getOffset()),
+                Math.toIntExact(pageable.getPageSize()));
+            long tot = authorizeService.countAdminAuthorizedCollection(context, query);
+            return converter.toRestPage(collections, pageable, tot , utils.obtainProjection());
+        } catch (SearchServiceException | SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
     @Override
     @PreAuthorize("hasPermission(#id, 'COLLECTION', 'WRITE')")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID id,

@@ -120,48 +120,48 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
                                   .withTitle("Author1")
                                   .withIssueDate("2017-10-17")
                                   .withAuthor("Smith, Donald")
-                                  .withRelationshipType("Person")
+                                  .withEntityType("Person")
                                   .build();
 
         Item author2 = ItemBuilder.createItem(context, col2)
                                   .withTitle("Author2")
                                   .withIssueDate("2016-02-13")
                                   .withAuthor("Smith, Maria")
-                                  .withRelationshipType("Person")
+                                  .withEntityType("Person")
                                   .build();
 
         Item author3 = ItemBuilder.createItem(context, col2)
                                   .withTitle("Author3")
                                   .withIssueDate("2016-02-13")
                                   .withAuthor("Maybe, Maybe")
-                                  .withRelationshipType("Person")
+                                  .withEntityType("Person")
                                   .build();
 
         Item orgUnit1 = ItemBuilder.createItem(context, col3)
                                    .withTitle("OrgUnit1")
                                    .withAuthor("Testy, TEst")
                                    .withIssueDate("2015-01-01")
-                                   .withRelationshipType("OrgUnit")
+                                   .withEntityType("OrgUnit")
                                    .build();
 
         Item project1 = ItemBuilder.createItem(context, col3)
                                    .withTitle("Project1")
                                    .withAuthor("Testy, TEst")
                                    .withIssueDate("2015-01-01")
-                                   .withRelationshipType("Project")
+                                   .withEntityType("Project")
                                    .build();
 
         Item publication = ItemBuilder.createItem(context, col3)
                                       .withTitle("Publication1")
                                       .withAuthor("Testy, TEst")
                                       .withIssueDate("2015-01-01")
-                                      .withRelationshipType("Publication")
+                                      .withEntityType("Publication")
                                       .build();
 
         Item publication2 = ItemBuilder.createItem(context, col3)
                                        .withTitle("Publication2")
                                        .withIssueDate("2015-01-01")
-                                       .withRelationshipType("Publication")
+                                       .withEntityType("Publication")
                                        .build();
 
         RelationshipType isOrgUnitOfPersonRelationshipType = relationshipTypeService

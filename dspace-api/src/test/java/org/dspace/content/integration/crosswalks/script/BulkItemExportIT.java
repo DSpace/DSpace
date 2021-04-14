@@ -239,19 +239,19 @@ public class BulkItemExportIT extends AbstractIntegrationTestWithDatabase {
 
         ItemBuilder.createItem(context, collection)
             .withTitle("Edward Red")
-            .withRelationshipType("Person")
+            .withEntityType("Person")
             .withPersonMainAffiliation("4Science", orgUnitId)
             .build();
 
         ItemBuilder.createItem(context, collection)
             .withTitle("John Smith")
-            .withRelationshipType("Person")
+            .withEntityType("Person")
             .withPersonMainAffiliation("4Science", orgUnitId)
             .build();
 
         ItemBuilder.createItem(context, collection)
             .withTitle("Walter White")
-            .withRelationshipType("Person")
+            .withEntityType("Person")
             .withPersonMainAffiliation("Company")
             .build();
 
@@ -508,7 +508,7 @@ public class BulkItemExportIT extends AbstractIntegrationTestWithDatabase {
         return ItemBuilder.createItem(context, collection)
             .withTitle(title)
             .withSubject(subject)
-            .withRelationshipType(entityType)
+            .withEntityType(entityType)
             .build();
     }
 
@@ -516,7 +516,7 @@ public class BulkItemExportIT extends AbstractIntegrationTestWithDatabase {
         return WorkspaceItemBuilder.createWorkspaceItem(context, collection)
             .withTitle(title)
             .withSubject(subject)
-            .withRelationshipType(entityType)
+            .withEntityType(entityType)
             .build();
     }
 
@@ -524,7 +524,7 @@ public class BulkItemExportIT extends AbstractIntegrationTestWithDatabase {
         return WorkflowItemBuilder.createWorkflowItem(context, collection)
             .withTitle(title)
             .withSubject(subject)
-            .withRelationshipType(entityType)
+            .withEntityType(entityType)
             .build();
     }
 }

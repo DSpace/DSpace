@@ -32,7 +32,6 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
-import org.dspace.discovery.IndexingService;
 import org.dspace.metrics.scopus.UpdateScopusMetrics;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -47,9 +46,6 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
 
     @Autowired
     private AuthorizeService authorizeService;
-
-    @Autowired
-    private IndexingService crisIndexingService;
 
     @Test
     public void findAllTest() throws Exception {
@@ -356,7 +352,7 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 1").build();
 
         Item itemA = ItemBuilder.createItem(context, col1)
@@ -405,8 +401,6 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
         int status = handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin);
 
         assertEquals(0, status);
-
-        crisIndexingService.retriveSolrDocByUniqueID(itemA.getID().toString());
 
         String tokenEperson = getAuthToken(admin.getEmail(), password);
         getClient(tokenEperson).perform(get("/api/core/items/" + itemA.getID() + "/metrics"))

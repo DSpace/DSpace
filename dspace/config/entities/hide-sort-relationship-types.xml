@@ -38,4 +38,40 @@
             <min>0</min>
         </rightCardinality>
     </type>
+    <type>
+        <leftType>Publication</leftType>
+        <rightType>Person</rightType>
+        <leftwardType>isResearchoutputsSelectedFor</leftwardType>
+        <rightwardType>hasSelectedResearchoutputs</rightwardType>
+        <leftCardinality>
+            <min>0</min>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+        </rightCardinality>
+    </type>
+    <type>
+        <leftType>Patent</leftType>
+        <rightType>Person</rightType>
+        <leftwardType>isResearchoutputsSelectedFor</leftwardType>
+        <rightwardType>hasSelectedResearchoutputs</rightwardType>
+        <leftCardinality>
+            <min>0</min>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+        </rightCardinality>
+    </type>
+    <type>
+        <leftType>Project</leftType>
+        <rightType>Person</rightType>
+        <leftwardType>isProjectsSelectedFor</leftwardType>
+        <rightwardType>hasSelectedProjects</rightwardType>
+        <leftCardinality>
+            <min>0</min>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+        </rightCardinality>
+    </type>
 </relationships>

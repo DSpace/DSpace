@@ -145,6 +145,7 @@
     <bean class="org.dspace.layout.service.impl.CrisLayoutTabServiceImpl"/>
     <bean class="org.dspace.layout.service.impl.CrisLayoutBoxServiceImpl"/>
     <bean class="org.dspace.layout.service.impl.CrisLayoutFieldServiceImpl"/>
+    <bean class="org.dspace.layout.service.impl.CrisLayoutMetadataGroupServiceImpl"/>
     <bean class="org.dspace.layout.service.impl.CrisLayoutMetric2BoxServiceImpl"/>
 
     <bean class="org.dspace.layout.service.impl.LayoutSecurityServiceImpl"/>

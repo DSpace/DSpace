@@ -26,8 +26,8 @@ public abstract class CustomAuthorityFilter {
      *
      * @return a list of custom solr filter queries
      */
-    public List<String> getFilterQueries(String relationshipType) {
-        if (appliesTo(relationshipType)) {
+    public List<String> getFilterQueries(String entityType) {
+        if (appliesTo(entityType)) {
             return createFilterQueries();
         }
         return Collections.emptyList();
@@ -39,9 +39,9 @@ public abstract class CustomAuthorityFilter {
      * Defines if instance can provide additional filter queries
      * for given relationship type
      */
-    private boolean appliesTo(String relationshipType) {
+    private boolean appliesTo(String entityType) {
         return Optional.ofNullable(supportedEntities)
-            .map(e -> e.contains(relationshipType))
+            .map(e -> e.contains(entityType))
             .orElse(true);
     }
 

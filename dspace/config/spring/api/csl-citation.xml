@@ -25,7 +25,6 @@
     </bean>
     
     <bean name="mapConverterPublicationTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
-		<constructor-arg value="mapConverterPublicationTypes" />
 		<property name="converterNameFile" value="mapConverter-publicationTypes.properties" />
 		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
 		<property name="defaultValue" value=""/>

@@ -53,6 +53,7 @@ import org.dspace.harvest.service.HarvestedCollectionService;
 import org.dspace.layout.factory.CrisLayoutServiceFactory;
 import org.dspace.layout.service.CrisLayoutBoxService;
 import org.dspace.layout.service.CrisLayoutFieldService;
+import org.dspace.layout.service.CrisLayoutMetadataGroupService;
 import org.dspace.layout.service.CrisLayoutMetric2BoxService;
 import org.dspace.layout.service.CrisLayoutTabService;
 import org.dspace.scripts.factory.ScriptServiceFactory;
@@ -109,6 +110,7 @@ public abstract class AbstractBuilder<T, S> {
     static CrisLayoutTabService crisLayoutTabService;
     static CrisLayoutBoxService crisLayoutBoxService;
     static CrisLayoutFieldService crisLayoutFieldService;
+    static CrisLayoutMetadataGroupService crisLayoutMetadataGroupService;
     static OrcidQueueService orcidQueueService;
     static OrcidHistoryService orcidHistoryService;
     static AuditService auditService;
@@ -170,10 +172,10 @@ public abstract class AbstractBuilder<T, S> {
         inProgressUserService = XmlWorkflowServiceFactory.getInstance().getInProgressUserService();
         poolTaskService = XmlWorkflowServiceFactory.getInstance().getPoolTaskService();
         workflowItemRoleService = XmlWorkflowServiceFactory.getInstance().getWorkflowItemRoleService();
-
         crisLayoutTabService = CrisLayoutServiceFactory.getInstance().getTabService();
         crisLayoutBoxService = CrisLayoutServiceFactory.getInstance().getBoxService();
         crisLayoutFieldService = CrisLayoutServiceFactory.getInstance().getFieldService();
+        crisLayoutMetadataGroupService = CrisLayoutServiceFactory.getInstance().getMetadataGroupService();
         orcidQueueService = OrcidQueueServiceFactory.getInstance().getOrcidQueueService();
         orcidHistoryService = OrcidHistoryServiceFactory.getInstance().getOrcidHistoryService();
         auditService = new DSpace().getSingletonService(AuditService.class);
@@ -215,6 +217,7 @@ public abstract class AbstractBuilder<T, S> {
         crisLayoutTabService = null;
         crisLayoutBoxService = null;
         crisLayoutFieldService = null;
+        crisLayoutMetadataGroupService = null;
         orcidQueueService = null;
         orcidHistoryService = null;
         crisMetricsService = null;

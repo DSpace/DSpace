@@ -431,49 +431,42 @@
 	</bean>
 	
 	<bean name="mapConverterCoarTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
-		<constructor-arg value="mapConverterCoarTypes" />
 		<property name="converterNameFile" value="mapConverter-coarTypes.properties" />
 		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
 		<property name="defaultValue" value="http://purl.org/coar/resource_type/c_1843"/>
 	</bean>
 	
 	<bean name="mapConverterFundingTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
-		<constructor-arg value="mapConverterFundingTypes" />
 		<property name="converterNameFile" value="mapConverter-fundingTypes.properties" />
 		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
 		<property name="defaultValue" value="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types"/>
 	</bean>
 
 	<bean name="mapConverterOrgUnitTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
-		<constructor-arg value="mapConverterOrgUnitTypes" />
 		<property name="converterNameFile" value="mapConverter-orgUnitTypes.properties" />
 		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
 		<property name="defaultValue" value="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_OrgUnit_Types"/>
 	</bean>
 	
 	<bean name="mapConverterCoarToPublicationTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
-		<constructor-arg value="mapConverterCoarToPublicationTypes" />
 		<property name="converterNameFile" value="mapConverter-coarToPublicationTypes.properties" />
 		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
 		<property name="defaultValue" value="Controlled Vocabulary for Resource Type Genres::other"/>
 	</bean>
 	
 	<bean name="mapConverterCerifToOrgUnitTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
-		<constructor-arg value="mapConverterCerifToOrgUnitTypes" />
 		<property name="converterNameFile" value="mapConverter-cerifToOrgUnitTypes.properties" />
 		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
 		<property name="defaultValue" value="Unspecified"/>
 	</bean>
 	
 	<bean name="mapConverterCerifToFundingTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
-		<constructor-arg value="mapConverterCerifToFundingTypes" />
 		<property name="converterNameFile" value="mapConverter-cerifToFundingTypes.properties" />
 		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
 		<property name="defaultValue" value="Unspecified"/>
 	</bean>
 	
     <bean name="mapConverterOpenAccessScopus" class="org.dspace.util.SimpleMapConverter" init-method="init">
-		<constructor-arg value="mapConverterOpenAccessScopus" />
 		<property name="converterNameFile" value="mapConverter-openAccesFlag.properties" />
 		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
 		<property name="defaultValue" value="Unspecified"/>

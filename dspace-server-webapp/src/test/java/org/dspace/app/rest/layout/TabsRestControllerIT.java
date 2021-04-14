@@ -517,7 +517,7 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
         Item item = ItemBuilder.createItem(context, collection)
             .withPersonIdentifierFirstName("Danilo")
             .withPersonIdentifierLastName("Di Nuzzo")
-            .withRelationshipType(eTypePer.getLabel())
+            .withEntityType(eTypePer.getLabel())
             .build();
         MetadataSchema schema = mdss.find(context, "person");
         MetadataField firstName = mfss.findByElement(context, schema, "givenName", null);

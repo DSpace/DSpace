@@ -121,14 +121,14 @@ public class ItemSearcherByMetadata implements ItemSearcher, ItemReferenceResolv
     private void resolveReferences(Context context, List<MetadataValue> metadataValues, Item item)
         throws SQLException, AuthorizeException {
 
-        String relationshipType = itemService.getMetadataFirstValue(item, "relationship", "type", null, Item.ANY);
+        String entityType = itemService.getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY);
 
         List<String> authorities = metadataValues.stream()
             .map(MetadataValue::getValue)
             .map(value -> AuthorityValueService.REFERENCE + authorityPrefix + "::" + value)
             .collect(Collectors.toList());
 
-        Iterator<ReloadableEntity<?>> entityIterator = findItemsToResolve(context, authorities, relationshipType);
+        Iterator<ReloadableEntity<?>> entityIterator = findItemsToResolve(context, authorities, entityType);
 
         while (entityIterator.hasNext()) {
             Item itemWithReference = getNextItem(entityIterator.next());
@@ -142,9 +142,9 @@ public class ItemSearcherByMetadata implements ItemSearcher, ItemReferenceResolv
     }
 
     private Iterator<ReloadableEntity<?>> findItemsToResolve(Context context, List<String> authorities,
-        String relationshipType) {
+        String entityType) {
 
-        String query = choiceAuthorityService.getAuthorityControlledFieldsByRelationshipType(relationshipType).stream()
+        String query = choiceAuthorityService.getAuthorityControlledFieldsByEntityType(entityType).stream()
             .map(field -> getFieldFilter(field, authorities))
             .collect(Collectors.joining(" OR "));
 

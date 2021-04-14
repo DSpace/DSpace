@@ -11,7 +11,7 @@
 	<bean id="itemAuthorityServiceFactory"
 		  class="org.dspace.content.authority.factory.ItemAuthorityServiceFactory">
 
-		<property name="itemAthorityRelationshipTypeMap">
+		<property name="itemAthorityEntityTypeMap">
 			<map>
 			    <!-- Specify here any services to use with the relative entity type -->
 				<entry key="person" value-ref="personItemAuthorityService" />

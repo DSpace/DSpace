@@ -22,7 +22,7 @@ public class CrisConstants {
      */
     public static final String PLACEHOLDER_PARENT_METADATA_VALUE = "#PLACEHOLDER_PARENT_METADATA_VALUE#";
 
-    public static final MetadataFieldName MD_ENTITY_TYPE = new MetadataFieldName("relationship", "type");
+    public static final MetadataFieldName MD_ENTITY_TYPE = new MetadataFieldName("dspace", "entity", "type");
     public static final MetadataFieldName MD_SUBMISSION_TYPE = new MetadataFieldName("cris", "submission",
             "definition");
     public static final MetadataFieldName MD_WORKFLOW_NAME = new MetadataFieldName("cris", "workflow", "name");

@@ -73,7 +73,7 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
         context.turnOffAuthorisationSystem();
         Item item = createItem(context, collection)
             .withTitle("Publication title")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withIssueDate("2018-05-17")
             .withAuthor("John Smith")
             .withAuthor("Edward Red")
@@ -96,7 +96,7 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
 
         Item firstItem = createItem(context, collection)
             .withTitle("Publication title")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withIssueDate("2018-05-17")
             .withAuthor("John Smith")
             .withAuthor("Edward Red")
@@ -105,7 +105,7 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
 
         Item secondItem = createItem(context, collection)
             .withTitle("Test publication")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withIssueDate("2020-01-31")
             .withAuthor("Walter White")
             .build();
@@ -127,7 +127,7 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
         context.turnOffAuthorisationSystem();
 
         Item item = createItem(context, collection)
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withType("Controlled Vocabulary for Resource Type Genres::text::periodical::journal")
             .withLanguage("en")
             .withDoiIdentifier("10.1000/182")
@@ -165,7 +165,7 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
         context.turnOffAuthorisationSystem();
 
         Item item = createItem(context, collection)
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withType("Controlled Vocabulary for Resource Type Genres::text::periodical::journal")
             .withLanguage("en")
             .withDoiIdentifier("10.1000/182")
@@ -203,7 +203,7 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
         context.turnOffAuthorisationSystem();
 
         Item item = createItem(context, collection)
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withType("Controlled Vocabulary for Resource Type Genres::text::periodical::journal")
             .withLanguage("en")
             .withDoiIdentifier("10.1000/182")
@@ -223,7 +223,7 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
             .build();
 
         Item anotherItem = createItem(context, collection)
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withType("Controlled Vocabulary for Resource Type Genres::text::book")
             .withLanguage("en")
             .withDoiIdentifier("10.1000/183")
@@ -252,7 +252,7 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
         context.turnOffAuthorisationSystem();
 
         Item item = createItem(context, collection)
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withType("Controlled Vocabulary for Resource Type Genres::text::periodical::journal")
             .withLanguage("en")
             .withDoiIdentifier("10.1000/182")
@@ -272,7 +272,7 @@ public class CSLItemDataCrosswalkIT extends AbstractIntegrationTestWithDatabase 
             .build();
 
         Item anotherItem = createItem(context, collection)
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withType("Controlled Vocabulary for Resource Type Genres::text::book")
             .withLanguage("en")
             .withDoiIdentifier("10.1000/183")

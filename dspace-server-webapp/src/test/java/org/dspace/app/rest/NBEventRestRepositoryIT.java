@@ -368,7 +368,7 @@ public class NBEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
         Collection colFunding = CollectionBuilder.createCollection(context, parentCommunity)
-                .withName("Collection Fundings").withRelationshipType("Funding").build();
+                .withName("Collection Fundings").withEntityType("Funding").build();
         Item funding = ItemBuilder.createItem(context, colFunding).withTitle("Tracking Papyrus and Parchment Paths")
                 .build();
         NBEvent eventProjectBound = NBEventBuilder.createTarget(context, col1, "Science and Freedom with project")
@@ -547,7 +547,7 @@ public class NBEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
         Collection colFunding = CollectionBuilder.createCollection(context, parentCommunity)
-                .withName("Collection Fundings").withRelationshipType("Funding").build();
+                .withName("Collection Fundings").withEntityType("Funding").build();
         NBEvent event = NBEventBuilder.createTarget(context, col1, "Science and Freedom 5")
                 .withTopic("ENRICH/MISSING/PROJECT")
                 .withMessage(
@@ -594,7 +594,7 @@ public class NBEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
         Collection colFunding = CollectionBuilder.createCollection(context, parentCommunity)
-                .withName("Collection Fundings").withRelationshipType("Funding").build();
+                .withName("Collection Fundings").withEntityType("Funding").build();
         Item funding = ItemBuilder.createItem(context, colFunding).withTitle("Tracking Papyrus and Parchment Paths")
                 .build();
         NBEvent event = NBEventBuilder.createTarget(context, col1, "Science and Freedom 5")
@@ -639,7 +639,7 @@ public class NBEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
         Collection colFunding = CollectionBuilder.createCollection(context, parentCommunity)
-                .withName("Collection Fundings").withRelationshipType("Funding").build();
+                .withName("Collection Fundings").withEntityType("Funding").build();
         NBEvent event = NBEventBuilder.createTarget(context, col1, "Science and Freedom")
                 .withTopic("ENRICH/MISSING/PID")
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();

@@ -95,10 +95,10 @@ public class OAIREPublicationLoaderRunnable
         List<IndexableObject> objects = null;
         if (uuid != null) {
             objects = searchService.search(context, "search.resourceid:" + uuid.toString(),
-                "lastModified", false, 0, 1000, "search.resourcetype:Item", "relationship.type:Person");
+                "lastModified", false, 0, 1000, "search.resourcetype:Item", "dspace.entity.type:Person");
         } else {
             objects = searchService.search(context, "*:*", "lastModified", false, 0, 1000, "search.resourcetype:Item",
-                    "relationship.type:Person");
+                    "dspace.entity.type:Person");
         }
         List<Item> items = new ArrayList<Item>();
         if (objects != null) {

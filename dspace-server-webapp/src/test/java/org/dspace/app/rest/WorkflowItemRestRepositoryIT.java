@@ -76,6 +76,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.RestMediaTypes;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -1939,12 +1940,12 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                         .andExpect(jsonPath("$._links",Matchers.allOf(
                                 hasJsonPath("$.claimedtasks.href",
                                          is("http://localhost/api/workflow/claimedtasks")),
-                                hasJsonPath("$.claimedtask-search.href",
-                                         is("http://localhost/api/workflow/claimedtask/search")),
+                                hasJsonPath("$.claimedtasks-search.href",
+                                         is("http://localhost/api/workflow/claimedtasks/search")),
                                 hasJsonPath("$.pooltasks.href",
                                          is("http://localhost/api/workflow/pooltasks")),
-                                hasJsonPath("$.pooltask-search.href",
-                                         is("http://localhost/api/workflow/pooltask/search"))
+                                hasJsonPath("$.pooltasks-search.href",
+                                         is("http://localhost/api/workflow/pooltasks/search"))
                         )));
     }
 
@@ -2000,7 +2001,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
         Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
             .withName("Collection")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withSubmitterGroup(eperson)
             .withWorkflowGroup(1, admin)
             .withSharedWorkspace()
@@ -2094,7 +2095,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
         Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
             .withName("Collection")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withSubmitterGroup(eperson)
             .withWorkflowGroup(1, admin)
             .build();
@@ -2176,7 +2177,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
         Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
             .withName("Collection")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withSubmitterGroup(eperson)
             .withWorkflowGroup(1, eperson)
             .withSharedWorkspace()
@@ -2270,7 +2271,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
         Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
             .withName("Collection")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withSubmitterGroup(eperson)
             .withWorkflowGroup(1, eperson)
             .build();
@@ -2350,9 +2351,11 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(status().isOk())
             .andDo(r -> taskId.set(read(r.getResponse().getContentAsString(), "$._embedded.pooltasks[0].id")));
 
-        getClient(authToken).perform(post("/api/workflow/pooltasks/{id}", taskId.get())
-            .contentType("application/x-www-form-urlencoded"))
-            .andExpect(status().isNoContent());
+        getClient(authToken).perform(post("/api/workflow/claimedtasks")
+            .contentType(RestMediaTypes.TEXT_URI_LIST)
+            .content("/api/workflow/pooltasks/" + taskId.get()))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$", Matchers.allOf(hasJsonPath("$.type", is("claimedtask")))));
 
         getClient(authToken).perform(get("/api/workflow/claimedtasks/search/findByUser")
             .param("uuid", user.getID().toString()))

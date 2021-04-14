@@ -43,7 +43,7 @@ public class UpdateScopusPersonMetrics implements MetricsExternalServices {
 
     @Override
     public List<String> getFilters() {
-        return Arrays.asList("relationship.type:Person", "person.identifier.scopus-author-id:*");
+        return Arrays.asList("dspace.entity.type:Person", "person.identifier.scopus-author-id:*");
     }
 
     @Override

@@ -872,7 +872,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmitterGroup(eperson)
                                            .build();
         Collection col2 = CollectionBuilder.createCollection(context, child1)
@@ -941,13 +941,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
                                            .withSubmitterGroup(eperson)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .build();
         Collection col2 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 2")
                                            .withSubmitterGroup(eperson)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .build();
 
@@ -1036,13 +1036,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
         Collection col2 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 2")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
@@ -1156,13 +1156,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
         Collection col2 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 2")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
@@ -1238,13 +1238,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
         Collection col2 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 2")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
@@ -1318,13 +1318,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
         Collection col2 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 2")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
@@ -1400,13 +1400,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
         Collection col2 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 2")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
@@ -1482,13 +1482,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
         Collection col2 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 2")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
@@ -1564,13 +1564,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
         Collection col2 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 2")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
@@ -1722,13 +1722,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
         Collection col2 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 2")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withSubmitterGroup(eperson)
                                            .build();
@@ -1823,7 +1823,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                 .withName("Collection 1")
-                .withRelationshipType("Publication")
+                .withEntityType("Publication")
                 .withSubmissionDefinition("traditional")
                 .withSubmitterGroup(eperson)
                 .build();
@@ -1884,7 +1884,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withTemplateItem()
                                            .withSubmitterGroup(eperson)
@@ -4723,6 +4723,224 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
+    /**
+     * Test the metadata extraction step adding an identifier
+     *
+     * @throws Exception
+     */
+    public void lookupPubmedMetadataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1, "123456789/extraction-test")
+                .withName("Collection 1").build();
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                .build();
+        WorkspaceItem witem2 = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                .withTitle("This is a test title")
+                .build();
+        context.restoreAuthSystemState();
+
+        // try to add the pmid identifier
+        List<Operation> addId = new ArrayList<Operation>();
+        // create a list of values to use in add operation
+        List<Map<String, String>> values = new ArrayList<Map<String, String>>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "18926410");
+        values.add(value);
+        addId.add(new AddOperation("/sections/traditionalpageone/dc.identifier.other", values));
+
+        String patchBody = getPatchContent(addId);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                    .andExpect(status().isOk())
+                    // testing lookup
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.other'][0].value",
+                        is("18926410")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
+                        is("Transfer of peanut allergy from the donor to a lung transplant recipient.")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.date.issued'][0].value",
+                        is(Matchers.notNullValue())))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][0].value",
+                        is(Matchers.notNullValue())))
+                    .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.description.abstract'][0].value",
+                        is(Matchers.notNullValue())))
+            ;
+
+        // verify that the patch changes have been persisted
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                .andExpect(status().isOk())
+                // testing lookup
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.other'][0].value",
+                    is("18926410")))
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
+                    is("Transfer of peanut allergy from the donor to a lung transplant recipient.")))
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.date.issued'][0].value",
+                    is(Matchers.notNullValue())))
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][0].value",
+                    is(Matchers.notNullValue())))
+                .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.description.abstract'][0].value",
+                    is(Matchers.notNullValue())))
+            ;
+
+        // verify that adding a pmid to a wsitem with already a title metadata will not alter the user input
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem2.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                    .andExpect(status().isOk())
+                    // testing lookup
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.other'][0].value",
+                        is("18926410")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
+                        is("This is a test title")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.date.issued'][0].value",
+                        is(Matchers.notNullValue())))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][0].value",
+                        is(Matchers.notNullValue())))
+                    .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.description.abstract'][0].value",
+                        is(Matchers.notNullValue())))
+            ;
+
+        // verify that we can remove metadata provided by pubmed
+        List<Operation> removeTitle = new ArrayList<Operation>();
+        removeTitle.add(new RemoveOperation("/sections/traditionalpageone/dc.title/0"));
+        String rmPatchBody = getPatchContent(removeTitle);
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem2.getID())
+                .content(rmPatchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                    .andExpect(status().isOk())
+                    // testing lookup
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.other'][0].value",
+                        is("18926410")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.title']").doesNotExist())
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.date.issued'][0].value",
+                        is(Matchers.notNullValue())))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][0].value",
+                        is(Matchers.notNullValue())))
+                    .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.description.abstract'][0].value",
+                        is(Matchers.notNullValue())))
+            ;
+        // verify that if we add more values to the listened metadata the lookup is not triggered again
+        // (i.e. the title stays empty)
+        List<Operation> addId2 = new ArrayList<Operation>();
+        addId2.add(new AddOperation("/sections/traditionalpageone/dc.identifier.other/-", value));
+
+        patchBody = getPatchContent(addId2);
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem2.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                    .andExpect(status().isOk())
+                    // testing lookup
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.other'][0].value",
+                        is("18926410")))
+                    // second copy of the added identifier
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.other'][1].value",
+                            is("18926410")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.title']").doesNotExist())
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.date.issued'][0].value",
+                        is(Matchers.notNullValue())))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][0].value",
+                        is(Matchers.notNullValue())))
+                    .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.description.abstract'][0].value",
+                        is(Matchers.notNullValue())))
+            ;
+
+        // verify that the patch changes have been persisted
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem2.getID()))
+                .andExpect(status().isOk())
+                // testing lookup
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.other'][0].value",
+                    is("18926410")))
+                // second copy of the added identifier
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.other'][1].value",
+                        is("18926410")))
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.title']").doesNotExist())
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.date.issued'][0].value",
+                    is(Matchers.notNullValue())))
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][0].value",
+                    is(Matchers.notNullValue())))
+                .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.description.abstract'][0].value",
+                    is(Matchers.notNullValue())))
+            ;
+
+    }
+
+    @Test
+    public void uploadBibtexFileOnExistingSubmissionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1, "123456789/extraction-test")
+                .withName("Collection 1").build();
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                .build();
+        WorkspaceItem witem2 = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                .withTitle("This is a test title")
+                .build();
+        context.restoreAuthSystemState();
+
+
+        InputStream bibtex = getClass().getResourceAsStream("bibtex-test.bib");
+        final MockMultipartFile bibtexFile = new MockMultipartFile("file", "/local/path/bibtex-test.bib",
+            "application/x-bibtex", bibtex);
+
+        try {
+            // adding a bibtex file with a single entry should automatically put the metadata in the bibtex file into
+            // the item
+            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems/" + witem.getID())
+                        .file(bibtexFile))
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
+                            is("My Article")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][0].value",
+                            is("Nobody Jr")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.date.issued'][0].value",
+                            is("2006")))
+                    .andExpect(jsonPath("$.sections.upload.files[0]"
+                         + ".metadata['dc.source'][0].value",
+                            is("/local/path/bibtex-test.bib")))
+                    .andExpect(jsonPath("$.sections.upload.files[0]"
+                         + ".metadata['dc.title'][0].value",
+                            is("bibtex-test.bib")));
+
+            // do again over a submission that already has a title, the manual input should be preserved
+            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems/" + witem2.getID())
+                        .file(bibtexFile))
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
+                            is("This is a test title")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][0].value",
+                            is("Nobody Jr")))
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.date.issued'][0].value",
+                            is("2006")))
+                    .andExpect(jsonPath("$.sections.upload.files[0]"
+                         + ".metadata['dc.source'][0].value",
+                            is("/local/path/bibtex-test.bib")))
+                    .andExpect(jsonPath("$.sections.upload.files[0]"
+                         + ".metadata['dc.title'][0].value",
+                            is("bibtex-test.bib")));
+        } finally {
+            bibtex.close();
+        }
+    }
+
+    @Test
     public void patchAcceptLicenseWrontPathTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -5356,12 +5574,12 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                 .withName("Collection 1")
-                .withRelationshipType("Publication")
+                .withEntityType("Publication")
                 .withSubmitterGroup(eperson)
                 .build();
         Collection col2 = CollectionBuilder.createCollection(context, child1)
                 .withName("Collection 2")
-                .withRelationshipType("Journal")
+                .withEntityType("Journal")
                 .withSubmissionDefinition("traditional")
                 .withSubmitterGroup(eperson)
                 .build();
@@ -5379,7 +5597,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                     .param("projection", "full")
                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
                     .andExpect(status().isCreated())
-                    .andExpect(jsonPath("$._embedded.collection.metadata.['relationship.type'][0].value",
+                    .andExpect(jsonPath("$._embedded.collection.metadata.['dspace.entity.type'][0].value",
                             equalTo("Publication")))
                     .andDo(result -> idRef1.set(read(result.getResponse().getContentAsString(), "$.id")));
 
@@ -5389,7 +5607,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                     .param("entityType", "Journal")
                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
                     .andExpect(status().isCreated())
-                    .andExpect(jsonPath("$._embedded.collection.metadata.['relationship.type'][0].value",
+                    .andExpect(jsonPath("$._embedded.collection.metadata.['dspace.entity.type'][0].value",
                             equalTo("Journal")))
                     .andDo(result -> idRef2.set(read(result.getResponse().getContentAsString(), "$.id")));
 
@@ -5413,7 +5631,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                 .withName("Collection 1")
-                .withRelationshipType("Publication")
+                .withEntityType("Publication")
                 .build();
 
         context.restoreAuthSystemState();
@@ -5449,7 +5667,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                 .withName("Collection 1")
-                .withRelationshipType("Publication")
+                .withEntityType("Publication")
                 .build();
 
         context.restoreAuthSystemState();
@@ -5491,7 +5709,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
             .withName("Collection")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withSubmitterGroup(submitter1, submitter2)
             .withSharedWorkspace()
             .build();
@@ -5570,7 +5788,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
             .withName("Collection")
-            .withRelationshipType("Publication")
+            .withEntityType("Publication")
             .withSubmitterGroup(submitter1, submitter2)
             .build();
 
@@ -5974,19 +6192,19 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                   .withAuthor("Smith, Donald")
                                   .withPersonIdentifierLastName("Smith")
                                   .withPersonIdentifierFirstName("Donald")
-                                  .withRelationshipType("Person")
+                                  .withEntityType("Person")
                                   .build();
 
         Item author2 = ItemBuilder.createItem(context, col1)
                                   .withTitle("Author2")
                                   .withIssueDate("2016-02-13")
                                   .withAuthor("Smith, Maria")
-                                  .withRelationshipType("Person")
+                                  .withEntityType("Person")
                                   .build();
 
         //2. One workspace item.
         WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
-                                                          .withRelationshipType("Publication")
+                                                          .withEntityType("Publication")
                                                           .build();
 
         EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();

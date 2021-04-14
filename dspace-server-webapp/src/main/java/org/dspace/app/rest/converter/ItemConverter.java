@@ -15,6 +15,8 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.MetadataValueList;
@@ -25,7 +27,6 @@ import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.service.ItemService;
@@ -84,6 +85,12 @@ public class ItemConverter
         item.setWithdrawn(obj.isWithdrawn());
         item.setLastModified(obj.getLastModified());
 
+        List<MetadataValue> entityTypes =
+            itemService.getMetadata(obj, "dspace", "entity", "type", Item.ANY, false);
+        if (CollectionUtils.isNotEmpty(entityTypes) && StringUtils.isNotBlank(entityTypes.get(0).getValue())) {
+            item.setEntityType(entityTypes.get(0).getValue());
+        }
+
         return item;
     }
 
@@ -101,8 +108,7 @@ public class ItemConverter
         List<MetadataValue> fullList = itemService.getMetadata(obj, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
 
         List<MetadataValue> returnList = new LinkedList<>();
-        String entityType = itemService.getMetadataFirstValue(obj, MetadataSchemaEnum.RELATIONSHIP.getName(),
-                "type", null, Item.ANY);
+        String entityType = itemService.getMetadataFirstValue(obj, "dspace", "entity", "type", Item.ANY);
         try {
             List<CrisLayoutBox> boxes;
             if (context != null) {
@@ -131,8 +137,7 @@ public class ItemConverter
 
     public boolean checkMetadataFieldVisibility(Context context, Item item,
             MetadataField metadataField) throws SQLException {
-        String entityType = itemService.getMetadataFirstValue(item, MetadataSchemaEnum.RELATIONSHIP.getName(), "type",
-                null, Item.ANY);
+        String entityType = itemService.getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY);
         List<CrisLayoutBox> boxes = crisLayoutBoxService.findEntityBoxes(context, entityType, 1000, 0);
         return checkMetadataFieldVisibility(context, boxes, item, metadataField);
     }

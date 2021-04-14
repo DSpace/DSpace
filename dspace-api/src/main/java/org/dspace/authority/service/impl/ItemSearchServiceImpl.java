@@ -49,26 +49,26 @@ public class ItemSearchServiceImpl implements ItemSearchService {
     }
 
     @Override
-    public Item search(Context context, String searchParam, String relationshipType) {
+    public Item search(Context context, String searchParam, String entityType) {
         try {
-            return performSearch(context, searchParam, relationshipType);
+            return performSearch(context, searchParam, entityType);
         } catch (SQLException | AuthorizeException ex) {
             String msg = "An error occurs searching an item by " + searchParam;
-            msg = StringUtils.isBlank(relationshipType) ? msg : " and relationship type " + relationshipType;
+            msg = StringUtils.isBlank(entityType) ? msg : " and relationship type " + entityType;
             throw new RuntimeException(msg, ex);
         }
     }
 
-    private Item performSearch(Context context, String searchParam, String relationshipType)
+    private Item performSearch(Context context, String searchParam, String entityType)
         throws SQLException, AuthorizeException {
 
-        return findByUuid(context, searchParam, relationshipType)
-            .or(() -> findByCrisSourceIdAndRelationshipType(context, searchParam, relationshipType))
-            .or(() -> findByItemSearcher(context, searchParam, relationshipType))
+        return findByUuid(context, searchParam, entityType)
+            .or(() -> findByCrisSourceIdAndEntityType(context, searchParam, entityType))
+            .or(() -> findByItemSearcher(context, searchParam, entityType))
             .orElse(null);
     }
 
-    private Optional<Item> findByUuid(Context context, String searchParam, String relationshipType)
+    private Optional<Item> findByUuid(Context context, String searchParam, String entityType)
         throws SQLException {
         UUID uuid = UUIDUtils.fromString(searchParam);
         if (uuid == null) {
@@ -76,24 +76,24 @@ public class ItemSearchServiceImpl implements ItemSearchService {
         }
         Item item = itemService.find(context, uuid);
         return Optional.ofNullable(item)
-            .filter(i -> hasRelationshipTypeEqualsTo(i, relationshipType));
+            .filter(i -> hasEntityTypeEqualsTo(i, entityType));
     }
 
-    private Optional<Item> findByCrisSourceIdAndRelationshipType(Context context, String crisSourceId,
-        String relationshipType) {
+    private Optional<Item> findByCrisSourceIdAndEntityType(Context context, String crisSourceId,
+        String entityType) {
         Iterator<Item> items = findByCrisSourceId(context, crisSourceId);
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(items, Spliterator.ORDERED), false)
-            .filter(item -> hasRelationshipTypeEqualsTo(item, relationshipType))
+            .filter(item -> hasEntityTypeEqualsTo(item, entityType))
             .findFirst();
     }
 
-    private Optional<Item> findByItemSearcher(Context context, String searchParam, String relationshipType) {
+    private Optional<Item> findByItemSearcher(Context context, String searchParam, String entityType) {
         String[] searchParamSections = searchParam.split(AuthorityValueService.SPLIT);
         if (searchParamSections.length != 2) {
             return Optional.empty();
         }
         return Optional.ofNullable(mapper.search(context, searchParamSections[0], searchParamSections[1]))
-            .filter(item -> hasRelationshipTypeEqualsTo(item, relationshipType));
+            .filter(item -> hasEntityTypeEqualsTo(item, entityType));
     }
 
     private Iterator<Item> findByCrisSourceId(Context context, String crisSourceId) {
@@ -104,11 +104,11 @@ public class ItemSearchServiceImpl implements ItemSearchService {
         }
     }
 
-    private boolean hasRelationshipTypeEqualsTo(Item item, String relationshipType) {
-        if (relationshipType == null) {
+    private boolean hasEntityTypeEqualsTo(Item item, String entityType) {
+        if (entityType == null) {
             return true;
         }
-        return relationshipType.equals(itemService.getMetadataFirstValue(item, "relationship", "type", null, ANY));
+        return entityType.equals(itemService.getMetadataFirstValue(item, "dspace", "entity", "type", ANY));
     }
 
 }

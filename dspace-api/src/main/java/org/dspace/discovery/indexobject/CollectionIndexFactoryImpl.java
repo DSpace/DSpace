@@ -129,7 +129,7 @@ public class CollectionIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Ind
         addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.title", title);
         doc.addField("dc.title_sort", title);
         addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields,
-                                                                              "relationship.type", relation);
+                                                                              "dspace.entity.type", relation);
         return doc;
     }
 

@@ -147,6 +147,7 @@
 
     <!--The configuration settings for discovery of withdrawn and indiscoverable items (admin only)-->
     <bean id="unDiscoverableItems" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
+        <property name="id" value="undiscoverable"/>
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
             <list>
@@ -223,7 +224,7 @@
                             <property name="snippets" value="5"/>
                         </bean>
                         <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
-                            <property name="field" value="relationship.type"/>
+                            <property name="field" value="dspace.entity.type"/>
                             <property name="snippets" value="5"/>
                         </bean>
                         <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
@@ -289,7 +290,7 @@
 
     <!--The configuration settings for discovery of withdrawn and undiscoverable items (admin only) and regular items-->
     <bean id="administrativeView" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
-        <!--Which sidebar facets are to be displayed-->
+        <property name="id" value="administrativeView"/>
         <property name="sidebarFacets">
             <list>
                 <ref bean="searchFilterDiscoverable" />
@@ -367,7 +368,7 @@
                             <property name="snippets" value="5"/>
                         </bean>
                         <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
-                            <property name="field" value="relationship.type"/>
+                            <property name="field" value="dspace.entity.type"/>
                             <property name="snippets" value="5"/>
                         </bean>
                         <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
@@ -530,7 +531,7 @@
                             <property name="snippets" value="5"/>
                         </bean>
                         <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
-                            <property name="field" value="relationship.type"/>
+                            <property name="field" value="dspace.entity.type"/>
                             <property name="snippets" value="5"/>
                         </bean>
                         <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
@@ -848,7 +849,7 @@
                 <property name="metadataFields">
                     <list>
                         <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
-                            <property name="field" value="relationship.type"/>
+                            <property name="field" value="dspace.entity.type"/>
                             <property name="snippets" value="5"/>
                         </bean>
                     </list>
@@ -921,7 +922,7 @@
                 <property name="metadataFields">
                     <list>
                         <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
-                            <property name="field" value="relationship.type"/>
+                            <property name="field" value="dspace.entity.type"/>
                             <property name="snippets" value="5"/>
                         </bean>
                     </list>
@@ -2216,7 +2217,7 @@
         <property name="indexFieldName" value="entityType"/>
         <property name="metadataFields">
             <list>
-                <value>relationship.type</value>
+                <value>dspace.entity.type</value>
             </list>
         </property>
         <property name="facetLimit" value="5"/>
@@ -2953,7 +2954,7 @@
     </bean>
 
     <bean id="sortEntityType" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
-        <property name="metadataField" value="relationship.type"/>
+        <property name="metadataField" value="dspace.entity.type"/>
     </bean>
 
 </beans>

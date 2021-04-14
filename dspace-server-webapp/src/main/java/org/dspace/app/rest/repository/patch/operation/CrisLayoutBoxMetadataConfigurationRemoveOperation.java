@@ -16,18 +16,19 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.CrisLayoutField;
+import org.dspace.layout.CrisMetadataGroup;
 import org.dspace.layout.service.CrisLayoutFieldService;
+import org.dspace.layout.service.CrisLayoutMetadataGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- *  * Example: <code>
+ * * Example: <code>
  * curl -X PATCH http://${dspace.server.url}/api/layout/boxmetadataconfigurations/<:box_id> -H "
  * Content-Type: application/json" -d '[{ "op": "remove", "path": "/rows/2/fields/1"]'
  * </code>
- * 
- * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
  *
+ * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
  */
 @Component
 public class CrisLayoutBoxMetadataConfigurationRemoveOperation<D> extends PatchOperation<D> {
@@ -39,6 +40,9 @@ public class CrisLayoutBoxMetadataConfigurationRemoveOperation<D> extends PatchO
 
     @Autowired
     private CrisLayoutFieldService fieldService;
+
+    @Autowired
+    private CrisLayoutMetadataGroupService crisLayoutMetadataGroupService;
 
     /* (non-Javadoc)
      * @see org.dspace.app.rest.repository.patch.operation.PatchOperation#perform
@@ -64,6 +68,15 @@ public class CrisLayoutBoxMetadataConfigurationRemoveOperation<D> extends PatchO
                 List<CrisLayoutField> fields = fieldService.findFieldByBoxId(context, box.getID(), row);
                 if (fields != null && fields.size() > position) {
                     try {
+                        // if it is a metadata group before delete all nested
+                        if (fields.get(position) != null) {
+                            List<CrisMetadataGroup> metadataGroupList = fields.get(position).getCrisMetadataGroupList();
+                            if (!metadataGroupList.isEmpty()) {
+                                for (CrisMetadataGroup metadataGroup : metadataGroupList) {
+                                    crisLayoutMetadataGroupService.delete(context, metadataGroup);
+                                }
+                            }
+                        }
                         fieldService.delete(context, fields.get(position));
                         fields.remove(fields.get(position));
                         // Update other field position
@@ -78,11 +91,12 @@ public class CrisLayoutBoxMetadataConfigurationRemoveOperation<D> extends PatchO
                     }
                 } else if (fields.isEmpty()) {
                     throw new
-                    UnprocessableEntityException("The row <" + row + "> hasn't fields!");
+                            UnprocessableEntityException("The row <" + row + "> hasn't fields!");
                 } else {
                     throw new
-                    UnprocessableEntityException("The row <" + row + "> hasn't a field in position <" + position + ">."
-                            + "Hint: the position is zero-based");
+                            UnprocessableEntityException(
+                            "The row <" + row + "> hasn't a field in position <" + position + ">."
+                                    + "Hint: the position is zero-based");
                 }
             }
         }
@@ -102,6 +116,7 @@ public class CrisLayoutBoxMetadataConfigurationRemoveOperation<D> extends PatchO
     /**
      * Returns an Integer object holding the value of the specified String,
      * if the string cannot be parsed as an integer returns null
+     *
      * @param val
      * @return
      */
@@ -109,7 +124,7 @@ public class CrisLayoutBoxMetadataConfigurationRemoveOperation<D> extends PatchO
         Integer value = null;
         try {
             value = Integer.valueOf(val);
-        } catch ( Exception e ) {
+        } catch (Exception e) {
             value = null;
         }
         return value;

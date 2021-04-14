@@ -26,7 +26,9 @@
         Will result in using the PubmedImportService for the lookup step
         Omitting this property will default to searching over all configured ImportService implementations
     -->
-    <bean id="importService" class="org.dspace.importer.external.service.ImportService" lazy-init="false" autowire="byType" destroy-method="destroy">
+    <bean id="org.dspace.importer.external.service.ImportService"
+        class="org.dspace.importer.external.service.ImportService"
+        lazy-init="false" autowire="byType" destroy-method="destroy">
         <property name="importSources">
             <list>
                 <ref bean="pubmedImportService" />
@@ -35,6 +37,7 @@
                 <ref bean="csvImportService" />
                 <ref bean="tsvImportService" />
                 <ref bean="endnoteImportService" />
+                <ref bean="grobidImportMetadataSourceService" />
             </list>
          </property>
     </bean>
@@ -208,6 +211,15 @@
           class="org.dspace.importer.external.openaire.service.OpenAireImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="openaireMetadataFieldMapping"/>
         <property name="queryParam" value="title"/>
+    </bean>
+
+    <bean id="grobidImportMetadataSourceService" class="org.dspace.submit.extraction.GrobidImportMetadataSourceServiceImpl">
+        <property name="supportedExtensions">
+            <list>
+                <value>pdf</value>
+            </list>
+        </property>
+        <property name="metadataFieldMap" ref="grobidMetadataFieldMap"></property>
     </bean>
 
 </beans>

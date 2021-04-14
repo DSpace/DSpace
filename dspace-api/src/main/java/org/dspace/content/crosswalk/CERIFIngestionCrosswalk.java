@@ -192,7 +192,7 @@ public class CERIFIngestionCrosswalk implements IngestionCrosswalk {
 
     private StreamSource getCerifToDimXslt(Item item) {
         String parent = configurationService.getProperty("dspace.dir") + File.separator + "config" + File.separator;
-        return new StreamSource(new File(parent, String.format(CERIF_TO_DIM_XSL_PATH, getRelationshipType(item))));
+        return new StreamSource(new File(parent, String.format(CERIF_TO_DIM_XSL_PATH, getEntityType(item))));
     }
 
     private IngestionCrosswalk getDIMIngestionCrosswalk() {
@@ -203,9 +203,9 @@ public class CERIFIngestionCrosswalk implements IngestionCrosswalk {
         return (IngestionCrosswalk) crosswalk;
     }
 
-    private String getRelationshipType(Item item) {
-        String relationshipType = itemService.getMetadataFirstValue(item, "relationship", "type", null, Item.ANY);
-        return StringUtils.isNotBlank(relationshipType) ? relationshipType : "Publication";
+    private String getEntityType(Item item) {
+        String itemEntityType = itemService.getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY);
+        return StringUtils.isNotBlank(itemEntityType) ? itemEntityType : "Publication";
     }
 
     public void setIdPrefix(String idPrefix) {

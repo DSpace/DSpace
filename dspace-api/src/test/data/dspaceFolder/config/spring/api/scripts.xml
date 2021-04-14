@@ -34,15 +34,15 @@
         <property name="description" value="Retry all failed commits to the OpenURLTracker"/>
         <property name="dspaceRunnableClass" value="org.dspace.statistics.export.RetryFailedOpenUrlTracker"/>
     </bean>
+    
+    <bean id="metadata-deletion" class="org.dspace.app.bulkedit.MetadataDeletionCliScriptConfiguration">
+        <property name="description" value="Delete all the values of the specified metadata field"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataDeletionCli"/>
+    </bean>
 
     <bean id="another-mock-script" class="org.dspace.scripts.MockDSpaceRunnableScriptConfiguration" scope="prototype">
         <property name="description" value="Mocking a script for testing purposes" />
         <property name="dspaceRunnableClass" value="org.dspace.scripts.impl.MockDSpaceRunnableScript"/>
-    </bean>
-
-    <bean id="metadata-deletion" class="org.dspace.app.bulkedit.MetadataDeletionCliScriptConfiguration">
-        <property name="description" value="Delete all the values of the specified metadata field"/>
-        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataDeletionCli"/>
     </bean>
     
     <bean id="bulk-import" class="org.dspace.app.bulkedit.BulkImportCliScriptConfiguration">
@@ -75,15 +75,15 @@
         <property name="dspaceRunnableClass" value="org.dspace.metrics.UpdateCrisMetricsInSolrDocCli"/>
     </bean>
 
+    <bean id="import-publications" class="org.dspace.script2externalservices.CreateWorkspaceItemWithExternalSourceCliScriptConfiguration">
+        <property name="description" value="Perform the creating of workspace item using external source"/>
+        <property name="dspaceRunnableClass" value="org.dspace.script2externalservices.CreateWorkspaceItemWithExternalSourceCli"/>
+    </bean>
+
     <!-- Keep as last script; for test ScriptRestRepository#findOneScriptByNameTest -->
     <bean id="mock-script" class="org.dspace.scripts.MockDSpaceRunnableScriptConfiguration" scope="prototype">
         <property name="description" value="Mocking a script for testing purposes" />
         <property name="dspaceRunnableClass" value="org.dspace.scripts.impl.MockDSpaceRunnableScript"/>
-    </bean>
-
-    <bean id="import-publications" class="org.dspace.script2externalservices.CreateWorkspaceItemWithExternalSourceCliScriptConfiguration">
-        <property name="description" value="Perform the creating of workspace item using external source"/>
-        <property name="dspaceRunnableClass" value="org.dspace.script2externalservices.CreateWorkspaceItemWithExternalSourceCli"/>
     </bean>
 
 </beans>

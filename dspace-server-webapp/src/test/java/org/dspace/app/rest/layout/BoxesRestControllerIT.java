@@ -142,7 +142,7 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
         Item item = ItemBuilder.createItem(context, collection)
             .withPersonIdentifierFirstName("Danilo")
             .withPersonIdentifierLastName("Di Nuzzo")
-            .withRelationshipType(eTypePer.getLabel())
+            .withEntityType(eTypePer.getLabel())
             .build();
         // get metadata field
         MetadataSchema schema = mdss.find(context, "person");

@@ -132,7 +132,7 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
                 requestService.setCurrentUserId(eperson.getID());
 
                 //Get the Spring authorities for this eperson
-                List<GrantedAuthority> authorities = authenticationProvider.getGrantedAuthorities(context, eperson);
+                List<GrantedAuthority> authorities = authenticationProvider.getGrantedAuthorities(context);
                 String onBehalfOfParameterValue = request.getHeader(ON_BEHALF_OF_REQUEST_PARAM);
                 if (onBehalfOfParameterValue != null) {
                     if (configurationService.getBooleanProperty("webui.user.assumelogin")) {
@@ -177,7 +177,7 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
             requestService.setCurrentUserId(epersonUuid);
             context.switchContextUser(onBehalfOfEPerson);
             return new DSpaceAuthentication(onBehalfOfEPerson.getEmail(),
-                                            authenticationProvider.getGrantedAuthorities(context, onBehalfOfEPerson));
+                                            authenticationProvider.getGrantedAuthorities(context));
         } else {
             throw new IllegalArgumentException("You're unable to use the login as feature to log " +
                                                    "in as another admin");

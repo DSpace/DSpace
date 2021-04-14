@@ -16,7 +16,9 @@ package org.dspace.content;
 public enum MetadataSchemaEnum {
     DC("dc"),
     EPERSON("eperson"),
-    RELATION("relation"), RELATIONSHIP("relationship"), CRIS("cris"), OAIRECERIF("oairecerif");
+    RELATION("relation"),
+    CRIS("cris"),
+    OAIRECERIF("oairecerif");
 
     /**
      * The String representation of the MetadataSchemaEnum

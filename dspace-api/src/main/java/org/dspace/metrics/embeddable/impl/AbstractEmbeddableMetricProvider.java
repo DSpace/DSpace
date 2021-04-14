@@ -62,8 +62,8 @@ public abstract class AbstractEmbeddableMetricProvider implements EmbeddableMetr
         return Optional.of(metric);
     }
 
-    protected String getRelationshipType(Item item) {
-        return getItemService().getMetadataFirstValue(item, "relationship", "type", null, Item.ANY);
+    protected String getEntityType(Item item) {
+        return getItemService().getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY);
     }
 
     @Override

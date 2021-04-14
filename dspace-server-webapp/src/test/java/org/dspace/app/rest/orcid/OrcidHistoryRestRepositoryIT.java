@@ -87,11 +87,11 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Person")
+                                           .withEntityType("Person")
                                            .withName("Collection 1").build();
 
         Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 2").build();
 
         Item itemPerson = ItemBuilder.createItem(context, col1)
@@ -144,11 +144,11 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Person")
+                                           .withEntityType("Person")
                                            .withName("Collection 1").build();
 
         Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 2").build();
 
         Item itemPerson = ItemBuilder.createItem(context, col1)
@@ -189,11 +189,11 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Person")
+                                           .withEntityType("Person")
                                            .withName("Collection 1").build();
 
         Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 2").build();
 
         Item itemPerson = ItemBuilder.createItem(context, col1)
@@ -240,11 +240,11 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                                               .withName("Parent Community").build();
 
             Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                               .withRelationshipType("Person")
+                                               .withEntityType("Person")
                                                .withName("Collection 1").build();
 
             Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
-                                               .withRelationshipType("Publication")
+                                               .withEntityType("Publication")
                                                .withName("Collection 2").build();
 
             Item itemPerson = ItemBuilder.createItem(context, col1)
@@ -318,11 +318,11 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                                               .withName("Parent Community").build();
 
             Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                               .withRelationshipType("Person")
+                                               .withEntityType("Person")
                                                .withName("Collection 1").build();
 
             Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
-                                               .withRelationshipType("Publication")
+                                               .withEntityType("Publication")
                                                .withName("Collection 2").build();
 
             Item itemPerson = ItemBuilder.createItem(context, col1)
@@ -389,11 +389,11 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                                           .withName("Parent Community").build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Person")
+                                           .withEntityType("Person")
                                            .withName("Collection 1").build();
 
         Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 2").build();
 
         Item itemPerson = ItemBuilder.createItem(context, col1)
@@ -432,11 +432,11 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                                           .withName("Parent Community").build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Person")
+                                           .withEntityType("Person")
                                            .withName("Collection 1").build();
 
         Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withRelationshipType("Publication")
+                                           .withEntityType("Publication")
                                            .withName("Collection 2").build();
 
         Item itemPerson = ItemBuilder.createItem(context, col1)
@@ -495,11 +495,11 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                                               .withName("Parent Community").build();
 
             Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                               .withRelationshipType("Person")
+                                               .withEntityType("Person")
                                                .withName("Collection 1").build();
 
             Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
-                                               .withRelationshipType("Publication")
+                                               .withEntityType("Publication")
                                                .withName("Collection 2").build();
 
             Item itemPerson = ItemBuilder.createItem(context, col1)
@@ -582,11 +582,11 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                                               .withName("Parent Community").build();
 
             Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                               .withRelationshipType("Person")
+                                               .withEntityType("Person")
                                                .withName("Collection 1").build();
 
             Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
-                                               .withRelationshipType("Publication")
+                                               .withEntityType("Publication")
                                                .withName("Collection 2").build();
 
             Item itemPerson = ItemBuilder.createItem(context, col1)

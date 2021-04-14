@@ -225,7 +225,7 @@ public class SubmissionConfigReader {
             }
         }
 
-        submitName = collService.getMetadataFirstValue(collection, "relationship", "type", null, null);
+        submitName = collService.getMetadataFirstValue(collection, "dspace", "entity", "type", null);
         if (submitName != null) {
             SubmissionConfig subConfig = getSubmissionConfigByName(submitName.toLowerCase());
             if (subConfig != null) {

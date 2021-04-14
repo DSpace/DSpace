@@ -206,7 +206,7 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
                    // We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
                    // Match only that a section exists with a submission configuration behind
-                   .andExpect(jsonPath("$._embedded.submissionsections", hasSize(8)))
+                   .andExpect(jsonPath("$._embedded.submissionsections", hasSize(7)))
                    .andExpect(jsonPath("$._embedded.submissionsections",
                                        Matchers.hasItem(
                                            allOf(
@@ -221,6 +221,21 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
                                                                   "config/submissionsections/traditionalpageone"))
                                            ))))
         ;
+        // the extract submission should NOT expose the backend only extract panel
+        getClient(token).perform(get("/api/config/submissiondefinitions/extractiontestprocess/sections")
+                .param("projection", "full"))
+                // The status has to be 200 OK
+                .andExpect(status().isOk())
+                // We expect the content type to be "application/hal+json;charset=UTF-8"
+                .andExpect(content().contentType(contentType))
+                // Match only that a section exists with a submission configuration behind
+                .andExpect(jsonPath("$._embedded.submissionsections", hasSize(6)))
+                .andExpect(jsonPath("$._embedded.submissionsections",
+                        Matchers.not(Matchers.hasItem(
+                                            hasJsonPath("$.id", is("extractionstep"))
+                                        ))))
+     ;
+
     }
 
     @Test
@@ -260,7 +275,7 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
             .withName("Collection 1")
-            .withRelationshipType("patent")
+            .withEntityType("patent")
             .build();
 
         context.restoreAuthSystemState();
@@ -273,5 +288,58 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
             .andExpect(content().contentType(contentType))
             .andExpect(jsonPath("$", SubmissionDefinitionsMatcher
                 .matchProperties(false, "patent", "patent")));
+    }
+
+    @Test
+    public void findAllPaginationTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/config/submissiondefinitions")
+                .param("size", "1")
+                .param("page", "0"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.submissiondefinitions[0].id", is("traditional")))
+                .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                        Matchers.containsString("/api/config/submissiondefinitions?"),
+                        Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                        Matchers.containsString("/api/config/submissiondefinitions?"),
+                        Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                        Matchers.containsString("/api/config/submissiondefinitions?"),
+                        Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                        Matchers.containsString("/api/config/submissiondefinitions?"),
+                        Matchers.containsString("page=8"), Matchers.containsString("size=1"))))
+                .andExpect(jsonPath("$.page.size", is(1)))
+                .andExpect(jsonPath("$.page.totalElements", is(9)))
+                .andExpect(jsonPath("$.page.totalPages", is(9)))
+                .andExpect(jsonPath("$.page.number", is(0)));
+
+        getClient(tokenAdmin).perform(get("/api/config/submissiondefinitions")
+                .param("size", "1")
+                .param("page", "1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.submissiondefinitions[0].id", is("patent")))
+                .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                        Matchers.containsString("/api/config/submissiondefinitions?"),
+                        Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                .andExpect(jsonPath("$._links.prev.href", Matchers.allOf(
+                        Matchers.containsString("/api/config/submissiondefinitions?"),
+                        Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                        Matchers.containsString("/api/config/submissiondefinitions?"),
+                        Matchers.containsString("page=2"), Matchers.containsString("size=1"))))
+                .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                        Matchers.containsString("/api/config/submissiondefinitions?"),
+                        Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                        Matchers.containsString("/api/config/submissiondefinitions?"),
+                        Matchers.containsString("page=8"), Matchers.containsString("size=1"))))
+                .andExpect(jsonPath("$.page.size", is(1)))
+                .andExpect(jsonPath("$.page.totalElements", is(9)))
+                .andExpect(jsonPath("$.page.totalPages", is(9)))
+                .andExpect(jsonPath("$.page.number", is(1)));
     }
 }

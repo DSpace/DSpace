@@ -1348,44 +1348,37 @@ prevent the generation of resource policy entry values with null dspace_object a
     @Override
     public List<MetadataValue> getMetadata(Item item, String schema, String element, String qualifier, String lang,
                                            boolean enableVirtualMetadata) {
-        //Fields of the relation schema are virtual metadata
-        //except for relation.type which is the type of item in the model
+
         enableVirtualMetadata = enableVirtualMetadata
             && configurationService.getBooleanProperty("item.enable-virtual-metadata", false);
-        if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName()) && !StringUtils.equals(element, "type")) {
 
-            List<RelationshipMetadataValue> relationMetadata = relationshipMetadataService
-                .getRelationshipMetadata(item, enableVirtualMetadata);
-            List<MetadataValue> listToReturn = new LinkedList<>();
-            for (MetadataValue metadataValue : relationMetadata) {
-                if (StringUtils.equals(metadataValue.getMetadataField().getElement(), element)) {
-                    listToReturn.add(metadataValue);
-                }
-            }
-            listToReturn = sortMetadataValueList(listToReturn);
-
-            return listToReturn;
-
-        } else {
-            List<MetadataValue> dbMetadataValues = super.getMetadata(item, schema, element, qualifier, lang);
+        if (!enableVirtualMetadata) {
+            log.debug("Called getMetadata for " + item.getID() + " without enableVirtualMetadata");
+            return super.getMetadata(item, schema, element, qualifier, lang);
+        }
+        if (item.isModifiedMetadataCache()) {
+            log.debug("Called getMetadata for " + item.getID() + " with invalid cache");
+            //rebuild cache
+            List<MetadataValue> dbMetadataValues = item.getMetadata();
 
             List<MetadataValue> fullMetadataValueList = new LinkedList<>();
-            if (enableVirtualMetadata) {
-                fullMetadataValueList.addAll(relationshipMetadataService.getRelationshipMetadata(item, true));
-
-            }
+            fullMetadataValueList.addAll(relationshipMetadataService.getRelationshipMetadata(item, true));
             fullMetadataValueList.addAll(dbMetadataValues);
 
-            List<MetadataValue> finalList = new LinkedList<>();
-            for (MetadataValue metadataValue : fullMetadataValueList) {
-                if (match(schema, element, qualifier, lang, metadataValue)) {
-                    finalList.add(metadataValue);
-                }
-            }
-            finalList = sortMetadataValueList(finalList);
-            return finalList;
+            item.setCachedMetadata(sortMetadataValueList(fullMetadataValueList));
         }
 
+        log.debug("Called getMetadata for " + item.getID() + " based on cache");
+        // Build up list of matching values based on the cache
+        List<MetadataValue> values = new ArrayList<>();
+        for (MetadataValue dcv : item.getCachedMetadata()) {
+            if (match(schema, element, qualifier, lang, dcv)) {
+                values.add(dcv);
+            }
+        }
+
+        // Create an array of matching values
+        return values;
     }
 
     /**

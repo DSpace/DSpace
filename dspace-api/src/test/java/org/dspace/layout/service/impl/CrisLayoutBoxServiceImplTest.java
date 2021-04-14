@@ -99,7 +99,7 @@ public class CrisLayoutBoxServiceImplTest {
         when(itemService.find(any(Context.class), eq(itemUuid)))
             .thenReturn(item);
 
-        when(itemService.getMetadata(item, "relationship.type"))
+        when(itemService.getMetadata(item, "dspace.entity.type"))
             .thenReturn("EntityType");
 
         when(dao.findByEntityType(any(Context.class), eq("EntityType"), eq(tabId), any(), any()))
@@ -120,7 +120,7 @@ public class CrisLayoutBoxServiceImplTest {
         when(itemService.find(any(Context.class), eq(itemUuid)))
             .thenReturn(item);
 
-        when(itemService.getMetadata(item, "relationship.type"))
+        when(itemService.getMetadata(item, "dspace.entity.type"))
             .thenReturn("EntityType");
 
         when(dao.findByEntityType(any(Context.class), eq("EntityType"), eq(tabId), any(), any()))
@@ -141,7 +141,7 @@ public class CrisLayoutBoxServiceImplTest {
         when(itemService.find(any(Context.class), eq(itemUuid)))
             .thenReturn(item);
 
-        when(itemService.getMetadata(item, "relationship.type"))
+        when(itemService.getMetadata(item, "dspace.entity.type"))
             .thenReturn("EntityType");
 
         when(dao.findByEntityType(any(Context.class), eq("EntityType"), eq(tabId), any(), any()))
@@ -164,7 +164,7 @@ public class CrisLayoutBoxServiceImplTest {
         when(itemService.find(any(Context.class), eq(itemUuid)))
             .thenReturn(item);
 
-        when(itemService.getMetadata(item, "relationship.type"))
+        when(itemService.getMetadata(item, "dspace.entity.type"))
             .thenReturn("EntityType");
 
         when(dao.findByEntityType(any(Context.class), eq("EntityType"), eq(tabId), any(), any()))
@@ -196,7 +196,7 @@ public class CrisLayoutBoxServiceImplTest {
         when(itemService.find(any(Context.class), eq(itemUuid)))
             .thenReturn(item);
 
-        when(itemService.getMetadata(item, "relationship.type"))
+        when(itemService.getMetadata(item, "dspace.entity.type"))
             .thenReturn("EntityType");
 
         when(dao.findByEntityType(any(Context.class), eq("EntityType"), eq(tabId), any(), any()))
@@ -237,7 +237,7 @@ public class CrisLayoutBoxServiceImplTest {
         when(itemService.find(any(Context.class), eq(itemUuid)))
             .thenReturn(item);
 
-        when(itemService.getMetadata(item, "relationship.type"))
+        when(itemService.getMetadata(item, "dspace.entity.type"))
             .thenReturn("EntityType");
 
         CrisLayoutBox fooBox = crisLayoutBox("box1", fooMetadata);

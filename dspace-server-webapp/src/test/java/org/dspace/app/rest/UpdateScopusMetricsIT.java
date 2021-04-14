@@ -84,7 +84,7 @@ public class UpdateScopusMetricsIT extends AbstractControllerIntegrationTest {
                                               .withName("Parent Community").build();
 
             Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                               .withRelationshipType("Publication")
+                                               .withEntityType("Publication")
                                                .withName("Collection 1").build();
 
             itemA = ItemBuilder.createItem(context, col1)
@@ -150,7 +150,7 @@ public class UpdateScopusMetricsIT extends AbstractControllerIntegrationTest {
                                               .withName("Parent Community").build();
 
             Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                               .withRelationshipType("Publication")
+                                               .withEntityType("Publication")
                                                .withName("Collection 1").build();
 
             itemA = ItemBuilder.createItem(context, col1)
@@ -200,7 +200,7 @@ public class UpdateScopusMetricsIT extends AbstractControllerIntegrationTest {
                                               .withName("Parent Community").build();
 
             Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                               .withRelationshipType("Publication")
+                                               .withEntityType("Publication")
                                                .withName("Collection 1").build();
 
             itemA = ItemBuilder.createItem(context, col1)
@@ -301,7 +301,7 @@ public class UpdateScopusMetricsIT extends AbstractControllerIntegrationTest {
                                               .withName("Parent Community").build();
 
             Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                               .withRelationshipType("Publication")
+                                               .withEntityType("Publication")
                                                .withName("Collection 1").build();
 
             itemA = ItemBuilder.createItem(context, col1)

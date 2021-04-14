@@ -96,13 +96,13 @@ public class StatisticsCategoryRestRepositoryIT extends AbstractControllerIntegr
                 .build();
         //create collections
         Collection colPeople = CollectionBuilder.createCollection(context, parentCommunity).withName("People")
-                .withRelationshipType("Person").build();
+                .withEntityType("Person").build();
         Collection colPub = CollectionBuilder.createCollection(context, parentCommunity).withName("Publication")
-                .withRelationshipType("Publication").build();
+                .withEntityType("Publication").build();
         Collection colProj = CollectionBuilder.createCollection(context, parentCommunity).withName("Project")
-                .withRelationshipType("Project").build();
+                .withEntityType("Project").build();
         Collection colOther = CollectionBuilder.createCollection(context, parentCommunity).withName("SomethingElse")
-                .withRelationshipType("SomethingElse").build();
+                .withEntityType("SomethingElse").build();
         Collection colUnspecified = CollectionBuilder.createCollection(context, parentCommunity)
                 .withName("A basic collection").build();
         // create items

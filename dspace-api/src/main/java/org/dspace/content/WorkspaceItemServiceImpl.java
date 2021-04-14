@@ -114,8 +114,8 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         }
 
         Optional<MetadataValue> optionalType =
-            collection.getMetadata().stream().filter(x -> x.getMetadataField().toString('.')
-                .equalsIgnoreCase(MetadataSchemaEnum.RELATIONSHIP.getName() + ".type")).findFirst();
+            collection.getMetadata().stream()
+                .filter(x -> x.getMetadataField().toString('.').equalsIgnoreCase("dspace.entity.type")).findFirst();
         if (optionalType.isPresent()) {
             MetadataValue original = optionalType.get();
             MetadataField metadataField = original.getMetadataField();

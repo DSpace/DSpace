@@ -83,7 +83,7 @@ public class ItemCorrectionFeature implements AuthorizationFeature {
             throw new IllegalArgumentException("No item found with the given id: " + itemRest.getUuid());
         }
 
-        String entityType = itemService.getMetadataFirstValue(item, "relationship", "type", null, Item.ANY);
+        String entityType = itemService.getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY);
         if (!correctItemModesMap.containsKey(entityType)) {
             return false;
         }

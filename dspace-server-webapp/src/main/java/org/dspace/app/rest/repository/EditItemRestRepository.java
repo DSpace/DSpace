@@ -25,7 +25,7 @@ import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.submit.AbstractRestProcessingStep;
+import org.dspace.app.rest.submit.AbstractProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.submit.UploadableStep;
 import org.dspace.app.util.SubmissionConfig;
@@ -231,10 +231,7 @@ public class EditItemRestRepository extends DSpaceRestRepository<EditItemRest, S
                 Object stepInstance = stepClass.newInstance();
                 if (UploadableStep.class.isAssignableFrom(stepClass)) {
                     UploadableStep uploadableStep = (UploadableStep) stepInstance;
-                    uploadableStep.doPreProcessing(context, source);
-                    ErrorRest err =
-                        uploadableStep.upload(context, submissionService, stepConfig, source, file);
-                    uploadableStep.doPostProcessing(context, source);
+                    ErrorRest err = uploadableStep.upload(context, submissionService, stepConfig, source, file);
                     if (err != null) {
                         errors.add(err);
                     }
@@ -323,14 +320,10 @@ public class EditItemRestRepository extends DSpaceRestRepository<EditItemRest, S
 
                     Object stepInstance = stepClass.newInstance();
 
-                    if (stepInstance instanceof AbstractRestProcessingStep) {
+                    if (stepInstance instanceof AbstractProcessingStep) {
                          // load the JSPStep interface for this step
-                        AbstractRestProcessingStep stepProcessing =
-                             (AbstractRestProcessingStep) stepClass.newInstance();
-                        stepProcessing.doPreProcessing(context, source);
-                        stepProcessing.doPatchProcessing(
-                                context, getRequestService().getCurrentRequest(), source, op, stepConfig);
-                        stepProcessing.doPostProcessing(context, source);
+                        AbstractProcessingStep stepProcessing = (AbstractProcessingStep) stepClass.newInstance();
+                        stepProcessing.doPatchProcessing(context, request, source, op, stepConfig);
                     } else {
                         throw new DSpaceBadRequestException(
                              "The submission step class specified by '" + stepConfig.getProcessingClassName() +

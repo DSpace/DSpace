@@ -79,18 +79,18 @@ public class OrcidQueueConsumer implements Consumer {
 
     private void consumeItem(Context context, Item item) throws SQLException {
 
-        String relationshipType = getMetadataValue(item, "relationship.type");
-        if (relationshipType == null) {
+        String entityType = getMetadataValue(item, "dspace.entity.type");
+        if (entityType == null) {
             return;
         }
 
-        switch (relationshipType) {
+        switch (entityType) {
             case "Person":
                 consumePerson(context, item);
                 break;
             case "Publication":
             case "Project":
-                consumeItem(context, item, relationshipType);
+                consumeItem(context, item, entityType);
                 break;
             default:
                 break;
@@ -100,7 +100,7 @@ public class OrcidQueueConsumer implements Consumer {
 
     }
 
-    private void consumeItem(Context context, Item item, String relationshipType) throws SQLException {
+    private void consumeItem(Context context, Item item, String entityType) throws SQLException {
         List<MetadataValue> metadataValues = item.getMetadata();
 
         for (MetadataValue metadata : metadataValues) {
@@ -120,7 +120,7 @@ public class OrcidQueueConsumer implements Consumer {
             }
 
             Item ownerItem = itemService.findByIdOrLegacyId(context, relatedItemUuid.toString());
-            String ownerType = getMetadataValue(ownerItem, "relationship.type");
+            String ownerType = getMetadataValue(ownerItem, "dspace.entity.type");
             String orcidId = getMetadataValue(ownerItem, "person.identifier.orcid");
             if (!"Person".equals(ownerType) || StringUtils.isEmpty(orcidId)) {
                 continue;
@@ -130,7 +130,7 @@ public class OrcidQueueConsumer implements Consumer {
                 continue;
             }
 
-            if (shouldBeSend(ownerItem, relationshipType)) {
+            if (shouldBeSend(ownerItem, entityType)) {
                 OrcidQueue orcidQueue = orcidQueueService.create(context, ownerItem, item);
                 log.debug("Created ORCID queue record with id " + orcidQueue.getID());
             }

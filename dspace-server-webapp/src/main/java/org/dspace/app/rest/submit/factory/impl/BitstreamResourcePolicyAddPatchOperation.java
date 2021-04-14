@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.model.UploadBitstreamAccessConditionDTO;
 import org.dspace.app.rest.model.patch.LateObjectEvaluator;
@@ -22,7 +23,6 @@ import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.services.model.Request;
 import org.dspace.submit.model.UploadConfiguration;
 import org.dspace.submit.model.UploadConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +45,8 @@ public class BitstreamResourcePolicyAddPatchOperation extends AddPatchOperation<
     UploadConfigurationService uploadConfigurationService;
 
     @Override
-    void add(Context context, Request currentRequest, InProgressSubmission source, String path, Object value)
-        throws Exception {
+    void add(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path, Object value)
+            throws Exception {
         //"path": "/sections/upload/files/0/accessConditions"
         String[] split = getAbsolutePath(path).split("/");
         Item item = source.getItem();
