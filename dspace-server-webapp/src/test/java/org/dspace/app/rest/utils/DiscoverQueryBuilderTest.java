@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
-import org.dspace.app.rest.exception.UnprocessableEntityException;
+import org.dspace.app.rest.exception.InvalidSearchRequestException;
 import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverFacetField;
@@ -274,7 +274,7 @@ public class DiscoverQueryBuilderTest {
             .buildQuery(context, scope, discoveryConfiguration, query, Arrays.asList(searchFilter), "TEST", page);
     }
 
-    @Test(expected = UnprocessableEntityException.class)
+    @Test(expected = InvalidSearchRequestException.class)
     public void testInvalidSortField() throws Exception {
         page = PageRequest.of(2, 10, Sort.Direction.ASC, "test");
         queryBuilder
