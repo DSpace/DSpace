@@ -625,13 +625,31 @@ placeholders for header images -->
 
 				ga('create', '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']"/><xsl:text>', 'auto');
 				</xsl:text>
-				<xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='focus'][@qualifier='containerType']/text() = 'type:item'">
-					<xsl:variable name="itemHandle" select="substring(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='focus'][@qualifier='object']/text(), 5)"/><xsl:text>
-					var itemType = document.getElementsByName("DC.type")[0].content;
-					ga('set', 'dimension1', '</xsl:text><xsl:value-of select="$itemHandle"/><xsl:text>');
-					ga('set', 'dimension2', '</xsl:text><xsl:value-of select="ex:getItemCollsAndComms($itemHandle)"/><xsl:text>');
-					ga('set', 'dimension3', itemType);
-				</xsl:text>
+				<xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='focus'][@qualifier='containerType']">
+					<xsl:variable name="dsoHandle">
+						<xsl:choose>
+						<xsl:when test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='focus'][@qualifier='object']">
+							<xsl:value-of select="substring-after(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='focus'][@qualifier='object']/text(), 'hdl:')"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="substring-after(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='focus'][@qualifier='container']/text(), 'hdl:')"/>
+						</xsl:otherwise>
+						</xsl:choose>
+					</xsl:variable>
+					<xsl:text>
+					ga('set', 'dimension1', '</xsl:text><xsl:value-of select="$dsoHandle"/><xsl:text>');
+					ga('set', 'dimension2', '</xsl:text><xsl:value-of select="ex:getDSOParentsHandles($dsoHandle)"/><xsl:text>');
+					ga('set', 'dimension4', '</xsl:text><xsl:value-of select="substring-after(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='focus'][@qualifier='containerType']/text(), 'type:')"/><xsl:text>');
+					</xsl:text>
+					<xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='focus'][@qualifier='containerType']/text() = 'type:item'"><xsl:text>
+						var itemType = document.getElementsByName("DC.type")[0].content;
+						var itemSubtype = document.getElementsByName("DC.type")[1].content;
+						var dateIssued = (document.getElementsByName("DCTERMS.issued")[0])? document.getElementsByName("DCTERMS.issued")[0].content : document.getElementsByName("DCTERMS.created")[0].content.substring(0,10);
+						ga('set', 'dimension3', itemType);
+						ga('set', 'dimension5', itemSubtype);
+						ga('set', 'dimension6', itemDateIssued);
+					</xsl:text>
+					</xsl:if>
 				</xsl:if><xsl:text>
 				ga('send', 'pageview');
 			</xsl:text></script>

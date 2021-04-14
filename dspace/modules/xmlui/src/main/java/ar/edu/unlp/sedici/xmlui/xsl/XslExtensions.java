@@ -19,12 +19,13 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.xpath.NodeSet;
-import org.dspace.app.xmlui.aspect.administrative.FlowItemUtils;
-import org.dspace.app.xmlui.aspect.administrative.FlowResult;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.handle.HandleManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -180,10 +181,10 @@ public class XslExtensions {
 	}
 
 	/*
-	 * Método que retorna los handles de las colecciones y comunidades de un item
+	 * Método que retorna los handles de las colecciones y comunidades de un dso
 	 * separados por coma
 	 */
-	public static String getItemCollsAndComms(String handle) throws SQLException {
+	public static String getDSOParentsHandles(String handle) throws SQLException {
 		Context context;
 		try {
 			context = new Context();
@@ -192,15 +193,23 @@ public class XslExtensions {
 			throw new RuntimeException(e);
 		}
 		List<String> handlesList = new ArrayList<String>();
-		FlowResult result = FlowItemUtils.resolveItemIdentifier(context, handle);
-		if (result != null && result.getParameter("itemID") != null) {
-			int itemID = (int) (result.getParameter("itemID"));
-			Item item = Item.find(context, itemID);
-			Collection[] collections = item.getCollections();
-			Community[] communities = item.getCommunities();
-			for (Collection col : collections) {
-				if (!handlesList.contains(col.getHandle())) {
-					handlesList.add(col.getHandle());
+		DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+		if (dso != null) {
+			Community[] communities = new Community[0];
+			if (dso.getType() == Constants.COMMUNITY) {
+				Community comm = (Community) dso;
+				communities = comm.getAllParents();
+			} else if (dso.getType() == Constants.COLLECTION) {
+				Collection coll = (Collection) dso;
+				communities = coll.getCommunities();
+			} else if (dso.getType() == Constants.ITEM) {
+				Item item = (Item) dso;
+				communities = item.getCommunities();
+				Collection[] collections = item.getCollections();
+				for (Collection col : collections) {
+					if (!handlesList.contains(col.getHandle())) {
+						handlesList.add(col.getHandle());
+					}
 				}
 			}
 			for (Community com : communities) {
