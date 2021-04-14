@@ -955,6 +955,30 @@
         <precision>-1</precision>
         <trim_type>none</trim_type>
       </field>
+      <field>
+        <name>xsrf</name>
+        <variable>xsrf</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>xsrfcookie</name>
+        <variable>xsrfcookie</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
     </fields>
     <attributes/>
     <cluster_schema/>
@@ -1212,6 +1236,14 @@ var queryBoxesURL = getVariable("host", "") + "/api/layout/boxes/search/findByEn
       <header>
         <field>Accept</field>
         <name>Accept</name>
+      </header>
+      <header>
+        <field>xsrf</field>
+        <name>X-XSRF-TOKEN</name>
+      </header>
+      <header>
+        <field>xsrfcookie</field>
+        <name>Cookie</name>
       </header>
     </headers>
     <parameters>

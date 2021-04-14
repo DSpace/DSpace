@@ -636,6 +636,14 @@
         <field>Content-Type</field>
         <name>Content-Type</name>
       </header>
+      <header>
+        <field>xsrf</field>
+        <name>X-XSRF-TOKEN</name>
+      </header>
+      <header>
+        <field>xsrfcookie</field>
+        <name>Cookie</name>
+      </header>
     </headers>
     <parameters>
       </parameters>
@@ -855,6 +863,30 @@
       <field>
         <name>Authorization</name>
         <variable>Authorization</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>xsrfcookie</name>
+        <variable>xsrf</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>xsrf</name>
+        <variable>xsrf</variable>
         <type>String</type>
         <format/>
         <currency/>

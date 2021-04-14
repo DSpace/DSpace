@@ -836,6 +836,30 @@
         <precision>-1</precision>
         <trim_type>none</trim_type>
       </field>
+      <field>
+        <name>xsrf</name>
+        <variable>xsrf</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>xsrfcookie</name>
+        <variable>xsrfcookie</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
     </fields>
     <attributes/>
     <cluster_schema/>
@@ -1267,21 +1291,35 @@ var queryBoxesURL = getVariable("host", "") + "/api/layout/boxes/search/findByEn
     <fields>
       <field>
         <name>Content-Type</name>
+        <rename/>
       </field>
       <field>
         <name>Accept</name>
+        <rename/>
       </field>
       <field>
         <name>Accept-Encoding</name>
+        <rename/>
       </field>
       <field>
         <name>Authorization</name>
+        <rename/>
       </field>
       <field>
         <name>entityname</name>
+        <rename/>
       </field>
       <field>
         <name>emptybody</name>
+        <rename/>
+      </field>
+      <field>
+        <name>xsrf</name>
+        <rename/>
+      </field>
+      <field>
+        <name>xsrfcookie</name>
+        <rename/>
       </field>
       <select_unspecified>N</select_unspecified>
     </fields>
@@ -1313,27 +1351,43 @@ var queryBoxesURL = getVariable("host", "") + "/api/layout/boxes/search/findByEn
     <fields>
       <field>
         <name>Content-Type</name>
+        <rename/>
       </field>
       <field>
         <name>Accept</name>
+        <rename/>
       </field>
       <field>
         <name>Accept-Encoding</name>
+        <rename/>
       </field>
       <field>
         <name>Authorization</name>
+        <rename/>
       </field>
       <field>
         <name>entityname</name>
+        <rename/>
       </field>
       <field>
         <name>tabURL</name>
+        <rename/>
       </field>
       <field>
         <name>output</name>
+        <rename/>
       </field>
       <field>
         <name>emptybody</name>
+        <rename/>
+      </field>
+      <field>
+        <name>xsrfcookie</name>
+        <rename/>
+      </field>
+      <field>
+        <name>xsrf</name>
+        <rename/>
       </field>
       <select_unspecified>N</select_unspecified>
     </fields>
@@ -1365,24 +1419,39 @@ var queryBoxesURL = getVariable("host", "") + "/api/layout/boxes/search/findByEn
     <fields>
       <field>
         <name>Content-Type</name>
+        <rename/>
       </field>
       <field>
         <name>Accept</name>
+        <rename/>
       </field>
       <field>
         <name>Accept-Encoding</name>
+        <rename/>
       </field>
       <field>
         <name>Authorization</name>
+        <rename/>
       </field>
       <field>
         <name>entityname</name>
+        <rename/>
       </field>
       <field>
         <name>boxURL</name>
+        <rename/>
       </field>
       <field>
         <name>emptybody</name>
+        <rename/>
+      </field>
+      <field>
+        <name>xsrfcookie</name>
+        <rename/>
+      </field>
+      <field>
+        <name>xsrf</name>
+        <rename/>
       </field>
       <select_unspecified>N</select_unspecified>
     </fields>
@@ -1483,6 +1552,14 @@ var queryBoxesURL = getVariable("host", "") + "/api/layout/boxes/search/findByEn
         <field>Content-Type</field>
         <name>Content-Type</name>
       </header>
+      <header>
+        <field>xsrfcookie</field>
+        <name>Cookie</name>
+      </header>
+      <header>
+        <field>xsrf</field>
+        <name>X-XSRF-TOKEN</name>
+      </header>
     </headers>
     <parameters>
       </parameters>
@@ -1546,6 +1623,14 @@ var queryBoxesURL = getVariable("host", "") + "/api/layout/boxes/search/findByEn
       <header>
         <field>Content-Type</field>
         <name>Content-Type</name>
+      </header>
+      <header>
+        <field>xsrf</field>
+        <name>X-XSRF-TOKEN</name>
+      </header>
+      <header>
+        <field>xsrfcookie</field>
+        <name>Cookie</name>
       </header>
     </headers>
     <parameters>
