@@ -21,7 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.query.SearchQueryConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
-import org.dspace.app.rest.exception.UnprocessableEntityException;
+import org.dspace.app.rest.exception.InvalidSearchRequestException;
 import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -294,8 +294,9 @@ public class DiscoverQueryBuilder implements InitializingBean {
             }
         }
 
-        if (StringUtils.isNotBlank(sortBy) & !isConfigured(sortBy, searchSortConfiguration)) {
-            throw new UnprocessableEntityException("The field: " + sortBy + "is not configured for the configuration!");
+        if (StringUtils.isNotBlank(sortBy) && !isConfigured(sortBy, searchSortConfiguration)) {
+            throw new InvalidSearchRequestException(
+                         "The field: " + sortBy + "is not configured for the configuration!");
         }
 
         //Load defaults if we did not receive values
@@ -328,10 +329,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
     }
 
     private boolean isConfigured(String sortBy, DiscoverySortConfiguration searchSortConfiguration) {
-        if (Objects.nonNull(searchSortConfiguration.getSortFieldConfiguration(sortBy))) {
-            return true;
-        }
-        return false;
+        return Objects.nonNull(searchSortConfiguration.getSortFieldConfiguration(sortBy));
     }
 
     private String getDefaultSortDirection(DiscoverySortConfiguration searchSortConfiguration, String sortOrder) {
