@@ -187,6 +187,7 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
             setOrcidMetadata(context, eperson, token);
 
             ePersonService.update(context, eperson);
+            context.setCurrentUser(eperson);
             context.dispatchEvents();
 
             return SUCCESS;

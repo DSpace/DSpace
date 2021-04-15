@@ -92,7 +92,7 @@ public interface ResearcherProfileService {
         ResearcherProfile researcherProfile, OrcidEntitySynchronizationPreference value) throws SQLException;
 
     /**
-     * Update the ORCID synchronization preference related to the fundings.
+     * Update the ORCID synchronization preference related to the projects.
      *
      * @param  context                  the relevant DSpace Context.
      * @param  profile                  the researcher profile to update
@@ -102,7 +102,7 @@ public interface ResearcherProfileService {
      * @throws IllegalArgumentException if the given researcher profile is no linked
      *                                  with an ORCID account
      */
-    public void updatePreferenceForSynchronizingFundingsWithOrcid(Context context,
+    public void updatePreferenceForSynchronizingProjectsWithOrcid(Context context,
         ResearcherProfile researcherProfile, OrcidEntitySynchronizationPreference value) throws SQLException;
 
     /**

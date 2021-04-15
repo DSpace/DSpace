@@ -181,9 +181,9 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
     }
 
     @Override
-    public void updatePreferenceForSynchronizingFundingsWithOrcid(Context context, ResearcherProfile researcherProfile,
+    public void updatePreferenceForSynchronizingProjectsWithOrcid(Context context, ResearcherProfile researcherProfile,
         OrcidEntitySynchronizationPreference value) throws SQLException {
-        updatePreferenceForSynchronizingWithOrcid(context, researcherProfile, "sync-fundings", of(value.name()));
+        updatePreferenceForSynchronizingWithOrcid(context, researcherProfile, "sync-projects", of(value.name()));
     }
 
     @Override

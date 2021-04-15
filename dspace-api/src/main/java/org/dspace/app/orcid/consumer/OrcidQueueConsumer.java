@@ -89,7 +89,7 @@ public class OrcidQueueConsumer implements Consumer {
                 consumePerson(context, item);
                 break;
             case "Publication":
-            case "Funding":
+            case "Project":
                 consumeItem(context, item, entityType);
                 break;
             default:
@@ -121,7 +121,7 @@ public class OrcidQueueConsumer implements Consumer {
 
             Item ownerItem = itemService.findByIdOrLegacyId(context, relatedItemUuid.toString());
             String ownerType = getMetadataValue(ownerItem, "dspace.entity.type");
-            String accessToken = getMetadataValue(item, "cris.orcid.access-token");
+            String accessToken = getMetadataValue(ownerItem, "cris.orcid.access-token");
             if (!"Person".equals(ownerType) || StringUtils.isEmpty(accessToken)) {
                 continue;
             }
@@ -149,7 +149,7 @@ public class OrcidQueueConsumer implements Consumer {
     }
 
     private boolean shouldBeSend(Item item, String relatedItemType) {
-        String syncSetting = "cris.orcid.sync-" + (relatedItemType.equals("Publication") ? "publications" : "fundings");
+        String syncSetting = "cris.orcid.sync-" + (relatedItemType.equals("Publication") ? "publications" : "projects");
         String syncSettingValue = getMetadataValue(item, syncSetting);
         return syncSettingValue != null && !syncSettingValue.equals(DISABLED.name());
     }

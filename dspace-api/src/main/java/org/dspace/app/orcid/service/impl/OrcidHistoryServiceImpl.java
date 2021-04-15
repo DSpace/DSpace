@@ -62,6 +62,7 @@ import org.orcid.jaxb.model.v3.release.common.ContributorEmail;
 import org.orcid.jaxb.model.v3.release.common.ContributorOrcid;
 import org.orcid.jaxb.model.v3.release.common.CreditName;
 import org.orcid.jaxb.model.v3.release.common.Day;
+import org.orcid.jaxb.model.v3.release.common.DisambiguatedOrganization;
 import org.orcid.jaxb.model.v3.release.common.FuzzyDate;
 import org.orcid.jaxb.model.v3.release.common.Month;
 import org.orcid.jaxb.model.v3.release.common.OrcidIdBase;
@@ -210,7 +211,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         } else {
             deleteOldRecords(context, entity, owner);
         }
-        return sendObjectToOrcid(context, orcidQueue, orcid, token, putCode, work, WORK_ENDPOINT);
+        return sendObjectToOrcid(context, orcidQueue, orcid, token, putCode, work, WORK_ENDPOINT, Work.class);
     }
 
     private OrcidHistory sendProjectToOrcid(Context context, OrcidQueue orcidQueue, String orcid, String token,
@@ -251,9 +252,10 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
             orgAddress.setCity(city);
             orgAddress.setCountry(country);
             org.setAddress(orgAddress);
+
             funding.setOrganization(org);
         }
-        return sendObjectToOrcid(context, orcidQueue, orcid, token, putCode, funding, FUNDING_ENDPOINT);
+        return sendObjectToOrcid(context, orcidQueue, orcid, token, putCode, funding, FUNDING_ENDPOINT, Funding.class);
     }
 
     private OrcidHistory sendPersonToOrcid(Context context, OrcidQueue orcidQueue, String orcid, String token)
@@ -263,8 +265,8 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         return null;
     }
 
-    private OrcidHistory sendObjectToOrcid(Context context, OrcidQueue orcidQueue, String orcid, String token,
-            Long putCode, Object objToSend, String endpoint) {
+    private <T> OrcidHistory sendObjectToOrcid(Context context, OrcidQueue orcidQueue, String orcid, String token,
+        Long putCode, T objToSend, String endpoint, Class<T> clazz) {
 
         Item entity = orcidQueue.getEntity();
         Item owner = orcidQueue.getOwner();
@@ -277,7 +279,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
 
         try {
 
-            JAXBContext jaxbContext = JAXBContext.newInstance(Work.class);
+            JAXBContext jaxbContext = JAXBContext.newInstance(clazz);
             String objToSendAsString = marshall(jaxbContext, objToSend);
 
             request.addHeader("Content-Type", "application/vnd.orcid+xml");

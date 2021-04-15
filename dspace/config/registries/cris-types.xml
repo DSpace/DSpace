@@ -89,7 +89,7 @@
     <dc-type>
         <schema>cris</schema>
         <element>orcid</element>
-        <qualifier>sync-fundings</qualifier>
+        <qualifier>sync-projects</qualifier>
         <scope_note></scope_note>
     </dc-type>
 

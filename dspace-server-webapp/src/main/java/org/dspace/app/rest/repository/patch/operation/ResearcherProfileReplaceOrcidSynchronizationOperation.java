@@ -46,7 +46,7 @@ public class ResearcherProfileReplaceOrcidSynchronizationOperation extends Patch
 
     private static final String PUBLICATIONS_PREFERENCES = "/publications";
 
-    private static final String FUNDINGS_PREFERENCES = "/fundings";
+    private static final String PROJECTS_PREFERENCES = "/projects";
 
     private static final String PROFILE_PREFERENCES = "/profile";
 
@@ -72,8 +72,8 @@ public class ResearcherProfileReplaceOrcidSynchronizationOperation extends Patch
                 profileService.updatePreferenceForSynchronizingPublicationsWithOrcid(context, profile,
                     parsePreference(value));
                 break;
-            case FUNDINGS_PREFERENCES:
-                profileService.updatePreferenceForSynchronizingFundingsWithOrcid(context, profile,
+            case PROJECTS_PREFERENCES:
+                profileService.updatePreferenceForSynchronizingProjectsWithOrcid(context, profile,
                     parsePreference(value));
                 break;
             case PROFILE_PREFERENCES:
