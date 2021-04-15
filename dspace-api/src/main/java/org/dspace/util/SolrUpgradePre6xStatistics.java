@@ -21,7 +21,8 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -51,19 +52,19 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * CLI tool to upgrade legacy id references in SOLR statistics to DSpace 6 UUID's.
- * 
+ *
  * This command will need to be run iteratively over each statistics shard until all legacy id values have
  * been replaced.
- * 
+ *
  * If a legacy id cannot be resolved from the database, the id will remain unchanged.
  *   "field:* AND NOT(field:*-*)" can be used to locate legacy ids
- * 
+ *
  * See DS-3602 for the origin of this issue.  This code is targeted for inclusion in the DSpace 6.1 release.
- * 
+ *
  * Recommendation: for a large repository, run this command with -Xmx2000m if possible.
- * 
+ *
  * To process 1,000,000 statistics records, it took 60 min to complete.
- * 
+ *
  * @author Terry Brady, Georgetown University Library
  */
 
@@ -109,7 +110,7 @@ public class SolrUpgradePre6xStatistics {
     }
 
     //Logger
-    private static final Logger log = Logger.getLogger(SolrUpgradePre6xStatistics.class);
+    private static final Logger log = LogManager.getLogger();
 
     //DSpace Servcies
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
@@ -202,7 +203,7 @@ public class SolrUpgradePre6xStatistics {
 
     /**
      * Compute the time since the last batch was processed
-     * 
+     *
      * @param fromStart
      *            if true, report on processing time since the start of the program
      * @return the time in ms since the start time
@@ -223,9 +224,9 @@ public class SolrUpgradePre6xStatistics {
 
     /*
      * Format ms count as h:mm:ss
-     * 
+     *
      * @param dur Duration in ms
-     * 
+     *
      * @return duration formatted as h:mm:ss
      */
     private String duration(long dur) {
@@ -238,7 +239,7 @@ public class SolrUpgradePre6xStatistics {
 
     /**
      * Print a status message appended with the processing time for the operation
-     * 
+     *
      * @param header
      *            Message to display
      * @param fromStart
@@ -313,7 +314,7 @@ public class SolrUpgradePre6xStatistics {
 
     /**
      * Entry point for command-line invocation
-     * 
+     *
      * @param args
      *            command-line arguments; see help for description
      * @throws ParseException
@@ -437,7 +438,7 @@ public class SolrUpgradePre6xStatistics {
      * Process records with a legacy id. From the command line, the user may specify
      * records of a specific type to update Otherwise, the following sequence will
      * be applied in order to optimize hibernate caching.
-     * 
+     *
      * Communities and Collections - retain in the cache since each is likely to be
      * re-used Items - retain in the cache until a new item is processed Bitstreams
      * - retain in the cache until a new bitstream is processed
@@ -462,12 +463,12 @@ public class SolrUpgradePre6xStatistics {
 
     /*
      * Update records associated with a particular object id
-     * 
+     *
      * @param query Query to retrieve all of the statistics records associated with
      * a particular object
-     * 
+     *
      * @param field Field to use for grouping records
-     * 
+     *
      * @return number of items processed. 0 indicates that no more work is available
      * (or the max processed has been reached).
      */
@@ -508,14 +509,14 @@ public class SolrUpgradePre6xStatistics {
 
     /*
      * Map solr fields from legacy ids to UUIDs.
-     * 
+     *
      * The id field is interpreted by the type field. The scopeId field is
      * interpreted by scopeType field.
-     * 
+     *
      * Legacy ids will be unchanged if they cannot be mapped
-     * 
+     *
      * @param input The SOLR statistics document to be updated
-     * 
+     *
      * @param col The SOLR field to update (if present)
      */
     private void mapField(SolrInputDocument input, FIELD col) throws SQLException {
@@ -581,7 +582,7 @@ public class SolrUpgradePre6xStatistics {
     /*
      * Determine if the last processed item should be cleared from the hibernate
      * cache
-     * 
+     *
      * @param item Current item being processed
      */
     private void checkLastItem(Item item) throws SQLException {
@@ -599,7 +600,7 @@ public class SolrUpgradePre6xStatistics {
     /*
      * Determine if the last processed bitstream should be cleared from the
      * hibernate cache
-     * 
+     *
      * @param bitstream Current bitstream being processed
      */
     private void checkLastBitstream(Bitstream bitstream) throws SQLException {
@@ -617,9 +618,9 @@ public class SolrUpgradePre6xStatistics {
     /*
      * Retrieve the UUID corresponding to a legacy id found in a SOLR statistics
      * record
-     * 
+     *
      * @param col Solr Statistic Field being processed
-     * 
+     *
      * @param val Value to lookup as a legacy id
      */
     private UUID mapId(FIELD col, int val) throws SQLException {
@@ -647,9 +648,9 @@ public class SolrUpgradePre6xStatistics {
     /*
      * Retrieve the UUID corresponding to a legacy id found in a SOLR statistics
      * record
-     * 
+     *
      * @param type Identifying type field for id OR scopeType field for scopeId
-     * 
+     *
      * @param val Value to lookup as a legacy id
      */
     private UUID mapType(int type, int val) throws SQLException {
@@ -679,9 +680,9 @@ public class SolrUpgradePre6xStatistics {
     /*
      * Retrieve the UUID corresponding to a legacy owner found in a SOLR statistics
      * record Legacy owner fields are prefixed in solr with "e" or "g"
-     * 
+     *
      * @param owntype Identifying type field (e - eperson, g - group)
-     * 
+     *
      * @param val Value to lookup as a legacy id
      */
     private UUID mapOwner(String owntype, int val) throws SQLException {

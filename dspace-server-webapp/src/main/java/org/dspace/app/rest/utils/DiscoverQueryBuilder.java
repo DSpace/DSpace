@@ -15,12 +15,14 @@ import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.query.SearchQueryConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.InvalidSearchRequestException;
 import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -312,6 +314,11 @@ public class DiscoverQueryBuilder implements InitializingBean {
             }
         }
 
+        if (StringUtils.isNotBlank(sortBy) && !isConfigured(sortBy, searchSortConfiguration)) {
+            throw new InvalidSearchRequestException(
+                         "The field: " + sortBy + "is not configured for the configuration!");
+        }
+
         //Load defaults if we did not receive values
         if (sortBy == null) {
             sortBy = getDefaultSortField(searchSortConfiguration);
@@ -341,10 +348,14 @@ public class DiscoverQueryBuilder implements InitializingBean {
         }
     }
 
+    private boolean isConfigured(String sortBy, DiscoverySortConfiguration searchSortConfiguration) {
+        return Objects.nonNull(searchSortConfiguration.getSortFieldConfiguration(sortBy));
+    }
+
     private String getDefaultSortDirection(DiscoverySortConfiguration searchSortConfiguration, String sortOrder) {
-        if (searchSortConfiguration != null) {
-            sortOrder = searchSortConfiguration.getDefaultSortOrder()
-                                               .toString();
+        if (Objects.nonNull(searchSortConfiguration.getSortFields()) &&
+            !searchSortConfiguration.getSortFields().isEmpty()) {
+            sortOrder = searchSortConfiguration.getSortFields().get(0).getDefaultSortOrder().name();
         }
         return sortOrder;
     }
@@ -352,8 +363,12 @@ public class DiscoverQueryBuilder implements InitializingBean {
     private String getDefaultSortField(DiscoverySortConfiguration searchSortConfiguration) {
         String sortBy;// Attempt to find the default one, if none found we use SCORE
         sortBy = "score";
-        if (searchSortConfiguration != null && searchSortConfiguration.getDefaultSort() != null) {
-            DiscoverySortFieldConfiguration defaultSort = searchSortConfiguration.getDefaultSort();
+        if (Objects.nonNull(searchSortConfiguration.getSortFields()) &&
+            !searchSortConfiguration.getSortFields().isEmpty()) {
+            DiscoverySortFieldConfiguration defaultSort = searchSortConfiguration.getSortFields().get(0);
+            if (StringUtils.isBlank(defaultSort.getMetadataField())) {
+                return sortBy;
+            }
             sortBy = defaultSort.getMetadataField();
         }
         return sortBy;

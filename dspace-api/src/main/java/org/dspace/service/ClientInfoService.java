@@ -34,4 +34,13 @@ public interface ClientInfoService {
      * @return true if this is the case, false otherwise
      */
     boolean isUseProxiesEnabled();
+
+    /**
+     * Whether a request is from a trusted proxy or not. Only returns true if trusted proxies are specified
+     * and the ipAddress is contained in those proxies. False in all other cases
+     * @param ipAddress IP address to check for
+     * @return true if trusted, false otherwise
+     */
+    boolean isRequestFromTrustedProxy(String ipAddress);
+
 }
