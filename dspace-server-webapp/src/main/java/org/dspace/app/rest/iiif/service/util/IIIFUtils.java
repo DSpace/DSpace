@@ -18,7 +18,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.iiif.model.ObjectMapperFactory;
 import org.dspace.app.rest.iiif.model.info.Info;
 import org.dspace.app.rest.iiif.model.info.RangeModel;
@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class IIIFUtils {
 
-    private static final Logger log = Logger.getLogger(IIIFUtils.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(IIIFUtils.class);
 
     // The canvas position will be appended to this string.
     private static final String CANVAS_PATH_BASE = "/canvas/c";
