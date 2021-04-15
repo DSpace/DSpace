@@ -33,7 +33,7 @@
     <!-- -->
     <!-- <processing-class> - The class which will process all information for -->
     <!-- this step. The class must extend -->
-    <!-- 'org.dspace.submit.AbstractProcessingStep' -->
+    <!-- 'org.dspace.app.rest.submit.AbstractProcessingStep' -->
     <!-- (or one of the org.dspace.submit.step.* classes) -->
     <!-- This property should reference the full path of the class -->
     <!-- (e.g. org.dspace.submit.step.MyCustomStep) -->

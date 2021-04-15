@@ -13,7 +13,8 @@ import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,7 +27,7 @@ import org.json.JSONTokener;
  * @see SHERPAPublisher
  *
  * @author Kim Shepherd
- * 
+ *
  */
 public class SHERPAPublisherResponse {
     // Is this response to be treated as an error?
@@ -52,7 +53,7 @@ public class SHERPAPublisherResponse {
         JSON, XML
     };
 
-    private static Logger log = Logger.getLogger(SHERPAPublisherResponse.class);
+    private static Logger log = LogManager.getLogger();
 
     /**
      * Parse SHERPA v2 API for a given format
@@ -90,7 +91,7 @@ public class SHERPAPublisherResponse {
                     for (int itemIndex = 0; itemIndex < items.length(); itemIndex++) {
                         SHERPAPublisher sherpaPublisher = new SHERPAPublisher();
 
-                        JSONObject item = items.getJSONObject(0);
+                        JSONObject item = items.getJSONObject(itemIndex);
 
                         // Parse system metadata (per-item / result information)
                         if (item.has("system_metadata")) {

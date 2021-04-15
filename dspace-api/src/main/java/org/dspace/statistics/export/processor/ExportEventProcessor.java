@@ -19,7 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.DCDate;
 import org.dspace.content.Entity;
 import org.dspace.content.EntityType;
@@ -41,7 +42,7 @@ import org.dspace.statistics.export.service.OpenUrlService;
  */
 public abstract class ExportEventProcessor {
 
-    private static Logger log = Logger.getLogger(ExportEventProcessor.class);
+    private static final Logger log = LogManager.getLogger();
 
     protected static final String ENTITY_TYPE_DEFAULT = "Publication";
 
@@ -50,14 +51,17 @@ public abstract class ExportEventProcessor {
 
     protected final static String UTF_8 = CharEncoding.UTF_8;
 
-    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-    private EntityService entityService = ContentServiceFactory.getInstance().getEntityService();
-    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-    private OpenUrlService openUrlService = OpenURLTrackerLoggerServiceFactory.getInstance().getOpenUrlService();
+    private final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
+    private final EntityService entityService
+            = ContentServiceFactory.getInstance().getEntityService();
+    private final ItemService itemService
+            = ContentServiceFactory.getInstance().getItemService();
+    private final OpenUrlService openUrlService
+            = OpenURLTrackerLoggerServiceFactory.getInstance().getOpenUrlService();
 
-
-    private Context context;
-    private HttpServletRequest request;
+    private final Context context;
+    private final HttpServletRequest request;
 
     /**
      * Creates a new ExportEventProcessor based on the params and initializes the services

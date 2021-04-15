@@ -20,7 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
@@ -61,7 +62,7 @@ import org.springframework.stereotype.Component;
 @Component(ItemRest.CATEGORY + "." + ItemRest.NAME)
 public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRest> {
 
-    private static final Logger log = Logger.getLogger(ItemRestRepository.class);
+    private static final Logger log = LogManager.getLogger(ItemRestRepository.class);
 
     public static final String[] COPYVIRTUAL_ALL = {"all"};
     public static final String[] COPYVIRTUAL_CONFIGURED = {"configured"};
