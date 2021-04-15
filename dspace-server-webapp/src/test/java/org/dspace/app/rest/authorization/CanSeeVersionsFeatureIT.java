@@ -43,7 +43,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Test for the canViewVersions authorization feature
  */
-public class ViewVersionsFeatureIT extends AbstractControllerIntegrationTest {
+public class CanSeeVersionsFeatureIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private Utils utils;
