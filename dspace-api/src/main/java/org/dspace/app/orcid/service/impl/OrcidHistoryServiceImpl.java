@@ -127,6 +127,11 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     }
 
     @Override
+    public List<OrcidHistory> findByOwner(Context context, Item owner) throws SQLException {
+        return orcidHistoryDAO.findByOwner(context, owner);
+    }
+
+    @Override
     public OrcidHistory create(Context context, Item owner, Item entity) throws SQLException {
         OrcidHistory orcidHistory = new OrcidHistory();
         orcidHistory.setEntity(entity);
@@ -173,18 +178,15 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
 
         switch (entityType) {
             case "Person":
-                //TODO
-                sendPersonToOrcid(context, orcidQueue, orcid, token);
-                break;
+                return sendPersonToOrcid(context, orcidQueue, orcid, token);
             case "Publication":
                 return sendPublicationToOrcid(context, orcidQueue, orcid, token, forceAddition);
             case "Project":
                 return sendProjectToOrcid(context, orcidQueue, orcid, token, forceAddition);
             default:
-                break;
+                throw new IllegalArgumentException("The item to send to ORCID has an invalid type: " + entityType);
 
         }
-        return null;
     }
 
     private OrcidHistory sendPublicationToOrcid(Context context, OrcidQueue orcidQueue, String orcid, String token,
@@ -254,10 +256,11 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         return sendObjectToOrcid(context, orcidQueue, orcid, token, putCode, funding, FUNDING_ENDPOINT);
     }
 
-    private void sendPersonToOrcid(Context context, OrcidQueue orcidQueue, String orcid, String token)
+    private OrcidHistory sendPersonToOrcid(Context context, OrcidQueue orcidQueue, String orcid, String token)
             throws SQLException {
         // TODO send person info to orcid
         orcidQueueDAO.delete(context, orcidQueue);
+        return null;
     }
 
     private OrcidHistory sendObjectToOrcid(Context context, OrcidQueue orcidQueue, String orcid, String token,

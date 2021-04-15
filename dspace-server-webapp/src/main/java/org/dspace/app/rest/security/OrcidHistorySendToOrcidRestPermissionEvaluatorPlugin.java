@@ -59,7 +59,7 @@ public class OrcidHistorySendToOrcidRestPermissionEvaluatorPlugin extends RestOb
 
         EPerson currentUser = context.getCurrentUser();
         String url = targetId.toString();
-        Pattern pattern = Pattern.compile("\\[\\/api\\/cris\\/orcidqueues\\/(.*)\\]");
+        Pattern pattern = Pattern.compile("\\[.*\\/api\\/cris\\/orcidqueues\\/(.*)\\]");
         Matcher matcher = pattern.matcher(url);
 
         matcher.find();

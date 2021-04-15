@@ -72,7 +72,7 @@ public class OrcidHistoryRestRepository extends DSpaceRestRepository<OrcidHistor
         }
         boolean forceAddition =  Boolean.parseBoolean(request.getParameter("forceAddition"));
         orcidHistory = orcidHistoryService.sendToOrcid(context, orcidQueue, forceAddition);
-        return converter.toRest(orcidHistory, utils.obtainProjection());
+        return orcidHistory != null ? converter.toRest(orcidHistory, utils.obtainProjection()) : null;
     }
 
     @Override

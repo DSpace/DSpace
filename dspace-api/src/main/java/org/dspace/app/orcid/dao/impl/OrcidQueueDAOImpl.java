@@ -31,8 +31,10 @@ public class OrcidQueueDAOImpl extends AbstractHibernateDAO<OrcidQueue> implemen
         throws SQLException {
         Query query = createQuery(context, "FROM OrcidQueue WHERE owner.id= :ownerId");
         query.setParameter("ownerId", ownerId);
+        if (limit != null && limit.intValue() > 0) {
+            query.setMaxResults(limit);
+        }
         query.setFirstResult(offset);
-        query.setMaxResults(limit);
         return query.getResultList();
     }
 

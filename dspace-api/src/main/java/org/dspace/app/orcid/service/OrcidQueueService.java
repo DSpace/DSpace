@@ -32,11 +32,21 @@ public interface OrcidQueueService {
     /**
      * Get the orcid queue records by the owner id.
      *
-     * @param context DSpace context object
-     * @param ownerId the owner item id
-     * @param limit   limit
-     * @param offset  offset
-     * @return the orcid queue records
+     * @param  context      DSpace context object
+     * @param  ownerId      the owner item id
+     * @return              the orcid queue records
+     * @throws SQLException if an SQL error occurs
+     */
+    public List<OrcidQueue> findByOwnerId(Context context, UUID ownerId) throws SQLException;
+
+    /**
+     * Get the orcid queue records by the owner id.
+     *
+     * @param  context      DSpace context object
+     * @param  ownerId      the owner item id
+     * @param  limit        limit
+     * @param  offset       offset
+     * @return              the orcid queue records
      * @throws SQLException if an SQL error occurs
      */
     public List<OrcidQueue> findByOwnerId(Context context, UUID ownerId, Integer limit, Integer offset)

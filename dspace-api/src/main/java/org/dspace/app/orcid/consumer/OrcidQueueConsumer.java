@@ -7,6 +7,8 @@
  */
 package org.dspace.app.orcid.consumer;
 
+import static org.dspace.app.profile.OrcidEntitySynchronizationPreference.DISABLED;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,8 +41,6 @@ import org.slf4j.LoggerFactory;
 public class OrcidQueueConsumer implements Consumer {
 
     private static Logger log = LoggerFactory.getLogger(OrcidQueueConsumer.class);
-
-    private static final String SYNC_DISABLED = "DISABLED";
 
     private OrcidQueueService orcidQueueService;
 
@@ -89,7 +89,7 @@ public class OrcidQueueConsumer implements Consumer {
                 consumePerson(context, item);
                 break;
             case "Publication":
-            case "Project":
+            case "Funding":
                 consumeItem(context, item, entityType);
                 break;
             default:
@@ -121,8 +121,8 @@ public class OrcidQueueConsumer implements Consumer {
 
             Item ownerItem = itemService.findByIdOrLegacyId(context, relatedItemUuid.toString());
             String ownerType = getMetadataValue(ownerItem, "dspace.entity.type");
-            String orcidId = getMetadataValue(ownerItem, "person.identifier.orcid");
-            if (!"Person".equals(ownerType) || StringUtils.isEmpty(orcidId)) {
+            String accessToken = getMetadataValue(item, "cris.orcid.access-token");
+            if (!"Person".equals(ownerType) || StringUtils.isEmpty(accessToken)) {
                 continue;
             }
 
@@ -140,18 +140,18 @@ public class OrcidQueueConsumer implements Consumer {
     }
 
     private void consumePerson(Context context, Item item) throws SQLException {
-        String orcidId = getMetadataValue(item, "person.identifier.orcid");
+        String accessToken = getMetadataValue(item, "cris.orcid.access-token");
         List<OrcidQueue> queueRecords = orcidQueueService.findByOwnerAndEntityId(context, item.getID(), item.getID());
-        if (StringUtils.isNotEmpty(orcidId) && queueRecords.isEmpty()) {
+        if (StringUtils.isNotEmpty(accessToken) && queueRecords.isEmpty()) {
             OrcidQueue orcidQueue = orcidQueueService.create(context, item, item);
             log.debug("Created ORCID queue record with id " + orcidQueue.getID());
         }
     }
 
     private boolean shouldBeSend(Item item, String relatedItemType) {
-        String syncSetting = "cris.orcid.sync-" + (relatedItemType.equals("Publication") ? "publications" : "projects");
+        String syncSetting = "cris.orcid.sync-" + (relatedItemType.equals("Publication") ? "publications" : "fundings");
         String syncSettingValue = getMetadataValue(item, syncSetting);
-        return syncSettingValue != null && !syncSettingValue.equals(SYNC_DISABLED);
+        return syncSettingValue != null && !syncSettingValue.equals(DISABLED.name());
     }
 
     private String getMetadataValue(Item item, String metadataField) {

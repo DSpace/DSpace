@@ -8,6 +8,7 @@
 package org.dspace.app.orcid.service;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.app.orcid.OrcidHistory;
 import org.dspace.app.orcid.OrcidQueue;
@@ -31,6 +32,16 @@ public interface OrcidHistoryService {
      * @throws         SQLException if database error
      */
     public OrcidHistory find(Context context, int id) throws SQLException;
+
+    /**
+     * Get the OrcidHistory records related to the given owner.
+     *
+     * @param  context      DSpace context object
+     * @param  id           owner the owner item
+     * @return              the found OrcidHistory entities
+     * @throws SQLException if database error
+     */
+    public List<OrcidHistory> findByOwner(Context context, Item owner) throws SQLException;
 
     public OrcidHistory create(Context context, Item owner, Item entity) throws SQLException;
 

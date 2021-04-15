@@ -14,6 +14,7 @@ import javax.persistence.Query;
 
 import org.dspace.app.orcid.OrcidHistory;
 import org.dspace.app.orcid.dao.OrcidHistoryDAO;
+import org.dspace.content.Item;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
 
@@ -31,6 +32,14 @@ public class OrcidHistoryDAOImpl extends AbstractHibernateDAO<OrcidHistory> impl
         Query query = createQuery(context, "FROM OrcidHistory WHERE owner.id = :ownerId AND entity.id = :entityId ");
         query.setParameter("ownerId", ownerId);
         query.setParameter("entityId", entityId);
+        return query.getResultList();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<OrcidHistory> findByOwner(Context context, Item owner) throws SQLException {
+        Query query = createQuery(context, "FROM OrcidHistory WHERE owner.id = :ownerId");
+        query.setParameter("ownerId", owner.getID());
         return query.getResultList();
     }
 

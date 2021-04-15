@@ -37,6 +37,11 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     private OrcidQueueDAO orcidQueueDAO;
 
     @Override
+    public List<OrcidQueue> findByOwnerId(Context context, UUID ownerId) throws SQLException {
+        return orcidQueueDAO.findByOwnerId(context, ownerId, -1, 0);
+    }
+
+    @Override
     public List<OrcidQueue> findByOwnerId(Context context, UUID ownerId, Integer limit, Integer offset)
         throws SQLException {
         return orcidQueueDAO.findByOwnerId(context, ownerId, limit, offset);
