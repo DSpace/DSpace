@@ -281,7 +281,7 @@ public class CrisLayoutBoxMetadataConfigurationAddOperation<D> extends PatchOper
                 }
                 MetadataField metadataField = metadataService.findByString(context, metadata, '.');
                 if (metadataField == null) {
-                    throw new UnprocessableEntityException("MetadataField <" + metadata + "> not exsists!");
+                    throw new UnprocessableEntityException("MetadataField <" + metadata + "> not exists!");
                 }
                 nestedField.setMetadataField(metadataField);
                 //else new cris layout field nested will be added in database
