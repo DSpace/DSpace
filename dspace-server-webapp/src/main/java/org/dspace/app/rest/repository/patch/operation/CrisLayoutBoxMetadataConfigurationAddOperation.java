@@ -178,7 +178,7 @@ public class CrisLayoutBoxMetadataConfigurationAddOperation<D> extends PatchOper
             }
         } else {
             if (StringUtils.equalsIgnoreCase(fieldType.asText(), "metadatagroup")) {
-                field = new CrisLayoutField();
+                field = new CrisLayoutFieldMetadata();
                 JsonNode metadataNode = node.get("metadatagroup").get("leading");
                 if (metadataNode != null && metadataNode.asText() != null) {
                     metadataType = metadataNode.asText();
