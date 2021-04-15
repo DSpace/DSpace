@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 import de.digitalcollections.iiif.model.sharedcanvas.AnnotationList;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.iiif.model.generator.CanvasGenerator;
 import org.dspace.app.rest.iiif.model.generator.CanvasItemsGenerator;
 import org.dspace.app.rest.iiif.model.generator.ContentSearchGenerator;
@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ManifestService extends AbstractResourceService {
 
-    private static final Logger log = Logger.getLogger(ManifestService.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ManifestService.class);
 
     private static final String PDF_DOWNLOAD_LABEL = "Download as PDF";
     private static final String RELATED_ITEM_LABEL = "DSpace item view";

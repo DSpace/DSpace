@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.iiif.service;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.iiif.model.generator.CanvasGenerator;
 import org.dspace.app.rest.iiif.model.info.Info;
 import org.dspace.services.ConfigurationService;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 @Scope("prototype")
 public class CanvasService extends AbstractResourceService {
 
-    private static final Logger log = Logger.getLogger(CanvasService.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CanvasService.class);
 
     // Default canvas dimensions.
     protected static final Integer DEFAULT_CANVAS_WIDTH = 1200;

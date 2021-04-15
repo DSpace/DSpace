@@ -21,7 +21,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.apache.commons.validator.routines.UrlValidator;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -49,7 +49,7 @@ import org.springframework.web.context.annotation.RequestScope;
 @RequestScope
 public class SearchService extends AbstractResourceService {
 
-    private static final Logger log = Logger.getLogger(SearchService.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SearchService.class);
 
     private final boolean validationEnabled;
 
