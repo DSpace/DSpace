@@ -28,6 +28,7 @@ import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.discovery.indexobject.factory.IndexFactory;
 import org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.metrics.UpdateCrisMetricsInSolrDocService;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
@@ -43,6 +44,8 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
                                                                  IndexingService.class);
 
     private IndexClientOptions indexClientOptions;
+
+    private UpdateCrisMetricsInSolrDocService updateCrisMetricsInSolrDocService;
 
     @Override
     public void internalRun() throws Exception {
@@ -142,6 +145,7 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
         }
 
         handler.logInfo("Done with indexing");
+        updateCrisMetricsInSolrDocService.performUpdate(context, handler, true);
     }
 
     @Override
@@ -158,6 +162,8 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
             throw new ParseException("Unable to create a new DSpace Context: " + e.getMessage());
         }
         indexClientOptions = IndexClientOptions.getIndexClientOption(commandLine);
+        updateCrisMetricsInSolrDocService = new DSpace().getServiceManager().getServiceByName(
+                UpdateCrisMetricsInSolrDocService.class.getName(), UpdateCrisMetricsInSolrDocService.class);
     }
     /**
      * Indexes the given object and all children, if applicable.
