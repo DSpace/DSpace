@@ -33,6 +33,7 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -96,6 +97,8 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     protected VersionDAO versionDAO;
     @Autowired(required = true)
     protected ClaimedTaskService claimedTaskService;
+    @Autowired(required = true)
+    protected MetadataSchemaService metadataSchemaService;
 
     protected EPersonServiceImpl() {
         super();

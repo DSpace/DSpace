@@ -30,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -116,10 +115,6 @@ public class ResearcherProfileRestRepository extends DSpaceRestRepository<Resear
     @PreAuthorize("hasPermission(#id, 'PROFILE', #patch)")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model,
         UUID id, Patch patch) throws SQLException, AuthorizeException {
-
-        if (hasNotVisibilityChange(patch)) {
-            throw new AccessDeniedException(NO_VISIBILITY_CHANGE_MSG);
-        }
 
         ResearcherProfile profile = researcherProfileService.findById(context, id);
         if (profile == null) {

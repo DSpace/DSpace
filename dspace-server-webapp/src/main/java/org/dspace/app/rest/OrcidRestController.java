@@ -11,7 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.rest.model.OrcidTokenRest;
+import org.dspace.app.orcid.client.OrcidClient;
+import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.content.Item;
@@ -19,17 +20,11 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 /**
  * Rest controller that store ORCID infos and handles redirect.
@@ -44,7 +39,7 @@ public class OrcidRestController {
     private ConfigurationService configurationService;
 
     @Autowired
-    private RestTemplate restTemplate;
+    private OrcidClient orcidClient;
 
     @Autowired
     private ItemService itemService;
@@ -59,7 +54,7 @@ public class OrcidRestController {
             Context context = ContextUtil.obtainContext(request);
             Item item = itemService.findByIdOrLegacyId(context, itemId);
 
-            OrcidTokenRest token = retrieveOrcidToken(code);
+            OrcidTokenResponseDTO token = orcidClient.getAccessToken(code);
 
             itemService.addMetadata(context, item, "person", "identifier", "orcid", null, token.getOrcid());
             itemService.addMetadata(context, item, "cris", "orcid", "access-token", null, token.getAccessToken());
@@ -75,23 +70,5 @@ public class OrcidRestController {
 
         String dspaceUiUrl = configurationService.getProperty("dspace.ui.url");
         response.sendRedirect(dspaceUiUrl + url);
-    }
-
-    private OrcidTokenRest retrieveOrcidToken(String code) {
-        String tokenUrl = configurationService.getProperty("orcid-api.token-url");
-        String clientId = configurationService.getProperty("orcid-api.application-client-id");
-        String clientSecret = configurationService.getProperty("orcid-api.application-client-secret");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-        MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
-        map.add("client_id", clientId);
-        map.add("client_secret", clientSecret);
-        map.add("grant_type", "authorization_code");
-        map.add("code", code);
-
-        HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(map, headers);
-        return restTemplate.postForObject(tokenUrl, tokenRequest, OrcidTokenRest.class);
     }
 }

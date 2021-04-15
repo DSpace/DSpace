@@ -55,6 +55,8 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
             = new MetadataFieldName(EPERSON, "phone");
     public static final MetadataFieldName MD_LANGUAGE
             = new MetadataFieldName(EPERSON, "language");
+    public static final MetadataFieldName MD_ORCID
+            = new MetadataFieldName(EPERSON, "orcid");
 
     /**
      * Find the eperson by their email address.
