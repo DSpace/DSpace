@@ -16,7 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,9 +29,9 @@ import org.json.JSONTokener;
  * The structure is based on journal data, which in turn contains data about publishers and policies
  *
  * @see SHERPAJournal
- * 
+ *
  * @author Kim Shepherd
- * 
+ *
  */
 public class SHERPAResponse {
     // Is this response to be treated as an error?
@@ -56,7 +57,7 @@ public class SHERPAResponse {
         JSON, XML
     };
 
-    private static Logger log = Logger.getLogger(SHERPAResponse.class);
+    private static Logger log = LogManager.getLogger();
 
     /**
      * Parse SHERPA v2 API for a given format

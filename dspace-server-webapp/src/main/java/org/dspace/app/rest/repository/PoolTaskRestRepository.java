@@ -13,7 +13,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
@@ -51,7 +52,7 @@ import org.springframework.stereotype.Component;
 public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, Integer>
                                     implements InitializingBean {
 
-    private static final Logger log = Logger.getLogger(PoolTaskRestRepository.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     ItemService itemService;

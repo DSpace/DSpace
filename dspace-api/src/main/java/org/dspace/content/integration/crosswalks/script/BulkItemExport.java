@@ -319,16 +319,11 @@ public class BulkItemExport extends DSpaceRunnable<BulkItemExportScriptConfigura
     }
 
     private String getDefaultSortDirection(DiscoverySortConfiguration searchSortConfiguration) {
-        return searchSortConfiguration.getDefaultSortOrder().toString();
+        return searchSortConfiguration.getSortFields().iterator().next().getDefaultSortOrder().toString();
     }
 
     private String getDefaultSortField(DiscoverySortConfiguration searchSortConfiguration) {
-        String sortBy = "score";
-        if (searchSortConfiguration != null && searchSortConfiguration.getDefaultSort() != null) {
-            DiscoverySortFieldConfiguration defaultSort = searchSortConfiguration.getDefaultSort();
-            sortBy = defaultSort.getMetadataField();
-        }
-        return sortBy;
+        return searchSortConfiguration.getSortFields().iterator().next().getMetadataField();
     }
 
     private Map<String, String> parseSearchFilters() {

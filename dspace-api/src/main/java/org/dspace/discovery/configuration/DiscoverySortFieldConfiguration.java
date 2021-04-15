@@ -18,11 +18,18 @@ public class DiscoverySortFieldConfiguration {
     private String metadataField;
     private String type = DiscoveryConfigurationParameters.TYPE_TEXT;
 
+    /** Attributes used for sorting of results **/
+    public enum SORT_ORDER {
+        desc,
+        asc
+    }
+
+    private SORT_ORDER defaultSortOrder;
+
     public String getMetadataField() {
         return metadataField;
     }
 
-    @Autowired(required = true)
     public void setMetadataField(String metadataField) {
         this.metadataField = metadataField;
     }
@@ -33,6 +40,15 @@ public class DiscoverySortFieldConfiguration {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public SORT_ORDER getDefaultSortOrder() {
+        return defaultSortOrder;
+    }
+
+    @Autowired(required = true)
+    public void setDefaultSortOrder(SORT_ORDER defaultSortOrder) {
+        this.defaultSortOrder = defaultSortOrder;
     }
 
     @Override
