@@ -856,6 +856,10 @@
                     <groupId>org.javassist</groupId>
                     <artifactId>javassist</artifactId>
                 </exclusion>
+                <exclusion>
+                	<groupId>io.swagger</groupId>
+                	<artifactId>swagger-jersey-jaxrs</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
