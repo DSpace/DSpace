@@ -15,7 +15,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.ConverterService;
@@ -49,7 +50,7 @@ import org.springframework.stereotype.Component;
 @Component(ProcessRest.CATEGORY + "." + ProcessRest.NAME)
 public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Integer> {
 
-    private static final Logger log = Logger.getLogger(ProcessRestRepository.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     private ProcessService processService;

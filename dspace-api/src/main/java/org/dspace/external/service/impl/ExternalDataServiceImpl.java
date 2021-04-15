@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.suggestion.SolrSuggestionStorageService;
 import org.dspace.app.suggestion.SuggestionProvider;
 import org.dspace.app.suggestion.SuggestionService;
@@ -36,7 +36,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class ExternalDataServiceImpl implements ExternalDataService {
 
-    private static final Logger log = Logger.getLogger(ExternalDataServiceImpl.class);
+    private static final Logger log
+            = org.apache.logging.log4j.LogManager.getLogger();
 
     @Autowired
     private List<ExternalDataProvider> externalDataProviders;

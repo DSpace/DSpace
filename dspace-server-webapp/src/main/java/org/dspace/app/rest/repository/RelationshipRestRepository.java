@@ -16,7 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
@@ -49,7 +50,7 @@ import org.springframework.stereotype.Component;
 @Component(RelationshipRest.CATEGORY + "." + RelationshipRest.NAME)
 public class RelationshipRestRepository extends DSpaceRestRepository<RelationshipRest, Integer> {
 
-    private static final Logger log = Logger.getLogger(RelationshipRestRepository.class);
+    private static final Logger log = LogManager.getLogger();
 
     private static final String ALL = "all";
     private static final String LEFT = "left";

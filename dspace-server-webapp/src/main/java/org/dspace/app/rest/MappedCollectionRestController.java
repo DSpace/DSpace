@@ -17,7 +17,8 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.MethodNotAllowedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -45,7 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/core/items" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/mappedCollections")
 public class MappedCollectionRestController {
 
-    private static final Logger log = Logger.getLogger(MappedCollectionRestController.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     private ItemService itemService;

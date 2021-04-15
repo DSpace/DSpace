@@ -25,6 +25,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.IntStream;
 
 import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -49,6 +50,7 @@ import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
@@ -80,6 +82,8 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     private RelationshipType publicationPersonRelationshipType;
 
     private List<String> authorsOriginalOrder;
+
+    private List<MetadataValue> authorsMetadataOriginalOrder;
 
     private AtomicReference<Integer> idRef1;
     private AtomicReference<Integer> idRef2;
@@ -202,19 +206,19 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
                              .andDo(result -> idRef2.set(read(result.getResponse().getContentAsString(), "$.id")));
 
         publication = workspaceItemService.find(context, publicationItem.getID());
-        List<MetadataValue> publicationAuthorList =
+        authorsMetadataOriginalOrder =
                 itemService.getMetadata(publication.getItem(), "dc", "contributor", "author", Item.ANY);
-        assertEquals(publicationAuthorList.size(), 5);
-        assertThat(publicationAuthorList.get(0).getValue(), equalTo(authorsOriginalOrder.get(0)));
-        assertThat(publicationAuthorList.get(0).getAuthority(), not(startsWith("virtual::")));
-        assertThat(publicationAuthorList.get(1).getValue(), equalTo(authorsOriginalOrder.get(1)));
-        assertThat(publicationAuthorList.get(1).getAuthority(), startsWith("virtual::"));
-        assertThat(publicationAuthorList.get(2).getValue(), equalTo(authorsOriginalOrder.get(2)));
-        assertThat(publicationAuthorList.get(2).getAuthority(), not(startsWith("virtual::")));
-        assertThat(publicationAuthorList.get(3).getValue(), equalTo(authorsOriginalOrder.get(3)));
-        assertThat(publicationAuthorList.get(3).getAuthority(), not(startsWith("virtual::")));
-        assertThat(publicationAuthorList.get(4).getValue(), equalTo(authorsOriginalOrder.get(4)));
-        assertThat(publicationAuthorList.get(4).getAuthority(), startsWith("virtual::"));
+        assertEquals(authorsMetadataOriginalOrder.size(), 5);
+        assertThat(authorsMetadataOriginalOrder.get(0).getValue(), equalTo(authorsOriginalOrder.get(0)));
+        assertThat(authorsMetadataOriginalOrder.get(0).getAuthority(), not(startsWith("virtual::")));
+        assertThat(authorsMetadataOriginalOrder.get(1).getValue(), equalTo(authorsOriginalOrder.get(1)));
+        assertThat(authorsMetadataOriginalOrder.get(1).getAuthority(), startsWith("virtual::"));
+        assertThat(authorsMetadataOriginalOrder.get(2).getValue(), equalTo(authorsOriginalOrder.get(2)));
+        assertThat(authorsMetadataOriginalOrder.get(2).getAuthority(), not(startsWith("virtual::")));
+        assertThat(authorsMetadataOriginalOrder.get(3).getValue(), equalTo(authorsOriginalOrder.get(3)));
+        assertThat(authorsMetadataOriginalOrder.get(3).getAuthority(), not(startsWith("virtual::")));
+        assertThat(authorsMetadataOriginalOrder.get(4).getValue(), equalTo(authorsOriginalOrder.get(4)));
+        assertThat(authorsMetadataOriginalOrder.get(4).getAuthority(), startsWith("virtual::"));
     }
 
     /**
@@ -1165,6 +1169,59 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     }
 
     /**
+     * This test will overwrite all authors (dc.contributor.author) of a workspace publication's "traditionalpageone"
+     * section using a PATCH add with the entire array values.
+     * It makes sure that virtual values are correctly reordered or deleted.
+     */
+    @Test
+    public void patchAddAllAuthorsOnTraditionalPageTest() throws  Exception {
+
+        // "Whyte, William"
+        // "Dahlen, Sarah" (virtual)
+        // "Peterson, Karrie"
+        // "Perotti, Enrico"
+        // "Linton, Oliver" (virtual)
+        initPersonPublicationWorkspace();
+
+        List<MetadataValue> expectedValues = new ArrayList<MetadataValue>();
+        expectedValues.add(this.authorsMetadataOriginalOrder.get(2)); // "Peterson, Karrie"
+        expectedValues.add(this.authorsMetadataOriginalOrder.get(4)); // "Linton, Oliver" (virtual)
+        expectedValues.add(this.authorsMetadataOriginalOrder.get(0)); // "Whyte, William"
+        patchAddEntireArray(expectedValues);
+
+    }
+
+    /**
+     * This test will overwrite all authors (dc.contributor.author) of a workspace publication's "traditionalpageone"
+     * section using a PATCH add with an array composed by only a not existent virtual metadata.
+     */
+    @Test
+    public void patchAddAllAuthorsOnTraditionalPageNotExistentRelationTest() throws  Exception {
+
+        initPersonPublicationWorkspace();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        List<MetadataValueRest> value = new ArrayList<MetadataValueRest>();
+
+        MetadataValueRest mrv = new MetadataValueRest();
+        value.add(mrv);
+        mrv.setValue("Dumbar, John");
+        mrv.setAuthority("virtual::" + Integer.MAX_VALUE);
+
+        AddOperation add = new AddOperation("/sections/traditionalpageone/dc.contributor.author", value);
+        ops.add(add);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(patch("/api/submission/workspaceitems/" + publicationItem.getID())
+                                         .content(patchBody)
+                                         .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isUnprocessableEntity());
+
+    }
+
+    /**
      * This method moves an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
      * section from position "from" to "path" using a PATCH request and verifies the order of the authors within the
      * section using an ordered list of expected author names.
@@ -1303,6 +1360,50 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
                            Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(2), 2)),
                            Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(3), 3))
                    )));
+    }
+
+    /**
+     * This method set the entire authors list (dc.contributor.author) within a workspace
+     * publication's "traditionalpageone" section
+     * @param metadataValues The metadata list of all the metadata values
+     */
+    private void patchAddEntireArray(List<MetadataValue> metadataValues) throws Exception {
+        List<Operation> ops = new ArrayList<Operation>();
+        List<MetadataValueRest> value = new ArrayList<MetadataValueRest>();
+
+        // generates the MetadataValueRest list
+        metadataValues.stream().forEach(mv -> {
+            MetadataValueRest mrv = new MetadataValueRest();
+            value.add(mrv);
+            mrv.setValue(mv.getValue());
+            if (mv.getAuthority() != null && mv.getAuthority().startsWith("virtual::")) {
+                mrv.setAuthority(mv.getAuthority());
+                mrv.setConfidence(mv.getConfidence());
+            }
+        });
+
+        AddOperation add = new AddOperation("/sections/traditionalpageone/dc.contributor.author", value);
+        ops.add(add);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(patch("/api/submission/workspaceitems/" + publicationItem.getID())
+                                         .content(patchBody)
+                                         .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk());
+
+        final String authorField = "dc.contributor.author";
+        final List<Matcher<? super Object>> matchers = new ArrayList<>();
+        IntStream.range(0, metadataValues.size()).forEach((i) -> {
+            matchers.add(Matchers.is(MetadataMatcher.matchMetadata(authorField, metadataValues.get(i).getValue(), i)));
+        });
+
+
+        getClient(token).perform(get("/api/submission/workspaceitems/" + publicationItem.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.sections.traditionalpageone", Matchers.allOf(matchers)));
     }
 
     /**

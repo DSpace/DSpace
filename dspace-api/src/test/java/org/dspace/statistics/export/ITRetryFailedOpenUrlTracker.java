@@ -13,7 +13,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractIntegrationTest;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
 import org.dspace.scripts.DSpaceRunnable;
@@ -33,7 +34,7 @@ import org.junit.Test;
 @Ignore
 public class ITRetryFailedOpenUrlTracker extends AbstractIntegrationTest {
 
-    private static Logger log = Logger.getLogger(ITRetryFailedOpenUrlTracker.class);
+    private static final Logger log = LogManager.getLogger();
 
 
     protected FailedOpenURLTrackerService failedOpenURLTrackerService =
@@ -43,8 +44,8 @@ public class ITRetryFailedOpenUrlTracker extends AbstractIntegrationTest {
                                                                  .getServiceByName("testProcessedUrls",
                                                                                    ArrayList.class);
 
-    private ScriptService scriptService = ScriptServiceFactory.getInstance().getScriptService();
-
+    private final ScriptService scriptService
+            = ScriptServiceFactory.getInstance().getScriptService();
 
     /**
      * Clean up the logged entries from the db after each test

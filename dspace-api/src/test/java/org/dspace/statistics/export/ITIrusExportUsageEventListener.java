@@ -24,7 +24,8 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.CharEncoding;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.BitstreamBuilder;
@@ -65,7 +66,7 @@ import org.junit.Test;
 //@RunWith(MockitoJUnitRunner.class)
 public class ITIrusExportUsageEventListener extends AbstractIntegrationTestWithDatabase {
 
-    private static Logger log = Logger.getLogger(ITIrusExportUsageEventListener.class);
+    private static final Logger log = LogManager.getLogger();
 
 
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
