@@ -644,7 +644,7 @@ placeholders for header images -->
 					<xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='focus'][@qualifier='containerType']/text() = 'type:item'"><xsl:text>
 						var itemType = document.getElementsByName("DC.type")[0].content;
 						var itemSubtype = document.getElementsByName("DC.type")[1].content;
-						var dateIssued = (document.getElementsByName("DCTERMS.issued")[0])? document.getElementsByName("DCTERMS.issued")[0].content : document.getElementsByName("DCTERMS.created")[0].content.substring(0,10);
+						var itemDateIssued = (document.getElementsByName("DCTERMS.issued")[0])? document.getElementsByName("DCTERMS.issued")[0].content : document.getElementsByName("DCTERMS.created")[0].content.substring(0,10);
 						ga('set', 'dimension3', itemType);
 						ga('set', 'dimension5', itemSubtype);
 						ga('set', 'dimension6', itemDateIssued);
