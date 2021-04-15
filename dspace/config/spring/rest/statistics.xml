@@ -15,7 +15,7 @@
 	</bean>
 
 	<bean id="topCountriesGenerator" class="org.dspace.app.rest.statistics.TopCountriesGenerator">
-	   <property name="viewMode" value="table" />
+	   <property name="viewMode" value="map" />
        <property name="maxResults" value="10" />
     </bean>
 
