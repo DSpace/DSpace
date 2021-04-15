@@ -686,15 +686,6 @@
   </entries>
   <hops>
     <hop>
-      <from>Start</from>
-      <to>login</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>Y</unconditional>
-    </hop>
-    <hop>
       <from>createTab</from>
       <to>createBox</to>
       <from_nr>0</from_nr>
@@ -740,15 +731,6 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>login</from>
-      <to>Validate</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
       <from>Add metadata to box</from>
       <to>Add security</to>
       <from_nr>0</from_nr>
@@ -769,6 +751,24 @@
     <hop>
       <from>box2metrics</from>
       <to>Add metadata to box</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Start</from>
+      <to>login</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>Y</unconditional>
+    </hop>
+    <hop>
+      <from>login</from>
+      <to>Validate</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
