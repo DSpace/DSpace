@@ -163,24 +163,24 @@ public class CrisLayoutBoxMetadataConfigurationAddOperation<D> extends PatchOper
                 throw new UnprocessableEntityException("Bitstream node cannot be null for a bitstream fieldType");
             }
             JsonNode bundleNode = bitstreamNode.get("bundle");
-            if (bundleNode != null && bundleNode.asText() != null) {
+            if (bundleNode != null && !bundleNode.isNull() && bundleNode.asText() != null) {
                 ((CrisLayoutFieldBitstream) field).setBundle(bundleNode.asText());
             } else {
                 throw new UnprocessableEntityException("Bundle cannot be null for a bitstream fieldType");
             }
             JsonNode metadataValueNode = bitstreamNode.get("metadataValue");
-            if (bundleNode != null && bundleNode.asText() != null) {
+            if (metadataValueNode != null && !metadataValueNode.isNull() && metadataValueNode.asText() != null) {
                 ((CrisLayoutFieldBitstream) field).setMetadataValue(metadataValueNode.asText());
             }
             JsonNode metadataNode = bitstreamNode.get("metadataField");
-            if (metadataNode != null && metadataNode.asText() != null) {
+            if (metadataNode != null && !metadataNode.isNull() && metadataNode.asText() != null) {
                 metadataType = metadataNode.asText();
             }
         } else {
             if (StringUtils.equalsIgnoreCase(fieldType.asText(), "metadatagroup")) {
                 field = new CrisLayoutFieldMetadata();
                 JsonNode metadataNode = node.get("metadatagroup").get("leading");
-                if (metadataNode != null && metadataNode.asText() != null) {
+                if (metadataNode != null && !metadataNode.isNull() && metadataNode.asText() != null) {
                     metadataType = metadataNode.asText();
                 }
             } else {
@@ -203,27 +203,27 @@ public class CrisLayoutBoxMetadataConfigurationAddOperation<D> extends PatchOper
         field.setMetadataField(metadataField);
 
         JsonNode labelNode = node.get("label");
-        if (labelNode != null && labelNode.asText() != null) {
+        if (labelNode != null && !labelNode.isNull() && labelNode.asText() != null) {
             field.setLabel(labelNode.asText());
         }
 
         JsonNode renderingNode = node.get("rendering");
-        if (renderingNode != null && renderingNode.asText() != null) {
+        if (renderingNode != null && !renderingNode.isNull() && renderingNode.asText() != null) {
             field.setRendering(renderingNode.asText());
         }
 
         JsonNode styleNode = node.get("style");
-        if (styleNode != null && styleNode.asText() != null) {
+        if (styleNode != null && !styleNode.isNull() && styleNode.asText() != null) {
             field.setStyle(styleNode.asText());
         }
 
         JsonNode styleLabelNode = node.get("styleLabel");
-        if (styleLabelNode != null && styleLabelNode.asText() != null) {
+        if (styleLabelNode != null && !styleLabelNode.isNull() && styleLabelNode.asText() != null) {
             field.setStyleLabel(styleLabelNode.asText());
         }
 
         JsonNode styleValueNode = node.get("styleValue");
-        if (styleValueNode != null && styleValueNode.asText() != null) {
+        if (styleValueNode != null && !styleValueNode.isNull() && styleValueNode.asText() != null) {
             field.setStyleValue(styleValueNode.asText());
         }
 
@@ -275,7 +275,7 @@ public class CrisLayoutBoxMetadataConfigurationAddOperation<D> extends PatchOper
                 //control if metadata exists in database
                 String metadata = null;
                 JsonNode metadataNode = v.get("metadata");
-                if (metadataNode != null && metadataNode.asText() != null) {
+                if (metadataNode != null && !metadataNode.isNull() && metadataNode.asText() != null) {
 
                     metadata = metadataNode.asText();
                 }
@@ -286,27 +286,27 @@ public class CrisLayoutBoxMetadataConfigurationAddOperation<D> extends PatchOper
                 nestedField.setMetadataField(metadataField);
                 //else new cris layout field nested will be added in database
                 JsonNode labelNode = v.get("label");
-                if (labelNode != null && labelNode.asText() != null) {
+                if (labelNode != null && !labelNode.isNull() && labelNode.asText() != null) {
                     nestedField.setLabel(labelNode.asText());
                 }
 
                 JsonNode renderingNode = v.get("rendering");
-                if (renderingNode != null && renderingNode.asText() != null) {
+                if (renderingNode != null && !renderingNode.isNull() && renderingNode.asText() != null) {
                     nestedField.setRendering(renderingNode.asText());
                 }
 
                 JsonNode styleNode = v.get("style");
-                if (styleNode != null && styleNode.asText() != null) {
+                if (styleNode != null && !styleNode.isNull() && styleNode.asText() != null) {
                     nestedField.setStyle(styleNode.asText());
                 }
 
                 JsonNode styleLabelNode = v.get("styleLabel");
-                if (styleLabelNode != null && styleLabelNode.asText() != null) {
+                if (styleLabelNode != null && !styleLabelNode.isNull() && styleLabelNode.asText() != null) {
                     nestedField.setStyleLabel(styleLabelNode.asText());
                 }
 
                 JsonNode styleValueNode = v.get("styleValue");
-                if (styleValueNode != null && styleValueNode.asText() != null) {
+                if (styleValueNode != null && !styleValueNode.isNull() && styleValueNode.asText() != null) {
                     nestedField.setStyleValue(styleValueNode.asText());
                 }
                 Integer priority = 0;
