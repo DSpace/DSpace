@@ -14,13 +14,16 @@ import static org.dspace.eperson.Group.ANONYMOUS;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.app.exception.ResourceConflictException;
+import org.dspace.app.profile.service.AfterResearcherProfileCreationAction;
 import org.dspace.app.profile.service.ResearcherProfileService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
@@ -83,6 +86,18 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
     @Autowired
     private AuthorizeService authorizeService;
 
+    @Autowired(required = false)
+    private List<AfterResearcherProfileCreationAction> afterCreationActions;
+
+    @PostConstruct
+    public void postConstruct() {
+
+        if (afterCreationActions == null) {
+            afterCreationActions = Collections.emptyList();
+        }
+
+    }
+
     @Override
     public ResearcherProfile findById(Context context, UUID id) throws SQLException, AuthorizeException {
         Assert.notNull(id, "An id must be provided to find a researcher profile");
@@ -113,7 +128,14 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
         context.turnOffAuthorisationSystem();
         Item item = createProfileItem(context, ePerson, collection);
         context.restoreAuthSystemState();
-        return new ResearcherProfile(item);
+
+        ResearcherProfile researcherProfile = new ResearcherProfile(item);
+
+        for (AfterResearcherProfileCreationAction afterCreationAction : afterCreationActions) {
+            afterCreationAction.perform(context, researcherProfile, ePerson);
+        }
+
+        return researcherProfile;
     }
 
     @Override
@@ -150,6 +172,37 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
             authorizeService.removeGroupPolicies(context, item, anonymous);
         }
 
+    }
+
+    @Override
+    public void updatePreferenceForSynchronizingPublicationsWithOrcid(Context context,
+        ResearcherProfile researcherProfile, OrcidEntitySynchronizationPreference value) throws SQLException {
+        updatePreferenceForSynchronizingWithOrcid(context, researcherProfile, "sync-publications", of(value.name()));
+    }
+
+    @Override
+    public void updatePreferenceForSynchronizingFundingsWithOrcid(Context context, ResearcherProfile researcherProfile,
+        OrcidEntitySynchronizationPreference value) throws SQLException {
+        updatePreferenceForSynchronizingWithOrcid(context, researcherProfile, "sync-fundings", of(value.name()));
+    }
+
+    @Override
+    public void updatePreferenceForSynchronizingProfileWithOrcid(Context context, ResearcherProfile researcherProfile,
+        List<OrcidProfileSynchronizationPreference> values) throws SQLException {
+
+        List<String> valuesAsString = values.stream()
+            .map(OrcidProfileSynchronizationPreference::name)
+            .collect(Collectors.toList());
+
+        updatePreferenceForSynchronizingWithOrcid(context, researcherProfile, "sync-profile", valuesAsString);
+
+    }
+
+    @Override
+    public void updateOrcidSynchronizationMode(Context context, ResearcherProfile researcherProfile,
+        OrcidSynchronizationMode value) throws SQLException {
+        Item item = researcherProfile.getItem();
+        itemService.setMetadataSingleValue(context, item, "cris", "orcid", "sync-mode", null, value.name());
     }
 
     private Item findResearcherProfileItemById(Context context, UUID id) throws SQLException, AuthorizeException {
@@ -243,41 +296,6 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
 
     private String getProfileType() {
         return configurationService.getProperty("researcher-profile.type", "Person");
-    }
-
-    @Override
-    public void updatePreferenceForSynchronizingPublicationsWithOrcid(Context context,
-        ResearcherProfile researcherProfile, OrcidEntitySynchronizationPreference value) throws SQLException {
-
-        updatePreferenceForSynchronizingWithOrcid(context, researcherProfile, "sync-publications", of(value.name()));
-
-    }
-
-    @Override
-    public void updatePreferenceForSynchronizingFundingsWithOrcid(Context context, ResearcherProfile researcherProfile,
-        OrcidEntitySynchronizationPreference value) throws SQLException {
-
-        updatePreferenceForSynchronizingWithOrcid(context, researcherProfile, "sync-fundings", of(value.name()));
-
-    }
-
-    @Override
-    public void updatePreferenceForSynchronizingProfileWithOrcid(Context context, ResearcherProfile researcherProfile,
-        List<OrcidProfileSynchronizationPreference> values) throws SQLException {
-
-        List<String> valuesAsString = values.stream()
-            .map(OrcidProfileSynchronizationPreference::name)
-            .collect(Collectors.toList());
-
-        updatePreferenceForSynchronizingWithOrcid(context, researcherProfile, "sync-profile", valuesAsString);
-
-    }
-
-    @Override
-    public void updateOrcidSynchronizationMode(Context context, ResearcherProfile researcherProfile,
-        OrcidSynchronizationMode value) throws SQLException {
-        Item item = researcherProfile.getItem();
-        itemService.setMetadataSingleValue(context, item, "cris", "orcid", "sync-mode", null, value.name());
     }
 
     private void updatePreferenceForSynchronizingWithOrcid(Context context, ResearcherProfile researcherProfile,

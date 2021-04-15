@@ -9,6 +9,7 @@ package org.dspace.authenticate;
 
 import static java.lang.String.format;
 import static java.net.URLEncoder.encode;
+import static org.dspace.content.Item.ANY;
 
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
@@ -155,22 +156,24 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
 
         String email = getEmail(person).orElse(null);
 
-        EPerson eperson = ePersonService.findByEmail(context, email);
-        if (eperson != null) {
-            eperson.setCanLogIn(true);
-            ePersonService.setMetadataSingleValue(context, eperson, "eperson", "orcid", null, null, orcid);
-            context.setCurrentUser(eperson);
+        ePerson = ePersonService.findByEmail(context, email);
+        if (ePerson != null) {
+            ePerson.setCanLogIn(true);
+            setOrcidMetadata(context, ePerson, token);
+            context.setCurrentUser(ePerson);
             return SUCCESS;
         }
 
-        return canSelfRegister() ? registerNewEPerson(context, person, orcid) : NO_SUCH_USER;
+        return canSelfRegister() ? registerNewEPerson(context, person, token) : NO_SUCH_USER;
 
     }
 
-    private int registerNewEPerson(Context context, Person person, String orcid) throws SQLException {
+    private int registerNewEPerson(Context context, Person person, OrcidTokenResponseDTO token) throws SQLException {
 
         try {
             context.turnOffAuthorisationSystem();
+
+            String orcid = token.getOrcid();
 
             EPerson eperson = ePersonService.create(context);
 
@@ -181,7 +184,7 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
             eperson.setCanLogIn(true);
             eperson.setSelfRegistered(true);
 
-            ePersonService.addMetadata(context, eperson, "eperson", "orcid", null, null, orcid);
+            setOrcidMetadata(context, eperson, token);
 
             ePersonService.update(context, eperson);
             context.dispatchEvents();
@@ -195,6 +198,23 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
         } finally {
             context.restoreAuthSystemState();
         }
+    }
+
+    private void setOrcidMetadata(Context context, EPerson person, OrcidTokenResponseDTO token) throws SQLException {
+
+        String orcid = token.getOrcid();
+        String accessToken = token.getAccessToken();
+        String refreshToken = token.getRefreshToken();
+        String[] scopes = StringUtils.isEmpty(token.getScope()) ? new String[] {} : token.getScope().split(" ");
+
+        ePersonService.setMetadataSingleValue(context, person, "eperson", "orcid", null, null, orcid);
+        ePersonService.setMetadataSingleValue(context, person, "eperson", "orcid", "access-token", null, accessToken);
+        ePersonService.setMetadataSingleValue(context, person, "eperson", "orcid", "refresh-token", null, refreshToken);
+        ePersonService.clearMetadata(context, person, "eperson", "orcid", "scope", ANY);
+        for (String scope : scopes) {
+            ePersonService.addMetadata(context, person, "eperson", "orcid", "scope", null, scope);
+        }
+
     }
 
     private Person getPerson(OrcidTokenResponseDTO token) {
