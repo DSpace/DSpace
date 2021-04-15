@@ -83,6 +83,10 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         "org.dspace.authenticate.ShibAuthentication"
     };
 
+    // see proxies.trusted.ipranges in local.cfg
+    public static final String TRUSTED_IP = "7.7.7.7";
+    public static final String UNTRUSTED_IP = "8.8.8.8";
+
     @Before
     public void setup() throws Exception {
         super.setUp();
@@ -451,7 +455,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
-    // This test is verifying that Spring Security's CORS settings are working as we expect
+    // This test (and next) is verifying that Spring Security's CORS settings are working as we expect
     public void testCannotReuseTokenFromUntrustedOrigin() throws Exception {
         // First, get a valid login token
         String token = getAuthToken(eperson.getEmail(), password);
@@ -476,42 +480,18 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void testReuseTokenWithDifferentIPWhenIPStored() throws Exception {
-        // Enable IP storage in JWT login token
-        configurationService.setProperty("jwt.login.token.include.ip", true);
-
-        String token = getAuthToken(eperson.getEmail(), password);
-
-        getClient(token).perform(get("/api/authn/status"))
-
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.okay", is(true)))
-                .andExpect(jsonPath("$.authenticated", is(true)))
-                .andExpect(jsonPath("$.type", is("status")));
-
-        // Verify a different IP address (behind a proxy, i.e. X-FORWARDED-FOR)
-        // is *not* able to authenticate with same token
-        getClient(token).perform(get("/api/authn/status")
-                                     .header("X-FORWARDED-FOR", "1.1.1.1"))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.okay", is(true)))
-                        .andExpect(jsonPath("$.authenticated", is(false)))
-                        .andExpect(jsonPath("$.type", is("status")));
-
-        // Verify a different IP address is *not* able to authenticate with same token
-        getClient(token).perform(get("/api/authn/status")
-                                    .with(ip("1.1.1.1")))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.okay", is(true)))
-                .andExpect(jsonPath("$.authenticated", is(false)))
-                .andExpect(jsonPath("$.type", is("status")));
+    // This test (and previous) is verifying that Spring Security's CORS settings are working as we expect
+    public void testCannotAuthenticateFromUntrustedOrigin() throws Exception {
+        // Post a valid username & password from an *untrusted* Origin
+        getClient().perform(post("/api/authn/login").header("Origin", "https://example.org")
+                                .param("user", eperson.getEmail())
+                                .param("password", password))
+                   // should result in a 403 error as Spring Security returns that for untrusted origins
+                   .andExpect(status().isForbidden());
     }
 
     @Test
-    public void testReuseTokenWithDifferentIPWhenIPNotStored() throws Exception {
-        // Disable IP storage in JWT login token
-        configurationService.setProperty("jwt.login.token.include.ip", false);
-
+    public void testReuseTokenWithDifferentIP() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
 
         getClient(token).perform(get("/api/authn/status"))
@@ -523,6 +503,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         // Verify a different IP address (behind a proxy, i.e. X-FORWARDED-FOR)
         // is able to authenticate with same token
+        // NOTE: We allow tokens to be used across several IPs to support environments where your IP is not static.
+        // Also keep in mind that if a token is used from an untrusted Origin, it will be blocked (see prior test).
         getClient(token).perform(get("/api/authn/status")
                                      .header("X-FORWARDED-FOR", "1.1.1.1"))
                         .andExpect(status().isOk())
@@ -996,6 +978,52 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
+    public void testShortLivedTokenUsingGet() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        // Verify the main session salt doesn't change
+        String salt = eperson.getSessionSalt();
+
+        getClient(token).perform(
+            get("/api/authn/shortlivedtokens")
+                .with(ip(TRUSTED_IP))
+        )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.token", notNullValue()))
+            .andExpect(jsonPath("$.type", is("shortlivedtoken")))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/authn/shortlivedtokens")))
+            // Verify generating short-lived token doesn't change our CSRF token
+            // (so, neither the CSRF cookie nor header are sent back)
+            .andExpect(cookie().doesNotExist("DSPACE-XSRF-COOKIE"))
+            .andExpect(header().doesNotExist("DSPACE-XSRF-TOKEN"));
+
+        assertEquals(salt, eperson.getSessionSalt());
+    }
+
+    @Test
+    public void testShortLivedTokenUsingGetFromUntrustedIpShould403() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(
+            get("/api/authn/shortlivedtokens")
+                .with(ip(UNTRUSTED_IP))
+        )
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testShortLivedTokenUsingGetFromUntrustedIpWithForwardHeaderShould403() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(
+            get("/api/authn/shortlivedtokens")
+                .with(ip(UNTRUSTED_IP))
+                .header("X-Forwarded-For", TRUSTED_IP) // this should not affect the test result
+        )
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
     public void testShortLivedTokenWithCSRFSentViaParam() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
 
@@ -1012,6 +1040,15 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     @Test
     public void testShortLivedTokenNotAuthenticated() throws Exception {
         getClient().perform(post("/api/authn/shortlivedtokens"))
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void testShortLivedTokenNotAuthenticatedUsingGet() throws Exception {
+        getClient().perform(
+            get("/api/authn/shortlivedtokens")
+                .with(ip(TRUSTED_IP))
+        )
             .andExpect(status().isUnauthorized());
     }
 
@@ -1091,6 +1128,17 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         String shortLivedToken = getShortLivedToken(eperson);
 
         getClient().perform(post("/api/authn/shortlivedtokens?authentication-token=" + shortLivedToken))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testGenerateShortLivedTokenWithShortLivedTokenUsingGet() throws Exception {
+        String shortLivedToken = getShortLivedToken(eperson);
+
+        getClient().perform(
+            get("/api/authn/shortlivedtokens?authentication-token=" + shortLivedToken)
+                .with(ip(TRUSTED_IP))
+        )
             .andExpect(status().isForbidden());
     }
 

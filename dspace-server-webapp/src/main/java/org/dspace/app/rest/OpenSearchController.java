@@ -21,9 +21,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
-import org.dspace.app.rest.utils.ScopeResolver;
 import org.dspace.app.util.SyndicationFeed;
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.app.util.service.OpenSearchService;
@@ -59,7 +58,7 @@ import org.w3c.dom.Document;
 @RequestMapping("/opensearch")
 public class OpenSearchController {
 
-    private static final Logger log = Logger.getLogger(ScopeResolver.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
     private static final String errorpath = "/error";
     private List<String> searchIndices = null;
 

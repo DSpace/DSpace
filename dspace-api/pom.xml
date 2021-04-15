@@ -413,6 +413,12 @@
             <groupId>org.apache.jena</groupId>
             <artifactId>apache-jena-libs</artifactId>
             <type>pom</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
@@ -459,6 +465,10 @@
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
         </dependency>
         <dependency>
             <groupId>jaxen</groupId>
@@ -523,8 +533,15 @@
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
+            <artifactId>mockito-inline</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <!-- Different version provided by hibernate-ehcache -->
+                <exclusion>
+                    <groupId>net.bytebuddy</groupId>
+                    <artifactId>byte-buddy</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -538,15 +555,9 @@
             <version>1.0</version>
         </dependency>
         <dependency>
-            <groupId>gr.ekt.bte</groupId>
-            <artifactId>bte-io</artifactId>
-            <version>0.9.3.5</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>net.bytebuddy</groupId>
-                    <artifactId>byte-buddy</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.jbibtex</groupId>
+            <artifactId>jbibtex</artifactId>
+            <version>1.0.10</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -632,7 +643,7 @@
         <!-- Used for full-text indexing with Solr -->
         <dependency>
             <groupId>org.apache.tika</groupId>
-            <artifactId>tika-core</artifactId>
+            <artifactId>tika-parsers</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>

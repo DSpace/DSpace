@@ -11,12 +11,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -1403,6 +1405,26 @@ prevent the generation of resource policy entry values with null dspace_object a
         Stream<MetadataValue> metadataValueStream = listToReturn.stream().sorted(comparator);
         listToReturn = metadataValueStream.collect(Collectors.toList());
         return listToReturn;
+    }
+
+    @Override
+    public MetadataValue addMetadata(Context context, Item dso, String schema, String element, String qualifier,
+            String lang, String value, String authority, int confidence, int place) throws SQLException {
+
+        // We will not verify that they are valid entries in the registry
+        // until update() is called.
+        MetadataField metadataField = metadataFieldService.findByElement(context, schema, element, qualifier);
+        if (metadataField == null) {
+            throw new SQLException(
+                "bad_dublin_core schema=" + schema + "." + element + "." + qualifier + ". Metadata field does not " +
+                "exist!");
+        }
+
+        final Supplier<Integer> placeSupplier =  () -> place;
+
+        return addMetadata(context, dso, metadataField, lang, Arrays.asList(value),
+                Arrays.asList(authority), Arrays.asList(confidence), placeSupplier)
+                .stream().findFirst().orElse(null);
     }
 
 

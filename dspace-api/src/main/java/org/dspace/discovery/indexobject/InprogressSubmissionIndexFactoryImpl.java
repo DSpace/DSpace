@@ -63,6 +63,10 @@ public abstract class InprogressSubmissionIndexFactoryImpl
         List<String> locations = indexableCollectionService.
                 getCollectionLocations(context, inProgressSubmission.getCollection());
 
+        // add the item's owning collection to the location list
+        // NOTE: inProgressSubmission.getItem().getCollections() is empty while the item is in-progress.
+        locations.add("l" + inProgressSubmission.getCollection().getID());
+
         // Add item metadata
         indexableItemService.addDiscoveryFields(doc, context, item, SearchUtils.getAllDiscoveryConfigurations(item));
         indexableCollectionService.storeCommunityCollectionLocations(doc, locations);
