@@ -410,7 +410,7 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
                                           CrisMetricsMatcher.matchCrisMetrics(metric2),
                                           CrisMetricsMatcher.matchCrisMetrics(metric3),
                                           CrisMetricsMatcher.matchCrisDynamicMetrics(itemA.getID(), "google-scholar"),
-                                          CrisMetricsMatcher.matchCrisDynamicMetrics(itemA.getID(), "altmetrics")
+                                          CrisMetricsMatcher.matchCrisDynamicMetrics(itemA.getID(), "altmetric")
                                           )))
                                .andExpect(jsonPath("$._links.self.href",
                                    Matchers.containsString("api/core/items/" + itemA.getID() + "/metrics")))

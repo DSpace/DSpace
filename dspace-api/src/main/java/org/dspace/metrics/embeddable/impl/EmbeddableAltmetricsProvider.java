@@ -72,7 +72,7 @@ public class EmbeddableAltmetricsProvider extends AbstractEmbeddableMetricProvid
 
     @Override
     public String getMetricType() {
-        return "altmetrics";
+        return "altmetric";
     }
 
     public String getBadgeType() {
