@@ -52,7 +52,7 @@ public class CanManageVersionsFeatureIT extends AbstractControllerIntegrationTes
     private Community communityA;
     private Collection collectionA;
 
-    final String feature = "canManageVersion";
+    final String feature = "canManageVersions";
 
     @Override
     @Before
