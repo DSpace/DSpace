@@ -1074,6 +1074,13 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     @Override
+    public Iterator<Item> findArchivedByMetadataField(Context context, String metadataField, String value)
+        throws SQLException, AuthorizeException {
+        String[] mdValueByField = getMDValueByField(metadataField);
+        return findArchivedByMetadataField(context, mdValueByField[0], mdValueByField[1], mdValueByField[2], value);
+    }
+
+    @Override
     public Iterator<Item> findUnfilteredByMetadataField(Context context, String schema, String element,
         String qualifier, String value) throws SQLException, AuthorizeException {
         MetadataSchema mds = metadataSchemaService.find(context, schema);

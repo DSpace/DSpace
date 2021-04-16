@@ -11,9 +11,11 @@ import static org.dspace.app.rest.security.WebSecurityConfiguration.ADMIN_GRANT;
 import static org.dspace.app.rest.security.WebSecurityConfiguration.AUTHENTICATED_GRANT;
 
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -63,8 +65,17 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
     @Autowired
     private HttpServletRequest request;
 
-    @Autowired
+    @Autowired(required = false)
     private List<PostLoggedInAction> postLoggedInActions;
+
+    @PostConstruct
+    public void postConstruct() {
+
+        if (postLoggedInActions == null) {
+            postLoggedInActions = Collections.emptyList();
+        }
+
+    }
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -105,7 +116,7 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
                         output = createAuthentication(password, newContext);
 
                         for (PostLoggedInAction action : postLoggedInActions) {
-                            action.loggedIn(newContext, request);
+                            action.loggedIn(newContext);
                         }
 
                     } else {

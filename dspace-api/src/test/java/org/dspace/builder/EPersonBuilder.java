@@ -122,6 +122,11 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
         return this;
     }
 
+    public EPersonBuilder withOrcid(final String orcid) {
+        setMetadataSingleValue(ePerson, "eperson", "orcid", null, orcid);
+        return this;
+    }
+
     public static void deleteEPerson(UUID uuid) throws SQLException, IOException {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();

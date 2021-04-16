@@ -7,8 +7,6 @@
  */
 package org.dspace.app.rest.login;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.dspace.core.Context;
 
 /**
@@ -24,7 +22,6 @@ public interface PostLoggedInAction {
      * Perform some operations after the user login.
      *
      * @param context the DSpace context
-     * @param request the incoming http request
      */
-    public void loggedIn(Context context, HttpServletRequest request);
+    public void loggedIn(Context context);
 }

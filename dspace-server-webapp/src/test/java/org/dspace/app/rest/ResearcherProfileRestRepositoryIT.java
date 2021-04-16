@@ -41,6 +41,7 @@ import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
+import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.junit.Test;
@@ -735,6 +736,150 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         // the profile item should be the same
         String secondItemId = getItemIdByProfileId(adminToken, id);
         assertEquals("The item should be the same", firstItemId, secondItemId);
+
+    }
+
+    /**
+     * Verify that after an user login an automatic claim between the logged eperson
+     * and possible profiles without eperson is done.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testAutomaticProfileClaimByOrcid() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+            .withCanLogin(true)
+            .withNameInMetadata("Test", "User")
+            .withPassword(password)
+            .withEmail("test@email.it")
+            .withOrcid("0000-1111-2222-3333")
+            .build();
+
+        Item item = ItemBuilder.createItem(context, personCollection)
+            .withTitle("Test User")
+            .withOrcidIdentifier("0000-1111-2222-3333")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String epersonId = ePerson.getID().toString();
+
+        String token = getAuthToken(ePerson.getEmail(), password);
+
+        getClient(token).perform(get("/api/cris/profiles/{id}", epersonId))
+            .andExpect(status().isOk());
+
+        String profileItemId = getItemIdByProfileId(token, epersonId);
+        assertEquals("The item should be the same", item.getID().toString(), profileItemId);
+
+    }
+
+    @Test
+    public void testNoAutomaticProfileClaimOccursIfManyClaimableItemsAreFound() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+            .withCanLogin(true)
+            .withNameInMetadata("Test", "User")
+            .withPassword(password)
+            .withEmail("test@email.it")
+            .withOrcid("0000-1111-2222-3333")
+            .build();
+
+        ItemBuilder.createItem(context, personCollection)
+            .withTitle("Test User")
+            .withOrcidIdentifier("0000-1111-2222-3333")
+            .build();
+
+        ItemBuilder.createItem(context, personCollection)
+            .withTitle("Test User 2")
+            .withOrcidIdentifier("0000-1111-2222-3333")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String epersonId = ePerson.getID().toString();
+
+        getClient(getAuthToken(ePerson.getEmail(), password))
+            .perform(get("/api/cris/profiles/{id}", epersonId))
+            .andExpect(status().isNotFound());
+
+    }
+
+    @Test
+    public void testNoAutomaticProfileClaimOccursIfTheUserHasAlreadyAProfile() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+            .withCanLogin(true)
+            .withNameInMetadata("Test", "User")
+            .withPassword(password)
+            .withEmail("test@email.it")
+            .withOrcid("0000-1111-2222-3333")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String epersonId = ePerson.getID().toString();
+
+        String token = getAuthToken(ePerson.getEmail(), password);
+
+        getClient(token).perform(post("/api/cris/profiles/")
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isCreated());
+
+        getClient(token).perform(get("/api/cris/profiles/{id}", epersonId))
+            .andExpect(status().isOk());
+
+        String profileItemId = getItemIdByProfileId(token, epersonId);
+
+        context.turnOffAuthorisationSystem();
+
+        ItemBuilder.createItem(context, personCollection)
+            .withTitle("Test User")
+            .withOrcidIdentifier("0000-1111-2222-3333")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        token = getAuthToken(ePerson.getEmail(), password);
+
+        String newProfileItemId = getItemIdByProfileId(token, epersonId);
+        assertEquals("The item should be the same", newProfileItemId, profileItemId);
+
+    }
+
+    @Test
+    public void testNoAutomaticProfileClaimOccursIfTheFoundProfileIsAlreadyClaimed() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+            .withCanLogin(true)
+            .withNameInMetadata("Test", "User")
+            .withPassword(password)
+            .withEmail("test@email.it")
+            .build();
+
+        ItemBuilder.createItem(context, personCollection)
+            .withTitle("Admin User")
+            .withPersonEmail("test@email.it")
+            .withCrisOwner("Admin User", admin.getID().toString())
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String epersonId = ePerson.getID().toString();
+
+        String token = getAuthToken(ePerson.getEmail(), password);
+
+        getClient(token).perform(get("/api/cris/profiles/{id}", epersonId))
+            .andExpect(status().isNotFound());
 
     }
 
