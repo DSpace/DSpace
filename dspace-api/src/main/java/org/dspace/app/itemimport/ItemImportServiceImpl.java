@@ -152,8 +152,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     @Autowired(required = true)
     protected ConfigurationService configurationService;
 
-    protected final String tempWorkDir
-            = configurationService.getProperty("org.dspace.app.batchitemimport.work.dir");
+    protected String tempWorkDir;
 
     protected boolean isTest = false;
     protected boolean isResume = false;
@@ -163,6 +162,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        tempWorkDir = configurationService.getProperty("org.dspace.app.batchitemimport.work.dir");
         //Ensure tempWorkDir exists
         File tempWorkDirFile = new File(tempWorkDir);
         if (!tempWorkDirFile.exists()) {
