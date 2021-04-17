@@ -48,6 +48,7 @@ public class IIIFRestRepository {
     @Autowired
     CanvasLookupService canvasLookupService;
 
+
     /**
      * The manifest response contains sufficient information for the client to initialize itself
      * and begin to display something quickly to the user. The manifest resource represents a single
@@ -61,7 +62,7 @@ public class IIIFRestRepository {
      * @param id DSpace Item uuid
      * @return manifest as JSON
      */
-    @Cacheable("manifests")
+    @Cacheable(key = "#id.toString()", cacheNames = "manifests")
     @PreAuthorize("hasPermission(#id, 'ITEM', 'READ')")
     public String getManifest(Context context, UUID id)
             throws ResourceNotFoundException {
@@ -128,4 +129,5 @@ public class IIIFRestRepository {
     public String getSeeAlsoAnnotations(Context context, UUID id) {
         return annotationListService.getSeeAlsoAnnotations(context, id);
     }
+
 }
