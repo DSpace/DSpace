@@ -79,6 +79,8 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
         * Apache Log4j (log4j:log4j:1.2.17 - http://logging.apache.org/log4j/1.2/)
         * "Java Concurrency in Practice" book annotations (net.jcip:jcip-annotations:1.0 - http://jcip.net/)
         * Ehcache Core (net.sf.ehcache:ehcache-core:2.4.3 - http://ehcache.org)
+        * Ehcache 3 (org.ehcache:ehcache:3.4.0 - https://www.ehcache.org/)
+        * JSR107 API (javax.cache:cache-api:1.1.0 - https://github.com/jsr107/jsr107spec)
         * opencsv (net.sf.opencsv:opencsv:2.3 - http://opencsv.sf.net)
         * Abdera Client (org.apache.abdera:abdera-client:1.1.3 - http://abdera.apache.org/abdera-client)
         * Abdera Core (org.apache.abdera:abdera-core:1.1.3 - http://abdera.apache.org/abdera-core)

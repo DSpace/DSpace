@@ -84,7 +84,7 @@ public class ManifestService extends AbstractResourceService {
      * @return Manifest as JSON
      */
     public String getManifest(Item item, Context context) {
-        initializeManifestGenerator(item, context);
+        initializeManifest(item, context);
         return utils.asJson(manifestGenerator.getResource());
     }
 
@@ -95,7 +95,7 @@ public class ManifestService extends AbstractResourceService {
      * @param context DSpace context
      * @return manifest object
      */
-    private void initializeManifestGenerator(Item item, Context context) {
+    private void initializeManifest(Item item, Context context) {
         List<Bundle> bundles = utils.getIiifBundle(item, IIIF_BUNDLE);
         List<Bitstream> bitstreams = utils.getBitstreams(bundles);
         Info info = utils.validateInfoForManifest(utils.getInfo(context, item, IIIF_BUNDLE), bitstreams);
