@@ -10,9 +10,10 @@ package org.dspace.app.rest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.orcid.client.OrcidClient;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
+import org.dspace.app.profile.ResearcherProfile;
+import org.dspace.app.profile.service.ProfileSynchronizationWithOrcidConfigurator;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.content.Item;
@@ -44,29 +45,22 @@ public class OrcidRestController {
     @Autowired
     private ItemService itemService;
 
+    @Autowired
+    private ProfileSynchronizationWithOrcidConfigurator orcidSynchronizationService;
+
     @RequestMapping(value = "/{itemId}", method = RequestMethod.GET)
     public void retrieveOrcidFromCode(HttpServletRequest request, HttpServletResponse response,
-        @RequestParam(name = "code", required = false) String code, @PathVariable(name = "itemId") String itemId,
+        @RequestParam(name = "code") String code, @PathVariable(name = "itemId") String itemId,
         @RequestParam(name = "url") String url) throws Exception {
 
-        if (StringUtils.isNotEmpty(code)) {
+        Context context = ContextUtil.obtainContext(request);
+        Item item = itemService.findByIdOrLegacyId(context, itemId);
 
-            Context context = ContextUtil.obtainContext(request);
-            Item item = itemService.findByIdOrLegacyId(context, itemId);
+        OrcidTokenResponseDTO token = orcidClient.getAccessToken(code);
 
-            OrcidTokenResponseDTO token = orcidClient.getAccessToken(code);
+        orcidSynchronizationService.configureProfile(context, new ResearcherProfile(item), token);
 
-            itemService.addMetadata(context, item, "person", "identifier", "orcid", null, token.getOrcid());
-            itemService.addMetadata(context, item, "cris", "orcid", "access-token", null, token.getAccessToken());
-            itemService.addMetadata(context, item, "cris", "orcid", "refresh-token", null, token.getRefreshToken());
-            String[] scopes = StringUtils.isEmpty(token.getScope()) ? new String[] {} : token.getScope().split(" ");
-            for (String scope : scopes) {
-                itemService.addMetadata(context, item, "cris", "orcid", "scope", null, scope);
-            }
-
-            context.complete();
-
-        }
+        context.complete();
 
         String dspaceUiUrl = configurationService.getProperty("dspace.ui.url");
         response.sendRedirect(dspaceUiUrl + url);

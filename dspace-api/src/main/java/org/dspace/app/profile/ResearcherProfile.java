@@ -33,6 +33,13 @@ public class ResearcherProfile {
 
     private final String orcidAccessToken;
 
+    /**
+     * Create a new ResearcherProfile object from the given item.
+     *
+     * @param  item                     the profile item
+     * @throws IllegalArgumentException if the given item has not a cris.owner
+     *                                  metadata with a valid authority
+     */
     public ResearcherProfile(Item item) {
         Assert.notNull(item, "A researcher profile requires an item");
         this.item = item;
@@ -64,7 +71,8 @@ public class ResearcherProfile {
 
     private MetadataValue getCrisOwnerMetadata(Item item) {
         return getMetadataValue(item, "cris.owner")
-            .orElseThrow(() -> new IllegalArgumentException("A profile item must have a cris.owner metadata"));
+            .filter(metadata -> UUIDUtils.fromString(metadata.getAuthority()) != null)
+            .orElseThrow(() -> new IllegalArgumentException("A profile item must have a valid cris.owner metadata"));
     }
 
     private String getOrcidAccessToken(Item item) {

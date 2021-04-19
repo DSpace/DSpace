@@ -7,7 +7,6 @@
  */
 package org.dspace.app.profile;
 
-import static java.util.List.of;
 import static org.dspace.content.authority.Choices.CF_ACCEPTED;
 import static org.dspace.core.Constants.READ;
 import static org.dspace.eperson.Group.ANONYMOUS;
@@ -18,7 +17,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -174,37 +172,6 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
 
     }
 
-    @Override
-    public void updatePreferenceForSynchronizingPublicationsWithOrcid(Context context,
-        ResearcherProfile researcherProfile, OrcidEntitySynchronizationPreference value) throws SQLException {
-        updatePreferenceForSynchronizingWithOrcid(context, researcherProfile, "sync-publications", of(value.name()));
-    }
-
-    @Override
-    public void updatePreferenceForSynchronizingProjectsWithOrcid(Context context, ResearcherProfile researcherProfile,
-        OrcidEntitySynchronizationPreference value) throws SQLException {
-        updatePreferenceForSynchronizingWithOrcid(context, researcherProfile, "sync-projects", of(value.name()));
-    }
-
-    @Override
-    public void updatePreferenceForSynchronizingProfileWithOrcid(Context context, ResearcherProfile researcherProfile,
-        List<OrcidProfileSynchronizationPreference> values) throws SQLException {
-
-        List<String> valuesAsString = values.stream()
-            .map(OrcidProfileSynchronizationPreference::name)
-            .collect(Collectors.toList());
-
-        updatePreferenceForSynchronizingWithOrcid(context, researcherProfile, "sync-profile", valuesAsString);
-
-    }
-
-    @Override
-    public void updateOrcidSynchronizationMode(Context context, ResearcherProfile researcherProfile,
-        OrcidSynchronizationMode value) throws SQLException {
-        Item item = researcherProfile.getItem();
-        itemService.setMetadataSingleValue(context, item, "cris", "orcid", "sync-mode", null, value.name());
-    }
-
     private Item findResearcherProfileItemById(Context context, UUID id) throws SQLException, AuthorizeException {
 
         String profileType = getProfileType();
@@ -296,23 +263,6 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
 
     private String getProfileType() {
         return configurationService.getProperty("researcher-profile.type", "Person");
-    }
-
-    private void updatePreferenceForSynchronizingWithOrcid(Context context, ResearcherProfile researcherProfile,
-        String metadataQualifier, List<String> values) throws SQLException {
-
-        if (!researcherProfile.isLinkedToOrcid()) {
-            throw new IllegalArgumentException("The given profile cannot be configured for the ORCID "
-                + "synchronization because it is not linked to any ORCID account: " + researcherProfile.getId());
-        }
-
-        Item item = researcherProfile.getItem();
-
-        itemService.clearMetadata(context, item, "cris", "orcid", metadataQualifier, Item.ANY);
-        for (String value : values) {
-            itemService.addMetadata(context, item, "cris", "orcid", metadataQualifier, null, value);
-        }
-
     }
 
 }

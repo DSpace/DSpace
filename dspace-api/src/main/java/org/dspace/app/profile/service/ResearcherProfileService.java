@@ -8,12 +8,8 @@
 package org.dspace.app.profile.service;
 
 import java.sql.SQLException;
-import java.util.List;
 import java.util.UUID;
 
-import org.dspace.app.profile.OrcidEntitySynchronizationPreference;
-import org.dspace.app.profile.OrcidProfileSynchronizationPreference;
-import org.dspace.app.profile.OrcidSynchronizationMode;
 import org.dspace.app.profile.ResearcherProfile;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -44,9 +40,9 @@ public interface ResearcherProfileService {
     /**
      * Create a new researcher profile for the given ePerson.
      *
-     * @param context the relevant DSpace Context.
-     * @param ePerson the ePerson
-     * @return the created profile
+     * @param  context                the relevant DSpace Context.
+     * @param  ePerson                the ePerson
+     * @return                        the created profile
      * @throws SQLException
      * @throws AuthorizeException
      * @throws SearchServiceException
@@ -76,57 +72,4 @@ public interface ResearcherProfileService {
      */
     public void changeVisibility(Context context, ResearcherProfile profile, boolean visible)
         throws AuthorizeException, SQLException;
-
-    /**
-     * Update the ORCID synchronization preference related to the publications
-     *
-     * @param  context                  the relevant DSpace Context.
-     * @param  profile                  the researcher profile to update
-     * @param  value                    the new synchronization preference value
-     * @throws SQLException             if a SQL error occurs during the profile
-     *                                  update
-     * @throws IllegalArgumentException if the given researcher profile is no linked
-     *                                  with an ORCID account
-     */
-    public void updatePreferenceForSynchronizingPublicationsWithOrcid(Context context,
-        ResearcherProfile researcherProfile, OrcidEntitySynchronizationPreference value) throws SQLException;
-
-    /**
-     * Update the ORCID synchronization preference related to the projects.
-     *
-     * @param  context                  the relevant DSpace Context.
-     * @param  profile                  the researcher profile to update
-     * @param  value                    the new synchronization preference value
-     * @throws SQLException             if a SQL error occurs during the profile
-     *                                  update
-     * @throws IllegalArgumentException if the given researcher profile is no linked
-     *                                  with an ORCID account
-     */
-    public void updatePreferenceForSynchronizingProjectsWithOrcid(Context context,
-        ResearcherProfile researcherProfile, OrcidEntitySynchronizationPreference value) throws SQLException;
-
-    /**
-     * Update the ORCID synchronization preference related to the profile itself.
-     *
-     * @param  context                  the relevant DSpace Context.
-     * @param  profile                  the researcher profile to update
-     * @param  value                    the new synchronization preference value
-     * @throws SQLException             if a SQL error occurs during the profile
-     *                                  update
-     * @throws IllegalArgumentException if the given researcher profile is no linked
-     *                                  with an ORCID account
-     */
-    public void updatePreferenceForSynchronizingProfileWithOrcid(Context context,
-        ResearcherProfile researcherProfile, List<OrcidProfileSynchronizationPreference> values) throws SQLException;
-
-    /**
-     * Update the ORCID synchronization mode.
-     *
-     * @param  context      the relevant DSpace Context.
-     * @param  profile      the researcher profile to update
-     * @param  value        the new synchronization mode value
-     * @throws SQLException if a SQL error occurs during the profile update
-     */
-    public void updateOrcidSynchronizationMode(Context context, ResearcherProfile researcherProfile,
-        OrcidSynchronizationMode value) throws SQLException;
 }

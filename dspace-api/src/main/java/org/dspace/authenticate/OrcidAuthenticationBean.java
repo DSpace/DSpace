@@ -24,6 +24,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.orcid.client.OrcidClient;
 import org.dspace.app.orcid.client.OrcidConfiguration;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
+import org.dspace.app.profile.ResearcherProfile;
+import org.dspace.app.profile.service.ProfileSynchronizationWithOrcidConfigurator;
+import org.dspace.app.profile.service.ResearcherProfileService;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -60,6 +64,12 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
 
     @Autowired
     private EPersonService ePersonService;
+
+    @Autowired
+    private ResearcherProfileService researcherProfileService;
+
+    @Autowired
+    private ProfileSynchronizationWithOrcidConfigurator orcidSynchronizationConfigurator;
 
     @Override
     public int authenticate(Context context, String username, String password, String realm, HttpServletRequest request)
@@ -158,14 +168,29 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
 
         ePerson = ePersonService.findByEmail(context, email);
         if (ePerson != null) {
+
             ePerson.setCanLogIn(true);
-            setOrcidMetadata(context, ePerson, token);
+            setOrcidMetadataOnEperson(context, ePerson, token);
+
+            ResearcherProfile profile = findProfile(context, ePerson);
+            if (profile != null) {
+                orcidSynchronizationConfigurator.configureProfile(context, profile, token);
+            }
+
             context.setCurrentUser(ePerson);
             return SUCCESS;
         }
 
         return canSelfRegister() ? registerNewEPerson(context, person, token) : NO_SUCH_USER;
 
+    }
+
+    private ResearcherProfile findProfile(Context context, EPerson ePerson) throws SQLException {
+        try {
+            return researcherProfileService.findById(context, ePerson.getID());
+        } catch (AuthorizeException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private int registerNewEPerson(Context context, Person person, OrcidTokenResponseDTO token) throws SQLException {
@@ -184,7 +209,7 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
             eperson.setCanLogIn(true);
             eperson.setSelfRegistered(true);
 
-            setOrcidMetadata(context, eperson, token);
+            setOrcidMetadataOnEperson(context, eperson, token);
 
             ePersonService.update(context, eperson);
             context.setCurrentUser(eperson);
@@ -201,7 +226,8 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
         }
     }
 
-    private void setOrcidMetadata(Context context, EPerson person, OrcidTokenResponseDTO token) throws SQLException {
+    private void setOrcidMetadataOnEperson(Context context, EPerson person, OrcidTokenResponseDTO token)
+        throws SQLException {
 
         String orcid = token.getOrcid();
         String accessToken = token.getAccessToken();
