@@ -73,7 +73,7 @@ public class EPersonAuthority implements ChoiceAuthority {
         Context context = new Context();
         try {
             EPerson ePerson = ePersonService.find(context, uuid);
-            return ePerson != null ? ePerson.getName() : null;
+            return ePerson != null ? ePerson.getFullName() : null;
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);

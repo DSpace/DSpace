@@ -2277,6 +2277,19 @@ You can leave out the day and/or month if they aren't applicable.</hint>
         </field>
       </row>
     </form>
+    <form name="owner">
+      <row>
+        <field>
+          <dc-schema>cris</dc-schema>
+          <dc-element>owner</dc-element>
+          <label>Owner</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint />
+        </field>
+      </row>
+    </form>
   </form-definitions>
   <form-value-pairs>
     <value-pairs value-pairs-name="patent_types" dc-term="patent_types">

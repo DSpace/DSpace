@@ -158,6 +158,11 @@
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
       <type>submission-form</type>
     </step-definition>
+    <step-definition id="owner" mandatory="true">
+      <heading>submit.progressbar.describe.owner</heading>
+      <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+      <type>submission-form</type>
+    </step-definition>
     <step-definition id="detect-duplicate" mandatory="true">
       <heading>submit.progressbar.detect-duplicate</heading>
       <processing-class>org.dspace.app.rest.submit.step.DetectPotentialDuplicateStep</processing-class>
@@ -276,6 +281,7 @@
     </submission-process>
     <submission-process name="person-edit">
       <step id="person" />
+      <step id="owner" />
       <step id="detect-duplicate" />
       <step id="upload" />
     </submission-process>
