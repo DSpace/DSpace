@@ -11,11 +11,15 @@ import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static java.util.Arrays.asList;
 import static java.util.UUID.fromString;
+import static org.dspace.app.matcher.MetadataValueMatcher.with;
 import static org.dspace.app.rest.matcher.HalMatcher.matchLinks;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataNotEmpty;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -42,8 +46,11 @@ import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.service.ItemService;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
+import org.dspace.util.UUIDUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -59,6 +66,9 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private ItemService itemService;
 
     private EPerson user;
 
@@ -880,6 +890,52 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
         getClient(token).perform(get("/api/cris/profiles/{id}", epersonId))
             .andExpect(status().isNotFound());
+
+    }
+
+    @Test
+    public void testOrcidMetadataOfEpersonAreCopiedOnProfile() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+            .withCanLogin(true)
+            .withOrcid("0000-1111-2222-3333")
+            .withEmail("test@email.it")
+            .withPassword(password)
+            .withNameInMetadata("Test", "User")
+            .withOrcidAccessToken("af097328-ac1c-4a3e-9eb4-069897874910")
+            .withOrcidRefreshToken("32aadae0-829e-49c5-824f-ccaf4d1913e4")
+            .withOrcidScope("/first-scope")
+            .withOrcidScope("/second-scope")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String ePersonId = ePerson.getID().toString();
+        String authToken = getAuthToken(ePerson.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/cris/profiles/")
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.id", is(ePersonId.toString())))
+            .andExpect(jsonPath("$.visible", is(false)))
+            .andExpect(jsonPath("$.type", is("profile")));
+
+        getClient(authToken).perform(get("/api/cris/profiles/{id}", ePersonId))
+            .andExpect(status().isOk());
+
+        String itemId = getItemIdByProfileId(authToken, ePersonId);
+
+        Item profileItem = itemService.find(context, UUIDUtils.fromString(itemId));
+        assertThat(profileItem, notNullValue());
+
+        List<MetadataValue> metadata = profileItem.getMetadata();
+        assertThat(metadata, hasItem(with("person.identifier.orcid", "0000-1111-2222-3333")));
+        assertThat(metadata, hasItem(with("cris.orcid.access-token", "af097328-ac1c-4a3e-9eb4-069897874910")));
+        assertThat(metadata, hasItem(with("cris.orcid.refresh-token", "32aadae0-829e-49c5-824f-ccaf4d1913e4")));
+        assertThat(metadata, hasItem(with("cris.orcid.scope", "/first-scope", 0)));
+        assertThat(metadata, hasItem(with("cris.orcid.scope", "/second-scope", 1)));
 
     }
 

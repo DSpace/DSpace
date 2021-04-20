@@ -9,6 +9,7 @@ package org.dspace.app.rest;
 
 import java.io.IOException;
 import java.util.Arrays;
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
@@ -16,7 +17,6 @@ import org.dspace.app.rest.model.AuthnRest;
 import org.dspace.services.ConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(value = "/api/" + AuthnRest.CATEGORY + "/orcid")
-public class OrcidAuthenticationRestController implements InitializingBean {
+public class OrcidAuthenticationRestController {
 
     private static final Logger log = LoggerFactory.getLogger(OrcidAuthenticationRestController.class);
 
@@ -41,10 +41,9 @@ public class OrcidAuthenticationRestController implements InitializingBean {
     @Autowired
     private DiscoverableEndpointsService discoverableEndpointsService;
 
-    @Override
-    public void afterPropertiesSet() {
-        discoverableEndpointsService
-            .register(this, Arrays.asList(new Link("/api/" + AuthnRest.CATEGORY, "orcid")));
+    @PostConstruct
+    public void postConstruct() {
+        discoverableEndpointsService.register(this, Arrays.asList(new Link("/api/" + AuthnRest.CATEGORY, "orcid")));
     }
 
     @GetMapping

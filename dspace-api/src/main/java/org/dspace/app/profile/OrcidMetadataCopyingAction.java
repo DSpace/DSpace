@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.dspace.app.profile.service.AfterResearcherProfileCreationAction;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataFieldName;
@@ -54,8 +55,11 @@ public class OrcidMetadataCopyingAction implements AfterResearcherProfileCreatio
         String itemMetadataField) throws SQLException {
 
         List<String> values = getMetadataValues(ePerson, ePersonMetadataField);
-        MetadataFieldName metadata = new MetadataFieldName(itemMetadataField);
+        if (CollectionUtils.isEmpty(values)) {
+            return;
+        }
 
+        MetadataFieldName metadata = new MetadataFieldName(itemMetadataField);
         itemService.clearMetadata(context, item, metadata.SCHEMA, metadata.ELEMENT, metadata.QUALIFIER, ANY);
         itemService.addMetadata(context, item, metadata.SCHEMA, metadata.ELEMENT, metadata.QUALIFIER, null, values);
 

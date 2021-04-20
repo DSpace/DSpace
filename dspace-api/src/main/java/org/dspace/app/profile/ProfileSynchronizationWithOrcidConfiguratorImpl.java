@@ -13,7 +13,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.app.profile.service.ProfileSynchronizationWithOrcidConfigurator;
 import org.dspace.content.Item;
@@ -39,7 +38,7 @@ public class ProfileSynchronizationWithOrcidConfiguratorImpl implements ProfileS
         String orcid = token.getOrcid();
         String accessToken = token.getAccessToken();
         String refreshToken = token.getRefreshToken();
-        String[] scopes = StringUtils.isEmpty(token.getScope()) ? new String[] {} : token.getScope().split(" ");
+        String[] scopes = token.getScopeAsArray();
 
         Item item = profile.getItem();
 

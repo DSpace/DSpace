@@ -237,7 +237,7 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
         String orcid = token.getOrcid();
         String accessToken = token.getAccessToken();
         String refreshToken = token.getRefreshToken();
-        String[] scopes = StringUtils.isEmpty(token.getScope()) ? new String[] {} : token.getScope().split(" ");
+        String[] scopes = token.getScopeAsArray();
 
         ePersonService.setMetadataSingleValue(context, person, "eperson", "orcid", null, null, orcid);
         ePersonService.setMetadataSingleValue(context, person, "eperson", "orcid", "access-token", null, accessToken);

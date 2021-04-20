@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.EntityType;
@@ -56,9 +55,6 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
 
     @Autowired
     private EntityTypeService entityTypeService;
-
-    @Autowired
-    private MetadataExposureService metadataExposureService;
 
     @Autowired
     private CrisLayoutBoxAccessService crisLayoutBoxAccessService;
@@ -301,9 +297,7 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
     }
 
     private boolean hasOrcidSyncBoxContent(Context context, CrisLayoutBox box, List<MetadataValue> values) {
-        return isOwnProfile(context, values) && values.stream()
-                                                      .map(metadata -> metadata.getMetadataField().toString('.'))
-                                                      .anyMatch(metadata -> metadata.equals("person.identifier.orcid"));
+        return isOwnProfile(context, values) && findFirstByMetadataField(values, "cris.orcid.access-token") != null;
     }
 
     private boolean hasOrcidAuthorizationsBoxContent(Context context, CrisLayoutBox box, List<MetadataValue> values) {
@@ -311,17 +305,20 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
     }
 
     private boolean isOwnProfile(Context context, List<MetadataValue> values) {
-        MetadataValue crisOwner = values.stream()
-                                        .filter(
-                                            metadata -> metadata.getMetadataField().toString('.').equals("cris.owner"))
-                                        .findFirst()
-                                        .orElse(null);
+        MetadataValue crisOwner = findFirstByMetadataField(values, "cris.owner");
 
         if (crisOwner == null || crisOwner.getAuthority() == null || context.getCurrentUser() == null) {
             return false;
         }
 
         return crisOwner.getAuthority().equals(context.getCurrentUser().getID().toString());
+    }
+
+    private MetadataValue findFirstByMetadataField(List<MetadataValue> values, String metadataField) {
+        return values.stream()
+            .filter(metadata -> metadata.getMetadataField().toString('.').equals(metadataField))
+            .findFirst()
+            .orElse(null);
     }
 
     // in private method so that exception can be handled and method can be invoked within a lambda

@@ -7,7 +7,9 @@
  */
 package org.dspace.app.orcid.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * This class map the response from and ORCID token endpoint.
@@ -124,6 +126,11 @@ public class OrcidTokenResponseDTO {
 
     public void setScope(String scope) {
         this.scope = scope;
+    }
+
+    @JsonIgnore
+    public String[] getScopeAsArray() {
+        return StringUtils.isEmpty(getScope()) ? new String[] {} : getScope().split(" ");
     }
 
 }

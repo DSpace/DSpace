@@ -7,6 +7,10 @@
  */
 package org.dspace.app.rest;
 
+import java.net.URI;
+import java.sql.SQLException;
+import java.util.Optional;
+import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -16,11 +20,12 @@ import org.dspace.app.profile.ResearcherProfile;
 import org.dspace.app.profile.service.ProfileSynchronizationWithOrcidConfigurator;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.utils.ContextUtil;
-import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
+import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -54,15 +59,31 @@ public class OrcidRestController {
         @RequestParam(name = "url") String url) throws Exception {
 
         Context context = ContextUtil.obtainContext(request);
-        Item item = itemService.findByIdOrLegacyId(context, itemId);
+
+        ResearcherProfile profile = findResearcherProfile(context, UUIDUtils.fromString(itemId))
+            .orElseThrow(() -> new ResourceNotFoundException("No profile found by item id: " + itemId));
 
         OrcidTokenResponseDTO token = orcidClient.getAccessToken(code);
 
-        orcidSynchronizationService.configureProfile(context, new ResearcherProfile(item), token);
+        orcidSynchronizationService.configureProfile(context, profile, token);
 
         context.complete();
 
-        String dspaceUiUrl = configurationService.getProperty("dspace.ui.url");
-        response.sendRedirect(dspaceUiUrl + url);
+        URI dspaceUiUrl = new URI(configurationService.getProperty("dspace.ui.url"));
+        response.sendRedirect(dspaceUiUrl.resolve(url).toString());
     }
+
+    private Optional<ResearcherProfile> findResearcherProfile(Context context, UUID itemId) throws SQLException {
+        return Optional.ofNullable(itemService.find(context, itemId))
+            .map(ResearcherProfile::new);
+    }
+
+    public OrcidClient getOrcidClient() {
+        return orcidClient;
+    }
+
+    public void setOrcidClient(OrcidClient orcidClient) {
+        this.orcidClient = orcidClient;
+    }
+
 }
