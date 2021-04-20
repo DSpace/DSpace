@@ -155,11 +155,10 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
 
         EPerson ePerson = ePersonService.findByNetid(context, orcid);
         if (ePerson != null) {
-            context.setCurrentUser(ePerson);
-            return SUCCESS;
+            return ePerson.canLogIn() ? logInEPerson(context, token, ePerson) : BAD_ARGS;
         }
 
-        Person person = getPerson(token);
+        Person person = getPersonFromOrcid(token);
         if (person == null) {
             return NO_SUCH_USER;
         }
@@ -168,20 +167,26 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
 
         ePerson = ePersonService.findByEmail(context, email);
         if (ePerson != null) {
-
-            ePerson.setCanLogIn(true);
-            setOrcidMetadataOnEperson(context, ePerson, token);
-
-            ResearcherProfile profile = findProfile(context, ePerson);
-            if (profile != null) {
-                orcidSynchronizationConfigurator.configureProfile(context, profile, token);
-            }
-
-            context.setCurrentUser(ePerson);
-            return SUCCESS;
+            return ePerson.canLogIn() ? logInEPerson(context, token, ePerson) : BAD_ARGS;
         }
 
         return canSelfRegister() ? registerNewEPerson(context, person, token) : NO_SUCH_USER;
+
+    }
+
+    private int logInEPerson(Context context, OrcidTokenResponseDTO token, EPerson ePerson)
+        throws SQLException {
+
+        context.setCurrentUser(ePerson);
+
+        setOrcidMetadataOnEPerson(context, ePerson, token);
+
+        ResearcherProfile profile = findProfile(context, ePerson);
+        if (profile != null) {
+            orcidSynchronizationConfigurator.configureProfile(context, profile, token);
+        }
+
+        return SUCCESS;
 
     }
 
@@ -209,7 +214,7 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
             eperson.setCanLogIn(true);
             eperson.setSelfRegistered(true);
 
-            setOrcidMetadataOnEperson(context, eperson, token);
+            setOrcidMetadataOnEPerson(context, eperson, token);
 
             ePersonService.update(context, eperson);
             context.setCurrentUser(eperson);
@@ -226,7 +231,7 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
         }
     }
 
-    private void setOrcidMetadataOnEperson(Context context, EPerson person, OrcidTokenResponseDTO token)
+    private void setOrcidMetadataOnEPerson(Context context, EPerson person, OrcidTokenResponseDTO token)
         throws SQLException {
 
         String orcid = token.getOrcid();
@@ -244,7 +249,7 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
 
     }
 
-    private Person getPerson(OrcidTokenResponseDTO token) {
+    private Person getPersonFromOrcid(OrcidTokenResponseDTO token) {
         try {
             return orcidClient.getPerson(token.getAccessToken(), token.getOrcid());
         } catch (Exception ex) {
@@ -286,6 +291,14 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
             LOGGER.error("An error occurs retriving the ORCID access_token", ex);
             return null;
         }
+    }
+
+    public OrcidClient getOrcidClient() {
+        return orcidClient;
+    }
+
+    public void setOrcidClient(OrcidClient orcidClient) {
+        this.orcidClient = orcidClient;
     }
 
 }
