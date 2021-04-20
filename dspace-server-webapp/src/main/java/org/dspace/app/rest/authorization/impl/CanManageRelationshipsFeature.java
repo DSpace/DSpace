@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @AuthorizationFeatureDocumentation(name = CanManageRelationshipsFeature.NAME,
-    description = "It can be used to verify if the user has WRITE permission on the Item")
+    description = "It can be used to verify if the user has permissions to manage relationships of the Item")
 public class CanManageRelationshipsFeature implements AuthorizationFeature {
 
     public static final String NAME = "canManageRelationships";

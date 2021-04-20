@@ -66,17 +66,15 @@ public class CanManageMappingsFeature implements AuthorizationFeature {
         }
         if (object instanceof ItemRest) {
             Item item = itemService.find(context, UUID.fromString(((ItemRest) object).getUuid()));
-            Collection parentCollection = item.getCollections().get(0);
-            List<Collection> collections = null;
             try {
-                collections = collectionService.findCollectionsWithSubmit("", context, null, 0, 2)
-                                               .stream()
-                                               .filter(c -> !c.getID().equals(parentCollection.getID()))
-                                               .collect(Collectors.toList());
+                List<Collection> collections = collectionService.findCollectionsWithSubmit("", context, null, 0, 2)
+                                                .stream()
+                                                .filter(c -> !c.getID().equals(item.getOwningCollection().getID()))
+                                                .collect(Collectors.toList());
+                return CollectionUtils.isNotEmpty(collections);
             } catch (SearchServiceException e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
-            return CollectionUtils.isNotEmpty(collections);
         }
         return false;
     }
