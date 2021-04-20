@@ -45,6 +45,7 @@ public class ProfileSynchronizationWithOrcidConfiguratorImpl implements ProfileS
         itemService.setMetadataSingleValue(context, item, "person", "identifier", "orcid", null, orcid);
         itemService.setMetadataSingleValue(context, item, "cris", "orcid", "access-token", null, accessToken);
         itemService.setMetadataSingleValue(context, item, "cris", "orcid", "refresh-token", null, refreshToken);
+        itemService.clearMetadata(context, item, "cris", "orcid", "scope", null);
         for (String scope : scopes) {
             itemService.addMetadata(context, item, "cris", "orcid", "scope", null, scope);
         }

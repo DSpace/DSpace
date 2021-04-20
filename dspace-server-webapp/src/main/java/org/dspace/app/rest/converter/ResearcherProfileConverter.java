@@ -9,6 +9,7 @@ package org.dspace.app.rest.converter;
 
 import org.dspace.app.profile.ResearcherProfile;
 import org.dspace.app.rest.model.ResearcherProfileRest;
+import org.dspace.app.rest.model.ResearcherProfileRest.OrcidSynchronizationRest;
 import org.dspace.app.rest.projection.Projection;
 import org.springframework.stereotype.Component;
 
@@ -25,9 +26,22 @@ public class ResearcherProfileConverter implements DSpaceConverter<ResearcherPro
     @Override
     public ResearcherProfileRest convert(ResearcherProfile profile, Projection projection) {
         ResearcherProfileRest researcherProfileRest = new ResearcherProfileRest();
+
         researcherProfileRest.setVisible(profile.isVisible());
         researcherProfileRest.setId(profile.getId());
         researcherProfileRest.setProjection(projection);
+
+        if (profile.isLinkedToOrcid()) {
+            profile.getOrcid().ifPresent(researcherProfileRest::setOrcid);
+
+            OrcidSynchronizationRest orcidSynchronization = new OrcidSynchronizationRest();
+            orcidSynchronization.setMode(profile.getOrcidSynchronizationMode());
+            orcidSynchronization.setProfilePreferences(profile.getOrcidSynchronizationProfilePreferences());
+            orcidSynchronization.setProjectsPreference(profile.getOrcidSynchronizationProjectsPreference());
+            orcidSynchronization.setPublicationsPreference(profile.getOrcidSynchronizationPublicationsPreference());
+            researcherProfileRest.setOrcidSynchronization(orcidSynchronization);
+        }
+
         return researcherProfileRest;
     }
 
