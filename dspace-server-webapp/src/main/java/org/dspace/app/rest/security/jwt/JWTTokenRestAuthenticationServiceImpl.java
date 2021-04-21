@@ -125,9 +125,9 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     }
 
     @Override
-    public EPerson getAuthenticatedEPerson(HttpServletRequest request, Context context) {
+    public EPerson getAuthenticatedEPerson(HttpServletRequest request, HttpServletResponse response, Context context) {
         try {
-            String token = getLoginToken(request);
+            String token = getLoginToken(request, response);
             EPerson ePerson = null;
             if (token == null) {
                 token = getShortLivedToken(request);
@@ -156,7 +156,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     @Override
     public void invalidateAuthenticationData(HttpServletRequest request, HttpServletResponse response,
                                              Context context) throws Exception {
-        String token = getLoginToken(request);
+        String token = getLoginToken(request, response);
         invalidateAuthenticationCookie(response);
         loginJWTTokenHandler.invalidateToken(token, request, context);
 
@@ -164,6 +164,10 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
         resetCSRFToken(request, response);
     }
 
+    /**
+     * Invalidate our temporary authentication cookie by overwriting it in the response.
+     * @param response
+     */
     @Override
     public void invalidateAuthenticationCookie(HttpServletResponse response) {
         // Re-send the same cookie (as addTokenToResponse()) with no value and a Max-Age of 0 seconds
@@ -179,6 +183,18 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
         return authenticationService;
     }
 
+    /**
+     * Return a comma-separated list of all currently enabled authentication options (based on DSpace configuration).
+     * This list is sent to the client in the WWW-Authenticate header in order to inform it of all the enabled
+     * authentication plugins *and* (optionally) to provide it with the "location" of the login page, if
+     * the authentication plugin requires an external login page (e.g. Shibboleth).
+     * <P>
+     * Example output looks like:
+     *    shibboleth realm="DSpace REST API" location=[shibboleth-url], password realm="DSpace REST API"
+     * @param request The current client request
+     * @param response The response being build for the client
+     * @return comma separated list of authentication options
+     */
     @Override
     public String getWwwAuthenticateHeaderValue(final HttpServletRequest request, final HttpServletResponse response) {
         Iterator<AuthenticationMethod> authenticationMethodIterator
@@ -195,10 +211,12 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
 
             wwwAuthenticate.append(authenticationMethod.getName()).append(" realm=\"DSpace REST API\"");
 
+            // If authentication method requires a custom login page, add that as the "location". The client is
+            // expected to read this "location" and send users to that URL when this authentication option is selected
+            // We cannot reply with a 303 code because many browsers handle 3xx response codes transparently. This
+            // means that the JavaScript client code is not aware of the 303 status and fails to react accordingly.
             String loginPageURL = authenticationMethod.loginPageURL(context, request, response);
             if (org.apache.commons.lang3.StringUtils.isNotBlank(loginPageURL)) {
-                // We cannot reply with a 303 code because may browsers handle 3xx response codes transparently. This
-                // means that the JavaScript client code is not aware of the 303 status and fails to react accordingly.
                 wwwAuthenticate.append(", location=\"").append(loginPageURL).append("\"");
             }
         }
@@ -232,7 +250,14 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
         response.setHeader(AUTHORIZATION_HEADER, String.format("%s %s", AUTHORIZATION_TYPE, token));
     }
 
-    private String getLoginToken(HttpServletRequest request) {
+    /**
+     * Get the Login token (JWT) in the current request. First we check the Authorization header.
+     * If not found there, we check for a temporary authentication cookie and use that.
+     * @param request current request
+     * @param request current response
+     * @return authentication token (if found), or null
+     */
+    private String getLoginToken(HttpServletRequest request, HttpServletResponse response) {
         String tokenValue = null;
         String authHeader = request.getHeader(AUTHORIZATION_HEADER);
         String authCookie = getAuthorizationCookie(request);
@@ -240,6 +265,12 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
             tokenValue = authHeader.replace(AUTHORIZATION_TYPE, "").trim();
         } else if (StringUtils.isNotBlank(authCookie)) {
             tokenValue = authCookie;
+            // If auth cookie is read/used, then we immediately remove the cookie & reset the CSRF token.
+            // This is because we treat auth cookies as temporary in nature, only to be used once & only used by
+            // specific auth plugins (like Shibboleth) which require them. So, an auth cookie should only ever be
+            // used for an initial login, after which Headers are used.
+            invalidateAuthenticationCookie(response);
+            resetCSRFToken(request, response);
         }
 
         return tokenValue;
