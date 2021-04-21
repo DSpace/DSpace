@@ -94,9 +94,9 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
             log.error("Access is denied (status:{})", HttpServletResponse.SC_FORBIDDEN, e);
             return;
         }
+        // If we have a valid Authentication, save it to Spring Security
         if (authentication != null) {
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            restAuthenticationService.invalidateAuthenticationCookie(res);
         }
         chain.doFilter(req, res);
     }
@@ -123,7 +123,7 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
 
             Context context = ContextUtil.obtainContext(request);
 
-            EPerson eperson = restAuthenticationService.getAuthenticatedEPerson(request, context);
+            EPerson eperson = restAuthenticationService.getAuthenticatedEPerson(request, res, context);
             if (eperson != null) {
                 //Pass the eperson ID to the request service
                 requestService.setCurrentUserId(eperson.getID());
