@@ -8,17 +8,14 @@
 package org.dspace.app.orcid.service.impl;
 
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.dao.OrcidQueueDAO;
 import org.dspace.app.orcid.service.OrcidQueueService;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -30,11 +27,11 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class OrcidQueueServiceImpl implements OrcidQueueService {
 
-    @Autowired(required = true)
-    protected AuthorizeService authorizeService;
-
     @Autowired
     private OrcidQueueDAO orcidQueueDAO;
+
+    @Autowired
+    private ItemService itemService;
 
     @Override
     public List<OrcidQueue> findByOwnerId(Context context, UUID ownerId) throws SQLException {
@@ -53,15 +50,45 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     }
 
     @Override
+    public List<OrcidQueue> findByOwnerOrEntity(Context context, Item item) throws SQLException {
+        return orcidQueueDAO.findByOwnerOrEntity(context, item);
+    }
+
+    @Override
     public long countByOwnerId(Context context, UUID ownerId) throws SQLException {
         return orcidQueueDAO.countByOwnerId(context, ownerId);
+    }
+
+    @Override
+    public List<OrcidQueue> findAll(Context context) throws SQLException {
+        return orcidQueueDAO.findAll(context, OrcidQueue.class);
     }
 
     @Override
     public OrcidQueue create(Context context, Item owner, Item entity) throws SQLException {
         OrcidQueue orcidQueue = new OrcidQueue();
         orcidQueue.setEntity(entity);
+        orcidQueue.setEntityType(itemService.getEntityType(entity));
         orcidQueue.setOwner(owner);
+        return orcidQueueDAO.create(context, orcidQueue);
+    }
+
+    @Override
+    public OrcidQueue create(Context context, Item owner, Item entity, String putCode) throws SQLException {
+        OrcidQueue orcidQueue = new OrcidQueue();
+        orcidQueue.setOwner(owner);
+        orcidQueue.setEntity(entity);
+        orcidQueue.setPutCode(putCode);
+        orcidQueue.setEntityType(itemService.getEntityType(entity));
+        return orcidQueueDAO.create(context, orcidQueue);
+    }
+
+    @Override
+    public OrcidQueue create(Context context, Item owner, String entityType, String putCode) throws SQLException {
+        OrcidQueue orcidQueue = new OrcidQueue();
+        orcidQueue.setEntityType(entityType);
+        orcidQueue.setOwner(owner);
+        orcidQueue.setPutCode(putCode);
         return orcidQueueDAO.create(context, orcidQueue);
     }
 
@@ -69,16 +96,12 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     public void deleteById(Context context, Integer id) throws SQLException {
         OrcidQueue orcidQueue = orcidQueueDAO.findByID(context, OrcidQueue.class, id);
         if (orcidQueue != null) {
-            orcidQueueDAO.delete(context, orcidQueue);
+            delete(context, orcidQueue);
         }
     }
 
     @Override
-    public void delete(Context context, OrcidQueue orcidQueue) throws SQLException, AuthorizeException {
-        if (!authorizeService.isAdmin(context)) {
-            throw new AuthorizeException(
-                "You must be an admin to delete a OrcidQueue");
-        }
+    public void delete(Context context, OrcidQueue orcidQueue) throws SQLException {
         orcidQueueDAO.delete(context, orcidQueue);
     }
 
@@ -88,20 +111,7 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     }
 
     @Override
-    public void update(Context context, OrcidQueue orcidQueue) throws SQLException, AuthorizeException {
-        update(context,Collections.singletonList(orcidQueue));
-    }
-
-    @Override
-    public void update(Context context, List<OrcidQueue> orcidQueueList) throws SQLException, AuthorizeException {
-        if (!authorizeService.isAdmin(context)) {
-            throw new AuthorizeException(
-                "You must be an admin to update a OrcidQueue");
-        }
-        if (CollectionUtils.isNotEmpty(orcidQueueList)) {
-            for (OrcidQueue orcidQueue: orcidQueueList) {
-                orcidQueueDAO.save(context, orcidQueue);
-            }
-        }
+    public void update(Context context, OrcidQueue orcidQueue) throws SQLException {
+        orcidQueueDAO.save(context, orcidQueue);
     }
 }

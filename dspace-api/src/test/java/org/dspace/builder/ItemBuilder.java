@@ -17,6 +17,8 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.UUID;
 
+import org.dspace.app.profile.OrcidEntitySynchronizationPreference;
+import org.dspace.app.profile.OrcidProfileSynchronizationPreference;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
@@ -168,6 +170,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, CRIS.getName(), "owner", null, null, value, authority, CF_ACCEPTED);
     }
 
+    public ItemBuilder withCrisOwner(EPerson ePerson) {
+        return withCrisOwner(ePerson.getFullName(), ePerson.getID().toString());
+    }
+
     public ItemBuilder withDoiIdentifier(String doi) {
         return addMetadataValue(item, "dc", "identifier", "doi", doi);
     }
@@ -190,6 +196,34 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withOrcidIdentifier(String orcid) {
         return addMetadataValue(item, "person", "identifier", "orcid", orcid);
+    }
+
+    public ItemBuilder withOrcidAccessToken(String accessToken) {
+        return addMetadataValue(item, "cris", "orcid", "access-token", accessToken);
+    }
+
+    public ItemBuilder withOrcidSynchronizationPublicationsPreference(OrcidEntitySynchronizationPreference value) {
+        return withOrcidSynchronizationPublicationsPreference(value.name());
+    }
+
+    public ItemBuilder withOrcidSynchronizationPublicationsPreference(String value) {
+        return setMetadataSingleValue(item, "cris", "orcid", "sync-publications", value);
+    }
+
+    public ItemBuilder withOrcidSynchronizationProjectsPreference(OrcidEntitySynchronizationPreference value) {
+        return withOrcidSynchronizationProjectsPreference(value.name());
+    }
+
+    public ItemBuilder withOrcidSynchronizationProjectsPreference(String value) {
+        return setMetadataSingleValue(item, "cris", "orcid", "sync-projects", value);
+    }
+
+    public ItemBuilder withOrcidSynchronizationProfilePreference(OrcidProfileSynchronizationPreference value) {
+        return withOrcidSynchronizationProfilePreference(value.name());
+    }
+
+    public ItemBuilder withOrcidSynchronizationProfilePreference(String value) {
+        return addMetadataValue(item, "cris", "orcid", "sync-profile", value);
     }
 
     public ItemBuilder withIsniIdentifier(String isni) {

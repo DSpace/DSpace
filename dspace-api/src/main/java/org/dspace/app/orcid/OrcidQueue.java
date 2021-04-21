@@ -7,6 +7,11 @@
  */
 package org.dspace.app.orcid;
 
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+
+import java.util.Objects;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -19,6 +24,12 @@ import javax.persistence.Table;
 import org.dspace.content.Item;
 import org.dspace.core.ReloadableEntity;
 
+/**
+ * Entity that model a record on the ORCID synchronization queue.
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ */
 @Entity
 @Table(name = "orcid_queue")
 public class OrcidQueue implements ReloadableEntity<Integer> {
@@ -35,6 +46,24 @@ public class OrcidQueue implements ReloadableEntity<Integer> {
     @ManyToOne
     @JoinColumn(name = "entity_id")
     private Item entity;
+
+    @Column(name = "put_code")
+    private String putCode;
+
+    @Column(name = "entity_type")
+    private String entityType;
+
+    public boolean isAddAction() {
+        return entity != null && isEmpty(putCode);
+    }
+
+    public boolean isUpdateAction() {
+        return entity != null && isNotEmpty(putCode);
+    }
+
+    public boolean isDeleteAction() {
+        return entity == null && isNotEmpty(putCode);
+    }
 
     public Integer getId() {
         return id;
@@ -64,5 +93,42 @@ public class OrcidQueue implements ReloadableEntity<Integer> {
     public void setEntity(Item entity) {
         this.entity = entity;
     }
+
+    public String getPutCode() {
+        return putCode;
+    }
+
+    public void setPutCode(String putCode) {
+        this.putCode = putCode;
+    }
+
+    public String getEntityType() {
+        return entityType;
+    }
+
+    public void setEntityType(String entityType) {
+        this.entityType = entityType;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        OrcidQueue other = (OrcidQueue) obj;
+        return Objects.equals(id, other.id);
+    }
+
 
 }

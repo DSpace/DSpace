@@ -8,21 +8,28 @@
 package org.dspace.app.orcid.factory;
 
 import org.dspace.app.orcid.service.OrcidHistoryService;
+import org.dspace.app.orcid.service.OrcidQueueService;
+import org.dspace.app.profile.service.ProfileOrcidSynchronizationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Abstract factory to get services for the orcid package, use
  * OrcidHistoryServiceFactory.getInstance() to retrieve an implementation.
  *
- * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
+ * @author Luca Giamminonni (luca.giamminonni at 4Science.it)
  *
  */
-public abstract class OrcidHistoryServiceFactory {
+public abstract class OrcidServiceFactory {
 
     public abstract OrcidHistoryService getOrcidHistoryService();
 
-    public static OrcidHistoryServiceFactory getInstance() {
+    public abstract OrcidQueueService getOrcidQueueService();
+
+    public abstract ProfileOrcidSynchronizationService getOrcidSynchronizationService();
+
+    public static OrcidServiceFactory getInstance() {
         return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(
-                      "orcidHistoryServiceFactory", OrcidHistoryServiceFactory.class);
+            "orcidServiceFactory", OrcidServiceFactory.class);
     }
+
 }

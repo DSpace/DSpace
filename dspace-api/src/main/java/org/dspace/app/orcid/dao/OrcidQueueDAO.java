@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dspace.app.orcid.OrcidQueue;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 
@@ -42,4 +43,14 @@ public interface OrcidQueueDAO extends GenericDAO<OrcidQueue> {
     long countByOwnerId(Context context, UUID ownerId) throws SQLException;
 
     public List<OrcidQueue> findByOwnerAndEntityId(Context context, UUID ownerId, UUID entityId) throws SQLException;
+
+    /**
+     * Get the OrcidQueue records where the given item is the owner OR the entity
+     *
+     * @param  context      DSpace context object
+     * @param  item         the item to search for
+     * @return              the found OrcidHistory entities
+     * @throws SQLException if database error
+     */
+    public List<OrcidQueue> findByOwnerOrEntity(Context context, Item item) throws SQLException;
 }

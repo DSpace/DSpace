@@ -13,7 +13,6 @@ import java.sql.SQLException;
 import org.apache.log4j.Logger;
 import org.dspace.app.orcid.OrcidHistory;
 import org.dspace.app.orcid.service.OrcidHistoryService;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
@@ -58,7 +57,7 @@ public class OrcidHistoryBuilder extends  AbstractBuilder<OrcidHistory, OrcidHis
     }
 
     @Override
-    public OrcidHistory build() throws SQLException, AuthorizeException {
+    public OrcidHistory build() throws SQLException {
         try {
             getService().update(context, orcidHistory);
             context.dispatchEvents();
@@ -90,14 +89,9 @@ public class OrcidHistoryBuilder extends  AbstractBuilder<OrcidHistory, OrcidHis
         }
 
         try (Context c = new Context()) {
-            c.turnOffAuthorisationSystem();
             OrcidHistory orcidHistory = orcidHistoryService.find(c, id);
             if (orcidHistory != null) {
-                try {
-                    orcidHistoryService.delete(c, orcidHistory);
-                } catch (AuthorizeException e) {
-                    throw new RuntimeException(e);
-                }
+                orcidHistoryService.delete(c, orcidHistory);
             }
             c.complete();
         }

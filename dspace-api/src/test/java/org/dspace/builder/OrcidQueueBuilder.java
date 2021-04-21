@@ -69,6 +69,11 @@ public class OrcidQueueBuilder extends  AbstractBuilder<OrcidQueue, OrcidQueueSe
         return orcidQueue;
     }
 
+    public OrcidQueueBuilder withPutCode(String putCode) {
+        orcidQueue.setPutCode(putCode);
+        return this;
+    }
+
     @Override
     public void delete(Context c, OrcidQueue orcidQueue) throws Exception {
         if (orcidQueue != null) {

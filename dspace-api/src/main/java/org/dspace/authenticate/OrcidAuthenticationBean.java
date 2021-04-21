@@ -25,7 +25,7 @@ import org.dspace.app.orcid.client.OrcidClient;
 import org.dspace.app.orcid.client.OrcidConfiguration;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.app.profile.ResearcherProfile;
-import org.dspace.app.profile.service.ProfileSynchronizationWithOrcidConfigurator;
+import org.dspace.app.profile.service.ProfileOrcidSynchronizationService;
 import org.dspace.app.profile.service.ResearcherProfileService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -69,7 +69,7 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
     private ResearcherProfileService researcherProfileService;
 
     @Autowired
-    private ProfileSynchronizationWithOrcidConfigurator orcidSynchronizationConfigurator;
+    private ProfileOrcidSynchronizationService orcidSynchronizationService;
 
     @Override
     public int authenticate(Context context, String username, String password, String realm, HttpServletRequest request)
@@ -183,7 +183,7 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
 
         ResearcherProfile profile = findProfile(context, ePerson);
         if (profile != null) {
-            orcidSynchronizationConfigurator.configureProfile(context, profile, token);
+            orcidSynchronizationService.linkProfile(context, profile, token);
         }
 
         return SUCCESS;

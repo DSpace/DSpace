@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.dspace.app.orcid.client.OrcidClient;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.app.profile.ResearcherProfile;
-import org.dspace.app.profile.service.ProfileSynchronizationWithOrcidConfigurator;
+import org.dspace.app.profile.service.ProfileOrcidSynchronizationService;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.content.service.ItemService;
@@ -51,7 +51,7 @@ public class OrcidRestController {
     private ItemService itemService;
 
     @Autowired
-    private ProfileSynchronizationWithOrcidConfigurator orcidSynchronizationService;
+    private ProfileOrcidSynchronizationService orcidSynchronizationService;
 
     @RequestMapping(value = "/{itemId}", method = RequestMethod.GET)
     public void retrieveOrcidFromCode(HttpServletRequest request, HttpServletResponse response,
@@ -65,7 +65,7 @@ public class OrcidRestController {
 
         OrcidTokenResponseDTO token = orcidClient.getAccessToken(code);
 
-        orcidSynchronizationService.configureProfile(context, profile, token);
+        orcidSynchronizationService.linkProfile(context, profile, token);
 
         context.complete();
 

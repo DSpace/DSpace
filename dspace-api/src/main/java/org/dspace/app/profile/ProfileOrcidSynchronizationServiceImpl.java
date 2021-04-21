@@ -8,31 +8,33 @@
 package org.dspace.app.profile;
 
 import static java.util.List.of;
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.dspace.app.profile.OrcidEntitySynchronizationPreference.DISABLED;
 
 import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
-import org.dspace.app.profile.service.ProfileSynchronizationWithOrcidConfigurator;
+import org.dspace.app.profile.service.ProfileOrcidSynchronizationService;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Implementation of {@link ProfileSynchronizationWithOrcidConfigurator}.
+ * Implementation of {@link ProfileOrcidSynchronizationService}.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public class ProfileSynchronizationWithOrcidConfiguratorImpl implements ProfileSynchronizationWithOrcidConfigurator {
+public class ProfileOrcidSynchronizationServiceImpl implements ProfileOrcidSynchronizationService {
 
     @Autowired
     private ItemService itemService;
 
     @Override
-    public void configureProfile(Context context, ResearcherProfile profile, OrcidTokenResponseDTO token)
+    public void linkProfile(Context context, ResearcherProfile profile, OrcidTokenResponseDTO token)
         throws SQLException {
 
         String orcid = token.getOrcid();
@@ -105,6 +107,36 @@ public class ProfileSynchronizationWithOrcidConfiguratorImpl implements ProfileS
             itemService.addMetadata(context, item, "cris", "orcid", metadataQualifier, null, value);
         }
 
+    }
+
+    @Override
+    public boolean isSynchronizationEnabled(ResearcherProfile profile, Item item) {
+
+        String entityType = itemService.getEntityType(item);
+        if (entityType == null) {
+            return false;
+        }
+
+        switch (entityType) {
+            case "Person":
+                return profile.getItem().equals(item) && !isEmpty(profile.getOrcidSynchronizationProfilePreferences());
+            case "Publication":
+                return !profile.getOrcidSynchronizationPublicationsPreference().equals(DISABLED.name());
+            case "Project":
+                return !profile.getOrcidSynchronizationProjectsPreference().equals(DISABLED.name());
+            default:
+                return false;
+        }
+
+    }
+
+    @Override
+    public boolean isSynchronizationEnabled(Item profileItem, Item item) {
+        try {
+            return isSynchronizationEnabled(new ResearcherProfile(profileItem), item);
+        } catch (IllegalArgumentException ex) {
+            return false;
+        }
     }
 
 }

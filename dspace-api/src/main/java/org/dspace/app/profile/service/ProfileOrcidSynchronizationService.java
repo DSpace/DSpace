@@ -15,16 +15,17 @@ import org.dspace.app.profile.OrcidEntitySynchronizationPreference;
 import org.dspace.app.profile.OrcidProfileSynchronizationPreference;
 import org.dspace.app.profile.OrcidSynchronizationMode;
 import org.dspace.app.profile.ResearcherProfile;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 
 /**
- * Service that handle the configuration of the syncronization between a DSpace
- * profile and the relative ORCID profile, if any.
+ * Service that handle the the syncronization between a DSpace profile and the
+ * relative ORCID profile, if any.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public interface ProfileSynchronizationWithOrcidConfigurator {
+public interface ProfileOrcidSynchronizationService {
 
     /**
      * Configure the given profile with the data present in the given ORCID token.
@@ -36,7 +37,7 @@ public interface ProfileSynchronizationWithOrcidConfigurator {
      * @param  token        the ORCID token
      * @throws SQLException if a SQL error occurs during the profile update
      */
-    public void configureProfile(Context context, ResearcherProfile profile, OrcidTokenResponseDTO token)
+    public void linkProfile(Context context, ResearcherProfile profile, OrcidTokenResponseDTO token)
         throws SQLException;
 
     /**
@@ -91,4 +92,26 @@ public interface ProfileSynchronizationWithOrcidConfigurator {
      */
     public void setSynchronizationMode(Context context, ResearcherProfile researcherProfile,
         OrcidSynchronizationMode value) throws SQLException;
+
+    /**
+     * Check if the given researcher profile is configured to synchronize the given
+     * item with ORCID.
+     *
+     * @param  profile the researcher profile
+     * @param  item    the entity type to check
+     * @return         true if the given entity type can be synchronize with ORCID,
+     *                 false otherwise
+     */
+    public boolean isSynchronizationEnabled(ResearcherProfile profile, Item item);
+
+    /**
+     * Check if the given researcher profile item is configured to synchronize the
+     * given item with ORCID.
+     *
+     * @param  profile the researcher profile item
+     * @param  item    the entity type to check
+     * @return         true if the given entity type can be synchronize with ORCID,
+     *                 false otherwise
+     */
+    public boolean isSynchronizationEnabled(Item profile, Item item);
 }

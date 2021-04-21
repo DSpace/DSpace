@@ -8,6 +8,8 @@
 package org.dspace.app.orcid.service.impl;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Comparator.comparing;
+import static org.apache.commons.lang3.math.NumberUtils.isCreatable;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -15,6 +17,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
 import javax.xml.bind.JAXBContext;
@@ -41,8 +44,6 @@ import org.dspace.app.orcid.dao.OrcidHistoryDAO;
 import org.dspace.app.orcid.dao.OrcidQueueDAO;
 import org.dspace.app.orcid.service.OrcidHistoryService;
 import org.dspace.app.util.OrcidWorkMetadata;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
@@ -85,6 +86,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * Implementation of {@link OrcidHistoryService}.
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
 public class OrcidHistoryServiceImpl implements OrcidHistoryService {
@@ -92,9 +94,6 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     private static final String WORK_ENDPOINT = "/work";
 
     private static final String FUNDING_ENDPOINT = "/funding";
-
-    @Autowired(required = true)
-    protected AuthorizeService authorizeService;
 
     @Autowired
     private OrcidHistoryDAO orcidHistoryDAO;
@@ -127,8 +126,8 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     }
 
     @Override
-    public List<OrcidHistory> findByOwner(Context context, Item owner) throws SQLException {
-        return orcidHistoryDAO.findByOwner(context, owner);
+    public List<OrcidHistory> findByOwnerOrEntity(Context context, Item owner) throws SQLException {
+        return orcidHistoryDAO.findByOwnerOrEntity(context, owner);
     }
 
     @Override
@@ -140,21 +139,29 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     }
 
     @Override
-    public void delete(Context context, OrcidHistory orcidHistory) throws SQLException, AuthorizeException {
-        if (!authorizeService.isAdmin(context)) {
-            throw new AuthorizeException("You must be an admin to delete a OrcidHistory");
-        }
+    public void delete(Context context, OrcidHistory orcidHistory) throws SQLException {
         orcidHistoryDAO.delete(context, orcidHistory);
     }
 
     @Override
-    public void update(Context context, OrcidHistory orcidHistory) throws SQLException, AuthorizeException {
-        if (!authorizeService.isAdmin(context)) {
-            throw new AuthorizeException("You must be an admin to update a OrcidHistory");
-        }
+    public void update(Context context, OrcidHistory orcidHistory) throws SQLException {
         if (orcidHistory != null) {
             orcidHistoryDAO.save(context, orcidHistory);
         }
+    }
+
+    @Override
+    public Optional<String> findLastPutCode(Context context, Item owner, Item entity) throws SQLException {
+        return orcidHistoryDAO.findByOwnerAndEntity(context, owner.getID(), entity.getID()).stream()
+            .sorted(comparing(OrcidHistory::getLastAttempt).reversed())
+            .map(history -> history.getPutCode())
+            .findFirst();
+    }
+
+    @Override
+    public List<OrcidHistory> findByEntity(Context context, Item entity) throws SQLException {
+        // TODO Auto-generated method stub
+        return orcidHistoryDAO.findByEntity(context, entity);
     }
 
     @Override
@@ -171,9 +178,10 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         }
 
         Item entity = orcidQueue.getEntity();
-        String entityType = getMetadataValue(entity, "dspace.entity.type");
+        String entityType = orcidQueue.getEntityType() != null ? orcidQueue.getEntityType()
+            : itemService.getEntityType(entity);
         if (entityType == null) {
-            throw new IllegalArgumentException("The related entity item does not have a relationship type");
+            throw new IllegalArgumentException("The related entity item does not have a entity type");
         }
 
         switch (entityType) {
@@ -194,7 +202,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         Item entity = orcidQueue.getEntity();
         Item owner = orcidQueue.getOwner();
         OrcidWorkMetadata itemMetadata = new OrcidWorkMetadata(entity);
-        Long putCode = null;
+        Long putCode = getPutCode(orcidQueue);
         Work work = new Work();
         addAuthors(context, work, itemMetadata);
         addPubblicationDate(work, itemMetadata);
@@ -205,8 +213,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         workTitle.setTitle(new Title(itemMetadata.getTitle()));
         work.setWorkTitle(workTitle);
         if (!forceAddition) {
-            putCode = findPutCode(context, entity, owner);
-            work.setPutCode(putCode);
+            work.setPutCode(getPutCode(orcidQueue));
         } else {
             deleteOldRecords(context, entity, owner);
         }
@@ -222,10 +229,9 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         Funding funding = new Funding();
         funding.setType(FundingType.GRANT);
 
-        Long putCode = null;
+        Long putCode = getPutCode(orcidQueue);
 
         if (!forceAddition) {
-            putCode = findPutCode(context, entity, owner);
             funding.setPutCode(putCode);
         } else {
             deleteOldRecords(context, entity, owner);
@@ -323,12 +329,6 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
                 }
             }
         }
-    }
-
-    private Long findPutCode(Context context, Item entity, Item owner) throws SQLException {
-        return orcidHistoryDAO.findByOwnerAndEntity(context, owner.getID(), entity.getID()).stream()
-                              .filter(history -> StringUtils.isNotBlank(history.getPutCode()))
-                              .map(history -> Long.valueOf(history.getPutCode())).findFirst().orElse(null);
     }
 
     private ExternalIDs getExternalIds(Item entity) {
@@ -504,5 +504,9 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
             citation.setCitation(citationVal);
             work.setWorkCitation(citation);
         }
+    }
+
+    private Long getPutCode(OrcidQueue orcidQueue) {
+        return isCreatable(orcidQueue.getPutCode()) ? Long.valueOf(orcidQueue.getPutCode()) : null;
     }
 }

@@ -9,17 +9,18 @@ package org.dspace.app.orcid.service;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 import org.dspace.app.orcid.OrcidHistory;
 import org.dspace.app.orcid.OrcidQueue;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
 /**
- * Interface of service to manage OrcidHistory
- * 
+ * Interface of service to manage OrcidHistory.
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  */
 public interface OrcidHistoryService {
 
@@ -34,15 +35,35 @@ public interface OrcidHistoryService {
     public OrcidHistory find(Context context, int id) throws SQLException;
 
     /**
-     * Get the OrcidHistory records related to the given owner.
+     * Get the OrcidHistory records where the given item is the owner OR the entity
      *
      * @param  context      DSpace context object
-     * @param  id           owner the owner item
+     * @param  item         the item to search for
      * @return              the found OrcidHistory entities
      * @throws SQLException if database error
      */
-    public List<OrcidHistory> findByOwner(Context context, Item owner) throws SQLException;
+    public List<OrcidHistory> findByOwnerOrEntity(Context context, Item item) throws SQLException;
 
+    /**
+     * Find the OrcidHistory records related to the given entity item.
+     *
+     * @param  context      DSpace context object
+     * @param  entity       the entity item
+     * @return              the found put codes
+     * @throws SQLException if database error
+     */
+    public List<OrcidHistory> findByEntity(Context context, Item entity) throws SQLException;
+
+    /**
+     * Create a new OrcidHistory records related to the given owner and entity
+     * items.
+     *
+     * @param  context      DSpace context object
+     * @param  owner        the owner item
+     * @param  entity       the entity item
+     * @return              the created orcid history record
+     * @throws SQLException if database error
+     */
     public OrcidHistory create(Context context, Item owner, Item entity) throws SQLException;
 
     /**
@@ -51,9 +72,8 @@ public interface OrcidHistoryService {
      * @param context             context
      * @param OrcidHistory        orcidHistory
      * @throws SQLException       if database error
-     * @throws AuthorizeException if authorization error
      */
-    public void delete(Context context, OrcidHistory orcidHistory) throws SQLException, AuthorizeException;
+    public void delete(Context context, OrcidHistory orcidHistory) throws SQLException;
 
     /**
      * Update the OrcidHistory
@@ -61,9 +81,20 @@ public interface OrcidHistoryService {
      * @param context             context
      * @param OrcidHistory        orcidHistory
      * @throws SQLException       if database error
-     * @throws AuthorizeException if authorization error
      */
-    public void update(Context context, OrcidHistory orcidHistory) throws SQLException, AuthorizeException;
+    public void update(Context context, OrcidHistory orcidHistory) throws SQLException;
+
+    /**
+     * Find the last put code related to the given owner and entity item.
+     *
+     * @param  context      DSpace context object
+     * @param  owner        the owner item
+     * @param  entity       the entity item
+     * @return              the found put code, if any
+     * @throws SQLException if database error
+     */
+    public Optional<String> findLastPutCode(Context context, Item owner, Item entity) throws SQLException;
 
     public OrcidHistory sendToOrcid(Context context, OrcidQueue orcidQueue, boolean forceAddition) throws SQLException;
+
 }

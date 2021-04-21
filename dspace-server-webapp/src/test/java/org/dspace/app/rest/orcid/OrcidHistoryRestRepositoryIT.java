@@ -605,12 +605,9 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                                               .withHandle("123456789/xxx")
                                               .withIssueDate("2013-08-03").build();
 
-            OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, itemPerson, itemPublication).build();
-
-            OrcidHistoryBuilder.createOrcidHistory(context, itemPerson, itemPublication)
-                               .withResponseMessage("<xml><work>...</work>")
-                               .withPutCode("12345")
-                               .withStatus(201).build();
+            OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, itemPerson, itemPublication)
+                .withPutCode("12345")
+                .build();
 
             context.restoreAuthSystemState();
 

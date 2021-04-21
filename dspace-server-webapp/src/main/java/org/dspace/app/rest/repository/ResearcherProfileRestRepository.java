@@ -125,11 +125,6 @@ public class ResearcherProfileRestRepository extends DSpaceRestRepository<Resear
 
     }
 
-    public boolean hasNotVisibilityChange(Patch patch) {
-        return patch.getOperations().stream()
-            .noneMatch(operation -> "/visible".equalsIgnoreCase(operation.getPath()));
-    }
-
     @Override
     public Class<ResearcherProfileRest> getDomainClass() {
         return ResearcherProfileRest.class;

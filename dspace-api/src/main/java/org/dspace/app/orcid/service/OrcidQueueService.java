@@ -16,18 +16,60 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
+/**
+ * Service that handles ORCID queue records.
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ */
 public interface OrcidQueueService {
 
     /**
-     * Create an OrcidQueue record with the given owner and entity.
+     * Create an OrcidQueue record with the given owner and entity to push new data
+     * to ORCID.
      *
-     * @param context DSpace context object
-     * @param owner   the owner item
-     * @param entity  the entity item
-     * @return the stored record
+     * @param  context      DSpace context object
+     * @param  owner        the owner item
+     * @param  entity       the entity item
+     * @return              the stored record
      * @throws SQLException if an SQL error occurs
      */
     public OrcidQueue create(Context context, Item owner, Item entity) throws SQLException;
+
+    /**
+     * Create an OrcidQueue record with the given owner to update a record on ORCID
+     * with the given putCode.
+     *
+     * @param  context      DSpace context object
+     * @param  owner        the owner item
+     * @param  entity       the entity item
+     * @param  putCode      the putCode related to the given entity item
+     * @return              the stored record
+     * @throws SQLException if an SQL error occurs
+     */
+    public OrcidQueue create(Context context, Item owner, Item entity, String putCode) throws SQLException;
+
+    /**
+     * Create an OrcidQueue record with the given owner to delete a record on ORCID
+     * related to the given entity type with the given putCode.
+     *
+     * @param  context      DSpace context object
+     * @param  owner        the owner item
+     * @param  entityType   the type of the entity item
+     * @param  putCode      the putCode related to the given entity item
+     * @return              the stored record
+     * @throws SQLException if an SQL error occurs
+     */
+    public OrcidQueue create(Context context, Item owner, String entityType, String putCode) throws SQLException;
+
+    /**
+     * Find all the ORCID queue records.
+     *
+     * @param  context      DSpace context object
+     * @return              the ORCID queue records
+     * @throws SQLException if an SQL error occurs
+     */
+    public List<OrcidQueue> findAll(Context context) throws SQLException;
 
     /**
      * Get the orcid queue records by the owner id.
@@ -52,7 +94,28 @@ public interface OrcidQueueService {
     public List<OrcidQueue> findByOwnerId(Context context, UUID ownerId, Integer limit, Integer offset)
         throws SQLException;
 
+    /**
+     * Get the orcid queue records by the owner and entity ids.
+     *
+     * @param  context      DSpace context object
+     * @param  ownerId      the owner item id
+     * @param  entityId     the entity item id
+     * @param  limit        limit
+     * @param  offset       offset
+     * @return              the orcid queue records
+     * @throws SQLException if an SQL error occurs
+     */
     public List<OrcidQueue> findByOwnerAndEntityId(Context context, UUID ownerId, UUID entityId) throws SQLException;
+
+    /**
+     * Get the OrcidQueue records where the given item is the owner OR the entity
+     *
+     * @param  context      DSpace context object
+     * @param  item         the item to search for
+     * @return              the found OrcidHistory entities
+     * @throws SQLException if database error
+     */
+    public List<OrcidQueue> findByOwnerOrEntity(Context context, Item item) throws SQLException;
 
     /**
      * Returns the number of records on the OrcidQueue associated with the given
@@ -82,7 +145,7 @@ public interface OrcidQueueService {
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      */
-    public void delete(Context context, OrcidQueue orcidQueue) throws SQLException, AuthorizeException;
+    public void delete(Context context, OrcidQueue orcidQueue) throws SQLException;
 
     /**
      * Get an OrcidQueue from the database.
@@ -100,17 +163,6 @@ public interface OrcidQueueService {
      * @param context             context
      * @param OrcidQueue          orcidQueue
      * @throws SQLException       if database error
-     * @throws AuthorizeException if authorization error
      */
-    public void update(Context context, OrcidQueue orcidQueue) throws SQLException, AuthorizeException;
-
-    /**
-     * Update the OrcidQueues
-     * 
-     * @param context              context
-     * @param orcidQueueList       list of orcidQueue
-     * @throws SQLException        if database error
-     * @throws AuthorizeException  if authorization error
-     */
-    public void update(Context context, List<OrcidQueue> orcidQueueList) throws SQLException, AuthorizeException;
+    public void update(Context context, OrcidQueue orcidQueue) throws SQLException;
 }

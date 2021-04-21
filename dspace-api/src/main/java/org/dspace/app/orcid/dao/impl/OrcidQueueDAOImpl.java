@@ -14,6 +14,7 @@ import javax.persistence.Query;
 
 import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.dao.OrcidQueueDAO;
+import org.dspace.content.Item;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
 
@@ -52,6 +53,14 @@ public class OrcidQueueDAOImpl extends AbstractHibernateDAO<OrcidQueue> implemen
         Query query = createQuery(context, "SELECT COUNT(queue) FROM OrcidQueue queue WHERE owner.id= :ownerId");
         query.setParameter("ownerId", ownerId);
         return (long) query.getSingleResult();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<OrcidQueue> findByOwnerOrEntity(Context context, Item item) throws SQLException {
+        Query query = createQuery(context, "FROM OrcidQueue WHERE owner.id= :itemId and entity.id = :itemId");
+        query.setParameter("itemId", item.getID());
+        return query.getResultList();
     }
 
 }
