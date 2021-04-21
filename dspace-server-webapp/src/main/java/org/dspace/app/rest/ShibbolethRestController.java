@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.AuthnRest;
+import org.dspace.authenticate.ShibAuthentication;
 import org.dspace.core.Utils;
 import org.dspace.services.ConfigurationService;
 import org.slf4j.Logger;
@@ -27,10 +28,27 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Rest controller that handles redirect after shibboleth authentication succeded
+ *  Rest controller that handles redirect *after* shibboleth authentication succeeded.
+ *  <P>
+ *  Shibboleth authentication does NOT occur in this Controller, but occurs before this class is called.
+ *  The general Shibboleth login process is as follows:
+ *    1. When Shibboleth plugin is enabled, client/UI receives Shibboleth's absolute URL in WWW-Authenticate header.
+ *       See {@link org.dspace.authenticate.ShibAuthentication} loginPageURL() method.
+ *    2. Client sends the user to that URL when they select Shibboleth authentication.
+ *    3. User logs in using Shibboleth
+ *    4. If successful, they are redirected by Shibboleth to this Controller (the path of this controller is passed
+ *       to Shibboleth as a URL param in step 1)
+ *    5. NOTE: Prior to hitting this Controller, {@link org.dspace.app.rest.security.ShibbolethAuthenticationFilter}
+ *       briefly intercepts the request in order to check for a valid Shibboleth login (see
+ *       ShibAuthentication.authenticate()) and store that user info in a JWT.
+ *    6. This Controller then gets the request & looks for a "redirectUrl" param (also a part of the original URL from
+ *       step 1), and redirects the user to that location (after verifying it's a trusted URL). Usually this is a
+ *       redirect back to the Client/UI page where the User started.
  *
  * @author Andrea Bollini (andrea dot bollini at 4science dot it)
  * @author Giuseppe Digilio (giuseppe dot digilio at 4science dot it)
+ * @see ShibAuthentication
+ * @see org.dspace.app.rest.security.ShibbolethAuthenticationFilter
  */
 @RequestMapping(value = "/api/" + AuthnRest.CATEGORY + "/shibboleth")
 @RestController
@@ -56,7 +74,11 @@ public class ShibbolethRestController implements InitializingBean {
     @RequestMapping(method = RequestMethod.GET)
     public void shibboleth(HttpServletResponse response,
             @RequestParam(name = "redirectUrl", required = false) String redirectUrl) throws IOException {
-        if (redirectUrl == null) {
+        // NOTE: By the time we get here, we already know that Shibboleth is enabled & authentication succeeded,
+        // as both of those are verified by ShibbolethAuthenticationFilter which runs before this controller
+
+        // If redirectUrl unspecified, default to the configured UI
+        if (StringUtils.isEmpty(redirectUrl)) {
             redirectUrl = configurationService.getProperty("dspace.ui.url");
         }
 
