@@ -17,8 +17,8 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.UUID;
 
-import org.dspace.app.profile.OrcidEntitySynchronizationPreference;
-import org.dspace.app.profile.OrcidProfileSynchronizationPreference;
+import org.dspace.app.profile.OrcidEntitySyncPreference;
+import org.dspace.app.profile.OrcidProfileSyncPreference;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
@@ -202,7 +202,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "cris", "orcid", "access-token", accessToken);
     }
 
-    public ItemBuilder withOrcidSynchronizationPublicationsPreference(OrcidEntitySynchronizationPreference value) {
+    public ItemBuilder withOrcidSynchronizationPublicationsPreference(OrcidEntitySyncPreference value) {
         return withOrcidSynchronizationPublicationsPreference(value.name());
     }
 
@@ -210,7 +210,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return setMetadataSingleValue(item, "cris", "orcid", "sync-publications", value);
     }
 
-    public ItemBuilder withOrcidSynchronizationProjectsPreference(OrcidEntitySynchronizationPreference value) {
+    public ItemBuilder withOrcidSynchronizationProjectsPreference(OrcidEntitySyncPreference value) {
         return withOrcidSynchronizationProjectsPreference(value.name());
     }
 
@@ -218,7 +218,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return setMetadataSingleValue(item, "cris", "orcid", "sync-projects", value);
     }
 
-    public ItemBuilder withOrcidSynchronizationProfilePreference(OrcidProfileSynchronizationPreference value) {
+    public ItemBuilder withOrcidSynchronizationProfilePreference(OrcidProfileSyncPreference value) {
         return withOrcidSynchronizationProfilePreference(value.name());
     }
 

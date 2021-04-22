@@ -7,8 +7,8 @@
  */
 package org.dspace.app.profile;
 
-import static org.dspace.app.profile.OrcidEntitySynchronizationPreference.DISABLED;
-import static org.dspace.app.profile.OrcidSynchronizationMode.MANUAL;
+import static org.dspace.app.profile.OrcidEntitySyncPreference.DISABLED;
+import static org.dspace.app.profile.OrcidSyncMode.MANUAL;
 import static org.dspace.core.Constants.READ;
 import static org.dspace.eperson.Group.ANONYMOUS;
 

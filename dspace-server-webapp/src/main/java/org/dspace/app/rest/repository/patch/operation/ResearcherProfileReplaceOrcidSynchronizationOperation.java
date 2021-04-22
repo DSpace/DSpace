@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.profile.OrcidEntitySynchronizationPreference;
-import org.dspace.app.profile.OrcidProfileSynchronizationPreference;
-import org.dspace.app.profile.OrcidSynchronizationMode;
+import org.dspace.app.profile.OrcidEntitySyncPreference;
+import org.dspace.app.profile.OrcidProfileSyncPreference;
+import org.dspace.app.profile.OrcidSyncMode;
 import org.dspace.app.profile.ResearcherProfile;
 import org.dspace.app.profile.service.ProfileOrcidSynchronizationService;
 import org.dspace.app.profile.service.ResearcherProfileService;
@@ -102,7 +102,7 @@ public class ResearcherProfileReplaceOrcidSynchronizationOperation extends Patch
             && operation.getPath().trim().toLowerCase().startsWith(OPERATION_ORCID_SYNCH);
     }
 
-    private List<OrcidProfileSynchronizationPreference> parseProfilePreferences(String value) {
+    private List<OrcidProfileSyncPreference> parseProfilePreferences(String value) {
         return Arrays.stream(value.split(","))
             .map(String::trim)
             .filter(StringUtils::isNotEmpty)
@@ -110,25 +110,25 @@ public class ResearcherProfileReplaceOrcidSynchronizationOperation extends Patch
             .collect(Collectors.toList());
     }
 
-    private OrcidProfileSynchronizationPreference parseProfilePreference(String value) {
+    private OrcidProfileSyncPreference parseProfilePreference(String value) {
         try {
-            return OrcidProfileSynchronizationPreference.valueOf(value.toUpperCase());
+            return OrcidProfileSyncPreference.valueOf(value.toUpperCase());
         } catch (IllegalArgumentException ex) {
             throw new UnprocessableEntityException("Invalid profile's synchronization preference value: " + value, ex);
         }
     }
 
-    private OrcidSynchronizationMode parseMode(String value) {
+    private OrcidSyncMode parseMode(String value) {
         try {
-            return OrcidSynchronizationMode.valueOf(value.toUpperCase());
+            return OrcidSyncMode.valueOf(value.toUpperCase());
         } catch (IllegalArgumentException ex) {
             throw new UnprocessableEntityException("Invalid synchronization mode value: " + value, ex);
         }
     }
 
-    private OrcidEntitySynchronizationPreference parsePreference(String value) {
+    private OrcidEntitySyncPreference parsePreference(String value) {
         try {
-            return OrcidEntitySynchronizationPreference.valueOf(value.toUpperCase());
+            return OrcidEntitySyncPreference.valueOf(value.toUpperCase());
         } catch (IllegalArgumentException ex) {
             throw new UnprocessableEntityException("Invalid synchronization preference value: " + value, ex);
         }

@@ -9,6 +9,7 @@ package org.dspace.app.orcid.service;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.dspace.app.orcid.OrcidHistory;
@@ -33,6 +34,15 @@ public interface OrcidHistoryService {
      * @throws         SQLException if database error
      */
     public OrcidHistory find(Context context, int id) throws SQLException;
+
+    /**
+     * Find all the ORCID history records.
+     *
+     * @param  context      DSpace context object
+     * @return              the ORCID history records
+     * @throws SQLException if an SQL error occurs
+     */
+    public List<OrcidHistory> findAll(Context context) throws SQLException;
 
     /**
      * Get the OrcidHistory records where the given item is the owner OR the entity
@@ -94,6 +104,18 @@ public interface OrcidHistoryService {
      * @throws SQLException if database error
      */
     public Optional<String> findLastPutCode(Context context, Item owner, Item entity) throws SQLException;
+
+    /**
+     * Find all the last put code related to the entity item each associated with
+     * the owner to which it refers.
+     *
+     * @param  context      DSpace context object
+     * @param  entity       the entity item
+     * @return              a map that relates the owners with the identified
+     *                      putCode
+     * @throws SQLException if database error
+     */
+    public Map<Item, String> findLastPutCodes(Context context, Item entity) throws SQLException;
 
     public OrcidHistory sendToOrcid(Context context, OrcidQueue orcidQueue, boolean forceAddition) throws SQLException;
 

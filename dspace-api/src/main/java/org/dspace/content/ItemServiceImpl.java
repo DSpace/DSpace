@@ -17,7 +17,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -1497,17 +1497,17 @@ prevent the generation of resource policy entry values with null dspace_object a
 
     }
 
-    private void createOrcidQueueRecordsToDeleteOnOrcid(Context context, Item item) throws SQLException {
+    private void createOrcidQueueRecordsToDeleteOnOrcid(Context context, Item entity) throws SQLException {
 
-        List<OrcidHistory> orcidHistoryRecords = orcidHistoryService.findByEntity(context, item);
+        String entityType = getEntityType(entity);
+        if ("Person".equals(entityType)) {
+            return;
+        }
 
-        for (OrcidHistory orcidHistoryRecord : orcidHistoryRecords) {
-            Item owner = orcidHistoryRecord.getOwner();
-            if (orcidSynchronizationService.isSynchronizationEnabled(owner, item)) {
-                Optional<String> putCode = orcidHistoryService.findLastPutCode(context, owner, item);
-                if (putCode.isPresent()) {
-                    orcidQueueService.create(context, owner, getEntityType(item), putCode.get());
-                }
+        Map<Item, String> ownerAndPutCodeMap = orcidHistoryService.findLastPutCodes(context, entity);
+        for (Item owner : ownerAndPutCodeMap.keySet()) {
+            if (orcidSynchronizationService.isSynchronizationEnabled(owner, entity)) {
+                orcidQueueService.create(context, owner, entityType, ownerAndPutCodeMap.get(owner));
             }
         }
 

@@ -11,9 +11,9 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
-import org.dspace.app.profile.OrcidEntitySynchronizationPreference;
-import org.dspace.app.profile.OrcidProfileSynchronizationPreference;
-import org.dspace.app.profile.OrcidSynchronizationMode;
+import org.dspace.app.profile.OrcidEntitySyncPreference;
+import org.dspace.app.profile.OrcidProfileSyncPreference;
+import org.dspace.app.profile.OrcidSyncMode;
 import org.dspace.app.profile.ResearcherProfile;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -52,7 +52,7 @@ public interface ProfileOrcidSynchronizationService {
      *                                  with an ORCID account
      */
     public void setPublicationPreference(Context context, ResearcherProfile researcherProfile,
-        OrcidEntitySynchronizationPreference value) throws SQLException;
+        OrcidEntitySyncPreference value) throws SQLException;
 
     /**
      * Set the projects synchronization preference for the given profile.
@@ -66,7 +66,7 @@ public interface ProfileOrcidSynchronizationService {
      *                                  with an ORCID account
      */
     public void setProjectPreference(Context context, ResearcherProfile researcherProfile,
-        OrcidEntitySynchronizationPreference value) throws SQLException;
+        OrcidEntitySyncPreference value) throws SQLException;
 
     /**
      * Update the profile's synchronization preference for the given profile.
@@ -80,7 +80,7 @@ public interface ProfileOrcidSynchronizationService {
      *                                  with an ORCID account
      */
     public void setProfilePreference(Context context, ResearcherProfile researcherProfile,
-        List<OrcidProfileSynchronizationPreference> values) throws SQLException;
+        List<OrcidProfileSyncPreference> values) throws SQLException;
 
     /**
      * Set the ORCID synchronization mode for the given profile.
@@ -91,7 +91,7 @@ public interface ProfileOrcidSynchronizationService {
      * @throws SQLException if a SQL error occurs during the profile update
      */
     public void setSynchronizationMode(Context context, ResearcherProfile researcherProfile,
-        OrcidSynchronizationMode value) throws SQLException;
+        OrcidSyncMode value) throws SQLException;
 
     /**
      * Check if the given researcher profile is configured to synchronize the given

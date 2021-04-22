@@ -53,7 +53,7 @@ public class OrcidQueue implements ReloadableEntity<Integer> {
     @Column(name = "entity_type")
     private String entityType;
 
-    public boolean isAddAction() {
+    public boolean isInsertAction() {
         return entity != null && isEmpty(putCode);
     }
 

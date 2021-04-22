@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 
@@ -32,8 +33,10 @@ import org.apache.http.message.BasicNameValuePair;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.authenticate.OrcidClientException;
 import org.dspace.util.ThrowingSupplier;
+import org.orcid.jaxb.model.v3.release.record.Funding;
 import org.orcid.jaxb.model.v3.release.record.Person;
 import org.orcid.jaxb.model.v3.release.record.Record;
+import org.orcid.jaxb.model.v3.release.record.Work;
 
 /**
  * Implementation of {@link OrcidClient}.
@@ -74,13 +77,27 @@ public class OrcidClientImpl implements OrcidClient {
     @Override
     public Person getPerson(String accessToken, String orcid) {
         HttpUriRequest httpUriRequest = buildGetUriRequest(accessToken, "/" + orcid + "/person");
-        return executeAndUnmarshall(httpUriRequest, Person.class);
+        return executeAndUnmarshall(httpUriRequest, false, Person.class);
     }
 
     @Override
     public Record getRecord(String accessToken, String orcid) {
         HttpUriRequest httpUriRequest = buildGetUriRequest(accessToken, "/" + orcid + "/record");
-        return executeAndUnmarshall(httpUriRequest, Record.class);
+        return executeAndUnmarshall(httpUriRequest, false, Record.class);
+    }
+
+    @Override
+    public Optional<Work> getWork(String accessToken, String orcid, String putCode) {
+        return Optional.ofNullable(putCode)
+            .map(code -> buildGetUriRequest(accessToken, "/" + orcid + "/work/" + code))
+            .map(httpUriRequest -> executeAndUnmarshall(httpUriRequest, true, Work.class));
+    }
+
+    @Override
+    public Optional<Funding> getFunding(String accessToken, String orcid, String putCode) {
+        return Optional.ofNullable(putCode)
+            .map(code -> buildGetUriRequest(accessToken, "/" + orcid + "/funding/" + code))
+            .map(httpUriRequest -> executeAndUnmarshall(httpUriRequest, true, Funding.class));
     }
 
     private HttpUriRequest buildGetUriRequest(String accessToken, String path) {
@@ -108,13 +125,17 @@ public class OrcidClientImpl implements OrcidClient {
 
     }
 
-    private <T> T executeAndUnmarshall(HttpUriRequest httpUriRequest, Class<T> clazz) {
+    private <T> T executeAndUnmarshall(HttpUriRequest httpUriRequest, boolean handleNotFoundAsNull, Class<T> clazz) {
 
         HttpClient client = HttpClientBuilder.create().build();
 
         return executeAndReturns(() -> {
 
             HttpResponse response = client.execute(httpUriRequest);
+
+            if (handleNotFoundAsNull && isNotFound(response)) {
+                return null;
+            }
 
             if (isNotSuccessfull(response)) {
                 throw new OrcidClientException(formatErrorMessage(response));
@@ -153,6 +174,10 @@ public class OrcidClientImpl implements OrcidClient {
 
     private boolean isNotSuccessfull(HttpResponse response) {
         return response.getStatusLine().getStatusCode() != HttpStatus.SC_OK;
+    }
+
+    private boolean isNotFound(HttpResponse response) {
+        return response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND;
     }
 
 }

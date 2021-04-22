@@ -27,6 +27,8 @@ public class OrcidQueueRest extends BaseObjectRest<Integer> {
 
     private String entityType;
 
+    private String putCode;
+
     @Override
     public String getType() {
         return NAME;
@@ -72,6 +74,14 @@ public class OrcidQueueRest extends BaseObjectRest<Integer> {
 
     public void setEntityType(String entityType) {
         this.entityType = entityType;
+    }
+
+    public String getPutCode() {
+        return putCode;
+    }
+
+    public void setPutCode(String putCode) {
+        this.putCode = putCode;
     }
 
 }

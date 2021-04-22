@@ -6,6 +6,6 @@
 -- http://www.dspace.org/license/
 --
 
-ALTER TABLE orcid_queue ADD COLUMN put_code VARYING(255);
-ALTER TABLE orcid_queue ADD COLUMN entity_type VARYING(255);
+ALTER TABLE orcid_queue ADD COLUMN put_code CHARACTER VARYING(255);
+ALTER TABLE orcid_queue ADD COLUMN entity_type CHARACTER VARYING(255);
 ALTER TABLE orcid_queue ALTER COLUMN entity_id DROP NOT NULL;

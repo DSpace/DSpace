@@ -58,7 +58,7 @@ public class OrcidQueueDAOImpl extends AbstractHibernateDAO<OrcidQueue> implemen
     @Override
     @SuppressWarnings("unchecked")
     public List<OrcidQueue> findByOwnerOrEntity(Context context, Item item) throws SQLException {
-        Query query = createQuery(context, "FROM OrcidQueue WHERE owner.id= :itemId and entity.id = :itemId");
+        Query query = createQuery(context, "FROM OrcidQueue WHERE owner.id= :itemId OR entity.id = :itemId");
         query.setParameter("itemId", item.getID());
         return query.getResultList();
     }

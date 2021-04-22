@@ -50,7 +50,7 @@ public class OrcidHistory implements ReloadableEntity<Integer> {
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "timestamp_last_attempt")
-    private Date lastAttempt;
+    private Date lastAttempt = new Date();
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "timestamp_success_attempt")

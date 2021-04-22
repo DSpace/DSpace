@@ -9,6 +9,9 @@ package org.dspace.app.orcid.service.impl;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Comparator.comparing;
+import static java.util.Comparator.naturalOrder;
+import static java.util.Comparator.nullsFirst;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.math.NumberUtils.isCreatable;
 
 import java.io.IOException;
@@ -16,7 +19,9 @@ import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
@@ -126,6 +131,11 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     }
 
     @Override
+    public List<OrcidHistory> findAll(Context context) throws SQLException {
+        return orcidHistoryDAO.findAll(context, OrcidHistory.class);
+    }
+
+    @Override
     public List<OrcidHistory> findByOwnerOrEntity(Context context, Item owner) throws SQLException {
         return orcidHistoryDAO.findByOwnerOrEntity(context, owner);
     }
@@ -152,15 +162,29 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
 
     @Override
     public Optional<String> findLastPutCode(Context context, Item owner, Item entity) throws SQLException {
-        return orcidHistoryDAO.findByOwnerAndEntity(context, owner.getID(), entity.getID()).stream()
-            .sorted(comparing(OrcidHistory::getLastAttempt).reversed())
-            .map(history -> history.getPutCode())
-            .findFirst();
+        List<OrcidHistory> records = orcidHistoryDAO.findByOwnerAndEntity(context, owner.getID(), entity.getID());
+        return findLastPutCode(records, owner);
+    }
+
+    @Override
+    public Map<Item, String> findLastPutCodes(Context context, Item entity) throws SQLException {
+        Map<Item, String> ownerAndPutCodeMap = new HashMap<Item, String>();
+
+        List<OrcidHistory> orcidHistoryRecords = findByEntity(context, entity);
+        for (OrcidHistory orcidHistoryRecord : orcidHistoryRecords) {
+            Item owner = orcidHistoryRecord.getOwner();
+            if (ownerAndPutCodeMap.containsKey(owner)) {
+                continue;
+            }
+
+            findLastPutCode(orcidHistoryRecords, owner).ifPresent(putCode -> ownerAndPutCodeMap.put(owner, putCode));
+        }
+
+        return ownerAndPutCodeMap;
     }
 
     @Override
     public List<OrcidHistory> findByEntity(Context context, Item entity) throws SQLException {
-        // TODO Auto-generated method stub
         return orcidHistoryDAO.findByEntity(context, entity);
     }
 
@@ -195,6 +219,15 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
                 throw new IllegalArgumentException("The item to send to ORCID has an invalid type: " + entityType);
 
         }
+    }
+
+    private Optional<String> findLastPutCode(List<OrcidHistory> orcidHistoryRecords, Item owner) {
+        return orcidHistoryRecords.stream()
+            .filter(orcidHistoryRecord -> owner.equals(orcidHistoryRecord.getOwner()))
+            .sorted(comparing(OrcidHistory::getLastAttempt, nullsFirst(naturalOrder())).reversed())
+            .map(history -> history.getPutCode())
+            .filter(putCode -> isNotBlank(putCode))
+            .findFirst();
     }
 
     private OrcidHistory sendPublicationToOrcid(Context context, OrcidQueue orcidQueue, String orcid, String token,
@@ -296,7 +329,6 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
             OrcidHistory history = new OrcidHistory();
             history.setEntity(entity);
             history.setOwner(owner);
-            history.setLastAttempt(new Date());
             history.setResponseMessage(IOUtils.toString(response.getEntity().getContent(), UTF_8.name()));
             history.setStatus(response.getStatusLine().getStatusCode());
             if (putCode != null) {

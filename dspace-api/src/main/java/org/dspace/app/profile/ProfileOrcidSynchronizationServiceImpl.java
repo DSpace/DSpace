@@ -9,7 +9,7 @@ package org.dspace.app.profile;
 
 import static java.util.List.of;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
-import static org.dspace.app.profile.OrcidEntitySynchronizationPreference.DISABLED;
+import static org.dspace.app.profile.OrcidEntitySyncPreference.DISABLED;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -56,23 +56,23 @@ public class ProfileOrcidSynchronizationServiceImpl implements ProfileOrcidSynch
 
     @Override
     public void setPublicationPreference(Context context, ResearcherProfile researcherProfile,
-        OrcidEntitySynchronizationPreference value) throws SQLException {
+        OrcidEntitySyncPreference value) throws SQLException {
         updatePreferenceForSynchronizingWithOrcid(context, researcherProfile, "sync-publications", of(value.name()));
     }
 
     @Override
     public void setProjectPreference(Context context, ResearcherProfile researcherProfile,
-        OrcidEntitySynchronizationPreference value) throws SQLException {
+        OrcidEntitySyncPreference value) throws SQLException {
         updatePreferenceForSynchronizingWithOrcid(context, researcherProfile, "sync-projects", of(value.name()));
 
     }
 
     @Override
     public void setProfilePreference(Context context, ResearcherProfile researcherProfile,
-        List<OrcidProfileSynchronizationPreference> values) throws SQLException {
+        List<OrcidProfileSyncPreference> values) throws SQLException {
 
         List<String> valuesAsString = values.stream()
-            .map(OrcidProfileSynchronizationPreference::name)
+            .map(OrcidProfileSyncPreference::name)
             .collect(Collectors.toList());
 
         updatePreferenceForSynchronizingWithOrcid(context, researcherProfile, "sync-profile", valuesAsString);
@@ -81,7 +81,7 @@ public class ProfileOrcidSynchronizationServiceImpl implements ProfileOrcidSynch
 
     @Override
     public void setSynchronizationMode(Context context, ResearcherProfile researcherProfile,
-        OrcidSynchronizationMode value) throws SQLException {
+        OrcidSyncMode value) throws SQLException {
 
         if (!researcherProfile.isLinkedToOrcid()) {
             throw new IllegalArgumentException("The given profile cannot be configured for the ORCID "

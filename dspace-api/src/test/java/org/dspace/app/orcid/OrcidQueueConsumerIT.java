@@ -8,10 +8,10 @@
 package org.dspace.app.orcid;
 
 import static org.dspace.app.matcher.OrcidQueueMatcher.matches;
-import static org.dspace.app.profile.OrcidEntitySynchronizationPreference.ALL;
-import static org.dspace.app.profile.OrcidEntitySynchronizationPreference.DISABLED;
-import static org.dspace.app.profile.OrcidProfileSynchronizationPreference.AFFILIATION;
-import static org.dspace.app.profile.OrcidProfileSynchronizationPreference.EDUCATION;
+import static org.dspace.app.profile.OrcidEntitySyncPreference.ALL;
+import static org.dspace.app.profile.OrcidEntitySyncPreference.DISABLED;
+import static org.dspace.app.profile.OrcidProfileSyncPreference.AFFILIATION;
+import static org.dspace.app.profile.OrcidProfileSyncPreference.EDUCATION;
 import static org.dspace.builder.OrcidHistoryBuilder.createOrcidHistory;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
@@ -423,7 +423,8 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         Item firstPublication = ItemBuilder.createItem(context, publicationCollection)
             .withTitle("Test publication")
             .withAuthor("Test User", firstProfile.getID().toString())
-            .withAuthor("Test User", secondProfile.getID().toString())
+            .withEditor("Test User", firstProfile.getID().toString())
+            .withAuthor("Another Test User", secondProfile.getID().toString())
             .build();
 
         Item secondPublication = ItemBuilder.createItem(context, publicationCollection)
