@@ -39,7 +39,8 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 
 /**
  * Custom Spring authentication filter for Stateless authentication, intercepts requests to check for valid
- * authentication
+ * authentication. This runs before *every* request in the DSpace backend to see if any authentication data
+ * is passed in that request. If so, it authenticates the EPerson in the current Context.
  *
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Tom Desair (tom dot desair at atmire dot com)
