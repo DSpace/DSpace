@@ -49,4 +49,13 @@ public class OrcidHistoryDAOImpl extends AbstractHibernateDAO<OrcidHistory> impl
         return query.getResultList();
     }
 
+    @Override
+    public List<OrcidHistory> findByEntityAndRecordType(Context context, Item entity, String recordType)
+        throws SQLException {
+        Query query = createQuery(context, "FROM OrcidHistory WHERE entity = :entity AND recordType = :type");
+        query.setParameter("entity", entity);
+        query.setParameter("type", recordType);
+        return query.getResultList();
+    }
+
 }

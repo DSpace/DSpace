@@ -28,20 +28,20 @@ public class OrcidQueueMatcher extends TypeSafeMatcher<OrcidQueue> {
 
     private final Matcher<Item> entityMatcher;
 
-    private final Matcher<String> entityTypeMatcher;
+    private final Matcher<String> recordTypeMatcher;
 
     private final Matcher<String> putCodeMatcher;
 
     private OrcidQueueMatcher(Matcher<Item> ownerMatcher, Matcher<Item> entityMatcher,
-        Matcher<String> entityTypeMatcher, Matcher<String> putCodeMatcher) {
+        Matcher<String> recordTypeMatcher, Matcher<String> putCodeMatcher) {
         this.ownerMatcher = ownerMatcher;
         this.entityMatcher = entityMatcher;
-        this.entityTypeMatcher = entityTypeMatcher;
+        this.recordTypeMatcher = recordTypeMatcher;
         this.putCodeMatcher = putCodeMatcher;
     }
 
-    public static OrcidQueueMatcher matches(Item owner, Item entity, String entityType, String putCode) {
-        return new OrcidQueueMatcher(is(owner), is(entity), is(entityType), is(putCode));
+    public static OrcidQueueMatcher matches(Item owner, Item entity, String recordType, String putCode) {
+        return new OrcidQueueMatcher(is(owner), is(entity), is(recordType), is(putCode));
     }
 
     @Override
@@ -49,7 +49,7 @@ public class OrcidQueueMatcher extends TypeSafeMatcher<OrcidQueue> {
         description.appendText("an orcid queue record that with the following attributes:")
             .appendText(" item owner ").appendDescriptionOf(ownerMatcher)
             .appendText(", item entity ").appendDescriptionOf(entityMatcher)
-            .appendText(", entity type ").appendDescriptionOf(entityTypeMatcher)
+            .appendText(", record type ").appendDescriptionOf(recordTypeMatcher)
             .appendText(" and put code ").appendDescriptionOf(putCodeMatcher);
     }
 
@@ -57,7 +57,7 @@ public class OrcidQueueMatcher extends TypeSafeMatcher<OrcidQueue> {
     protected boolean matchesSafely(OrcidQueue item) {
         return ownerMatcher.matches(item.getOwner())
             && entityMatcher.matches(item.getEntity())
-            && entityTypeMatcher.matches(item.getEntityType())
+            && recordTypeMatcher.matches(item.getRecordType())
             && putCodeMatcher.matches(item.getPutCode());
     }
 

@@ -17,7 +17,86 @@
     
     <bean class="org.dspace.app.orcid.client.OrcidConfiguration" />
     <bean class="org.dspace.app.orcid.client.OrcidClientImpl" />
+    <bean class="org.dspace.app.orcid.service.impl.PlainMetadataSignatureGeneratorImpl" />
     
     
+    <bean class="org.dspace.app.orcid.service.impl.OrcidProfileSectionConfigurationHandlerImpl">
+    	<constructor-arg name="configurations">
+    		<list>
+    		
+    			<bean class="org.dspace.app.orcid.model.OrcidAffiliationConfiguration">
+					<constructor-arg name="sectionType" value="AFFILIATION" />
+					<constructor-arg name="preference" value="AFFILIATION" />
+					<constructor-arg name="departmentField" value="oairecerif.person.affiliation" />
+					<constructor-arg name="roleTitleField" value="oairecerif.affiliation.role" />
+					<constructor-arg name="startDateField" value="oairecerif.affiliation.startDate" />
+					<constructor-arg name="endDateField" value="oairecerif.affiliation.endDate" />
+				</bean>
+				
+    			<bean class="org.dspace.app.orcid.model.OrcidAffiliationConfiguration">
+					<constructor-arg name="sectionType" value="QUALIFICATION" />
+					<constructor-arg name="preference" value="EDUCATION" />
+					<constructor-arg name="departmentField" value="crisrp.qualification" />
+					<constructor-arg name="roleTitleField" value="" />
+					<constructor-arg name="startDateField" value="crisrp.qualification.start" />
+					<constructor-arg name="endDateField" value="crisrp.qualification.end" />
+				</bean>
+				
+    			<bean class="org.dspace.app.orcid.model.OrcidAffiliationConfiguration">
+					<constructor-arg name="sectionType" value="EDUCATION" />
+					<constructor-arg name="preference" value="EDUCATION" />
+					<constructor-arg name="departmentField" value="crisrp.education" />
+					<constructor-arg name="roleTitleField" value="crisrp.education.role" />
+					<constructor-arg name="startDateField" value="crisrp.education.start" />
+					<constructor-arg name="endDateField" value="crisrp.education.end" />
+				</bean>
+				
+    			<bean class="org.dspace.app.orcid.model.OrcidSimpleValueConfiguration">
+					<constructor-arg name="sectionType" value="OTHER_NAMES" />
+					<constructor-arg name="preference" value="BIOGRAPHICAL" />
+					<constructor-arg name="metadataField" value="crisrp.name.variant" />
+				</bean>
+				
+    			<bean class="org.dspace.app.orcid.model.OrcidSimpleValueConfiguration">
+					<constructor-arg name="sectionType" value="OTHER_NAMES" />
+					<constructor-arg name="preference" value="BIOGRAPHICAL" />
+					<constructor-arg name="metadataField" value="crisrp.name.translated" />
+				</bean>
+				
+    			<bean class="org.dspace.app.orcid.model.OrcidSimpleValueConfiguration">
+					<constructor-arg name="sectionType" value="KEYWORDS" />
+					<constructor-arg name="preference" value="BIOGRAPHICAL" />
+					<constructor-arg name="metadataField" value="dc.subject" />
+				</bean>
+				
+    			<bean class="org.dspace.app.orcid.model.OrcidSimpleValueConfiguration">
+					<constructor-arg name="sectionType" value="COUNTRY" />
+					<constructor-arg name="preference" value="BIOGRAPHICAL" />
+					<constructor-arg name="metadataField" value="crisrp.country" />
+				</bean>
+				
+    			<bean class="org.dspace.app.orcid.model.OrcidExternalIdConfiguration">
+					<constructor-arg name="sectionType" value="EXTERNAL_IDS" />
+					<constructor-arg name="preference" value="IDENTIFIERS" />
+					<constructor-arg name="metadataField" value="person.identifier.scopus-author-id" />
+					<constructor-arg name="externalIdType" value="SCOPUS" />
+				</bean>
+				
+    			<bean class="org.dspace.app.orcid.model.OrcidExternalIdConfiguration">
+					<constructor-arg name="sectionType" value="EXTERNAL_IDS" />
+					<constructor-arg name="preference" value="IDENTIFIERS" />
+					<constructor-arg name="metadataField" value="person.identifier.rid" />
+					<constructor-arg name="externalIdType" value="RID" />
+				</bean>
+				
+    			<bean class="org.dspace.app.orcid.model.OrcidSimpleValueConfiguration">
+					<constructor-arg name="sectionType" value="RESEARCHER_URLS" />
+					<constructor-arg name="preference" value="IDENTIFIERS" />
+					<constructor-arg name="metadataField" value="oairecerif.identifier.urld" />
+				</bean>
+				
+    		</list>
+    	</constructor-arg>
+    </bean>
     
 </beans>

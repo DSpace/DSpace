@@ -47,11 +47,14 @@ public class OrcidQueue implements ReloadableEntity<Integer> {
     @JoinColumn(name = "entity_id")
     private Item entity;
 
+    @Column(name = "description")
+    private String description;
+
     @Column(name = "put_code")
     private String putCode;
 
-    @Column(name = "entity_type")
-    private String entityType;
+    @Column(name = "record_type")
+    private String recordType;
 
     public boolean isInsertAction() {
         return entity != null && isEmpty(putCode);
@@ -102,14 +105,6 @@ public class OrcidQueue implements ReloadableEntity<Integer> {
         this.putCode = putCode;
     }
 
-    public String getEntityType() {
-        return entityType;
-    }
-
-    public void setEntityType(String entityType) {
-        this.entityType = entityType;
-    }
-
     @Override
     public int hashCode() {
         return Objects.hash(id);
@@ -130,5 +125,20 @@ public class OrcidQueue implements ReloadableEntity<Integer> {
         return Objects.equals(id, other.id);
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getRecordType() {
+        return recordType;
+    }
+
+    public void setRecordType(String recordType) {
+        this.recordType = recordType;
+    }
 
 }

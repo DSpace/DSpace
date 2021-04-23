@@ -7,22 +7,14 @@
  */
 package org.dspace.app.orcid.service.impl;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.PostConstruct;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.dspace.app.orcid.service.MetadataSignatureGenerator;
-import org.dspace.app.util.DCInputsReader;
-import org.dspace.app.util.DCInputsReaderException;
-import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
-import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,40 +30,20 @@ public class PlainMetadataSignatureGeneratorImpl implements MetadataSignatureGen
     @Autowired
     private ItemService itemService;
 
-    @Autowired
-    private CollectionService collectionService;
-
-    private DCInputsReader reader;
-
-    @PostConstruct
-    public void postConstruct() throws DCInputsReaderException {
-        this.reader = new DCInputsReader();
-    }
-
     @Override
-    public List<String> generate(Context context, Item item, String metadataField) throws SQLException {
-
-        List<String> metadataGroup = getMetadataGroup(context, item, metadataField);
-        if (CollectionUtils.isEmpty(metadataGroup)) {
-            return generate(context, item, List.of(metadataField));
-        } else {
-            return generate(context, item, metadataGroup);
-        }
-    }
-
-    private List<String> generate(Context context, Item item, List<String> metadataFields) {
+    public List<String> generate(Context context, Item item, List<String> metadataFields) {
 
         List<String> signatures = new ArrayList<String>();
 
         Map<String, List<MetadataValue>> metadataFieldMap = new LinkedHashMap<>();
-        int groupSize = -1;
+        int maxGroupSize = -1;
         for (String metadataField : metadataFields) {
             List<MetadataValue> metadataValues = itemService.getMetadataByMetadataString(item, metadataField);
-            groupSize = groupSize != -1 ? metadataValues.size() : groupSize;
+            maxGroupSize = metadataValues.size() > maxGroupSize ? metadataValues.size() : maxGroupSize;
             metadataFieldMap.put(metadataField, metadataValues);
         }
 
-        for (int currentPlace = 0; currentPlace < groupSize; currentPlace++) {
+        for (int currentPlace = 0; currentPlace < maxGroupSize; currentPlace++) {
             List<String> signatureSections = new ArrayList<>();
             for (String metadataField : metadataFields) {
                 List<MetadataValue> metadataValues = metadataFieldMap.get(metadataField);
@@ -86,15 +58,6 @@ public class PlainMetadataSignatureGeneratorImpl implements MetadataSignatureGen
 
         return signatures;
 
-    }
-
-    private List<String> getMetadataGroup(Context context, Item item, String groupName) throws SQLException {
-        Collection collection = collectionService.findByItem(context, item);
-        try {
-            return this.reader.getAllNestedMetadataByGroupName(collection, groupName);
-        } catch (DCInputsReaderException e) {
-            return Collections.emptyList();
-        }
     }
 
 }

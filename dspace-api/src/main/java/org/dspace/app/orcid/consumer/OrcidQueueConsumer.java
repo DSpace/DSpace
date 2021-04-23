@@ -14,13 +14,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.orcid.OrcidHistory;
 import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.factory.OrcidServiceFactory;
+import org.dspace.app.orcid.model.OrcidProfileSectionConfiguration;
+import org.dspace.app.orcid.model.OrcidProfileSectionType;
+import org.dspace.app.orcid.service.MetadataSignatureGenerator;
 import org.dspace.app.orcid.service.OrcidHistoryService;
+import org.dspace.app.orcid.service.OrcidProfileSectionConfigurationHandler;
 import org.dspace.app.orcid.service.OrcidQueueService;
-import org.dspace.app.profile.service.ProfileOrcidSynchronizationService;
+import org.dspace.app.orcid.service.OrcidSynchronizationService;
+import org.dspace.app.profile.OrcidProfileSyncPreference;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataFieldName;
@@ -32,8 +39,6 @@ import org.dspace.core.CrisConstants;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
 import org.dspace.util.UUIDUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The consumer to fill the ORCID queue.
@@ -43,23 +48,31 @@ import org.slf4j.LoggerFactory;
  */
 public class OrcidQueueConsumer implements Consumer {
 
-    private static Logger log = LoggerFactory.getLogger(OrcidQueueConsumer.class);
-
     private OrcidQueueService orcidQueueService;
 
     private OrcidHistoryService orcidHistoryService;
 
-    private ProfileOrcidSynchronizationService orcidSynchronizationService;
+    private OrcidSynchronizationService orcidSynchronizationService;
 
     private ItemService itemService;
+
+    private OrcidProfileSectionConfigurationHandler profileSectionConfigurationHandler;
+
+    private MetadataSignatureGenerator metadataSignatureGenerator;
 
     private List<UUID> alreadyConsumedItems = new ArrayList<>();
 
     @Override
     public void initialize() throws Exception {
-        this.orcidQueueService = OrcidServiceFactory.getInstance().getOrcidQueueService();
-        this.orcidHistoryService = OrcidServiceFactory.getInstance().getOrcidHistoryService();
-        this.orcidSynchronizationService = OrcidServiceFactory.getInstance().getOrcidSynchronizationService();
+
+        OrcidServiceFactory orcidServiceFactory = OrcidServiceFactory.getInstance();
+
+        this.orcidQueueService = orcidServiceFactory.getOrcidQueueService();
+        this.orcidHistoryService = orcidServiceFactory.getOrcidHistoryService();
+        this.orcidSynchronizationService = orcidServiceFactory.getOrcidSynchronizationService();
+        this.profileSectionConfigurationHandler = orcidServiceFactory.getOrcidProfileSectionConfigurationHandler();
+        this.metadataSignatureGenerator = orcidServiceFactory.getMetadataSignatureGenerator();
+
         this.itemService = ContentServiceFactory.getInstance().getItemService();
     }
 
@@ -135,8 +148,7 @@ public class OrcidQueueConsumer implements Consumer {
                 continue;
             }
 
-            OrcidQueue orcidQueue = createOrcidQueue(context, owner, entity);
-            log.debug("Created ORCID queue record with id " + orcidQueue.getID());
+            createOrcidQueue(context, owner, entity);
 
         }
 
@@ -144,17 +156,55 @@ public class OrcidQueueConsumer implements Consumer {
 
     private void consumePerson(Context context, Item item) throws SQLException {
 
-        if (isNotLinkedToOrcid(item) || isAlreadyQueued(context, item, item)) {
+        if (isNotLinkedToOrcid(item) || profileShouldNotBeSynchronized(item)) {
             return;
         }
 
-        if (profileShouldNotBeSynchronized(item)) {
-            return;
+        List<OrcidHistory> orcidHistories = orcidHistoryService.findByEntity(context, item);
+
+        List<OrcidProfileSectionConfiguration> configurations = findProfileConfigurations(item);
+
+        for (OrcidProfileSectionConfiguration configuration : configurations) {
+
+            OrcidProfileSectionType sectionType = configuration.getSectionType();
+            if (isAlreadyQueued(context, item, sectionType)) {
+                continue;
+            }
+
+            List<String> metadataFields = configuration.getMetadataFields();
+            List<String> signatures = metadataSignatureGenerator.generate(context, item, metadataFields);
+
+            boolean areNewMetadataAvailable = areNewMetadataAvailable(orcidHistories, sectionType, signatures);
+            boolean areSomeMetadataDeleted = areSomeMetadataDeleted(orcidHistories, sectionType, signatures);
+
+            if (areNewMetadataAvailable || areSomeMetadataDeleted) {
+                orcidQueueService.create(context, item, sectionType.name());
+            }
+
         }
 
-        OrcidQueue orcidQueue = orcidQueueService.create(context, item, item);
-        log.debug("Created ORCID queue record with id " + orcidQueue.getID());
+    }
 
+    private boolean areNewMetadataAvailable(List<OrcidHistory> orcidHistories, OrcidProfileSectionType sectionType,
+        List<String> signatures) {
+
+        List<String> orcidHistorySignatures = orcidHistories.stream()
+            .filter(orcidHistory -> sectionType.name().equals(orcidHistory.getRecordType()))
+            .map(OrcidHistory::getMetadata)
+            .collect(Collectors.toList());
+
+        return signatures.stream().anyMatch(signature -> !orcidHistorySignatures.contains(signature));
+    }
+
+    private boolean areSomeMetadataDeleted(List<OrcidHistory> orcidHistories, OrcidProfileSectionType sectionType,
+        List<String> signatures) {
+        return orcidHistories.stream()
+            .filter(orcidHistory -> sectionType.name().equals(orcidHistory.getRecordType()))
+            .anyMatch(orcidHistory -> !signatures.contains(orcidHistory.getMetadata()));
+    }
+
+    private boolean isAlreadyQueued(Context context, Item item, OrcidProfileSectionType type) throws SQLException {
+        return isNotEmpty(orcidQueueService.findByEntityAndRecordType(context, item, type.name()));
     }
 
     private boolean isAlreadyQueued(Context context, Item owner, Item entity) throws SQLException {
@@ -193,6 +243,11 @@ public class OrcidQueueConsumer implements Consumer {
 
     private String getMetadataValue(Item item, String metadataField) {
         return itemService.getMetadataFirstValue(item, new MetadataFieldName(metadataField), Item.ANY);
+    }
+
+    private List<OrcidProfileSectionConfiguration> findProfileConfigurations(Item item) {
+        List<OrcidProfileSyncPreference> profilePreferences = orcidSynchronizationService.getProfilePreferences(item);
+        return this.profileSectionConfigurationHandler.findByPreferences(profilePreferences);
     }
 
     @Override

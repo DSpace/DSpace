@@ -44,6 +44,12 @@ public class OrcidHistory implements ReloadableEntity<Integer> {
     @Column(name = "put_code")
     private String putCode;
 
+    @Column(name = "record_type")
+    private String recordType;
+
+    @Column(name = "metadata")
+    private String metadata;
+
     @Lob
     @Column(name = "response_message")
     private String responseMessage;
@@ -126,6 +132,22 @@ public class OrcidHistory implements ReloadableEntity<Integer> {
 
     public void setSuccessAttempt(Date successAttempt) {
         this.successAttempt = successAttempt;
+    }
+
+    public String getRecordType() {
+        return recordType;
+    }
+
+    public void setRecordType(String recordType) {
+        this.recordType = recordType;
+    }
+
+    public String getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(String metadata) {
+        this.metadata = metadata;
     }
 
 }

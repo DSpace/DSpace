@@ -30,7 +30,7 @@ import org.dspace.app.orcid.OrcidHistory;
 import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.service.OrcidHistoryService;
 import org.dspace.app.orcid.service.OrcidQueueService;
-import org.dspace.app.profile.service.ProfileOrcidSynchronizationService;
+import org.dspace.app.orcid.service.OrcidSynchronizationService;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -133,7 +133,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     private OrcidQueueService orcidQueueService;
 
     @Autowired(required = true)
-    private ProfileOrcidSynchronizationService orcidSynchronizationService;
+    private OrcidSynchronizationService orcidSynchronizationService;
 
     protected ItemServiceImpl() {
         super();

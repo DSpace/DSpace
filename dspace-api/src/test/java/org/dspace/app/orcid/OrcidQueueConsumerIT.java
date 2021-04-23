@@ -12,7 +12,9 @@ import static org.dspace.app.profile.OrcidEntitySyncPreference.ALL;
 import static org.dspace.app.profile.OrcidEntitySyncPreference.DISABLED;
 import static org.dspace.app.profile.OrcidProfileSyncPreference.AFFILIATION;
 import static org.dspace.app.profile.OrcidProfileSyncPreference.EDUCATION;
+import static org.dspace.app.profile.OrcidProfileSyncPreference.IDENTIFIERS;
 import static org.dspace.builder.OrcidHistoryBuilder.createOrcidHistory;
+import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
@@ -30,6 +32,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.OrcidHistoryBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -85,6 +88,10 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
             .withCrisOwner(eperson)
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
+            .withPersonAffiliation("4Science")
+            .withPersonAffiliationStartDate("2021-01-01")
+            .withPersonAffiliationEndDate(PLACEHOLDER_PARENT_METADATA_VALUE)
+            .withPersonAffiliationRole("Researcher")
             .withOrcidSynchronizationProfilePreference(AFFILIATION)
             .withOrcidSynchronizationProfilePreference(EDUCATION)
             .build();
@@ -94,15 +101,43 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
         assertThat(orcidQueueRecords, hasSize(1));
-        assertThat(orcidQueueRecords.get(0), matches(profile, profile, "Person", null));
+        assertThat(orcidQueueRecords.get(0), matches(profile, profile, "AFFILIATION", null));
 
-        addMetadata(profile, "person", "birthDate", null, "1992-06-26", null);
+        addMetadata(profile, "crisrp", "education", null, "High School", null);
         context.commit();
 
         List<OrcidQueue> newOrcidQueueRecords = orcidQueueService.findAll(context);
-        assertThat(newOrcidQueueRecords, hasSize(1));
+        assertThat(newOrcidQueueRecords, hasSize(2));
+        assertThat(newOrcidQueueRecords, hasItem(matches(profile, profile, "AFFILIATION", null)));
+        assertThat(newOrcidQueueRecords, hasItem(matches(profile, profile, "EDUCATION", null)));
+    }
 
-        assertThat(orcidQueueRecords.get(0), equalTo(newOrcidQueueRecords.get(0)));
+    @Test
+    public void testOrcidQueueRecordCreationForDeletionOfProfileMetadata() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item profile = ItemBuilder.createItem(context, profileCollection)
+            .withTitle("Test User")
+            .withCrisOwner(eperson)
+            .withOrcidIdentifier("0000-1111-2222-3333")
+            .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
+            .withOrcidSynchronizationProfilePreference(AFFILIATION)
+            .build();
+
+        OrcidHistoryBuilder.createOrcidHistory(context, profile, profile)
+            .withMetadata("XX/YY/ZZ/AA")
+            .withRecordType("AFFILIATION")
+            .build();
+
+        addMetadata(profile, "crisrp", "education", null, "High School", null);
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
+        assertThat(orcidQueueRecords, hasSize(1));
+        assertThat(orcidQueueRecords.get(0), matches(profile, profile, "AFFILIATION", null));
     }
 
     @Test
@@ -114,6 +149,27 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
             .withCrisOwner(eperson)
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
+            .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        assertThat(orcidQueueService.findAll(context), empty());
+    }
+
+    @Test
+    public void testNoOrcidQueueRecordCreationOccursIfNoComplianceMetadataArePresent() throws SQLException {
+        context.turnOffAuthorisationSystem();
+
+        ItemBuilder.createItem(context, profileCollection)
+            .withTitle("Test User")
+            .withOrcidIdentifier("0000-1111-2222-3333")
+            .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
+            .withPersonAffiliation("4Science")
+            .withPersonAffiliationStartDate("2021-01-01")
+            .withPersonAffiliationEndDate(PLACEHOLDER_PARENT_METADATA_VALUE)
+            .withPersonAffiliationRole("Researcher")
+            .withOrcidSynchronizationProfilePreference(IDENTIFIERS)
             .build();
 
         context.restoreAuthSystemState();

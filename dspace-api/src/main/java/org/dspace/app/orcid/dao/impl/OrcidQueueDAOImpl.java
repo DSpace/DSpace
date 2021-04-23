@@ -24,10 +24,10 @@ import org.dspace.core.Context;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
+@SuppressWarnings("unchecked")
 public class OrcidQueueDAOImpl extends AbstractHibernateDAO<OrcidQueue> implements OrcidQueueDAO {
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<OrcidQueue> findByOwnerId(Context context, UUID ownerId, Integer limit, Integer offset)
         throws SQLException {
         Query query = createQuery(context, "FROM OrcidQueue WHERE owner.id= :ownerId");
@@ -40,7 +40,6 @@ public class OrcidQueueDAOImpl extends AbstractHibernateDAO<OrcidQueue> implemen
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<OrcidQueue> findByOwnerAndEntityId(Context context, UUID ownerId, UUID entityId) throws SQLException {
         Query query = createQuery(context, "FROM OrcidQueue WHERE owner.id= :ownerId and entity.id = :entityId");
         query.setParameter("ownerId", ownerId);
@@ -56,10 +55,17 @@ public class OrcidQueueDAOImpl extends AbstractHibernateDAO<OrcidQueue> implemen
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<OrcidQueue> findByOwnerOrEntity(Context context, Item item) throws SQLException {
         Query query = createQuery(context, "FROM OrcidQueue WHERE owner.id= :itemId OR entity.id = :itemId");
         query.setParameter("itemId", item.getID());
+        return query.getResultList();
+    }
+
+    @Override
+    public List<OrcidQueue> findByEntityAndRecordType(Context context, Item entity, String type) throws SQLException {
+        Query query = createQuery(context, "FROM OrcidQueue WHERE entity = :entity AND recordType = :type");
+        query.setParameter("entity", entity);
+        query.setParameter("type", type);
         return query.getResultList();
     }
 

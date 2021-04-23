@@ -7,9 +7,11 @@
  */
 package org.dspace.app.orcid.factory;
 
+import org.dspace.app.orcid.service.MetadataSignatureGenerator;
 import org.dspace.app.orcid.service.OrcidHistoryService;
+import org.dspace.app.orcid.service.OrcidProfileSectionConfigurationHandler;
 import org.dspace.app.orcid.service.OrcidQueueService;
-import org.dspace.app.profile.service.ProfileOrcidSynchronizationService;
+import org.dspace.app.orcid.service.OrcidSynchronizationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -24,10 +26,16 @@ public class OrcidServiceFactoryImpl extends OrcidServiceFactory {
     private OrcidHistoryService orcidHistoryService;
 
     @Autowired
-    private ProfileOrcidSynchronizationService orcidSynchronizationService;
+    private OrcidSynchronizationService orcidSynchronizationService;
 
     @Autowired
     private OrcidQueueService orcidQueueService;
+
+    @Autowired
+    private OrcidProfileSectionConfigurationHandler orcidProfileSectionConfigurationHandler;
+
+    @Autowired
+    private MetadataSignatureGenerator metadataSignatureGenerator;
 
     @Override
     public OrcidHistoryService getOrcidHistoryService() {
@@ -40,8 +48,18 @@ public class OrcidServiceFactoryImpl extends OrcidServiceFactory {
     }
 
     @Override
-    public ProfileOrcidSynchronizationService getOrcidSynchronizationService() {
+    public OrcidSynchronizationService getOrcidSynchronizationService() {
         return orcidSynchronizationService;
+    }
+
+    @Override
+    public OrcidProfileSectionConfigurationHandler getOrcidProfileSectionConfigurationHandler() {
+        return orcidProfileSectionConfigurationHandler;
+    }
+
+    @Override
+    public MetadataSignatureGenerator getMetadataSignatureGenerator() {
+        return metadataSignatureGenerator;
     }
 
 }

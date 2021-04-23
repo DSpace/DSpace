@@ -13,16 +13,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.orcid.service.OrcidSynchronizationService;
 import org.dspace.app.profile.OrcidEntitySyncPreference;
 import org.dspace.app.profile.OrcidProfileSyncPreference;
 import org.dspace.app.profile.OrcidSyncMode;
 import org.dspace.app.profile.ResearcherProfile;
-import org.dspace.app.profile.service.ProfileOrcidSynchronizationService;
 import org.dspace.app.profile.service.ResearcherProfileService;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -57,7 +58,7 @@ public class ResearcherProfileReplaceOrcidSynchronizationOperation extends Patch
     private ResearcherProfileService profileService;
 
     @Autowired
-    private ProfileOrcidSynchronizationService orcidSynchronizationService;
+    private OrcidSynchronizationService orcidSynchronizationService;
 
     @Override
     public ResearcherProfile perform(Context context, ResearcherProfile profile, Operation operation)
@@ -71,18 +72,20 @@ public class ResearcherProfileReplaceOrcidSynchronizationOperation extends Patch
 
         String value = (String) valueObject;
 
+        Item profileItem = profile.getItem();
+
         switch (path) {
             case PUBLICATIONS_PREFERENCES:
-                orcidSynchronizationService.setPublicationPreference(context, profile, parsePreference(value));
+                orcidSynchronizationService.setPublicationPreference(context, profileItem, parsePreference(value));
                 break;
             case PROJECTS_PREFERENCES:
-                orcidSynchronizationService.setProjectPreference(context, profile, parsePreference(value));
+                orcidSynchronizationService.setProjectPreference(context, profileItem, parsePreference(value));
                 break;
             case PROFILE_PREFERENCES:
-                orcidSynchronizationService.setProfilePreference(context, profile, parseProfilePreferences(value));
+                orcidSynchronizationService.setProfilePreference(context, profileItem, parseProfilePreferences(value));
                 break;
             case MODE_PREFERENCES:
-                orcidSynchronizationService.setSynchronizationMode(context, profile, parseMode(value));
+                orcidSynchronizationService.setSynchronizationMode(context, profileItem, parseMode(value));
                 break;
             default:
                 throw new UnprocessableEntityException("Invalid path starting with " + OPERATION_ORCID_SYNCH);

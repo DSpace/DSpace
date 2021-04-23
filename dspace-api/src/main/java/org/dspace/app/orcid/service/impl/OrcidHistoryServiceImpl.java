@@ -47,7 +47,11 @@ import org.dspace.app.orcid.OrcidHistory;
 import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.dao.OrcidHistoryDAO;
 import org.dspace.app.orcid.dao.OrcidQueueDAO;
+import org.dspace.app.orcid.model.OrcidAffiliationConfiguration;
+import org.dspace.app.orcid.model.OrcidProfileSectionConfiguration;
+import org.dspace.app.orcid.model.OrcidProfileSectionType;
 import org.dspace.app.orcid.service.OrcidHistoryService;
+import org.dspace.app.orcid.service.OrcidProfileSectionConfigurationHandler;
 import org.dspace.app.util.OrcidWorkMetadata;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
@@ -115,6 +119,9 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     @Autowired
     @Qualifier("mapConverterOrcidWorkType")
     private SimpleMapConverter mapConverterModifier;
+
+    @Autowired
+    private OrcidProfileSectionConfigurationHandler orcidProfileSectionConfigurationHandler;
 
     private HttpClient httpClient;
 
@@ -189,6 +196,12 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     }
 
     @Override
+    public List<OrcidHistory> findByEntityAndRecordType(Context context, Item entity, String recordType)
+        throws SQLException {
+        return orcidHistoryDAO.findByEntityAndRecordType(context, entity, recordType);
+    }
+
+    @Override
     public OrcidHistory sendToOrcid(Context context, OrcidQueue orcidQueue, boolean forceAddition) throws SQLException {
         Item owner = orcidQueue.getOwner();
         String orcid = getMetadataValue(owner, "person.identifier.orcid");
@@ -202,8 +215,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         }
 
         Item entity = orcidQueue.getEntity();
-        String entityType = orcidQueue.getEntityType() != null ? orcidQueue.getEntityType()
-            : itemService.getEntityType(entity);
+        String entityType = itemService.getEntityType(entity);
         if (entityType == null) {
             throw new IllegalArgumentException("The related entity item does not have a entity type");
         }
@@ -298,9 +310,69 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
 
     private OrcidHistory sendPersonToOrcid(Context context, OrcidQueue orcidQueue, String orcid, String token)
             throws SQLException {
-        // TODO send person info to orcid
+
+        String recordType = orcidQueue.getRecordType();
+        Item person = orcidQueue.getEntity();
+
+        List<OrcidHistory> orcidHistoryRecords = findByEntityAndRecordType(context, person, recordType);
+        for (OrcidHistory orcidHistoryRecord : orcidHistoryRecords) {
+            if (StringUtils.isNotBlank(orcidHistoryRecord.getPutCode())) {
+                // TODO: perform deletion on orcid by putCode
+                delete(context, orcidHistoryRecord);
+            }
+        }
+
+        // TODO: check type
+        List<OrcidProfileSectionConfiguration> profileSections = findProfileConfigurations(recordType);
+        for (OrcidProfileSectionConfiguration profileSection : profileSections) {
+            OrcidProfileSectionType sectionType = profileSection.getSectionType();
+            switch (sectionType) {
+                case AFFILIATION:
+                    OrcidAffiliationConfiguration affiliation = (OrcidAffiliationConfiguration) profileSection;
+
+                    String departmentField = affiliation.getDepartmentField();
+                    String roleTitleField = affiliation.getRoleTitleField();
+                    String endDateField = affiliation.getEndDateField();
+                    String startDateField = affiliation.getStartDateField();
+
+                    List<MetadataValue> metadataValues = itemService.getMetadataByMetadataString(person,
+                        departmentField);
+
+                    // TODO: build an instance of affiliation foreach nested metadata and push them
+                    // on orcid
+
+                    break;
+                case COUNTRY:
+                    break;
+                case EDUCATION:
+                    break;
+                case EXTERNAL_IDS:
+                    break;
+                case KEYWORDS:
+                    break;
+                case OTHER_NAMES:
+                    break;
+                case QUALIFICATION:
+                    break;
+                case RESEARCHER_URLS:
+                    break;
+                default:
+                    break;
+
+            }
+        }
+
+        // TODO: delete the orcid queue only if all the push are ok
         orcidQueueDAO.delete(context, orcidQueue);
+        // TODO: returns the last orcid history record
         return null;
+    }
+
+    /**
+     * @param recordType
+     */
+    private List<OrcidProfileSectionConfiguration> findProfileConfigurations(String recordType) {
+        return orcidProfileSectionConfigurationHandler.findBySectionType(OrcidProfileSectionType.valueOf(recordType));
     }
 
     private <T> OrcidHistory sendObjectToOrcid(Context context, OrcidQueue orcidQueue, String orcid, String token,

@@ -62,6 +62,8 @@ public interface OrcidQueueService {
      */
     public OrcidQueue create(Context context, Item owner, String entityType, String putCode) throws SQLException;
 
+    OrcidQueue create(Context context, Item item, String recordType) throws SQLException;
+
     /**
      * Find all the ORCID queue records.
      *
@@ -116,6 +118,8 @@ public interface OrcidQueueService {
      * @throws SQLException if database error
      */
     public List<OrcidQueue> findByOwnerOrEntity(Context context, Item item) throws SQLException;
+
+    public List<OrcidQueue> findByEntityAndRecordType(Context context, Item entity, String type) throws SQLException;
 
     /**
      * Returns the number of records on the OrcidQueue associated with the given

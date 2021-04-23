@@ -119,4 +119,6 @@ public interface OrcidHistoryService {
 
     public OrcidHistory sendToOrcid(Context context, OrcidQueue orcidQueue, boolean forceAddition) throws SQLException;
 
+    List<OrcidHistory> findByEntityAndRecordType(Context context, Item entity, String recordType) throws SQLException;
+
 }

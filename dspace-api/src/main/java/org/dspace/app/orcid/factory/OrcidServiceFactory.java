@@ -7,9 +7,11 @@
  */
 package org.dspace.app.orcid.factory;
 
+import org.dspace.app.orcid.service.MetadataSignatureGenerator;
 import org.dspace.app.orcid.service.OrcidHistoryService;
+import org.dspace.app.orcid.service.OrcidProfileSectionConfigurationHandler;
 import org.dspace.app.orcid.service.OrcidQueueService;
-import org.dspace.app.profile.service.ProfileOrcidSynchronizationService;
+import org.dspace.app.orcid.service.OrcidSynchronizationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -25,7 +27,11 @@ public abstract class OrcidServiceFactory {
 
     public abstract OrcidQueueService getOrcidQueueService();
 
-    public abstract ProfileOrcidSynchronizationService getOrcidSynchronizationService();
+    public abstract OrcidSynchronizationService getOrcidSynchronizationService();
+
+    public abstract OrcidProfileSectionConfigurationHandler getOrcidProfileSectionConfigurationHandler();
+
+    public abstract MetadataSignatureGenerator getMetadataSignatureGenerator();
 
     public static OrcidServiceFactory getInstance() {
         return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(

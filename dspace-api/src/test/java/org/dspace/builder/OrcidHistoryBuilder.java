@@ -78,7 +78,7 @@ public class OrcidHistoryBuilder extends  AbstractBuilder<OrcidHistory, OrcidHis
 
     /**
      * Delete the Test OrcidHistory referred to by the given ID
-     * 
+     *
      * @param id                Integer of Test OrcidHistory to delete
      * @throws SQLException
      * @throws IOException
@@ -121,6 +121,16 @@ public class OrcidHistoryBuilder extends  AbstractBuilder<OrcidHistory, OrcidHis
 
     public OrcidHistoryBuilder withStatus(Integer status) throws SQLException {
         orcidHistory.setStatus(status);
+        return this;
+    }
+
+    public OrcidHistoryBuilder withMetadata(String metadata) throws SQLException {
+        orcidHistory.setMetadata(metadata);
+        return this;
+    }
+
+    public OrcidHistoryBuilder withRecordType(String recordType) throws SQLException {
+        orcidHistory.setRecordType(recordType);
         return this;
     }
 }

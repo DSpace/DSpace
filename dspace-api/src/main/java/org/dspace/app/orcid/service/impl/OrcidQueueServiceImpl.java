@@ -55,6 +55,11 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     }
 
     @Override
+    public List<OrcidQueue> findByEntityAndRecordType(Context context, Item entity, String type) throws SQLException {
+        return orcidQueueDAO.findByEntityAndRecordType(context, entity, type);
+    }
+
+    @Override
     public long countByOwnerId(Context context, UUID ownerId) throws SQLException {
         return orcidQueueDAO.countByOwnerId(context, ownerId);
     }
@@ -68,7 +73,7 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     public OrcidQueue create(Context context, Item owner, Item entity) throws SQLException {
         OrcidQueue orcidQueue = new OrcidQueue();
         orcidQueue.setEntity(entity);
-        orcidQueue.setEntityType(itemService.getEntityType(entity));
+        orcidQueue.setRecordType(itemService.getEntityType(entity));
         orcidQueue.setOwner(owner);
         return orcidQueueDAO.create(context, orcidQueue);
     }
@@ -79,16 +84,26 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
         orcidQueue.setOwner(owner);
         orcidQueue.setEntity(entity);
         orcidQueue.setPutCode(putCode);
-        orcidQueue.setEntityType(itemService.getEntityType(entity));
+        orcidQueue.setRecordType(itemService.getEntityType(entity));
         return orcidQueueDAO.create(context, orcidQueue);
     }
 
     @Override
-    public OrcidQueue create(Context context, Item owner, String entityType, String putCode) throws SQLException {
+    public OrcidQueue create(Context context, Item owner, String type, String putCode) throws SQLException {
         OrcidQueue orcidQueue = new OrcidQueue();
-        orcidQueue.setEntityType(entityType);
+        orcidQueue.setRecordType(type);
         orcidQueue.setOwner(owner);
         orcidQueue.setPutCode(putCode);
+        return orcidQueueDAO.create(context, orcidQueue);
+    }
+
+    @Override
+    public OrcidQueue create(Context context, Item item, String recordType) throws SQLException {
+        OrcidQueue orcidQueue = new OrcidQueue();
+        orcidQueue.setEntity(item);
+        orcidQueue.setRecordType(recordType);
+        orcidQueue.setOwner(item);
+        orcidQueue.setDescription(recordType);
         return orcidQueueDAO.create(context, orcidQueue);
     }
 
