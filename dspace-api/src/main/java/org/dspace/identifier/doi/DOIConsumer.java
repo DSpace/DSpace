@@ -20,6 +20,7 @@ import org.dspace.identifier.DOI;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.IdentifierNotFoundException;
+import org.dspace.identifier.doi.service.DOIFilterService;
 import org.dspace.search.SearchConsumer;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
@@ -81,13 +82,16 @@ public class DOIConsumer implements Consumer
         DOIIdentifierProvider provider = new DSpace().getSingletonService(
                 DOIIdentifierProvider.class);
         
+        DOIFilterService doiFilterService = new DSpace().getSingletonService(
+                DOIFilterService.class);
+        
         String doi = null;
         try {
             doi = provider.lookup(ctx, dso);
         }
         catch (IdentifierNotFoundException ex)
         {
-            if (provider.isEligibleDSO(dso)) {
+            if ( doiFilterService.isEligibleDSO(dso)) {
                 log.warn("DOIConsumer cannot handles items without DOIs, skipping: "
                         + event.toString());
             }
