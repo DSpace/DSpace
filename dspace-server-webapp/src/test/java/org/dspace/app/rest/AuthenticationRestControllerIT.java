@@ -269,6 +269,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                    .andExpect(jsonPath("$.okay", is(true)))
                    .andExpect(jsonPath("$.authenticated", is(true)))
                    .andExpect(jsonPath("$.type", is("status")))
+                   // Verify the Auth cookie has been deleted after one usage
+                   .andExpect(cookie().value(AUTHORIZATION_COOKIE, ""))
                    // Verify that the CSRF token has been changed
                    // (as both cookie and header should be sent back)
                    .andExpect(cookie().exists("DSPACE-XSRF-COOKIE"))
