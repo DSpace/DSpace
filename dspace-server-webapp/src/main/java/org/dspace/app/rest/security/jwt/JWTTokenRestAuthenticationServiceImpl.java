@@ -157,7 +157,6 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     public void invalidateAuthenticationData(HttpServletRequest request, HttpServletResponse response,
                                              Context context) throws Exception {
         String token = getLoginToken(request, response);
-        invalidateAuthenticationCookie(response);
         loginJWTTokenHandler.invalidateToken(token, request, context);
 
         // Reset our CSRF token, generating a new one
@@ -166,16 +165,20 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
 
     /**
      * Invalidate our temporary authentication cookie by overwriting it in the response.
+     * @param request
      * @param response
      */
     @Override
-    public void invalidateAuthenticationCookie(HttpServletResponse response) {
+    public void invalidateAuthenticationCookie(HttpServletRequest request, HttpServletResponse response) {
         // Re-send the same cookie (as addTokenToResponse()) with no value and a Max-Age of 0 seconds
         ResponseCookie cookie = ResponseCookie.from(AUTHORIZATION_COOKIE, "")
                                               .maxAge(0).httpOnly(true).secure(true).sameSite("None").build();
 
         // Write the cookie to the Set-Cookie header in order to send it
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        // Reset our CSRF token, generating a new one
+        resetCSRFToken(request, response);
     }
 
     @Override
@@ -254,7 +257,6 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
      * Get the Login token (JWT) in the current request. First we check the Authorization header.
      * If not found there, we check for a temporary authentication cookie and use that.
      * @param request current request
-     * @param request current response
      * @return authentication token (if found), or null
      */
     private String getLoginToken(HttpServletRequest request, HttpServletResponse response) {
@@ -265,12 +267,10 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
             tokenValue = authHeader.replace(AUTHORIZATION_TYPE, "").trim();
         } else if (StringUtils.isNotBlank(authCookie)) {
             tokenValue = authCookie;
-            // If auth cookie is read/used, then we immediately remove the cookie & reset the CSRF token.
-            // This is because we treat auth cookies as temporary in nature, only to be used once & only used by
-            // specific auth plugins (like Shibboleth) which require them. So, an auth cookie should only ever be
-            // used for an initial login, after which Headers are used.
-            invalidateAuthenticationCookie(response);
-            resetCSRFToken(request, response);
+            // After auth cookie is read, immediately invalidate it (and this also resets the CSRF token).
+            // This ensures the auth cookie is temporary in nature, only to be used once (usually on initial login,
+            // e.g. via Shibboleth). After that, we assume Authorization Header will be used.
+            invalidateAuthenticationCookie(request, response);
         }
 
         return tokenValue;
@@ -292,6 +292,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals(AUTHORIZATION_COOKIE) && StringUtils.isNotEmpty(cookie.getValue())) {
                     authCookie = cookie.getValue();
+                    break;
                 }
             }
         }
