@@ -23,7 +23,10 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
- * This class will filter login requests to try and authenticate them
+ * This class will filter /api/authn/login requests to try and authenticate them. Keep in mind, this filter runs *after*
+ * StatelessAuthenticationFilter (which looks for authentication data in the request itself). So, in some scenarios
+ * (e.g. after a Shibboleth login) the StatelessAuthenticationFilter does the actual authentication, and this Filter
+ * just ensures the auth token (JWT) is sent back in an Authorization header.
  *
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Tom Desair (tom dot desair at atmire dot com)

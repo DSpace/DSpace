@@ -71,8 +71,7 @@ public interface RestAuthenticationService {
      * existing authentication data/token is destroyed/invalidated and cannot be reused in later requests.
      * <P>
      * In other words, this method invalidates the authentication data created by addAuthenticationDataForUser().
-     * This also should include clearing any Cookie created by that method, usually by calling the separate
-     * invalidateAuthenticationCookie() method in this same class.
+     *
      * @param request current request
      * @param response current response
      * @param context current DSpace Context.
@@ -103,8 +102,9 @@ public interface RestAuthenticationService {
      * addAuthenticationDataForUser()). It's useful for those services to immediately *remove/discard* the Cookie after
      * it has been used. This ensures the auth Cookie is temporary in nature, and is destroyed as soon as it is no
      * longer needed.
+     * @param request current request
      * @param res current response (where Cookie should be destroyed)
      */
-    void invalidateAuthenticationCookie(HttpServletResponse res);
+    void invalidateAuthenticationCookie(HttpServletRequest request, HttpServletResponse res);
 
 }
