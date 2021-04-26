@@ -341,7 +341,7 @@ public class OrcidAuthenticationRestControllerIT extends AbstractControllerInteg
     @Test
     public void testNoAuthenticationIfAnErrorOccursRetrivingOrcidToken() throws Exception {
 
-        when(orcidClientMock.getAccessToken(CODE)).thenThrow(new OrcidClientException("No Connection"));
+        when(orcidClientMock.getAccessToken(CODE)).thenThrow(new OrcidClientException(500, "internal error"));
 
         context.turnOffAuthorisationSystem();
 
@@ -368,7 +368,7 @@ public class OrcidAuthenticationRestControllerIT extends AbstractControllerInteg
     public void testNoAuthenticationIfAnErrorOccursRetrivingOrcidPerson() throws Exception {
 
         when(orcidClientMock.getAccessToken(CODE)).thenReturn(buildOrcidTokenResponse(ORCID, ACCESS_TOKEN));
-        when(orcidClientMock.getPerson(ACCESS_TOKEN, ORCID)).thenThrow(new OrcidClientException("Internal Error"));
+        when(orcidClientMock.getPerson(ACCESS_TOKEN, ORCID)).thenThrow(new OrcidClientException(500, "Internal Error"));
 
         context.turnOffAuthorisationSystem();
 

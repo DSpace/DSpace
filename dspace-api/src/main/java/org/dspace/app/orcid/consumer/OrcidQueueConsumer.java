@@ -16,15 +16,15 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.orcid.OrcidHistory;
 import org.dspace.app.orcid.OrcidQueue;
+import org.dspace.app.orcid.builder.OrcidProfileSectionBuilder;
 import org.dspace.app.orcid.factory.OrcidServiceFactory;
-import org.dspace.app.orcid.model.OrcidProfileSectionConfiguration;
 import org.dspace.app.orcid.model.OrcidProfileSectionType;
-import org.dspace.app.orcid.service.MetadataSignatureGenerator;
 import org.dspace.app.orcid.service.OrcidHistoryService;
-import org.dspace.app.orcid.service.OrcidProfileSectionConfigurationHandler;
+import org.dspace.app.orcid.service.OrcidProfileSectionBuilderService;
 import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.app.orcid.service.OrcidSynchronizationService;
 import org.dspace.app.profile.OrcidProfileSyncPreference;
@@ -56,9 +56,7 @@ public class OrcidQueueConsumer implements Consumer {
 
     private ItemService itemService;
 
-    private OrcidProfileSectionConfigurationHandler profileSectionConfigurationHandler;
-
-    private MetadataSignatureGenerator metadataSignatureGenerator;
+    private OrcidProfileSectionBuilderService profileSectionBuilderService;
 
     private List<UUID> alreadyConsumedItems = new ArrayList<>();
 
@@ -70,8 +68,7 @@ public class OrcidQueueConsumer implements Consumer {
         this.orcidQueueService = orcidServiceFactory.getOrcidQueueService();
         this.orcidHistoryService = orcidServiceFactory.getOrcidHistoryService();
         this.orcidSynchronizationService = orcidServiceFactory.getOrcidSynchronizationService();
-        this.profileSectionConfigurationHandler = orcidServiceFactory.getOrcidProfileSectionConfigurationHandler();
-        this.metadataSignatureGenerator = orcidServiceFactory.getMetadataSignatureGenerator();
+        this.profileSectionBuilderService = orcidServiceFactory.getOrcidProfileSectionBuilderService();
 
         this.itemService = ContentServiceFactory.getInstance().getItemService();
     }
@@ -162,22 +159,18 @@ public class OrcidQueueConsumer implements Consumer {
 
         List<OrcidHistory> orcidHistories = orcidHistoryService.findByEntity(context, item);
 
-        List<OrcidProfileSectionConfiguration> configurations = findProfileConfigurations(item);
+        List<OrcidProfileSectionBuilder> configurations = findProfileConfigurations(item);
 
-        for (OrcidProfileSectionConfiguration configuration : configurations) {
+        for (OrcidProfileSectionBuilder configuration : configurations) {
 
             OrcidProfileSectionType sectionType = configuration.getSectionType();
             if (isAlreadyQueued(context, item, sectionType)) {
                 continue;
             }
 
-            List<String> metadataFields = configuration.getMetadataFields();
-            List<String> signatures = metadataSignatureGenerator.generate(context, item, metadataFields);
+            String signature = profileSectionBuilderService.getMetadataSignature(context, item, sectionType);
 
-            boolean areNewMetadataAvailable = areNewMetadataAvailable(orcidHistories, sectionType, signatures);
-            boolean areSomeMetadataDeleted = areSomeMetadataDeleted(orcidHistories, sectionType, signatures);
-
-            if (areNewMetadataAvailable || areSomeMetadataDeleted) {
+            if (anyMetadataChange(orcidHistories, sectionType, signature)) {
                 orcidQueueService.create(context, item, sectionType.name());
             }
 
@@ -185,22 +178,19 @@ public class OrcidQueueConsumer implements Consumer {
 
     }
 
-    private boolean areNewMetadataAvailable(List<OrcidHistory> orcidHistories, OrcidProfileSectionType sectionType,
-        List<String> signatures) {
+    private boolean anyMetadataChange(List<OrcidHistory> records, OrcidProfileSectionType type, String signature) {
 
-        List<String> orcidHistorySignatures = orcidHistories.stream()
-            .filter(orcidHistory -> sectionType.name().equals(orcidHistory.getRecordType()))
-            .map(OrcidHistory::getMetadata)
+        List<OrcidHistory> filteredRecords = records.stream()
+            .filter(record -> type.name().equals(record.getRecordType()))
+            .filter(record -> StringUtils.isNotBlank(record.getMetadata()))
             .collect(Collectors.toList());
 
-        return signatures.stream().anyMatch(signature -> !orcidHistorySignatures.contains(signature));
-    }
+        if (CollectionUtils.isEmpty(filteredRecords)) {
+            return StringUtils.isNotEmpty(signature);
+        }
 
-    private boolean areSomeMetadataDeleted(List<OrcidHistory> orcidHistories, OrcidProfileSectionType sectionType,
-        List<String> signatures) {
-        return orcidHistories.stream()
-            .filter(orcidHistory -> sectionType.name().equals(orcidHistory.getRecordType()))
-            .anyMatch(orcidHistory -> !signatures.contains(orcidHistory.getMetadata()));
+        return filteredRecords.stream()
+            .anyMatch(record -> !signature.equals(record.getMetadata()));
     }
 
     private boolean isAlreadyQueued(Context context, Item item, OrcidProfileSectionType type) throws SQLException {
@@ -208,7 +198,7 @@ public class OrcidQueueConsumer implements Consumer {
     }
 
     private boolean isAlreadyQueued(Context context, Item owner, Item entity) throws SQLException {
-        return isNotEmpty(orcidQueueService.findByOwnerAndEntityId(context, owner.getID(), entity.getID()));
+        return isNotEmpty(orcidQueueService.findByOwnerAndEntity(context, owner, entity));
     }
 
     private boolean isNotLinkedToOrcid(Item ownerItem) {
@@ -245,9 +235,9 @@ public class OrcidQueueConsumer implements Consumer {
         return itemService.getMetadataFirstValue(item, new MetadataFieldName(metadataField), Item.ANY);
     }
 
-    private List<OrcidProfileSectionConfiguration> findProfileConfigurations(Item item) {
+    private List<OrcidProfileSectionBuilder> findProfileConfigurations(Item item) {
         List<OrcidProfileSyncPreference> profilePreferences = orcidSynchronizationService.getProfilePreferences(item);
-        return this.profileSectionConfigurationHandler.findByPreferences(profilePreferences);
+        return this.profileSectionBuilderService.findByPreferences(profilePreferences);
     }
 
     @Override

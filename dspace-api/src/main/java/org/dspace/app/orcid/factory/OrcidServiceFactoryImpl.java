@@ -9,7 +9,7 @@ package org.dspace.app.orcid.factory;
 
 import org.dspace.app.orcid.service.MetadataSignatureGenerator;
 import org.dspace.app.orcid.service.OrcidHistoryService;
-import org.dspace.app.orcid.service.OrcidProfileSectionConfigurationHandler;
+import org.dspace.app.orcid.service.OrcidProfileSectionBuilderService;
 import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.app.orcid.service.OrcidSynchronizationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,7 @@ public class OrcidServiceFactoryImpl extends OrcidServiceFactory {
     private OrcidQueueService orcidQueueService;
 
     @Autowired
-    private OrcidProfileSectionConfigurationHandler orcidProfileSectionConfigurationHandler;
+    private OrcidProfileSectionBuilderService orcidProfileSectionBuilderService;
 
     @Autowired
     private MetadataSignatureGenerator metadataSignatureGenerator;
@@ -53,8 +53,8 @@ public class OrcidServiceFactoryImpl extends OrcidServiceFactory {
     }
 
     @Override
-    public OrcidProfileSectionConfigurationHandler getOrcidProfileSectionConfigurationHandler() {
-        return orcidProfileSectionConfigurationHandler;
+    public OrcidProfileSectionBuilderService getOrcidProfileSectionBuilderService() {
+        return orcidProfileSectionBuilderService;
     }
 
     @Override

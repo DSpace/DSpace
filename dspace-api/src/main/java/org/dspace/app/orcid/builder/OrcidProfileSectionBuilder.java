@@ -5,27 +5,38 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.orcid.model;
+package org.dspace.app.orcid.builder;
 
 import static java.lang.String.format;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.dspace.app.orcid.model.OrcidProfileSectionType;
 import org.dspace.app.profile.OrcidProfileSyncPreference;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.service.ItemService;
+import org.dspace.core.Context;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Interface to mark all the available orcid profile section configurations.
+ * Abstract class for that handle commons behaviors of all the available orcid
+ * profile section builders.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public abstract class OrcidProfileSectionConfiguration {
+public abstract class OrcidProfileSectionBuilder {
 
-    private final OrcidProfileSectionType sectionType;
+    protected final OrcidProfileSectionType sectionType;
 
-    private final OrcidProfileSyncPreference preference;
+    protected final OrcidProfileSyncPreference preference;
 
-    public OrcidProfileSectionConfiguration(OrcidProfileSectionType sectionType,
+    @Autowired
+    protected ItemService itemService;
+
+    public OrcidProfileSectionBuilder(OrcidProfileSectionType sectionType,
         OrcidProfileSyncPreference preference) {
         this.sectionType = sectionType;
         this.preference = preference;
@@ -36,6 +47,16 @@ public abstract class OrcidProfileSectionConfiguration {
         }
 
     }
+
+    /**
+     * Returns many instances of ORCID objects starting from the given item.
+     *
+     * @param  context the DSpace Context
+     * @param  item    the item
+     * @param  type    the profile section type
+     * @return         the ORCID objects
+     */
+    public abstract List<Object> buildOrcidObjects(Context context, Item item, OrcidProfileSectionType type);
 
     /**
      * Returns the section type.
@@ -69,5 +90,19 @@ public abstract class OrcidProfileSectionConfiguration {
      * @return the metadataFields
      */
     public abstract List<String> getMetadataFields();
+
+    public ItemService getItemService() {
+        return itemService;
+    }
+
+    public void setItemService(ItemService itemService) {
+        this.itemService = itemService;
+    }
+
+    protected List<String> getMetadataValues(Item item, String metadataField) {
+        return itemService.getMetadataByMetadataString(item, metadataField).stream()
+            .map(MetadataValue::getValue)
+            .collect(Collectors.toList());
+    }
 
 }

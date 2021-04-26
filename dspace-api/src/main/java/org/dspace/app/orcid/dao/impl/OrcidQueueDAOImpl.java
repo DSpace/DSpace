@@ -40,10 +40,10 @@ public class OrcidQueueDAOImpl extends AbstractHibernateDAO<OrcidQueue> implemen
     }
 
     @Override
-    public List<OrcidQueue> findByOwnerAndEntityId(Context context, UUID ownerId, UUID entityId) throws SQLException {
-        Query query = createQuery(context, "FROM OrcidQueue WHERE owner.id= :ownerId and entity.id = :entityId");
-        query.setParameter("ownerId", ownerId);
-        query.setParameter("entityId", entityId);
+    public List<OrcidQueue> findByOwnerAndEntity(Context context, Item owner, Item entity) throws SQLException {
+        Query query = createQuery(context, "FROM OrcidQueue WHERE owner = :owner AND entity = :entity");
+        query.setParameter("owner", owner);
+        query.setParameter("entity", entity);
         return query.getResultList();
     }
 

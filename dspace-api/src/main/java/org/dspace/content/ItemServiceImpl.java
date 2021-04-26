@@ -1507,7 +1507,9 @@ prevent the generation of resource policy entry values with null dspace_object a
         Map<Item, String> ownerAndPutCodeMap = orcidHistoryService.findLastPutCodes(context, entity);
         for (Item owner : ownerAndPutCodeMap.keySet()) {
             if (orcidSynchronizationService.isSynchronizationEnabled(owner, entity)) {
-                orcidQueueService.create(context, owner, entityType, ownerAndPutCodeMap.get(owner));
+                String putCode = ownerAndPutCodeMap.get(owner);
+                String title = getMetadataFirstValue(entity, "dc", "title", null, Item.ANY);
+                orcidQueueService.create(context, owner, title, entityType, putCode);
             }
         }
 

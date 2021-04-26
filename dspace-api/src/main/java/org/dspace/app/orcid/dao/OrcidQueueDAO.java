@@ -40,9 +40,26 @@ public interface OrcidQueueDAO extends GenericDAO<OrcidQueue> {
     public List<OrcidQueue> findByOwnerId(Context context, UUID ownerId, Integer limit, Integer offset)
         throws SQLException;
 
+    /**
+     * Count the orcid queue records with the same ownerId.
+     *
+     * @param  context      DSpace context object
+     * @param  ownerId      the owner item id
+     * @return              the count result
+     * @throws SQLException if an SQL error occurs
+     */
     long countByOwnerId(Context context, UUID ownerId) throws SQLException;
 
-    public List<OrcidQueue> findByOwnerAndEntityId(Context context, UUID ownerId, UUID entityId) throws SQLException;
+    /**
+     * Returns all the orcid queue records with the given owner and entity items.
+     *
+     * @param  context      DSpace context object
+     * @param  owner        the owner item
+     * @param  entity       the entity item
+     * @return              the found orcid queue records
+     * @throws SQLException
+     */
+    public List<OrcidQueue> findByOwnerAndEntity(Context context, Item owner, Item entity) throws SQLException;
 
     /**
      * Get the OrcidQueue records where the given item is the owner OR the entity

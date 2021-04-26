@@ -98,7 +98,7 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
 
         String authorizeUrl = orcidConfiguration.getAuthorizeEndpointUrl();
         String clientId = orcidConfiguration.getClientId();
-        String redirectUri = orcidConfiguration.getRedirectUri();
+        String redirectUri = orcidConfiguration.getRedirectUrl();
         String scopes = String.join("+", orcidConfiguration.getScopes());
 
         if (StringUtils.isAnyBlank(authorizeUrl, clientId, redirectUri, scopes)) {

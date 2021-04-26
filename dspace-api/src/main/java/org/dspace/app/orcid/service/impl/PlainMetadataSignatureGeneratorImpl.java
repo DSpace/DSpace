@@ -7,10 +7,8 @@
  */
 package org.dspace.app.orcid.service.impl;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.dspace.app.orcid.service.MetadataSignatureGenerator;
 import org.dspace.content.Item;
@@ -27,37 +25,21 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class PlainMetadataSignatureGeneratorImpl implements MetadataSignatureGenerator {
 
-    @Autowired
     private ItemService itemService;
 
+    @Autowired
+    public PlainMetadataSignatureGeneratorImpl(ItemService itemService) {
+        this.itemService = itemService;
+    }
+
     @Override
-    public List<String> generate(Context context, Item item, List<String> metadataFields) {
-
-        List<String> signatures = new ArrayList<String>();
-
-        Map<String, List<MetadataValue>> metadataFieldMap = new LinkedHashMap<>();
-        int maxGroupSize = -1;
-        for (String metadataField : metadataFields) {
-            List<MetadataValue> metadataValues = itemService.getMetadataByMetadataString(item, metadataField);
-            maxGroupSize = metadataValues.size() > maxGroupSize ? metadataValues.size() : maxGroupSize;
-            metadataFieldMap.put(metadataField, metadataValues);
-        }
-
-        for (int currentPlace = 0; currentPlace < maxGroupSize; currentPlace++) {
-            List<String> signatureSections = new ArrayList<>();
-            for (String metadataField : metadataFields) {
-                List<MetadataValue> metadataValues = metadataFieldMap.get(metadataField);
-                if (metadataValues.size() <= currentPlace) {
-                    signatureSections.add("#");
-                } else {
-                    signatureSections.add(String.valueOf(metadataValues.get(currentPlace).getID()));
-                }
-            }
-            signatures.add(String.join("/", signatureSections));
-        }
-
-        return signatures;
-
+    public String generate(Context context, Item item, List<String> metadataFields) {
+        return metadataFields.stream()
+            .flatMap(metadataField -> itemService.getMetadataByMetadataString(item, metadataField).stream())
+            .map(MetadataValue::getID)
+            .sorted()
+            .map(String::valueOf)
+            .collect(Collectors.joining("/"));
     }
 
 }

@@ -10,10 +10,8 @@ package org.dspace.app.orcid.client;
 import java.util.Optional;
 
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
-import org.orcid.jaxb.model.v3.release.record.Funding;
 import org.orcid.jaxb.model.v3.release.record.Person;
 import org.orcid.jaxb.model.v3.release.record.Record;
-import org.orcid.jaxb.model.v3.release.record.Work;
 
 /**
  * Interface for classes that allow to contact ORCID.
@@ -54,24 +52,41 @@ public interface OrcidClient {
     Record getRecord(String accessToken, String orcid);
 
     /**
-     * Retrieves a summary of the work with the given putCode related to the given
+     * Retrieves an object from ORCID with the given putCode related to the given
      * orcid.
+     *
+     * @param  accessToken              the access token
+     * @param  orcid                    the orcid id of the record to retrieve
+     * @param  putCode                  the object's put code
+     * @param  clazz                    the object's class
+     * @return                          the Object, if any
+     * @throws OrcidClientException     if some error occurs during the search
+     * @throws IllegalArgumentException if the given object class is not an valid
+     *                                  ORCID object
+     */
+    <T> Optional<T> getObject(String accessToken, String orcid, String putCode, Class<T> clazz);
+
+    /**
+     * Push the given object to ORCID.
+     *
+     * @param  accessToken              the access token
+     * @param  orcid                    the orcid it
+     * @param  object                   the orcid object to push
+     * @return                          the orcid response if any error occurs
+     * @throws OrcidClientException     if some error occurs during the push
+     * @throws IllegalArgumentException if the given object is not an valid ORCID
+     *                                  object
+     */
+    OrcidResponse push(String accessToken, String orcid, Object object);
+
+    /**
+     * Delete the ORCID object with the given putCode on the given path.
      *
      * @param  accessToken          the access token
      * @param  orcid                the orcid id of the record to retrieve
      * @return                      the Work, if any
      * @throws OrcidClientException if some error occurs during the search
      */
-    Optional<Work> getWork(String accessToken, String orcid, String putCode);
+    OrcidResponse deleteByPutCode(String accessToken, String orcid, String putCode, String path);
 
-    /**
-     * Retrieves a summary of the funding with the given putCode related to the
-     * given orcid.
-     *
-     * @param  accessToken          the access token
-     * @param  orcid                the orcid id of the record to retrieve
-     * @return                      the Funding, if any
-     * @throws OrcidClientException if some error occurs during the search
-     */
-    Optional<Funding> getFunding(String accessToken, String orcid, String putCode);
 }

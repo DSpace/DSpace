@@ -24,14 +24,26 @@ public class OrcidQueueMatcher {
 
     private OrcidQueueMatcher() {}
 
-    public static Matcher<? super Object> matchOrcidQueue(OrcidQueue orcidQueue, String entityType) {
+    public static Matcher<? super Object> matchOrcidQueue(OrcidQueue orcidQueue) {
         return allOf(
                 hasJsonPath("$.id", is(orcidQueue.getID())),
                 hasJsonPath("$.ownerId", is(orcidQueue.getOwner().getID().toString())),
                 hasJsonPath("$.entityId", is(orcidQueue.getEntity().getID().toString())),
-                hasJsonPath("$.entityName", is(orcidQueue.getEntity().getName())),
-                hasJsonPath("$.entityType", is(entityType)),
+                hasJsonPath("$.description", is(orcidQueue.getDescription())),
+                hasJsonPath("$.recordType", is(orcidQueue.getRecordType())),
+                hasJsonPath("$.putCode", is(orcidQueue.getPutCode())),
                 hasJsonPath("$.type", is("orcidqueue"))
         );
+    }
+
+    public static Matcher<? super Object> matchOrcidQueue(OrcidQueue orcidQueue, String description) {
+        return allOf(
+            hasJsonPath("$.id", is(orcidQueue.getID())),
+            hasJsonPath("$.ownerId", is(orcidQueue.getOwner().getID().toString())),
+            hasJsonPath("$.entityId", is(orcidQueue.getEntity().getID().toString())),
+            hasJsonPath("$.description", is(description)),
+            hasJsonPath("$.recordType", is(orcidQueue.getRecordType())),
+            hasJsonPath("$.putCode", is(orcidQueue.getPutCode())),
+            hasJsonPath("$.type", is("orcidqueue")));
     }
 }

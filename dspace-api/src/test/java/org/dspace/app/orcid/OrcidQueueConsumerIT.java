@@ -96,6 +96,10 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
             .withOrcidSynchronizationProfilePreference(EDUCATION)
             .build();
 
+        OrcidHistoryBuilder.createOrcidHistory(context, profile, profile)
+            .withRecordType("AFFILIATION") // missing metadata
+            .build();
+
         context.restoreAuthSystemState();
         context.commit();
 
@@ -149,6 +153,10 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
             .withCrisOwner(eperson)
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
+            .withPersonAffiliation("4Science")
+            .withPersonAffiliationStartDate("2021-01-01")
+            .withPersonAffiliationEndDate(PLACEHOLDER_PARENT_METADATA_VALUE)
+            .withPersonAffiliationRole("Researcher")
             .build();
 
         context.restoreAuthSystemState();

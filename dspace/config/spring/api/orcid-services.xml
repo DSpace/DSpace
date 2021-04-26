@@ -15,84 +15,82 @@
     
     <bean class="org.dspace.authenticate.OrcidAuthenticationBean" id="orcidAuthentication"/>
     
-    <bean class="org.dspace.app.orcid.client.OrcidConfiguration" />
+    <bean class="org.dspace.app.orcid.client.OrcidConfiguration">
+    	<property name="apiUrl" value="${orcid.api-url}" />
+    	<property name="domainUrl" value="${orcid.domain-url}" />
+    	<property name="redirectUrl" value="${orcid.redirect-url}" />
+    	<property name="clientId" value="${orcid.application-client-id}" />
+    	<property name="clientSecret" value="${orcid.application-client-secret}" />
+    	<property name="tokenEndpointUrl" value="${orcid.token-url}" />
+    	<property name="authorizeEndpointUrl" value="${orcid.authorize-url}" />
+    	<property name="scopes" value="${orcid.scope}" />
+    </bean>
+    
     <bean class="org.dspace.app.orcid.client.OrcidClientImpl" />
-    <bean class="org.dspace.app.orcid.service.impl.PlainMetadataSignatureGeneratorImpl" />
+    <bean id="metadataSignatureGenerator" class="org.dspace.app.orcid.service.impl.PlainMetadataSignatureGeneratorImpl" />
     
     
-    <bean class="org.dspace.app.orcid.service.impl.OrcidProfileSectionConfigurationHandlerImpl">
-    	<constructor-arg name="configurations">
+    <bean class="org.dspace.app.orcid.service.impl.OrcidProfileSectionBuilderServiceImpl">
+    	<constructor-arg name="metadataSignatureGenerator" ref="metadataSignatureGenerator" />
+    	<constructor-arg name="sectionBuilders">
     		<list>
     		
-    			<bean class="org.dspace.app.orcid.model.OrcidAffiliationConfiguration">
+    			<bean class="org.dspace.app.orcid.builder.OrcidAffiliationBuilder">
 					<constructor-arg name="sectionType" value="AFFILIATION" />
 					<constructor-arg name="preference" value="AFFILIATION" />
-					<constructor-arg name="departmentField" value="oairecerif.person.affiliation" />
-					<constructor-arg name="roleTitleField" value="oairecerif.affiliation.role" />
-					<constructor-arg name="startDateField" value="oairecerif.affiliation.startDate" />
-					<constructor-arg name="endDateField" value="oairecerif.affiliation.endDate" />
+					<constructor-arg name="departmentField" value="${orcid.mapping.affiliation.name}" />
+					<constructor-arg name="roleTitleField" value="${orcid.mapping.affiliation.role}" />
+					<constructor-arg name="startDateField" value="${orcid.mapping.affiliation.start-date}" />
+					<constructor-arg name="endDateField" value="${orcid.mapping.affiliation.end-date}" />
 				</bean>
 				
-    			<bean class="org.dspace.app.orcid.model.OrcidAffiliationConfiguration">
+    			<bean class="org.dspace.app.orcid.builder.OrcidAffiliationBuilder">
 					<constructor-arg name="sectionType" value="QUALIFICATION" />
 					<constructor-arg name="preference" value="EDUCATION" />
-					<constructor-arg name="departmentField" value="crisrp.qualification" />
-					<constructor-arg name="roleTitleField" value="" />
-					<constructor-arg name="startDateField" value="crisrp.qualification.start" />
-					<constructor-arg name="endDateField" value="crisrp.qualification.end" />
+					<constructor-arg name="departmentField" value="${orcid.mapping.qualification.name}" />
+					<constructor-arg name="roleTitleField" value="${orcid.mapping.qualification.role}" />
+					<constructor-arg name="startDateField" value="${orcid.mapping.qualification.start-date}" />
+					<constructor-arg name="endDateField" value="${orcid.mapping.qualification.end-date}" />
 				</bean>
 				
-    			<bean class="org.dspace.app.orcid.model.OrcidAffiliationConfiguration">
+    			<bean class="org.dspace.app.orcid.builder.OrcidAffiliationBuilder">
 					<constructor-arg name="sectionType" value="EDUCATION" />
 					<constructor-arg name="preference" value="EDUCATION" />
-					<constructor-arg name="departmentField" value="crisrp.education" />
-					<constructor-arg name="roleTitleField" value="crisrp.education.role" />
-					<constructor-arg name="startDateField" value="crisrp.education.start" />
-					<constructor-arg name="endDateField" value="crisrp.education.end" />
+					<constructor-arg name="departmentField" value="${orcid.mapping.education.name}" />
+					<constructor-arg name="roleTitleField" value="${orcid.mapping.education.role}" />
+					<constructor-arg name="startDateField" value="${orcid.mapping.education.start-date}" />
+					<constructor-arg name="endDateField" value="${orcid.mapping.education.end-date}" />
 				</bean>
 				
-    			<bean class="org.dspace.app.orcid.model.OrcidSimpleValueConfiguration">
+    			<bean class="org.dspace.app.orcid.builder.OrcidSimpleValueBuilder">
 					<constructor-arg name="sectionType" value="OTHER_NAMES" />
 					<constructor-arg name="preference" value="BIOGRAPHICAL" />
-					<constructor-arg name="metadataField" value="crisrp.name.variant" />
+					<constructor-arg name="metadataFields" value="${orcid.mapping.other-names}" />
 				</bean>
 				
-    			<bean class="org.dspace.app.orcid.model.OrcidSimpleValueConfiguration">
-					<constructor-arg name="sectionType" value="OTHER_NAMES" />
-					<constructor-arg name="preference" value="BIOGRAPHICAL" />
-					<constructor-arg name="metadataField" value="crisrp.name.translated" />
-				</bean>
-				
-    			<bean class="org.dspace.app.orcid.model.OrcidSimpleValueConfiguration">
+    			<bean class="org.dspace.app.orcid.builder.OrcidSimpleValueBuilder">
 					<constructor-arg name="sectionType" value="KEYWORDS" />
 					<constructor-arg name="preference" value="BIOGRAPHICAL" />
-					<constructor-arg name="metadataField" value="dc.subject" />
+					<constructor-arg name="metadataFields" value="${orcid.mapping.keywords}" />
 				</bean>
 				
-    			<bean class="org.dspace.app.orcid.model.OrcidSimpleValueConfiguration">
+    			<bean class="org.dspace.app.orcid.builder.OrcidSimpleValueBuilder">
 					<constructor-arg name="sectionType" value="COUNTRY" />
 					<constructor-arg name="preference" value="BIOGRAPHICAL" />
-					<constructor-arg name="metadataField" value="crisrp.country" />
+					<constructor-arg name="metadataFields" value="${orcid.mapping.country}" />
 				</bean>
 				
-    			<bean class="org.dspace.app.orcid.model.OrcidExternalIdConfiguration">
+    			<bean class="org.dspace.app.orcid.builder.OrcidExternalIdBuilder">
 					<constructor-arg name="sectionType" value="EXTERNAL_IDS" />
 					<constructor-arg name="preference" value="IDENTIFIERS" />
-					<constructor-arg name="metadataField" value="person.identifier.scopus-author-id" />
-					<constructor-arg name="externalIdType" value="SCOPUS" />
+					<constructor-arg name="metadataFields" value="${orcid.mapping.external-ids.values}" />
+					<constructor-arg name="externalIdType" value="${orcid.mapping.external-ids.types}" />
 				</bean>
 				
-    			<bean class="org.dspace.app.orcid.model.OrcidExternalIdConfiguration">
-					<constructor-arg name="sectionType" value="EXTERNAL_IDS" />
-					<constructor-arg name="preference" value="IDENTIFIERS" />
-					<constructor-arg name="metadataField" value="person.identifier.rid" />
-					<constructor-arg name="externalIdType" value="RID" />
-				</bean>
-				
-    			<bean class="org.dspace.app.orcid.model.OrcidSimpleValueConfiguration">
+    			<bean class="org.dspace.app.orcid.builder.OrcidSimpleValueBuilder">
 					<constructor-arg name="sectionType" value="RESEARCHER_URLS" />
 					<constructor-arg name="preference" value="IDENTIFIERS" />
-					<constructor-arg name="metadataField" value="oairecerif.identifier.urld" />
+					<constructor-arg name="metadataFields" value="${orcid.mapping.researcher-urls}" />
 				</bean>
 				
     		</list>

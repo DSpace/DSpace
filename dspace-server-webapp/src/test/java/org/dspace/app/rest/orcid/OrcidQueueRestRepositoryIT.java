@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.orcid;
 
+import static org.dspace.app.rest.matcher.OrcidQueueMatcher.matchOrcidQueue;
+import static org.dspace.builder.OrcidQueueBuilder.createOrcidQueue;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -124,8 +126,8 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
                                   .param("ownerId", itemPerson.getID().toString()))
                                   .andExpect(status().isOk())
                                   .andExpect(jsonPath("$._embedded.orcidqueues", Matchers.containsInAnyOrder(
-                                             OrcidQueueMatcher.matchOrcidQueue(orcidQueue, "Publication"),
-                                             OrcidQueueMatcher.matchOrcidQueue(orcidQueue3, "Project")
+                                             OrcidQueueMatcher.matchOrcidQueue(orcidQueue, itemPublication.getName()),
+                                             OrcidQueueMatcher.matchOrcidQueue(orcidQueue3, itemProject.getName())
                                              )))
                                   .andExpect(jsonPath("$.page.totalElements", is(2)));
 
@@ -133,7 +135,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
                                    .param("ownerId", itemPerson2.getID().toString()))
                                    .andExpect(status().isOk())
                                    .andExpect(jsonPath("$._embedded.orcidqueues", Matchers.contains(
-                                              OrcidQueueMatcher.matchOrcidQueue(orcidQueue2, "Publication")
+                                              matchOrcidQueue(orcidQueue2, itemPublication2.getName())
                                               )))
                                    .andExpect(jsonPath("$.page.totalElements", is(1)))
                                    .andExpect(jsonPath("$._links.self.href", Matchers
@@ -143,8 +145,8 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
                              .param("ownerId", itemPerson.getID().toString()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$._embedded.orcidqueues", Matchers.containsInAnyOrder(
-                                        OrcidQueueMatcher.matchOrcidQueue(orcidQueue, "Publication"),
-                                        OrcidQueueMatcher.matchOrcidQueue(orcidQueue3, "Project")
+                                        OrcidQueueMatcher.matchOrcidQueue(orcidQueue, itemPublication.getName()),
+                                        OrcidQueueMatcher.matchOrcidQueue(orcidQueue3, itemProject.getName())
                                         )))
                              .andExpect(jsonPath("$.page.totalElements", is(2)));
     }
@@ -206,8 +208,8 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
         itemService.addMetadata(context, itemPerson, "crisevent", "description", "keywords", null, "psychoceramics");
         itemService.addMetadata(context, itemPerson, "dc", "identifier", "scopus", null, "7004769520");
 
-        OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, itemPerson, itemPublication).build();
-        OrcidQueue orcidQueue2 = OrcidQueueBuilder.createOrcidQueue(context, itemPerson2, itemPublication2).build();
+        OrcidQueueBuilder.createOrcidQueue(context, itemPerson, itemPublication).build();
+        OrcidQueueBuilder.createOrcidQueue(context, itemPerson2, itemPublication2).build();
 
         context.restoreAuthSystemState();
         String tokenResearcher2 = getAuthToken(researcher2.getEmail(), password);
@@ -255,7 +257,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
         itemService.addMetadata(context, itemPerson, "crisevent", "description", "keywords", null, "psychoceramics");
         itemService.addMetadata(context, itemPerson, "dc", "identifier", "scopus", null, "7004769520");
 
-        OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, itemPerson, itemPublication).build();
+        OrcidQueueBuilder.createOrcidQueue(context, itemPerson, itemPublication).build();
 
         context.restoreAuthSystemState();
 
@@ -315,8 +317,8 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
                                            .withTitle("Bulk and surface plasmons in artificially structured materials")
                                            .withIssueDate("2015-05-21").build();
 
-        OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, itemPerson1, itemPublication).build();
-        OrcidQueue orcidQueue2 = OrcidQueueBuilder.createOrcidQueue(context, itemPerson2, itemPublication2).build();
+        OrcidQueue orcidQueue = createOrcidQueue(context, itemPerson1, itemPublication).withPutCode("12345").build();
+        OrcidQueue orcidQueue2 = createOrcidQueue(context, itemPerson2, itemPublication2).build();
 
         context.restoreAuthSystemState();
         String tokenResearcher = getAuthToken(researcher.getEmail(), password);
@@ -324,8 +326,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
 
         getClient(tokenResearcher).perform(get("/api/cris/orcidqueues/" + orcidQueue.getID().toString()))
                              .andExpect(status().isOk())
-                             .andExpect(jsonPath("$", is(
-                                        OrcidQueueMatcher.matchOrcidQueue(orcidQueue, "Publication"))))
+                             .andExpect(jsonPath("$", is(matchOrcidQueue(orcidQueue, itemPublication.getName()))))
                              .andExpect(jsonPath("$._links.self.href", Matchers
                                        .containsString("/api/cris/orcidqueues/" + orcidQueue.getID())))
                              .andExpect(jsonPath("$._links.owner.href", Matchers
@@ -335,8 +336,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
 
         getClient(tokenResearcher2).perform(get("/api/cris/orcidqueues/" + orcidQueue2.getID().toString()))
                              .andExpect(status().isOk())
-                             .andExpect(jsonPath("$", is(
-                                        OrcidQueueMatcher.matchOrcidQueue(orcidQueue2, "Publication"))))
+                             .andExpect(jsonPath("$", is(matchOrcidQueue(orcidQueue2, itemPublication2.getName()))))
                              .andExpect(jsonPath("$._links.self.href", Matchers
                                        .containsString("/api/cris/orcidqueues/" + orcidQueue2.getID())))
                              .andExpect(jsonPath("$._links.owner.href", Matchers
@@ -529,8 +529,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
 
         getClient(tokenResearcher).perform(get("/api/cris/orcidqueues/" + orcidQueue.getID()))
                                   .andExpect(status().isOk())
-                                  .andExpect(jsonPath("$", is(
-                                          OrcidQueueMatcher.matchOrcidQueue(orcidQueue, "Publication"))));
+                                  .andExpect(jsonPath("$", is(matchOrcidQueue(orcidQueue, itemPublication.getName()))));
     }
 
     @Test
@@ -577,8 +576,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
 
         getClient(tokenResearcher).perform(get("/api/cris/orcidqueues/" + orcidQueue.getID()))
                                   .andExpect(status().isOk())
-                                  .andExpect(jsonPath("$", is(
-                                          OrcidQueueMatcher.matchOrcidQueue(orcidQueue, "Publication"))));
+                                  .andExpect(jsonPath("$", is(matchOrcidQueue(orcidQueue, itemPublication.getName()))));
     }
 
     @Test

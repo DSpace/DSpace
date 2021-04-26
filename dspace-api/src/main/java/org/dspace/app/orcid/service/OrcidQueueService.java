@@ -55,14 +55,26 @@ public interface OrcidQueueService {
      *
      * @param  context      DSpace context object
      * @param  owner        the owner item
-     * @param  entityType   the type of the entity item
+     * @param  description  the orcid queue record description
+     * @param  type         the type of the entity item
      * @param  putCode      the putCode related to the given entity item
      * @return              the stored record
      * @throws SQLException if an SQL error occurs
      */
-    public OrcidQueue create(Context context, Item owner, String entityType, String putCode) throws SQLException;
+    OrcidQueue create(Context context, Item owner, String description, String type, String putCode) throws SQLException;
 
-    OrcidQueue create(Context context, Item item, String recordType) throws SQLException;
+    /**
+     * Create an OrcidQueue record with the given item as owner and entity and with
+     * the given record type.
+     *
+     * @param  context      DSpace context object
+     * @param  item         the item that is the owner and the entity of the new
+     *                      record to create
+     * @param  recordType   the record type
+     * @return              the stored record
+     * @throws SQLException if an SQL error occurs
+     */
+    OrcidQueue create(Context context, Item owner, String recordType) throws SQLException;
 
     /**
      * Find all the ORCID queue records.
@@ -97,28 +109,38 @@ public interface OrcidQueueService {
         throws SQLException;
 
     /**
-     * Get the orcid queue records by the owner and entity ids.
+     * Get the orcid queue records by the owner and entity.
      *
      * @param  context      DSpace context object
-     * @param  ownerId      the owner item id
-     * @param  entityId     the entity item id
+     * @param  ownerId      the owner item
+     * @param  entityId     the entity item
      * @param  limit        limit
      * @param  offset       offset
-     * @return              the orcid queue records
+     * @return              the found OrcidQueue records
      * @throws SQLException if an SQL error occurs
      */
-    public List<OrcidQueue> findByOwnerAndEntityId(Context context, UUID ownerId, UUID entityId) throws SQLException;
+    public List<OrcidQueue> findByOwnerAndEntity(Context context, Item owner, Item entity) throws SQLException;
 
     /**
      * Get the OrcidQueue records where the given item is the owner OR the entity
      *
      * @param  context      DSpace context object
      * @param  item         the item to search for
-     * @return              the found OrcidHistory entities
+     * @return              the found OrcidQueue records
      * @throws SQLException if database error
      */
     public List<OrcidQueue> findByOwnerOrEntity(Context context, Item item) throws SQLException;
 
+    /**
+     * Get the OrcidQueue records where the given item is the entity and with the
+     * given record type.
+     *
+     * @param  context      DSpace context object
+     * @param  entity       the entity item
+     * @param  type         the record type
+     * @return              the found OrcidQueue records
+     * @throws SQLException
+     */
     public List<OrcidQueue> findByEntityAndRecordType(Context context, Item entity, String type) throws SQLException;
 
     /**

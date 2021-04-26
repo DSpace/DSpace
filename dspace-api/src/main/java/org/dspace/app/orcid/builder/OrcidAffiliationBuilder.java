@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.orcid.model;
+package org.dspace.app.orcid.builder;
 
 import static org.dspace.app.orcid.model.OrcidProfileSectionType.AFFILIATION;
 import static org.dspace.app.orcid.model.OrcidProfileSectionType.EDUCATION;
@@ -15,18 +15,24 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.orcid.model.OrcidProfileSectionType;
 import org.dspace.app.profile.OrcidProfileSyncPreference;
+import org.dspace.content.Item;
+import org.dspace.core.Context;
 import org.orcid.jaxb.model.v3.release.record.Affiliation;
+import org.orcid.jaxb.model.v3.release.record.Education;
+import org.orcid.jaxb.model.v3.release.record.Employment;
+import org.orcid.jaxb.model.v3.release.record.Qualification;
 
 /**
- * Implementation of {@link OrcidProfileSectionConfiguration} that model the
- * ORCID affiliations (Education, Employment, Qualification etc..). This
- * configuration will be used to build instance of {@link Affiliation}.
+ * Implementation of {@link OrcidProfileSectionBuilder} that model the ORCID
+ * affiliations (Education, Employment, Qualification etc..). This builder will
+ * be used to build instance of {@link Affiliation}.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public class OrcidAffiliationConfiguration extends OrcidProfileSectionConfiguration {
+public class OrcidAffiliationBuilder extends OrcidProfileSectionBuilder {
 
     private final String departmentField;
 
@@ -36,7 +42,7 @@ public class OrcidAffiliationConfiguration extends OrcidProfileSectionConfigurat
 
     private final String endDateField;
 
-    public OrcidAffiliationConfiguration(OrcidProfileSectionType sectionType, OrcidProfileSyncPreference preference,
+    public OrcidAffiliationBuilder(OrcidProfileSectionType sectionType, OrcidProfileSyncPreference preference,
         String departmentField, String roleTitleField, String startDateField, String endDateField) {
         super(sectionType, preference);
         this.departmentField = departmentField;
@@ -71,6 +77,24 @@ public class OrcidAffiliationConfiguration extends OrcidProfileSectionConfigurat
     @Override
     public List<OrcidProfileSectionType> getSupportedTypes() {
         return List.of(AFFILIATION, QUALIFICATION, EDUCATION);
+    }
+
+    @Override
+    public List<Object> buildOrcidObjects(Context context, Item item, OrcidProfileSectionType type) {
+        return null;
+    }
+
+    private Affiliation buildAffiliation() {
+        switch (sectionType) {
+            case AFFILIATION:
+                return new Employment();
+            case EDUCATION:
+                return new Education();
+            case QUALIFICATION:
+                return new Qualification();
+            default:
+                throw new IllegalStateException("Orcid affiliation builder does not supports " + sectionType);
+        }
     }
 
 }

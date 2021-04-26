@@ -62,13 +62,13 @@ public class ResearcherProfileConverter implements DSpaceConverter<ResearcherPro
     private String getPublicationsPreference(Item item) {
         return orcidSynchronizationService.getPublicationsPreference(item)
             .map(OrcidEntitySyncPreference::name)
-            .orElse(null);
+            .orElse(OrcidEntitySyncPreference.DISABLED.name());
     }
 
     private String getProjectsPreference(Item item) {
         return orcidSynchronizationService.getProjectsPreference(item)
             .map(OrcidEntitySyncPreference::name)
-            .orElse(null);
+            .orElse(OrcidEntitySyncPreference.DISABLED.name());
     }
 
     private List<String> getProfilePreferences(Item item) {
@@ -80,7 +80,7 @@ public class ResearcherProfileConverter implements DSpaceConverter<ResearcherPro
     private String getMode(Item item) {
         return orcidSynchronizationService.getSynchronizationMode(item)
             .map(OrcidSyncMode::name)
-            .orElse(null);
+            .orElse(OrcidSyncMode.MANUAL.name());
     }
 
     @Override

@@ -7,12 +7,14 @@
  */
 package org.dspace.app.orcid.service.impl;
 
+import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.nullsFirst;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.math.NumberUtils.isCreatable;
+import static org.dspace.app.orcid.model.OrcidProfileSectionType.valueOf;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -32,6 +34,7 @@ import javax.xml.bind.Marshaller;
 import com.ibm.icu.text.DecimalFormat;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -45,14 +48,15 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 import org.dspace.app.orcid.OrcidHistory;
 import org.dspace.app.orcid.OrcidQueue;
+import org.dspace.app.orcid.client.OrcidClient;
+import org.dspace.app.orcid.client.OrcidResponse;
 import org.dspace.app.orcid.dao.OrcidHistoryDAO;
 import org.dspace.app.orcid.dao.OrcidQueueDAO;
-import org.dspace.app.orcid.model.OrcidAffiliationConfiguration;
-import org.dspace.app.orcid.model.OrcidProfileSectionConfiguration;
 import org.dspace.app.orcid.model.OrcidProfileSectionType;
 import org.dspace.app.orcid.service.OrcidHistoryService;
-import org.dspace.app.orcid.service.OrcidProfileSectionConfigurationHandler;
+import org.dspace.app.orcid.service.OrcidProfileSectionBuilderService;
 import org.dspace.app.util.OrcidWorkMetadata;
+import org.dspace.authenticate.OrcidClientException;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
@@ -121,7 +125,10 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     private SimpleMapConverter mapConverterModifier;
 
     @Autowired
-    private OrcidProfileSectionConfigurationHandler orcidProfileSectionConfigurationHandler;
+    private OrcidProfileSectionBuilderService profileBuilderService;
+
+    @Autowired
+    private OrcidClient orcidClient;
 
     private HttpClient httpClient;
 
@@ -215,6 +222,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         }
 
         Item entity = orcidQueue.getEntity();
+        // TODO check if entity == null --> delete on orcid
         String entityType = itemService.getEntityType(entity);
         if (entityType == null) {
             throw new IllegalArgumentException("The related entity item does not have a entity type");
@@ -311,68 +319,80 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     private OrcidHistory sendPersonToOrcid(Context context, OrcidQueue orcidQueue, String orcid, String token)
             throws SQLException {
 
-        String recordType = orcidQueue.getRecordType();
+        if (!EnumUtils.isValidEnum(OrcidProfileSectionType.class, orcidQueue.getRecordType())) {
+            throw new IllegalArgumentException(format("The OrcidQueue type with id %s is not valid for profile's "
+                + "update", orcidQueue.getRecordType()));
+        }
+
+        OrcidProfileSectionType recordType = valueOf(orcidQueue.getRecordType());
         Item person = orcidQueue.getEntity();
 
-        List<OrcidHistory> orcidHistoryRecords = findByEntityAndRecordType(context, person, recordType);
-        for (OrcidHistory orcidHistoryRecord : orcidHistoryRecords) {
-            if (StringUtils.isNotBlank(orcidHistoryRecord.getPutCode())) {
-                // TODO: perform deletion on orcid by putCode
-                delete(context, orcidHistoryRecord);
+        OrcidHistory orcidHistory = null;
+
+        try {
+
+            List<OrcidHistory> orcidHistoryRecords = findByEntityAndRecordType(context, person, recordType.name());
+            for (OrcidHistory orcidHistoryRecord : orcidHistoryRecords) {
+                String putCode = orcidHistoryRecord.getPutCode();
+                if (StringUtils.isNotBlank(putCode)) {
+                    orcidClient.deleteByPutCode(token, orcid, putCode, recordType.getPath());
+                    delete(context, orcidHistoryRecord);
+                }
             }
+
+            String metadataSignature = profileBuilderService.getMetadataSignature(context, person, recordType);
+            List<Object> objects = profileBuilderService.buildOrcidObjects(context, person, recordType);
+
+            for (Object orcidObject : objects) {
+                OrcidResponse orcidResponse = orcidClient.push(token, orcid, orcidObject);
+                orcidHistory = createFromOrcidResponse(context, recordType, person, metadataSignature, orcidResponse);
+            }
+
+            orcidQueueDAO.delete(context, orcidQueue);
+
+        } catch (OrcidClientException ex) {
+            ex.printStackTrace();
+            return createFromOrcidError(context, recordType, person, ex);
+        } catch (RuntimeException ex) {
+            return createFromGenericError(context, recordType, person, ex);
         }
 
-        // TODO: check type
-        List<OrcidProfileSectionConfiguration> profileSections = findProfileConfigurations(recordType);
-        for (OrcidProfileSectionConfiguration profileSection : profileSections) {
-            OrcidProfileSectionType sectionType = profileSection.getSectionType();
-            switch (sectionType) {
-                case AFFILIATION:
-                    OrcidAffiliationConfiguration affiliation = (OrcidAffiliationConfiguration) profileSection;
-
-                    String departmentField = affiliation.getDepartmentField();
-                    String roleTitleField = affiliation.getRoleTitleField();
-                    String endDateField = affiliation.getEndDateField();
-                    String startDateField = affiliation.getStartDateField();
-
-                    List<MetadataValue> metadataValues = itemService.getMetadataByMetadataString(person,
-                        departmentField);
-
-                    // TODO: build an instance of affiliation foreach nested metadata and push them
-                    // on orcid
-
-                    break;
-                case COUNTRY:
-                    break;
-                case EDUCATION:
-                    break;
-                case EXTERNAL_IDS:
-                    break;
-                case KEYWORDS:
-                    break;
-                case OTHER_NAMES:
-                    break;
-                case QUALIFICATION:
-                    break;
-                case RESEARCHER_URLS:
-                    break;
-                default:
-                    break;
-
-            }
-        }
-
-        // TODO: delete the orcid queue only if all the push are ok
-        orcidQueueDAO.delete(context, orcidQueue);
-        // TODO: returns the last orcid history record
-        return null;
+        return orcidHistory;
     }
 
-    /**
-     * @param recordType
-     */
-    private List<OrcidProfileSectionConfiguration> findProfileConfigurations(String recordType) {
-        return orcidProfileSectionConfigurationHandler.findBySectionType(OrcidProfileSectionType.valueOf(recordType));
+    private OrcidHistory createFromGenericError(Context context, OrcidProfileSectionType recordType, Item person,
+        RuntimeException ex) throws SQLException {
+        OrcidHistory history = new OrcidHistory();
+        history.setEntity(person);
+        history.setOwner(person);
+        history.setResponseMessage(ex.getMessage());
+        history.setStatus(500);
+        history.setRecordType(recordType.name());
+        return orcidHistoryDAO.create(context, history);
+    }
+
+    private OrcidHistory createFromOrcidError(Context context, OrcidProfileSectionType recordType, Item person,
+        OrcidClientException ex) throws SQLException {
+        OrcidHistory history = new OrcidHistory();
+        history.setEntity(person);
+        history.setOwner(person);
+        history.setResponseMessage(ex.getMessage());
+        history.setStatus(ex.getStatus());
+        history.setRecordType(recordType.name());
+        return orcidHistoryDAO.create(context, history);
+    }
+
+    private OrcidHistory createFromOrcidResponse(Context context, OrcidProfileSectionType recordType, Item person,
+        String metadataSignature, OrcidResponse orcidResponse) throws SQLException {
+        OrcidHistory history = new OrcidHistory();
+        history.setEntity(person);
+        history.setOwner(person);
+        history.setResponseMessage(orcidResponse.getContent());
+        history.setStatus(orcidResponse.getStatus());
+        history.setPutCode(orcidResponse.getPutCode());
+        history.setRecordType(recordType.name());
+        history.setMetadata(metadataSignature);
+        return orcidHistoryDAO.create(context, history);
     }
 
     private <T> OrcidHistory sendObjectToOrcid(Context context, OrcidQueue orcidQueue, String orcid, String token,
@@ -380,7 +400,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
 
         Item entity = orcidQueue.getEntity();
         Item owner = orcidQueue.getOwner();
-        String orcidUrl = configurationService.getProperty("orcid-api.api-url");
+        String orcidUrl = configurationService.getProperty("orcid.api-url");
         String path = orcidUrl + "/" + orcid + endpoint;
         HttpEntityEnclosingRequestBase request = putCode != null ? new HttpPut(path + "/" + putCode)
                 : new HttpPost(path);

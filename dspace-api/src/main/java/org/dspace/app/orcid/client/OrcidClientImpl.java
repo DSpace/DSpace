@@ -7,19 +7,29 @@
  */
 package org.dspace.app.orcid.client;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.apache.http.client.methods.RequestBuilder.delete;
 import static org.apache.http.client.methods.RequestBuilder.get;
+import static org.apache.http.client.methods.RequestBuilder.post;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -28,14 +38,24 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
+import org.dspace.app.orcid.model.OrcidProfileSectionType;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.authenticate.OrcidClientException;
 import org.dspace.util.ThrowingSupplier;
+import org.orcid.jaxb.model.v3.release.record.Address;
+import org.orcid.jaxb.model.v3.release.record.Education;
+import org.orcid.jaxb.model.v3.release.record.Employment;
 import org.orcid.jaxb.model.v3.release.record.Funding;
+import org.orcid.jaxb.model.v3.release.record.Keyword;
+import org.orcid.jaxb.model.v3.release.record.OtherName;
 import org.orcid.jaxb.model.v3.release.record.Person;
+import org.orcid.jaxb.model.v3.release.record.PersonExternalIdentifier;
+import org.orcid.jaxb.model.v3.release.record.Qualification;
 import org.orcid.jaxb.model.v3.release.record.Record;
+import org.orcid.jaxb.model.v3.release.record.ResearcherUrl;
 import org.orcid.jaxb.model.v3.release.record.Work;
 
 /**
@@ -46,6 +66,8 @@ import org.orcid.jaxb.model.v3.release.record.Work;
  */
 public class OrcidClientImpl implements OrcidClient {
 
+    private static final Map<Class<?>, String> PATHS_MAP = initializePathsMap();
+
     private final OrcidConfiguration orcidConfiguration;
 
     private final ObjectMapper objectMapper;
@@ -53,6 +75,21 @@ public class OrcidClientImpl implements OrcidClient {
     public OrcidClientImpl(OrcidConfiguration orcidConfiguration) {
         this.orcidConfiguration = orcidConfiguration;
         this.objectMapper = new ObjectMapper();
+    }
+
+    private static Map<Class<?>, String> initializePathsMap() {
+        Map<Class<?>, String> map = new HashMap<Class<?>, String>();
+        map.put(Work.class, "/work");
+        map.put(Funding.class, "/funding");
+        map.put(Employment.class, OrcidProfileSectionType.AFFILIATION.getPath());
+        map.put(Education.class, OrcidProfileSectionType.EDUCATION.getPath());
+        map.put(Qualification.class, OrcidProfileSectionType.QUALIFICATION.getPath());
+        map.put(Address.class, OrcidProfileSectionType.COUNTRY.getPath());
+        map.put(OtherName.class, OrcidProfileSectionType.OTHER_NAMES.getPath());
+        map.put(ResearcherUrl.class, OrcidProfileSectionType.RESEARCHER_URLS.getPath());
+        map.put(PersonExternalIdentifier.class, OrcidProfileSectionType.EXTERNAL_IDS.getPath());
+        map.put(Keyword.class, OrcidProfileSectionType.KEYWORDS.getPath());
+        return map;
     }
 
     @Override
@@ -87,21 +124,49 @@ public class OrcidClientImpl implements OrcidClient {
     }
 
     @Override
-    public Optional<Work> getWork(String accessToken, String orcid, String putCode) {
-        return Optional.ofNullable(putCode)
-            .map(code -> buildGetUriRequest(accessToken, "/" + orcid + "/work/" + code))
-            .map(httpUriRequest -> executeAndUnmarshall(httpUriRequest, true, Work.class));
+    public <T> Optional<T> getObject(String accessToken, String orcid, String putCode, Class<T> clazz) {
+        String path = PATHS_MAP.get(clazz);
+        if (path == null) {
+            throw new IllegalArgumentException("The given class is not an ORCID object's class: " + clazz);
+        }
+        HttpUriRequest httpUriRequest = buildGetUriRequest(accessToken, "/" + orcid + path);
+        return Optional.ofNullable(executeAndUnmarshall(httpUriRequest, true, clazz));
     }
 
     @Override
-    public Optional<Funding> getFunding(String accessToken, String orcid, String putCode) {
-        return Optional.ofNullable(putCode)
-            .map(code -> buildGetUriRequest(accessToken, "/" + orcid + "/funding/" + code))
-            .map(httpUriRequest -> executeAndUnmarshall(httpUriRequest, true, Funding.class));
+    public OrcidResponse push(String accessToken, String orcid, Object object) {
+        String path = PATHS_MAP.get(object.getClass());
+        if (path == null) {
+            throw new IllegalArgumentException("The given object is not an ORCID object: " + object.getClass());
+        }
+
+        HttpUriRequest httpUriRequest = buildPostUriRequest(accessToken, "/" + orcid + path, object);
+        return execute(httpUriRequest, false);
+    }
+
+    @Override
+    public OrcidResponse deleteByPutCode(String accessToken, String orcid, String putCode, String path) {
+        HttpUriRequest httpUriRequest = buildDeleteUriRequest(accessToken, "/" + orcid + path + "/" + putCode);
+        return execute(httpUriRequest, true);
     }
 
     private HttpUriRequest buildGetUriRequest(String accessToken, String path) {
-        return get(orcidConfiguration.getApiUrl() + path)
+        return get(orcidConfiguration.getApiUrl() + path.trim())
+            .addHeader("Content-Type", "application/x-www-form-urlencoded")
+            .addHeader("Authorization", "Bearer " + accessToken)
+            .build();
+    }
+
+    private HttpUriRequest buildPostUriRequest(String accessToken, String path, Object object) {
+        return post(orcidConfiguration.getApiUrl() + path.trim())
+            .addHeader("Content-Type", "application/vnd.orcid+xml")
+            .addHeader("Authorization", "Bearer " + accessToken)
+            .setEntity(convertToEntity(object))
+            .build();
+    }
+
+    private HttpUriRequest buildDeleteUriRequest(String accessToken, String path) {
+        return delete(orcidConfiguration.getApiUrl() + path.trim())
             .addHeader("Content-Type", "application/x-www-form-urlencoded")
             .addHeader("Authorization", "Bearer " + accessToken)
             .build();
@@ -116,7 +181,7 @@ public class OrcidClientImpl implements OrcidClient {
             HttpResponse response = client.execute(httpUriRequest);
 
             if (isNotSuccessfull(response)) {
-                throw new OrcidClientException(formatErrorMessage(response));
+                throw new OrcidClientException(getStatusCode(response), formatErrorMessage(response));
             }
 
             return objectMapper.readValue(response.getEntity().getContent(), clazz);
@@ -138,10 +203,30 @@ public class OrcidClientImpl implements OrcidClient {
             }
 
             if (isNotSuccessfull(response)) {
-                throw new OrcidClientException(formatErrorMessage(response));
+                throw new OrcidClientException(getStatusCode(response), formatErrorMessage(response));
             }
 
             return unmarshall(response.getEntity(), clazz);
+
+        });
+    }
+
+    private OrcidResponse execute(HttpUriRequest httpUriRequest, boolean handleNotFoundAsNull) {
+        HttpClient client = HttpClientBuilder.create().build();
+
+        return executeAndReturns(() -> {
+
+            HttpResponse response = client.execute(httpUriRequest);
+
+            if (handleNotFoundAsNull && isNotFound(response)) {
+                return new OrcidResponse(getStatusCode(response), null, null);
+            }
+
+            if (isNotSuccessfull(response)) {
+                throw new OrcidClientException(getStatusCode(response), formatErrorMessage(response));
+            }
+
+            return new OrcidResponse(getStatusCode(response), getPutCode(response), getContent(response));
 
         });
     }
@@ -164,6 +249,22 @@ public class OrcidClientImpl implements OrcidClient {
         return (T) unmarshaller.unmarshal(content);
     }
 
+    private HttpEntity convertToEntity(Object object) {
+        try {
+            return new StringEntity(marshall(object));
+        } catch (UnsupportedEncodingException | JAXBException ex) {
+            throw new IllegalArgumentException("The given object cannot be sent to ORCID", ex);
+        }
+    }
+
+    private String marshall(Object object) throws JAXBException {
+        JAXBContext jaxbContext = JAXBContext.newInstance(object.getClass());
+        Marshaller marshaller = jaxbContext.createMarshaller();
+        StringWriter stringWriter = new StringWriter();
+        marshaller.marshal(object, stringWriter);
+        return stringWriter.toString();
+    }
+
     private String formatErrorMessage(HttpResponse response) {
         try {
             return IOUtils.toString(response.getEntity().getContent(), Charset.defaultCharset());
@@ -173,11 +274,30 @@ public class OrcidClientImpl implements OrcidClient {
     }
 
     private boolean isNotSuccessfull(HttpResponse response) {
-        return response.getStatusLine().getStatusCode() != HttpStatus.SC_OK;
+        int statusCode = getStatusCode(response);
+        return statusCode < 200 || statusCode > 299;
     }
 
     private boolean isNotFound(HttpResponse response) {
-        return response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND;
+        return getStatusCode(response) == HttpStatus.SC_NOT_FOUND;
+    }
+
+    private int getStatusCode(HttpResponse response) {
+        return response.getStatusLine().getStatusCode();
+    }
+
+    private String getContent(HttpResponse response) throws UnsupportedOperationException, IOException {
+        HttpEntity entity = response.getEntity();
+        return entity != null ? IOUtils.toString(entity.getContent(), UTF_8.name()) : null;
+    }
+
+    private String getPutCode(HttpResponse response) {
+        Header[] headers = response.getHeaders("Location");
+        if (headers.length == 0) {
+            return null;
+        }
+        String value = headers[0].getValue();
+        return value.substring(value.lastIndexOf("/") + 1);
     }
 
 }

@@ -45,8 +45,8 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     }
 
     @Override
-    public List<OrcidQueue> findByOwnerAndEntityId(Context context, UUID ownerId, UUID entityId) throws SQLException {
-        return orcidQueueDAO.findByOwnerAndEntityId(context, ownerId, entityId);
+    public List<OrcidQueue> findByOwnerAndEntity(Context context, Item owner, Item entity) throws SQLException {
+        return orcidQueueDAO.findByOwnerAndEntity(context, owner, entity);
     }
 
     @Override
@@ -89,11 +89,13 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     }
 
     @Override
-    public OrcidQueue create(Context context, Item owner, String type, String putCode) throws SQLException {
+    public OrcidQueue create(Context context, Item owner, String description, String type, String putCode)
+        throws SQLException {
         OrcidQueue orcidQueue = new OrcidQueue();
         orcidQueue.setRecordType(type);
         orcidQueue.setOwner(owner);
         orcidQueue.setPutCode(putCode);
+        orcidQueue.setDescription(description);
         return orcidQueueDAO.create(context, orcidQueue);
     }
 

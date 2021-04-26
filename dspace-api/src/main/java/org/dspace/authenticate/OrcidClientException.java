@@ -18,16 +18,19 @@ public class OrcidClientException extends RuntimeException {
 
     private static final long serialVersionUID = -7618061110212398216L;
 
-    public OrcidClientException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    private Integer status = 0;
 
-    public OrcidClientException(String message) {
-        super(message);
+    public OrcidClientException(Integer status, String content) {
+        super(content);
+        this.status = status;
     }
 
     public OrcidClientException(Throwable cause) {
         super(cause);
+    }
+
+    public Integer getStatus() {
+        return this.status;
     }
 
 }

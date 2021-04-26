@@ -14,12 +14,23 @@ package org.dspace.app.orcid.model;
  */
 public enum OrcidProfileSectionType {
 
-    AFFILIATION,
-    EDUCATION,
-    QUALIFICATION,
-    OTHER_NAMES,
-    COUNTRY,
-    KEYWORDS,
-    EXTERNAL_IDS,
-    RESEARCHER_URLS;
+    AFFILIATION("/employment"),
+    EDUCATION("/education"),
+    QUALIFICATION("/qualification"),
+    OTHER_NAMES("/other-names"),
+    COUNTRY("/address"),
+    KEYWORDS("/keywords"),
+    EXTERNAL_IDS("/external-identifiers"),
+    RESEARCHER_URLS("/researcher-urls");
+
+    private final String path;
+
+    private OrcidProfileSectionType(String path) {
+        this.path = path;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
 }
