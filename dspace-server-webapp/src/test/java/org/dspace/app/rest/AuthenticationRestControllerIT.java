@@ -189,6 +189,10 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .requestAttr("SHIB-SCOPED-AFFILIATION", "faculty;staff"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl(uiURL))
+                // Verify that the CSRF token has NOT been changed. Creating the auth cookie should NOT change our CSRF
+                // token. The CSRF token should only change when we call /login with the cookie (see later in this test)
+                .andExpect(cookie().doesNotExist("DSPACE-XSRF-COOKIE"))
+                .andExpect(header().doesNotExist("DSPACE-XSRF-TOKEN"))
                 .andExpect(cookie().exists(AUTHORIZATION_COOKIE))
                 .andReturn().getResponse().getCookie(AUTHORIZATION_COOKIE);
 
@@ -196,12 +200,12 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         assertNotNull(authCookie);
         String token = authCookie.getValue();
 
-        // Now, simulate the UI sending the cookie back to the REST API in order to complete the authentication.
-        // This is where the temporary cookie will be read, verified & destroyed. After this point, the UI will
-        // only use the Authorization header for all future requests.
-        // NOTE that this call has an "Origin" matching the UI, to better mock that the request came from there &
-        // to verify the temporary auth cookie is valid for the UI's origin.
-        //Check if we are authenticated with a status request with authorization cookie
+        // This step is _not required_ to successfully authenticate, but it mocks the behavior of our UI & HAL Browser.
+        // We'll send a "/status" request to the REST API with our auth cookie. This should return that we have a
+        // *valid* authentication (as auth cookie is valid), however the cookie will remain. To complete the login
+        // process we MUST call the "/login" endpoint (see the next step in this test).
+        // (NOTE that this call has an "Origin" matching the UI, to better mock that the request came from there &
+        // to verify the temporary auth cookie is valid for the UI's origin.)
         getClient().perform(get("/api/authn/status").header("Origin", uiURL)
                                                               .secure(true)
                                                               .cookie(authCookie))
@@ -210,15 +214,31 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$.okay", is(true)))
                 .andExpect(jsonPath("$.authenticated", is(true)))
                 .andExpect(jsonPath("$.type", is("status")))
-                // Verify the Auth cookie has been deleted after one usage
+                // Verify that the CSRF token has NOT been changed... status checks won't change the token
+                // (only login/logout will)
+                .andExpect(cookie().doesNotExist("DSPACE-XSRF-COOKIE"))
+                .andExpect(header().doesNotExist("DSPACE-XSRF-TOKEN"));
+
+        // To complete the authentication process, we pass our auth cookie to the "/login" endpoint.
+        // This is where the temporary cookie will be read, verified & destroyed. After this point, the UI will
+        // only use the 'Authorization' header for all future requests.
+        // (NOTE that this call has an "Origin" matching the UI, to better mock that the request came from there &
+        // to verify the temporary auth cookie is valid for the UI's origin.)
+        getClient().perform(post("/api/authn/login").header("Origin", uiURL)
+                                                              .secure(true)
+                                                              .cookie(authCookie))
+                .andExpect(status().isOk())
+                // Verify the Auth cookie has been destroyed
                 .andExpect(cookie().value(AUTHORIZATION_COOKIE, ""))
+                // Verify token is now sent back in the Authorization header as the Bearer token
+                .andExpect(header().string(AUTHORIZATION_HEADER, "Bearer " + token))
                 // Verify that the CSRF token has been changed
                 // (as both cookie and header should be sent back)
                 .andExpect(cookie().exists("DSPACE-XSRF-COOKIE"))
                 .andExpect(header().exists("DSPACE-XSRF-TOKEN"));
 
         // Now that the auth cookie is cleared, all future requests (from UI)
-        // should be made via the Authorization header. So, this tests the token is still valid if sent via headers.
+        // should be made via the Authorization header. So, this tests the token is still valid if sent via header.
         getClient(token).perform(get("/api/authn/status").header("Origin", uiURL))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
@@ -248,6 +268,9 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(status().isUnauthorized());
     }
 
+    // NOTE: This test is similar to testStatusShibAuthenticatedWithCookie(), but proves the same process works
+    // for Password Authentication in theory (NOTE: at this time, there's no way to create an auth cookie via the
+    // Password Authentication process).
     @Test
     public void testStatusPasswordAuthenticatedWithCookie() throws Exception {
         // Login via password to retrieve a valid token
@@ -256,26 +279,49 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         // Remove "Bearer " from that token, so that we are left with the token itself
         token = token.replace("Bearer ", "");
 
-        // Save token to an Authorization cookie
-        Cookie[] cookies = new Cookie[1];
-        cookies[0] = new Cookie(AUTHORIZATION_COOKIE, token);
+        // Fake the creation of an auth cookie, just for testing. (Currently, it's not possible to create an auth cookie
+        // via Password auth, but this test proves it would work if enabled)
+        Cookie authCookie = new Cookie(AUTHORIZATION_COOKIE, token);
 
-        //Check if we are authenticated with a status request using authorization cookie
-        getClient().perform(get("/api/authn/status")
-                                .secure(true)
-                                .cookie(cookies))
+        // Now, similar to how both the UI & Hal Browser authentication works, send a "/status" request to the REST API
+        // with our auth cookie. This should return that we *have a valid* authentication (in the auth cookie).
+        // However, this is just a validation check, so this auth cookie will remain. To complete the login process
+        // we'll need to call the "/login" endpoint (see the next step in this test).
+        getClient().perform(get("/api/authn/status").secure(true).cookie(authCookie))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$.okay", is(true)))
                    .andExpect(jsonPath("$.authenticated", is(true)))
                    .andExpect(jsonPath("$.type", is("status")))
-                   // Verify the Auth cookie has been deleted after one usage
-                   .andExpect(cookie().value(AUTHORIZATION_COOKIE, ""))
-                   // Verify that the CSRF token has been changed
-                   // (as both cookie and header should be sent back)
-                   .andExpect(cookie().exists("DSPACE-XSRF-COOKIE"))
-                   .andExpect(header().exists("DSPACE-XSRF-TOKEN"));
-        //Logout
+                   // Verify that the CSRF token has NOT been changed... status checks won't change the token
+                   // (only login/logout will)
+                   .andExpect(cookie().doesNotExist("DSPACE-XSRF-COOKIE"))
+                   .andExpect(header().doesNotExist("DSPACE-XSRF-TOKEN"));
+
+        // To complete the authentication process, we pass our auth cookie to the "/login" endpoint.
+        // This is where the temporary cookie will be read, verified & destroyed. After this point, the UI will
+        // only use the Authorization header for all future requests.
+        getClient().perform(post("/api/authn/login").secure(true).cookie(authCookie))
+                    .andExpect(status().isOk())
+                    // Verify the Auth cookie has been destroyed
+                    .andExpect(cookie().value(AUTHORIZATION_COOKIE, ""))
+                    // Verify token is now sent back in the Authorization header
+                    .andExpect(header().string(AUTHORIZATION_HEADER, "Bearer " + token))
+                    // Verify that the CSRF token has been changed
+                    // (as both cookie and header should be sent back)
+                    .andExpect(cookie().exists("DSPACE-XSRF-COOKIE"))
+                    .andExpect(header().exists("DSPACE-XSRF-TOKEN"));
+
+        // Now that the auth cookie is cleared, all future requests (from UI)
+        // should be made via the Authorization header. So, this tests the token is still valid if sent via header.
+        getClient(token).perform(get("/api/authn/status"))
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType(contentType))
+                    .andExpect(jsonPath("$.okay", is(true)))
+                    .andExpect(jsonPath("$.authenticated", is(true)))
+                    .andExpect(jsonPath("$.type", is("status")));
+
+        // Logout, invalidating the token
         getClient(token).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
     }
