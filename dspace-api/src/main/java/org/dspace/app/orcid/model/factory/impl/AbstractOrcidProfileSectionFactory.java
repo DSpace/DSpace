@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.orcid.builder;
+package org.dspace.app.orcid.model.factory.impl;
 
 import static java.lang.String.format;
 
@@ -13,21 +13,22 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.dspace.app.orcid.model.OrcidProfileSectionType;
+import org.dspace.app.orcid.model.factory.OrcidCommonObjectFactory;
+import org.dspace.app.orcid.model.factory.OrcidProfileSectionFactory;
 import org.dspace.app.profile.OrcidProfileSyncPreference;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Abstract class for that handle commons behaviors of all the available orcid
- * profile section builders.
+ * profile section factories.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public abstract class OrcidProfileSectionBuilder {
+public abstract class AbstractOrcidProfileSectionFactory implements OrcidProfileSectionFactory {
 
     protected final OrcidProfileSectionType sectionType;
 
@@ -36,7 +37,10 @@ public abstract class OrcidProfileSectionBuilder {
     @Autowired
     protected ItemService itemService;
 
-    public OrcidProfileSectionBuilder(OrcidProfileSectionType sectionType,
+    @Autowired
+    protected OrcidCommonObjectFactory orcidCommonObjectFactory;
+
+    public AbstractOrcidProfileSectionFactory(OrcidProfileSectionType sectionType,
         OrcidProfileSyncPreference preference) {
         this.sectionType = sectionType;
         this.preference = preference;
@@ -45,18 +49,7 @@ public abstract class OrcidProfileSectionBuilder {
             throw new IllegalArgumentException(format("The ORCID configuration does not support "
                 + "the section type %s. Supported types are %s", sectionType, getSupportedTypes()));
         }
-
     }
-
-    /**
-     * Returns many instances of ORCID objects starting from the given item.
-     *
-     * @param  context the DSpace Context
-     * @param  item    the item
-     * @param  type    the profile section type
-     * @return         the ORCID objects
-     */
-    public abstract List<Object> buildOrcidObjects(Context context, Item item, OrcidProfileSectionType type);
 
     /**
      * Returns the section type.
@@ -76,27 +69,20 @@ public abstract class OrcidProfileSectionBuilder {
         return preference;
     }
 
-    /**
-     * Returns all the supported profile section types.
-     *
-     * @return the supported sections
-     */
-    public abstract List<OrcidProfileSectionType> getSupportedTypes();
-
-    /**
-     * Returns all the metadata fields involved in the profile section
-     * configuration.
-     *
-     * @return the metadataFields
-     */
-    public abstract List<String> getMetadataFields();
-
     public ItemService getItemService() {
         return itemService;
     }
 
     public void setItemService(ItemService itemService) {
         this.itemService = itemService;
+    }
+
+    public OrcidCommonObjectFactory getOrcidCommonObjectFactory() {
+        return orcidCommonObjectFactory;
+    }
+
+    public void setOrcidCommonObjectFactory(OrcidCommonObjectFactory orcidCommonObjectFactory) {
+        this.orcidCommonObjectFactory = orcidCommonObjectFactory;
     }
 
     protected List<String> getMetadataValues(Item item, String metadataField) {

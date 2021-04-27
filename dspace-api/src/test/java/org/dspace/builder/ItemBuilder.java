@@ -302,12 +302,16 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "person", "email", null, email);
     }
 
+    public ItemBuilder withPersonMainAffiliationName(String name, String authority) {
+        return addMetadataValue(item, "person", "affiliation", "name", null, name, authority, 600);
+    }
+
     public ItemBuilder withPersonAffiliation(String affiliation) {
         return addMetadataValue(item, "oairecerif", "person", "affiliation", affiliation);
     }
 
-    public ItemBuilder withPersonAffiliationName(String name, String authority) {
-        return addMetadataValue(item, "person", "affiliation", "name", null, name, authority, 600);
+    public ItemBuilder withPersonAffiliation(String affiliation, String authority) {
+        return addMetadataValue(item, "oairecerif", "person", "affiliation", null, affiliation, authority, 600);
     }
 
     public ItemBuilder withPersonAffiliationStartDate(String startDate) {
@@ -533,6 +537,18 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withOrgUnitLegalName(String legalName) {
         return addMetadataValue(item, "organization", "legalName", null, legalName);
+    }
+
+    public ItemBuilder withOrgUnitLocality(String addressLocality) {
+        return addMetadataValue(item, "organization", "address", "addressLocality", addressLocality);
+    }
+
+    public ItemBuilder withOrgUnitCountry(String addressCountry) {
+        return addMetadataValue(item, "organization", "address", "addressCountry", addressCountry);
+    }
+
+    public ItemBuilder withOrgUnitRinggoldIdentifier(String identifier) {
+        return addMetadataValue(item, "organization", "identifier", "rin", identifier);
     }
 
     public ItemBuilder withParentOrganization(String parent) {

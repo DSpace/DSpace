@@ -9,7 +9,7 @@ package org.dspace.app.orcid.factory;
 
 import org.dspace.app.orcid.service.MetadataSignatureGenerator;
 import org.dspace.app.orcid.service.OrcidHistoryService;
-import org.dspace.app.orcid.service.OrcidProfileSectionBuilderService;
+import org.dspace.app.orcid.service.OrcidProfileSectionFactoryService;
 import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.app.orcid.service.OrcidSynchronizationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -29,7 +29,7 @@ public abstract class OrcidServiceFactory {
 
     public abstract OrcidSynchronizationService getOrcidSynchronizationService();
 
-    public abstract OrcidProfileSectionBuilderService getOrcidProfileSectionBuilderService();
+    public abstract OrcidProfileSectionFactoryService getOrcidProfileSectionFactoryService();
 
     public abstract MetadataSignatureGenerator getMetadataSignatureGenerator();
 

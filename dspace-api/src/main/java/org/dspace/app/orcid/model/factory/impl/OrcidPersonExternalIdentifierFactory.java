@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.orcid.builder;
+package org.dspace.app.orcid.model.factory.impl;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -23,17 +23,17 @@ import org.orcid.jaxb.model.v3.release.common.Url;
 import org.orcid.jaxb.model.v3.release.record.PersonExternalIdentifier;
 
 /**
- * Implementation of {@link OrcidProfileSectionBuilder} that model an
+ * Implementation of {@link OrcidProfileSectionFactory} that model an personal
  * external id.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public class OrcidExternalIdBuilder extends OrcidSimpleValueBuilder {
+public class OrcidPersonExternalIdentifierFactory extends OrcidSimpleValueObjectFactory {
 
     private final List<String> externalIdTypes;
 
-    public OrcidExternalIdBuilder(OrcidProfileSectionType sectionType,
+    public OrcidPersonExternalIdentifierFactory(OrcidProfileSectionType sectionType,
         OrcidProfileSyncPreference preference, String metadataFields, String externalIdType) {
 
         super(sectionType, preference, metadataFields);
@@ -56,7 +56,7 @@ public class OrcidExternalIdBuilder extends OrcidSimpleValueBuilder {
     }
 
     @Override
-    public List<Object> buildOrcidObjects(Context context, Item item, OrcidProfileSectionType type) {
+    public List<Object> create(Context context, Item item) {
 
         List<Object> objects = new ArrayList<Object>();
 

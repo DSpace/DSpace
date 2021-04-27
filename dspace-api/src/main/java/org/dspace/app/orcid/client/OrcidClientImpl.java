@@ -260,6 +260,7 @@ public class OrcidClientImpl implements OrcidClient {
     private String marshall(Object object) throws JAXBException {
         JAXBContext jaxbContext = JAXBContext.newInstance(object.getClass());
         Marshaller marshaller = jaxbContext.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         StringWriter stringWriter = new StringWriter();
         marshaller.marshal(object, stringWriter);
         return stringWriter.toString();

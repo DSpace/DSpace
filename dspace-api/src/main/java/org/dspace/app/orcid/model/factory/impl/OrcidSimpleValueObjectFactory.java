@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.orcid.builder;
+package org.dspace.app.orcid.model.factory.impl;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -30,17 +30,17 @@ import org.orcid.jaxb.model.v3.release.record.OtherName;
 import org.orcid.jaxb.model.v3.release.record.ResearcherUrl;
 
 /**
- * Implementation of {@OrcidProfileSectionConfiguration} that build ORCID
+ * Implementation of {@link OrcidProfileSectionFactory} that creates ORCID
  * objects with a single value.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public class OrcidSimpleValueBuilder extends OrcidProfileSectionBuilder {
+public class OrcidSimpleValueObjectFactory extends AbstractOrcidProfileSectionFactory {
 
     protected final List<String> metadataFields;
 
-    public OrcidSimpleValueBuilder(OrcidProfileSectionType sectionType, OrcidProfileSyncPreference preference,
+    public OrcidSimpleValueObjectFactory(OrcidProfileSectionType sectionType, OrcidProfileSyncPreference preference,
         String metadataFields) {
         super(sectionType, preference);
         this.metadataFields = metadataFields != null ? asList(metadataFields.split(",")) : emptyList();
@@ -57,47 +57,47 @@ public class OrcidSimpleValueBuilder extends OrcidProfileSectionBuilder {
     }
 
     @Override
-    public List<Object> buildOrcidObjects(Context context, Item item, OrcidProfileSectionType type) {
+    public List<Object> create(Context context, Item item) {
         return metadataFields.stream()
             .flatMap(metadataField -> getMetadataValues(item, metadataField).stream())
-            .map(this::buildOrcidObject)
+            .map(this::createOrcidObject)
             .collect(Collectors.toList());
     }
 
-    private Object buildOrcidObject(String metadataValue) {
+    private Object createOrcidObject(String metadataValue) {
         switch (getSectionType()) {
             case COUNTRY:
-                return buildAddress(metadataValue);
+                return createAddress(metadataValue);
             case KEYWORDS:
-                return buildKeyword(metadataValue);
+                return createKeyword(metadataValue);
             case OTHER_NAMES:
-                return buildOtherName(metadataValue);
+                return createOtherName(metadataValue);
             case RESEARCHER_URLS:
-                return buildResearcherUrl(metadataValue);
+                return createResearcherUrl(metadataValue);
             default:
                 throw new IllegalStateException("OrcidSimpleValueBuilder does not support type " + getSectionType());
         }
     }
 
-    private ResearcherUrl buildResearcherUrl(String metadataValue) {
+    private ResearcherUrl createResearcherUrl(String metadataValue) {
         ResearcherUrl researcherUrl = new ResearcherUrl();
         researcherUrl.setUrl(new Url(metadataValue));
         return researcherUrl;
     }
 
-    private OtherName buildOtherName(String metadataValue) {
+    private OtherName createOtherName(String metadataValue) {
         OtherName otherName = new OtherName();
         otherName.setContent(metadataValue);
         return otherName;
     }
 
-    private Keyword buildKeyword(String metadataValue) {
+    private Keyword createKeyword(String metadataValue) {
         Keyword keyword = new Keyword();
         keyword.setContent(metadataValue);
         return keyword;
     }
 
-    private Address buildAddress(String metadataValue) {
+    private Address createAddress(String metadataValue) {
         Address address = new Address();
         address.setCountry(new Country(Iso3166Country.fromValue(metadataValue)));
         return address;

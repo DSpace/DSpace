@@ -54,7 +54,7 @@ import org.dspace.app.orcid.dao.OrcidHistoryDAO;
 import org.dspace.app.orcid.dao.OrcidQueueDAO;
 import org.dspace.app.orcid.model.OrcidProfileSectionType;
 import org.dspace.app.orcid.service.OrcidHistoryService;
-import org.dspace.app.orcid.service.OrcidProfileSectionBuilderService;
+import org.dspace.app.orcid.service.OrcidProfileSectionFactoryService;
 import org.dspace.app.util.OrcidWorkMetadata;
 import org.dspace.authenticate.OrcidClientException;
 import org.dspace.content.Item;
@@ -125,7 +125,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     private SimpleMapConverter mapConverterModifier;
 
     @Autowired
-    private OrcidProfileSectionBuilderService profileBuilderService;
+    private OrcidProfileSectionFactoryService profileFactoryService;
 
     @Autowired
     private OrcidClient orcidClient;
@@ -230,7 +230,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
 
         switch (entityType) {
             case "Person":
-                return sendPersonToOrcid(context, orcidQueue, orcid, token);
+                return sendProfileDataToOrcid(context, orcidQueue, orcid, token);
             case "Publication":
                 return sendPublicationToOrcid(context, orcidQueue, orcid, token, forceAddition);
             case "Project":
@@ -316,7 +316,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         return sendObjectToOrcid(context, orcidQueue, orcid, token, putCode, funding, FUNDING_ENDPOINT, Funding.class);
     }
 
-    private OrcidHistory sendPersonToOrcid(Context context, OrcidQueue orcidQueue, String orcid, String token)
+    private OrcidHistory sendProfileDataToOrcid(Context context, OrcidQueue orcidQueue, String orcid, String token)
             throws SQLException {
 
         if (!EnumUtils.isValidEnum(OrcidProfileSectionType.class, orcidQueue.getRecordType())) {
@@ -340,8 +340,8 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
                 }
             }
 
-            String metadataSignature = profileBuilderService.getMetadataSignature(context, person, recordType);
-            List<Object> objects = profileBuilderService.buildOrcidObjects(context, person, recordType);
+            String metadataSignature = profileFactoryService.getMetadataSignature(context, person, recordType);
+            List<Object> objects = profileFactoryService.createOrcidObjects(context, person, recordType);
 
             for (Object orcidObject : objects) {
                 OrcidResponse orcidResponse = orcidClient.push(token, orcid, orcidObject);
@@ -351,7 +351,6 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
             orcidQueueDAO.delete(context, orcidQueue);
 
         } catch (OrcidClientException ex) {
-            ex.printStackTrace();
             return createFromOrcidError(context, recordType, person, ex);
         } catch (RuntimeException ex) {
             return createFromGenericError(context, recordType, person, ex);

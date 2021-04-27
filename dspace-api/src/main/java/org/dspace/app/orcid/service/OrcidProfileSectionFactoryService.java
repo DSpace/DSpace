@@ -9,19 +9,19 @@ package org.dspace.app.orcid.service;
 
 import java.util.List;
 
-import org.dspace.app.orcid.builder.OrcidProfileSectionBuilder;
 import org.dspace.app.orcid.model.OrcidProfileSectionType;
+import org.dspace.app.orcid.model.factory.impl.AbstractOrcidProfileSectionFactory;
 import org.dspace.app.profile.OrcidProfileSyncPreference;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
 /**
  * Interface that mark classes that handle the configured instance of
- * {@link OrcidProfileSectionBuilder}.
+ * {@link AbstractOrcidProfileSectionFactory}.
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public interface OrcidProfileSectionBuilderService {
+public interface OrcidProfileSectionFactoryService {
 
     /**
      * Returns all the profile section configurations of the given type.
@@ -29,7 +29,7 @@ public interface OrcidProfileSectionBuilderService {
      * @param  type the type of the section configurations to retrieve
      * @return      the section configurations of the given type
      */
-    List<OrcidProfileSectionBuilder> findBySectionType(OrcidProfileSectionType type);
+    List<AbstractOrcidProfileSectionFactory> findBySectionType(OrcidProfileSectionType type);
 
     /**
      * Returns all the profile section configurations relative to the given
@@ -38,7 +38,7 @@ public interface OrcidProfileSectionBuilderService {
      * @param  preferences the preferences to search for
      * @return             the section configurations
      */
-    List<OrcidProfileSectionBuilder> findByPreferences(List<OrcidProfileSyncPreference> preferences);
+    List<AbstractOrcidProfileSectionFactory> findByPreferences(List<OrcidProfileSyncPreference> preferences);
 
     /**
      * Builds many instance of ORCID objects starting from the given item compliance
@@ -49,7 +49,7 @@ public interface OrcidProfileSectionBuilderService {
      * @param  type    the profile section type
      * @return         the created objects
      */
-    List<Object> buildOrcidObjects(Context context, Item item, OrcidProfileSectionType type);
+    List<Object> createOrcidObjects(Context context, Item item, OrcidProfileSectionType type);
 
     /**
      * Get the metadata signature of the givn item's metadata values related to the

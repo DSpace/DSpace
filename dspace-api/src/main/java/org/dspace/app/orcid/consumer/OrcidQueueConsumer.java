@@ -20,11 +20,11 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.orcid.OrcidHistory;
 import org.dspace.app.orcid.OrcidQueue;
-import org.dspace.app.orcid.builder.OrcidProfileSectionBuilder;
 import org.dspace.app.orcid.factory.OrcidServiceFactory;
 import org.dspace.app.orcid.model.OrcidProfileSectionType;
+import org.dspace.app.orcid.model.factory.impl.AbstractOrcidProfileSectionFactory;
 import org.dspace.app.orcid.service.OrcidHistoryService;
-import org.dspace.app.orcid.service.OrcidProfileSectionBuilderService;
+import org.dspace.app.orcid.service.OrcidProfileSectionFactoryService;
 import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.app.orcid.service.OrcidSynchronizationService;
 import org.dspace.app.profile.OrcidProfileSyncPreference;
@@ -56,7 +56,7 @@ public class OrcidQueueConsumer implements Consumer {
 
     private ItemService itemService;
 
-    private OrcidProfileSectionBuilderService profileSectionBuilderService;
+    private OrcidProfileSectionFactoryService profileSectionBuilderService;
 
     private List<UUID> alreadyConsumedItems = new ArrayList<>();
 
@@ -68,7 +68,7 @@ public class OrcidQueueConsumer implements Consumer {
         this.orcidQueueService = orcidServiceFactory.getOrcidQueueService();
         this.orcidHistoryService = orcidServiceFactory.getOrcidHistoryService();
         this.orcidSynchronizationService = orcidServiceFactory.getOrcidSynchronizationService();
-        this.profileSectionBuilderService = orcidServiceFactory.getOrcidProfileSectionBuilderService();
+        this.profileSectionBuilderService = orcidServiceFactory.getOrcidProfileSectionFactoryService();
 
         this.itemService = ContentServiceFactory.getInstance().getItemService();
     }
@@ -159,9 +159,9 @@ public class OrcidQueueConsumer implements Consumer {
 
         List<OrcidHistory> orcidHistories = orcidHistoryService.findByEntity(context, item);
 
-        List<OrcidProfileSectionBuilder> configurations = findProfileConfigurations(item);
+        List<AbstractOrcidProfileSectionFactory> configurations = findProfileConfigurations(item);
 
-        for (OrcidProfileSectionBuilder configuration : configurations) {
+        for (AbstractOrcidProfileSectionFactory configuration : configurations) {
 
             OrcidProfileSectionType sectionType = configuration.getSectionType();
             if (isAlreadyQueued(context, item, sectionType)) {
@@ -235,7 +235,7 @@ public class OrcidQueueConsumer implements Consumer {
         return itemService.getMetadataFirstValue(item, new MetadataFieldName(metadataField), Item.ANY);
     }
 
-    private List<OrcidProfileSectionBuilder> findProfileConfigurations(Item item) {
+    private List<AbstractOrcidProfileSectionFactory> findProfileConfigurations(Item item) {
         List<OrcidProfileSyncPreference> profilePreferences = orcidSynchronizationService.getProfilePreferences(item);
         return this.profileSectionBuilderService.findByPreferences(profilePreferences);
     }
