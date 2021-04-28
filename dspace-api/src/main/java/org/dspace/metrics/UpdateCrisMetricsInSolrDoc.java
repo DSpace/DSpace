@@ -7,18 +7,12 @@
  */
 package org.dspace.metrics;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.metrics.CrisMetrics;
-import org.dspace.app.metrics.service.CrisMetricsService;
-import org.dspace.app.metrics.service.CrisMetricsServiceImpl;
 import org.dspace.core.Context;
-import org.dspace.discovery.IndexingService;
-import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.scripts.DSpaceRunnable;
@@ -34,18 +28,14 @@ public class UpdateCrisMetricsInSolrDoc extends
 
     private static final Logger log = LogManager.getLogger(UpdateCrisMetricsInSolrDoc.class);
 
-    private CrisMetricsService crisMetricsService;
-
-    private IndexingService crisIndexingService;
+    private UpdateCrisMetricsInSolrDocService updateCrisMetricsInSolrDocService;
 
     protected Context context;
 
     @Override
     public void setup() throws ParseException {
-        crisMetricsService = new DSpace().getServiceManager().getServiceByName(
-                                 CrisMetricsServiceImpl.class.getName(), CrisMetricsServiceImpl.class);
-        crisIndexingService = new DSpace().getServiceManager().getServiceByName(
-                                  IndexingService.class.getName(), IndexingService.class);
+        updateCrisMetricsInSolrDocService = new DSpace().getServiceManager().getServiceByName(
+                UpdateCrisMetricsInSolrDocService.class.getName(), UpdateCrisMetricsInSolrDocService.class);
     }
 
     @Override
@@ -60,31 +50,12 @@ public class UpdateCrisMetricsInSolrDoc extends
         assignCurrentUserInContext();
         assignSpecialGroupsInContext();
         try {
-            performUpdate(context);
+            updateCrisMetricsInSolrDocService.performUpdate(context, handler, commandLine.hasOption("o"));
             context.complete();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             handler.handleException(e);
             context.abort();
-        }
-    }
-
-    private void performUpdate(Context context) {
-        try {
-            List<CrisMetrics> metrics = crisMetricsService.findAllLast(context,-1,-1);
-            handler.logInfo("Update start");
-            for (CrisMetrics metric : metrics) {
-                crisIndexingService.updateMetrics(context, metric);
-            }
-            handler.logInfo("Update end");
-            if (commandLine.hasOption("o")) {
-                handler.logInfo("Starting solr optimization");
-                crisIndexingService.optimize();
-                handler.logInfo("Solr optimization performed");
-            }
-        } catch (SQLException | SearchServiceException e) {
-            log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
         }
     }
 

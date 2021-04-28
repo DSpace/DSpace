@@ -242,5 +242,7 @@
         </property>
     </bean>
 
+    <bean class="org.dspace.metrics.UpdateCrisMetricsInSolrDocService"/>
+
 
 </beans>
