@@ -34,7 +34,7 @@ public interface OrcidQueueService {
      * @return              the stored record
      * @throws SQLException if an SQL error occurs
      */
-    public OrcidQueue create(Context context, Item owner, Item entity) throws SQLException;
+    public OrcidQueue createEntityInsertionRecord(Context context, Item owner, Item entity) throws SQLException;
 
     /**
      * Create an OrcidQueue record with the given owner to update a record on ORCID
@@ -47,7 +47,8 @@ public interface OrcidQueueService {
      * @return              the stored record
      * @throws SQLException if an SQL error occurs
      */
-    public OrcidQueue create(Context context, Item owner, Item entity, String putCode) throws SQLException;
+    public OrcidQueue createEntityUpdateRecord(Context context, Item owner, Item entity, String putCode)
+        throws SQLException;
 
     /**
      * Create an OrcidQueue record with the given owner to delete a record on ORCID
@@ -61,20 +62,36 @@ public interface OrcidQueueService {
      * @return              the stored record
      * @throws SQLException if an SQL error occurs
      */
-    OrcidQueue create(Context context, Item owner, String description, String type, String putCode) throws SQLException;
+    OrcidQueue createEntityDeletionRecord(Context context, Item owner, String description, String type, String putCode)
+        throws SQLException;
 
     /**
-     * Create an OrcidQueue record with the given item as owner and entity and with
-     * the given record type.
+     * Create an OrcidQueue record with the profile to add data to ORCID.
      *
      * @param  context      DSpace context object
-     * @param  item         the item that is the owner and the entity of the new
-     *                      record to create
+     * @param  profile      the profile item
+     * @param  description  the record description
      * @param  recordType   the record type
+     * @param  metadata     the metadata signature
      * @return              the stored record
      * @throws SQLException if an SQL error occurs
      */
-    OrcidQueue create(Context context, Item owner, String recordType) throws SQLException;
+    OrcidQueue createProfileInsertionRecord(Context context, Item profile, String description, String recordType,
+        String metadata) throws SQLException;
+
+    /**
+     * Create an OrcidQueue record with the profile to remove data from ORCID.
+     *
+     * @param  context      DSpace context object
+     * @param  profile      the profile item
+     * @param  description  the record description
+     * @param  recordType   the record type
+     * @param  putCode      the putCode
+     * @return              the stored record
+     * @throws SQLException if an SQL error occurs
+     */
+    OrcidQueue createProfileDeletionRecord(Context context, Item profile, String description, String recordType,
+        String putCode) throws SQLException;
 
     /**
      * Find all the ORCID queue records.

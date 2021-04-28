@@ -53,6 +53,7 @@ import org.dspace.app.orcid.client.OrcidResponse;
 import org.dspace.app.orcid.dao.OrcidHistoryDAO;
 import org.dspace.app.orcid.dao.OrcidQueueDAO;
 import org.dspace.app.orcid.model.OrcidProfileSectionType;
+import org.dspace.app.orcid.service.MetadataSignatureGenerator;
 import org.dspace.app.orcid.service.OrcidHistoryService;
 import org.dspace.app.orcid.service.OrcidProfileSectionFactoryService;
 import org.dspace.app.util.OrcidWorkMetadata;
@@ -126,6 +127,9 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
 
     @Autowired
     private OrcidProfileSectionFactoryService profileFactoryService;
+
+    @Autowired
+    private MetadataSignatureGenerator metadataSignatureGenerator;
 
     @Autowired
     private OrcidClient orcidClient;
@@ -203,9 +207,9 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     }
 
     @Override
-    public List<OrcidHistory> findByEntityAndRecordType(Context context, Item entity, String recordType)
-        throws SQLException {
-        return orcidHistoryDAO.findByEntityAndRecordType(context, entity, recordType);
+    public List<OrcidHistory> findSuccessfullyRecordsByEntityAndType(Context context,
+        Item entity, String recordType) throws SQLException {
+        return orcidHistoryDAO.findSuccessfullyRecordsByEntityAndType(context, entity, recordType);
     }
 
     @Override
@@ -326,29 +330,19 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
 
         OrcidProfileSectionType recordType = valueOf(orcidQueue.getRecordType());
         Item person = orcidQueue.getEntity();
-
-        OrcidHistory orcidHistory = null;
+        String signature = orcidQueue.getMetadata();
 
         try {
 
-            List<OrcidHistory> orcidHistoryRecords = findByEntityAndRecordType(context, person, recordType.name());
-            for (OrcidHistory orcidHistoryRecord : orcidHistoryRecords) {
-                String putCode = orcidHistoryRecord.getPutCode();
-                if (StringUtils.isNotBlank(putCode)) {
-                    orcidClient.deleteByPutCode(token, orcid, putCode, recordType.getPath());
-                    delete(context, orcidHistoryRecord);
-                }
-            }
+            List<MetadataValue> metadataValues = metadataSignatureGenerator.findBySignature(context, person, signature);
 
-            String metadataSignature = profileFactoryService.getMetadataSignature(context, person, recordType);
-            List<Object> objects = profileFactoryService.createOrcidObjects(context, person, recordType);
-
-            for (Object orcidObject : objects) {
-                OrcidResponse orcidResponse = orcidClient.push(token, orcid, orcidObject);
-                orcidHistory = createFromOrcidResponse(context, recordType, person, metadataSignature, orcidResponse);
-            }
+            Object orcidObject = profileFactoryService.createOrcidObject(context, metadataValues, recordType);
+            OrcidResponse orcidResponse = orcidClient.push(token, orcid, orcidObject);
+            OrcidHistory orcidHistory = createFromOrcidResponse(context, recordType, person, signature, orcidResponse);
 
             orcidQueueDAO.delete(context, orcidQueue);
+
+            return orcidHistory;
 
         } catch (OrcidClientException ex) {
             return createFromOrcidError(context, recordType, person, ex);
@@ -356,7 +350,6 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
             return createFromGenericError(context, recordType, person, ex);
         }
 
-        return orcidHistory;
     }
 
     private OrcidHistory createFromGenericError(Context context, OrcidProfileSectionType recordType, Item person,

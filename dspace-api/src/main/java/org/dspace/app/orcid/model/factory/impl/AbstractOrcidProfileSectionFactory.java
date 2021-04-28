@@ -10,11 +10,11 @@ package org.dspace.app.orcid.model.factory.impl;
 import static java.lang.String.format;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.dspace.app.orcid.model.OrcidProfileSectionType;
 import org.dspace.app.orcid.model.factory.OrcidCommonObjectFactory;
 import org.dspace.app.orcid.model.factory.OrcidProfileSectionFactory;
+import org.dspace.app.orcid.service.MetadataSignatureGenerator;
 import org.dspace.app.profile.OrcidProfileSyncPreference;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
@@ -40,6 +40,9 @@ public abstract class AbstractOrcidProfileSectionFactory implements OrcidProfile
     @Autowired
     protected OrcidCommonObjectFactory orcidCommonObjectFactory;
 
+    @Autowired
+    protected MetadataSignatureGenerator metadataSignatureGenerator;
+
     public AbstractOrcidProfileSectionFactory(OrcidProfileSectionType sectionType,
         OrcidProfileSyncPreference preference) {
         this.sectionType = sectionType;
@@ -51,20 +54,14 @@ public abstract class AbstractOrcidProfileSectionFactory implements OrcidProfile
         }
     }
 
-    /**
-     * Returns the section type.
-     *
-     * @return the section type
-     */
-    public OrcidProfileSectionType getSectionType() {
+    protected abstract List<OrcidProfileSectionType> getSupportedTypes();
+
+    @Override
+    public OrcidProfileSectionType getProfileSectionType() {
         return sectionType;
     }
 
-    /**
-     * Returns the synchronization preference related to this configuration.
-     *
-     * @return the section name
-     */
+    @Override
     public OrcidProfileSyncPreference getSynchronizationPreference() {
         return preference;
     }
@@ -85,10 +82,8 @@ public abstract class AbstractOrcidProfileSectionFactory implements OrcidProfile
         this.orcidCommonObjectFactory = orcidCommonObjectFactory;
     }
 
-    protected List<String> getMetadataValues(Item item, String metadataField) {
-        return itemService.getMetadataByMetadataString(item, metadataField).stream()
-            .map(MetadataValue::getValue)
-            .collect(Collectors.toList());
+    protected List<MetadataValue> getMetadataValues(Item item, String metadataField) {
+        return itemService.getMetadataByMetadataString(item, metadataField);
     }
 
 }

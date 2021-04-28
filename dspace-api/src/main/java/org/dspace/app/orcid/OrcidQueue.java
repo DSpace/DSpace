@@ -56,6 +56,9 @@ public class OrcidQueue implements ReloadableEntity<Integer> {
     @Column(name = "record_type")
     private String recordType;
 
+    @Column(name = "metadata")
+    private String metadata;
+
     public boolean isInsertAction() {
         return entity != null && isEmpty(putCode);
     }
@@ -139,6 +142,14 @@ public class OrcidQueue implements ReloadableEntity<Integer> {
 
     public void setRecordType(String recordType) {
         this.recordType = recordType;
+    }
+
+    public String getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(String metadata) {
+        this.metadata = metadata;
     }
 
 }

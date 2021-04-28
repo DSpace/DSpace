@@ -11,13 +11,11 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.dspace.app.orcid.model.OrcidProfileSectionType.EXTERNAL_IDS;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.dspace.app.orcid.model.OrcidProfileSectionType;
 import org.dspace.app.profile.OrcidProfileSyncPreference;
-import org.dspace.content.Item;
-import org.dspace.core.Context;
+import org.dspace.content.MetadataValue;
 import org.orcid.jaxb.model.common.Relationship;
 import org.orcid.jaxb.model.v3.release.common.Url;
 import org.orcid.jaxb.model.v3.release.record.PersonExternalIdentifier;
@@ -43,7 +41,6 @@ public class OrcidPersonExternalIdentifierFactory extends OrcidSimpleValueObject
             throw new IllegalArgumentException("The external id types configuration is not compliance with "
                 + "the metadata fields configuration");
         }
-
     }
 
     public List<String> getExternalIdTypes() {
@@ -56,22 +53,22 @@ public class OrcidPersonExternalIdentifierFactory extends OrcidSimpleValueObject
     }
 
     @Override
-    public List<Object> create(Context context, Item item) {
+    protected Object create(MetadataValue metadataValue) {
 
-        List<Object> objects = new ArrayList<Object>();
+        String currentMetadataField = metadataValue.getMetadataField().toString('.');
+        int metadataFieldIndex = metadataFields.indexOf(currentMetadataField);
 
-        for (int i = 0; i < metadataFields.size(); i++) {
-            for (String metadataValue : getMetadataValues(item, metadataFields.get(i))) {
-                PersonExternalIdentifier externalId = new PersonExternalIdentifier();
-                externalId.setValue(metadataValue);
-                externalId.setType(externalIdTypes.get(i));
-                externalId.setRelationship(Relationship.SELF);
-                externalId.setUrl(new Url(metadataValue));
-                objects.add(externalId);
-            }
+        if (metadataFieldIndex < 0) {
+            throw new IllegalArgumentException("Metadata field not supported: " + currentMetadataField);
         }
 
-        return objects;
+        PersonExternalIdentifier externalId = new PersonExternalIdentifier();
+        externalId.setValue(metadataValue.getValue());
+        externalId.setType(externalIdTypes.get(metadataFieldIndex));
+        externalId.setRelationship(Relationship.SELF);
+        externalId.setUrl(new Url(metadataValue.getValue()));
+
+        return externalId;
     }
 
 }

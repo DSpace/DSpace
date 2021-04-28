@@ -7,19 +7,20 @@
  */
 package org.dspace.app.orcid.service.impl;
 
-import static java.util.Collections.emptyList;
-import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
+import static java.util.stream.Collectors.toMap;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.dspace.app.orcid.model.OrcidProfileSectionType;
-import org.dspace.app.orcid.model.factory.impl.AbstractOrcidProfileSectionFactory;
-import org.dspace.app.orcid.service.MetadataSignatureGenerator;
+import org.dspace.app.orcid.model.factory.OrcidProfileSectionFactory;
 import org.dspace.app.orcid.service.OrcidProfileSectionFactoryService;
 import org.dspace.app.profile.OrcidProfileSyncPreference;
-import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
 
 /**
@@ -30,42 +31,31 @@ import org.dspace.core.Context;
  */
 public class OrcidProfileSectionFactoryServiceImpl implements OrcidProfileSectionFactoryService {
 
-    private final List<AbstractOrcidProfileSectionFactory> sectionFactories;
+    private final Map<OrcidProfileSectionType, OrcidProfileSectionFactory> sectionFactories;
 
-    private final MetadataSignatureGenerator metadataSignatureGenerator;
-
-    private OrcidProfileSectionFactoryServiceImpl(List<AbstractOrcidProfileSectionFactory> sectionFactories,
-        MetadataSignatureGenerator metadataSignatureGenerator) {
-        this.sectionFactories = isNotEmpty(sectionFactories) ? sectionFactories : emptyList();
-        this.metadataSignatureGenerator = metadataSignatureGenerator;
+    private OrcidProfileSectionFactoryServiceImpl(List<OrcidProfileSectionFactory> sectionFactories) {
+        this.sectionFactories = sectionFactories.stream()
+            .collect(toMap(OrcidProfileSectionFactory::getProfileSectionType, Function.identity()));
     }
 
     @Override
-    public List<AbstractOrcidProfileSectionFactory> findBySectionType(OrcidProfileSectionType type) {
-        return filterBy(configuration -> configuration.getSectionType() == type);
+    public Optional<OrcidProfileSectionFactory> findBySectionType(OrcidProfileSectionType type) {
+        return Optional.ofNullable(this.sectionFactories.get(type));
     }
 
     @Override
-    public List<AbstractOrcidProfileSectionFactory> findByPreferences(List<OrcidProfileSyncPreference> preferences) {
+    public List<OrcidProfileSectionFactory> findByPreferences(List<OrcidProfileSyncPreference> preferences) {
         return filterBy(configuration -> preferences.contains(configuration.getSynchronizationPreference()));
     }
 
     @Override
-    public List<Object> createOrcidObjects(Context context, Item item, OrcidProfileSectionType type) {
-        return findBySectionType(type).stream()
-            .flatMap(builder -> builder.create(context, item).stream())
-            .collect(Collectors.toList());
+    public Object createOrcidObject(Context context, List<MetadataValue> metadataValues, OrcidProfileSectionType type) {
+        return findBySectionType(type)
+            .map(factory -> factory.create(context, metadataValues))
+            .orElseThrow(() -> new IllegalArgumentException("No ORCID profile section factory configured for " + type));
     }
 
-    private List<AbstractOrcidProfileSectionFactory> filterBy(Predicate<AbstractOrcidProfileSectionFactory> predicate) {
-        return sectionFactories.stream().filter(predicate).collect(Collectors.toList());
-    }
-
-    @Override
-    public String getMetadataSignature(Context context, Item item, OrcidProfileSectionType type) {
-        List<String> metadataFields = findBySectionType(type).stream()
-            .flatMap(builder -> builder.getMetadataFields().stream())
-            .collect(Collectors.toList());
-        return metadataSignatureGenerator.generate(context, item, metadataFields);
+    private List<OrcidProfileSectionFactory> filterBy(Predicate<OrcidProfileSectionFactory> predicate) {
+        return sectionFactories.values().stream().filter(predicate).collect(Collectors.toList());
     }
 }

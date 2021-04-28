@@ -1509,7 +1509,7 @@ prevent the generation of resource policy entry values with null dspace_object a
             if (orcidSynchronizationService.isSynchronizationEnabled(owner, entity)) {
                 String putCode = ownerAndPutCodeMap.get(owner);
                 String title = getMetadataFirstValue(entity, "dc", "title", null, Item.ANY);
-                orcidQueueService.create(context, owner, title, entityType, putCode);
+                orcidQueueService.createEntityDeletionRecord(context, owner, title, entityType, putCode);
             }
         }
 

@@ -49,7 +49,7 @@ public class OrcidQueueBuilder extends  AbstractBuilder<OrcidQueue, OrcidQueueSe
     private OrcidQueueBuilder create(Context context, Item owner, Item entity) {
         try {
             this.context = context;
-            this.orcidQueue = getService().create(context, owner, entity);
+            this.orcidQueue = getService().createEntityInsertionRecord(context, owner, entity);
         } catch (Exception e) {
             log.error("Error in OrcidQueueBuilder.create(..), error: ", e);
         }

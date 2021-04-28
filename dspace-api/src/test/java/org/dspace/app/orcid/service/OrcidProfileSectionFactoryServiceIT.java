@@ -18,24 +18,28 @@ import static org.dspace.app.orcid.model.OrcidProfileSectionType.QUALIFICATION;
 import static org.dspace.app.orcid.model.OrcidProfileSectionType.RESEARCHER_URLS;
 import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.core.Every.everyItem;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.orcid.factory.OrcidServiceFactory;
+import org.dspace.app.orcid.model.OrcidProfileSectionType;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.junit.Before;
 import org.junit.Test;
 import org.orcid.jaxb.model.common.Iso3166Country;
@@ -60,6 +64,8 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
 
     private OrcidProfileSectionFactoryService profileSectionFactoryService;
 
+    private ItemService itemService;
+
     private Collection collection;
 
     private Collection orgUnits;
@@ -68,6 +74,7 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
     public void setup() {
 
         profileSectionFactoryService = OrcidServiceFactory.getInstance().getOrcidProfileSectionFactoryService();
+        itemService = ContentServiceFactory.getInstance().getItemService();
 
         context.turnOffAuthorisationSystem();
 
@@ -107,10 +114,14 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
 
         context.restoreAuthSystemState();
 
-        List<Object> orcidObjects = profileSectionFactoryService.createOrcidObjects(context, item, AFFILIATION);
-        assertThat(orcidObjects, hasSize(2));
+        List<MetadataValue> values = new ArrayList<>();
+        values.add(getMetadata(item, "oairecerif.person.affiliation", 0));
+        values.add(getMetadata(item, "oairecerif.affiliation.startDate", 0));
+        values.add(getMetadata(item, "oairecerif.affiliation.endDate", 0));
+        values.add(getMetadata(item, "oairecerif.affiliation.role", 0));
 
-        Object firstOrcidObject = orcidObjects.get(0);
+        Object firstOrcidObject = profileSectionFactoryService.createOrcidObject(context, values, AFFILIATION);
+
         assertThat(firstOrcidObject, instanceOf(Employment.class));
         Employment qualification = (Employment) firstOrcidObject;
         assertThat(qualification.getStartDate(), notNullValue());
@@ -124,7 +135,13 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
         assertThat(qualification.getOrganization().getAddress(), nullValue());
         assertThat(qualification.getOrganization().getDisambiguatedOrganization(), nullValue());
 
-        Object secondOrcidObject = orcidObjects.get(1);
+        values = new ArrayList<>();
+        values.add(getMetadata(item, "oairecerif.person.affiliation", 1));
+        values.add(getMetadata(item, "oairecerif.affiliation.startDate", 1));
+        values.add(getMetadata(item, "oairecerif.affiliation.endDate", 1));
+        values.add(getMetadata(item, "oairecerif.affiliation.role", 1));
+
+        Object secondOrcidObject = profileSectionFactoryService.createOrcidObject(context, values, AFFILIATION);
         assertThat(secondOrcidObject, instanceOf(Employment.class));
         Employment secondEmployment = (Employment) secondOrcidObject;
         assertThat(secondEmployment.getStartDate(), notNullValue());
@@ -141,6 +158,26 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
         assertThat(secondEmployment.getOrganization().getAddress(), nullValue());
         assertThat(secondEmployment.getOrganization().getDisambiguatedOrganization(), nullValue());
 
+    }
+
+    @Test
+    public void testManyEmploymentsMetadataSignatureGeneration() {
+
+        context.turnOffAuthorisationSystem();
+
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("Test profile")
+            .withPersonAffiliation("4Science")
+            .withPersonAffiliationStartDate("2020-02")
+            .withPersonAffiliationEndDate(PLACEHOLDER_PARENT_METADATA_VALUE)
+            .withPersonAffiliationRole("Researcher")
+            .withPersonAffiliation("Organization", "a1ce40bc-448c-47a6-ba1a-c695bc88f3b7")
+            .withPersonAffiliationStartDate("2021-02")
+            .withPersonAffiliationEndDate("2021-03-31")
+            .withPersonAffiliationRole(PLACEHOLDER_PARENT_METADATA_VALUE)
+            .build();
+
+        assertThat(getMetadataSignatures(item, AFFILIATION), hasSize(2));
     }
 
     @Test
@@ -165,10 +202,13 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
 
         context.restoreAuthSystemState();
 
-        List<Object> orcidObjects = profileSectionFactoryService.createOrcidObjects(context, item, AFFILIATION);
-        assertThat(orcidObjects, hasSize(1));
+        List<MetadataValue> values = new ArrayList<>();
+        values.add(getMetadata(item, "oairecerif.person.affiliation", 0));
+        values.add(getMetadata(item, "oairecerif.affiliation.startDate", 0));
+        values.add(getMetadata(item, "oairecerif.affiliation.endDate", 0));
+        values.add(getMetadata(item, "oairecerif.affiliation.role", 0));
 
-        Object firstOrcidObject = orcidObjects.get(0);
+        Object firstOrcidObject = profileSectionFactoryService.createOrcidObject(context, values, AFFILIATION);
         assertThat(firstOrcidObject, instanceOf(Employment.class));
         Employment qualification = (Employment) firstOrcidObject;
         assertThat(qualification.getStartDate(), notNullValue());
@@ -201,10 +241,12 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
             .build();
         context.restoreAuthSystemState();
 
-        List<Object> orcidObjects = profileSectionFactoryService.createOrcidObjects(context, item, QUALIFICATION);
-        assertThat(orcidObjects, hasSize(1));
+        List<MetadataValue> values = new ArrayList<>();
+        values.add(getMetadata(item, "crisrp.qualification", 0));
+        values.add(getMetadata(item, "crisrp.qualification.start", 0));
+        values.add(getMetadata(item, "crisrp.qualification.end", 0));
 
-        Object orcidObject = orcidObjects.get(0);
+        Object orcidObject = profileSectionFactoryService.createOrcidObject(context, values, QUALIFICATION);
         assertThat(orcidObject, instanceOf(Qualification.class));
         Qualification qualification = (Qualification) orcidObject;
         assertThat(qualification.getStartDate(), notNullValue());
@@ -233,10 +275,12 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
             .build();
         context.restoreAuthSystemState();
 
-        List<Object> orcidObjects = profileSectionFactoryService.createOrcidObjects(context, item, EDUCATION);
-        assertThat(orcidObjects, hasSize(1));
+        List<MetadataValue> values = new ArrayList<>();
+        values.add(getMetadata(item, "crisrp.education", 0));
+        values.add(getMetadata(item, "crisrp.education.start", 0));
+        values.add(getMetadata(item, "crisrp.education.end", 0));
 
-        Object orcidObject = orcidObjects.get(0);
+        Object orcidObject = profileSectionFactoryService.createOrcidObject(context, values, EDUCATION);
         assertThat(orcidObject, instanceOf(Education.class));
         Education education = (Education) orcidObject;
         assertThat(education.getStartDate(), notNullValue());
@@ -260,15 +304,26 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
             .build();
         context.restoreAuthSystemState();
 
-        List<Object> orcidObjects = profileSectionFactoryService.createOrcidObjects(context, item, COUNTRY);
-        assertThat(orcidObjects, hasSize(1));
+        List<MetadataValue> values = List.of(getMetadata(item, "crisrp.country", 0));
 
-        Object orcidObject = orcidObjects.get(0);
+        Object orcidObject = profileSectionFactoryService.createOrcidObject(context, values, COUNTRY);
         assertThat(orcidObject, instanceOf(Address.class));
         Address address = (Address) orcidObject;
         assertThat(address.getCountry(), notNullValue());
         assertThat(address.getCountry().getValue(), is(Iso3166Country.IT));
 
+    }
+
+    @Test
+    public void testAddressMetadataSignatureGeneration() {
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("Test profile")
+            .withPersonCountry("IT")
+            .build();
+        context.restoreAuthSystemState();
+
+        assertThat(getMetadataSignatures(item, COUNTRY), hasSize(1));
     }
 
     @Test
@@ -281,12 +336,30 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
             .build();
         context.restoreAuthSystemState();
 
-        List<Object> orcidObjects = profileSectionFactoryService.createOrcidObjects(context, item, EXTERNAL_IDS);
-        assertThat(orcidObjects, hasSize(2));
+        List<MetadataValue> values = List.of(getMetadata(item, "person.identifier.scopus-author-id", 0));
 
-        assertThat(orcidObjects, everyItem(instanceOf(PersonExternalIdentifier.class)));
-        assertThat(orcidObjects, hasItem(matches(hasTypeAndValue("SCOPUS", "SCOPUS-123456"))));
-        assertThat(orcidObjects, hasItem(matches(hasTypeAndValue("RID", "R-ID-01"))));
+        Object firstOrcidObject = profileSectionFactoryService.createOrcidObject(context, values, EXTERNAL_IDS);
+        assertThat(firstOrcidObject, instanceOf(PersonExternalIdentifier.class));
+        assertThat((PersonExternalIdentifier) firstOrcidObject, matches(hasTypeAndValue("SCOPUS", "SCOPUS-123456")));
+
+        values = List.of(getMetadata(item, "person.identifier.rid", 0));
+
+        Object secondOrcidObject = profileSectionFactoryService.createOrcidObject(context, values, EXTERNAL_IDS);
+        assertThat(secondOrcidObject, instanceOf(PersonExternalIdentifier.class));
+        assertThat((PersonExternalIdentifier) secondOrcidObject, matches(hasTypeAndValue("RID", "R-ID-01")));
+    }
+
+    @Test
+    public void testExternalIdentifiersGeneration() {
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("Test profile")
+            .withScopusAuthorIdentifier("SCOPUS-123456")
+            .withResearcherIdentifier("R-ID-01")
+            .build();
+        context.restoreAuthSystemState();
+
+        assertThat(getMetadataSignatures(item, EXTERNAL_IDS), hasSize(2));
     }
 
     @Test
@@ -295,16 +368,14 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
         Item item = ItemBuilder.createItem(context, collection)
             .withTitle("Test profile")
             .withUrlIdentifier("www.test.com")
-            .withUrlIdentifier("www.test.it")
             .build();
         context.restoreAuthSystemState();
 
-        List<Object> orcidObjects = profileSectionFactoryService.createOrcidObjects(context, item, RESEARCHER_URLS);
-        assertThat(orcidObjects, hasSize(2));
+        List<MetadataValue> values = List.of(getMetadata(item, "oairecerif.identifier.url", 0));
 
-        assertThat(orcidObjects, everyItem(instanceOf(ResearcherUrl.class)));
-        assertThat(orcidObjects, hasItem(matches(hasUrl("www.test.com"))));
-        assertThat(orcidObjects, hasItem(matches(hasUrl("www.test.it"))));
+        Object orcidObject = profileSectionFactoryService.createOrcidObject(context, values, RESEARCHER_URLS);
+        assertThat(orcidObject, instanceOf(ResearcherUrl.class));
+        assertThat((ResearcherUrl) orcidObject, matches(hasUrl("www.test.com")));
     }
 
     @Test
@@ -312,19 +383,14 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context, collection)
             .withTitle("Test profile")
-            .withSubject("First subject")
-            .withSubject("Second subject")
-            .withSubject("Third subject")
+            .withSubject("Subject")
             .build();
         context.restoreAuthSystemState();
 
-        List<Object> orcidObjects = profileSectionFactoryService.createOrcidObjects(context, item, KEYWORDS);
-        assertThat(orcidObjects, hasSize(3));
-
-        assertThat(orcidObjects, everyItem(instanceOf(Keyword.class)));
-        assertThat(orcidObjects, hasItem(matches(hasContent("First subject"))));
-        assertThat(orcidObjects, hasItem(matches(hasContent("Second subject"))));
-        assertThat(orcidObjects, hasItem(matches(hasContent("Third subject"))));
+        List<MetadataValue> values = List.of(getMetadata(item, "dc.subject", 0));
+        Object orcidObject = profileSectionFactoryService.createOrcidObject(context, values, KEYWORDS);
+        assertThat(orcidObject, instanceOf(Keyword.class));
+        assertThat((Keyword) orcidObject, matches(hasContent("Subject")));
     }
 
     @Test
@@ -334,16 +400,24 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
             .withTitle("Test profile")
             .withVariantName("Variant name")
             .withVernacularName("Vernacular name")
-            .withUrlIdentifier("www.test.it")
             .build();
         context.restoreAuthSystemState();
 
-        List<Object> orcidObjects = profileSectionFactoryService.createOrcidObjects(context, item, OTHER_NAMES);
-        assertThat(orcidObjects, hasSize(2));
+        List<MetadataValue> values = List.of(getMetadata(item, "crisrp.name.variant", 0));
+        Object orcidObject = profileSectionFactoryService.createOrcidObject(context, values, OTHER_NAMES);
+        assertThat(orcidObject, instanceOf(OtherName.class));
+        assertThat((OtherName) orcidObject, matches(hasValue("Variant name")));
 
-        assertThat(orcidObjects, everyItem(instanceOf(OtherName.class)));
-        assertThat(orcidObjects, hasItem(matches(hasValue("Variant name"))));
-        assertThat(orcidObjects, hasItem(matches(hasValue("Vernacular name"))));
+        values = List.of(getMetadata(item, "crisrp.name.translated", 0));
+        orcidObject = profileSectionFactoryService.createOrcidObject(context, values, OTHER_NAMES);
+        assertThat(orcidObject, instanceOf(OtherName.class));
+        assertThat((OtherName) orcidObject, matches(hasValue("Vernacular name")));
+    }
+
+    private MetadataValue getMetadata(Item item, String metadataField, int place) {
+        List<MetadataValue> values = itemService.getMetadataByMetadataString(item, metadataField);
+        assertThat(values.size(), greaterThan(place));
+        return values.get(place);
     }
 
     private Predicate<PersonExternalIdentifier> hasTypeAndValue(String type, String value) {
@@ -363,5 +437,11 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
 
     private Predicate<OtherName> hasValue(String value) {
         return name -> value.equals(name.getContent());
+    }
+
+    private List<String> getMetadataSignatures(Item item, OrcidProfileSectionType sectionType) {
+        return profileSectionFactoryService.findBySectionType(sectionType)
+            .map(factory -> factory.getMetadataSignatures(context, item))
+            .orElseThrow(() -> new IllegalStateException("No profile section factory of type " + sectionType));
     }
 }

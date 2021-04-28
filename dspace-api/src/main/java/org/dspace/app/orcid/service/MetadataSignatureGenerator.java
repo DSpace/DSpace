@@ -10,11 +10,12 @@ package org.dspace.app.orcid.service;
 import java.util.List;
 
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
 
 /**
  * Interface that mark classes that can be used to generate a signature for
- * metadata fields.
+ * metadata values.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
@@ -22,13 +23,22 @@ import org.dspace.core.Context;
 public interface MetadataSignatureGenerator {
 
     /**
-     * Generate a signature related to the metadata values of the given item
-     * relative to the given metadataFields.
+     * Generate a signature related to the given metadata values.
      *
-     * @param  context       the DSpace context
-     * @param  item          the item
-     * @param  metadataField the metadataField
-     * @return               the generated signature
+     * @param  context        the DSpace context
+     * @param  metadataValues the metadata values to sign
+     * @return                the generated signature
      */
-    public String generate(Context context, Item item, List<String> metadataFields);
+    public String generate(Context context, List<MetadataValue> metadataValues);
+
+    /**
+     * Returns the metadata values traceable by the given item related with the
+     * given signature.
+     *
+     * @param  context   the DSpace context
+     * @param  item      the item
+     * @param  signature the metadata signature
+     * @return           the founded metadata
+     */
+    public List<MetadataValue> findBySignature(Context context, Item item, String signature);
 }

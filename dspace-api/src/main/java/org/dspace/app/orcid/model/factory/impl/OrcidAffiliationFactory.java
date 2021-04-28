@@ -7,7 +7,6 @@
  */
 package org.dspace.app.orcid.model.factory.impl;
 
-import static java.util.Collections.emptyList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.dspace.app.orcid.model.OrcidProfileSectionType.AFFILIATION;
 import static org.dspace.app.orcid.model.OrcidProfileSectionType.EDUCATION;
@@ -15,11 +14,13 @@ import static org.dspace.app.orcid.model.OrcidProfileSectionType.QUALIFICATION;
 import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.orcid.model.OrcidProfileSectionType;
 import org.dspace.app.profile.OrcidProfileSyncPreference;
@@ -87,37 +88,14 @@ public class OrcidAffiliationFactory extends AbstractOrcidProfileSectionFactory 
     }
 
     @Override
-    public List<Object> create(Context context, Item item) {
-
-        List<Object> objects = new ArrayList<Object>();
-
-        Map<String, List<MetadataValue>> metadataGroups = getMetadataGroups(item);
-        int groupSize = metadataGroups.getOrDefault(organizationField, emptyList()).size();
-        for (int currentGroupIndex = 0; currentGroupIndex < groupSize; currentGroupIndex++) {
-            objects.add(buildAffiliation(context, item, metadataGroups, currentGroupIndex));
-        }
-
-        return objects;
-    }
-
-    private Map<String, List<MetadataValue>> getMetadataGroups(Item item) {
-        Map<String, List<MetadataValue>> metadataGroups = new HashMap<>();
-        metadataGroups.put(organizationField, itemService.getMetadataByMetadataString(item, organizationField));
-        metadataGroups.put(roleField, itemService.getMetadataByMetadataString(item, roleField));
-        metadataGroups.put(startDateField, itemService.getMetadataByMetadataString(item, startDateField));
-        metadataGroups.put(endDateField, itemService.getMetadataByMetadataString(item, endDateField));
-        return metadataGroups;
-    }
-
-    private Affiliation buildAffiliation(Context context, Item item, Map<String, List<MetadataValue>> metadataGroups,
-        int currentGroupIndex) {
+    public Object create(Context context, List<MetadataValue> metadataValues) {
 
         Affiliation affiliation = buildAffiliation();
 
-        MetadataValue organization = getCurrentNestedMetadata(metadataGroups, organizationField, currentGroupIndex);
-        MetadataValue role = getCurrentNestedMetadata(metadataGroups, roleField, currentGroupIndex);
-        MetadataValue startDate = getCurrentNestedMetadata(metadataGroups, startDateField, currentGroupIndex);
-        MetadataValue endDate = getCurrentNestedMetadata(metadataGroups, endDateField, currentGroupIndex);
+        MetadataValue organization = getMetadataValueByField(metadataValues, organizationField);
+        MetadataValue role = getMetadataValueByField(metadataValues, roleField);
+        MetadataValue startDate = getMetadataValueByField(metadataValues, startDateField);
+        MetadataValue endDate = getMetadataValueByField(metadataValues, endDateField);
 
         orcidCommonObjectFactory.createFuzzyDate(startDate).ifPresent(affiliation::setStartDate);
         orcidCommonObjectFactory.createFuzzyDate(endDate).ifPresent(affiliation::setEndDate);
@@ -128,10 +106,38 @@ public class OrcidAffiliationFactory extends AbstractOrcidProfileSectionFactory 
         return affiliation;
     }
 
-    private MetadataValue getCurrentNestedMetadata(Map<String, List<MetadataValue>> metadataGroups,
-        String metadataField, int currentGroupIndex) {
-        List<MetadataValue> metadataValues = metadataGroups.getOrDefault(metadataField, emptyList());
-        return metadataValues.size() > currentGroupIndex ? metadataValues.get(currentGroupIndex) : null;
+    @Override
+    public List<String> getMetadataSignatures(Context context, Item item) {
+        List<String> signatures = new ArrayList<String>();
+
+        Map<String, List<MetadataValue>> metadataGroups = getMetadataGroups(item);
+        int groupSize = metadataGroups.getOrDefault(organizationField, Collections.emptyList()).size();
+        for (int currentGroupIndex = 0; currentGroupIndex < groupSize; currentGroupIndex++) {
+            List<MetadataValue> metadataValues = getMetadataValueByPlace(metadataGroups, currentGroupIndex);
+            signatures.add(metadataSignatureGenerator.generate(context, metadataValues));
+        }
+
+        return signatures;
+    }
+
+    @Override
+    public String getDescription(Context context, Item item, String signature) {
+        List<MetadataValue> metadataValues = metadataSignatureGenerator.findBySignature(context, item, signature);
+        if (CollectionUtils.isEmpty(metadataValues)) {
+            return null;
+        }
+
+        return metadataValues.stream()
+            .filter(metadataValue -> organizationField.equals(metadataValue.getMetadataField().toString('.')))
+            .map(MetadataValue::getValue)
+            .findFirst()
+            .orElse(null);
+    }
+
+    private MetadataValue getMetadataValueByField(List<MetadataValue> metadataValues, String metadataField) {
+        return metadataValues.stream()
+            .filter(metadataValue -> metadataValue.getMetadataField().toString('.').equals(metadataField))
+            .findFirst().orElse(null);
     }
 
     private Affiliation buildAffiliation() {
@@ -149,6 +155,26 @@ public class OrcidAffiliationFactory extends AbstractOrcidProfileSectionFactory 
 
     private boolean isUnprocessableValue(MetadataValue value) {
         return value == null || isBlank(value.getValue()) || value.getValue().equals(PLACEHOLDER_PARENT_METADATA_VALUE);
+    }
+
+    private Map<String, List<MetadataValue>> getMetadataGroups(Item item) {
+        Map<String, List<MetadataValue>> metadataGroups = new HashMap<>();
+        metadataGroups.put(organizationField, itemService.getMetadataByMetadataString(item, organizationField));
+        metadataGroups.put(roleField, itemService.getMetadataByMetadataString(item, roleField));
+        metadataGroups.put(startDateField, itemService.getMetadataByMetadataString(item, startDateField));
+        metadataGroups.put(endDateField, itemService.getMetadataByMetadataString(item, endDateField));
+        return metadataGroups;
+    }
+
+    private List<MetadataValue> getMetadataValueByPlace(Map<String, List<MetadataValue>> metadataGroups, int place) {
+        List<MetadataValue> metadataValues = new ArrayList<MetadataValue>();
+        for (String metadataField : metadataGroups.keySet()) {
+            List<MetadataValue> nestedMetadataValues = metadataGroups.get(metadataField);
+            if (nestedMetadataValues.size() > place) {
+                metadataValues.add(nestedMetadataValues.get(place));
+            }
+        }
+        return metadataValues;
     }
 
 }

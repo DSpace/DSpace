@@ -8,28 +8,30 @@
 package org.dspace.app.orcid.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.dspace.app.orcid.model.OrcidProfileSectionType;
-import org.dspace.app.orcid.model.factory.impl.AbstractOrcidProfileSectionFactory;
+import org.dspace.app.orcid.model.factory.OrcidProfileSectionFactory;
 import org.dspace.app.profile.OrcidProfileSyncPreference;
-import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
 
 /**
  * Interface that mark classes that handle the configured instance of
- * {@link AbstractOrcidProfileSectionFactory}.
+ * {@link OrcidProfileSectionFactory}.
+ *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
 public interface OrcidProfileSectionFactoryService {
 
     /**
-     * Returns all the profile section configurations of the given type.
+     * Returns the profile section factory of the given type.
      *
      * @param  type the type of the section configurations to retrieve
      * @return      the section configurations of the given type
      */
-    List<AbstractOrcidProfileSectionFactory> findBySectionType(OrcidProfileSectionType type);
+    Optional<OrcidProfileSectionFactory> findBySectionType(OrcidProfileSectionType type);
 
     /**
      * Returns all the profile section configurations relative to the given
@@ -38,27 +40,16 @@ public interface OrcidProfileSectionFactoryService {
      * @param  preferences the preferences to search for
      * @return             the section configurations
      */
-    List<AbstractOrcidProfileSectionFactory> findByPreferences(List<OrcidProfileSyncPreference> preferences);
+    List<OrcidProfileSectionFactory> findByPreferences(List<OrcidProfileSyncPreference> preferences);
 
     /**
-     * Builds many instance of ORCID objects starting from the given item compliance
-     * to the given profile section type.
+     * Builds an ORCID object starting from the given metadata values compliance to
+     * the given profile section type.
      *
-     * @param  context the DSpace context
-     * @param  item    the item
-     * @param  type    the profile section type
-     * @return         the created objects
+     * @param  context        the DSpace context
+     * @param  metadataValues the metadata values
+     * @param  type           the profile section type
+     * @return                the created objects
      */
-    List<Object> createOrcidObjects(Context context, Item item, OrcidProfileSectionType type);
-
-    /**
-     * Get the metadata signature of the givn item's metadata values related to the
-     * given profile section type.
-     *
-     * @param  context the DSpace context
-     * @param  item    the item
-     * @param  type    the type of the section configurations
-     * @return         the metadata signature
-     */
-    String getMetadataSignature(Context context, Item item, OrcidProfileSectionType type);
+    Object createOrcidObject(Context context, List<MetadataValue> metadataValues, OrcidProfileSectionType type);
 }

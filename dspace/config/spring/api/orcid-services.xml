@@ -37,7 +37,6 @@
     </bean>
     
     <bean class="org.dspace.app.orcid.service.impl.OrcidProfileSectionFactoryServiceImpl">
-    	<constructor-arg name="metadataSignatureGenerator" ref="metadataSignatureGenerator" />
     	<constructor-arg name="sectionFactories">
     		<list>
     		

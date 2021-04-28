@@ -58,5 +58,6 @@ public interface OrcidHistoryDAO extends GenericDAO<OrcidHistory> {
      */
     List<OrcidHistory> findByEntity(Context context, Item entity) throws SQLException;
 
-    List<OrcidHistory> findByEntityAndRecordType(Context context, Item entity, String recordType) throws SQLException;
+    List<OrcidHistory> findSuccessfullyRecordsByEntityAndType(Context context, Item entity,
+        String recordType) throws SQLException;
 }

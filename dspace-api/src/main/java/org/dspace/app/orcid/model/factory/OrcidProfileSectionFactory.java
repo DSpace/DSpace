@@ -10,7 +10,9 @@ package org.dspace.app.orcid.model.factory;
 import java.util.List;
 
 import org.dspace.app.orcid.model.OrcidProfileSectionType;
+import org.dspace.app.profile.OrcidProfileSyncPreference;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
 
 /**
@@ -22,20 +24,27 @@ import org.dspace.core.Context;
 public interface OrcidProfileSectionFactory {
 
     /**
-     * Creates many instances of ORCID objects starting from the given item.
+     * Creates an instance of an ORCID object starting from the metadata values
      *
-     * @param  context the DSpace Context
-     * @param  item    the item
-     * @return         the ORCID objects
+     * @param  context        the DSpace Context
+     * @param  metadataValues the metadata values
+     * @return                the ORCID object
      */
-    public abstract List<Object> create(Context context, Item item);
+    public Object create(Context context, List<MetadataValue> metadataValues);
 
     /**
-     * Returns all the supported profile section types.
+     * Returns the profile section type related to this factory.
      *
-     * @return the supported sections
+     * @return the profile section type
      */
-    public List<OrcidProfileSectionType> getSupportedTypes();
+    public OrcidProfileSectionType getProfileSectionType();
+
+    /**
+     * Returns the profile synchronization preference related to this factory.
+     *
+     * @return the synchronization preference
+     */
+    public OrcidProfileSyncPreference getSynchronizationPreference();
 
     /**
      * Returns all the metadata fields involved in the profile section
@@ -44,4 +53,26 @@ public interface OrcidProfileSectionFactory {
      * @return the metadataFields
      */
     public List<String> getMetadataFields();
+
+    /**
+     * Given the input item's metadata values generate a metadata signature for each
+     * metadata field groups handled by this factory or for each metadata fields if
+     * the factory is configured with single metadata fields.
+     *
+     * @param  context the DSpace context
+     * @param  item    the item
+     * @return         the metadata signatures
+     */
+    public List<String> getMetadataSignatures(Context context, Item item);
+
+    /**
+     * Returns a description of the item's metadata values related to the given
+     * signature.
+     *
+     * @param  context   the DSpace context
+     * @param  item      the item
+     * @param  signature the metadata signature
+     * @return           the metadata values description
+     */
+    public String getDescription(Context context, Item item, String signature);
 }

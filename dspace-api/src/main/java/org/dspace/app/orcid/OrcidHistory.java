@@ -10,6 +10,8 @@ package org.dspace.app.orcid;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -49,6 +51,10 @@ public class OrcidHistory implements ReloadableEntity<Integer> {
 
     @Column(name = "metadata")
     private String metadata;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "operation")
+    private Operation operation;
 
     @Lob
     @Column(name = "response_message")
@@ -148,6 +154,20 @@ public class OrcidHistory implements ReloadableEntity<Integer> {
 
     public void setMetadata(String metadata) {
         this.metadata = metadata;
+    }
+
+    public Operation getOperation() {
+        return operation;
+    }
+
+    public void setOperation(Operation operation) {
+        this.operation = operation;
+    }
+
+    public static enum Operation {
+        INSERT,
+        UPDATE,
+        DELETE;
     }
 
 }

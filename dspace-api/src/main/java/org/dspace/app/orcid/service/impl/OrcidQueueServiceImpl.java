@@ -70,7 +70,7 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     }
 
     @Override
-    public OrcidQueue create(Context context, Item owner, Item entity) throws SQLException {
+    public OrcidQueue createEntityInsertionRecord(Context context, Item owner, Item entity) throws SQLException {
         OrcidQueue orcidQueue = new OrcidQueue();
         orcidQueue.setEntity(entity);
         orcidQueue.setRecordType(itemService.getEntityType(entity));
@@ -79,7 +79,8 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     }
 
     @Override
-    public OrcidQueue create(Context context, Item owner, Item entity, String putCode) throws SQLException {
+    public OrcidQueue createEntityUpdateRecord(Context context, Item owner, Item entity, String putCode)
+        throws SQLException {
         OrcidQueue orcidQueue = new OrcidQueue();
         orcidQueue.setOwner(owner);
         orcidQueue.setEntity(entity);
@@ -89,7 +90,8 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     }
 
     @Override
-    public OrcidQueue create(Context context, Item owner, String description, String type, String putCode)
+    public OrcidQueue createEntityDeletionRecord(Context context, Item owner, String description, String type,
+        String putCode)
         throws SQLException {
         OrcidQueue orcidQueue = new OrcidQueue();
         orcidQueue.setRecordType(type);
@@ -100,12 +102,26 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     }
 
     @Override
-    public OrcidQueue create(Context context, Item item, String recordType) throws SQLException {
+    public OrcidQueue createProfileInsertionRecord(Context context, Item profile, String description, String recordType,
+        String metadata) throws SQLException {
         OrcidQueue orcidQueue = new OrcidQueue();
-        orcidQueue.setEntity(item);
+        orcidQueue.setEntity(profile);
         orcidQueue.setRecordType(recordType);
-        orcidQueue.setOwner(item);
-        orcidQueue.setDescription(recordType);
+        orcidQueue.setOwner(profile);
+        orcidQueue.setDescription(description);
+        orcidQueue.setMetadata(metadata);
+        return orcidQueueDAO.create(context, orcidQueue);
+    }
+
+    @Override
+    public OrcidQueue createProfileDeletionRecord(Context context, Item profile, String description, String recordType,
+        String putCode) throws SQLException {
+        OrcidQueue orcidQueue = new OrcidQueue();
+        orcidQueue.setEntity(profile);
+        orcidQueue.setRecordType(recordType);
+        orcidQueue.setOwner(profile);
+        orcidQueue.setDescription(description);
+        orcidQueue.setPutCode(putCode);
         return orcidQueueDAO.create(context, orcidQueue);
     }
 
