@@ -132,7 +132,18 @@
         <property name="sourceIdentifier" value="openaire"/>
         <property name="recordIdMetadata" value="dc.identifier.other"/>
     </bean>
-    
+
+    <bean id="crossRefLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="CrossRefImportService"/>
+        <property name="sourceIdentifier" value="crossref"/>
+        <property name="recordIdMetadata" value="dc.identifier.doi"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+            </list>
+        </property>
+    </bean>
+
 </beans>
 
 
