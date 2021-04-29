@@ -219,7 +219,7 @@ public class OrcidClientImpl implements OrcidClient {
             HttpResponse response = client.execute(httpUriRequest);
 
             if (handleNotFoundAsNull && isNotFound(response)) {
-                return new OrcidResponse(getStatusCode(response), null, null);
+                return new OrcidResponse(getStatusCode(response), null, getContent(response));
             }
 
             if (isNotSuccessfull(response)) {

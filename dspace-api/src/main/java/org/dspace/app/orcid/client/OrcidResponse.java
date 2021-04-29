@@ -7,6 +7,8 @@
  */
 package org.dspace.app.orcid.client;
 
+import org.apache.http.HttpStatus;
+
 /**
  * Model a successfully response incoming from ORCID using {@link OrcidClient}.
  *
@@ -37,6 +39,10 @@ public final class OrcidResponse {
 
     public String getContent() {
         return content;
+    }
+
+    public boolean isNotFoundStatus() {
+        return status == HttpStatus.SC_NOT_FOUND;
     }
 
 }

@@ -11,10 +11,12 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
+import org.dspace.app.orcid.OrcidOperation;
 import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.dao.OrcidQueueDAO;
 import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataFieldName;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,11 +57,6 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     }
 
     @Override
-    public List<OrcidQueue> findByEntityAndRecordType(Context context, Item entity, String type) throws SQLException {
-        return orcidQueueDAO.findByEntityAndRecordType(context, entity, type);
-    }
-
-    @Override
     public long countByOwnerId(Context context, UUID ownerId) throws SQLException {
         return orcidQueueDAO.countByOwnerId(context, ownerId);
     }
@@ -75,6 +72,8 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
         orcidQueue.setEntity(entity);
         orcidQueue.setRecordType(itemService.getEntityType(entity));
         orcidQueue.setOwner(owner);
+        orcidQueue.setDescription(getMetadataValue(entity, "dc.title"));
+        orcidQueue.setOperation(OrcidOperation.INSERT);
         return orcidQueueDAO.create(context, orcidQueue);
     }
 
@@ -86,6 +85,8 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
         orcidQueue.setEntity(entity);
         orcidQueue.setPutCode(putCode);
         orcidQueue.setRecordType(itemService.getEntityType(entity));
+        orcidQueue.setDescription(getMetadataValue(entity, "dc.title"));
+        orcidQueue.setOperation(OrcidOperation.UPDATE);
         return orcidQueueDAO.create(context, orcidQueue);
     }
 
@@ -98,6 +99,7 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
         orcidQueue.setOwner(owner);
         orcidQueue.setPutCode(putCode);
         orcidQueue.setDescription(description);
+        orcidQueue.setOperation(OrcidOperation.DELETE);
         return orcidQueueDAO.create(context, orcidQueue);
     }
 
@@ -110,18 +112,21 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
         orcidQueue.setOwner(profile);
         orcidQueue.setDescription(description);
         orcidQueue.setMetadata(metadata);
+        orcidQueue.setOperation(OrcidOperation.INSERT);
         return orcidQueueDAO.create(context, orcidQueue);
     }
 
     @Override
     public OrcidQueue createProfileDeletionRecord(Context context, Item profile, String description, String recordType,
-        String putCode) throws SQLException {
+        String metadata, String putCode) throws SQLException {
         OrcidQueue orcidQueue = new OrcidQueue();
         orcidQueue.setEntity(profile);
         orcidQueue.setRecordType(recordType);
         orcidQueue.setOwner(profile);
         orcidQueue.setDescription(description);
         orcidQueue.setPutCode(putCode);
+        orcidQueue.setMetadata(metadata);
+        orcidQueue.setOperation(OrcidOperation.DELETE);
         return orcidQueueDAO.create(context, orcidQueue);
     }
 
@@ -139,6 +144,14 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     }
 
     @Override
+    public void deleteByEntityAndRecordType(Context context, Item entity, String recordType) throws SQLException {
+        List<OrcidQueue> records = orcidQueueDAO.findByEntityAndRecordType(context, entity, recordType);
+        for (OrcidQueue record : records) {
+            orcidQueueDAO.delete(context, record);
+        }
+    }
+
+    @Override
     public OrcidQueue find(Context context, int id) throws SQLException {
         return orcidQueueDAO.findByID(context, OrcidQueue.class, id);
     }
@@ -146,5 +159,9 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     @Override
     public void update(Context context, OrcidQueue orcidQueue) throws SQLException {
         orcidQueueDAO.save(context, orcidQueue);
+    }
+
+    private String getMetadataValue(Item item, String metadatafield) {
+        return itemService.getMetadataFirstValue(item, new MetadataFieldName(metadatafield), Item.ANY);
     }
 }

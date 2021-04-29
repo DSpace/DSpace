@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+import org.dspace.app.orcid.model.OrcidEntityType;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.app.profile.OrcidEntitySyncPreference;
 import org.dspace.app.profile.OrcidProfileSyncPreference;
@@ -48,32 +49,20 @@ public interface OrcidSynchronizationService {
     public void linkProfile(Context context, Item profile, OrcidTokenResponseDTO token) throws SQLException;
 
     /**
-     * Set the publications synchronization preference for the given profile.
+     * Set the synchronization preference for the given profile related to the given
+     * ORCID entity type.
      *
      * @param  context                  the relevant DSpace Context.
      * @param  profile                  the researcher profile to update
+     * @param  entityType               the orcid entity type
      * @param  value                    the new synchronization preference value
      * @throws SQLException             if a SQL error occurs during the profile
      *                                  update
      * @throws IllegalArgumentException if the given researcher profile is no linked
      *                                  with an ORCID account
      */
-    public void setPublicationPreference(Context context, Item profile, OrcidEntitySyncPreference value)
-        throws SQLException;
-
-    /**
-     * Set the projects synchronization preference for the given profile.
-     *
-     * @param  context                  the relevant DSpace Context.
-     * @param  profile                  the researcher profile to update
-     * @param  value                    the new synchronization preference value
-     * @throws SQLException             if a SQL error occurs during the profile
-     *                                  update
-     * @throws IllegalArgumentException if the given researcher profile is no linked
-     *                                  with an ORCID account
-     */
-    public void setProjectPreference(Context context, Item profile, OrcidEntitySyncPreference value)
-        throws SQLException;
+    public void setEntityPreference(Context context, Item profile, OrcidEntityType entityType,
+        OrcidEntitySyncPreference value) throws SQLException;
 
     /**
      * Update the profile's synchronization preference for the given profile.
@@ -119,22 +108,14 @@ public interface OrcidSynchronizationService {
     Optional<OrcidSyncMode> getSynchronizationMode(Item profile);
 
     /**
-     * Returns the ORCID synchronization preference related to publications
+     * Returns the ORCID synchronization preference related to the given entity type
      * configured for the given profile item.
      *
-     * @param  profile the researcher profile item
-     * @return         the configured preference
+     * @param  profile    the researcher profile item
+     * @param  entityType the orcid entity type
+     * @return            the configured preference
      */
-    Optional<OrcidEntitySyncPreference> getPublicationsPreference(Item profile);
-
-    /**
-     * Returns the ORCID synchronization preference related to projects configured
-     * for the given profile item.
-     *
-     * @param  profile the researcher profile item
-     * @return         the synchronization mode
-     */
-    Optional<OrcidEntitySyncPreference> getProjectsPreference(Item profile);
+    Optional<OrcidEntitySyncPreference> getEntityPreference(Item profile, OrcidEntityType entityType);
 
     /**
      * Returns the ORCID synchronization preferences related to the profile itself

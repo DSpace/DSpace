@@ -36,7 +36,7 @@ public interface OrcidCommonObjectFactory {
      *
      * @param  context       the DSpace context
      * @param  metadataValue the metadata value
-     * @return               the created Organization's instance
+     * @return               the created Organization's instance, if any
      */
-    public Organization createOrganization(Context context, MetadataValue metadataValue);
+    public Optional<Organization> createOrganization(Context context, MetadataValue metadataValue);
 }

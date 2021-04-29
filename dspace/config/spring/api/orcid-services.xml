@@ -9,7 +9,6 @@
 
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
     
-
     <bean class="org.dspace.app.orcid.service.impl.OrcidQueueServiceImpl" />
     <bean class="org.dspace.app.orcid.service.impl.OrcidHistoryServiceImpl" />
     
@@ -28,6 +27,14 @@
     
     <bean class="org.dspace.app.orcid.client.OrcidClientImpl" />
     <bean id="metadataSignatureGenerator" class="org.dspace.app.orcid.service.impl.PlainMetadataSignatureGeneratorImpl" />
+    
+    <bean class="org.dspace.app.orcid.service.impl.OrcidEntityFactoryServiceImpl">
+    	<constructor-arg name="itemService" ref="org.dspace.content.ItemServiceImpl" />
+    	<constructor-arg name="entityFactories">
+    		<list>
+    		</list>
+   		</constructor-arg>
+	</bean>
     
     <bean class="org.dspace.app.orcid.model.factory.impl.OrcidCommonObjectFactoryImpl">
     	<constructor-arg name="organizationCityField" value="${orcid.mapping.organization.city}" />

@@ -8,20 +8,27 @@
 package org.dspace.app.orcid;
 
 import static org.dspace.app.matcher.OrcidQueueMatcher.matches;
+import static org.dspace.app.orcid.OrcidOperation.DELETE;
+import static org.dspace.app.orcid.OrcidOperation.INSERT;
+import static org.dspace.app.orcid.OrcidOperation.UPDATE;
 import static org.dspace.app.profile.OrcidEntitySyncPreference.ALL;
 import static org.dspace.app.profile.OrcidEntitySyncPreference.DISABLED;
 import static org.dspace.app.profile.OrcidProfileSyncPreference.AFFILIATION;
+import static org.dspace.app.profile.OrcidProfileSyncPreference.BIOGRAPHICAL;
 import static org.dspace.app.profile.OrcidProfileSyncPreference.EDUCATION;
 import static org.dspace.app.profile.OrcidProfileSyncPreference.IDENTIFIERS;
 import static org.dspace.builder.OrcidHistoryBuilder.createOrcidHistory;
 import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 
 import java.sql.SQLException;
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
@@ -85,7 +92,6 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         Item profile = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
-            .withCrisOwner(eperson)
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
             .withPersonAffiliation("4Science")
@@ -96,24 +102,160 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
             .withOrcidSynchronizationProfilePreference(EDUCATION)
             .build();
 
+        context.restoreAuthSystemState();
+        context.commit();
+
+        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
+        assertThat(queueRecords, hasSize(1));
+        assertThat(queueRecords.get(0), matches(profile, profile, "AFFILIATION", null,
+            containsString("4Science"), "Researcher at 4Science (2021-01-01)", INSERT));
+
+        addMetadata(profile, "crisrp", "education", null, "High School", null);
+        context.commit();
+
+        queueRecords = orcidQueueService.findAll(context);
+        assertThat(queueRecords, hasSize(2));
+        assertThat(queueRecords, hasItem(matches(profile, profile, "AFFILIATION", null,
+            containsString("4Science"), "Researcher at 4Science (2021-01-01)", INSERT)));
+        assertThat(queueRecords, hasItem(matches(profile, profile, "EDUCATION", null,
+            containsString("High School"), "High School", INSERT)));
+    }
+
+    @Test
+    public void testOrcidQueueRecordCreationForProfileWithSameMetadataPreviouslyDeleted() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Item profile = ItemBuilder.createItem(context, profileCollection)
+            .withTitle("Test User")
+            .withOrcidIdentifier("0000-1111-2222-3333")
+            .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
+            .withOrcidSynchronizationProfilePreference(BIOGRAPHICAL)
+            .build();
+
         OrcidHistoryBuilder.createOrcidHistory(context, profile, profile)
-            .withRecordType("AFFILIATION") // missing metadata
+            .withRecordType("COUNTRY")
+            .withMetadata("crisrp.country::IT")
+            .withPutCode("123456")
+            .withOperation(OrcidOperation.INSERT)
+            .withTimestamp(Date.from(Instant.ofEpochMilli(100000)))
+            .withStatus(201)
+            .build();
+
+        OrcidHistoryBuilder.createOrcidHistory(context, profile, profile)
+            .withRecordType("COUNTRY")
+            .withMetadata("crisrp.country::IT")
+            .withPutCode("123456")
+            .withOperation(OrcidOperation.DELETE)
+            .withTimestamp(Date.from(Instant.ofEpochMilli(200000)))
+            .withStatus(204)
             .build();
 
         context.restoreAuthSystemState();
         context.commit();
 
-        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
-        assertThat(orcidQueueRecords, hasSize(1));
-        assertThat(orcidQueueRecords.get(0), matches(profile, profile, "AFFILIATION", null));
+        assertThat(orcidQueueService.findAll(context), empty());
 
-        addMetadata(profile, "crisrp", "education", null, "High School", null);
+        addMetadata(profile, "crisrp", "country", null, "IT", null);
         context.commit();
 
-        List<OrcidQueue> newOrcidQueueRecords = orcidQueueService.findAll(context);
-        assertThat(newOrcidQueueRecords, hasSize(2));
-        assertThat(newOrcidQueueRecords, hasItem(matches(profile, profile, "AFFILIATION", null)));
-        assertThat(newOrcidQueueRecords, hasItem(matches(profile, profile, "EDUCATION", null)));
+        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
+        assertThat(queueRecords, hasSize(1));
+        assertThat(queueRecords.get(0), matches(profile, profile, "COUNTRY", null, "crisrp.country::IT", "IT", INSERT));
+    }
+
+    @Test
+    public void testOrcidQueueRecordCreationForProfileWithMetadataPreviouslyDeletedAndThenInsertedAgain()
+        throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item profile = ItemBuilder.createItem(context, profileCollection)
+            .withTitle("Test User")
+            .withOrcidIdentifier("0000-1111-2222-3333")
+            .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
+            .withOrcidSynchronizationProfilePreference(BIOGRAPHICAL)
+            .build();
+
+        OrcidHistoryBuilder.createOrcidHistory(context, profile, profile)
+            .withRecordType("COUNTRY")
+            .withMetadata("crisrp.country::IT")
+            .withPutCode("123456")
+            .withOperation(OrcidOperation.INSERT)
+            .withTimestamp(Date.from(Instant.ofEpochMilli(100000)))
+            .withStatus(201)
+            .build();
+
+        OrcidHistoryBuilder.createOrcidHistory(context, profile, profile)
+            .withRecordType("COUNTRY")
+            .withMetadata("crisrp.country::IT")
+            .withPutCode("123456")
+            .withOperation(OrcidOperation.DELETE)
+            .withTimestamp(Date.from(Instant.ofEpochMilli(200000)))
+            .withStatus(204)
+            .build();
+
+        OrcidHistoryBuilder.createOrcidHistory(context, profile, profile)
+            .withRecordType("COUNTRY")
+            .withMetadata("crisrp.country::IT")
+            .withPutCode("123456")
+            .withOperation(OrcidOperation.INSERT)
+            .withTimestamp(Date.from(Instant.ofEpochMilli(300000)))
+            .withStatus(201)
+            .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        assertThat(orcidQueueService.findAll(context), empty());
+
+        addMetadata(profile, "crisrp", "country", null, "IT", null);
+        context.commit();
+
+        assertThat(orcidQueueService.findAll(context), empty());
+
+    }
+
+    @Test
+    public void testOrcidQueueRecordCreationForProfileWithNotSuccessfullyMetadataDeletion()
+        throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item profile = ItemBuilder.createItem(context, profileCollection)
+            .withTitle("Test User")
+            .withOrcidIdentifier("0000-1111-2222-3333")
+            .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
+            .withOrcidSynchronizationProfilePreference(BIOGRAPHICAL)
+            .build();
+
+        OrcidHistoryBuilder.createOrcidHistory(context, profile, profile)
+            .withRecordType("COUNTRY")
+            .withMetadata("crisrp.country::IT")
+            .withPutCode("123456")
+            .withOperation(OrcidOperation.INSERT)
+            .withTimestamp(Date.from(Instant.ofEpochMilli(100000)))
+            .withStatus(201)
+            .build();
+
+        OrcidHistoryBuilder.createOrcidHistory(context, profile, profile)
+            .withRecordType("COUNTRY")
+            .withMetadata("crisrp.country::IT")
+            .withPutCode("123456")
+            .withOperation(OrcidOperation.DELETE)
+            .withTimestamp(Date.from(Instant.ofEpochMilli(200000)))
+            .withStatus(400)
+            .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        assertThat(orcidQueueService.findAll(context), empty());
+
+        addMetadata(profile, "crisrp", "country", null, "IT", null);
+        context.commit();
+
+        assertThat(orcidQueueService.findAll(context), empty());
+
     }
 
     @Test
@@ -123,7 +265,6 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         Item profile = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
-            .withCrisOwner(eperson)
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
             .withOrcidSynchronizationProfilePreference(AFFILIATION)
@@ -132,6 +273,10 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         OrcidHistoryBuilder.createOrcidHistory(context, profile, profile)
             .withMetadata("XX/YY/ZZ/AA")
             .withRecordType("AFFILIATION")
+            .withOperation(OrcidOperation.INSERT)
+            .withDescription("4Science (2020, 2021)")
+            .withStatus(201)
+            .withPutCode("12345")
             .build();
 
         addMetadata(profile, "crisrp", "education", null, "High School", null);
@@ -139,9 +284,10 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
-        assertThat(orcidQueueRecords, hasSize(1));
-        assertThat(orcidQueueRecords.get(0), matches(profile, profile, "AFFILIATION", null));
+        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
+        assertThat(queueRecords, hasSize(1));
+        assertThat(queueRecords.get(0), matches(profile, profile, "AFFILIATION", "12345", "XX/YY/ZZ/AA",
+            "4Science (2020, 2021)", DELETE));
     }
 
     @Test
@@ -150,7 +296,6 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
-            .withCrisOwner(eperson)
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
             .withPersonAffiliation("4Science")
@@ -193,7 +338,6 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         Item profile = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
-            .withCrisOwner(eperson)
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
             .withOrcidSynchronizationPublicationsPreference(ALL)
@@ -211,7 +355,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
         assertThat(orcidQueueRecords, hasSize(1));
-        assertThat(orcidQueueRecords.get(0), matches(profile, publication, "Publication", null));
+        assertThat(orcidQueueRecords.get(0), matches(profile, publication, "Publication", INSERT));
 
         addMetadata(publication, "dc", "contributor", "editor", "Editor", null);
         context.commit();
@@ -229,7 +373,6 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         Item profile = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
-            .withCrisOwner(eperson)
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
             .withOrcidSynchronizationPublicationsPreference(ALL)
@@ -243,6 +386,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         createOrcidHistory(context, profile, publication)
             .withPutCode("123456")
+            .withOperation(INSERT)
             .build();
 
         addMetadata(publication, "dc", "contributor", "author", "Test User", profile.getID().toString());
@@ -252,7 +396,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
         assertThat(orcidQueueRecords, hasSize(1));
-        assertThat(orcidQueueRecords.get(0), matches(profile, publication, "Publication", "123456"));
+        assertThat(orcidQueueRecords.get(0), matches(profile, publication, "Publication", "123456", UPDATE));
     }
 
     @Test
@@ -262,7 +406,6 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         Item profile = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
-            .withCrisOwner(eperson)
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
             .build();
@@ -293,7 +436,6 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         Item profile = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
-            .withCrisOwner(eperson)
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
             .withOrcidSynchronizationProjectsPreference(ALL)
@@ -311,7 +453,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
         assertThat(orcidQueueRecords, hasSize(1));
-        assertThat(orcidQueueRecords.get(0), matches(profile, project, "Project", null));
+        assertThat(orcidQueueRecords.get(0), matches(profile, project, "Project", null, INSERT));
 
         addMetadata(project, "dc", "type", null, "Project type", null);
         context.commit();
@@ -329,7 +471,6 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         Item profile = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
-            .withCrisOwner(eperson)
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
             .withOrcidSynchronizationProjectsPreference(ALL)
@@ -352,7 +493,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
         assertThat(orcidQueueRecords, hasSize(1));
-        assertThat(orcidQueueRecords.get(0), matches(profile, project, "Project", "123456"));
+        assertThat(orcidQueueRecords.get(0), matches(profile, project, "Project", "123456", UPDATE));
     }
 
     @Test
@@ -362,7 +503,6 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         Item profile = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
-            .withCrisOwner(eperson)
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
             .build();
@@ -393,7 +533,6 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         Item profile = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
-            .withCrisOwner(eperson)
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
             .build();
 
@@ -418,7 +557,6 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         Item profile = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
-            .withCrisOwner(eperson)
             .withOrcidIdentifier("0000-1111-2222-3333")
             .build();
 
@@ -443,7 +581,6 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         Item profile = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
-            .withCrisOwner(eperson)
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
             .build();
@@ -468,7 +605,6 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         Item firstProfile = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
-            .withCrisOwner(eperson)
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
             .withOrcidSynchronizationPublicationsPreference(ALL)
@@ -502,9 +638,9 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
         assertThat(orcidQueueRecords, hasSize(3));
 
-        assertThat(orcidQueueRecords, hasItem(matches(firstProfile, firstPublication, "Publication", null)));
-        assertThat(orcidQueueRecords, hasItem(matches(secondProfile, firstPublication, "Publication", null)));
-        assertThat(orcidQueueRecords, hasItem(matches(secondProfile, secondPublication, "Publication", null)));
+        assertThat(orcidQueueRecords, hasItem(matches(firstProfile, firstPublication, "Publication", null, INSERT)));
+        assertThat(orcidQueueRecords, hasItem(matches(secondProfile, firstPublication, "Publication", null, INSERT)));
+        assertThat(orcidQueueRecords, hasItem(matches(secondProfile, secondPublication, "Publication", null, INSERT)));
     }
 
     private void addMetadata(Item item, String schema, String element, String qualifier, String value,

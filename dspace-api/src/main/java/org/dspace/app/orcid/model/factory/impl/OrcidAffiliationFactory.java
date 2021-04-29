@@ -101,7 +101,7 @@ public class OrcidAffiliationFactory extends AbstractOrcidProfileSectionFactory 
         orcidCommonObjectFactory.createFuzzyDate(endDate).ifPresent(affiliation::setEndDate);
         affiliation.setRoleTitle(isUnprocessableValue(role) ? null : role.getValue());
 
-        affiliation.setOrganization(orcidCommonObjectFactory.createOrganization(context, organization));
+        orcidCommonObjectFactory.createOrganization(context, organization).ifPresent(affiliation::setOrganization);
 
         return affiliation;
     }
@@ -127,11 +127,32 @@ public class OrcidAffiliationFactory extends AbstractOrcidProfileSectionFactory 
             return null;
         }
 
-        return metadataValues.stream()
-            .filter(metadataValue -> organizationField.equals(metadataValue.getMetadataField().toString('.')))
-            .map(MetadataValue::getValue)
-            .findFirst()
-            .orElse(null);
+        MetadataValue organization = getMetadataValueByField(metadataValues, organizationField);
+        MetadataValue role = getMetadataValueByField(metadataValues, roleField);
+        MetadataValue startDate = getMetadataValueByField(metadataValues, startDateField);
+        MetadataValue endDate = getMetadataValueByField(metadataValues, endDateField);
+
+        String description = isUnprocessableValue(role) ? "" : role.getValue() + " at ";
+        description += isUnprocessableValue(organization) ? "" : organization.getValue() + " ";
+        description += getDateDescription(startDate, endDate);
+
+        return description.trim();
+    }
+
+    private String getDateDescription(MetadataValue startDate, MetadataValue endDate) {
+        List<String> dates = new ArrayList<String>();
+        if (isProcessableValue(startDate)) {
+            dates.add(startDate.getValue());
+        }
+        if (isProcessableValue(endDate)) {
+            dates.add(endDate.getValue());
+        }
+
+        if (dates.isEmpty()) {
+            return "";
+        }
+
+        return dates.stream().collect(Collectors.joining(", ", "(", ")"));
     }
 
     private MetadataValue getMetadataValueByField(List<MetadataValue> metadataValues, String metadataField) {
@@ -151,6 +172,10 @@ public class OrcidAffiliationFactory extends AbstractOrcidProfileSectionFactory 
             default:
                 throw new IllegalStateException("Orcid affiliation builder does not supports " + sectionType);
         }
+    }
+
+    private boolean isProcessableValue(MetadataValue value) {
+        return !isUnprocessableValue(value);
     }
 
     private boolean isUnprocessableValue(MetadataValue value) {

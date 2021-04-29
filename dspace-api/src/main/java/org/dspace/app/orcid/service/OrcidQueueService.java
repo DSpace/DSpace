@@ -91,7 +91,7 @@ public interface OrcidQueueService {
      * @throws SQLException if an SQL error occurs
      */
     OrcidQueue createProfileDeletionRecord(Context context, Item profile, String description, String recordType,
-        String putCode) throws SQLException;
+        String metadata, String putCode) throws SQLException;
 
     /**
      * Find all the ORCID queue records.
@@ -149,18 +149,6 @@ public interface OrcidQueueService {
     public List<OrcidQueue> findByOwnerOrEntity(Context context, Item item) throws SQLException;
 
     /**
-     * Get the OrcidQueue records where the given item is the entity and with the
-     * given record type.
-     *
-     * @param  context      DSpace context object
-     * @param  entity       the entity item
-     * @param  type         the record type
-     * @return              the found OrcidQueue records
-     * @throws SQLException
-     */
-    public List<OrcidQueue> findByEntityAndRecordType(Context context, Item entity, String type) throws SQLException;
-
-    /**
      * Returns the number of records on the OrcidQueue associated with the given
      * ownerId.
      *
@@ -183,19 +171,29 @@ public interface OrcidQueueService {
     /**
      * Delete an OrcidQueue
      *
-     * @param context             context
-     * @param OrcidQueue          orcidQueue
+     * @param  context            DSpace context object
+     * @param  OrcidQueue         orcidQueue
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      */
     public void delete(Context context, OrcidQueue orcidQueue) throws SQLException;
 
     /**
+     * Delete all the OrcidQueue records with the given entity and record type.
+     *
+     * @param  context      DSpace context object
+     * @param  entity       the entity item
+     * @param  recordType   the record type
+     * @throws SQLException if database error occurs
+     */
+    public void deleteByEntityAndRecordType(Context context, Item entity, String recordType) throws SQLException;
+
+    /**
      * Get an OrcidQueue from the database.
      *
-     * @param context DSpace context object
-     * @param id      ID of the OrcidQueue
-     * @return the OrcidQueue format, or null if the ID is invalid.
+     * @param  context      DSpace context object
+     * @param  id           ID of the OrcidQueue
+     * @return              the OrcidQueue format, or null if the ID is invalid.
      * @throws SQLException if database error
      */
     public OrcidQueue find(Context context, int id) throws SQLException;

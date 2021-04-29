@@ -18,6 +18,7 @@ import static org.dspace.app.orcid.model.OrcidProfileSectionType.QUALIFICATION;
 import static org.dspace.app.orcid.model.OrcidProfileSectionType.RESEARCHER_URLS;
 import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
@@ -28,10 +29,12 @@ import static org.hamcrest.Matchers.nullValue;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.orcid.factory.OrcidServiceFactory;
 import org.dspace.app.orcid.model.OrcidProfileSectionType;
+import org.dspace.app.orcid.model.factory.OrcidProfileSectionFactory;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
@@ -177,7 +180,16 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
             .withPersonAffiliationRole(PLACEHOLDER_PARENT_METADATA_VALUE)
             .build();
 
-        assertThat(getMetadataSignatures(item, AFFILIATION), hasSize(2));
+        OrcidProfileSectionFactory affiliationFactory = getFactory(item, AFFILIATION);
+
+        List<String> signatures = affiliationFactory.getMetadataSignatures(context, item);
+        assertThat(signatures, hasSize(2));
+
+        String firstDescription = affiliationFactory.getDescription(context, item, signatures.get(0));
+        assertThat(firstDescription, is("Researcher at 4Science (2020-02)"));
+
+        String secondDescription = affiliationFactory.getDescription(context, item, signatures.get(1));
+        assertThat(secondDescription, is("Organization (2021-02, 2021-03-31)"));
     }
 
     @Test
@@ -323,7 +335,11 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
             .build();
         context.restoreAuthSystemState();
 
-        assertThat(getMetadataSignatures(item, COUNTRY), hasSize(1));
+        OrcidProfileSectionFactory countryFactory = getFactory(item, COUNTRY);
+
+        List<String> signatures = countryFactory.getMetadataSignatures(context, item);
+        assertThat(signatures, hasSize(1));
+        assertThat(countryFactory.getDescription(context, item, signatures.get(0)), is("IT"));
     }
 
     @Test
@@ -359,7 +375,15 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
             .build();
         context.restoreAuthSystemState();
 
-        assertThat(getMetadataSignatures(item, EXTERNAL_IDS), hasSize(2));
+        OrcidProfileSectionFactory externalIdsFactory = getFactory(item, EXTERNAL_IDS);
+        List<String> signatures = externalIdsFactory.getMetadataSignatures(context, item);
+        assertThat(signatures, hasSize(2));
+
+        List<String> descriptions = signatures.stream()
+            .map(signature -> externalIdsFactory.getDescription(context, item, signature))
+            .collect(Collectors.toList());
+
+        assertThat(descriptions, containsInAnyOrder("SCOPUS-123456", "R-ID-01"));
     }
 
     @Test
@@ -439,9 +463,8 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
         return name -> value.equals(name.getContent());
     }
 
-    private List<String> getMetadataSignatures(Item item, OrcidProfileSectionType sectionType) {
+    private OrcidProfileSectionFactory getFactory(Item item, OrcidProfileSectionType sectionType) {
         return profileSectionFactoryService.findBySectionType(sectionType)
-            .map(factory -> factory.getMetadataSignatures(context, item))
             .orElseThrow(() -> new IllegalStateException("No profile section factory of type " + sectionType));
     }
 }

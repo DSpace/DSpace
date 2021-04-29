@@ -92,10 +92,10 @@ public class OrcidCommonObjectFactoryImpl implements OrcidCommonObjectFactory {
     }
 
     @Override
-    public Organization createOrganization(Context context, MetadataValue metadataValue) {
+    public Optional<Organization> createOrganization(Context context, MetadataValue metadataValue) {
 
         if (isUnprocessableValue(metadataValue)) {
-            return null;
+            return empty();
         }
 
         Organization organization = new Organization();
@@ -108,7 +108,7 @@ public class OrcidCommonObjectFactoryImpl implements OrcidCommonObjectFactory {
             organization.setDisambiguatedOrganization(createDisambiguatedOrganization(organizationItem));
         }
 
-        return organization;
+        return of(organization);
     }
 
     private OrganizationAddress createOrganizationAddress(Item organizationItem) {

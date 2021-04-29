@@ -117,9 +117,21 @@ public interface OrcidHistoryService {
      */
     public Map<Item, String> findLastPutCodes(Context context, Item entity) throws SQLException;
 
-    public OrcidHistory sendToOrcid(Context context, OrcidQueue orcidQueue, boolean forceAddition) throws SQLException;
-
+    /**
+     * Find all the successfully Orcid history records with the given record type
+     * related to the given entity. An history record is considered successful if
+     * the status is between 200 and 300.
+     *
+     * @param  context      DSpace context object
+     * @param  entity       the entity item
+     * @param  recordType   the record type
+     * @return              the found orcid history records
+     * @throws SQLException if database error
+     */
     List<OrcidHistory> findSuccessfullyRecordsByEntityAndType(Context context, Item entity, String recordType)
+        throws SQLException;
+
+    public OrcidHistory synchronizeWithOrcid(Context context, OrcidQueue orcidQueue, boolean forceAddition)
         throws SQLException;
 
 }

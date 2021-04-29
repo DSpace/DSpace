@@ -16,7 +16,7 @@ import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
 
 /**
- * Interface for classes that creates ORCID profile section objects.
+ * Interface for classes that creates ORCID profile section object.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *

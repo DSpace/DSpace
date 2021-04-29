@@ -49,12 +49,16 @@ public class OrcidHistory implements ReloadableEntity<Integer> {
     @Column(name = "record_type")
     private String recordType;
 
+    @Column(name = "description")
+    private String description;
+
+    @Lob
     @Column(name = "metadata")
     private String metadata;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "operation")
-    private Operation operation;
+    private OrcidOperation operation;
 
     @Lob
     @Column(name = "response_message")
@@ -62,11 +66,7 @@ public class OrcidHistory implements ReloadableEntity<Integer> {
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "timestamp_last_attempt")
-    private Date lastAttempt = new Date();
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "timestamp_success_attempt")
-    private Date successAttempt;
+    private Date timestamp = new Date();
 
     @Column(name = "status")
     private Integer status;
@@ -124,22 +124,6 @@ public class OrcidHistory implements ReloadableEntity<Integer> {
         this.responseMessage = responseMessage;
     }
 
-    public Date getLastAttempt() {
-        return lastAttempt;
-    }
-
-    public void setLastAttempt(Date lastAttempt) {
-        this.lastAttempt = lastAttempt;
-    }
-
-    public Date getSuccessAttempt() {
-        return successAttempt;
-    }
-
-    public void setSuccessAttempt(Date successAttempt) {
-        this.successAttempt = successAttempt;
-    }
-
     public String getRecordType() {
         return recordType;
     }
@@ -156,18 +140,28 @@ public class OrcidHistory implements ReloadableEntity<Integer> {
         this.metadata = metadata;
     }
 
-    public Operation getOperation() {
+    public OrcidOperation getOperation() {
         return operation;
     }
 
-    public void setOperation(Operation operation) {
+    public void setOperation(OrcidOperation operation) {
         this.operation = operation;
     }
 
-    public static enum Operation {
-        INSERT,
-        UPDATE,
-        DELETE;
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Date getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
     }
 
 }

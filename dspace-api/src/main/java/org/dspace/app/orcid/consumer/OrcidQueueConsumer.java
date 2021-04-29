@@ -7,6 +7,9 @@
  */
 package org.dspace.app.orcid.consumer;
 
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.naturalOrder;
+import static java.util.Comparator.nullsFirst;
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 
 import java.sql.SQLException;
@@ -14,10 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.orcid.OrcidHistory;
-import org.dspace.app.orcid.OrcidHistory.Operation;
+import org.dspace.app.orcid.OrcidOperation;
 import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.factory.OrcidServiceFactory;
 import org.dspace.app.orcid.model.factory.OrcidProfileSectionFactory;
@@ -37,6 +41,8 @@ import org.dspace.core.CrisConstants;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
 import org.dspace.util.UUIDUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The consumer to fill the ORCID queue.
@@ -45,6 +51,8 @@ import org.dspace.util.UUIDUtils;
  *
  */
 public class OrcidQueueConsumer implements Consumer {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrcidQueueConsumer.class);
 
     private OrcidQueueService orcidQueueService;
 
@@ -168,11 +176,22 @@ public class OrcidQueueConsumer implements Consumer {
 
         List<OrcidHistory> historyRecords = findOrcidHistoryRecords(context, item, sectionType);
 
-        for (String signature : signatures) {
+        deleteRecordsByEntityAndType(context, item, sectionType);
+        createInsertionRecordForNewSignatures(context, item, historyRecords, factory, signatures);
+        createDeletionRecordForNoMorePresentSignatures(context, item, historyRecords, factory, signatures);
 
-            if (isAlreadyQueued(context, item, sectionType, signature)) {
-                continue;
-            }
+    }
+
+    private void deleteRecordsByEntityAndType(Context context, Item item, String sectionType) throws SQLException {
+        orcidQueueService.deleteByEntityAndRecordType(context, item, sectionType);
+    }
+
+    private void createInsertionRecordForNewSignatures(Context context, Item item, List<OrcidHistory> historyRecords,
+        OrcidProfileSectionFactory factory, List<String> signatures) throws SQLException {
+
+        String sectionType = factory.getProfileSectionType().name();
+
+        for (String signature : signatures) {
 
             if (isNotAlreadySynchronized(historyRecords, signature)) {
                 String description = factory.getDescription(context, item, signature);
@@ -181,11 +200,36 @@ public class OrcidQueueConsumer implements Consumer {
 
         }
 
-        // TODO verify all the orcid history records with a signature not present in
-        // signatures (for each of this record add a delete record on orcid queue)
+    }
 
-        // TODO delete all record on orcid queue where action is not delete and
-        // signature is not present in signatures
+    private void createDeletionRecordForNoMorePresentSignatures(Context context, Item profile,
+        List<OrcidHistory> historyRecords, OrcidProfileSectionFactory factory, List<String> signatures)
+        throws SQLException {
+
+        String sectionType = factory.getProfileSectionType().name();
+
+        List<String> deletedSignatures = historyRecords.stream()
+            .filter(historyRecord -> historyRecord.getOperation() == OrcidOperation.DELETE)
+            .map(OrcidHistory::getMetadata)
+            .collect(Collectors.toList());
+
+        for (OrcidHistory historyRecord : historyRecords) {
+            String storedSignature = historyRecord.getMetadata();
+            String putCode = historyRecord.getPutCode();
+            String description = historyRecord.getDescription();
+
+            if (signatures.contains(storedSignature) || deletedSignatures.contains(storedSignature)) {
+                continue;
+            }
+
+            if (StringUtils.isBlank(putCode)) {
+                LOGGER.warn("The orcid history record with id {} should have a not blank put code");
+                continue;
+            }
+
+            orcidQueueService.createProfileDeletionRecord(context, profile, description,
+                sectionType, storedSignature, putCode);
+        }
 
     }
 
@@ -195,13 +239,17 @@ public class OrcidQueueConsumer implements Consumer {
     }
 
     private boolean isNotAlreadySynchronized(List<OrcidHistory> records, String signature) {
-        return records.stream()
-            .filter(record -> signature.equals(record.getMetadata()))
-            .noneMatch(record -> record.getOperation() == Operation.DELETE);
+        return getLastOperation(records, signature)
+            .map(operation -> operation == OrcidOperation.DELETE)
+            .orElse(Boolean.TRUE);
     }
 
-    private boolean isAlreadyQueued(Context context, Item item, String type, String metadata) throws SQLException {
-        return isNotEmpty(orcidQueueService.findByEntityAndRecordType(context, item, type));
+    private Optional<OrcidOperation> getLastOperation(List<OrcidHistory> records, String signature) {
+        return records.stream()
+            .filter(record -> signature.equals(record.getMetadata()))
+            .sorted(comparing(OrcidHistory::getTimestamp, nullsFirst(naturalOrder())).reversed())
+            .map(OrcidHistory::getOperation)
+            .findFirst();
     }
 
     private boolean isAlreadyQueued(Context context, Item owner, Item entity) throws SQLException {

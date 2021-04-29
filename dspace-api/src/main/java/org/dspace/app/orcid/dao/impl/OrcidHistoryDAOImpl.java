@@ -52,8 +52,8 @@ public class OrcidHistoryDAOImpl extends AbstractHibernateDAO<OrcidHistory> impl
     @Override
     public List<OrcidHistory> findSuccessfullyRecordsByEntityAndType(Context context, Item entity,
         String recordType) throws SQLException {
-        Query query = createQuery(context, "FROM OrcidHistory "
-            + "WHERE entity = :entity AND recordType = :type AND status BETWEEN 200 AND 300");
+        Query query = createQuery(context, "FROM OrcidHistory WHERE entity = :entity AND recordType = :type "
+            + "AND status BETWEEN 200 AND 300");
         query.setParameter("entity", entity);
         query.setParameter("type", recordType);
         return query.getResultList();

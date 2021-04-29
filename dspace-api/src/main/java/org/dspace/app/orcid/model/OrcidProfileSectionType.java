@@ -7,8 +7,11 @@
  */
 package org.dspace.app.orcid.model;
 
+import org.apache.commons.lang3.EnumUtils;
+
 /**
  * Enum that model all the ORCID profile sections that could be synchronized.
+ *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
@@ -31,6 +34,14 @@ public enum OrcidProfileSectionType {
 
     public String getPath() {
         return path;
+    }
+
+    public static boolean isValid(String type) {
+        return type != null ? EnumUtils.isValidEnum(OrcidProfileSectionType.class, type.toUpperCase()) : false;
+    }
+
+    public static OrcidProfileSectionType fromString(String type) {
+        return isValid(type) ? OrcidProfileSectionType.valueOf(type.toUpperCase()) : null;
     }
 
 }

@@ -126,8 +126,8 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
                                   .param("ownerId", itemPerson.getID().toString()))
                                   .andExpect(status().isOk())
                                   .andExpect(jsonPath("$._embedded.orcidqueues", Matchers.containsInAnyOrder(
-                                             OrcidQueueMatcher.matchOrcidQueue(orcidQueue, itemPublication.getName()),
-                                             OrcidQueueMatcher.matchOrcidQueue(orcidQueue3, itemProject.getName())
+                                             OrcidQueueMatcher.matchOrcidQueue(orcidQueue),
+                                             OrcidQueueMatcher.matchOrcidQueue(orcidQueue3)
                                              )))
                                   .andExpect(jsonPath("$.page.totalElements", is(2)));
 
@@ -135,7 +135,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
                                    .param("ownerId", itemPerson2.getID().toString()))
                                    .andExpect(status().isOk())
                                    .andExpect(jsonPath("$._embedded.orcidqueues", Matchers.contains(
-                                              matchOrcidQueue(orcidQueue2, itemPublication2.getName())
+                                              matchOrcidQueue(orcidQueue2)
                                               )))
                                    .andExpect(jsonPath("$.page.totalElements", is(1)))
                                    .andExpect(jsonPath("$._links.self.href", Matchers
@@ -145,8 +145,8 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
                              .param("ownerId", itemPerson.getID().toString()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$._embedded.orcidqueues", Matchers.containsInAnyOrder(
-                                        OrcidQueueMatcher.matchOrcidQueue(orcidQueue, itemPublication.getName()),
-                                        OrcidQueueMatcher.matchOrcidQueue(orcidQueue3, itemProject.getName())
+                                        OrcidQueueMatcher.matchOrcidQueue(orcidQueue),
+                                        OrcidQueueMatcher.matchOrcidQueue(orcidQueue3)
                                         )))
                              .andExpect(jsonPath("$.page.totalElements", is(2)));
     }
@@ -326,7 +326,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
 
         getClient(tokenResearcher).perform(get("/api/cris/orcidqueues/" + orcidQueue.getID().toString()))
                              .andExpect(status().isOk())
-                             .andExpect(jsonPath("$", is(matchOrcidQueue(orcidQueue, itemPublication.getName()))))
+                             .andExpect(jsonPath("$", is(matchOrcidQueue(orcidQueue))))
                              .andExpect(jsonPath("$._links.self.href", Matchers
                                        .containsString("/api/cris/orcidqueues/" + orcidQueue.getID())))
                              .andExpect(jsonPath("$._links.owner.href", Matchers
@@ -336,7 +336,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
 
         getClient(tokenResearcher2).perform(get("/api/cris/orcidqueues/" + orcidQueue2.getID().toString()))
                              .andExpect(status().isOk())
-                             .andExpect(jsonPath("$", is(matchOrcidQueue(orcidQueue2, itemPublication2.getName()))))
+                             .andExpect(jsonPath("$", is(matchOrcidQueue(orcidQueue2))))
                              .andExpect(jsonPath("$._links.self.href", Matchers
                                        .containsString("/api/cris/orcidqueues/" + orcidQueue2.getID())))
                              .andExpect(jsonPath("$._links.owner.href", Matchers
@@ -529,7 +529,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
 
         getClient(tokenResearcher).perform(get("/api/cris/orcidqueues/" + orcidQueue.getID()))
                                   .andExpect(status().isOk())
-                                  .andExpect(jsonPath("$", is(matchOrcidQueue(orcidQueue, itemPublication.getName()))));
+                                  .andExpect(jsonPath("$", is(matchOrcidQueue(orcidQueue))));
     }
 
     @Test
@@ -576,7 +576,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
 
         getClient(tokenResearcher).perform(get("/api/cris/orcidqueues/" + orcidQueue.getID()))
                                   .andExpect(status().isOk())
-                                  .andExpect(jsonPath("$", is(matchOrcidQueue(orcidQueue, itemPublication.getName()))));
+                                  .andExpect(jsonPath("$", is(matchOrcidQueue(orcidQueue))));
     }
 
     @Test

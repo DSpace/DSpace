@@ -50,9 +50,9 @@ public class OrcidProfileSectionFactoryServiceImpl implements OrcidProfileSectio
 
     @Override
     public Object createOrcidObject(Context context, List<MetadataValue> metadataValues, OrcidProfileSectionType type) {
-        return findBySectionType(type)
-            .map(factory -> factory.create(context, metadataValues))
+        OrcidProfileSectionFactory profileSectionFactory = findBySectionType(type)
             .orElseThrow(() -> new IllegalArgumentException("No ORCID profile section factory configured for " + type));
+        return profileSectionFactory.create(context, metadataValues);
     }
 
     private List<OrcidProfileSectionFactory> filterBy(Predicate<OrcidProfileSectionFactory> predicate) {

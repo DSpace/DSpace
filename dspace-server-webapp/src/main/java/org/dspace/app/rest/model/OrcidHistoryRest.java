@@ -34,9 +34,7 @@ public class OrcidHistoryRest extends BaseObjectRest<Integer> {
 
     private String putCode;
 
-    private Date lastAttempt;
-
-    private Date successAttempt;
+    private Date timestamp;
 
     private String responseMessage;
 
@@ -90,20 +88,12 @@ public class OrcidHistoryRest extends BaseObjectRest<Integer> {
         this.putCode = putCode;
     }
 
-    public Date getLastAttempt() {
-        return lastAttempt;
+    public Date getTimestamp() {
+        return timestamp;
     }
 
-    public void setLastAttempt(Date lastAttempt) {
-        this.lastAttempt = lastAttempt;
-    }
-
-    public Date getSuccessAttempt() {
-        return successAttempt;
-    }
-
-    public void setSuccessAttempt(Date successAttempt) {
-        this.successAttempt = successAttempt;
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
     }
 
     public String getResponseMessage() {

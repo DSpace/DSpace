@@ -71,7 +71,7 @@ public class OrcidHistoryRestRepository extends DSpaceRestRepository<OrcidHistor
             throw new IllegalArgumentException("No ORCID Queue record found, the uri-list does not contait a resource");
         }
         boolean forceAddition =  Boolean.parseBoolean(request.getParameter("forceAddition"));
-        orcidHistory = orcidHistoryService.sendToOrcid(context, orcidQueue, forceAddition);
+        orcidHistory = orcidHistoryService.synchronizeWithOrcid(context, orcidQueue, forceAddition);
         return orcidHistory != null ? converter.toRest(orcidHistory, utils.obtainProjection()) : null;
     }
 

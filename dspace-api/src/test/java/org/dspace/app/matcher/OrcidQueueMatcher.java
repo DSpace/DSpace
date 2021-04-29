@@ -9,6 +9,7 @@ package org.dspace.app.matcher;
 
 import static org.hamcrest.Matchers.is;
 
+import org.dspace.app.orcid.OrcidOperation;
 import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.content.Item;
 import org.hamcrest.Description;
@@ -32,16 +33,45 @@ public class OrcidQueueMatcher extends TypeSafeMatcher<OrcidQueue> {
 
     private final Matcher<String> putCodeMatcher;
 
+    private final Matcher<String> descriptionMatcher;
+
+    private final Matcher<String> metadataMatcher;
+
+    private final Matcher<OrcidOperation> operationMatcher;
+
     private OrcidQueueMatcher(Matcher<Item> ownerMatcher, Matcher<Item> entityMatcher,
-        Matcher<String> recordTypeMatcher, Matcher<String> putCodeMatcher) {
+        Matcher<String> recordTypeMatcher, Matcher<String> putCodeMatcher, Matcher<String> metadataMatcher,
+        Matcher<String> descriptionMatcher, Matcher<OrcidOperation> operationMatcher) {
         this.ownerMatcher = ownerMatcher;
         this.entityMatcher = entityMatcher;
         this.recordTypeMatcher = recordTypeMatcher;
         this.putCodeMatcher = putCodeMatcher;
+        this.metadataMatcher = metadataMatcher;
+        this.descriptionMatcher = descriptionMatcher;
+        this.operationMatcher = operationMatcher;
     }
 
-    public static OrcidQueueMatcher matches(Item owner, Item entity, String recordType, String putCode) {
-        return new OrcidQueueMatcher(is(owner), is(entity), is(recordType), is(putCode));
+    public static OrcidQueueMatcher matches(Item owner, Item entity, String recordType, OrcidOperation operation) {
+        return new OrcidQueueMatcher(is(owner), is(entity), is(recordType), anything(),
+            anything(), anything(), is(operation));
+    }
+
+    public static OrcidQueueMatcher matches(Item owner, Item entity, String recordType,
+        String putCode, OrcidOperation operation) {
+        return new OrcidQueueMatcher(is(owner), is(entity), is(recordType), is(putCode),
+            anything(), anything(), is(operation));
+    }
+
+    public static OrcidQueueMatcher matches(Item owner, Item entity, String recordType,
+        String putCode, String metadata, String description, OrcidOperation operation) {
+        return new OrcidQueueMatcher(is(owner), is(entity), is(recordType),
+            is(putCode), is(metadata), is(description), is(operation));
+    }
+
+    public static OrcidQueueMatcher matches(Item owner, Item entity, String recordType,
+        String putCode, Matcher<String> metadata, String description, OrcidOperation operation) {
+        return new OrcidQueueMatcher(is(owner), is(entity), is(recordType),
+            is(putCode), metadata, is(description), is(operation));
     }
 
     @Override
@@ -50,6 +80,9 @@ public class OrcidQueueMatcher extends TypeSafeMatcher<OrcidQueue> {
             .appendText(" item owner ").appendDescriptionOf(ownerMatcher)
             .appendText(", item entity ").appendDescriptionOf(entityMatcher)
             .appendText(", record type ").appendDescriptionOf(recordTypeMatcher)
+            .appendText(", metadata ").appendDescriptionOf(metadataMatcher)
+            .appendText(", description ").appendDescriptionOf(descriptionMatcher)
+            .appendText(", operation ").appendDescriptionOf(operationMatcher)
             .appendText(" and put code ").appendDescriptionOf(putCodeMatcher);
     }
 
@@ -58,7 +91,14 @@ public class OrcidQueueMatcher extends TypeSafeMatcher<OrcidQueue> {
         return ownerMatcher.matches(item.getOwner())
             && entityMatcher.matches(item.getEntity())
             && recordTypeMatcher.matches(item.getRecordType())
-            && putCodeMatcher.matches(item.getPutCode());
+            && metadataMatcher.matches(item.getMetadata())
+            && putCodeMatcher.matches(item.getPutCode())
+            && descriptionMatcher.matches(item.getDescription())
+            && operationMatcher.matches(item.getOperation());
+    }
+
+    private static <T> Matcher<T> anything() {
+        return LambdaMatcher.matches((obj) -> true);
     }
 
 }

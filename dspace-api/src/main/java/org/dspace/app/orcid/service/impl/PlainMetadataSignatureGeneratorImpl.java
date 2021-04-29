@@ -20,7 +20,18 @@ import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
 
 /**
- * Implementation of {@link MetadataSignatureGenerator}.
+ * Implementation of {@link MetadataSignatureGenerator} that composes a
+ * signature made up of a section for each metadata value, divided by the
+ * character SIGNATURE_SECTIONS_SEPARATOR. <br/>
+ * Each section is composed of the metadata field, the metadata value and, if
+ * present, the authority, divided by the character METADATA_SECTIONS_SEPARATOR.
+ * <br/>
+ * The presence of the metadata field allows to have different signatures for
+ * metadata with the same values but referring to different fields, while the
+ * authority allows to distinguish metadata that refer to different entities,
+ * even if they have the same value. Finally, the various sections of the
+ * signature are sorted by metadata field so that the order of the input
+ * metadata values does not affect the signature.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *

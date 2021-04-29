@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest.converter;
 
+import static org.dspace.app.orcid.model.OrcidEntityType.PROJECT;
+import static org.dspace.app.orcid.model.OrcidEntityType.PUBLICATION;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,13 +63,13 @@ public class ResearcherProfileConverter implements DSpaceConverter<ResearcherPro
     }
 
     private String getPublicationsPreference(Item item) {
-        return orcidSynchronizationService.getPublicationsPreference(item)
+        return orcidSynchronizationService.getEntityPreference(item, PUBLICATION)
             .map(OrcidEntitySyncPreference::name)
             .orElse(OrcidEntitySyncPreference.DISABLED.name());
     }
 
     private String getProjectsPreference(Item item) {
-        return orcidSynchronizationService.getProjectsPreference(item)
+        return orcidSynchronizationService.getEntityPreference(item, PROJECT)
             .map(OrcidEntitySyncPreference::name)
             .orElse(OrcidEntitySyncPreference.DISABLED.name());
     }

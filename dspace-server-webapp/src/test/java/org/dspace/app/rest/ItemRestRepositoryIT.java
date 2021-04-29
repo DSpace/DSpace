@@ -10,6 +10,7 @@ package org.dspace.app.rest;
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.matcher.OrcidQueueMatcher.matches;
+import static org.dspace.app.orcid.OrcidOperation.DELETE;
 import static org.dspace.app.profile.OrcidEntitySyncPreference.ALL;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
@@ -3662,8 +3663,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
         assertThat(orcidQueueRecords, hasSize(2));
-        assertThat(orcidQueueRecords, hasItem(matches(firstProfile, null, "Publication", "12345")));
-        assertThat(orcidQueueRecords, hasItem(matches(thirdProfile, null, "Publication", "98765")));
+        assertThat(orcidQueueRecords, hasItem(matches(firstProfile, null, "Publication", "12345", DELETE)));
+        assertThat(orcidQueueRecords, hasItem(matches(thirdProfile, null, "Publication", "98765", DELETE)));
     }
 
     @Test
@@ -3730,7 +3731,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
         assertThat(orcidQueueRecords, hasSize(1));
-        assertThat(orcidQueueRecords, hasItem(matches(firstProfile, null, "Project", "12345")));
+        assertThat(orcidQueueRecords, hasItem(matches(firstProfile, null, "Project", "12345", DELETE)));
     }
 
     private void initPublicationAuthorsRelationships() throws SQLException {

@@ -10,6 +10,8 @@ package org.dspace.app.orcid.service.impl;
 import static java.util.List.of;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.EnumUtils.isValidEnum;
+import static org.dspace.app.orcid.model.OrcidEntityType.PROJECT;
+import static org.dspace.app.orcid.model.OrcidEntityType.PUBLICATION;
 import static org.dspace.app.profile.OrcidEntitySyncPreference.DISABLED;
 
 import java.sql.SQLException;
@@ -18,6 +20,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.dspace.app.orcid.model.OrcidEntityType;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.app.orcid.service.OrcidSynchronizationService;
 import org.dspace.app.profile.OrcidEntitySyncPreference;
@@ -60,16 +63,9 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
     }
 
     @Override
-    public void setPublicationPreference(Context context, Item profile,
+    public void setEntityPreference(Context context, Item profile, OrcidEntityType type,
         OrcidEntitySyncPreference value) throws SQLException {
-        updatePreferenceForSynchronizingWithOrcid(context, profile, "sync-publications", of(value.name()));
-    }
-
-    @Override
-    public void setProjectPreference(Context context, Item profile,
-        OrcidEntitySyncPreference value) throws SQLException {
-        updatePreferenceForSynchronizingWithOrcid(context, profile, "sync-projects", of(value.name()));
-
+        updatePreferenceForSynchronizingWithOrcid(context, profile, "sync-" + type.name() + "s", of(value.name()));
     }
 
     @Override
@@ -122,9 +118,9 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
             case "Person":
                 return profile.equals(item) && !isEmpty(getProfilePreferences(profile));
             case "Publication":
-                return getPublicationsPreference(profile).filter(preference -> preference != DISABLED).isPresent();
+                return getEntityPreference(profile, PUBLICATION).filter(pref -> pref != DISABLED).isPresent();
             case "Project":
-                return getProjectsPreference(profile).filter(preference -> preference != DISABLED).isPresent();
+                return getEntityPreference(profile, PROJECT).filter(pref -> pref != DISABLED).isPresent();
             default:
                 return false;
         }
@@ -140,16 +136,8 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
     }
 
     @Override
-    public Optional<OrcidEntitySyncPreference> getPublicationsPreference(Item item) {
-        return getMetadataValue(item, "cris.orcid.sync-publications")
-            .map(metadataValue -> metadataValue.getValue())
-            .filter(value -> isValidEnum(OrcidEntitySyncPreference.class, value))
-            .map(value -> OrcidEntitySyncPreference.valueOf(value));
-    }
-
-    @Override
-    public Optional<OrcidEntitySyncPreference> getProjectsPreference(Item item) {
-        return getMetadataValue(item, "cris.orcid.sync-projects")
+    public Optional<OrcidEntitySyncPreference> getEntityPreference(Item item, OrcidEntityType entityType) {
+        return getMetadataValue(item, "cris.orcid.sync-" + entityType.name().toLowerCase() + "s")
             .map(metadataValue -> metadataValue.getValue())
             .filter(value -> isValidEnum(OrcidEntitySyncPreference.class, value))
             .map(value -> OrcidEntitySyncPreference.valueOf(value));

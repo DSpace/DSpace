@@ -18,9 +18,9 @@ public class OrcidClientException extends RuntimeException {
 
     private static final long serialVersionUID = -7618061110212398216L;
 
-    private Integer status = 0;
+    private int status = 0;
 
-    public OrcidClientException(Integer status, String content) {
+    public OrcidClientException(int status, String content) {
         super(content);
         this.status = status;
     }
@@ -29,7 +29,7 @@ public class OrcidClientException extends RuntimeException {
         super(cause);
     }
 
-    public Integer getStatus() {
+    public int getStatus() {
         return this.status;
     }
 

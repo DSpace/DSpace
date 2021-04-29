@@ -13,10 +13,13 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -56,8 +59,13 @@ public class OrcidQueue implements ReloadableEntity<Integer> {
     @Column(name = "record_type")
     private String recordType;
 
+    @Lob
     @Column(name = "metadata")
     private String metadata;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "operation")
+    private OrcidOperation operation;
 
     public boolean isInsertAction() {
         return entity != null && isEmpty(putCode);
@@ -150,6 +158,21 @@ public class OrcidQueue implements ReloadableEntity<Integer> {
 
     public void setMetadata(String metadata) {
         this.metadata = metadata;
+    }
+
+    public OrcidOperation getOperation() {
+        return operation;
+    }
+
+    public void setOperation(OrcidOperation operation) {
+        this.operation = operation;
+    }
+
+    @Override
+    public String toString() {
+        return "OrcidQueue [id=" + id + ", owner=" + owner + ", entity=" + entity + ", description=" + description
+            + ", putCode=" + putCode + ", recordType=" + recordType + ", metadata=" + metadata + ", operation="
+            + operation + "]";
     }
 
 }

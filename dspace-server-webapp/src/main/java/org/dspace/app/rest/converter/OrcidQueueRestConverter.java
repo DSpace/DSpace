@@ -11,9 +11,6 @@ import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.rest.model.OrcidQueueRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataFieldName;
-import org.dspace.content.service.ItemService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -25,9 +22,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class OrcidQueueRestConverter implements DSpaceConverter<OrcidQueue, OrcidQueueRest> {
 
-    @Autowired
-    private ItemService ItemService;
-
     @Override
     public OrcidQueueRest convert(OrcidQueue orcidQueue, Projection projection) {
         OrcidQueueRest rest = new OrcidQueueRest();
@@ -35,35 +29,14 @@ public class OrcidQueueRestConverter implements DSpaceConverter<OrcidQueue, Orci
         Item entity = orcidQueue.getEntity();
 
         rest.setEntityId(entity != null ? entity.getID() : null);
-        rest.setDescription(getDescription(orcidQueue, entity));
-        rest.setRecordType(getRecordType(orcidQueue, entity));
+        rest.setDescription(orcidQueue.getDescription());
+        rest.setRecordType(orcidQueue.getRecordType());
         rest.setId(orcidQueue.getId());
         rest.setOwnerId(orcidQueue.getOwner().getID());
-        rest.setPutCode(orcidQueue.getPutCode());
+        rest.setOperation(orcidQueue.getOperation() != null ? orcidQueue.getOperation().name() : null);
         rest.setProjection(projection);
 
         return rest;
-    }
-
-    private String getDescription(OrcidQueue orcidQueue, Item entity) {
-        if (orcidQueue.getDescription() != null) {
-            return orcidQueue.getDescription();
-        }
-
-        return entity != null ? getMetadataValue(entity, "dc.title") : null;
-
-    }
-
-    private String getRecordType(OrcidQueue orcidQueue, Item entity) {
-        if (orcidQueue.getRecordType() != null) {
-            return orcidQueue.getRecordType();
-        } else {
-            return ItemService.getEntityType(entity);
-        }
-    }
-
-    private String getMetadataValue(Item item, String metadatafield) {
-        return ItemService.getMetadataFirstValue(item, new MetadataFieldName(metadatafield), Item.ANY);
     }
 
     @Override

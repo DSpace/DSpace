@@ -71,5 +71,13 @@ public interface OrcidQueueDAO extends GenericDAO<OrcidQueue> {
      */
     public List<OrcidQueue> findByOwnerOrEntity(Context context, Item item) throws SQLException;
 
+    /**
+     * Find all the OrcidQueue records with the given entity and record type.
+     *
+     * @param  context      DSpace context object
+     * @param  entity       the entity item
+     * @param  recordType   the record type
+     * @throws SQLException if database error occurs
+     */
     public List<OrcidQueue> findByEntityAndRecordType(Context context, Item entity, String type) throws SQLException;
 }

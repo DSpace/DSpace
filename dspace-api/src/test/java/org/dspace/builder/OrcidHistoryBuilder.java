@@ -9,9 +9,11 @@ package org.dspace.builder;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.orcid.OrcidHistory;
+import org.dspace.app.orcid.OrcidOperation;
 import org.dspace.app.orcid.service.OrcidHistoryService;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -131,6 +133,21 @@ public class OrcidHistoryBuilder extends  AbstractBuilder<OrcidHistory, OrcidHis
 
     public OrcidHistoryBuilder withRecordType(String recordType) throws SQLException {
         orcidHistory.setRecordType(recordType);
+        return this;
+    }
+
+    public OrcidHistoryBuilder withOperation(OrcidOperation operation) throws SQLException {
+        orcidHistory.setOperation(operation);
+        return this;
+    }
+
+    public OrcidHistoryBuilder withDescription(String description) throws SQLException {
+        orcidHistory.setDescription(description);
+        return this;
+    }
+
+    public OrcidHistoryBuilder withTimestamp(Date timestamp) {
+        orcidHistory.setTimestamp(timestamp);
         return this;
     }
 }

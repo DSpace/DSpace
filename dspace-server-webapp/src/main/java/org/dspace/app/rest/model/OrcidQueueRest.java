@@ -27,7 +27,7 @@ public class OrcidQueueRest extends BaseObjectRest<Integer> {
 
     private String recordType;
 
-    private String putCode;
+    private String operation;
 
     @Override
     public String getType() {
@@ -76,12 +76,12 @@ public class OrcidQueueRest extends BaseObjectRest<Integer> {
         this.recordType = recordType;
     }
 
-    public String getPutCode() {
-        return putCode;
+    public String getOperation() {
+        return operation;
     }
 
-    public void setPutCode(String putCode) {
-        this.putCode = putCode;
+    public void setOperation(String operation) {
+        this.operation = operation;
     }
 
 }

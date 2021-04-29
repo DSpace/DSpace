@@ -9,10 +9,16 @@
 ALTER TABLE orcid_queue ADD COLUMN put_code CHARACTER VARYING(255);
 ALTER TABLE orcid_queue ADD COLUMN record_type CHARACTER VARYING(255);
 ALTER TABLE orcid_queue ADD COLUMN description CHARACTER VARYING(255);
-ALTER TABLE orcid_queue ADD COLUMN metadata CHARACTER VARYING(255);
+ALTER TABLE orcid_queue ADD COLUMN operation CHARACTER VARYING(255);
+ALTER TABLE orcid_queue ADD COLUMN metadata TEXT;
+
 ALTER TABLE orcid_queue ALTER COLUMN entity_id DROP NOT NULL;
 
-ALTER TABLE orcid_history ADD COLUMN metadata CHARACTER VARYING(255);
+ALTER TABLE orcid_history ADD COLUMN metadata TEXT;
 ALTER TABLE orcid_history ADD COLUMN operation CHARACTER VARYING(255);
 ALTER TABLE orcid_history ADD COLUMN record_type CHARACTER VARYING(255);
+ALTER TABLE orcid_history ADD COLUMN description CHARACTER VARYING(255);
+
+ALTER TABLE orcid_history DROP COLUMN timestamp_success_attempt;
+
 ALTER TABLE orcid_history ALTER COLUMN entity_id DROP NOT NULL;

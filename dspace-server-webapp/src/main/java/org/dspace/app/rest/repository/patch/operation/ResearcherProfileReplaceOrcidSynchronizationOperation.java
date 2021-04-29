@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest.repository.patch.operation;
 
+import static org.dspace.app.orcid.model.OrcidEntityType.PROJECT;
+import static org.dspace.app.orcid.model.OrcidEntityType.PUBLICATION;
+
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
@@ -58,7 +61,7 @@ public class ResearcherProfileReplaceOrcidSynchronizationOperation extends Patch
     private ResearcherProfileService profileService;
 
     @Autowired
-    private OrcidSynchronizationService orcidSynchronizationService;
+    private OrcidSynchronizationService synchronizationService;
 
     @Override
     public ResearcherProfile perform(Context context, ResearcherProfile profile, Operation operation)
@@ -76,16 +79,16 @@ public class ResearcherProfileReplaceOrcidSynchronizationOperation extends Patch
 
         switch (path) {
             case PUBLICATIONS_PREFERENCES:
-                orcidSynchronizationService.setPublicationPreference(context, profileItem, parsePreference(value));
+                synchronizationService.setEntityPreference(context, profileItem, PUBLICATION, parsePreference(value));
                 break;
             case PROJECTS_PREFERENCES:
-                orcidSynchronizationService.setProjectPreference(context, profileItem, parsePreference(value));
+                synchronizationService.setEntityPreference(context, profileItem, PROJECT, parsePreference(value));
                 break;
             case PROFILE_PREFERENCES:
-                orcidSynchronizationService.setProfilePreference(context, profileItem, parseProfilePreferences(value));
+                synchronizationService.setProfilePreference(context, profileItem, parseProfilePreferences(value));
                 break;
             case MODE_PREFERENCES:
-                orcidSynchronizationService.setSynchronizationMode(context, profileItem, parseMode(value));
+                synchronizationService.setSynchronizationMode(context, profileItem, parseMode(value));
                 break;
             default:
                 throw new UnprocessableEntityException("Invalid path starting with " + OPERATION_ORCID_SYNCH);

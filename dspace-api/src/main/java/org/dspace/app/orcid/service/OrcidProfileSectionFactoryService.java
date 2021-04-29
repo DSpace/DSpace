@@ -49,7 +49,7 @@ public interface OrcidProfileSectionFactoryService {
      * @param  context        the DSpace context
      * @param  metadataValues the metadata values
      * @param  type           the profile section type
-     * @return                the created objects
+     * @return                the created object
      */
     Object createOrcidObject(Context context, List<MetadataValue> metadataValues, OrcidProfileSectionType type);
 }
