@@ -34,7 +34,7 @@ Past releases are all available via GitHub at https://github.com/DSpace/DSpace/r
 Documentation for each release may be viewed online or downloaded via our [Documentation Wiki](https://wiki.lyrasis.org/display/DSDOC/).
 
 The latest DSpace Installation instructions are available at:
-https://wiki.lyrasis.org/display/DSDOC6x/Installing+DSpace
+https://wiki.lyrasis.org/display/DSDOC7x/Installing+DSpace
 
 Please be aware that, as a Java web application, DSpace requires a database (PostgreSQL or Oracle)
 and a servlet container (usually Tomcat) in order to function.
