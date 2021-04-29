@@ -1027,8 +1027,6 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                        SortOptionMatcher.sortOptionMatcher("person.givenName",
                                          DiscoverySortFieldConfiguration.SORT_ORDER.asc.name()),
                        SortOptionMatcher.sortOptionMatcher("person.birthDate",
-                                         DiscoverySortFieldConfiguration.SORT_ORDER.desc.name()),
-                       SortOptionMatcher.sortOptionMatcher("dc.date.accessioned",
                                          DiscoverySortFieldConfiguration.SORT_ORDER.desc.name())
                     )));
     }
