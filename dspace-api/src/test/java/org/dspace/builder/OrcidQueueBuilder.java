@@ -9,7 +9,6 @@ package org.dspace.builder;
 
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
 import org.dspace.app.orcid.OrcidOperation;
 import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.service.OrcidQueueService;
@@ -23,8 +22,6 @@ import org.dspace.core.Context;
  * @author Mykhaylo Boychuk (4science)
  */
 public class OrcidQueueBuilder extends  AbstractBuilder<OrcidQueue, OrcidQueueService> {
-
-    private static final Logger log = Logger.getLogger(OrcidQueueBuilder.class);
 
     private OrcidQueue orcidQueue;
 
@@ -44,15 +41,32 @@ public class OrcidQueueBuilder extends  AbstractBuilder<OrcidQueue, OrcidQueueSe
 
     public static OrcidQueueBuilder createOrcidQueue(Context context, Item owner, Item entity) {
         OrcidQueueBuilder builder = new OrcidQueueBuilder(context);
-        return builder.create(context, owner, entity);
+        return builder.createEntityInsertionRecord(context, owner, entity);
     }
 
-    private OrcidQueueBuilder create(Context context, Item owner, Item entity) {
+    public static OrcidQueueBuilder createOrcidQueue(Context context, Item owner, String description,
+        String type, String putCode) {
+        OrcidQueueBuilder builder = new OrcidQueueBuilder(context);
+        return builder.createEntityDeletionRecord(context, owner, description, type, putCode);
+    }
+
+    private OrcidQueueBuilder createEntityDeletionRecord(Context context, Item owner,
+        String description, String type, String putCode) {
+        try {
+            this.context = context;
+            this.orcidQueue = getService().createEntityDeletionRecord(context, owner, description, type, putCode);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return this;
+    }
+
+    private OrcidQueueBuilder createEntityInsertionRecord(Context context, Item owner, Item entity) {
         try {
             this.context = context;
             this.orcidQueue = getService().createEntityInsertionRecord(context, owner, entity);
         } catch (Exception e) {
-            log.error("Error in OrcidQueueBuilder.create(..), error: ", e);
+            throw new RuntimeException(e);
         }
         return this;
     }
@@ -65,7 +79,7 @@ public class OrcidQueueBuilder extends  AbstractBuilder<OrcidQueue, OrcidQueueSe
 
             indexingService.commit();
         } catch (Exception e) {
-            log.error("Error in OrcidQueueBuilder.build(), error: ", e);
+            throw new RuntimeException(e);
         }
         return orcidQueue;
     }

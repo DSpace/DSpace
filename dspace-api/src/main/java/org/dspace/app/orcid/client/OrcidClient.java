@@ -56,7 +56,7 @@ public interface OrcidClient {
      * orcid.
      *
      * @param  accessToken              the access token
-     * @param  orcid                    the orcid id of the record to retrieve
+     * @param  orcid                    the orcid id
      * @param  putCode                  the object's put code
      * @param  clazz                    the object's class
      * @return                          the Object, if any
@@ -70,9 +70,9 @@ public interface OrcidClient {
      * Push the given object to ORCID.
      *
      * @param  accessToken              the access token
-     * @param  orcid                    the orcid it
+     * @param  orcid                    the orcid id
      * @param  object                   the orcid object to push
-     * @return                          the orcid response if any error occurs
+     * @return                          the orcid response if no error occurs
      * @throws OrcidClientException     if some error occurs during the push
      * @throws IllegalArgumentException if the given object is not an valid ORCID
      *                                  object
@@ -80,10 +80,26 @@ public interface OrcidClient {
     OrcidResponse push(String accessToken, String orcid, Object object);
 
     /**
+     * Update the object with the given putCode.
+     *
+     * @param  accessToken              the access token
+     * @param  orcid                    the orcid id
+     * @param  object                   the orcid object to push
+     * @param  putCode                  the put code of the resource to delete
+     * @return                          the orcid response if no error occurs
+     * @throws OrcidClientException     if some error occurs during the push
+     * @throws IllegalArgumentException if the given object is not an valid ORCID
+     *                                  object
+     */
+    OrcidResponse update(String accessToken, String orcid, Object object, String putCode);
+
+    /**
      * Delete the ORCID object with the given putCode on the given path.
      *
      * @param  accessToken          the access token
-     * @param  orcid                the orcid id of the record to retrieve
+     * @param  orcid                the orcid id
+     * @param  putCode              the put code of the resource to delete
+     * @param  path                 the path of the resource to delete
      * @return                      the Work, if any
      * @throws OrcidClientException if some error occurs during the search
      */

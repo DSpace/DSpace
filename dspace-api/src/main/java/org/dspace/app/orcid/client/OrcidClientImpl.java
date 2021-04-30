@@ -11,6 +11,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.http.client.methods.RequestBuilder.delete;
 import static org.apache.http.client.methods.RequestBuilder.get;
 import static org.apache.http.client.methods.RequestBuilder.post;
+import static org.apache.http.client.methods.RequestBuilder.put;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,6 +46,7 @@ import org.dspace.app.orcid.model.OrcidProfileSectionType;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.authenticate.OrcidClientException;
 import org.dspace.util.ThrowingSupplier;
+import org.orcid.jaxb.model.v3.release.record.Activity;
 import org.orcid.jaxb.model.v3.release.record.Address;
 import org.orcid.jaxb.model.v3.release.record.Education;
 import org.orcid.jaxb.model.v3.release.record.Employment;
@@ -139,15 +141,21 @@ public class OrcidClientImpl implements OrcidClient {
         if (path == null) {
             throw new IllegalArgumentException("The given object is not an ORCID object: " + object.getClass());
         }
+        return execute(buildPostUriRequest(accessToken, "/" + orcid + path, object), false);
+    }
 
-        HttpUriRequest httpUriRequest = buildPostUriRequest(accessToken, "/" + orcid + path, object);
-        return execute(httpUriRequest, false);
+    @Override
+    public OrcidResponse update(String accessToken, String orcid, Object object, String putCode) {
+        String path = PATHS_MAP.get(object.getClass());
+        if (path == null) {
+            throw new IllegalArgumentException("The given object is not an ORCID object: " + object.getClass());
+        }
+        return execute(buildPutUriRequest(accessToken, "/" + orcid + path + "/" + putCode, object), false);
     }
 
     @Override
     public OrcidResponse deleteByPutCode(String accessToken, String orcid, String putCode, String path) {
-        HttpUriRequest httpUriRequest = buildDeleteUriRequest(accessToken, "/" + orcid + path + "/" + putCode);
-        return execute(httpUriRequest, true);
+        return execute(buildDeleteUriRequest(accessToken, "/" + orcid + path + "/" + putCode), true);
     }
 
     private HttpUriRequest buildGetUriRequest(String accessToken, String path) {
@@ -165,9 +173,16 @@ public class OrcidClientImpl implements OrcidClient {
             .build();
     }
 
+    private HttpUriRequest buildPutUriRequest(String accessToken, String path, Object object) {
+        return put(orcidConfiguration.getApiUrl() + path.trim())
+            .addHeader("Content-Type", "application/vnd.orcid+xml")
+            .addHeader("Authorization", "Bearer " + accessToken)
+            .setEntity(convertToEntity(object))
+            .build();
+    }
+
     private HttpUriRequest buildDeleteUriRequest(String accessToken, String path) {
         return delete(orcidConfiguration.getApiUrl() + path.trim())
-            .addHeader("Content-Type", "application/x-www-form-urlencoded")
             .addHeader("Authorization", "Bearer " + accessToken)
             .build();
     }
@@ -290,6 +305,10 @@ public class OrcidClientImpl implements OrcidClient {
     private String getContent(HttpResponse response) throws UnsupportedOperationException, IOException {
         HttpEntity entity = response.getEntity();
         return entity != null ? IOUtils.toString(entity.getContent(), UTF_8.name()) : null;
+    }
+
+    private boolean isUpdate(Object object) {
+        return object instanceof Activity && ((Activity) object).getPutCode() != null;
     }
 
     private String getPutCode(HttpResponse response) {

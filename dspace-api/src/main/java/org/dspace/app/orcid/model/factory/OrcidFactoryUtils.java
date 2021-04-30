@@ -7,13 +7,10 @@
  */
 package org.dspace.app.orcid.model.factory;
 
-import static org.apache.commons.lang3.StringUtils.split;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.util.Strings;
 
 /**
  * Utility class for Orcid factory classes.
@@ -22,10 +19,6 @@ import org.apache.logging.log4j.util.Strings;
  *
  */
 public final class OrcidFactoryUtils {
-
-    public static final String LANGUAGE_SEPARATOR_PREFIX = "[";
-
-    public static final String LANGUAGE_SEPARATOR_SUFFIX = "]";
 
     private OrcidFactoryUtils() {
 

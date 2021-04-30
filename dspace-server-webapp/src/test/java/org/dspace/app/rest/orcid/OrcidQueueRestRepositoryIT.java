@@ -9,6 +9,7 @@ package org.dspace.app.rest.orcid;
 
 import static org.dspace.app.rest.matcher.OrcidQueueMatcher.matchOrcidQueue;
 import static org.dspace.builder.OrcidQueueBuilder.createOrcidQueue;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -343,6 +344,43 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
                                        .containsString("/api/core/items/" + itemPerson2.getID())))
                              .andExpect(jsonPath("$._links.entity.href", Matchers
                                        .containsString("/api/core/items/" + itemPublication2.getID())));
+    }
+
+    @Test
+    public void findOneWithDeleteRecordTypeTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson researcher = EPersonBuilder.createEPerson(context)
+            .withNameInMetadata("Josiah", "Carberry")
+            .withEmail("josiah.Carberry@example.com")
+            .withPassword(password)
+            .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+            .withEntityType("Person")
+            .withName("Collection 1").build();
+
+        Item itemPerson = ItemBuilder.createItem(context, collection)
+            .withPersonIdentifierFirstName("Josiah")
+            .withPersonIdentifierLastName("Carberry")
+            .withOrcidIdentifier("0000-0002-1825-0097")
+            .withCrisOwner(researcher.getFullName(), researcher.getID().toString())
+            .build();
+
+        OrcidQueue orcidQueue = createOrcidQueue(context, itemPerson, "Description", "Publication", "12345").build();
+
+        context.restoreAuthSystemState();
+        String tokenResearcher = getAuthToken(researcher.getEmail(), password);
+
+        getClient(tokenResearcher).perform(get("/api/cris/orcidqueues/" + orcidQueue.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", is(matchOrcidQueue(orcidQueue))))
+            .andExpect(jsonPath("$._links.self.href", containsString("/api/cris/orcidqueues/" + orcidQueue.getID())))
+            .andExpect(jsonPath("$._links.owner.href", containsString("/api/core/items/" + itemPerson.getID())));
     }
 
     @Test

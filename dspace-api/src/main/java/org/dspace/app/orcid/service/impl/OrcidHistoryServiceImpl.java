@@ -41,6 +41,8 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.orcid.jaxb.model.v3.release.record.Activity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -51,6 +53,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  */
 public class OrcidHistoryServiceImpl implements OrcidHistoryService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrcidHistoryServiceImpl.class);
 
     @Autowired
     private OrcidHistoryDAO orcidHistoryDAO;
@@ -164,6 +168,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         } catch (OrcidClientException ex) {
             return createHistoryRecordFromOrcidError(context, orcidQueue, operation, ex);
         } catch (RuntimeException ex) {
+            LOGGER.warn("An unexpected error occurs during the orcid synchronization", ex);
             return createHistoryRecordFromGenericError(context, orcidQueue, operation, ex);
         }
 
@@ -215,9 +220,11 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         Activity activity = activityFactoryService.createOrcidObject(context, orcidQueue.getEntity());
         if (toUpdate) {
             activity.setPutCode(getPutCode(orcidQueue));
+            return orcidClient.update(token, orcid, activity, orcidQueue.getPutCode());
+        } else {
+            return orcidClient.push(token, orcid, activity);
         }
 
-        return orcidClient.push(token, orcid, activity);
     }
 
     private OrcidResponse sendProfileDataToOrcid(Context context, String orcid, String token, OrcidQueue orcidQueue) {
