@@ -14,6 +14,7 @@ import static org.dspace.app.orcid.model.OrcidProfileSectionType.KEYWORDS;
 import static org.dspace.app.orcid.model.OrcidProfileSectionType.OTHER_NAMES;
 import static org.dspace.app.orcid.model.OrcidProfileSectionType.RESEARCHER_URLS;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,17 +41,10 @@ import org.orcid.jaxb.model.v3.release.record.ResearcherUrl;
  */
 public class OrcidSimpleValueObjectFactory extends AbstractOrcidProfileSectionFactory {
 
-    protected final List<String> metadataFields;
+    private List<String> metadataFields = new ArrayList<String>();
 
-    public OrcidSimpleValueObjectFactory(OrcidProfileSectionType sectionType, OrcidProfileSyncPreference preference,
-        String metadataFields) {
+    public OrcidSimpleValueObjectFactory(OrcidProfileSectionType sectionType, OrcidProfileSyncPreference preference) {
         super(sectionType, preference);
-        this.metadataFields = metadataFields != null ? asList(metadataFields.split(",")) : emptyList();
-    }
-
-    @Override
-    public List<String> getMetadataFields() {
-        return metadataFields;
     }
 
     @Override
@@ -134,6 +128,15 @@ public class OrcidSimpleValueObjectFactory extends AbstractOrcidProfileSectionFa
         Address address = new Address();
         address.setCountry(new Country(Iso3166Country.fromValue(metadataValue.getValue())));
         return address;
+    }
+
+    public void setMetadataFields(String metadataFields) {
+        this.metadataFields = metadataFields != null ? asList(metadataFields.split(",")) : emptyList();
+    }
+
+    @Override
+    public List<String> getMetadataFields() {
+        return metadataFields;
     }
 
 }

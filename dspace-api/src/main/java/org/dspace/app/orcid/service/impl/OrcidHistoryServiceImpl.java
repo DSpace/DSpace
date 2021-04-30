@@ -302,4 +302,13 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     private Long getPutCode(OrcidQueue orcidQueue) {
         return isCreatable(orcidQueue.getPutCode()) ? Long.valueOf(orcidQueue.getPutCode()) : null;
     }
+
+    public OrcidClient getOrcidClient() {
+        return orcidClient;
+    }
+
+    public void setOrcidClient(OrcidClient orcidClient) {
+        this.orcidClient = orcidClient;
+    }
+
 }

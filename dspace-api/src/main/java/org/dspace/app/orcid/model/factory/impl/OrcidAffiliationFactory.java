@@ -42,21 +42,16 @@ import org.orcid.jaxb.model.v3.release.record.Qualification;
  */
 public class OrcidAffiliationFactory extends AbstractOrcidProfileSectionFactory {
 
-    private final String organizationField;
+    private String organizationField;
 
-    private final String roleField;
+    private String roleField;
 
-    private final String startDateField;
+    private String startDateField;
 
-    private final String endDateField;
+    private String endDateField;
 
-    public OrcidAffiliationFactory(OrcidProfileSectionType sectionType, OrcidProfileSyncPreference preference,
-        String organizationField, String roleField, String startDateField, String endDateField) {
+    public OrcidAffiliationFactory(OrcidProfileSectionType sectionType, OrcidProfileSyncPreference preference) {
         super(sectionType, preference);
-        this.organizationField = organizationField;
-        this.roleField = roleField;
-        this.startDateField = startDateField;
-        this.endDateField = endDateField;
     }
 
     @Override
@@ -64,22 +59,6 @@ public class OrcidAffiliationFactory extends AbstractOrcidProfileSectionFactory 
         return List.of(organizationField, roleField, startDateField, endDateField).stream()
             .filter(StringUtils::isNotBlank)
             .collect(Collectors.toList());
-    }
-
-    public String getOrganizationField() {
-        return organizationField;
-    }
-
-    public String getRoleField() {
-        return roleField;
-    }
-
-    public String getStartDateField() {
-        return startDateField;
-    }
-
-    public String getEndDateField() {
-        return endDateField;
     }
 
     @Override
@@ -200,6 +179,38 @@ public class OrcidAffiliationFactory extends AbstractOrcidProfileSectionFactory 
             }
         }
         return metadataValues;
+    }
+
+    public String getOrganizationField() {
+        return organizationField;
+    }
+
+    public String getRoleField() {
+        return roleField;
+    }
+
+    public String getStartDateField() {
+        return startDateField;
+    }
+
+    public String getEndDateField() {
+        return endDateField;
+    }
+
+    public void setOrganizationField(String organizationField) {
+        this.organizationField = organizationField;
+    }
+
+    public void setRoleField(String roleField) {
+        this.roleField = roleField;
+    }
+
+    public void setStartDateField(String startDateField) {
+        this.startDateField = startDateField;
+    }
+
+    public void setEndDateField(String endDateField) {
+        this.endDateField = endDateField;
     }
 
 }

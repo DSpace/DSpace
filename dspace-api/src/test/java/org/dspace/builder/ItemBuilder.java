@@ -186,12 +186,12 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "dc", "identifier", "issn", issn);
     }
 
-    public ItemBuilder withIsiIdentifier(String issn) {
-        return addMetadataValue(item, "dc", "identifier", "isi", issn);
+    public ItemBuilder withIsiIdentifier(String isi) {
+        return addMetadataValue(item, "dc", "identifier", "isi", isi);
     }
 
-    public ItemBuilder withScopusIdentifier(String issn) {
-        return addMetadataValue(item, "dc", "identifier", "scopus", issn);
+    public ItemBuilder withScopusIdentifier(String scopus) {
+        return addMetadataValue(item, "dc", "identifier", "scopus", scopus);
     }
 
     public ItemBuilder withOrcidIdentifier(String orcid) {

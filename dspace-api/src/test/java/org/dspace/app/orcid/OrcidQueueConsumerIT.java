@@ -11,6 +11,7 @@ import static org.dspace.app.matcher.OrcidQueueMatcher.matches;
 import static org.dspace.app.orcid.OrcidOperation.DELETE;
 import static org.dspace.app.orcid.OrcidOperation.INSERT;
 import static org.dspace.app.orcid.OrcidOperation.UPDATE;
+import static org.dspace.app.orcid.model.OrcidProfileSectionType.KEYWORDS;
 import static org.dspace.app.profile.OrcidEntitySyncPreference.ALL;
 import static org.dspace.app.profile.OrcidEntitySyncPreference.DISABLED;
 import static org.dspace.app.profile.OrcidProfileSyncPreference.AFFILIATION;
@@ -42,6 +43,7 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.OrcidHistoryBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.junit.After;
@@ -160,7 +162,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
         assertThat(queueRecords, hasSize(1));
-        assertThat(queueRecords.get(0), matches(profile, profile, "COUNTRY", null, "crisrp.country::IT", "IT", INSERT));
+        assertThat(queueRecords.get(0), matches(profile, "COUNTRY", null, "crisrp.country::IT", "IT", INSERT));
     }
 
     @Test
@@ -286,8 +288,109 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
         assertThat(queueRecords, hasSize(1));
-        assertThat(queueRecords.get(0), matches(profile, profile, "AFFILIATION", "12345", "XX/YY/ZZ/AA",
+        assertThat(queueRecords.get(0), matches(profile, "AFFILIATION", "12345", "XX/YY/ZZ/AA",
             "4Science (2020, 2021)", DELETE));
+    }
+
+    @Test
+    public void testOrcidQueueRecordCreationAndDeletion() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item item = ItemBuilder.createItem(context, profileCollection)
+            .withTitle("Test User")
+            .withOrcidIdentifier("0000-1111-2222-3333")
+            .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
+            .withSubject("Science")
+            .withOrcidSynchronizationProfilePreference(BIOGRAPHICAL)
+            .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        List<OrcidQueue> records = orcidQueueService.findAll(context);
+        assertThat(records, hasSize(1));
+        assertThat(records, hasItem(matches(item, KEYWORDS.name(), null, "dc.subject::Science", "Science", INSERT)));
+
+        removeMetadata(item, "dc", "subject", null);
+        context.commit();
+
+        assertThat(orcidQueueService.findAll(context), empty());
+
+    }
+
+    @Test
+    public void testOrcidQueueRecordCreationAndDeletionWithOrcidHistoryInsertionInTheMiddle() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item item = ItemBuilder.createItem(context, profileCollection)
+            .withTitle("Test User")
+            .withOrcidIdentifier("0000-1111-2222-3333")
+            .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
+            .withSubject("Science")
+            .withOrcidSynchronizationProfilePreference(BIOGRAPHICAL)
+            .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        List<OrcidQueue> records = orcidQueueService.findAll(context);
+        assertThat(records, hasSize(1));
+        assertThat(records, hasItem(matches(item, KEYWORDS.name(), null, "dc.subject::Science", "Science", INSERT)));
+
+        OrcidHistoryBuilder.createOrcidHistory(context, item, item)
+            .withPutCode("12345")
+            .withMetadata("dc.subject::Science")
+            .withDescription("Science")
+            .withRecordType(KEYWORDS.name())
+            .withOperation(INSERT)
+            .withStatus(201)
+            .build();
+
+        removeMetadata(item, "dc", "subject", null);
+        context.commit();
+
+        records = orcidQueueService.findAll(context);
+        assertThat(records, hasSize(1));
+        assertThat(records, hasItem(matches(item, KEYWORDS.name(), "12345", "dc.subject::Science", "Science", DELETE)));
+
+    }
+
+    @Test
+    public void testOrcidQueueRecordCreationAndDeletionWithFailedOrcidHistoryInsertionInTheMiddle() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item item = ItemBuilder.createItem(context, profileCollection)
+            .withTitle("Test User")
+            .withOrcidIdentifier("0000-1111-2222-3333")
+            .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
+            .withSubject("Science")
+            .withOrcidSynchronizationProfilePreference(BIOGRAPHICAL)
+            .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        List<OrcidQueue> records = orcidQueueService.findAll(context);
+        assertThat(records, hasSize(1));
+        assertThat(records, hasItem(matches(item, KEYWORDS.name(), null, "dc.subject::Science", "Science", INSERT)));
+
+        OrcidHistoryBuilder.createOrcidHistory(context, item, item)
+            .withPutCode("12345")
+            .withMetadata("dc.subject::Science")
+            .withDescription("Science")
+            .withRecordType(KEYWORDS.name())
+            .withOperation(INSERT)
+            .withStatus(400)
+            .build();
+
+        removeMetadata(item, "dc", "subject", null);
+        context.commit();
+
+        assertThat(orcidQueueService.findAll(context), empty());
+
     }
 
     @Test
@@ -648,6 +751,15 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
         item = context.reloadEntity(item);
         itemService.addMetadata(context, item, schema, element, qualifier, null, value, authority, 600);
+        itemService.update(context, item);
+        context.restoreAuthSystemState();
+    }
+
+    private void removeMetadata(Item item, String schema, String element, String qualifier) throws Exception {
+        context.turnOffAuthorisationSystem();
+        item = context.reloadEntity(item);
+        List<MetadataValue> metadata = itemService.getMetadata(item, schema, element, qualifier, Item.ANY);
+        itemService.removeMetadataValues(context, item, metadata);
         itemService.update(context, item);
         context.restoreAuthSystemState();
     }

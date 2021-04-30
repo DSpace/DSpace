@@ -9,10 +9,14 @@ package org.dspace.app.orcid.model.factory;
 
 import java.util.Optional;
 
+import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
+import org.orcid.jaxb.model.common.ContributorRole;
+import org.orcid.jaxb.model.v3.release.common.Contributor;
 import org.orcid.jaxb.model.v3.release.common.FuzzyDate;
 import org.orcid.jaxb.model.v3.release.common.Organization;
+import org.orcid.jaxb.model.v3.release.common.Url;
 
 /**
  * Interface for factory classes that creates common ORCID objects.
@@ -39,4 +43,23 @@ public interface OrcidCommonObjectFactory {
      * @return               the created Organization's instance, if any
      */
     public Optional<Organization> createOrganization(Context context, MetadataValue metadataValue);
+
+    /**
+     * Creates an instance of {@link Contributor} from the given metadata value.
+     *
+     * @param  context       the DSpace context
+     * @param  metadataValue the metadata value
+     * @param  role          the contributor role
+     * @return               the created Contributor instance, if any
+     */
+    public Optional<Contributor> createContributor(Context context, MetadataValue metadataValue, ContributorRole role);
+
+    /**
+     * Creates an instance of {@link Url} from the given item.
+     * @param  context the DSpace context
+     * @param  item    the item
+     * @return         the created Url instance, if any
+     */
+    public Optional<Url> createUrl(Context context, Item item);
+
 }

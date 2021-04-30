@@ -20,6 +20,8 @@ import org.orcid.jaxb.model.v3.release.record.Activity;
  */
 public interface OrcidEntityFactory {
 
+    String SIMPLE_HANDLE_PLACEHOLDER = "$simple-handle";
+
     /**
      * Returns the entity type created from this factory.
      *

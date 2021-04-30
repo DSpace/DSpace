@@ -68,6 +68,12 @@ public class OrcidQueueMatcher extends TypeSafeMatcher<OrcidQueue> {
             is(putCode), is(metadata), is(description), is(operation));
     }
 
+    public static OrcidQueueMatcher matches(Item item, String recordType,
+        String putCode, String metadata, String description, OrcidOperation operation) {
+        return new OrcidQueueMatcher(is(item), is(item), is(recordType),
+            is(putCode), is(metadata), is(description), is(operation));
+    }
+
     public static OrcidQueueMatcher matches(Item owner, Item entity, String recordType,
         String putCode, Matcher<String> metadata, String description, OrcidOperation operation) {
         return new OrcidQueueMatcher(is(owner), is(entity), is(recordType),

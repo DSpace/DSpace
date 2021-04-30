@@ -8,6 +8,7 @@
 package org.dspace.app.orcid.factory;
 
 import org.dspace.app.orcid.service.MetadataSignatureGenerator;
+import org.dspace.app.orcid.service.OrcidEntityFactoryService;
 import org.dspace.app.orcid.service.OrcidHistoryService;
 import org.dspace.app.orcid.service.OrcidProfileSectionFactoryService;
 import org.dspace.app.orcid.service.OrcidQueueService;
@@ -32,7 +33,10 @@ public class OrcidServiceFactoryImpl extends OrcidServiceFactory {
     private OrcidQueueService orcidQueueService;
 
     @Autowired
-    private OrcidProfileSectionFactoryService orcidProfileSectionBuilderService;
+    private OrcidProfileSectionFactoryService orcidProfileSectionFactoryService;
+
+    @Autowired
+    private OrcidEntityFactoryService orcidEntityFactoryService;
 
     @Autowired
     private MetadataSignatureGenerator metadataSignatureGenerator;
@@ -54,12 +58,17 @@ public class OrcidServiceFactoryImpl extends OrcidServiceFactory {
 
     @Override
     public OrcidProfileSectionFactoryService getOrcidProfileSectionFactoryService() {
-        return orcidProfileSectionBuilderService;
+        return orcidProfileSectionFactoryService;
     }
 
     @Override
     public MetadataSignatureGenerator getMetadataSignatureGenerator() {
         return metadataSignatureGenerator;
+    }
+
+    @Override
+    public OrcidEntityFactoryService getOrcidEntityFactoryService() {
+        return orcidEntityFactoryService;
     }
 
 }

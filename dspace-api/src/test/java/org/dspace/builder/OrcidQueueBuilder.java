@@ -10,6 +10,7 @@ package org.dspace.builder;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.orcid.OrcidOperation;
 import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.authorize.AuthorizeException;
@@ -71,6 +72,26 @@ public class OrcidQueueBuilder extends  AbstractBuilder<OrcidQueue, OrcidQueueSe
 
     public OrcidQueueBuilder withPutCode(String putCode) {
         orcidQueue.setPutCode(putCode);
+        return this;
+    }
+
+    public OrcidQueueBuilder withMetadata(String metadata) throws SQLException {
+        orcidQueue.setMetadata(metadata);
+        return this;
+    }
+
+    public OrcidQueueBuilder withRecordType(String recordType) throws SQLException {
+        orcidQueue.setRecordType(recordType);
+        return this;
+    }
+
+    public OrcidQueueBuilder withOperation(OrcidOperation operation) throws SQLException {
+        orcidQueue.setOperation(operation);
+        return this;
+    }
+
+    public OrcidQueueBuilder withDescription(String description) throws SQLException {
+        orcidQueue.setDescription(description);
         return this;
     }
 

@@ -24,6 +24,7 @@ import org.dspace.app.orcid.OrcidHistory;
 import org.dspace.app.orcid.OrcidOperation;
 import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.factory.OrcidServiceFactory;
+import org.dspace.app.orcid.model.OrcidEntityType;
 import org.dspace.app.orcid.model.factory.OrcidProfileSectionFactory;
 import org.dspace.app.orcid.service.OrcidHistoryService;
 import org.dspace.app.orcid.service.OrcidProfileSectionFactoryService;
@@ -109,16 +110,10 @@ public class OrcidQueueConsumer implements Consumer {
             return;
         }
 
-        switch (entityType) {
-            case "Person":
-                consumePerson(context, item);
-                break;
-            case "Publication":
-            case "Project":
-                consumeEntity(context, item);
-                break;
-            default:
-                break;
+        if (OrcidEntityType.isValid(entityType)) {
+            consumeEntity(context, item);
+        } else if (entityType.equals("Person")) {
+            consumePerson(context, item);
         }
 
         alreadyConsumedItems.add(item.getID());

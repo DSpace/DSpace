@@ -10,8 +10,6 @@ package org.dspace.app.orcid.service.impl;
 import static java.util.List.of;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.EnumUtils.isValidEnum;
-import static org.dspace.app.orcid.model.OrcidEntityType.PROJECT;
-import static org.dspace.app.orcid.model.OrcidEntityType.PUBLICATION;
 import static org.dspace.app.profile.OrcidEntitySyncPreference.DISABLED;
 
 import java.sql.SQLException;
@@ -65,7 +63,8 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
     @Override
     public void setEntityPreference(Context context, Item profile, OrcidEntityType type,
         OrcidEntitySyncPreference value) throws SQLException {
-        updatePreferenceForSynchronizingWithOrcid(context, profile, "sync-" + type.name() + "s", of(value.name()));
+        String metadataQualifier = "sync-" + type.name().toLowerCase() + "s";
+        updatePreferenceForSynchronizingWithOrcid(context, profile, metadataQualifier, of(value.name()));
     }
 
     @Override
@@ -114,16 +113,17 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
             return false;
         }
 
-        switch (entityType) {
-            case "Person":
-                return profile.equals(item) && !isEmpty(getProfilePreferences(profile));
-            case "Publication":
-                return getEntityPreference(profile, PUBLICATION).filter(pref -> pref != DISABLED).isPresent();
-            case "Project":
-                return getEntityPreference(profile, PROJECT).filter(pref -> pref != DISABLED).isPresent();
-            default:
-                return false;
+        if (OrcidEntityType.isValid(entityType)) {
+            return getEntityPreference(profile, OrcidEntityType.fromString(entityType))
+                .filter(pref -> pref != DISABLED)
+                .isPresent();
         }
+
+        if (entityType.equals("Person")) {
+            return profile.equals(item) && !isEmpty(getProfilePreferences(profile));
+        }
+
+        return false;
 
     }
 

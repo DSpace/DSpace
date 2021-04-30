@@ -7,11 +7,13 @@
  */
 package org.dspace.app.orcid.model.factory.impl;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static org.dspace.app.orcid.model.OrcidProfileSectionType.EXTERNAL_IDS;
+import static org.dspace.app.orcid.model.factory.OrcidFactoryUtils.parseConfigurations;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.dspace.app.orcid.model.OrcidProfileSectionType;
 import org.dspace.app.profile.OrcidProfileSyncPreference;
@@ -29,22 +31,11 @@ import org.orcid.jaxb.model.v3.release.record.PersonExternalIdentifier;
  */
 public class OrcidPersonExternalIdentifierFactory extends OrcidSimpleValueObjectFactory {
 
-    private final List<String> externalIdTypes;
+    private Map<String, String> externalIds = new HashMap<>();
 
     public OrcidPersonExternalIdentifierFactory(OrcidProfileSectionType sectionType,
-        OrcidProfileSyncPreference preference, String metadataFields, String externalIdType) {
-
-        super(sectionType, preference, metadataFields);
-        this.externalIdTypes = externalIdType != null ? asList(externalIdType.split(",")) : emptyList();
-
-        if (getExternalIdTypes().size() != getMetadataFields().size()) {
-            throw new IllegalArgumentException("The external id types configuration is not compliance with "
-                + "the metadata fields configuration");
-        }
-    }
-
-    public List<String> getExternalIdTypes() {
-        return externalIdTypes;
+        OrcidProfileSyncPreference preference) {
+        super(sectionType, preference);
     }
 
     @Override
@@ -56,19 +47,28 @@ public class OrcidPersonExternalIdentifierFactory extends OrcidSimpleValueObject
     protected Object create(MetadataValue metadataValue) {
 
         String currentMetadataField = metadataValue.getMetadataField().toString('.');
-        int metadataFieldIndex = metadataFields.indexOf(currentMetadataField);
+        String externalIdType = externalIds.get(currentMetadataField);
 
-        if (metadataFieldIndex < 0) {
+        if (externalIdType == null) {
             throw new IllegalArgumentException("Metadata field not supported: " + currentMetadataField);
         }
 
         PersonExternalIdentifier externalId = new PersonExternalIdentifier();
         externalId.setValue(metadataValue.getValue());
-        externalId.setType(externalIdTypes.get(metadataFieldIndex));
+        externalId.setType(externalIdType);
         externalId.setRelationship(Relationship.SELF);
         externalId.setUrl(new Url(metadataValue.getValue()));
 
         return externalId;
+    }
+
+    public Map<String, String> getExternalIds() {
+        return externalIds;
+    }
+
+    public void setExternalIds(String externalIds) {
+        this.externalIds = parseConfigurations(externalIds);
+        setMetadataFields(this.externalIds.keySet().stream().collect(Collectors.joining(",")));
     }
 
 }
