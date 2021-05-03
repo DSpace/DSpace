@@ -5,11 +5,11 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.authenticate;
+package org.dspace.app.orcid.exception;
 
 /**
  * Exception throwable from class that implements {@link OrcidClient} in case of
- * error.
+ * error response from the ORCID registry.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *

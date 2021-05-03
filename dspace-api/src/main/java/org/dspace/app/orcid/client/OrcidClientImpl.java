@@ -42,11 +42,11 @@ import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
+import org.dspace.app.orcid.exception.OrcidClientException;
+import org.dspace.app.orcid.model.OrcidEntityType;
 import org.dspace.app.orcid.model.OrcidProfileSectionType;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
-import org.dspace.authenticate.OrcidClientException;
 import org.dspace.util.ThrowingSupplier;
-import org.orcid.jaxb.model.v3.release.record.Activity;
 import org.orcid.jaxb.model.v3.release.record.Address;
 import org.orcid.jaxb.model.v3.release.record.Education;
 import org.orcid.jaxb.model.v3.release.record.Employment;
@@ -81,8 +81,8 @@ public class OrcidClientImpl implements OrcidClient {
 
     private static Map<Class<?>, String> initializePathsMap() {
         Map<Class<?>, String> map = new HashMap<Class<?>, String>();
-        map.put(Work.class, "/work");
-        map.put(Funding.class, "/funding");
+        map.put(Work.class, OrcidEntityType.PUBLICATION.getPath());
+        map.put(Funding.class, OrcidEntityType.PROJECT.getPath());
         map.put(Employment.class, OrcidProfileSectionType.AFFILIATION.getPath());
         map.put(Education.class, OrcidProfileSectionType.EDUCATION.getPath());
         map.put(Qualification.class, OrcidProfileSectionType.QUALIFICATION.getPath());
@@ -305,10 +305,6 @@ public class OrcidClientImpl implements OrcidClient {
     private String getContent(HttpResponse response) throws UnsupportedOperationException, IOException {
         HttpEntity entity = response.getEntity();
         return entity != null ? IOUtils.toString(entity.getContent(), UTF_8.name()) : null;
-    }
-
-    private boolean isUpdate(Object object) {
-        return object instanceof Activity && ((Activity) object).getPutCode() != null;
     }
 
     private String getPutCode(HttpResponse response) {

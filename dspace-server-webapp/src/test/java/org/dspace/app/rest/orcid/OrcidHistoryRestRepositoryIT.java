@@ -36,10 +36,10 @@ import org.dspace.app.orcid.OrcidOperation;
 import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.client.OrcidClient;
 import org.dspace.app.orcid.client.OrcidResponse;
+import org.dspace.app.orcid.exception.OrcidClientException;
 import org.dspace.app.orcid.service.impl.OrcidHistoryServiceImpl;
 import org.dspace.app.rest.matcher.OrcidHistoryMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.authenticate.OrcidClientException;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
@@ -55,8 +55,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.orcid.jaxb.model.common.Iso3166Country;
-import org.orcid.jaxb.model.v3.release.common.PublicationDate;
+import org.orcid.jaxb.model.v3.release.common.FuzzyDate;
 import org.orcid.jaxb.model.v3.release.record.Address;
+import org.orcid.jaxb.model.v3.release.record.Funding;
 import org.orcid.jaxb.model.v3.release.record.Work;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.RestMediaTypes;
@@ -460,6 +461,64 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     @Test
+    public void testCreationForPublicationUpdateWithForceAddition() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, profile, publication)
+            .withDescription("A Methodology for the Emulation of Architecture")
+            .withOperation(OrcidOperation.UPDATE)
+            .withRecordType("Publication")
+            .withPutCode("12345")
+            .build();
+        context.restoreAuthSystemState();
+
+        when(orcidClientMock.push(eq(ACCESS_TOKEN), eq(ORCID), any())).thenReturn(createdResponse("12345"));
+
+        String authToken = getAuthToken(researcher.getEmail(), password);
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        try {
+
+            getClient(getAuthToken(researcher.getEmail(), password))
+                .perform(post("/api/cris/orcidhistories")
+                    .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                    .content("/api/cris/orcidqueues/" + orcidQueue.getID())
+                    .param("forceAddition", "true"))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            getClient(authToken).perform(get("/api/cris/orcidhistories/" + idRef.get()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.allOf(
+                    hasJsonPath("$.id", is(idRef.get())),
+                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.entityId", is(publication.getID().toString())),
+                    hasJsonPath("$.status", is(201)),
+                    hasJsonPath("$.putCode", is("12345")),
+                    hasJsonPath("$.type", is("orcidhistory")))));
+
+        } finally {
+            OrcidHistoryBuilder.deleteOrcidHistory(idRef.get());
+        }
+
+        assertThat(context.reloadEntity(orcidQueue), nullValue());
+
+        ArgumentCaptor<Object> captor = ArgumentCaptor.forClass(Object.class);
+        verify(orcidClientMock).push(eq(ACCESS_TOKEN), eq(ORCID), captor.capture());
+
+        Object sentObject = captor.getValue();
+        assertThat(sentObject, instanceOf(Work.class));
+
+        Work work = (Work) sentObject;
+        assertThat(work.getPutCode(), nullValue());
+        assertThat(work.getWorkTitle().getTitle().getContent(), is("A Methodology for the Emulation of Architecture"));
+        assertThat(work.getPublicationDate(), matches(date("2013", "08", "03")));
+
+        verifyNoMoreInteractions(orcidClientMock);
+
+    }
+
+    @Test
     public void testCreationForPublicationDeletion() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -648,7 +707,307 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
 
     }
 
-    private Predicate<PublicationDate> date(String year, String month, String days) {
+    @Test
+    public void testCreationForProjectInsert() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Collection projects = CollectionBuilder.createCollection(context, parentCommunity)
+            .withEntityType("Project")
+            .withName("Collection 3")
+            .build();
+
+        Item project = ItemBuilder.createItem(context, projects)
+            .withTitle("Test project")
+            .withProjectStartDate("2013-08-03")
+            .build();
+
+        OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, profile, project)
+            .withDescription("Test project")
+            .withOperation(OrcidOperation.INSERT)
+            .withRecordType("Project")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        when(orcidClientMock.push(eq(ACCESS_TOKEN), eq(ORCID), any())).thenReturn(createdResponse("12345"));
+
+        String authToken = getAuthToken(researcher.getEmail(), password);
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        try {
+
+            getClient(getAuthToken(researcher.getEmail(), password))
+                .perform(post("/api/cris/orcidhistories")
+                    .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                    .content("/api/cris/orcidqueues/" + orcidQueue.getID()))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            getClient(authToken).perform(get("/api/cris/orcidhistories/" + idRef.get()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.allOf(
+                    hasJsonPath("$.id", is(idRef.get())),
+                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.entityId", is(project.getID().toString())),
+                    hasJsonPath("$.status", is(201)),
+                    hasJsonPath("$.putCode", is("12345")),
+                    hasJsonPath("$.type", is("orcidhistory")))));
+
+        } finally {
+            OrcidHistoryBuilder.deleteOrcidHistory(idRef.get());
+        }
+
+        assertThat(context.reloadEntity(orcidQueue), nullValue());
+
+        ArgumentCaptor<Object> captor = ArgumentCaptor.forClass(Object.class);
+        verify(orcidClientMock).push(eq(ACCESS_TOKEN), eq(ORCID), captor.capture());
+
+        Object sentObject = captor.getValue();
+        assertThat(sentObject, instanceOf(Funding.class));
+
+        Funding funding = (Funding) sentObject;
+        assertThat(funding.getPutCode(), nullValue());
+        assertThat(funding.getTitle().getTitle().getContent(), is("Test project"));
+        assertThat(funding.getStartDate(), matches(date("2013", "08", "03")));
+
+        verifyNoMoreInteractions(orcidClientMock);
+
+    }
+
+    @Test
+    public void testCreationForProjectInsertWithOrcidClientException() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Collection projects = CollectionBuilder.createCollection(context, parentCommunity)
+            .withEntityType("Project")
+            .withName("Collection 3")
+            .build();
+
+        Item project = ItemBuilder.createItem(context, projects)
+            .withTitle("Test project")
+            .withProjectStartDate("2013-08-03")
+            .build();
+
+        OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, profile, project)
+            .withDescription("Test project")
+            .withOperation(OrcidOperation.INSERT)
+            .withRecordType("Project")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        when(orcidClientMock.push(eq(ACCESS_TOKEN), eq(ORCID), any()))
+            .thenThrow(new OrcidClientException(400, "Invalid resource"));
+
+        String authToken = getAuthToken(researcher.getEmail(), password);
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        try {
+
+            getClient(getAuthToken(researcher.getEmail(), password))
+                .perform(post("/api/cris/orcidhistories")
+                    .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                    .content("/api/cris/orcidqueues/" + orcidQueue.getID()))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            getClient(authToken).perform(get("/api/cris/orcidhistories/" + idRef.get()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.allOf(
+                    hasJsonPath("$.id", is(idRef.get())),
+                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.entityId", is(project.getID().toString())),
+                    hasJsonPath("$.responseMessage", is("Invalid resource")),
+                    hasJsonPath("$.status", is(400)),
+                    hasJsonPath("$.putCode", nullValue()),
+                    hasJsonPath("$.type", is("orcidhistory")))));
+
+        } finally {
+            OrcidHistoryBuilder.deleteOrcidHistory(idRef.get());
+        }
+
+        assertThat(context.reloadEntity(orcidQueue), notNullValue());
+
+        verify(orcidClientMock).push(eq(ACCESS_TOKEN), eq(ORCID), any(Funding.class));
+        verifyNoMoreInteractions(orcidClientMock);
+
+    }
+
+    @Test
+    public void testCreationForProjectInsertWithGenericException() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Collection projects = CollectionBuilder.createCollection(context, parentCommunity)
+            .withEntityType("Project")
+            .withName("Collection 3")
+            .build();
+
+        Item project = ItemBuilder.createItem(context, projects)
+            .withTitle("Test project")
+            .withProjectStartDate("2013-08-03")
+            .build();
+
+        OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, profile, project)
+            .withDescription("Test project")
+            .withOperation(OrcidOperation.INSERT)
+            .withRecordType("Project")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        when(orcidClientMock.push(eq(ACCESS_TOKEN), eq(ORCID), any()))
+            .thenThrow(new RuntimeException("GENERIC ERROR"));
+
+        String authToken = getAuthToken(researcher.getEmail(), password);
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        try {
+
+            getClient(getAuthToken(researcher.getEmail(), password))
+                .perform(post("/api/cris/orcidhistories")
+                    .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                    .content("/api/cris/orcidqueues/" + orcidQueue.getID()))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            getClient(authToken).perform(get("/api/cris/orcidhistories/" + idRef.get()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.allOf(
+                    hasJsonPath("$.id", is(idRef.get())),
+                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.entityId", is(project.getID().toString())),
+                    hasJsonPath("$.responseMessage", is("GENERIC ERROR")),
+                    hasJsonPath("$.status", is(500)),
+                    hasJsonPath("$.putCode", nullValue()),
+                    hasJsonPath("$.type", is("orcidhistory")))));
+
+        } finally {
+            OrcidHistoryBuilder.deleteOrcidHistory(idRef.get());
+        }
+
+        assertThat(context.reloadEntity(orcidQueue), notNullValue());
+
+        verify(orcidClientMock).push(eq(ACCESS_TOKEN), eq(ORCID), any(Funding.class));
+        verifyNoMoreInteractions(orcidClientMock);
+
+    }
+
+    @Test
+    public void testCreationForProjectUpdate() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Collection projects = CollectionBuilder.createCollection(context, parentCommunity)
+            .withEntityType("Project")
+            .withName("Collection 3")
+            .build();
+
+        Item project = ItemBuilder.createItem(context, projects)
+            .withTitle("Test project")
+            .withProjectStartDate("2013-08-03")
+            .build();
+
+        OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, profile, project)
+            .withDescription("Test project")
+            .withOperation(OrcidOperation.UPDATE)
+            .withRecordType("Project")
+            .withPutCode("12345")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        when(orcidClientMock.update(eq(ACCESS_TOKEN), eq(ORCID), any(), eq("12345")))
+            .thenReturn(updatedResponse("12345"));
+
+        String authToken = getAuthToken(researcher.getEmail(), password);
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        try {
+
+            getClient(getAuthToken(researcher.getEmail(), password))
+                .perform(post("/api/cris/orcidhistories")
+                    .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                    .content("/api/cris/orcidqueues/" + orcidQueue.getID()))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            getClient(authToken).perform(get("/api/cris/orcidhistories/" + idRef.get()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.allOf(
+                    hasJsonPath("$.id", is(idRef.get())),
+                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.entityId", is(project.getID().toString())),
+                    hasJsonPath("$.status", is(200)),
+                    hasJsonPath("$.putCode", is("12345")),
+                    hasJsonPath("$.type", is("orcidhistory")))));
+
+        } finally {
+            OrcidHistoryBuilder.deleteOrcidHistory(idRef.get());
+        }
+
+        assertThat(context.reloadEntity(orcidQueue), nullValue());
+
+        ArgumentCaptor<Object> captor = ArgumentCaptor.forClass(Object.class);
+        verify(orcidClientMock).update(eq(ACCESS_TOKEN), eq(ORCID), captor.capture(), eq("12345"));
+
+        Object sentObject = captor.getValue();
+        assertThat(sentObject, instanceOf(Funding.class));
+
+        Funding funding = (Funding) sentObject;
+        assertThat(funding.getPutCode(), is(12345L));
+        assertThat(funding.getTitle().getTitle().getContent(), is("Test project"));
+        assertThat(funding.getStartDate(), matches(date("2013", "08", "03")));
+
+        verifyNoMoreInteractions(orcidClientMock);
+
+    }
+
+    @Test
+    public void testCreationForProjectDeletion() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        OrcidQueue orcidQueue = createOrcidQueue(context, profile, "Description", "Project", "12345").build();
+        context.restoreAuthSystemState();
+
+        when(orcidClientMock.deleteByPutCode(ACCESS_TOKEN, ORCID, "12345", "/funding")).thenReturn(deletedResponse());
+
+        String authToken = getAuthToken(researcher.getEmail(), password);
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        try {
+
+            getClient(getAuthToken(researcher.getEmail(), password))
+                .perform(post("/api/cris/orcidhistories")
+                    .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                    .content("/api/cris/orcidqueues/" + orcidQueue.getID()))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            getClient(authToken).perform(get("/api/cris/orcidhistories/" + idRef.get()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.allOf(
+                    hasJsonPath("$.id", is(idRef.get())),
+                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.entityId", nullValue()),
+                    hasJsonPath("$.status", is(204)),
+                    hasJsonPath("$.putCode", nullValue()),
+                    hasJsonPath("$.type", is("orcidhistory")))));
+
+        } finally {
+            OrcidHistoryBuilder.deleteOrcidHistory(idRef.get());
+        }
+
+        assertThat(context.reloadEntity(orcidQueue), nullValue());
+
+        verify(orcidClientMock).deleteByPutCode(ACCESS_TOKEN, ORCID, "12345", "/funding");
+        verifyNoMoreInteractions(orcidClientMock);
+
+    }
+
+    private Predicate<? super FuzzyDate> date(String year, String month, String days) {
         return date -> date != null
             && year.equals(date.getYear().getValue())
             && month.equals(date.getMonth().getValue())

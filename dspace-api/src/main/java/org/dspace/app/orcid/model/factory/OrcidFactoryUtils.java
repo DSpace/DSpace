@@ -53,7 +53,7 @@ public final class OrcidFactoryUtils {
      * @return                       the configuration sections
      * @throws IllegalStateException if the given configuration is not valid
      */
-    public static String[] parseConfiguration(String configuration) {
+    private static String[] parseConfiguration(String configuration) {
         String[] configurations = configuration.split("::");
         if (configurations.length != 2) {
             throw new IllegalStateException(

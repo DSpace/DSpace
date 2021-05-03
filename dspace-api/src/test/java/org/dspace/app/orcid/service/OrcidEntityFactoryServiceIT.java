@@ -7,6 +7,7 @@
  */
 package org.dspace.app.orcid.service;
 
+import static org.apache.commons.lang.StringUtils.endsWith;
 import static org.dspace.app.matcher.LambdaMatcher.matches;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -17,6 +18,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.orcid.jaxb.model.common.ContributorRole.AUTHOR;
+import static org.orcid.jaxb.model.common.FundingContributorRole.CO_LEAD;
+import static org.orcid.jaxb.model.common.FundingContributorRole.LEAD;
 import static org.orcid.jaxb.model.common.SequenceType.ADDITIONAL;
 import static org.orcid.jaxb.model.common.SequenceType.FIRST;
 
@@ -33,12 +36,19 @@ import org.dspace.content.Item;
 import org.junit.Before;
 import org.junit.Test;
 import org.orcid.jaxb.model.common.ContributorRole;
+import org.orcid.jaxb.model.common.FundingContributorRole;
 import org.orcid.jaxb.model.common.Relationship;
 import org.orcid.jaxb.model.common.SequenceType;
 import org.orcid.jaxb.model.v3.release.common.Contributor;
-import org.orcid.jaxb.model.v3.release.common.PublicationDate;
+import org.orcid.jaxb.model.v3.release.common.ContributorEmail;
+import org.orcid.jaxb.model.v3.release.common.ContributorOrcid;
+import org.orcid.jaxb.model.v3.release.common.FuzzyDate;
+import org.orcid.jaxb.model.v3.release.common.Url;
 import org.orcid.jaxb.model.v3.release.record.Activity;
 import org.orcid.jaxb.model.v3.release.record.ExternalID;
+import org.orcid.jaxb.model.v3.release.record.Funding;
+import org.orcid.jaxb.model.v3.release.record.FundingContributor;
+import org.orcid.jaxb.model.v3.release.record.FundingContributors;
 import org.orcid.jaxb.model.v3.release.record.Work;
 
 /**
@@ -135,6 +145,7 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
         assertThat(work.getWorkTitle().getTitle(), notNullValue());
         assertThat(work.getWorkTitle().getTitle().getContent(), is("Test publication"));
         assertThat(work.getWorkContributors(), notNullValue());
+        assertThat(work.getUrl(), matches(urlEndsWith(publication.getHandle())));
 
         List<Contributor> contributors = work.getWorkContributors().getContributor();
         assertThat(contributors, hasSize(2));
@@ -152,6 +163,66 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
 
     }
 
+    @Test
+    public void testFundingCreation() {
+        context.turnOffAuthorisationSystem();
+
+        Item investigator = ItemBuilder.createItem(context, persons)
+            .withTitle("Jesse Pinkman")
+            .withPersonEmail("test@test.it")
+            .build();
+
+        Item orgUnit = ItemBuilder.createItem(context, orgUnits)
+            .withTitle("4Science")
+            .withOrgUnitCountry("IT")
+            .withOrgUnitLocality("Milan")
+            .withOrgUnitCrossrefIdentifier("12345")
+            .build();
+
+        Item project = ItemBuilder.createItem(context, projects)
+            .withTitle("Test project")
+            .withProjectStartDate("2001-03")
+            .withProjectEndDate("2010-03-25")
+            .withProjectCoordinator("4Science", orgUnit.getID().toString())
+            .withProjectInvestigator("Walter White")
+            .withProjectInvestigator("Jesse Pinkman", investigator.getID().toString())
+            .withProjectCoinvestigators("Mario Rossi")
+            .withInternalId("888-666-444")
+            .withUrlIdentifier("www.test.com")
+            .withDescriptionAbstract("This is a project to test orcid mapping")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        Activity activity = entityFactoryService.createOrcidObject(context, project);
+        assertThat(activity, instanceOf(Funding.class));
+
+        Funding funding = (Funding) activity;
+        assertThat(funding.getTitle(), notNullValue());
+        assertThat(funding.getTitle().getTitle(), notNullValue());
+        assertThat(funding.getTitle().getTitle().getContent(), is("Test project"));
+        assertThat(funding.getStartDate(), matches(date("2001", "03", "01")));
+        assertThat(funding.getEndDate(), matches(date("2010", "03", "25")));
+        assertThat(funding.getDescription(), is("This is a project to test orcid mapping"));
+        assertThat(funding.getUrl(), matches(urlEndsWith(project.getHandle())));
+
+        FundingContributors fundingContributors = funding.getContributors();
+        assertThat(fundingContributors, notNullValue());
+
+        List<FundingContributor> contributors = fundingContributors.getContributor();
+        assertThat(contributors, hasSize(3));
+        assertThat(contributors, hasItem(matches(fundingContributor("Walter White", LEAD))));
+        assertThat(contributors, hasItem(matches(fundingContributor("Jesse Pinkman", LEAD, "test@test.it"))));
+        assertThat(contributors, hasItem(matches(fundingContributor("Mario Rossi", CO_LEAD))));
+
+        assertThat(funding.getExternalIdentifiers(), notNullValue());
+
+        List<ExternalID> externalIds = funding.getExternalIdentifiers().getExternalIdentifier();
+        assertThat(externalIds, hasSize(2));
+        assertThat(externalIds, hasItem(matches(externalId("other-id", "888-666-444"))));
+        assertThat(externalIds, hasItem(matches(externalId("uri", "www.test.com"))));
+    }
+
     private Predicate<ExternalID> externalId(String type, String value) {
         return externalId -> externalId.getRelationship() == Relationship.SELF
             && type.equals(externalId.getType())
@@ -164,24 +235,46 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
             && contributor.getContributorAttributes().getContributorSequence() == sequence;
     }
 
-    private Predicate<Contributor> contributor(String orcid, String email) {
-        return contributor -> contributor.getContributorEmail() != null
-            && email.equals(contributor.getContributorEmail().getValue())
-            && contributor.getContributorOrcid() != null
-            && orcid.equals(contributor.getContributorOrcid().getPath())
-            && "https://sandbox.orcid.org".equals(contributor.getContributorOrcid().getHost())
-            && ("https://sandbox.orcid.org/" + orcid).equals(contributor.getContributorOrcid().getUri());
+    private Predicate<FundingContributor> fundingContributor(String name, FundingContributorRole role) {
+        return contributor -> contributor.getCreditName().getContent().equals(name)
+            && contributor.getContributorAttributes().getContributorRole() == role;
     }
 
-    private Predicate<Contributor> contributor(String name, ContributorRole role, SequenceType sequence, String orcid,
-        String email) {
+    private Predicate<FundingContributor> fundingContributor(String name, FundingContributorRole role, String email) {
+        return fundingContributor(name, role)
+            .and(fundingContributor -> sameEmail(fundingContributor.getContributorEmail(), email))
+            .and(fundingContributor -> fundingContributor.getContributorOrcid() == null);
+    }
+
+    private Predicate<Contributor> contributor(String orcid, String email) {
+        return contributor -> sameEmail(contributor.getContributorEmail(), email)
+            && sameOrcid(contributor.getContributorOrcid(), orcid);
+    }
+
+    private boolean sameEmail(ContributorEmail contributorEmail, String email) {
+        return contributorEmail != null && email.equals(contributorEmail.getValue());
+    }
+
+    private boolean sameOrcid(ContributorOrcid contributorOrcid, String orcid) {
+        return contributorOrcid != null
+            && orcid.equals(contributorOrcid.getPath())
+            && "https://sandbox.orcid.org".equals(contributorOrcid.getHost())
+            && ("https://sandbox.orcid.org/" + orcid).equals(contributorOrcid.getUri());
+    }
+
+    private Predicate<Contributor> contributor(String name, ContributorRole role, SequenceType sequence,
+        String orcid, String email) {
         return contributor(name, role, sequence).and(contributor(orcid, email));
     }
 
-    private Predicate<PublicationDate> date(String year, String month, String days) {
+    private Predicate<? super FuzzyDate> date(String year, String month, String days) {
         return date -> date != null
             && year.equals(date.getYear().getValue())
             && month.equals(date.getMonth().getValue())
             && days.equals(date.getDay().getValue());
+    }
+
+    private Predicate<Url> urlEndsWith(String handle) {
+        return url -> url != null && url.getValue() != null && endsWith(url.getValue(), handle);
     }
 }

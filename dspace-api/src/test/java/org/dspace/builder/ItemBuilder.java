@@ -551,6 +551,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "organization", "identifier", "rin", identifier);
     }
 
+    public ItemBuilder withOrgUnitCrossrefIdentifier(String crossrefid) {
+        return addMetadataValue(item, "organization", "identifier", "crossrefid", crossrefid);
+    }
+
     public ItemBuilder withParentOrganization(String parent) {
         return addMetadataValue(item, "organization", "parentOrganization", null, parent);
     }

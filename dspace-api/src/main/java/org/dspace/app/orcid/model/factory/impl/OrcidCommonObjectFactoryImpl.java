@@ -39,6 +39,7 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.util.MultiFormatDateParser;
 import org.dspace.util.UUIDUtils;
 import org.orcid.jaxb.model.common.ContributorRole;
+import org.orcid.jaxb.model.common.FundingContributorRole;
 import org.orcid.jaxb.model.common.Iso3166Country;
 import org.orcid.jaxb.model.v3.release.common.Contributor;
 import org.orcid.jaxb.model.v3.release.common.ContributorAttributes;
@@ -51,6 +52,8 @@ import org.orcid.jaxb.model.v3.release.common.OrcidIdBase;
 import org.orcid.jaxb.model.v3.release.common.Organization;
 import org.orcid.jaxb.model.v3.release.common.OrganizationAddress;
 import org.orcid.jaxb.model.v3.release.common.Url;
+import org.orcid.jaxb.model.v3.release.record.FundingContributor;
+import org.orcid.jaxb.model.v3.release.record.FundingContributorAttributes;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -136,6 +139,27 @@ public class OrcidCommonObjectFactoryImpl implements OrcidCommonObjectFactory {
     }
 
     @Override
+    public Optional<FundingContributor> createFundingContributor(Context context, MetadataValue metadataValue,
+        FundingContributorRole role) {
+
+        if (isUnprocessableValue(metadataValue)) {
+            return empty();
+        }
+
+        FundingContributor contributor = new FundingContributor();
+        contributor.setCreditName(new CreditName(metadataValue.getValue()));
+        contributor.setContributorAttributes(getFundingContributorAttributes(metadataValue, role));
+
+        Item authorItem = findItem(context, UUIDUtils.fromString(metadataValue.getAuthority()));
+        if (authorItem != null) {
+            contributor.setContributorEmail(getContributorEmail(authorItem));
+            contributor.setContributorOrcid(getContributorOrcid(authorItem));
+        }
+
+        return of(contributor);
+    }
+
+    @Override
     public Optional<Url> createUrl(Context context, Item item) {
         String handle = item.getHandle();
         if (StringUtils.isBlank(handle)) {
@@ -182,6 +206,13 @@ public class OrcidCommonObjectFactoryImpl implements OrcidCommonObjectFactory {
         address.setCity(getMetadataValue(organizationItem, organizationCityField));
         address.setCountry(Iso3166Country.fromValue(getMetadataValue(organizationItem, organizationCountryField)));
         return address;
+    }
+
+    private FundingContributorAttributes getFundingContributorAttributes(MetadataValue metadataValue,
+        FundingContributorRole role) {
+        FundingContributorAttributes attributes = new FundingContributorAttributes();
+        attributes.setContributorRole(role);
+        return attributes;
     }
 
     private DisambiguatedOrganization createDisambiguatedOrganization(Item organizationItem) {

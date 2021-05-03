@@ -131,6 +131,17 @@ public interface OrcidHistoryService {
     List<OrcidHistory> findSuccessfullyRecordsByEntityAndType(Context context, Item entity, String recordType)
         throws SQLException;
 
+    /**
+     * Synchronize the entity related to the given orcidQueue record with ORCID.
+     *
+     * @param  context       DSpace context object
+     * @param  orcidQueue    the orcid queue record that has the references of the
+     *                       data to be synchronized
+     * @param  forceAddition to force the insert on the ORCID registry
+     * @return               the created orcid history record with the
+     *                       synchronization result
+     * @throws SQLException  if database error
+     */
     public OrcidHistory synchronizeWithOrcid(Context context, OrcidQueue orcidQueue, boolean forceAddition)
         throws SQLException;
 
