@@ -179,7 +179,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient("unvalidToken").perform(
             get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_VISITS_REPORT_ID))
                                  // ** THEN **
-                                 .andExpect(status().isForbidden());
+                                 .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -829,7 +829,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
             .perform(get("/api/statistics/usagereports/search/object?uri=http://localhost:8080/server/api/core" +
                          "/items/" + itemNotVisitedWithBitstreams.getID()))
             // ** THEN **
-            .andExpect(status().isForbidden());
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
