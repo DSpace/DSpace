@@ -122,7 +122,7 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
         //When we call this facets endpoint
         getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT))
             //We expect a 403 Forbidden status
-            .andExpect(status().isForbidden());
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -193,7 +193,7 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
         //When we call this facets endpoint
         getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + workflowName))
             //We expect a 403 Forbidden status
-            .andExpect(status().isForbidden());
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -403,7 +403,7 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
         getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + defaultWorkflow.getID()
             + "/collections"))
             //We expect a 403 Forbidden status
-            .andExpect(status().isForbidden());
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -442,7 +442,7 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
         getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + defaultWorkflow.getID()
             + "/steps"))
             //We expect a 403 Forbidden status
-            .andExpect(status().isForbidden());
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
