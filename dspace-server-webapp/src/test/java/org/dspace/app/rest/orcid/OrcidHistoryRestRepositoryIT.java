@@ -128,6 +128,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
             .withAuthor("Josiah, Carberry")
             .withTitle("A Methodology for the Emulation of Architecture")
             .withIssueDate("2013-08-03")
+            .withType("Controlled Vocabulary for Resource Type Genres:text::book ")
             .build();
 
         context.restoreAuthSystemState();
@@ -717,9 +718,23 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
             .withName("Collection 3")
             .build();
 
+        Collection orgUnits = CollectionBuilder.createCollection(context, parentCommunity)
+            .withEntityType("OrgUnit")
+            .withName("Collection 4")
+            .build();
+
+        Item orgUnit = ItemBuilder.createItem(context, orgUnits)
+            .withTitle("4Science")
+            .withOrgUnitCountry("IT")
+            .withOrgUnitLocality("Milan")
+            .withOrgUnitCrossrefIdentifier("12345")
+            .build();
+
         Item project = ItemBuilder.createItem(context, projects)
             .withTitle("Test project")
             .withProjectStartDate("2013-08-03")
+            .withInternalId("888-666-444")
+            .withProjectCoordinator("4Science", orgUnit.getID().toString())
             .build();
 
         OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, profile, project)
@@ -785,9 +800,23 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
             .withName("Collection 3")
             .build();
 
+        Collection orgUnits = CollectionBuilder.createCollection(context, parentCommunity)
+            .withEntityType("OrgUnit")
+            .withName("Collection 4")
+            .build();
+
+        Item orgUnit = ItemBuilder.createItem(context, orgUnits)
+            .withTitle("4Science")
+            .withOrgUnitCountry("IT")
+            .withOrgUnitLocality("Milan")
+            .withOrgUnitCrossrefIdentifier("12345")
+            .build();
+
         Item project = ItemBuilder.createItem(context, projects)
             .withTitle("Test project")
             .withProjectStartDate("2013-08-03")
+            .withInternalId("888-666-444")
+            .withProjectCoordinator("4Science", orgUnit.getID().toString())
             .build();
 
         OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, profile, project)
@@ -845,9 +874,23 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
             .withName("Collection 3")
             .build();
 
+        Collection orgUnits = CollectionBuilder.createCollection(context, parentCommunity)
+            .withEntityType("OrgUnit")
+            .withName("Collection 4")
+            .build();
+
+        Item orgUnit = ItemBuilder.createItem(context, orgUnits)
+            .withTitle("4Science")
+            .withOrgUnitCountry("IT")
+            .withOrgUnitLocality("Milan")
+            .withOrgUnitCrossrefIdentifier("12345")
+            .build();
+
         Item project = ItemBuilder.createItem(context, projects)
             .withTitle("Test project")
             .withProjectStartDate("2013-08-03")
+            .withInternalId("888-666-444")
+            .withProjectCoordinator("4Science", orgUnit.getID().toString())
             .build();
 
         OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, profile, project)
@@ -905,9 +948,23 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
             .withName("Collection 3")
             .build();
 
+        Collection orgUnits = CollectionBuilder.createCollection(context, parentCommunity)
+            .withEntityType("OrgUnit")
+            .withName("Collection 4")
+            .build();
+
+        Item orgUnit = ItemBuilder.createItem(context, orgUnits)
+            .withTitle("4Science")
+            .withOrgUnitCountry("IT")
+            .withOrgUnitLocality("Milan")
+            .withOrgUnitCrossrefIdentifier("12345")
+            .build();
+
         Item project = ItemBuilder.createItem(context, projects)
             .withTitle("Test project")
             .withProjectStartDate("2013-08-03")
+            .withInternalId("888-666-444")
+            .withProjectCoordinator("4Science", orgUnit.getID().toString())
             .build();
 
         OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, profile, project)
@@ -1003,6 +1060,55 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
         assertThat(context.reloadEntity(orcidQueue), nullValue());
 
         verify(orcidClientMock).deleteByPutCode(ACCESS_TOKEN, ORCID, "12345", "/funding");
+        verifyNoMoreInteractions(orcidClientMock);
+
+    }
+
+    @Test
+    public void testWithInvalidProject() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Collection projects = CollectionBuilder.createCollection(context, parentCommunity)
+            .withEntityType("Project")
+            .withName("Collection 3")
+            .build();
+
+        Collection orgUnits = CollectionBuilder.createCollection(context, parentCommunity)
+            .withEntityType("OrgUnit")
+            .withName("Collection 4")
+            .build();
+
+        Item orgUnit = ItemBuilder.createItem(context, orgUnits)
+            .withTitle("4Science")
+            .withOrgUnitCountry("IT")
+            .withOrgUnitCrossrefIdentifier("12345")
+            .build();
+
+        Item project = ItemBuilder.createItem(context, projects)
+            .withTitle("Test project")
+            .withProjectStartDate("2013-08-03")
+            .withInternalId("888-666-444")
+            .withProjectCoordinator("4Science", orgUnit.getID().toString())
+            .build();
+
+        OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, profile, project)
+            .withDescription("Test project")
+            .withOperation(OrcidOperation.INSERT)
+            .withRecordType("Project")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        when(orcidClientMock.push(eq(ACCESS_TOKEN), eq(ORCID), any())).thenReturn(createdResponse("12345"));
+
+        getClient(getAuthToken(researcher.getEmail(), password))
+            .perform(post("/api/cris/orcidhistories")
+                .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                .content("/api/cris/orcidqueues/" + orcidQueue.getID()))
+            .andExpect(status().isUnprocessableEntity());
+
+        assertThat(context.reloadEntity(orcidQueue), notNullValue());
         verifyNoMoreInteractions(orcidClientMock);
 
     }

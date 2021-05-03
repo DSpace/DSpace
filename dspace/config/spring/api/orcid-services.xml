@@ -31,6 +31,8 @@
     <bean class="org.dspace.app.orcid.client.OrcidClientImpl" />
     <bean id="metadataSignatureGenerator" class="org.dspace.app.orcid.service.impl.PlainMetadataSignatureGeneratorImpl" />
     
+    <bean class="org.dspace.app.orcid.model.validator.impl.OrcidValidatorImpl" />
+    
     <bean class="org.dspace.app.orcid.service.impl.OrcidEntityFactoryServiceImpl">
     	<constructor-arg name="itemService" ref="org.dspace.content.ItemServiceImpl" />
     	<constructor-arg name="entityFactories">

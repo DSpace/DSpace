@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.HttpStatus;
 import org.dspace.app.orcid.OrcidHistory;
 import org.dspace.app.orcid.OrcidOperation;
@@ -29,8 +30,11 @@ import org.dspace.app.orcid.client.OrcidResponse;
 import org.dspace.app.orcid.dao.OrcidHistoryDAO;
 import org.dspace.app.orcid.dao.OrcidQueueDAO;
 import org.dspace.app.orcid.exception.OrcidClientException;
+import org.dspace.app.orcid.exception.OrcidValidationException;
 import org.dspace.app.orcid.model.OrcidEntityType;
 import org.dspace.app.orcid.model.OrcidProfileSectionType;
+import org.dspace.app.orcid.model.validator.OrcidValidationError;
+import org.dspace.app.orcid.model.validator.OrcidValidator;
 import org.dspace.app.orcid.service.MetadataSignatureGenerator;
 import org.dspace.app.orcid.service.OrcidEntityFactoryService;
 import org.dspace.app.orcid.service.OrcidHistoryService;
@@ -76,6 +80,9 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
 
     @Autowired
     private OrcidClient orcidClient;
+
+    @Autowired
+    private OrcidValidator orcidValidator;
 
     @Override
     public OrcidHistory find(Context context, int id) throws SQLException {
@@ -165,6 +172,8 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
             orcidQueueDAO.delete(context, orcidQueue);
             return orcidHistory;
 
+        } catch (OrcidValidationException ex) {
+            throw ex;
         } catch (OrcidClientException ex) {
             return createHistoryRecordFromOrcidError(context, orcidQueue, operation, ex);
         } catch (RuntimeException ex) {
@@ -218,6 +227,12 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         boolean toUpdate) {
 
         Activity activity = activityFactoryService.createOrcidObject(context, orcidQueue.getEntity());
+
+        List<OrcidValidationError> validationErrors = orcidValidator.validate(activity);
+        if (CollectionUtils.isNotEmpty(validationErrors)) {
+            throw new OrcidValidationException(validationErrors);
+        }
+
         if (toUpdate) {
             activity.setPutCode(getPutCode(orcidQueue));
             return orcidClient.update(token, orcid, activity, orcidQueue.getPutCode());
@@ -235,6 +250,11 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
 
         List<MetadataValue> metadataValues = metadataSignatureGenerator.findBySignature(context, person, signature);
         Object orcidObject = profileFactoryService.createOrcidObject(context, metadataValues, recordType);
+
+        List<OrcidValidationError> validationErrors = orcidValidator.validate(orcidObject);
+        if (CollectionUtils.isNotEmpty(validationErrors)) {
+            throw new OrcidValidationException(validationErrors);
+        }
 
         return orcidClient.push(token, orcid, orcidObject);
     }
