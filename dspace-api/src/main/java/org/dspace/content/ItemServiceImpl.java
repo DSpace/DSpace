@@ -1500,7 +1500,7 @@ prevent the generation of resource policy entry values with null dspace_object a
     private void createOrcidQueueRecordsToDeleteOnOrcid(Context context, Item entity) throws SQLException {
 
         String entityType = getEntityType(entity);
-        if ("Person".equals(entityType)) {
+        if (getProfileType().equals(entityType)) {
             return;
         }
 
@@ -1516,9 +1516,14 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     private void deleteOrcidHistoryRecords(Context context, Item item) throws SQLException {
-        List<OrcidHistory> orcidHistoryRecords = orcidHistoryService.findByOwnerOrEntity(context, item);
-        for (OrcidHistory orcidHistoryRecord : orcidHistoryRecords) {
-            orcidHistoryService.delete(context, orcidHistoryRecord);
+        List<OrcidHistory> historyRecords = orcidHistoryService.findByOwnerOrEntity(context, item);
+        for (OrcidHistory historyRecord : historyRecords) {
+            if (historyRecord.getOwner().equals(item)) {
+                orcidHistoryService.delete(context, historyRecord);
+            } else {
+                historyRecord.setEntity(null);
+                orcidHistoryService.update(context, historyRecord);
+            }
         }
     }
 
@@ -1527,6 +1532,10 @@ prevent the generation of resource policy entry values with null dspace_object a
         for (OrcidQueue orcidQueueRecord : orcidQueueRecords) {
             orcidQueueService.delete(context, orcidQueueRecord);
         }
+    }
+
+    private String getProfileType() {
+        return configurationService.getProperty("researcher-profile.type", "Person");
     }
 
 }

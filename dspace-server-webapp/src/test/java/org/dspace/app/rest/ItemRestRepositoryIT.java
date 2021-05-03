@@ -23,6 +23,7 @@ import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -46,6 +47,7 @@ import javax.ws.rs.core.MediaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
+import org.dspace.app.orcid.OrcidHistory;
 import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.service.OrcidHistoryService;
 import org.dspace.app.orcid.service.OrcidQueueService;
@@ -3648,11 +3650,12 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         createOrcidQueue(context, firstProfile, publication).build();
         createOrcidQueue(context, secondProfile, publication).build();
 
-        createOrcidHistory(context, firstProfile, publication).build();
-        createOrcidHistory(context, firstProfile, publication).withPutCode("12345").build();
-        createOrcidHistory(context, secondProfile, publication).build();
-        createOrcidHistory(context, secondProfile, publication).withPutCode("67891").build();
-        createOrcidHistory(context, thirdProfile, publication).withPutCode("98765").build();
+        List<OrcidHistory> historyRecords = new ArrayList<OrcidHistory>();
+        historyRecords.add(createOrcidHistory(context, firstProfile, publication).build());
+        historyRecords.add(createOrcidHistory(context, firstProfile, publication).withPutCode("12345").build());
+        historyRecords.add(createOrcidHistory(context, secondProfile, publication).build());
+        historyRecords.add(createOrcidHistory(context, secondProfile, publication).withPutCode("67891").build());
+        historyRecords.add(createOrcidHistory(context, thirdProfile, publication).withPutCode("98765").build());
 
         context.restoreAuthSystemState();
 
@@ -3665,6 +3668,12 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         assertThat(orcidQueueRecords, hasSize(2));
         assertThat(orcidQueueRecords, hasItem(matches(firstProfile, null, "Publication", "12345", DELETE)));
         assertThat(orcidQueueRecords, hasItem(matches(thirdProfile, null, "Publication", "98765", DELETE)));
+
+        for (OrcidHistory historyRecord : historyRecords) {
+            historyRecord = context.reloadEntity(historyRecord);
+            assertThat(historyRecord, notNullValue());
+            assertThat(historyRecord.getEntity(), nullValue());
+        }
     }
 
     @Test
@@ -3716,11 +3725,12 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         createOrcidQueue(context, firstProfile, project).build();
         createOrcidQueue(context, secondProfile, project).build();
 
-        createOrcidHistory(context, firstProfile, project).build();
-        createOrcidHistory(context, firstProfile, project).withPutCode("12345").build();
-        createOrcidHistory(context, secondProfile, project).build();
-        createOrcidHistory(context, secondProfile, project).withPutCode("67891").build();
-        createOrcidHistory(context, thirdProfile, project).build();
+        List<OrcidHistory> historyRecords = new ArrayList<OrcidHistory>();
+        historyRecords.add(createOrcidHistory(context, firstProfile, project).build());
+        historyRecords.add(createOrcidHistory(context, firstProfile, project).withPutCode("12345").build());
+        historyRecords.add(createOrcidHistory(context, secondProfile, project).build());
+        historyRecords.add(createOrcidHistory(context, secondProfile, project).withPutCode("67891").build());
+        historyRecords.add(createOrcidHistory(context, thirdProfile, project).build());
 
         context.restoreAuthSystemState();
 
@@ -3732,6 +3742,13 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
         assertThat(orcidQueueRecords, hasSize(1));
         assertThat(orcidQueueRecords, hasItem(matches(firstProfile, null, "Project", "12345", DELETE)));
+
+        for (OrcidHistory historyRecord : historyRecords) {
+            historyRecord = context.reloadEntity(historyRecord);
+            assertThat(historyRecord, notNullValue());
+            assertThat(historyRecord.getEntity(), nullValue());
+        }
+
     }
 
     private void initPublicationAuthorsRelationships() throws SQLException {
