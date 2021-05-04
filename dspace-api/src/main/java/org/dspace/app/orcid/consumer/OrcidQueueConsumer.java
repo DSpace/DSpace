@@ -41,6 +41,8 @@ import org.dspace.core.Context;
 import org.dspace.core.CrisConstants;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.UUIDUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +67,8 @@ public class OrcidQueueConsumer implements Consumer {
 
     private OrcidProfileSectionFactoryService profileSectionFactoryService;
 
+    private ConfigurationService configurationService;
+
     private List<UUID> alreadyConsumedItems = new ArrayList<>();
 
     @Override
@@ -76,6 +80,7 @@ public class OrcidQueueConsumer implements Consumer {
         this.orcidHistoryService = orcidServiceFactory.getOrcidHistoryService();
         this.orcidSynchronizationService = orcidServiceFactory.getOrcidSynchronizationService();
         this.profileSectionFactoryService = orcidServiceFactory.getOrcidProfileSectionFactoryService();
+        this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
         this.itemService = ContentServiceFactory.getInstance().getItemService();
     }
@@ -112,8 +117,8 @@ public class OrcidQueueConsumer implements Consumer {
 
         if (OrcidEntityType.isValid(entityType)) {
             consumeEntity(context, item);
-        } else if (entityType.equals("Person")) {
-            consumePerson(context, item);
+        } else if (entityType.equals(getProfileType())) {
+            consumeProfile(context, item);
         }
 
         alreadyConsumedItems.add(item.getID());
@@ -138,7 +143,7 @@ public class OrcidQueueConsumer implements Consumer {
 
             Item owner = itemService.find(context, relatedItemUuid);
 
-            if (isNotPersonItem(owner) || isNotLinkedToOrcid(owner)) {
+            if (isNotProfileItem(owner) || isNotLinkedToOrcid(owner)) {
                 continue;
             }
 
@@ -152,19 +157,19 @@ public class OrcidQueueConsumer implements Consumer {
 
     }
 
-    private void consumePerson(Context context, Item item) throws SQLException {
+    private void consumeProfile(Context context, Item item) throws SQLException {
 
         if (isNotLinkedToOrcid(item) || profileShouldNotBeSynchronized(item)) {
             return;
         }
 
         for (OrcidProfileSectionFactory factory : findProfileFactories(item)) {
-            consumePerson(context, item, factory);
+            consumeProfile(context, item, factory);
         }
 
     }
 
-    private void consumePerson(Context context, Item item, OrcidProfileSectionFactory factory) throws SQLException {
+    private void consumeProfile(Context context, Item item, OrcidProfileSectionFactory factory) throws SQLException {
 
         String sectionType = factory.getProfileSectionType().name();
         List<String> signatures = factory.getMetadataSignatures(context, item);
@@ -264,8 +269,8 @@ public class OrcidQueueConsumer implements Consumer {
         return !orcidSynchronizationService.isSynchronizationEnabled(item, item);
     }
 
-    private boolean isNotPersonItem(Item ownerItem) {
-        return !"Person".equals(itemService.getEntityType(ownerItem));
+    private boolean isNotProfileItem(Item ownerItem) {
+        return !getProfileType().equals(itemService.getEntityType(ownerItem));
     }
 
     private boolean isNestedMetadataPlaceholder(MetadataValue metadata) {
@@ -288,6 +293,10 @@ public class OrcidQueueConsumer implements Consumer {
     private List<OrcidProfileSectionFactory> findProfileFactories(Item item) {
         List<OrcidProfileSyncPreference> profilePreferences = orcidSynchronizationService.getProfilePreferences(item);
         return this.profileSectionFactoryService.findByPreferences(profilePreferences);
+    }
+
+    private String getProfileType() {
+        return configurationService.getProperty("researcher-profile.type", "Person");
     }
 
     @Override
