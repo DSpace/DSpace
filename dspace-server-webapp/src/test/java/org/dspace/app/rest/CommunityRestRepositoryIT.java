@@ -2478,4 +2478,118 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/core/communities/search/findAdminAuthorized"))
             .andExpect(status().isUnauthorized());
     }
+
+    @Test
+    public void findAllSearchTopEmbeddedPaginationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .withLogo("ThisIsSomeDummyText")
+                                          .build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Collection 1").build();
+
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 2").build();
+
+        CommunityBuilder.createCommunity(context)
+                        .withName("Parent Community 2")
+                        .withLogo("SomeTest").build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community").build();
+
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 2").build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/communities/search/top")
+                   .param("size", "1")
+                   .param("embed", "subcommunities")
+                   .param("embed", "collections")
+                   .param("embed.size", "subcommunities=1")
+                   .param("embed.size", "collections=1"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
+                                       CommunityMatcher.matchCommunity(parentCommunity))))
+                    // Verify subcommunities
+                   .andExpect(jsonPath("$._embedded.communities[0]._embedded.subcommunities._embedded.subcommunities",
+                              Matchers.contains(CommunityMatcher.matchCommunity(child1))))
+                   .andExpect(jsonPath("$._embedded.communities[0]._embedded.subcommunities._links.self.href",
+                              Matchers.containsString("/api/core/communities/" + parentCommunity.getID()
+                                                    + "/subcommunities?size=1")))
+                   .andExpect(jsonPath("$._embedded.communities[0]._embedded.subcommunities._links.next.href",
+                              Matchers.containsString("/api/core/communities/" + parentCommunity.getID()
+                                                    + "/subcommunities?page=1&size=1")))
+                   .andExpect(jsonPath("$._embedded.communities[0]._embedded.subcommunities._links.last.href",
+                              Matchers.containsString("/api/core/communities/" + parentCommunity.getID()
+                                                    + "/subcommunities?page=1&size=1")))
+                    // Verify collections
+                   .andExpect(jsonPath("$._embedded.communities[0]._embedded.collections._embedded.collections",
+                              Matchers.contains(CollectionMatcher.matchCollection(col))))
+                   .andExpect(jsonPath("$._embedded.communities[0]._embedded.collections._links.self.href",
+                              Matchers.containsString("/api/core/communities/" + parentCommunity.getID()
+                                                    + "/collections?size=1")))
+                   .andExpect(jsonPath("$._embedded.communities[0]._embedded.collections._links.next.href",
+                              Matchers.containsString("/api/core/communities/" + parentCommunity.getID()
+                                                    + "/collections?page=1&size=1")))
+                   .andExpect(jsonPath("$._embedded.communities[0]._embedded.collections._links.last.href",
+                              Matchers.containsString("/api/core/communities/" + parentCommunity.getID()
+                                                    + "/collections?page=1&size=1")))
+
+                   .andExpect(jsonPath("$._links.self.href",
+                              Matchers.containsString("/api/core/communities/search/top?size=1")))
+                   .andExpect(jsonPath("$._links.first.href",
+                              Matchers.containsString("/api/core/communities/search/top?page=0&size=1")))
+                   .andExpect(jsonPath("$._links.next.href",
+                              Matchers.containsString("/api/core/communities/search/top?page=1&size=1")))
+                   .andExpect(jsonPath("$._links.last.href",
+                              Matchers.containsString("/api/core/communities/search/top?page=1&size=1")))
+                   .andExpect(jsonPath("$.page.size", is(1)))
+                   .andExpect(jsonPath("$.page.totalPages", is(2)))
+                   .andExpect(jsonPath("$.page.totalElements", is(2)));
+
+        getClient().perform(get("/api/core/communities/search/top")
+                   .param("size", "1")
+                   .param("embed", "subcommunities")
+                   .param("embed", "collections")
+                   .param("embed.size", "subcommunities=2")
+                   .param("embed.size", "collections=2"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
+                                       CommunityMatcher.matchCommunity(parentCommunity))))
+                    // Verify subcommunities
+                   .andExpect(jsonPath("$._embedded.communities[0]._embedded.subcommunities._embedded.subcommunities",
+                              Matchers.containsInAnyOrder(CommunityMatcher.matchCommunity(child1),
+                                                          CommunityMatcher.matchCommunity(child2)
+                                                          )))
+                   .andExpect(jsonPath("$._embedded.communities[0]._embedded.subcommunities._links.self.href",
+                              Matchers.containsString("/api/core/communities/" + parentCommunity.getID()
+                                                    + "/subcommunities?size=2")))
+                    // Verify collections
+                   .andExpect(jsonPath("$._embedded.communities[0]._embedded.collections._embedded.collections",
+                              Matchers.containsInAnyOrder(CollectionMatcher.matchCollection(col),
+                                                          CollectionMatcher.matchCollection(col2)
+                                                          )))
+                   .andExpect(jsonPath("$._embedded.communities[0]._embedded.collections._links.self.href",
+                              Matchers.containsString("/api/core/communities/" + parentCommunity.getID()
+                                                    + "/collections?size=2")))
+
+                   .andExpect(jsonPath("$._links.self.href",
+                              Matchers.containsString("/api/core/communities/search/top?size=1")))
+                   .andExpect(jsonPath("$._links.first.href",
+                              Matchers.containsString("/api/core/communities/search/top?page=0&size=1")))
+                   .andExpect(jsonPath("$._links.next.href",
+                              Matchers.containsString("/api/core/communities/search/top?page=1&size=1")))
+                   .andExpect(jsonPath("$._links.last.href",
+                              Matchers.containsString("/api/core/communities/search/top?page=1&size=1")))
+                   .andExpect(jsonPath("$.page.size", is(1)))
+                   .andExpect(jsonPath("$.page.totalPages", is(2)))
+                   .andExpect(jsonPath("$.page.totalElements", is(2)));
+    }
+
 }
