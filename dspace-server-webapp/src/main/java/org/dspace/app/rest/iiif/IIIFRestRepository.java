@@ -14,6 +14,7 @@ import org.dspace.app.rest.iiif.service.AnnotationListService;
 import org.dspace.app.rest.iiif.service.CanvasLookupService;
 import org.dspace.app.rest.iiif.service.ManifestService;
 import org.dspace.app.rest.iiif.service.SearchService;
+import org.dspace.app.rest.repository.AbstractDSpaceRestRepository;
 import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
@@ -28,7 +29,7 @@ import org.springframework.stereotype.Component;
  * Repository for IIIF Presentation and Search API requests.
  */
 @Component
-public class IIIFRestRepository {
+public class IIIFRestRepository extends AbstractDSpaceRestRepository {
 
     @Autowired
     ItemService itemService;
@@ -58,15 +59,15 @@ public class IIIFRestRepository {
      *
      * Returns manifest for single DSpace item.
      *
-     * @param context DSpace context
      * @param id DSpace Item uuid
      * @return manifest as JSON
      */
     @Cacheable(key = "#id.toString()", cacheNames = "manifests")
     @PreAuthorize("hasPermission(#id, 'ITEM', 'READ')")
-    public String getManifest(Context context, UUID id)
+    public String getManifest(UUID id)
             throws ResourceNotFoundException {
         Item item;
+        Context context = obtainContext();
         try {
             item = itemService.find(context, id);
         } catch (SQLException e) {
@@ -83,15 +84,15 @@ public class IIIFRestRepository {
      * laying out the different content resources that make up the display. This information
      * should be embedded within a sequence.
      *
-     * @param context DSpace context
      * @param id DSpace item uuid
      * @param canvasId canvas identifier
      * @return canvas as JSON
      */
     @PreAuthorize("hasPermission(#id, 'ITEM', 'READ')")
-    public String getCanvas(Context context, UUID id, String canvasId)
+    public String getCanvas(UUID id, String canvasId)
             throws ResourceNotFoundException {
         Item item;
+        Context context = obtainContext();
         try {
             item = itemService.find(context, id);
         } catch (SQLException e) {
@@ -121,12 +122,12 @@ public class IIIFRestRepository {
     /**
      * Returns annotations for machine readable metadata that describes the resource.
      *
-     * @param context DSpace context
      * @param id the Item uuid
      * @return AnnotationList as JSON
      */
     @PreAuthorize("hasPermission(#id, 'ITEM', 'READ')")
-    public String getSeeAlsoAnnotations(Context context, UUID id) {
+    public String getSeeAlsoAnnotations(UUID id) {
+        Context context = obtainContext();
         return annotationListService.getSeeAlsoAnnotations(context, id);
     }
 
