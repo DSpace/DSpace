@@ -10,6 +10,8 @@ package org.dspace.app.orcid;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -44,17 +46,27 @@ public class OrcidHistory implements ReloadableEntity<Integer> {
     @Column(name = "put_code")
     private String putCode;
 
+    @Column(name = "record_type")
+    private String recordType;
+
+    @Column(name = "description")
+    private String description;
+
+    @Lob
+    @Column(name = "metadata")
+    private String metadata;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "operation")
+    private OrcidOperation operation;
+
     @Lob
     @Column(name = "response_message")
     private String responseMessage;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "timestamp_last_attempt")
-    private Date lastAttempt;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "timestamp_success_attempt")
-    private Date successAttempt;
+    private Date timestamp = new Date();
 
     @Column(name = "status")
     private Integer status;
@@ -112,20 +124,44 @@ public class OrcidHistory implements ReloadableEntity<Integer> {
         this.responseMessage = responseMessage;
     }
 
-    public Date getLastAttempt() {
-        return lastAttempt;
+    public String getRecordType() {
+        return recordType;
     }
 
-    public void setLastAttempt(Date lastAttempt) {
-        this.lastAttempt = lastAttempt;
+    public void setRecordType(String recordType) {
+        this.recordType = recordType;
     }
 
-    public Date getSuccessAttempt() {
-        return successAttempt;
+    public String getMetadata() {
+        return metadata;
     }
 
-    public void setSuccessAttempt(Date successAttempt) {
-        this.successAttempt = successAttempt;
+    public void setMetadata(String metadata) {
+        this.metadata = metadata;
+    }
+
+    public OrcidOperation getOperation() {
+        return operation;
+    }
+
+    public void setOperation(OrcidOperation operation) {
+        this.operation = operation;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Date getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
     }
 
 }

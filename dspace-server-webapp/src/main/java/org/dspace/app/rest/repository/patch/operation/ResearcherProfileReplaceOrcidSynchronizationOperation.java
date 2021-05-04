@@ -7,22 +7,26 @@
  */
 package org.dspace.app.rest.repository.patch.operation;
 
+import static org.dspace.app.orcid.model.OrcidEntityType.PROJECT;
+import static org.dspace.app.orcid.model.OrcidEntityType.PUBLICATION;
+
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.profile.OrcidEntitySynchronizationPreference;
-import org.dspace.app.profile.OrcidProfileSynchronizationPreference;
-import org.dspace.app.profile.OrcidSynchronizationMode;
+import org.dspace.app.orcid.service.OrcidSynchronizationService;
+import org.dspace.app.profile.OrcidEntitySyncPreference;
+import org.dspace.app.profile.OrcidProfileSyncPreference;
+import org.dspace.app.profile.OrcidSyncMode;
 import org.dspace.app.profile.ResearcherProfile;
-import org.dspace.app.profile.service.ProfileSynchronizationWithOrcidConfigurator;
 import org.dspace.app.profile.service.ResearcherProfileService;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -57,7 +61,7 @@ public class ResearcherProfileReplaceOrcidSynchronizationOperation extends Patch
     private ResearcherProfileService profileService;
 
     @Autowired
-    private ProfileSynchronizationWithOrcidConfigurator orcidSynchronizationConfigurator;
+    private OrcidSynchronizationService synchronizationService;
 
     @Override
     public ResearcherProfile perform(Context context, ResearcherProfile profile, Operation operation)
@@ -71,18 +75,20 @@ public class ResearcherProfileReplaceOrcidSynchronizationOperation extends Patch
 
         String value = (String) valueObject;
 
+        Item profileItem = profile.getItem();
+
         switch (path) {
             case PUBLICATIONS_PREFERENCES:
-                orcidSynchronizationConfigurator.setPublicationPreference(context, profile, parsePreference(value));
+                synchronizationService.setEntityPreference(context, profileItem, PUBLICATION, parsePreference(value));
                 break;
             case PROJECTS_PREFERENCES:
-                orcidSynchronizationConfigurator.setProjectPreference(context, profile, parsePreference(value));
+                synchronizationService.setEntityPreference(context, profileItem, PROJECT, parsePreference(value));
                 break;
             case PROFILE_PREFERENCES:
-                orcidSynchronizationConfigurator.setProfilePreference(context, profile, parseProfilePreferences(value));
+                synchronizationService.setProfilePreference(context, profileItem, parseProfilePreferences(value));
                 break;
             case MODE_PREFERENCES:
-                orcidSynchronizationConfigurator.setSynchronizationMode(context, profile, parseMode(value));
+                synchronizationService.setSynchronizationMode(context, profileItem, parseMode(value));
                 break;
             default:
                 throw new UnprocessableEntityException("Invalid path starting with " + OPERATION_ORCID_SYNCH);
@@ -102,7 +108,7 @@ public class ResearcherProfileReplaceOrcidSynchronizationOperation extends Patch
             && operation.getPath().trim().toLowerCase().startsWith(OPERATION_ORCID_SYNCH);
     }
 
-    private List<OrcidProfileSynchronizationPreference> parseProfilePreferences(String value) {
+    private List<OrcidProfileSyncPreference> parseProfilePreferences(String value) {
         return Arrays.stream(value.split(","))
             .map(String::trim)
             .filter(StringUtils::isNotEmpty)
@@ -110,25 +116,25 @@ public class ResearcherProfileReplaceOrcidSynchronizationOperation extends Patch
             .collect(Collectors.toList());
     }
 
-    private OrcidProfileSynchronizationPreference parseProfilePreference(String value) {
+    private OrcidProfileSyncPreference parseProfilePreference(String value) {
         try {
-            return OrcidProfileSynchronizationPreference.valueOf(value.toUpperCase());
+            return OrcidProfileSyncPreference.valueOf(value.toUpperCase());
         } catch (IllegalArgumentException ex) {
             throw new UnprocessableEntityException("Invalid profile's synchronization preference value: " + value, ex);
         }
     }
 
-    private OrcidSynchronizationMode parseMode(String value) {
+    private OrcidSyncMode parseMode(String value) {
         try {
-            return OrcidSynchronizationMode.valueOf(value.toUpperCase());
+            return OrcidSyncMode.valueOf(value.toUpperCase());
         } catch (IllegalArgumentException ex) {
             throw new UnprocessableEntityException("Invalid synchronization mode value: " + value, ex);
         }
     }
 
-    private OrcidEntitySynchronizationPreference parsePreference(String value) {
+    private OrcidEntitySyncPreference parsePreference(String value) {
         try {
-            return OrcidEntitySynchronizationPreference.valueOf(value.toUpperCase());
+            return OrcidEntitySyncPreference.valueOf(value.toUpperCase());
         } catch (IllegalArgumentException ex) {
             throw new UnprocessableEntityException("Invalid synchronization preference value: " + value, ex);
         }

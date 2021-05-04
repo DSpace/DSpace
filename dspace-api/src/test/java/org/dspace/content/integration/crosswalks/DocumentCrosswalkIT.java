@@ -417,13 +417,13 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         ItemBuilder.createItem(context, collection)
             .withEntityType("Person")
             .withTitle("Walter White")
-            .withPersonAffiliationName("Test OrgUnit", orgUnit.getID().toString())
+            .withPersonMainAffiliationName("Test OrgUnit", orgUnit.getID().toString())
             .build();
 
         ItemBuilder.createItem(context, collection)
             .withEntityType("Person")
             .withTitle("Jesse Pinkman")
-            .withPersonAffiliationName("Test OrgUnit", orgUnit.getID().toString())
+            .withPersonMainAffiliationName("Test OrgUnit", orgUnit.getID().toString())
             .build();
 
         context.restoreAuthSystemState();

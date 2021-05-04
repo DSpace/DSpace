@@ -1,0 +1,325 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+package org.dspace.app.orcid.model.factory.impl;
+
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.dspace.app.orcid.model.factory.OrcidFactoryUtils.parseConfigurations;
+import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
+import static org.orcid.jaxb.model.common.ContributorRole.AUTHOR;
+import static org.orcid.jaxb.model.common.SequenceType.ADDITIONAL;
+import static org.orcid.jaxb.model.common.SequenceType.FIRST;
+
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.orcid.client.OrcidConfiguration;
+import org.dspace.app.orcid.model.factory.OrcidCommonObjectFactory;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataFieldName;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.service.ItemService;
+import org.dspace.core.Context;
+import org.dspace.core.exception.SQLRuntimeException;
+import org.dspace.handle.service.HandleService;
+import org.dspace.util.MultiFormatDateParser;
+import org.dspace.util.UUIDUtils;
+import org.orcid.jaxb.model.common.ContributorRole;
+import org.orcid.jaxb.model.common.FundingContributorRole;
+import org.orcid.jaxb.model.common.Iso3166Country;
+import org.orcid.jaxb.model.v3.release.common.Contributor;
+import org.orcid.jaxb.model.v3.release.common.ContributorAttributes;
+import org.orcid.jaxb.model.v3.release.common.ContributorEmail;
+import org.orcid.jaxb.model.v3.release.common.ContributorOrcid;
+import org.orcid.jaxb.model.v3.release.common.CreditName;
+import org.orcid.jaxb.model.v3.release.common.DisambiguatedOrganization;
+import org.orcid.jaxb.model.v3.release.common.FuzzyDate;
+import org.orcid.jaxb.model.v3.release.common.OrcidIdBase;
+import org.orcid.jaxb.model.v3.release.common.Organization;
+import org.orcid.jaxb.model.v3.release.common.OrganizationAddress;
+import org.orcid.jaxb.model.v3.release.common.Url;
+import org.orcid.jaxb.model.v3.release.record.FundingContributor;
+import org.orcid.jaxb.model.v3.release.record.FundingContributorAttributes;
+import org.springframework.beans.factory.annotation.Autowired;
+
+/**
+ * Implementation of {@link OrcidCommonObjectFactory}.
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ */
+public class OrcidCommonObjectFactoryImpl implements OrcidCommonObjectFactory {
+
+    @Autowired
+    private ItemService itemService;
+
+    @Autowired
+    private OrcidConfiguration orcidConfiguration;
+
+    @Autowired
+    private HandleService handleService;
+
+    private String organizationCityField;
+
+    private String organizationCountryField;
+
+    private String contributorEmailField;
+
+    private String contributorOrcidField;
+
+    private Map<String, String> disambiguatedOrganizationIdentifierFields = new HashMap<>();
+
+    @Override
+    public Optional<FuzzyDate> createFuzzyDate(MetadataValue metadataValue) {
+
+        if (isUnprocessableValue(metadataValue)) {
+            return empty();
+        }
+
+        Date date = MultiFormatDateParser.parse(metadataValue.getValue());
+        if (date == null) {
+            return empty();
+        }
+
+        LocalDate localDate = convertToLocalDate(date);
+        return of(FuzzyDate.valueOf(localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth()));
+    }
+
+    @Override
+    public Optional<Organization> createOrganization(Context context, MetadataValue metadataValue) {
+
+        if (isUnprocessableValue(metadataValue)) {
+            return empty();
+        }
+
+        Organization organization = new Organization();
+
+        organization.setName(metadataValue.getValue());
+
+        Item organizationItem = findRelatedItem(context, metadataValue);
+        if (organizationItem != null) {
+            organization.setAddress(createOrganizationAddress(organizationItem));
+            organization.setDisambiguatedOrganization(createDisambiguatedOrganization(organizationItem));
+        }
+
+        return of(organization);
+    }
+
+    @Override
+    public Optional<Contributor> createContributor(Context context, MetadataValue metadataValue, ContributorRole role) {
+        if (isUnprocessableValue(metadataValue)) {
+            return empty();
+        }
+
+        Contributor contributor = new Contributor();
+        contributor.setCreditName(new CreditName(metadataValue.getValue()));
+        contributor.setContributorAttributes(getContributorAttributes(metadataValue, role));
+
+        Item authorItem = findItem(context, UUIDUtils.fromString(metadataValue.getAuthority()));
+        if (authorItem != null) {
+            contributor.setContributorEmail(getContributorEmail(authorItem));
+            contributor.setContributorOrcid(getContributorOrcid(authorItem));
+        }
+
+        return of(contributor);
+    }
+
+    @Override
+    public Optional<FundingContributor> createFundingContributor(Context context, MetadataValue metadataValue,
+        FundingContributorRole role) {
+
+        if (isUnprocessableValue(metadataValue)) {
+            return empty();
+        }
+
+        FundingContributor contributor = new FundingContributor();
+        contributor.setCreditName(new CreditName(metadataValue.getValue()));
+        contributor.setContributorAttributes(getFundingContributorAttributes(metadataValue, role));
+
+        Item authorItem = findItem(context, UUIDUtils.fromString(metadataValue.getAuthority()));
+        if (authorItem != null) {
+            contributor.setContributorEmail(getContributorEmail(authorItem));
+            contributor.setContributorOrcid(getContributorOrcid(authorItem));
+        }
+
+        return of(contributor);
+    }
+
+    @Override
+    public Optional<Url> createUrl(Context context, Item item) {
+        String handle = item.getHandle();
+        if (StringUtils.isBlank(handle)) {
+            return empty();
+        }
+
+        return of(new Url(handleService.getCanonicalForm(handle)));
+    }
+
+    private ContributorOrcid getContributorOrcid(Item authorItem) {
+        String orcid = getMetadataValue(authorItem, contributorOrcidField);
+        return isNotBlank(orcid) ? new ContributorOrcid(getOrcidIdBase(orcid)) : null;
+    }
+
+    private OrcidIdBase getOrcidIdBase(String orcid) {
+
+        OrcidIdBase orcidBase = new OrcidIdBase();
+        orcidBase.setPath(orcid);
+
+        String orcidDomain = orcidConfiguration.getDomainUrl();
+
+        if (StringUtils.isNotBlank(orcidDomain)) {
+            orcidBase.setHost(orcidDomain);
+            orcidBase.setUri(orcidDomain + "/" + orcid);
+        }
+
+        return orcidBase;
+    }
+
+    private ContributorEmail getContributorEmail(Item authorItem) {
+        String email = getMetadataValue(authorItem, contributorEmailField);
+        return isNotBlank(email) ? new ContributorEmail(email) : null;
+    }
+
+    private ContributorAttributes getContributorAttributes(MetadataValue metadataValue, ContributorRole role) {
+        ContributorAttributes attributes = new ContributorAttributes();
+        attributes.setContributorRole(role);
+        attributes.setContributorSequence(role == AUTHOR && metadataValue.getPlace() == 0 ? FIRST : ADDITIONAL);
+        return attributes;
+    }
+
+    private OrganizationAddress createOrganizationAddress(Item organizationItem) {
+        OrganizationAddress address = new OrganizationAddress();
+        address.setCity(getMetadataValue(organizationItem, organizationCityField));
+        address.setCountry(Iso3166Country.fromValue(getMetadataValue(organizationItem, organizationCountryField)));
+        return address;
+    }
+
+    private FundingContributorAttributes getFundingContributorAttributes(MetadataValue metadataValue,
+        FundingContributorRole role) {
+        FundingContributorAttributes attributes = new FundingContributorAttributes();
+        attributes.setContributorRole(role);
+        return attributes;
+    }
+
+    private DisambiguatedOrganization createDisambiguatedOrganization(Item organizationItem) {
+
+        for (String identifierField : disambiguatedOrganizationIdentifierFields.keySet()) {
+
+            String source = disambiguatedOrganizationIdentifierFields.get(identifierField);
+            String identifier = getMetadataValue(organizationItem, identifierField);
+
+            if (isNotBlank(identifier)) {
+                DisambiguatedOrganization disambiguatedOrganization = new DisambiguatedOrganization();
+                disambiguatedOrganization.setDisambiguatedOrganizationIdentifier(identifier);
+                disambiguatedOrganization.setDisambiguationSource(source);
+                return disambiguatedOrganization;
+            }
+
+        }
+
+        return null;
+    }
+
+    private Item findRelatedItem(Context context, MetadataValue metadataValue) {
+        try {
+            return itemService.find(context, UUIDUtils.fromString(metadataValue.getAuthority()));
+        } catch (SQLException e) {
+            throw new SQLRuntimeException(e);
+        }
+    }
+
+    private boolean isUnprocessableValue(MetadataValue value) {
+        return value == null || isBlank(value.getValue()) || value.getValue().equals(PLACEHOLDER_PARENT_METADATA_VALUE);
+    }
+
+    private String getMetadataValue(Item item, String metadataField) {
+        if (StringUtils.isNotBlank(metadataField)) {
+            return itemService.getMetadataFirstValue(item, new MetadataFieldName(metadataField), Item.ANY);
+        } else {
+            return null;
+        }
+    }
+
+    private LocalDate convertToLocalDate(Date date) {
+        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    }
+
+    private Item findItem(Context context, UUID uuid) {
+        try {
+            return itemService.find(context, uuid);
+        } catch (SQLException e) {
+            throw new SQLRuntimeException(e);
+        }
+    }
+
+    public String getOrganizationCityField() {
+        return organizationCityField;
+    }
+
+    public String getOrganizationCountryField() {
+        return organizationCountryField;
+    }
+
+    public Map<String, String> getDisambiguatedOrganizationIdentifierFields() {
+        return disambiguatedOrganizationIdentifierFields;
+    }
+
+    public String getContributorEmailField() {
+        return contributorEmailField;
+    }
+
+    public String getContributorOrcidField() {
+        return contributorOrcidField;
+    }
+
+    public ItemService getItemService() {
+        return itemService;
+    }
+
+    public void setItemService(ItemService itemService) {
+        this.itemService = itemService;
+    }
+
+    public OrcidConfiguration getOrcidConfiguration() {
+        return orcidConfiguration;
+    }
+
+    public void setOrcidConfiguration(OrcidConfiguration orcidConfiguration) {
+        this.orcidConfiguration = orcidConfiguration;
+    }
+
+    public void setOrganizationCityField(String organizationCityField) {
+        this.organizationCityField = organizationCityField;
+    }
+
+    public void setOrganizationCountryField(String organizationCountryField) {
+        this.organizationCountryField = organizationCountryField;
+    }
+
+    public void setContributorEmailField(String contributorEmailField) {
+        this.contributorEmailField = contributorEmailField;
+    }
+
+    public void setContributorOrcidField(String contributorOrcidField) {
+        this.contributorOrcidField = contributorOrcidField;
+    }
+
+    public void setDisambiguatedOrganizationIdentifierFields(String disambiguatedOrganizationIds) {
+        this.disambiguatedOrganizationIdentifierFields = parseConfigurations(disambiguatedOrganizationIds);
+    }
+
+}

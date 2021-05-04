@@ -23,23 +23,20 @@ import org.springframework.stereotype.Component;
 public class OrcidQueueRestConverter implements DSpaceConverter<OrcidQueue, OrcidQueueRest> {
 
     @Override
-    public OrcidQueueRest convert(OrcidQueue modelObject, Projection projection) {
+    public OrcidQueueRest convert(OrcidQueue orcidQueue, Projection projection) {
         OrcidQueueRest rest = new OrcidQueueRest();
-        rest.setEntityId(modelObject.getEntity().getID());
-        rest.setEntityName(getMetadataValueFromItem(modelObject.getEntity(), "dc.title"));
-        rest.setEntityType(getMetadataValueFromItem(modelObject.getEntity(), "dspace.entity.type"));
-        rest.setId(modelObject.getId());
-        rest.setOwnerId(modelObject.getOwner().getID());
-        rest.setProjection(projection);
-        return rest;
-    }
 
-    private String getMetadataValueFromItem(Item entity, String metadataField) {
-        return entity.getMetadata().stream()
-            .filter(metadata -> metadata.getMetadataField().toString('.').equals(metadataField))
-            .map(metadata -> metadata.getValue())
-            .findFirst()
-            .orElse(null);
+        Item entity = orcidQueue.getEntity();
+
+        rest.setEntityId(entity != null ? entity.getID() : null);
+        rest.setDescription(orcidQueue.getDescription());
+        rest.setRecordType(orcidQueue.getRecordType());
+        rest.setId(orcidQueue.getId());
+        rest.setOwnerId(orcidQueue.getOwner().getID());
+        rest.setOperation(orcidQueue.getOperation() != null ? orcidQueue.getOperation().name() : null);
+        rest.setProjection(projection);
+
+        return rest;
     }
 
     @Override

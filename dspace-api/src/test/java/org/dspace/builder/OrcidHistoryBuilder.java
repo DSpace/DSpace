@@ -9,11 +9,12 @@ package org.dspace.builder;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.orcid.OrcidHistory;
+import org.dspace.app.orcid.OrcidOperation;
 import org.dspace.app.orcid.service.OrcidHistoryService;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
@@ -58,7 +59,7 @@ public class OrcidHistoryBuilder extends  AbstractBuilder<OrcidHistory, OrcidHis
     }
 
     @Override
-    public OrcidHistory build() throws SQLException, AuthorizeException {
+    public OrcidHistory build() throws SQLException {
         try {
             getService().update(context, orcidHistory);
             context.dispatchEvents();
@@ -79,7 +80,7 @@ public class OrcidHistoryBuilder extends  AbstractBuilder<OrcidHistory, OrcidHis
 
     /**
      * Delete the Test OrcidHistory referred to by the given ID
-     * 
+     *
      * @param id                Integer of Test OrcidHistory to delete
      * @throws SQLException
      * @throws IOException
@@ -90,14 +91,9 @@ public class OrcidHistoryBuilder extends  AbstractBuilder<OrcidHistory, OrcidHis
         }
 
         try (Context c = new Context()) {
-            c.turnOffAuthorisationSystem();
             OrcidHistory orcidHistory = orcidHistoryService.find(c, id);
             if (orcidHistory != null) {
-                try {
-                    orcidHistoryService.delete(c, orcidHistory);
-                } catch (AuthorizeException e) {
-                    throw new RuntimeException(e);
-                }
+                orcidHistoryService.delete(c, orcidHistory);
             }
             c.complete();
         }
@@ -127,6 +123,31 @@ public class OrcidHistoryBuilder extends  AbstractBuilder<OrcidHistory, OrcidHis
 
     public OrcidHistoryBuilder withStatus(Integer status) throws SQLException {
         orcidHistory.setStatus(status);
+        return this;
+    }
+
+    public OrcidHistoryBuilder withMetadata(String metadata) throws SQLException {
+        orcidHistory.setMetadata(metadata);
+        return this;
+    }
+
+    public OrcidHistoryBuilder withRecordType(String recordType) throws SQLException {
+        orcidHistory.setRecordType(recordType);
+        return this;
+    }
+
+    public OrcidHistoryBuilder withOperation(OrcidOperation operation) throws SQLException {
+        orcidHistory.setOperation(operation);
+        return this;
+    }
+
+    public OrcidHistoryBuilder withDescription(String description) throws SQLException {
+        orcidHistory.setDescription(description);
+        return this;
+    }
+
+    public OrcidHistoryBuilder withTimestamp(Date timestamp) {
+        orcidHistory.setTimestamp(timestamp);
         return this;
     }
 }

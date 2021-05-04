@@ -10,8 +10,10 @@ package org.dspace.app.rest.matcher;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 import org.dspace.app.orcid.OrcidQueue;
+import org.dspace.content.Item;
 import org.hamcrest.Matcher;
 
 /**
@@ -24,13 +26,15 @@ public class OrcidQueueMatcher {
 
     private OrcidQueueMatcher() {}
 
-    public static Matcher<? super Object> matchOrcidQueue(OrcidQueue orcidQueue, String entityType) {
+    public static Matcher<? super Object> matchOrcidQueue(OrcidQueue orcidQueue) {
+        Item entity = orcidQueue.getEntity();
         return allOf(
                 hasJsonPath("$.id", is(orcidQueue.getID())),
                 hasJsonPath("$.ownerId", is(orcidQueue.getOwner().getID().toString())),
-                hasJsonPath("$.entityId", is(orcidQueue.getEntity().getID().toString())),
-                hasJsonPath("$.entityName", is(orcidQueue.getEntity().getName())),
-                hasJsonPath("$.entityType", is(entityType)),
+                hasJsonPath("$.entityId", entity != null ? is(entity.getID().toString()) : nullValue()),
+                hasJsonPath("$.description", is(orcidQueue.getDescription())),
+                hasJsonPath("$.recordType", is(orcidQueue.getRecordType())),
+                hasJsonPath("$.operation", is(orcidQueue.getOperation().name())),
                 hasJsonPath("$.type", is("orcidqueue"))
         );
     }

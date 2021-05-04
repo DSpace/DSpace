@@ -7,7 +7,7 @@
  */
 package org.dspace.app.orcid.client;
 
-import org.dspace.services.ConfigurationService;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * A class that contains all the configurations related to ORCID.
@@ -17,42 +17,84 @@ import org.dspace.services.ConfigurationService;
  */
 public final class OrcidConfiguration {
 
-    private final ConfigurationService configurationService;
+    private String apiUrl;
 
-    public OrcidConfiguration(ConfigurationService configurationService) {
-        this.configurationService = configurationService;
-    }
+    private String domainUrl;
+
+    private String redirectUrl;
+
+    private String clientId;
+
+    private String clientSecret;
+
+    private String tokenEndpointUrl;
+
+    private String authorizeEndpointUrl;
+
+    private String scopes;
 
     public String getApiUrl() {
-        return configurationService.getProperty("orcid-api.api-url");
+        return apiUrl;
+    }
+
+    public void setApiUrl(String apiUrl) {
+        this.apiUrl = apiUrl;
     }
 
     public String getDomainUrl() {
-        return configurationService.getProperty("orcid.domain-url");
+        return domainUrl;
     }
 
-    public String getRedirectUri() {
-        return configurationService.getProperty("dspace.server.url") + "/api/authn/orcid";
+    public void setDomainUrl(String domainUrl) {
+        this.domainUrl = domainUrl;
+    }
+
+    public String getRedirectUrl() {
+        return redirectUrl;
+    }
+
+    public void setRedirectUrl(String redirectUrl) {
+        this.redirectUrl = redirectUrl;
     }
 
     public String getClientId() {
-        return configurationService.getProperty("orcid-api.application-client-id");
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
     }
 
     public String getClientSecret() {
-        return configurationService.getProperty("orcid-api.application-client-secret");
+        return clientSecret;
+    }
+
+    public void setClientSecret(String clientSecret) {
+        this.clientSecret = clientSecret;
     }
 
     public String getTokenEndpointUrl() {
-        return configurationService.getProperty("orcid-api.token-url");
+        return tokenEndpointUrl;
+    }
+
+    public void setTokenEndpointUrl(String tokenEndpointUrl) {
+        this.tokenEndpointUrl = tokenEndpointUrl;
     }
 
     public String getAuthorizeEndpointUrl() {
-        return configurationService.getProperty("orcid-api.authorize-url");
+        return authorizeEndpointUrl;
+    }
+
+    public void setAuthorizeEndpointUrl(String authorizeEndpointUrl) {
+        this.authorizeEndpointUrl = authorizeEndpointUrl;
+    }
+
+    public void setScopes(String scopes) {
+        this.scopes = scopes;
     }
 
     public String[] getScopes() {
-        return configurationService.getArrayProperty("orcid-api.scope");
+        return StringUtils.isNotBlank(scopes) ? StringUtils.split(scopes, ",") : new String[] {};
     }
 
 }

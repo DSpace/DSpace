@@ -7,20 +7,33 @@
  */
 package org.dspace.app.orcid.consumer;
 
-import static org.dspace.app.profile.OrcidEntitySynchronizationPreference.DISABLED;
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.naturalOrder;
+import static java.util.Comparator.nullsFirst;
+import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.orcid.OrcidHistory;
+import org.dspace.app.orcid.OrcidOperation;
 import org.dspace.app.orcid.OrcidQueue;
-import org.dspace.app.orcid.factory.OrcidQueueServiceFactory;
+import org.dspace.app.orcid.factory.OrcidServiceFactory;
+import org.dspace.app.orcid.model.OrcidEntityType;
+import org.dspace.app.orcid.model.factory.OrcidProfileSectionFactory;
+import org.dspace.app.orcid.service.OrcidHistoryService;
+import org.dspace.app.orcid.service.OrcidProfileSectionFactoryService;
 import org.dspace.app.orcid.service.OrcidQueueService;
-import org.dspace.authority.service.AuthorityValueService;
+import org.dspace.app.orcid.service.OrcidSynchronizationService;
+import org.dspace.app.profile.OrcidProfileSyncPreference;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataFieldName;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -40,17 +53,30 @@ import org.slf4j.LoggerFactory;
  */
 public class OrcidQueueConsumer implements Consumer {
 
-    private static Logger log = LoggerFactory.getLogger(OrcidQueueConsumer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrcidQueueConsumer.class);
 
     private OrcidQueueService orcidQueueService;
 
+    private OrcidHistoryService orcidHistoryService;
+
+    private OrcidSynchronizationService orcidSynchronizationService;
+
     private ItemService itemService;
+
+    private OrcidProfileSectionFactoryService profileSectionFactoryService;
 
     private List<UUID> alreadyConsumedItems = new ArrayList<>();
 
     @Override
     public void initialize() throws Exception {
-        this.orcidQueueService = OrcidQueueServiceFactory.getInstance().getOrcidQueueService();
+
+        OrcidServiceFactory orcidServiceFactory = OrcidServiceFactory.getInstance();
+
+        this.orcidQueueService = orcidServiceFactory.getOrcidQueueService();
+        this.orcidHistoryService = orcidServiceFactory.getOrcidHistoryService();
+        this.orcidSynchronizationService = orcidServiceFactory.getOrcidSynchronizationService();
+        this.profileSectionFactoryService = orcidServiceFactory.getOrcidProfileSectionFactoryService();
+
         this.itemService = ContentServiceFactory.getInstance().getItemService();
     }
 
@@ -79,38 +105,29 @@ public class OrcidQueueConsumer implements Consumer {
 
     private void consumeItem(Context context, Item item) throws SQLException {
 
-        String entityType = getMetadataValue(item, "dspace.entity.type");
+        String entityType = itemService.getEntityType(item);
         if (entityType == null) {
             return;
         }
 
-        switch (entityType) {
-            case "Person":
-                consumePerson(context, item);
-                break;
-            case "Publication":
-            case "Project":
-                consumeItem(context, item, entityType);
-                break;
-            default:
-                break;
+        if (OrcidEntityType.isValid(entityType)) {
+            consumeEntity(context, item);
+        } else if (entityType.equals("Person")) {
+            consumePerson(context, item);
         }
 
         alreadyConsumedItems.add(item.getID());
 
     }
 
-    private void consumeItem(Context context, Item item, String entityType) throws SQLException {
-        List<MetadataValue> metadataValues = item.getMetadata();
+    private void consumeEntity(Context context, Item entity) throws SQLException {
+        List<MetadataValue> metadataValues = entity.getMetadata();
 
         for (MetadataValue metadata : metadataValues) {
 
             String authority = metadata.getAuthority();
-            // ignore nested metadata with placeholder
-            if (StringUtils.equals(metadata.getValue(), CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE)) {
-                continue;
-            }
-            if (StringUtils.isBlank(authority) || authority.startsWith(AuthorityValueService.GENERATE)) {
+
+            if (isNestedMetadataPlaceholder(metadata)) {
                 continue;
             }
 
@@ -119,47 +136,158 @@ public class OrcidQueueConsumer implements Consumer {
                 continue;
             }
 
-            Item ownerItem = itemService.findByIdOrLegacyId(context, relatedItemUuid.toString());
-            String ownerType = getMetadataValue(ownerItem, "dspace.entity.type");
-            String accessToken = getMetadataValue(ownerItem, "cris.orcid.access-token");
-            if (!"Person".equals(ownerType) || StringUtils.isEmpty(accessToken)) {
+            Item owner = itemService.find(context, relatedItemUuid);
+
+            if (isNotPersonItem(owner) || isNotLinkedToOrcid(owner)) {
                 continue;
             }
 
-            if (!orcidQueueService.findByOwnerAndEntityId(context, relatedItemUuid, item.getID()).isEmpty()) {
+            if (shouldNotBeSynchronized(owner, entity) || isAlreadyQueued(context, owner, entity)) {
                 continue;
             }
 
-            if (shouldBeSend(ownerItem, entityType)) {
-                OrcidQueue orcidQueue = orcidQueueService.create(context, ownerItem, item);
-                log.debug("Created ORCID queue record with id " + orcidQueue.getID());
-            }
+            createOrcidQueue(context, owner, entity);
 
         }
 
     }
 
     private void consumePerson(Context context, Item item) throws SQLException {
-        String accessToken = getMetadataValue(item, "cris.orcid.access-token");
-        List<OrcidQueue> queueRecords = orcidQueueService.findByOwnerAndEntityId(context, item.getID(), item.getID());
-        if (StringUtils.isNotEmpty(accessToken) && queueRecords.isEmpty()) {
-            OrcidQueue orcidQueue = orcidQueueService.create(context, item, item);
-            log.debug("Created ORCID queue record with id " + orcidQueue.getID());
+
+        if (isNotLinkedToOrcid(item) || profileShouldNotBeSynchronized(item)) {
+            return;
+        }
+
+        for (OrcidProfileSectionFactory factory : findProfileFactories(item)) {
+            consumePerson(context, item, factory);
+        }
+
+    }
+
+    private void consumePerson(Context context, Item item, OrcidProfileSectionFactory factory) throws SQLException {
+
+        String sectionType = factory.getProfileSectionType().name();
+        List<String> signatures = factory.getMetadataSignatures(context, item);
+
+        List<OrcidHistory> historyRecords = findOrcidHistoryRecords(context, item, sectionType);
+
+        deleteRecordsByEntityAndType(context, item, sectionType);
+        createInsertionRecordForNewSignatures(context, item, historyRecords, factory, signatures);
+        createDeletionRecordForNoMorePresentSignatures(context, item, historyRecords, factory, signatures);
+
+    }
+
+    private void deleteRecordsByEntityAndType(Context context, Item item, String sectionType) throws SQLException {
+        orcidQueueService.deleteByEntityAndRecordType(context, item, sectionType);
+    }
+
+    private void createInsertionRecordForNewSignatures(Context context, Item item, List<OrcidHistory> historyRecords,
+        OrcidProfileSectionFactory factory, List<String> signatures) throws SQLException {
+
+        String sectionType = factory.getProfileSectionType().name();
+
+        for (String signature : signatures) {
+
+            if (isNotAlreadySynchronized(historyRecords, signature)) {
+                String description = factory.getDescription(context, item, signature);
+                orcidQueueService.createProfileInsertionRecord(context, item, description, sectionType, signature);
+            }
+
+        }
+
+    }
+
+    private void createDeletionRecordForNoMorePresentSignatures(Context context, Item profile,
+        List<OrcidHistory> historyRecords, OrcidProfileSectionFactory factory, List<String> signatures)
+        throws SQLException {
+
+        String sectionType = factory.getProfileSectionType().name();
+
+        List<String> deletedSignatures = historyRecords.stream()
+            .filter(historyRecord -> historyRecord.getOperation() == OrcidOperation.DELETE)
+            .map(OrcidHistory::getMetadata)
+            .collect(Collectors.toList());
+
+        for (OrcidHistory historyRecord : historyRecords) {
+            String storedSignature = historyRecord.getMetadata();
+            String putCode = historyRecord.getPutCode();
+            String description = historyRecord.getDescription();
+
+            if (signatures.contains(storedSignature) || deletedSignatures.contains(storedSignature)) {
+                continue;
+            }
+
+            if (StringUtils.isBlank(putCode)) {
+                LOGGER.warn("The orcid history record with id {} should have a not blank put code");
+                continue;
+            }
+
+            orcidQueueService.createProfileDeletionRecord(context, profile, description,
+                sectionType, storedSignature, putCode);
+        }
+
+    }
+
+    private List<OrcidHistory> findOrcidHistoryRecords(Context context, Item item,
+        String sectionType) throws SQLException {
+        return orcidHistoryService.findSuccessfullyRecordsByEntityAndType(context, item, sectionType);
+    }
+
+    private boolean isNotAlreadySynchronized(List<OrcidHistory> records, String signature) {
+        return getLastOperation(records, signature)
+            .map(operation -> operation == OrcidOperation.DELETE)
+            .orElse(Boolean.TRUE);
+    }
+
+    private Optional<OrcidOperation> getLastOperation(List<OrcidHistory> records, String signature) {
+        return records.stream()
+            .filter(record -> signature.equals(record.getMetadata()))
+            .sorted(comparing(OrcidHistory::getTimestamp, nullsFirst(naturalOrder())).reversed())
+            .map(OrcidHistory::getOperation)
+            .findFirst();
+    }
+
+    private boolean isAlreadyQueued(Context context, Item owner, Item entity) throws SQLException {
+        return isNotEmpty(orcidQueueService.findByOwnerAndEntity(context, owner, entity));
+    }
+
+    private boolean isNotLinkedToOrcid(Item ownerItem) {
+        return getMetadataValue(ownerItem, "cris.orcid.access-token") == null
+            || getMetadataValue(ownerItem, "person.identifier.orcid") == null;
+    }
+
+    private boolean shouldNotBeSynchronized(Item owner, Item entity) {
+        return !orcidSynchronizationService.isSynchronizationEnabled(owner, entity);
+    }
+
+    private boolean profileShouldNotBeSynchronized(Item item) {
+        return !orcidSynchronizationService.isSynchronizationEnabled(item, item);
+    }
+
+    private boolean isNotPersonItem(Item ownerItem) {
+        return !"Person".equals(itemService.getEntityType(ownerItem));
+    }
+
+    private boolean isNestedMetadataPlaceholder(MetadataValue metadata) {
+        return StringUtils.equals(metadata.getValue(), CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE);
+    }
+
+    private OrcidQueue createOrcidQueue(Context context, Item owner, Item entity) throws SQLException {
+        Optional<String> putCode = orcidHistoryService.findLastPutCode(context, owner, entity);
+        if (putCode.isPresent()) {
+            return orcidQueueService.createEntityUpdateRecord(context, owner, entity, putCode.get());
+        } else {
+            return orcidQueueService.createEntityInsertionRecord(context, owner, entity);
         }
     }
 
-    private boolean shouldBeSend(Item item, String relatedItemType) {
-        String syncSetting = "cris.orcid.sync-" + (relatedItemType.equals("Publication") ? "publications" : "projects");
-        String syncSettingValue = getMetadataValue(item, syncSetting);
-        return syncSettingValue != null && !syncSettingValue.equals(DISABLED.name());
+    private String getMetadataValue(Item item, String metadataField) {
+        return itemService.getMetadataFirstValue(item, new MetadataFieldName(metadataField), Item.ANY);
     }
 
-    private String getMetadataValue(Item item, String metadataField) {
-        return item.getMetadata().stream()
-            .filter(metadata -> metadata.getMetadataField().toString('.').equals(metadataField))
-            .map(metadata -> metadata.getValue())
-            .findFirst()
-            .orElse(null);
+    private List<OrcidProfileSectionFactory> findProfileFactories(Item item) {
+        List<OrcidProfileSyncPreference> profilePreferences = orcidSynchronizationService.getProfilePreferences(item);
+        return this.profileSectionFactoryService.findByPreferences(profilePreferences);
     }
 
     @Override

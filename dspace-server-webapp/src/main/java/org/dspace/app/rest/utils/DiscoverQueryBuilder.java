@@ -284,8 +284,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
                         new String[discoveryConfiguration.getDefaultFilterQueries()
                                                          .size()]);
 
-        if (discoveryConfiguration != null &&
-                discoveryConfiguration instanceof DiscoveryRelatedItemConfiguration) {
+        if (scope != null && discoveryConfiguration instanceof DiscoveryRelatedItemConfiguration) {
             if (queryArray != null) {
                 for ( int i = 0; i < queryArray.length; i++ ) {
                     queryArray[i] = MessageFormat.format(queryArray[i], scope.getID());

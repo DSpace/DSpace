@@ -24,8 +24,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.orcid.client.OrcidClient;
 import org.dspace.app.orcid.client.OrcidConfiguration;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
+import org.dspace.app.orcid.service.OrcidSynchronizationService;
 import org.dspace.app.profile.ResearcherProfile;
-import org.dspace.app.profile.service.ProfileSynchronizationWithOrcidConfigurator;
 import org.dspace.app.profile.service.ResearcherProfileService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -69,7 +69,7 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
     private ResearcherProfileService researcherProfileService;
 
     @Autowired
-    private ProfileSynchronizationWithOrcidConfigurator orcidSynchronizationConfigurator;
+    private OrcidSynchronizationService orcidSynchronizationService;
 
     @Override
     public int authenticate(Context context, String username, String password, String realm, HttpServletRequest request)
@@ -98,7 +98,7 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
 
         String authorizeUrl = orcidConfiguration.getAuthorizeEndpointUrl();
         String clientId = orcidConfiguration.getClientId();
-        String redirectUri = orcidConfiguration.getRedirectUri();
+        String redirectUri = orcidConfiguration.getRedirectUrl();
         String scopes = String.join("+", orcidConfiguration.getScopes());
 
         if (StringUtils.isAnyBlank(authorizeUrl, clientId, redirectUri, scopes)) {
@@ -183,7 +183,7 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
 
         ResearcherProfile profile = findProfile(context, ePerson);
         if (profile != null) {
-            orcidSynchronizationConfigurator.configureProfile(context, profile, token);
+            orcidSynchronizationService.linkProfile(context, profile.getItem(), token);
         }
 
         return SUCCESS;

@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -29,6 +30,7 @@ import org.dspace.app.orcid.OrcidHistory;
 import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.service.OrcidHistoryService;
 import org.dspace.app.orcid.service.OrcidQueueService;
+import org.dspace.app.orcid.service.OrcidSynchronizationService;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -129,6 +131,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Autowired(required = true)
     private OrcidQueueService orcidQueueService;
+
+    @Autowired(required = true)
+    private OrcidSynchronizationService orcidSynchronizationService;
 
     protected ItemServiceImpl() {
         super();
@@ -1402,6 +1407,11 @@ prevent the generation of resource policy entry values with null dspace_object a
         return values;
     }
 
+    @Override
+    public String getEntityType(Item item) {
+        return getMetadataFirstValue(item, new MetadataFieldName("dspace.entity.type"), Item.ANY);
+    }
+
     /**
      * Supports moving metadata by adding the metadata value or updating the place of the relationship
      */
@@ -1477,20 +1487,55 @@ prevent the generation of resource policy entry values with null dspace_object a
 
             context.turnOffAuthorisationSystem();
 
-            List<OrcidHistory> orcidHistories = orcidHistoryService.findByOwner(context, item);
-            for (OrcidHistory orcidHistory : orcidHistories) {
-                orcidHistoryService.delete(context, orcidHistory);
-            }
-
-            List<OrcidQueue> orcidQueues = orcidQueueService.findByOwnerId(context, item.getID());
-            for (OrcidQueue orcidQueue : orcidQueues) {
-                orcidQueueService.delete(context, orcidQueue);
-            }
+            createOrcidQueueRecordsToDeleteOnOrcid(context, item);
+            deleteOrcidHistoryRecords(context, item);
+            deleteOrcidQueueRecords(context, item);
 
         } finally {
             context.restoreAuthSystemState();
         }
 
+    }
+
+    private void createOrcidQueueRecordsToDeleteOnOrcid(Context context, Item entity) throws SQLException {
+
+        String entityType = getEntityType(entity);
+        if (getProfileType().equals(entityType)) {
+            return;
+        }
+
+        Map<Item, String> ownerAndPutCodeMap = orcidHistoryService.findLastPutCodes(context, entity);
+        for (Item owner : ownerAndPutCodeMap.keySet()) {
+            if (orcidSynchronizationService.isSynchronizationEnabled(owner, entity)) {
+                String putCode = ownerAndPutCodeMap.get(owner);
+                String title = getMetadataFirstValue(entity, "dc", "title", null, Item.ANY);
+                orcidQueueService.createEntityDeletionRecord(context, owner, title, entityType, putCode);
+            }
+        }
+
+    }
+
+    private void deleteOrcidHistoryRecords(Context context, Item item) throws SQLException {
+        List<OrcidHistory> historyRecords = orcidHistoryService.findByOwnerOrEntity(context, item);
+        for (OrcidHistory historyRecord : historyRecords) {
+            if (historyRecord.getOwner().equals(item)) {
+                orcidHistoryService.delete(context, historyRecord);
+            } else {
+                historyRecord.setEntity(null);
+                orcidHistoryService.update(context, historyRecord);
+            }
+        }
+    }
+
+    private void deleteOrcidQueueRecords(Context context, Item item) throws SQLException {
+        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findByOwnerOrEntity(context, item);
+        for (OrcidQueue orcidQueueRecord : orcidQueueRecords) {
+            orcidQueueService.delete(context, orcidQueueRecord);
+        }
+    }
+
+    private String getProfileType() {
+        return configurationService.getProperty("researcher-profile.type", "Person");
     }
 
 }

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dspace.app.orcid.OrcidQueue;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 
@@ -39,7 +40,44 @@ public interface OrcidQueueDAO extends GenericDAO<OrcidQueue> {
     public List<OrcidQueue> findByOwnerId(Context context, UUID ownerId, Integer limit, Integer offset)
         throws SQLException;
 
+    /**
+     * Count the orcid queue records with the same ownerId.
+     *
+     * @param  context      DSpace context object
+     * @param  ownerId      the owner item id
+     * @return              the count result
+     * @throws SQLException if an SQL error occurs
+     */
     long countByOwnerId(Context context, UUID ownerId) throws SQLException;
 
-    public List<OrcidQueue> findByOwnerAndEntityId(Context context, UUID ownerId, UUID entityId) throws SQLException;
+    /**
+     * Returns all the orcid queue records with the given owner and entity items.
+     *
+     * @param  context      DSpace context object
+     * @param  owner        the owner item
+     * @param  entity       the entity item
+     * @return              the found orcid queue records
+     * @throws SQLException
+     */
+    public List<OrcidQueue> findByOwnerAndEntity(Context context, Item owner, Item entity) throws SQLException;
+
+    /**
+     * Get the OrcidQueue records where the given item is the owner OR the entity
+     *
+     * @param  context      DSpace context object
+     * @param  item         the item to search for
+     * @return              the found OrcidHistory entities
+     * @throws SQLException if database error
+     */
+    public List<OrcidQueue> findByOwnerOrEntity(Context context, Item item) throws SQLException;
+
+    /**
+     * Find all the OrcidQueue records with the given entity and record type.
+     *
+     * @param  context      DSpace context object
+     * @param  entity       the entity item
+     * @param  recordType   the record type
+     * @throws SQLException if database error occurs
+     */
+    public List<OrcidQueue> findByEntityAndRecordType(Context context, Item entity, String type) throws SQLException;
 }

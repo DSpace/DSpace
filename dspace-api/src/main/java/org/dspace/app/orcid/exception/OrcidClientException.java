@@ -5,11 +5,11 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.authenticate;
+package org.dspace.app.orcid.exception;
 
 /**
  * Exception throwable from class that implements {@link OrcidClient} in case of
- * error.
+ * error response from the ORCID registry.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
@@ -18,16 +18,19 @@ public class OrcidClientException extends RuntimeException {
 
     private static final long serialVersionUID = -7618061110212398216L;
 
-    public OrcidClientException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    private int status = 0;
 
-    public OrcidClientException(String message) {
-        super(message);
+    public OrcidClientException(int status, String content) {
+        super(content);
+        this.status = status;
     }
 
     public OrcidClientException(Throwable cause) {
         super(cause);
+    }
+
+    public int getStatus() {
+        return this.status;
     }
 
 }

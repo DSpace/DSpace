@@ -18,9 +18,9 @@
 <!--
     <alias name="OrcidSource" alias="AuthoritySource"/>
     <bean name="OrcidSource" class="org.dspace.authority.orcid.Orcidv3SolrAuthorityImpl">
-        <property name="clientId" value="${orcid.clientid}" />
-        <property name="clientSecret" value="${orcid.clientsecret}" />
-        <property name="OAUTHUrl" value="${orcid.oauth.url}" />
+        <property name="clientId" value="${orcid.application-client-id}" />
+        <property name="clientSecret" value="${orcid.application-client-secret}" />
+        <property name="OAUTHUrl" value="${orcid.authorize-url}" />
         <property name="orcidRestConnector" ref="orcidRestConnector"/>
     </bean>
  -->
@@ -40,11 +40,4 @@
             </map>
         </property>
     </bean>
-
-	<!-- Converts an input value to an output one -->
-	<bean name="mapConverterOrcidWorkType" class="org.dspace.util.SimpleMapConverter" init-method="init">
-		<property name="converterNameFile" value="mapConverter-orcid-worktype.properties" />
-		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
-		<property name="defaultValue" value="other"/>
-	</bean>
 </beans>

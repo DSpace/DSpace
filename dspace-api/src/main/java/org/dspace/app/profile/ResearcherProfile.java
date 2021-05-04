@@ -7,15 +7,11 @@
  */
 package org.dspace.app.profile;
 
-import static org.dspace.app.profile.OrcidEntitySynchronizationPreference.DISABLED;
-import static org.dspace.app.profile.OrcidSynchronizationMode.MANUAL;
 import static org.dspace.core.Constants.READ;
 import static org.dspace.eperson.Group.ANONYMOUS;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.dspace.content.Item;
@@ -62,10 +58,6 @@ public class ResearcherProfile {
             .anyMatch(policy -> READ == policy.getAction() && ANONYMOUS.equals(policy.getGroup().getName()));
     }
 
-    public boolean isLinkedToOrcid() {
-        return getOrcidAccessToken().isPresent() && getOrcid().isPresent();
-    }
-
     public Item getItem() {
         return item;
     }
@@ -75,39 +67,10 @@ public class ResearcherProfile {
             .map(metadataValue -> metadataValue.getValue());
     }
 
-    public String getOrcidSynchronizationMode() {
-        return getMetadataValue(item, "cris.orcid.sync-mode")
-            .map(metadataValue -> metadataValue.getValue())
-            .orElse(MANUAL.name());
-    }
-
-    public String getOrcidSynchronizationPublicationsPreference() {
-        return getMetadataValue(item, "cris.orcid.sync-publications")
-            .map(metadataValue -> metadataValue.getValue())
-            .orElse(DISABLED.name());
-    }
-
-    public String getOrcidSynchronizationProjectsPreference() {
-        return getMetadataValue(item, "cris.orcid.sync-projects")
-            .map(metadataValue -> metadataValue.getValue())
-            .orElse(DISABLED.name());
-    }
-
-    public List<String> getOrcidSynchronizationProfilePreferences() {
-        return getMetadataValues(item, "cris.orcid.sync-profile")
-            .map(MetadataValue::getValue)
-            .collect(Collectors.toList());
-    }
-
     private MetadataValue getCrisOwnerMetadata(Item item) {
         return getMetadataValue(item, "cris.owner")
             .filter(metadata -> UUIDUtils.fromString(metadata.getAuthority()) != null)
             .orElseThrow(() -> new IllegalArgumentException("A profile item must have a valid cris.owner metadata"));
-    }
-
-    private Optional<String> getOrcidAccessToken() {
-        return getMetadataValue(item, "cris.orcid.access-token")
-            .map(metadataValue -> metadataValue.getValue());
     }
 
     private Optional<MetadataValue> getMetadataValue(Item item, String metadataField) {

@@ -17,6 +17,8 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.UUID;
 
+import org.dspace.app.profile.OrcidEntitySyncPreference;
+import org.dspace.app.profile.OrcidProfileSyncPreference;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
@@ -168,6 +170,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, CRIS.getName(), "owner", null, null, value, authority, CF_ACCEPTED);
     }
 
+    public ItemBuilder withCrisOwner(EPerson ePerson) {
+        return withCrisOwner(ePerson.getFullName(), ePerson.getID().toString());
+    }
+
     public ItemBuilder withDoiIdentifier(String doi) {
         return addMetadataValue(item, "dc", "identifier", "doi", doi);
     }
@@ -180,16 +186,44 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "dc", "identifier", "issn", issn);
     }
 
-    public ItemBuilder withIsiIdentifier(String issn) {
-        return addMetadataValue(item, "dc", "identifier", "isi", issn);
+    public ItemBuilder withIsiIdentifier(String isi) {
+        return addMetadataValue(item, "dc", "identifier", "isi", isi);
     }
 
-    public ItemBuilder withScopusIdentifier(String issn) {
-        return addMetadataValue(item, "dc", "identifier", "scopus", issn);
+    public ItemBuilder withScopusIdentifier(String scopus) {
+        return addMetadataValue(item, "dc", "identifier", "scopus", scopus);
     }
 
     public ItemBuilder withOrcidIdentifier(String orcid) {
         return addMetadataValue(item, "person", "identifier", "orcid", orcid);
+    }
+
+    public ItemBuilder withOrcidAccessToken(String accessToken) {
+        return addMetadataValue(item, "cris", "orcid", "access-token", accessToken);
+    }
+
+    public ItemBuilder withOrcidSynchronizationPublicationsPreference(OrcidEntitySyncPreference value) {
+        return withOrcidSynchronizationPublicationsPreference(value.name());
+    }
+
+    public ItemBuilder withOrcidSynchronizationPublicationsPreference(String value) {
+        return setMetadataSingleValue(item, "cris", "orcid", "sync-publications", value);
+    }
+
+    public ItemBuilder withOrcidSynchronizationProjectsPreference(OrcidEntitySyncPreference value) {
+        return withOrcidSynchronizationProjectsPreference(value.name());
+    }
+
+    public ItemBuilder withOrcidSynchronizationProjectsPreference(String value) {
+        return setMetadataSingleValue(item, "cris", "orcid", "sync-projects", value);
+    }
+
+    public ItemBuilder withOrcidSynchronizationProfilePreference(OrcidProfileSyncPreference value) {
+        return withOrcidSynchronizationProfilePreference(value.name());
+    }
+
+    public ItemBuilder withOrcidSynchronizationProfilePreference(String value) {
+        return addMetadataValue(item, "cris", "orcid", "sync-profile", value);
     }
 
     public ItemBuilder withIsniIdentifier(String isni) {
@@ -268,12 +302,16 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "person", "email", null, email);
     }
 
+    public ItemBuilder withPersonMainAffiliationName(String name, String authority) {
+        return addMetadataValue(item, "person", "affiliation", "name", null, name, authority, 600);
+    }
+
     public ItemBuilder withPersonAffiliation(String affiliation) {
         return addMetadataValue(item, "oairecerif", "person", "affiliation", affiliation);
     }
 
-    public ItemBuilder withPersonAffiliationName(String name, String authority) {
-        return addMetadataValue(item, "person", "affiliation", "name", null, name, authority, 600);
+    public ItemBuilder withPersonAffiliation(String affiliation, String authority) {
+        return addMetadataValue(item, "oairecerif", "person", "affiliation", null, affiliation, authority, 600);
     }
 
     public ItemBuilder withPersonAffiliationStartDate(String startDate) {
@@ -499,6 +537,22 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withOrgUnitLegalName(String legalName) {
         return addMetadataValue(item, "organization", "legalName", null, legalName);
+    }
+
+    public ItemBuilder withOrgUnitLocality(String addressLocality) {
+        return addMetadataValue(item, "organization", "address", "addressLocality", addressLocality);
+    }
+
+    public ItemBuilder withOrgUnitCountry(String addressCountry) {
+        return addMetadataValue(item, "organization", "address", "addressCountry", addressCountry);
+    }
+
+    public ItemBuilder withOrgUnitRinggoldIdentifier(String identifier) {
+        return addMetadataValue(item, "organization", "identifier", "rin", identifier);
+    }
+
+    public ItemBuilder withOrgUnitCrossrefIdentifier(String crossrefid) {
+        return addMetadataValue(item, "organization", "identifier", "crossrefid", crossrefid);
     }
 
     public ItemBuilder withParentOrganization(String parent) {

@@ -9,15 +9,13 @@ package org.dspace.app.profile;
 
 /**
  * Enum that model the allowed values to configure the ORCID synchronization
- * preferences for the user's profile.
+ * mode.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public enum OrcidProfileSynchronizationPreference {
+public enum OrcidSyncMode {
 
-    AFFILIATION,
-    EDUCATION,
-    BIOGRAPHICAL,
-    IDENTIFIERS;
+    MANUAL,
+    BATCH;
 }

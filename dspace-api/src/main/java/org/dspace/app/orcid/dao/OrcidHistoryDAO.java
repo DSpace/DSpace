@@ -39,12 +39,36 @@ public interface OrcidHistoryDAO extends GenericDAO<OrcidHistory> {
     List<OrcidHistory> findByOwnerAndEntity(Context context, UUID ownerId, UUID entityId) throws SQLException;
 
     /**
-     * Get the OrcidHistory records related to the given owner.
+     * Get the OrcidHistory records where the given item is the owner or the entity
      *
      * @param  context      DSpace context object
-     * @param  id           owner the owner item
+     * @param  item         the item to search for
      * @return              the found OrcidHistory entities
      * @throws SQLException if database error
      */
-    List<OrcidHistory> findByOwner(Context context, Item owner) throws SQLException;
+    public List<OrcidHistory> findByOwnerOrEntity(Context context, Item item) throws SQLException;
+
+    /**
+     * Find the OrcidHistory records related to the given entity item.
+     *
+     * @param  context      DSpace context object
+     * @param  entity       the entity item
+     * @return              the found put codes
+     * @throws SQLException if database error
+     */
+    List<OrcidHistory> findByEntity(Context context, Item entity) throws SQLException;
+
+    /**
+     * Find all the successfully Orcid history records with the given record type
+     * related to the given entity. An history record is considered successful if
+     * the status is between 200 and 300.
+     *
+     * @param  context      DSpace context object
+     * @param  entity       the entity item
+     * @param  recordType   the record type
+     * @return              the found orcid history records
+     * @throws SQLException if database error
+     */
+    List<OrcidHistory> findSuccessfullyRecordsByEntityAndType(Context context, Item entity,
+        String recordType) throws SQLException;
 }

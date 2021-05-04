@@ -23,9 +23,11 @@ public class OrcidQueueRest extends BaseObjectRest<Integer> {
 
     private UUID entityId;
 
-    private String entityName;
+    private String description;
 
-    private String entityType;
+    private String recordType;
+
+    private String operation;
 
     @Override
     public String getType() {
@@ -58,20 +60,28 @@ public class OrcidQueueRest extends BaseObjectRest<Integer> {
         this.entityId = entityId;
     }
 
-    public String getEntityName() {
-        return entityName;
+    public String getDescription() {
+        return description;
     }
 
-    public void setEntityName(String entityName) {
-        this.entityName = entityName;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getEntityType() {
-        return entityType;
+    public String getRecordType() {
+        return recordType;
     }
 
-    public void setEntityType(String entityType) {
-        this.entityType = entityType;
+    public void setRecordType(String recordType) {
+        this.recordType = recordType;
+    }
+
+    public String getOperation() {
+        return operation;
+    }
+
+    public void setOperation(String operation) {
+        this.operation = operation;
     }
 
 }

@@ -7,10 +7,22 @@
  */
 package org.dspace.app.rest.converter;
 
+import static org.dspace.app.orcid.model.OrcidEntityType.PROJECT;
+import static org.dspace.app.orcid.model.OrcidEntityType.PUBLICATION;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.dspace.app.orcid.service.OrcidSynchronizationService;
+import org.dspace.app.profile.OrcidEntitySyncPreference;
+import org.dspace.app.profile.OrcidProfileSyncPreference;
+import org.dspace.app.profile.OrcidSyncMode;
 import org.dspace.app.profile.ResearcherProfile;
 import org.dspace.app.rest.model.ResearcherProfileRest;
 import org.dspace.app.rest.model.ResearcherProfileRest.OrcidSynchronizationRest;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.content.Item;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,6 +35,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class ResearcherProfileConverter implements DSpaceConverter<ResearcherProfile, ResearcherProfileRest> {
 
+    @Autowired
+    private OrcidSynchronizationService orcidSynchronizationService;
+
     @Override
     public ResearcherProfileRest convert(ResearcherProfile profile, Projection projection) {
         ResearcherProfileRest researcherProfileRest = new ResearcherProfileRest();
@@ -31,18 +46,44 @@ public class ResearcherProfileConverter implements DSpaceConverter<ResearcherPro
         researcherProfileRest.setId(profile.getId());
         researcherProfileRest.setProjection(projection);
 
-        if (profile.isLinkedToOrcid()) {
+        Item item = profile.getItem();
+
+        if (orcidSynchronizationService.isLinkedToOrcid(item)) {
             profile.getOrcid().ifPresent(researcherProfileRest::setOrcid);
 
             OrcidSynchronizationRest orcidSynchronization = new OrcidSynchronizationRest();
-            orcidSynchronization.setMode(profile.getOrcidSynchronizationMode());
-            orcidSynchronization.setProfilePreferences(profile.getOrcidSynchronizationProfilePreferences());
-            orcidSynchronization.setProjectsPreference(profile.getOrcidSynchronizationProjectsPreference());
-            orcidSynchronization.setPublicationsPreference(profile.getOrcidSynchronizationPublicationsPreference());
+            orcidSynchronization.setMode(getMode(item));
+            orcidSynchronization.setProfilePreferences(getProfilePreferences(item));
+            orcidSynchronization.setProjectsPreference(getProjectsPreference(item));
+            orcidSynchronization.setPublicationsPreference(getPublicationsPreference(item));
             researcherProfileRest.setOrcidSynchronization(orcidSynchronization);
         }
 
         return researcherProfileRest;
+    }
+
+    private String getPublicationsPreference(Item item) {
+        return orcidSynchronizationService.getEntityPreference(item, PUBLICATION)
+            .map(OrcidEntitySyncPreference::name)
+            .orElse(OrcidEntitySyncPreference.DISABLED.name());
+    }
+
+    private String getProjectsPreference(Item item) {
+        return orcidSynchronizationService.getEntityPreference(item, PROJECT)
+            .map(OrcidEntitySyncPreference::name)
+            .orElse(OrcidEntitySyncPreference.DISABLED.name());
+    }
+
+    private List<String> getProfilePreferences(Item item) {
+        return orcidSynchronizationService.getProfilePreferences(item).stream()
+            .map(OrcidProfileSyncPreference::name)
+            .collect(Collectors.toList());
+    }
+
+    private String getMode(Item item) {
+        return orcidSynchronizationService.getSynchronizationMode(item)
+            .map(OrcidSyncMode::name)
+            .orElse(OrcidSyncMode.MANUAL.name());
     }
 
     @Override
