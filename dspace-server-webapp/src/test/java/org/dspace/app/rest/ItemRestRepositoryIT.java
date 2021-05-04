@@ -3757,10 +3757,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
                                .andExpect(jsonPath("$.name", Matchers.is(item.getName())))
                                .andExpect(jsonPath("$.handle", Matchers.is(item.getHandle())))
-                               .andExpect(jsonPath("$.metadata", matchMetadata("dc.contributor.author", "Doe, John")))
-                               .andExpect(jsonPath("$.metadata", matchMetadata("dc.date.issued", "2017-10-17")))
-                               .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Public item 1")))
-                               .andExpect(jsonPath("$.metadata", matchMetadata("dc.subject", "ExtraEntry")))
+                               .andExpect(jsonPath("$.metadata").isEmpty())
                                .andExpect(jsonPath("$.withdrawn", Matchers.is(true)))
                                .andExpect(jsonPath("$.inArchive", Matchers.is(false)));
     }
