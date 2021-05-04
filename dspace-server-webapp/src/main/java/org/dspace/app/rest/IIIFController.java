@@ -10,8 +10,6 @@ package org.dspace.app.rest;
 import java.util.UUID;
 
 import org.dspace.app.rest.iiif.IIIFRestRepository;
-import org.dspace.app.rest.repository.AbstractDSpaceRestRepository;
-import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/iiif")
-public class IIIFController extends AbstractDSpaceRestRepository {
+public class IIIFController {
 
     @Autowired
     IIIFRestRepository iiifRestRepository;
@@ -44,8 +42,7 @@ public class IIIFController extends AbstractDSpaceRestRepository {
      */
     @RequestMapping(method = RequestMethod.GET, value = "/{id}/manifest")
     public String findOne(@PathVariable UUID id) {
-        Context context = obtainContext();
-        return iiifRestRepository.getManifest(context, id);
+        return iiifRestRepository.getManifest(id);
     }
 
     /**
@@ -61,13 +58,13 @@ public class IIIFController extends AbstractDSpaceRestRepository {
      * This endpoint for searches within the manifest scope (by DSpace item uuid).
      *
      * @param id DSpace Item uuid
-     * @param q query terms
+     * @param query query terms
      * @return AnnotationList as JSON
      */
     @RequestMapping(method = RequestMethod.GET, value = "/{id}/manifest/search")
     public String searchInManifest(@PathVariable UUID id,
-                                   @RequestParam(name = "q") String q) {
-        return iiifRestRepository.searchInManifest(id, q);
+                                   @RequestParam(name = "q") String query) {
+        return iiifRestRepository.searchInManifest(id, query);
     }
 
     /**
@@ -83,8 +80,7 @@ public class IIIFController extends AbstractDSpaceRestRepository {
      */
     @RequestMapping(method = RequestMethod.GET, value = "/{id}/manifest/seeAlso")
     public String findSeeAlsoList(@PathVariable UUID id) {
-        Context context = obtainContext();
-        return iiifRestRepository.getSeeAlsoAnnotations(context, id);
+        return iiifRestRepository.getSeeAlsoAnnotations(id);
     }
 
     /**
@@ -101,7 +97,6 @@ public class IIIFController extends AbstractDSpaceRestRepository {
      */
     @RequestMapping(method = RequestMethod.GET, value = "/{id}/canvas/{cid}")
     public String findCanvas(@PathVariable UUID id, @PathVariable String cid) {
-        Context context = obtainContext();
-        return iiifRestRepository.getCanvas(context, id, cid);
+        return iiifRestRepository.getCanvas(id, cid);
     }
 }
