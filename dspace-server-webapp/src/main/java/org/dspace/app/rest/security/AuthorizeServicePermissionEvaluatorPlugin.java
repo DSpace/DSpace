@@ -89,8 +89,10 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends RestObjectPermiss
                     // If the item is still inprogress we can process here only the READ permission.
                     // Other actions need to be evaluated against the wrapper object (workspace or workflow item)
                     if (dSpaceObject instanceof Item) {
-                        if (!DSpaceRestPermission.READ.equals(restPermission)
-                            && !((Item) dSpaceObject).isArchived() && !((Item) dSpaceObject).isWithdrawn()) {
+                        if (((Item) dSpaceObject).isWithdrawn()) {
+                            return true;
+                        }
+                        if (!DSpaceRestPermission.READ.equals(restPermission) && !((Item) dSpaceObject).isArchived()) {
                             return false;
                         }
                     }
