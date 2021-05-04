@@ -26,6 +26,7 @@ public class OrcidValidationException extends RuntimeException {
     private final List<OrcidValidationError> errors;
 
     public OrcidValidationException(List<OrcidValidationError> errors) {
+        super("Errors occurs during ORCID object validation");
         this.errors = errors;
     }
 
@@ -33,7 +34,12 @@ public class OrcidValidationException extends RuntimeException {
         return errors;
     }
 
-    public String formatMessage() {
+    @Override
+    public String getMessage() {
+        return super.getMessage() + ". Error codes: " + formatErrors();
+    }
+
+    private String formatErrors() {
         return errors.stream()
             .map(error -> error.getCode())
             .collect(Collectors.joining(","));

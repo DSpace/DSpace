@@ -9,7 +9,6 @@ package org.dspace.app.orcid.model.validator;
 
 import java.util.List;
 
-import org.orcid.jaxb.model.v3.release.common.Organization;
 import org.orcid.jaxb.model.v3.release.record.Affiliation;
 import org.orcid.jaxb.model.v3.release.record.Funding;
 import org.orcid.jaxb.model.v3.release.record.Work;
@@ -36,7 +35,7 @@ public interface OrcidValidator {
      * @param  work the work to validate
      * @return      the validation errors, if any
      */
-    List<OrcidValidationError> validate(Work work);
+    List<OrcidValidationError> validateWork(Work work);
 
     /**
      * Validate the given funding and returns the validation errors, if any.
@@ -44,7 +43,7 @@ public interface OrcidValidator {
      * @param  funding the funding to validate
      * @return         the validation errors, if any
      */
-    List<OrcidValidationError> validate(Funding funding);
+    List<OrcidValidationError> validateFunding(Funding funding);
 
     /**
      * Validate the given affiliation and returns the validation errors, if any.
@@ -52,13 +51,5 @@ public interface OrcidValidator {
      * @param  affiliation the affiliation to validate
      * @return             the validation errors, if any
      */
-    List<OrcidValidationError> validate(Affiliation affiliation);
-
-    /**
-     * Validate the given organization and returns the validation errors, if any.
-     *
-     * @param  organization the organization to validate
-     * @return              the validation errors, if any
-     */
-    List<OrcidValidationError> validate(Organization organization);
+    List<OrcidValidationError> validateAffiliation(Affiliation affiliation);
 }

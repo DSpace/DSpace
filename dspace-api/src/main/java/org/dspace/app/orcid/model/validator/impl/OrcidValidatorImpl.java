@@ -60,22 +60,22 @@ public class OrcidValidatorImpl implements OrcidValidator {
     public List<OrcidValidationError> validate(Object object) {
 
         if (object instanceof Work && isWorkValidationEnabled()) {
-            return validate((Work) object);
+            return validateWork((Work) object);
         }
 
         if (object instanceof Funding && isFundingValidationEnabled()) {
-            return validate((Funding) object);
+            return validateFunding((Funding) object);
         }
 
         if (object instanceof Affiliation && isAffiliationValidationEnabled()) {
-            return validate((Affiliation) object);
+            return validateAffiliation((Affiliation) object);
         }
 
         return Collections.emptyList();
     }
 
     @Override
-    public List<OrcidValidationError> validate(Work work) {
+    public List<OrcidValidationError> validateWork(Work work) {
         List<OrcidValidationError> errors = new ArrayList<OrcidValidationError>();
 
         WorkTitle title = work.getWorkTitle();
@@ -91,7 +91,7 @@ public class OrcidValidatorImpl implements OrcidValidator {
     }
 
     @Override
-    public List<OrcidValidationError> validate(Funding funding) {
+    public List<OrcidValidationError> validateFunding(Funding funding) {
 
         List<OrcidValidationError> errors = new ArrayList<OrcidValidationError>();
 
@@ -116,7 +116,7 @@ public class OrcidValidatorImpl implements OrcidValidator {
     }
 
     @Override
-    public List<OrcidValidationError> validate(Affiliation affiliation) {
+    public List<OrcidValidationError> validateAffiliation(Affiliation affiliation) {
         List<OrcidValidationError> errors = new ArrayList<OrcidValidationError>();
         if (affiliation.getStartDate() == null) {
             errors.add(START_DATE_REQUIRED);
@@ -131,8 +131,7 @@ public class OrcidValidatorImpl implements OrcidValidator {
         return errors;
     }
 
-    @Override
-    public List<OrcidValidationError> validate(Organization organization) {
+    private List<OrcidValidationError> validate(Organization organization) {
         List<OrcidValidationError> errors = new ArrayList<OrcidValidationError>();
         if (isBlank(organization.getName())) {
             errors.add(ORGANIZATION_NAME_REQUIRED);

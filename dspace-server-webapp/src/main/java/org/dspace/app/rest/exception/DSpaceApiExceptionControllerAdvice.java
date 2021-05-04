@@ -141,7 +141,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     @ExceptionHandler({ OrcidValidationException.class })
     protected void handleOrcidValidationException(HttpServletRequest request, HttpServletResponse response,
         OrcidValidationException ex) throws IOException {
-        sendErrorResponse(request, response, ex, ex.formatMessage(), HttpStatus.UNPROCESSABLE_ENTITY.value());
+        sendErrorResponse(request, response, ex, ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
     /**
