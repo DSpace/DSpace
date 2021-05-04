@@ -3574,4 +3574,195 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
     }
 
+    @Test
+    public void findWithdrawnItemByAnonymousTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Public item 1")
+                               .withIssueDate("2017-10-17")
+                               .withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", true);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        // check item status
+        getClient(token).perform(get("/api/core/items/" + item.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                        .andExpect(jsonPath("$.withdrawn", Matchers.is(false)))
+                        .andExpect(jsonPath("$.inArchive", Matchers.is(true)));
+
+        // withdraw item
+        getClient(token).perform(patch("/api/core/items/" + item.getID())
+                        .content(patchBody)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                        .andExpect(jsonPath("$.withdrawn", Matchers.is(true)))
+                        .andExpect(jsonPath("$.inArchive", Matchers.is(false)));
+
+        // check item status after the patch
+        getClient(token).perform(get("/api/core/items/" + item.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                        .andExpect(jsonPath("$.withdrawn", Matchers.is(true)))
+                        .andExpect(jsonPath("$.inArchive", Matchers.is(false)));
+
+        // check item status
+        getClient().perform(get("/api/core/items/" + item.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                   .andExpect(jsonPath("$.name", Matchers.is(item.getName())))
+                   .andExpect(jsonPath("$.handle", Matchers.is(item.getHandle())))
+                   .andExpect(jsonPath("$.metadata").isEmpty())
+                   .andExpect(jsonPath("$.withdrawn", Matchers.is(true)))
+                   .andExpect(jsonPath("$.inArchive", Matchers.is(false)));
+
+    }
+
+    @Test
+    public void findWithdrawnItemByAdminTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Public item 1")
+                               .withIssueDate("2017-10-17")
+                               .withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", true);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        // check item status
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                             .andExpect(jsonPath("$.withdrawn", Matchers.is(false)))
+                             .andExpect(jsonPath("$.inArchive", Matchers.is(true)));
+
+        // withdraw item
+        getClient(tokenAdmin).perform(patch("/api/core/items/" + item.getID())
+                             .content(patchBody)
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                             .andExpect(jsonPath("$.withdrawn", Matchers.is(true)))
+                             .andExpect(jsonPath("$.inArchive", Matchers.is(false)));
+
+        // check item status after the patch
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                             .andExpect(jsonPath("$.withdrawn", Matchers.is(true)))
+                             .andExpect(jsonPath("$.inArchive", Matchers.is(false)));
+
+        // check item status
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(item.getName())))
+                             .andExpect(jsonPath("$.handle", Matchers.is(item.getHandle())))
+                             .andExpect(jsonPath("$.metadata", matchMetadata("dc.contributor.author", "Doe, John")))
+                             .andExpect(jsonPath("$.metadata", matchMetadata("dc.date.issued", "2017-10-17")))
+                             .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Public item 1")))
+                             .andExpect(jsonPath("$.metadata", matchMetadata("dc.subject", "ExtraEntry")))
+                             .andExpect(jsonPath("$.withdrawn", Matchers.is(true)))
+                             .andExpect(jsonPath("$.inArchive", Matchers.is(false)));
+    }
+
+    @Test
+    public void findWithdrawnItemByLoggedUserTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Public item 1")
+                               .withIssueDate("2017-10-17")
+                               .withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", true);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        // check item status
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                             .andExpect(jsonPath("$.withdrawn", Matchers.is(false)))
+                             .andExpect(jsonPath("$.inArchive", Matchers.is(true)));
+
+        // withdraw item
+        getClient(tokenAdmin).perform(patch("/api/core/items/" + item.getID())
+                             .content(patchBody)
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                             .andExpect(jsonPath("$.withdrawn", Matchers.is(true)))
+                             .andExpect(jsonPath("$.inArchive", Matchers.is(false)));
+
+        // check item status after the patch
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                             .andExpect(jsonPath("$.withdrawn", Matchers.is(true)))
+                             .andExpect(jsonPath("$.inArchive", Matchers.is(false)));
+
+        // check item status
+        getClient(tokenEperson).perform(get("/api/core/items/" + item.getID()))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                               .andExpect(jsonPath("$.name", Matchers.is(item.getName())))
+                               .andExpect(jsonPath("$.handle", Matchers.is(item.getHandle())))
+                               .andExpect(jsonPath("$.metadata", matchMetadata("dc.contributor.author", "Doe, John")))
+                               .andExpect(jsonPath("$.metadata", matchMetadata("dc.date.issued", "2017-10-17")))
+                               .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Public item 1")))
+                               .andExpect(jsonPath("$.metadata", matchMetadata("dc.subject", "ExtraEntry")))
+                               .andExpect(jsonPath("$.withdrawn", Matchers.is(true)))
+                               .andExpect(jsonPath("$.inArchive", Matchers.is(false)));
+    }
+
 }
