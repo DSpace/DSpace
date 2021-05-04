@@ -27,11 +27,11 @@ import org.springframework.stereotype.Component;
  * current user is the object's admin. Otherwise, authorization is granted if the current user can view the object.
  */
 @Component
-@AuthorizationFeatureDocumentation(name = ViewVersionsFeature.NAME,
+@AuthorizationFeatureDocumentation(name = CanSeeVersionsFeature.NAME,
     description = "It can be used to verify if the user can view the versions of an Item")
-public class ViewVersionsFeature implements AuthorizationFeature {
+public class CanSeeVersionsFeature implements AuthorizationFeature {
 
-    public final static String NAME = "canViewVersions";
+    public final static String NAME = "canSeeVersions";
 
     @Autowired
     private ConfigurationService configurationService;
