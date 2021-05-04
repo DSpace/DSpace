@@ -19,6 +19,7 @@ import java.util.UUID;
 
 import org.dspace.app.profile.OrcidEntitySyncPreference;
 import org.dspace.app.profile.OrcidProfileSyncPreference;
+import org.dspace.app.profile.OrcidSynchronizationMode;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
@@ -224,6 +225,14 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withOrcidSynchronizationProfilePreference(String value) {
         return addMetadataValue(item, "cris", "orcid", "sync-profile", value);
+    }
+
+    public ItemBuilder withOrcidSynchronizationMode(OrcidSynchronizationMode mode) {
+        return withOrcidSynchronizationMode(mode.name());
+    }
+
+    private ItemBuilder withOrcidSynchronizationMode(String mode) {
+        return setMetadataSingleValue(item, "cris", "orcid", "sync-mode", mode);
     }
 
     public ItemBuilder withIsniIdentifier(String isni) {

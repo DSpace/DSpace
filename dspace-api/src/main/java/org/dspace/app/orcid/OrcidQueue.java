@@ -79,17 +79,13 @@ public class OrcidQueue implements ReloadableEntity<Integer> {
         return entity == null && isNotEmpty(putCode);
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
+    public void setID(Integer id) {
         this.id = id;
     }
 
     @Override
     public Integer getID() {
-        return getId();
+        return this.id;
     }
 
     public Item getOwner() {

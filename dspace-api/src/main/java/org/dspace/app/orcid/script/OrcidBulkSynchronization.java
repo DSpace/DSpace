@@ -1,0 +1,239 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+package org.dspace.app.orcid.script;
+
+import static org.dspace.app.profile.OrcidSynchronizationMode.BATCH;
+import static org.dspace.app.profile.OrcidSynchronizationMode.MANUAL;
+import static org.dspace.util.ExceptionMessageUtils.getRootMessage;
+
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.apache.commons.cli.ParseException;
+import org.dspace.app.orcid.OrcidHistory;
+import org.dspace.app.orcid.OrcidQueue;
+import org.dspace.app.orcid.exception.OrcidValidationException;
+import org.dspace.app.orcid.factory.OrcidServiceFactory;
+import org.dspace.app.orcid.service.OrcidHistoryService;
+import org.dspace.app.orcid.service.OrcidQueueService;
+import org.dspace.app.orcid.service.OrcidSynchronizationService;
+import org.dspace.app.profile.OrcidSynchronizationMode;
+import org.dspace.content.Item;
+import org.dspace.core.Context;
+import org.dspace.core.exception.SQLRuntimeException;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.utils.DSpace;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Script that perform the bulk synchronization with ORCID registry of all the
+ * ORCID queue records that has an owner that configure the synchronization mode
+ * equals to BATCH.
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ */
+public class OrcidBulkSynchronization
+    extends DSpaceRunnable<OrcidBulkSynchronizationScriptConfiguration<OrcidBulkSynchronization>> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrcidBulkSynchronization.class);
+
+    private OrcidQueueService orcidQueueService;
+
+    private OrcidHistoryService orcidHistoryService;
+
+    private OrcidSynchronizationService orcidSynchronizationService;
+
+    private Context context;
+
+    private Map<Item, OrcidSynchronizationMode> synchronizationModeByOwner = new HashMap<>();
+
+    @Override
+    public void setup() throws ParseException {
+        OrcidServiceFactory orcidServiceFactory = OrcidServiceFactory.getInstance();
+        this.orcidQueueService = orcidServiceFactory.getOrcidQueueService();
+        this.orcidHistoryService = orcidServiceFactory.getOrcidHistoryService();
+        this.orcidSynchronizationService = orcidServiceFactory.getOrcidSynchronizationService();
+    }
+
+    @Override
+    public void internalRun() throws Exception {
+        context = new Context();
+        assignCurrentUserInContext();
+        assignSpecialGroupsInContext();
+
+        try {
+            context.turnOffAuthorisationSystem();
+            performBulkSynchronization();
+            context.complete();
+        } catch (Exception e) {
+            handler.handleException(e);
+            context.abort();
+        } finally {
+            context.restoreAuthSystemState();
+        }
+    }
+
+    private void performBulkSynchronization() throws SQLException {
+
+        List<OrcidQueue> queueRecords = findQueueRecordsToSynchronize();
+        handler.logInfo("Found " + queueRecords.size() + " queue records to synchronize with ORCID");
+
+        for (OrcidQueue queueRecord : queueRecords) {
+            performSynchronization(queueRecord);
+        }
+
+    }
+
+    private List<OrcidQueue> findQueueRecordsToSynchronize() throws SQLException {
+        return orcidQueueService.findAll(context).stream()
+            .filter(record -> getOwnerSynchronizationMode(record.getOwner()) == BATCH)
+            .collect(Collectors.toList());
+    }
+
+    private void performSynchronization(OrcidQueue queueRecord) {
+
+        try {
+
+            queueRecord = reload(queueRecord);
+
+            handler.logInfo(getOperationInfoMessage(queueRecord));
+
+            OrcidHistory orcidHistory = orcidHistoryService.synchronizeWithOrcid(context, queueRecord, false);
+
+            handler.logInfo(getSynchronizationResultMessage(orcidHistory));
+
+            commitTransaction();
+
+        } catch (OrcidValidationException ex) {
+            rollbackTransaction();
+            handler.logError(getValidationErrorMessage(ex));
+        } catch (Exception ex) {
+            rollbackTransaction();
+            String errorMessage = getUnexpectedErrorMessage(ex);
+            LOGGER.error(errorMessage, ex);
+            handler.logError(errorMessage);
+        }
+
+    }
+
+    private OrcidSynchronizationMode getOwnerSynchronizationMode(Item owner) {
+        OrcidSynchronizationMode synchronizationMode = synchronizationModeByOwner.get(owner);
+        if (synchronizationMode == null) {
+            synchronizationMode = orcidSynchronizationService.getSynchronizationMode(owner).orElse(MANUAL);
+            synchronizationModeByOwner.put(owner, synchronizationMode);
+        }
+        return synchronizationMode;
+    }
+
+    private String getOperationInfoMessage(OrcidQueue record) {
+
+        UUID ownerId = record.getOwner().getID();
+        String putCode = record.getPutCode();
+        String type = record.getRecordType();
+
+        switch (record.getOperation()) {
+            case INSERT:
+                return "Addition of " + type + " for profile with ID: " + ownerId;
+            case UPDATE:
+                return "Update of " + type + " for profile with ID: " + ownerId + " by put code " + putCode;
+            case DELETE:
+                return "Deletion of " + type + " for profile with ID: " + ownerId + " by put code " + putCode;
+            default:
+                return "Synchronization of " + type + " data for profile with ID: " + ownerId;
+        }
+
+    }
+
+    private String getSynchronizationResultMessage(OrcidHistory orcidHistory) {
+
+        String message = "History record created with status " + orcidHistory.getStatus();
+
+        switch (orcidHistory.getStatus()) {
+            case 201:
+            case 200:
+            case 204:
+                message += ". The operation was completed successfully";
+                break;
+            case 400:
+                message += ". The resource sent to ORCID registry is not valid";
+                break;
+            case 404:
+                message += ". The resource does not exists anymore on the ORCID registry";
+                break;
+            case 409:
+                message += ". The resource is already present on the ORCID registry";
+                break;
+            default:
+                break;
+        }
+
+        return message;
+
+    }
+
+    private String getValidationErrorMessage(OrcidValidationException ex) {
+        return ex.getMessage();
+    }
+
+    private String getUnexpectedErrorMessage(Exception ex) {
+        return "An unexpected error occurs during the synchronization: " + getRootMessage(ex);
+    }
+
+    private void assignCurrentUserInContext() throws SQLException {
+        UUID uuid = getEpersonIdentifier();
+        if (uuid != null) {
+            EPerson ePerson = EPersonServiceFactory.getInstance().getEPersonService().find(context, uuid);
+            context.setCurrentUser(ePerson);
+        }
+    }
+
+    private void assignSpecialGroupsInContext() throws SQLException {
+        for (UUID uuid : handler.getSpecialGroups()) {
+            context.setSpecialGroup(uuid);
+        }
+    }
+
+    private OrcidQueue reload(OrcidQueue queueRecord) {
+        try {
+            return context.reloadEntity(queueRecord);
+        } catch (SQLException e) {
+            throw new SQLRuntimeException(e);
+        }
+    }
+
+    private void commitTransaction() {
+        try {
+            context.commit();
+        } catch (SQLException e) {
+            throw new SQLRuntimeException(e);
+        }
+    }
+
+    private void rollbackTransaction() {
+        try {
+            context.rollback();
+        } catch (SQLException e) {
+            throw new SQLRuntimeException(e);
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public OrcidBulkSynchronizationScriptConfiguration<OrcidBulkSynchronization> getScriptConfiguration() {
+        return new DSpace().getServiceManager().getServiceByName("orcid-bulk-synchronization",
+            OrcidBulkSynchronizationScriptConfiguration.class);
+    }
+
+}

@@ -23,7 +23,7 @@ import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.app.orcid.service.OrcidSynchronizationService;
 import org.dspace.app.profile.OrcidEntitySyncPreference;
 import org.dspace.app.profile.OrcidProfileSyncPreference;
-import org.dspace.app.profile.OrcidSyncMode;
+import org.dspace.app.profile.OrcidSynchronizationMode;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
@@ -80,7 +80,8 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
     }
 
     @Override
-    public void setSynchronizationMode(Context context, Item profile,  OrcidSyncMode value) throws SQLException {
+    public void setSynchronizationMode(Context context, Item profile, OrcidSynchronizationMode value)
+        throws SQLException {
 
         if (!isLinkedToOrcid(profile)) {
             throw new IllegalArgumentException("The given profile cannot be configured for the ORCID "
@@ -128,11 +129,11 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
     }
 
     @Override
-    public Optional<OrcidSyncMode> getSynchronizationMode(Item item) {
+    public Optional<OrcidSynchronizationMode> getSynchronizationMode(Item item) {
         return getMetadataValue(item, "cris.orcid.sync-mode")
             .map(metadataValue -> metadataValue.getValue())
-            .filter(value -> isValidEnum(OrcidSyncMode.class, value))
-            .map(value -> OrcidSyncMode.valueOf(value));
+            .filter(value -> isValidEnum(OrcidSynchronizationMode.class, value))
+            .map(value -> OrcidSynchronizationMode.valueOf(value));
     }
 
     @Override

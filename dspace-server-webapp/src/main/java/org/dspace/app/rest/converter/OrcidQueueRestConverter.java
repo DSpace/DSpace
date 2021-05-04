@@ -31,7 +31,7 @@ public class OrcidQueueRestConverter implements DSpaceConverter<OrcidQueue, Orci
         rest.setEntityId(entity != null ? entity.getID() : null);
         rest.setDescription(orcidQueue.getDescription());
         rest.setRecordType(orcidQueue.getRecordType());
-        rest.setId(orcidQueue.getId());
+        rest.setId(orcidQueue.getID());
         rest.setOwnerId(orcidQueue.getOwner().getID());
         rest.setOperation(orcidQueue.getOperation() != null ? orcidQueue.getOperation().name() : null);
         rest.setProjection(projection);

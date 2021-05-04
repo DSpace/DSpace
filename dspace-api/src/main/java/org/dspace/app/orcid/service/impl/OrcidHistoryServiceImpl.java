@@ -7,6 +7,7 @@
  */
 package org.dspace.app.orcid.service.impl;
 
+import static java.lang.String.format;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.nullsFirst;
@@ -21,6 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.dspace.app.orcid.OrcidHistory;
 import org.dspace.app.orcid.OrcidOperation;
@@ -157,11 +159,15 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     public OrcidHistory synchronizeWithOrcid(Context context, OrcidQueue orcidQueue, boolean forceAddition)
         throws SQLException {
 
+        Item owner = orcidQueue.getOwner();
+
         String orcid = getMetadataValue(orcidQueue.getOwner(), "person.identifier.orcid")
-            .orElseThrow(() -> new IllegalArgumentException("The related owner item does not have an orcid"));
+            .orElseThrow(() -> new IllegalArgumentException(
+                format("The related owner item (id = %s) does not have an orcid", owner.getID())));
 
         String token = getMetadataValue(orcidQueue.getOwner(), "cris.orcid.access-token")
-            .orElseThrow(() -> new IllegalArgumentException("The related owner item does not have an access token"));
+            .orElseThrow(() -> new IllegalArgumentException(
+                format("The related owner item (id = %s) does not have an access token", owner.getID())));
 
         OrcidOperation operation = calculateOperation(orcidQueue, forceAddition);
 
@@ -197,7 +203,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     private OrcidOperation calculateOperation(OrcidQueue orcidQueue, boolean forceAddition) {
         OrcidOperation operation = orcidQueue.getOperation();
         if (operation == null) {
-            throw new IllegalArgumentException("The orcid queue record with id " + orcidQueue.getId()
+            throw new IllegalArgumentException("The orcid queue record with id " + orcidQueue.getID()
                 + "  has no operation defined");
         }
         return operation != OrcidOperation.DELETE && forceAddition ? OrcidOperation.INSERT : operation;
@@ -306,7 +312,8 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     }
 
     private Optional<String> getMetadataValue(Item item, String metadataField) {
-        return ofNullable(itemService.getMetadataFirstValue(item, new MetadataFieldName(metadataField), Item.ANY));
+        return ofNullable(itemService.getMetadataFirstValue(item, new MetadataFieldName(metadataField), Item.ANY))
+            .filter(StringUtils::isNotBlank);
     }
 
     private boolean isProfileSectionType(OrcidQueue orcidQueue) {

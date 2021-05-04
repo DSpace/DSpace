@@ -79,17 +79,13 @@ public class OrcidHistory implements ReloadableEntity<Integer> {
         this.status = status;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
     public void setId(Integer id) {
         this.id = id;
     }
 
     @Override
     public Integer getID() {
-        return getId();
+        return id;
     }
 
     public Item getOwner() {

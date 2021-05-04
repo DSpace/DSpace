@@ -79,6 +79,11 @@
         <property name="description" value="Perform the creating of workspace item using external source"/>
         <property name="dspaceRunnableClass" value="org.dspace.script2externalservices.CreateWorkspaceItemWithExternalSourceCli"/>
     </bean>
+    
+    <bean id="orcid-bulk-synchronization" class="org.dspace.app.orcid.script.OrcidBulkSynchronizationScriptConfiguration">
+        <property name="description" value="Perform the bulk synchronization of all the BATCH configured ORCID entities placed in the ORCID queue"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.orcid.script.OrcidBulkSynchronization"/>
+    </bean>
 
     <!-- Keep as last script; for test ScriptRestRepository#findOneScriptByNameTest -->
     <bean id="mock-script" class="org.dspace.scripts.MockDSpaceRunnableScriptConfiguration" scope="prototype">

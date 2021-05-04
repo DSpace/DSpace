@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import org.dspace.app.orcid.service.OrcidSynchronizationService;
 import org.dspace.app.profile.OrcidEntitySyncPreference;
 import org.dspace.app.profile.OrcidProfileSyncPreference;
-import org.dspace.app.profile.OrcidSyncMode;
+import org.dspace.app.profile.OrcidSynchronizationMode;
 import org.dspace.app.profile.ResearcherProfile;
 import org.dspace.app.rest.model.ResearcherProfileRest;
 import org.dspace.app.rest.model.ResearcherProfileRest.OrcidSynchronizationRest;
@@ -82,8 +82,8 @@ public class ResearcherProfileConverter implements DSpaceConverter<ResearcherPro
 
     private String getMode(Item item) {
         return orcidSynchronizationService.getSynchronizationMode(item)
-            .map(OrcidSyncMode::name)
-            .orElse(OrcidSyncMode.MANUAL.name());
+            .map(OrcidSynchronizationMode::name)
+            .orElse(OrcidSynchronizationMode.MANUAL.name());
     }
 
     @Override
