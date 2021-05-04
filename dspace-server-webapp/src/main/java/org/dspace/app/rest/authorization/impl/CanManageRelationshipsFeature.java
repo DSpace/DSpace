@@ -6,32 +6,32 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.authorization.impl;
-
 import java.sql.SQLException;
 
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.model.BaseObjectRest;
-import org.dspace.app.rest.model.CollectionRest;
+import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * The manage mapped items feature. It can be used to verify if mapped items can be listed, searched, added and removed.
- *
- * Authorization is granted if the current user has ADD and WRITE permissions on the given Collection.
+ * The CanManageRelationshipsFeature feature. It can be used to verify
+ * if the user has WRITE permission on the Item.
+ * 
+ * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
 @Component
-@AuthorizationFeatureDocumentation(name = ManageMappedItemsFeature.NAME,
-    description = "It can be used to verify if mapped items can be listed, searched, added and removed")
-public class ManageMappedItemsFeature implements AuthorizationFeature {
+@AuthorizationFeatureDocumentation(name = CanManageRelationshipsFeature.NAME,
+    description = "It can be used to verify if the user has permissions to manage relationships of the Item")
+public class CanManageRelationshipsFeature implements AuthorizationFeature {
 
-    public final static String NAME = "canManageMappedItems";
+    public static final String NAME = "canManageRelationships";
 
     @Autowired
     private AuthorizeService authorizeService;
@@ -41,13 +41,10 @@ public class ManageMappedItemsFeature implements AuthorizationFeature {
 
     @Override
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
-        if (object instanceof CollectionRest) {
-            Collection collection = (Collection)utils.getDSpaceAPIObjectFromRest(context, object);
-
-            if (authorizeService.authorizeActionBoolean(context, collection, Constants.WRITE)
-                && authorizeService.authorizeActionBoolean(context, collection, Constants.ADD)) {
-                return true;
-            }
+        if (object instanceof ItemRest) {
+            DSpaceObject dSpaceObject = (DSpaceObject) utils.getDSpaceAPIObjectFromRest(context, object);
+            return authorizeService.authorizeActionBoolean(context, context.getCurrentUser(),
+                    dSpaceObject, Constants.WRITE, true);
         }
         return false;
     }
@@ -55,7 +52,7 @@ public class ManageMappedItemsFeature implements AuthorizationFeature {
     @Override
     public String[] getSupportedTypes() {
         return new String[]{
-            CollectionRest.CATEGORY + "." + CollectionRest.NAME
+            ItemRest.CATEGORY + "." + ItemRest.NAME
         };
     }
 }
