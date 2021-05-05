@@ -80,4 +80,14 @@ public interface OrcidQueueDAO extends GenericDAO<OrcidQueue> {
      * @throws SQLException if database error occurs
      */
     public List<OrcidQueue> findByEntityAndRecordType(Context context, Item entity, String type) throws SQLException;
+
+    /**
+     * Get all the OrcidQueue records with attempts less than the given attempts.
+     *
+     * @param  context      DSpace context object
+     * @param  attempts     the maximum value of attempts
+     * @return              the found OrcidQueue records
+     * @throws SQLException if database error
+     */
+    public List<OrcidQueue> findByAttemptsLessThan(Context context, int attempts) throws SQLException;
 }

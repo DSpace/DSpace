@@ -67,6 +67,9 @@ public class OrcidQueue implements ReloadableEntity<Integer> {
     @Column(name = "operation")
     private OrcidOperation operation;
 
+    @Column(name = "attempts")
+    private Integer attempts = 0;
+
     public boolean isInsertAction() {
         return entity != null && isEmpty(putCode);
     }
@@ -162,6 +165,14 @@ public class OrcidQueue implements ReloadableEntity<Integer> {
 
     public void setOperation(OrcidOperation operation) {
         this.operation = operation;
+    }
+
+    public Integer getAttempts() {
+        return attempts;
+    }
+
+    public void setAttempts(Integer attempts) {
+        this.attempts = attempts;
     }
 
     @Override

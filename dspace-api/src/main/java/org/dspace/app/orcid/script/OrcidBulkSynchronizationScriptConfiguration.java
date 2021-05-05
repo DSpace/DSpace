@@ -33,7 +33,7 @@ public class OrcidBulkSynchronizationScriptConfiguration<T extends OrcidBulkSync
     @Override
     public boolean isAllowedToExecute(Context context) {
         try {
-            return authorizeService.isCollectionAdmin(context) || authorizeService.isAdmin(context);
+            return authorizeService.isAdmin(context);
         } catch (SQLException e) {
             throw new RuntimeException("SQLException occurred when checking if the current user is an admin", e);
         }
@@ -53,6 +53,11 @@ public class OrcidBulkSynchronizationScriptConfiguration<T extends OrcidBulkSync
     public Options getOptions() {
         if (options == null) {
             Options options = new Options();
+
+            options.addOption("f", "force", false, "force the synchronization ignoring maximum attempts");
+            options.getOption("f").setType(boolean.class);
+            options.getOption("f").setRequired(false);
+
             super.options = options;
         }
         return options;

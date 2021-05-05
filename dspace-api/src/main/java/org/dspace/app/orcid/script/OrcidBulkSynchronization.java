@@ -33,6 +33,8 @@ import org.dspace.core.exception.SQLRuntimeException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,9 +57,13 @@ public class OrcidBulkSynchronization
 
     private OrcidSynchronizationService orcidSynchronizationService;
 
+    private ConfigurationService configurationService;
+
     private Context context;
 
     private Map<Item, OrcidSynchronizationMode> synchronizationModeByOwner = new HashMap<>();
+
+    private boolean ignoreMaxAttempts = false;
 
     @Override
     public void setup() throws ParseException {
@@ -65,6 +71,12 @@ public class OrcidBulkSynchronization
         this.orcidQueueService = orcidServiceFactory.getOrcidQueueService();
         this.orcidHistoryService = orcidServiceFactory.getOrcidHistoryService();
         this.orcidSynchronizationService = orcidServiceFactory.getOrcidSynchronizationService();
+        this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+        if (commandLine.hasOption('f')) {
+            ignoreMaxAttempts = true;
+        }
+
     }
 
     @Override
@@ -97,9 +109,18 @@ public class OrcidBulkSynchronization
     }
 
     private List<OrcidQueue> findQueueRecordsToSynchronize() throws SQLException {
-        return orcidQueueService.findAll(context).stream()
+        return findQueueRecords().stream()
             .filter(record -> getOwnerSynchronizationMode(record.getOwner()) == BATCH)
             .collect(Collectors.toList());
+    }
+
+    private List<OrcidQueue> findQueueRecords() throws SQLException {
+        if (ignoreMaxAttempts) {
+            return orcidQueueService.findAll(context);
+        } else {
+            int attempts = configurationService.getIntProperty("orcid.bulk-synchronization.max-attempts");
+            return orcidQueueService.findByAttemptsLessThan(context, attempts);
+        }
     }
 
     private void performSynchronization(OrcidQueue queueRecord) {
@@ -124,6 +145,8 @@ public class OrcidBulkSynchronization
             String errorMessage = getUnexpectedErrorMessage(ex);
             LOGGER.error(errorMessage, ex);
             handler.logError(errorMessage);
+        } finally {
+            incrementAttempts(queueRecord);
         }
 
     }
@@ -142,6 +165,10 @@ public class OrcidBulkSynchronization
         UUID ownerId = record.getOwner().getID();
         String putCode = record.getPutCode();
         String type = record.getRecordType();
+
+        if (record.getOperation() == null) {
+            return "Synchronization of " + type + " data for profile with ID: " + ownerId;
+        }
 
         switch (record.getOperation()) {
             case INSERT:
@@ -189,6 +216,22 @@ public class OrcidBulkSynchronization
 
     private String getUnexpectedErrorMessage(Exception ex) {
         return "An unexpected error occurs during the synchronization: " + getRootMessage(ex);
+    }
+
+    private void incrementAttempts(OrcidQueue queueRecord) {
+        queueRecord = reload(queueRecord);
+        if (queueRecord == null) {
+            return;
+        }
+
+        try {
+            queueRecord.setAttempts(queueRecord.getAttempts() != null ? queueRecord.getAttempts() + 1 : 1);
+            orcidQueueService.update(context, queueRecord);
+            commitTransaction();
+        } catch (SQLException e) {
+            throw new SQLRuntimeException(e);
+        }
+
     }
 
     private void assignCurrentUserInContext() throws SQLException {

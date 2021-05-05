@@ -34,6 +34,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.function.Predicate;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.orcid.OrcidHistory;
@@ -52,6 +53,8 @@ import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -72,6 +75,8 @@ public class OrcidBulkSynchronizationIT extends AbstractIntegrationTestWithDatab
 
     private OrcidQueueService orcidQueueService;
 
+    private ConfigurationService configurationService;
+
     private OrcidClient orcidClient;
 
     private OrcidClient orcidClientMock;
@@ -81,6 +86,8 @@ public class OrcidBulkSynchronizationIT extends AbstractIntegrationTestWithDatab
 
         orcidHistoryService = (OrcidHistoryServiceImpl) OrcidServiceFactory.getInstance().getOrcidHistoryService();
         orcidQueueService = OrcidServiceFactory.getInstance().getOrcidQueueService();
+
+        configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
         context.setCurrentUser(admin);
 
@@ -116,7 +123,7 @@ public class OrcidBulkSynchronizationIT extends AbstractIntegrationTestWithDatab
 
     @Test
     public void testWithoutOrcidQueueRecords() throws Exception {
-        TestDSpaceRunnableHandler handler = runBulkSynchronization();
+        TestDSpaceRunnableHandler handler = runBulkSynchronization(false);
         assertThat(handler.getInfoMessages(), hasSize(1));
         assertThat(handler.getInfoMessages().get(0), is("Found 0 queue records to synchronize with ORCID"));
         assertThat(handler.getErrorMessages(), empty());
@@ -157,7 +164,7 @@ public class OrcidBulkSynchronizationIT extends AbstractIntegrationTestWithDatab
 
         context.commit();
 
-        TestDSpaceRunnableHandler handler = runBulkSynchronization();
+        TestDSpaceRunnableHandler handler = runBulkSynchronization(false);
 
         String firstOwnerId = firstOwner.getID().toString();
         String thirdOwnerId = thirdOwner.getID().toString();
@@ -186,8 +193,8 @@ public class OrcidBulkSynchronizationIT extends AbstractIntegrationTestWithDatab
 
         List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
         assertThat(queueRecords, hasSize(2));
-        assertThat(queueRecords, hasItem(matches(secondOwner, thirdEntity, "Publication", INSERT)));
-        assertThat(queueRecords, hasItem(matches(secondOwner, fourthEntity, "Publication", INSERT)));
+        assertThat(queueRecords, hasItem(matches(secondOwner, thirdEntity, "Publication", INSERT, 0)));
+        assertThat(queueRecords, hasItem(matches(secondOwner, fourthEntity, "Publication", INSERT, 0)));
 
         List<OrcidHistory> historyRecords = orcidHistoryService.findAll(context);
         assertThat(historyRecords, hasSize(4));
@@ -220,7 +227,7 @@ public class OrcidBulkSynchronizationIT extends AbstractIntegrationTestWithDatab
 
         context.commit();
 
-        TestDSpaceRunnableHandler handler = runBulkSynchronization();
+        TestDSpaceRunnableHandler handler = runBulkSynchronization(false);
 
         assertThat(handler.getInfoMessages(), hasSize(6));
         assertThat(handler.getInfoMessages(), containsInAnyOrder(
@@ -243,7 +250,7 @@ public class OrcidBulkSynchronizationIT extends AbstractIntegrationTestWithDatab
 
         List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
         assertThat(queueRecords, hasSize(1));
-        assertThat(queueRecords, hasItem(matches(firstOwner, secondEntity, "Publication", UPDATE)));
+        assertThat(queueRecords, hasItem(matches(firstOwner, secondEntity, "Publication", UPDATE, 1)));
 
         List<OrcidHistory> historyRecords = orcidHistoryService.findAll(context);
         assertThat(historyRecords, hasSize(2));
@@ -269,7 +276,7 @@ public class OrcidBulkSynchronizationIT extends AbstractIntegrationTestWithDatab
 
         context.commit();
 
-        TestDSpaceRunnableHandler handler = runBulkSynchronization();
+        TestDSpaceRunnableHandler handler = runBulkSynchronization(false);
 
         assertThat(handler.getInfoMessages(), hasSize(4));
         assertThat(handler.getInfoMessages(), containsInAnyOrder(
@@ -289,7 +296,7 @@ public class OrcidBulkSynchronizationIT extends AbstractIntegrationTestWithDatab
 
         List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
         assertThat(queueRecords, hasSize(1));
-        assertThat(queueRecords, hasItem(matches(secondOwner, secondEntity, "Publication", INSERT)));
+        assertThat(queueRecords, hasItem(matches(secondOwner, secondEntity, "Publication", INSERT, 1)));
 
         List<OrcidHistory> historyRecords = orcidHistoryService.findAll(context);
         assertThat(historyRecords, hasSize(1));
@@ -317,7 +324,7 @@ public class OrcidBulkSynchronizationIT extends AbstractIntegrationTestWithDatab
 
         context.commit();
 
-        TestDSpaceRunnableHandler handler = runBulkSynchronization();
+        TestDSpaceRunnableHandler handler = runBulkSynchronization(false);
 
         assertThat(handler.getInfoMessages(), hasSize(5));
         assertThat(handler.getInfoMessages(), containsInAnyOrder(
@@ -336,13 +343,92 @@ public class OrcidBulkSynchronizationIT extends AbstractIntegrationTestWithDatab
 
         List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
         assertThat(queueRecords, hasSize(1));
-        assertThat(queueRecords, hasItem(matches(firstOwner, firstEntity, "Publication", INSERT)));
+        assertThat(queueRecords, hasItem(matches(firstOwner, firstEntity, "Publication", INSERT, 1)));
 
         List<OrcidHistory> historyRecords = orcidHistoryService.findAll(context);
         assertThat(historyRecords, hasSize(2));
         assertThat(historyRecords, hasItem(matches(history(firstOwner, firstEntity, 400, INSERT))));
         assertThat(historyRecords, hasItem(matches(history(secondOwner, secondEntity, 201, INSERT))));
 
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testWithTooManyAttempts() throws Exception {
+
+        configurationService.setProperty("orcid.bulk-synchronization.max-attempts", 2);
+
+        Item owner = createOwnerItem("0000-1111-2222-3333", BATCH);
+        Item entity = createPublication("First publication");
+
+        when(orcidClientMock.push(any(), eq("0000-1111-2222-3333"), any()))
+            .thenThrow(new OrcidClientException(400, "Bad request"));
+
+        createOrcidQueue(context, owner, entity);
+
+        // First attempt
+
+        TestDSpaceRunnableHandler handler = runBulkSynchronization(false);
+        assertThat(handler.getInfoMessages(), hasItem("Found 1 queue records to synchronize with ORCID"));
+        assertThat(handler.getErrorMessages(), empty());
+        assertThat(handler.getWarningMessages(), empty());
+
+        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
+        assertThat(queueRecords, hasSize(1));
+        assertThat(queueRecords, hasItem(matches(owner, entity, "Publication", INSERT, 1)));
+
+        List<OrcidHistory> historyRecords = orcidHistoryService.findAll(context);
+        assertThat(historyRecords, hasSize(1));
+        assertThat(historyRecords, hasItem(matches(history(owner, entity, 400, INSERT))));
+
+        // Second attempt
+
+        handler = runBulkSynchronization(false);
+        assertThat(handler.getInfoMessages(), hasItem("Found 1 queue records to synchronize with ORCID"));
+        assertThat(handler.getErrorMessages(), empty());
+        assertThat(handler.getWarningMessages(), empty());
+
+        queueRecords = orcidQueueService.findAll(context);
+        assertThat(queueRecords, hasSize(1));
+        assertThat(queueRecords, hasItem(matches(owner, entity, "Publication", INSERT, 2)));
+
+        historyRecords = orcidHistoryService.findAll(context);
+        assertThat(historyRecords, hasSize(2));
+        assertThat(historyRecords, contains(matches(history(owner, entity, 400, INSERT)),
+            matches(history(owner, entity, 400, INSERT))));
+
+        // Third attempt
+
+        handler = runBulkSynchronization(false);
+        assertThat(handler.getInfoMessages(), hasItem("Found 0 queue records to synchronize with ORCID"));
+        assertThat(handler.getErrorMessages(), empty());
+        assertThat(handler.getWarningMessages(), empty());
+
+        queueRecords = orcidQueueService.findAll(context);
+        assertThat(queueRecords, hasSize(1));
+        assertThat(queueRecords, hasItem(matches(owner, entity, "Publication", INSERT, 2)));
+
+        historyRecords = orcidHistoryService.findAll(context);
+        assertThat(historyRecords, hasSize(2));
+        assertThat(historyRecords, contains(matches(history(owner, entity, 400, INSERT)),
+            matches(history(owner, entity, 400, INSERT))));
+
+        // Fourth attempt forcing synchronization
+
+        handler = runBulkSynchronization(true);
+        assertThat(handler.getInfoMessages(), hasItem("Found 1 queue records to synchronize with ORCID"));
+        assertThat(handler.getErrorMessages(), empty());
+        assertThat(handler.getWarningMessages(), empty());
+
+        queueRecords = orcidQueueService.findAll(context);
+        assertThat(queueRecords, hasSize(1));
+        assertThat(queueRecords, hasItem(matches(owner, entity, "Publication", INSERT, 3)));
+
+        historyRecords = orcidHistoryService.findAll(context);
+        assertThat(historyRecords, hasSize(3));
+        assertThat(historyRecords, contains(matches(history(owner, entity, 400, INSERT)),
+            matches(history(owner, entity, 400, INSERT)),
+            matches(history(owner, entity, 400, INSERT))));
     }
 
     private Predicate<OrcidHistory> history(Item owner, Item entity, int status, OrcidOperation operation) {
@@ -358,8 +444,9 @@ public class OrcidBulkSynchronizationIT extends AbstractIntegrationTestWithDatab
             && operation == history.getOperation();
     }
 
-    private TestDSpaceRunnableHandler runBulkSynchronization() throws Exception {
+    private TestDSpaceRunnableHandler runBulkSynchronization(boolean forceSynchronization) throws Exception {
         String[] args = new String[] { "orcid-bulk-synchronization" };
+        args = forceSynchronization ? ArrayUtils.add(args, "-f") : args;
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
         return handler;

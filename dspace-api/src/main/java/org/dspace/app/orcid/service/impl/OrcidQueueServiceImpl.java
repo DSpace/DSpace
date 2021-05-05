@@ -139,6 +139,11 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     }
 
     @Override
+    public List<OrcidQueue> findByAttemptsLessThan(Context context, int attempts) throws SQLException {
+        return orcidQueueDAO.findByAttemptsLessThan(context, attempts);
+    }
+
+    @Override
     public void delete(Context context, OrcidQueue orcidQueue) throws SQLException {
         orcidQueueDAO.delete(context, orcidQueue);
     }

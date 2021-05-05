@@ -149,6 +149,16 @@ public interface OrcidQueueService {
     public List<OrcidQueue> findByOwnerOrEntity(Context context, Item item) throws SQLException;
 
     /**
+     * Get all the OrcidQueue records with attempts less than the given attempts.
+     *
+     * @param  context      DSpace context object
+     * @param  attempts     the maximum value of attempts
+     * @return              the found OrcidQueue records
+     * @throws SQLException if database error
+     */
+    public List<OrcidQueue> findByAttemptsLessThan(Context context, int attempts) throws SQLException;
+
+    /**
      * Returns the number of records on the OrcidQueue associated with the given
      * ownerId.
      *
