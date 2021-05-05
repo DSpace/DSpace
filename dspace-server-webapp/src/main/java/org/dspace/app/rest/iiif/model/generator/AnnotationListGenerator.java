@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest.iiif.model.generator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.digitalcollections.iiif.model.openannotation.Annotation;
 import de.digitalcollections.iiif.model.sharedcanvas.AnnotationList;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
@@ -24,20 +27,24 @@ import org.springframework.stereotype.Component;
 public class AnnotationListGenerator implements org.dspace.app.rest.iiif.model.generator.IIIFResource {
 
     private String identifier;
-    private Annotation annotation;
+    private List<Annotation> annotations = new ArrayList<>();
 
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
     }
 
+    /**
+     * Adds Annotation resource to the annotation list.
+     * @param annotation the Annotation Resource
+     */
     public void addResource(org.dspace.app.rest.iiif.model.generator.AnnotationGenerator annotation) {
-        this.annotation = (Annotation) annotation.getResource();
+        this.annotations.add((Annotation) annotation.getResource());
     }
 
     @Override
     public Resource<Annotation> getResource() {
-        AnnotationList annotations = new AnnotationList(identifier);
-        annotations.addResource(annotation);
-        return annotations;
+        AnnotationList annotationList = new AnnotationList(identifier);
+        annotationList.setResources(annotations);
+        return annotationList;
     }
 }
