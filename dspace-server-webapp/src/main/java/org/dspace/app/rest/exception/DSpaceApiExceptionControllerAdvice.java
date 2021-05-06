@@ -119,6 +119,14 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                 HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
+    @ExceptionHandler( {InvalidSearchRequestException.class})
+    protected void handleInvalidSearchRequestException(HttpServletRequest request, HttpServletResponse response,
+                                                      Exception ex) throws IOException {
+        sendErrorResponse(request, response, null,
+                "Invalid search request",
+                HttpStatus.UNPROCESSABLE_ENTITY.value());
+    }
+
     /**
      * Add user-friendly error messages to the response body for selected errors.
      * Since the error messages will be exposed to the API user, the exception classes are expected to implement

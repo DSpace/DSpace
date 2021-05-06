@@ -247,6 +247,7 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
         @JsonIgnore
         private String actualName;
         private String name;
+        private String sortOrder;
 
         public void setActualName(String name) {
             this.actualName = name;
@@ -262,6 +263,14 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
 
         public String getName() {
             return name;
+        }
+
+        public String getSortOrder() {
+            return sortOrder;
+        }
+
+        public void setSortOrder(String sortOrder) {
+            this.sortOrder = sortOrder;
         }
 
         @Override
