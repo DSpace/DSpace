@@ -281,6 +281,11 @@
     </submission-process>
     <submission-process name="person-edit">
       <step id="person" />
+      <step id="detect-duplicate" />
+      <step id="upload" />
+    </submission-process>
+    <submission-process name="admin-person-edit">
+      <step id="person" />
       <step id="owner" />
       <step id="detect-duplicate" />
       <step id="upload" />
