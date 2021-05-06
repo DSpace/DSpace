@@ -9,6 +9,8 @@ package org.dspace.app.orcid.model.factory.impl;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang3.EnumUtils.isValidEnum;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.dspace.app.orcid.model.factory.OrcidFactoryUtils.parseConfigurations;
@@ -37,6 +39,7 @@ import org.dspace.core.Context;
 import org.dspace.core.exception.SQLRuntimeException;
 import org.dspace.handle.service.HandleService;
 import org.dspace.util.MultiFormatDateParser;
+import org.dspace.util.SimpleMapConverter;
 import org.dspace.util.UUIDUtils;
 import org.orcid.jaxb.model.common.ContributorRole;
 import org.orcid.jaxb.model.common.FundingContributorRole;
@@ -45,6 +48,7 @@ import org.orcid.jaxb.model.v3.release.common.Contributor;
 import org.orcid.jaxb.model.v3.release.common.ContributorAttributes;
 import org.orcid.jaxb.model.v3.release.common.ContributorEmail;
 import org.orcid.jaxb.model.v3.release.common.ContributorOrcid;
+import org.orcid.jaxb.model.v3.release.common.Country;
 import org.orcid.jaxb.model.v3.release.common.CreditName;
 import org.orcid.jaxb.model.v3.release.common.DisambiguatedOrganization;
 import org.orcid.jaxb.model.v3.release.common.FuzzyDate;
@@ -72,6 +76,8 @@ public class OrcidCommonObjectFactoryImpl implements OrcidCommonObjectFactory {
 
     @Autowired
     private HandleService handleService;
+
+    private SimpleMapConverter countryConverter;
 
     private String organizationCityField;
 
@@ -169,6 +175,17 @@ public class OrcidCommonObjectFactoryImpl implements OrcidCommonObjectFactory {
         return of(new Url(handleService.getCanonicalForm(handle)));
     }
 
+    @Override
+    public Optional<Country> createCountry(Context context, MetadataValue metadataValue) {
+
+        if (isUnprocessableValue(metadataValue)) {
+            return empty();
+        }
+
+        return convertToIso3166Country(metadataValue.getValue())
+            .map(isoCountry -> new Country(isoCountry));
+    }
+
     private ContributorOrcid getContributorOrcid(Item authorItem) {
         String orcid = getMetadataValue(authorItem, contributorOrcidField);
         return isNotBlank(orcid) ? new ContributorOrcid(getOrcidIdBase(orcid)) : null;
@@ -203,8 +220,12 @@ public class OrcidCommonObjectFactoryImpl implements OrcidCommonObjectFactory {
 
     private OrganizationAddress createOrganizationAddress(Item organizationItem) {
         OrganizationAddress address = new OrganizationAddress();
+
         address.setCity(getMetadataValue(organizationItem, organizationCityField));
-        address.setCountry(Iso3166Country.fromValue(getMetadataValue(organizationItem, organizationCountryField)));
+
+        convertToIso3166Country(getMetadataValue(organizationItem, organizationCountryField))
+            .ifPresent(address::setCountry);
+
         return address;
     }
 
@@ -232,6 +253,13 @@ public class OrcidCommonObjectFactoryImpl implements OrcidCommonObjectFactory {
         }
 
         return null;
+    }
+
+    private Optional<Iso3166Country> convertToIso3166Country(String countryValue) {
+        return ofNullable(countryValue)
+            .map(value -> countryConverter != null ? countryConverter.getValue(value) : value)
+            .filter(value -> isValidEnum(Iso3166Country.class, value))
+            .map(value -> Iso3166Country.fromValue(value));
     }
 
     private Item findRelatedItem(Context context, MetadataValue metadataValue) {
@@ -320,6 +348,14 @@ public class OrcidCommonObjectFactoryImpl implements OrcidCommonObjectFactory {
 
     public void setDisambiguatedOrganizationIdentifierFields(String disambiguatedOrganizationIds) {
         this.disambiguatedOrganizationIdentifierFields = parseConfigurations(disambiguatedOrganizationIds);
+    }
+
+    public SimpleMapConverter getCountryConverter() {
+        return countryConverter;
+    }
+
+    public void setCountryConverter(SimpleMapConverter countryConverter) {
+        this.countryConverter = countryConverter;
     }
 
 }

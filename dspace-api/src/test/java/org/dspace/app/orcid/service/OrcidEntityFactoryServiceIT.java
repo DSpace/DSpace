@@ -37,12 +37,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.orcid.jaxb.model.common.ContributorRole;
 import org.orcid.jaxb.model.common.FundingContributorRole;
+import org.orcid.jaxb.model.common.Iso3166Country;
 import org.orcid.jaxb.model.common.Relationship;
 import org.orcid.jaxb.model.common.SequenceType;
 import org.orcid.jaxb.model.v3.release.common.Contributor;
 import org.orcid.jaxb.model.v3.release.common.ContributorEmail;
 import org.orcid.jaxb.model.v3.release.common.ContributorOrcid;
 import org.orcid.jaxb.model.v3.release.common.FuzzyDate;
+import org.orcid.jaxb.model.v3.release.common.Organization;
 import org.orcid.jaxb.model.v3.release.common.Url;
 import org.orcid.jaxb.model.v3.release.record.Activity;
 import org.orcid.jaxb.model.v3.release.record.ExternalID;
@@ -174,7 +176,7 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
 
         Item orgUnit = ItemBuilder.createItem(context, orgUnits)
             .withTitle("4Science")
-            .withOrgUnitCountry("IT")
+            .withOrgUnitCountry("ITA")
             .withOrgUnitLocality("Milan")
             .withOrgUnitCrossrefIdentifier("12345")
             .build();
@@ -205,6 +207,16 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
         assertThat(funding.getEndDate(), matches(date("2010", "03", "25")));
         assertThat(funding.getDescription(), is("This is a project to test orcid mapping"));
         assertThat(funding.getUrl(), matches(urlEndsWith(project.getHandle())));
+
+        Organization organization = funding.getOrganization();
+        assertThat(organization, notNullValue());
+        assertThat(organization.getName(), is("4Science"));
+        assertThat(organization.getAddress(), notNullValue());
+        assertThat(organization.getAddress().getCountry(), is(Iso3166Country.IT));
+        assertThat(organization.getAddress().getCity(), is("Milan"));
+        assertThat(organization.getDisambiguatedOrganization(), notNullValue());
+        assertThat(organization.getDisambiguatedOrganization().getDisambiguatedOrganizationIdentifier(), is("12345"));
+        assertThat(organization.getDisambiguatedOrganization().getDisambiguationSource(), is("FUNDREF"));
 
         FundingContributors fundingContributors = funding.getContributors();
         assertThat(fundingContributors, notNullValue());

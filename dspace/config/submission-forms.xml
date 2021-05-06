@@ -1463,7 +1463,7 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <dc-schema>crisrp</dc-schema>
           <dc-element>country</dc-element>
           <label>Country</label>
-          <input-type>onebox</input-type>
+          <input-type value-pairs-name="common_iso_countries">dropdown</input-type>
           <repeatable>false</repeatable>
           <required />
           <hint />
@@ -1534,7 +1534,7 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <dc-element>acronym</dc-element>
           <label>Acronym or short form of title</label>
           <input-type>onebox</input-type>
-          <repeatable>true</repeatable>
+          <repeatable>false</repeatable>
           <required />
           <hint />
         </field>
@@ -1634,7 +1634,7 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <dc-element>address</dc-element>
           <dc-qualifier>addressCountry</dc-qualifier>
           <label>Country</label>
-          <input-type>onebox</input-type>
+          <input-type value-pairs-name="common_iso_countries">dropdown</input-type>
           <repeatable>false</repeatable>
           <required />
           <hint />
@@ -1725,7 +1725,7 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <dc-element>openaireid</dc-element>
           <label>OpenAIRE ID</label>
           <input-type>onebox</input-type>
-          <repeatable>true</repeatable>
+          <repeatable>false</repeatable>
           <required />
           <hint />
         </field>
@@ -2181,7 +2181,7 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <dc-element>event</dc-element>
           <dc-qualifier>country</dc-qualifier>
           <label>Country</label>
-          <input-type>onebox</input-type>
+          <input-type value-pairs-name="common_iso_countries">dropdown</input-type>
           <repeatable>false</repeatable>
           <required />
           <hint />
@@ -2874,7 +2874,7 @@ You can leave out the day and/or month if they aren't applicable.</hint>
         <stored-value>Research Institute</stored-value>
       </pair>
       <pair>
-        <displayed-value>Strategic Research Insitute</displayed-value>
+        <displayed-value>Strategic Research Institute</displayed-value>
         <stored-value>Strategic Research Insitute</stored-value>
       </pair>
       <pair>
@@ -2966,6 +2966,1036 @@ You can leave out the day and/or month if they aren't applicable.</hint>
       <pair>
         <displayed-value>Workshop</displayed-value>
         <stored-value>Workshop</stored-value>
+      </pair>
+    </value-pairs>
+    <value-pairs value-pairs-name="common_iso_countries" dc-term="common_iso_countries">
+      <pair>
+        <displayed-value>Unspecified</displayed-value>
+        <stored-value />
+      </pair>
+      <pair>
+        <displayed-value>Afghanistan</displayed-value>
+        <stored-value>AFG</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Albania</displayed-value>
+        <stored-value>ALB</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Algeria</displayed-value>
+        <stored-value>DZA</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>American Samoa</displayed-value>
+        <stored-value>ASM</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Andorra</displayed-value>
+        <stored-value>AND</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Angola</displayed-value>
+        <stored-value>AGO</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Anguilla</displayed-value>
+        <stored-value>AIA</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Antarctica</displayed-value>
+        <stored-value>ATA</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Antigua and Barbuda</displayed-value>
+        <stored-value>ATG</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Argentina</displayed-value>
+        <stored-value>ARG</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Armenia</displayed-value>
+        <stored-value>ARM</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Aruba</displayed-value>
+        <stored-value>ABW</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Australia</displayed-value>
+        <stored-value>AUS</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Austria</displayed-value>
+        <stored-value>AUT</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Azerbaijan</displayed-value>
+        <stored-value>AZE</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Bahamas</displayed-value>
+        <stored-value>BHS</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Bahrain</displayed-value>
+        <stored-value>BHR</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Bangladesh</displayed-value>
+        <stored-value>BGD</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Barbados</displayed-value>
+        <stored-value>BRB</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Belarus</displayed-value>
+        <stored-value>BLR</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Belgium</displayed-value>
+        <stored-value>BEL</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Belize</displayed-value>
+        <stored-value>BLZ</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Benin</displayed-value>
+        <stored-value>BEN</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Bermuda</displayed-value>
+        <stored-value>BMU</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Bhutan</displayed-value>
+        <stored-value>BTN</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Bolivia, Plurinational State of</displayed-value>
+        <stored-value>BOL</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Bolivia</displayed-value>
+        <stored-value>BOL</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Bosnia and Herzegovina</displayed-value>
+        <stored-value>BIH</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Botswana</displayed-value>
+        <stored-value>BWA</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Bouvet Island</displayed-value>
+        <stored-value>BVT</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Brazil</displayed-value>
+        <stored-value>BRA</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>British Indian Ocean Territory</displayed-value>
+        <stored-value>IOT</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Brunei Darussalam</displayed-value>
+        <stored-value>BRN</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Brunei</displayed-value>
+        <stored-value>BRN</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Bulgaria</displayed-value>
+        <stored-value>BGR</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Burkina Faso</displayed-value>
+        <stored-value>BFA</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Burundi</displayed-value>
+        <stored-value>BDI</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Cambodia</displayed-value>
+        <stored-value>KHM</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Cameroon</displayed-value>
+        <stored-value>CMR</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Canada</displayed-value>
+        <stored-value>CAN</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Cape Verde</displayed-value>
+        <stored-value>CPV</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Cayman Islands</displayed-value>
+        <stored-value>CYM</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Central African Republic</displayed-value>
+        <stored-value>CAF</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Chad</displayed-value>
+        <stored-value>TCD</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Chile</displayed-value>
+        <stored-value>CHL</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>China</displayed-value>
+        <stored-value>CHN</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Christmas Island</displayed-value>
+        <stored-value>CXR</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Cocos (Keeling) Islands</displayed-value>
+        <stored-value>CCK</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Colombia</displayed-value>
+        <stored-value>COL</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Comoros</displayed-value>
+        <stored-value>COM</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Congo</displayed-value>
+        <stored-value>COG</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Congo, the Democratic Republic of the</displayed-value>
+        <stored-value>COD</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Cook Islands</displayed-value>
+        <stored-value>COK</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Costa Rica</displayed-value>
+        <stored-value>CRI</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Côte d'Ivoire</displayed-value>
+        <stored-value>CIV</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Ivory Coast</displayed-value>
+        <stored-value>CIV</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Croatia</displayed-value>
+        <stored-value>HRV</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Cuba</displayed-value>
+        <stored-value>CUB</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Cyprus</displayed-value>
+        <stored-value>CYP</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Czech Republic</displayed-value>
+        <stored-value>CZE</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Denmark</displayed-value>
+        <stored-value>DNK</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Djibouti</displayed-value>
+        <stored-value>DJI</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Dominica</displayed-value>
+        <stored-value>DMA</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Dominican Republic</displayed-value>
+        <stored-value>DOM</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Ecuador</displayed-value>
+        <stored-value>ECU</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Egypt</displayed-value>
+        <stored-value>EGY</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>El Salvador</displayed-value>
+        <stored-value>SLV</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Equatorial Guinea</displayed-value>
+        <stored-value>GNQ</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Eritrea</displayed-value>
+        <stored-value>ERI</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Estonia</displayed-value>
+        <stored-value>EST</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Ethiopia</displayed-value>
+        <stored-value>ETH</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Falkland Islands (Malvinas)</displayed-value>
+        <stored-value>FLK</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Faroe Islands</displayed-value>
+        <stored-value>FRO</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Fiji</displayed-value>
+        <stored-value>FJI</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Finland</displayed-value>
+        <stored-value>FIN</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>France</displayed-value>
+        <stored-value>FRA</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>French Guiana</displayed-value>
+        <stored-value>GUF</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>French Polynesia</displayed-value>
+        <stored-value>PYF</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>French Southern Territories</displayed-value>
+        <stored-value>ATF</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Gabon</displayed-value>
+        <stored-value>GAB</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Gambia</displayed-value>
+        <stored-value>GMB</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Georgia</displayed-value>
+        <stored-value>GEO</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Germany</displayed-value>
+        <stored-value>DEU</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Ghana</displayed-value>
+        <stored-value>GHA</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Gibraltar</displayed-value>
+        <stored-value>GIB</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Greece</displayed-value>
+        <stored-value>GRC</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Greenland</displayed-value>
+        <stored-value>GRL</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Grenada</displayed-value>
+        <stored-value>GRD</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Guadeloupe</displayed-value>
+        <stored-value>GLP</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Guam</displayed-value>
+        <stored-value>GUM</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Guatemala</displayed-value>
+        <stored-value>GTM</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Guernsey</displayed-value>
+        <stored-value>GGY</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Guinea</displayed-value>
+        <stored-value>GIN</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Guinea-Bissau</displayed-value>
+        <stored-value>GNB</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Guyana</displayed-value>
+        <stored-value>GUY</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Haiti</displayed-value>
+        <stored-value>HTI</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Heard Island and McDonald Islands</displayed-value>
+        <stored-value>HMD</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Holy See (Vatican City State)</displayed-value>
+        <stored-value>VAT</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Honduras</displayed-value>
+        <stored-value>HND</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Hong Kong</displayed-value>
+        <stored-value>HKG</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Hungary</displayed-value>
+        <stored-value>HUN</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Iceland</displayed-value>
+        <stored-value>ISL</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>India</displayed-value>
+        <stored-value>IND</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Indonesia</displayed-value>
+        <stored-value>IDN</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Iran, Islamic Republic of</displayed-value>
+        <stored-value>IRN</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Iraq</displayed-value>
+        <stored-value>IRQ</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Ireland</displayed-value>
+        <stored-value>IRL</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Isle of Man</displayed-value>
+        <stored-value>IMN</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Israel</displayed-value>
+        <stored-value>ISR</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Italy</displayed-value>
+        <stored-value>ITA</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Jamaica</displayed-value>
+        <stored-value>JAM</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Japan</displayed-value>
+        <stored-value>JPN</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Jersey</displayed-value>
+        <stored-value>JEY</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Jordan</displayed-value>
+        <stored-value>JOR</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Kazakhstan</displayed-value>
+        <stored-value>KAZ</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Kenya</displayed-value>
+        <stored-value>KEN</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Kiribati</displayed-value>
+        <stored-value>KIR</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Korea, Democratic People's Republic of</displayed-value>
+        <stored-value>PRK</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Korea, Republic of</displayed-value>
+        <stored-value>KOR</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>South Korea</displayed-value>
+        <stored-value>KOR</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Kuwait</displayed-value>
+        <stored-value>KWT</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Kyrgyzstan</displayed-value>
+        <stored-value>KGZ</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Lao People's Democratic Republic</displayed-value>
+        <stored-value>LAO</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Latvia</displayed-value>
+        <stored-value>LVA</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Lebanon</displayed-value>
+        <stored-value>LBN</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Lesotho</displayed-value>
+        <stored-value>LSO</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Liberia</displayed-value>
+        <stored-value>LBR</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Libyan Arab Jamahiriya</displayed-value>
+        <stored-value>LBY</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Libya</displayed-value>
+        <stored-value>LBY</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Liechtenstein</displayed-value>
+        <stored-value>LIE</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Lithuania</displayed-value>
+        <stored-value>LTU</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Luxembourg</displayed-value>
+        <stored-value>LUX</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Macao</displayed-value>
+        <stored-value>MAC</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Macedonia, the former Yugoslav Republic of</displayed-value>
+        <stored-value>MKD</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Madagascar</displayed-value>
+        <stored-value>MDG</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Malawi</displayed-value>
+        <stored-value>MWI</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Malaysia</displayed-value>
+        <stored-value>MYS</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Maldives</displayed-value>
+        <stored-value>MDV</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Mali</displayed-value>
+        <stored-value>MLI</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Malta</displayed-value>
+        <stored-value>MLT</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Marshall Islands</displayed-value>
+        <stored-value>MHL</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Martinique</displayed-value>
+        <stored-value>MTQ</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Mauritania</displayed-value>
+        <stored-value>MRT</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Mauritius</displayed-value>
+        <stored-value>MUS</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Mayotte</displayed-value>
+        <stored-value>MYT</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Mexico</displayed-value>
+        <stored-value>MEX</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Micronesia, Federated States of</displayed-value>
+        <stored-value>FSM</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Moldova, Republic of</displayed-value>
+        <stored-value>MDA</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Monaco</displayed-value>
+        <stored-value>MCO</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Mongolia</displayed-value>
+        <stored-value>MNG</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Montenegro</displayed-value>
+        <stored-value>MNE</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Montserrat</displayed-value>
+        <stored-value>MSR</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Morocco</displayed-value>
+        <stored-value>MAR</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Mozambique</displayed-value>
+        <stored-value>MOZ</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Myanmar</displayed-value>
+        <stored-value>MMR</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Burma</displayed-value>
+        <stored-value>MMR</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Namibia</displayed-value>
+        <stored-value>NAM</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Nauru</displayed-value>
+        <stored-value>NRU</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Nepal</displayed-value>
+        <stored-value>NPL</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Netherlands</displayed-value>
+        <stored-value>NLD</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Netherlands Antilles</displayed-value>
+        <stored-value>ANT</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>New Caledonia</displayed-value>
+        <stored-value>NCL</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>New Zealand</displayed-value>
+        <stored-value>NZL</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Nicaragua</displayed-value>
+        <stored-value>NIC</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Niger</displayed-value>
+        <stored-value>NER</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Nigeria</displayed-value>
+        <stored-value>NGA</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Niue</displayed-value>
+        <stored-value>NIU</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Norfolk Island</displayed-value>
+        <stored-value>NFK</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Northern Mariana Islands</displayed-value>
+        <stored-value>MNP</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Norway</displayed-value>
+        <stored-value>NOR</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Oman</displayed-value>
+        <stored-value>OMN</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Pakistan</displayed-value>
+        <stored-value>PAK</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Palau</displayed-value>
+        <stored-value>PLW</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Palestinian Territory, Occupied</displayed-value>
+        <stored-value>PSE</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Panama</displayed-value>
+        <stored-value>PAN</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Papua New Guinea</displayed-value>
+        <stored-value>PNG</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Paraguay</displayed-value>
+        <stored-value>PRY</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Peru</displayed-value>
+        <stored-value>PER</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Philippines</displayed-value>
+        <stored-value>PHL</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Pitcairn</displayed-value>
+        <stored-value>PCN</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Poland</displayed-value>
+        <stored-value>POL</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Portugal</displayed-value>
+        <stored-value>PRT</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Puerto Rico</displayed-value>
+        <stored-value>PRI</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Qatar</displayed-value>
+        <stored-value>QAT</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Réunion</displayed-value>
+        <stored-value>REU</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Romania</displayed-value>
+        <stored-value>ROU</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Russian Federation</displayed-value>
+        <stored-value>RUS</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Russia</displayed-value>
+        <stored-value>RUS</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Rwanda</displayed-value>
+        <stored-value>RWA</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Saint Helena, Ascension and Tristan da Cunha</displayed-value>
+        <stored-value>SHN</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Saint Kitts and Nevis</displayed-value>
+        <stored-value>KNA</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Saint Lucia</displayed-value>
+        <stored-value>LCA</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Saint Pierre and Miquelon</displayed-value>
+        <stored-value>SPM</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Saint Vincent and the Grenadines</displayed-value>
+        <stored-value>VCT</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Saint Vincent &amp; the Grenadines</displayed-value>
+        <stored-value>VCT</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>St. Vincent and the Grenadines</displayed-value>
+        <stored-value>VCT</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Samoa</displayed-value>
+        <stored-value>WSM</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>San Marino</displayed-value>
+        <stored-value>SMR</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Sao Tome and Principe</displayed-value>
+        <stored-value>STP</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Saudi Arabia</displayed-value>
+        <stored-value>SAU</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Senegal</displayed-value>
+        <stored-value>SEN</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Serbia</displayed-value>
+        <stored-value>SRB</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Seychelles</displayed-value>
+        <stored-value>SYC</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Sierra Leone</displayed-value>
+        <stored-value>SLE</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Singapore</displayed-value>
+        <stored-value>SGP</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Slovakia</displayed-value>
+        <stored-value>SVK</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Slovenia</displayed-value>
+        <stored-value>SVN</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Solomon Islands</displayed-value>
+        <stored-value>SLB</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Somalia</displayed-value>
+        <stored-value>SOM</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>South Africa</displayed-value>
+        <stored-value>ZAF</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>South Georgia and the South Sandwich Islands</displayed-value>
+        <stored-value>SGS</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>South Sudan</displayed-value>
+        <stored-value>SSD</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Spain</displayed-value>
+        <stored-value>ESP</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Sri Lanka</displayed-value>
+        <stored-value>LKA</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Sudan</displayed-value>
+        <stored-value>SDN</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Suriname</displayed-value>
+        <stored-value>SUR</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Svalbard and Jan Mayen</displayed-value>
+        <stored-value>SJM</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Swaziland</displayed-value>
+        <stored-value>SWZ</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Sweden</displayed-value>
+        <stored-value>SWE</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Switzerland</displayed-value>
+        <stored-value>CHE</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Syrian Arab Republic</displayed-value>
+        <stored-value>SYR</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Taiwan, Province of China</displayed-value>
+        <stored-value>TWN</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Taiwan</displayed-value>
+        <stored-value>TWN</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Tajikistan</displayed-value>
+        <stored-value>TJK</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Tanzania, United Republic of</displayed-value>
+        <stored-value>TZA</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Thailand</displayed-value>
+        <stored-value>THA</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Timor-Leste</displayed-value>
+        <stored-value>TLS</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Togo</displayed-value>
+        <stored-value>TGO</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Tokelau</displayed-value>
+        <stored-value>TKL</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Tonga</displayed-value>
+        <stored-value>TON</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Trinidad and Tobago</displayed-value>
+        <stored-value>TTO</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Tunisia</displayed-value>
+        <stored-value>TUN</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Turkey</displayed-value>
+        <stored-value>TUR</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Turkmenistan</displayed-value>
+        <stored-value>TKM</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Turks and Caicos Islands</displayed-value>
+        <stored-value>TCA</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Tuvalu</displayed-value>
+        <stored-value>TUV</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Uganda</displayed-value>
+        <stored-value>UGA</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Ukraine</displayed-value>
+        <stored-value>UKR</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>United Arab Emirates</displayed-value>
+        <stored-value>ARE</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>United Kingdom</displayed-value>
+        <stored-value>GBR</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>United States</displayed-value>
+        <stored-value>USA</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>United States Minor Outlying Islands</displayed-value>
+        <stored-value>UMI</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Uruguay</displayed-value>
+        <stored-value>URY</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Uzbekistan</displayed-value>
+        <stored-value>UZB</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Vanuatu</displayed-value>
+        <stored-value>VUT</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Venezuela, Bolivarian Republic of</displayed-value>
+        <stored-value>VEN</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Venezuela</displayed-value>
+        <stored-value>VEN</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Viet Nam</displayed-value>
+        <stored-value>VNM</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Vietnam</displayed-value>
+        <stored-value>VNM</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Virgin Islands, British</displayed-value>
+        <stored-value>VGB</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Virgin Islands, U.S.</displayed-value>
+        <stored-value>VIR</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Wallis and Futuna</displayed-value>
+        <stored-value>WLF</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Western Sahara</displayed-value>
+        <stored-value>ESH</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Yemen</displayed-value>
+        <stored-value>YEM</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Zambia</displayed-value>
+        <stored-value>ZMB</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Zimbabwe</displayed-value>
+        <stored-value>ZWE</stored-value>
       </pair>
     </value-pairs>
   </form-value-pairs>

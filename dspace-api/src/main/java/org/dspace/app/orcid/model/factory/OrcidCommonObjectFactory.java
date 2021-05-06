@@ -15,6 +15,7 @@ import org.dspace.core.Context;
 import org.orcid.jaxb.model.common.ContributorRole;
 import org.orcid.jaxb.model.common.FundingContributorRole;
 import org.orcid.jaxb.model.v3.release.common.Contributor;
+import org.orcid.jaxb.model.v3.release.common.Country;
 import org.orcid.jaxb.model.v3.release.common.FuzzyDate;
 import org.orcid.jaxb.model.v3.release.common.Organization;
 import org.orcid.jaxb.model.v3.release.common.Url;
@@ -75,5 +76,14 @@ public interface OrcidCommonObjectFactory {
      * @return         the created Url instance, if any
      */
     public Optional<Url> createUrl(Context context, Item item);
+
+    /**
+     * Creates an instance of {@link Country} from the given metadata value.
+     *
+     * @param  context       the DSpace context
+     * @param  metadataValue the metadata value
+     * @return               the created Country instance, if any
+     */
+    public Optional<Country> createCountry(Context context, MetadataValue metadataValue);
 
 }

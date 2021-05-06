@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import org.dspace.app.orcid.model.OrcidProfileSectionType;
 import org.dspace.app.profile.OrcidProfileSyncPreference;
 import org.dspace.content.MetadataValue;
+import org.dspace.core.Context;
 import org.orcid.jaxb.model.common.Relationship;
 import org.orcid.jaxb.model.v3.release.common.Url;
 import org.orcid.jaxb.model.v3.release.record.PersonExternalIdentifier;
@@ -44,7 +45,7 @@ public class OrcidPersonExternalIdentifierFactory extends OrcidSimpleValueObject
     }
 
     @Override
-    protected Object create(MetadataValue metadataValue) {
+    protected Object create(Context context, MetadataValue metadataValue) {
 
         String currentMetadataField = metadataValue.getMetadataField().toString('.');
         String externalIdType = externalIds.get(currentMetadataField);

@@ -199,7 +199,7 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
 
         Item orgUnit = ItemBuilder.createItem(context, orgUnits)
             .withTitle("4Science")
-            .withOrgUnitCountry("IT")
+            .withOrgUnitCountry("ITA")
             .withOrgUnitLocality("Milan")
             .withOrgUnitRinggoldIdentifier("12345")
             .build();
@@ -312,7 +312,7 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context, collection)
             .withTitle("Test profile")
-            .withPersonCountry("IT")
+            .withPersonCountry("ITA")
             .build();
         context.restoreAuthSystemState();
 
@@ -331,7 +331,7 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context, collection)
             .withTitle("Test profile")
-            .withPersonCountry("IT")
+            .withPersonCountry("ITA")
             .build();
         context.restoreAuthSystemState();
 
@@ -339,7 +339,7 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
 
         List<String> signatures = countryFactory.getMetadataSignatures(context, item);
         assertThat(signatures, hasSize(1));
-        assertThat(countryFactory.getDescription(context, item, signatures.get(0)), is("IT"));
+        assertThat(countryFactory.getDescription(context, item, signatures.get(0)), is("ITA"));
     }
 
     @Test
