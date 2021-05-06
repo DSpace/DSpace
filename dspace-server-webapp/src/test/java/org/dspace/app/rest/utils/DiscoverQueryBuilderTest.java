@@ -28,6 +28,7 @@ import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.when;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -35,6 +36,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.InvalidSearchRequestException;
 import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverFacetField;
@@ -139,17 +141,23 @@ public class DiscoverQueryBuilderTest {
         discoveryConfiguration.setHitHighlightingConfiguration(discoveryHitHighlightingConfiguration);
 
 
-        DiscoverySortConfiguration sortConfiguration = new DiscoverySortConfiguration();
-
         DiscoverySortFieldConfiguration defaultSort = new DiscoverySortFieldConfiguration();
         defaultSort.setMetadataField("dc.date.accessioned");
         defaultSort.setType(DiscoveryConfigurationParameters.TYPE_DATE);
-        sortConfiguration.setDefaultSort(defaultSort);
-        sortConfiguration.setDefaultSortOrder(DiscoverySortConfiguration.SORT_ORDER.desc);
+        defaultSort.setDefaultSortOrder(DiscoverySortFieldConfiguration.SORT_ORDER.desc);
+
+
+        List<DiscoverySortFieldConfiguration> listSortField = new ArrayList<DiscoverySortFieldConfiguration>();
+        listSortField.add(defaultSort);
+
+        DiscoverySortConfiguration sortConfiguration = new DiscoverySortConfiguration();
 
         DiscoverySortFieldConfiguration titleSort = new DiscoverySortFieldConfiguration();
         titleSort.setMetadataField("dc.title");
-        sortConfiguration.setSortFields(Arrays.asList(titleSort));
+        titleSort.setDefaultSortOrder(DiscoverySortFieldConfiguration.SORT_ORDER.asc);
+        listSortField.add(titleSort);
+
+        sortConfiguration.setSortFields(listSortField);
 
         discoveryConfiguration.setSearchSortConfiguration(sortConfiguration);
 
@@ -266,7 +274,7 @@ public class DiscoverQueryBuilderTest {
             .buildQuery(context, scope, discoveryConfiguration, query, Arrays.asList(searchFilter), "TEST", page);
     }
 
-    @Test(expected = DSpaceBadRequestException.class)
+    @Test(expected = InvalidSearchRequestException.class)
     public void testInvalidSortField() throws Exception {
         page = PageRequest.of(2, 10, Sort.Direction.ASC, "test");
         queryBuilder
