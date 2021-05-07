@@ -186,10 +186,10 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
         assertThat(signatures, hasSize(2));
 
         String firstDescription = affiliationFactory.getDescription(context, item, signatures.get(0));
-        assertThat(firstDescription, is("Researcher at 4Science (2020-02)"));
+        assertThat(firstDescription, is("Researcher at 4Science ( from 2020-02 to present )"));
 
         String secondDescription = affiliationFactory.getDescription(context, item, signatures.get(1));
-        assertThat(secondDescription, is("Organization (2021-02, 2021-03-31)"));
+        assertThat(secondDescription, is("Organization ( from 2021-02 to 2021-03-31 )"));
     }
 
     @Test
@@ -199,7 +199,7 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
 
         Item orgUnit = ItemBuilder.createItem(context, orgUnits)
             .withTitle("4Science")
-            .withOrgUnitCountry("ITA")
+            .withOrgUnitCountry("IT")
             .withOrgUnitLocality("Milan")
             .withOrgUnitRinggoldIdentifier("12345")
             .build();
@@ -312,7 +312,7 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context, collection)
             .withTitle("Test profile")
-            .withPersonCountry("ITA")
+            .withPersonCountry("IT")
             .build();
         context.restoreAuthSystemState();
 
@@ -331,7 +331,7 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context, collection)
             .withTitle("Test profile")
-            .withPersonCountry("ITA")
+            .withPersonCountry("IT")
             .build();
         context.restoreAuthSystemState();
 
@@ -339,7 +339,7 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
 
         List<String> signatures = countryFactory.getMetadataSignatures(context, item);
         assertThat(signatures, hasSize(1));
-        assertThat(countryFactory.getDescription(context, item, signatures.get(0)), is("ITA"));
+        assertThat(countryFactory.getDescription(context, item, signatures.get(0)), is("IT"));
     }
 
     @Test

@@ -176,7 +176,7 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
 
         Item orgUnit = ItemBuilder.createItem(context, orgUnits)
             .withTitle("4Science")
-            .withOrgUnitCountry("ITA")
+            .withOrgUnitCountry("IT")
             .withOrgUnitLocality("Milan")
             .withOrgUnitCrossrefIdentifier("12345")
             .build();

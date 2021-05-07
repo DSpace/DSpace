@@ -74,7 +74,6 @@
     	<property name="contributorOrcidField" value="${orcid.mapping.contributor.orcid}" />
     	<property name="organizationCityField" value="${orcid.mapping.organization.city}" />
     	<property name="organizationCountryField" value="${orcid.mapping.organization.country}" />
-		<property name="countryConverter" ref="${orcid.mapping.country.converter}" />
     	<property name="disambiguatedOrganizationIdentifierFields" value="${orcid.mapping.organization.identifiers}" />
     </bean>
     
@@ -151,12 +150,6 @@
     
     <bean name="mapConverterOrcidLanguageCode" class="org.dspace.util.SimpleMapConverter" init-method="init">
 		<property name="converterNameFile" value="mapConverter-orcid-language-codes.properties" />
-		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
-		<property name="defaultValue" value=""/>
-	</bean>
-    
-    <bean name="mapConverterCountryIsoCode" class="org.dspace.util.SimpleMapConverter" init-method="init">
-		<property name="converterNameFile" value="mapConverter-country-iso-codes.properties" />
 		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
 		<property name="defaultValue" value=""/>
 	</bean>
