@@ -63,7 +63,8 @@ public interface SearchService {
      * @param field    the field of the filter query
      * @param operator equals/notequals/notcontains/authority/notauthority
      * @param value    the filter query value
-     * @param config   the discovery configuration
+     * @param config   (nullable) the discovery configuration (if not null, field's corresponding facet.type checked to
+     *                be standard so suffix is not added for equals operator)
      * @return a filter query
      * @throws SQLException if database error
      *                      An exception that provides information on a database access error or other errors.
