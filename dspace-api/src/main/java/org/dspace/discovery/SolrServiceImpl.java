@@ -1082,8 +1082,12 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
 
             if (operator.endsWith("equals")) {
-                final DiscoverySearchFilterFacet facet = config.getSidebarFacet(field);
-                if (facet == null || !facet.getType().equals(DiscoveryConfigurationParameters.TYPE_STANDARD)) {
+                final boolean isStandardField
+                    = Optional.ofNullable(config)
+                              .flatMap(c -> Optional.ofNullable(c.getSidebarFacet(field)))
+                              .map(facet -> facet.getType().equals(DiscoveryConfigurationParameters.TYPE_STANDARD))
+                              .orElse(false);
+                if (!isStandardField) {
                     filterQuery.append("_keyword");
                 }
             } else if (operator.endsWith("authority")) {
