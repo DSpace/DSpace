@@ -110,7 +110,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
         assertThat(queueRecords, hasSize(1));
         assertThat(queueRecords.get(0), matches(profile, profile, "AFFILIATION", null,
-            containsString("4Science"), "Researcher at 4Science (2021-01-01)", INSERT));
+            containsString("4Science"), "Researcher at 4Science ( from 2021-01-01 to present )", INSERT));
 
         addMetadata(profile, "crisrp", "education", null, "High School", null);
         context.commit();
@@ -118,9 +118,9 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         queueRecords = orcidQueueService.findAll(context);
         assertThat(queueRecords, hasSize(2));
         assertThat(queueRecords, hasItem(matches(profile, profile, "AFFILIATION", null,
-            containsString("4Science"), "Researcher at 4Science (2021-01-01)", INSERT)));
+            containsString("4Science"), "Researcher at 4Science ( from 2021-01-01 to present )", INSERT)));
         assertThat(queueRecords, hasItem(matches(profile, profile, "EDUCATION", null,
-            containsString("High School"), "High School", INSERT)));
+            containsString("High School"), "High School ( from unspecified to present )", INSERT)));
     }
 
     @Test
