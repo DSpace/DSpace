@@ -17,12 +17,10 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.suggestion.SolrSuggestionProvider;
-import org.dspace.app.suggestion.SolrSuggestionStorageService;
 import org.dspace.app.suggestion.Suggestion;
 import org.dspace.app.suggestion.SuggestionEvidence;
 import org.dspace.content.Item;
 import org.dspace.content.dto.MetadataValueDTO;
-import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
@@ -44,13 +42,7 @@ public class OAIREPublicationLoader extends SolrSuggestionProvider {
     private List<ExternalDataProvider> otherProviders;
 
     @Autowired
-    private ItemService itemService;
-
-    @Autowired
     private ConfigurationService configurationService;
-
-    @Autowired
-    private SolrSuggestionStorageService solrSuggestionService;
 
     private List<EvidenceScorer> pipeline;
 
@@ -116,9 +108,9 @@ public class OAIREPublicationLoader extends SolrSuggestionProvider {
         List<ExternalDataObject> metadata = getImportRecords(researcher);
         List<Suggestion> records = reduceAndTransform(researcher, metadata);
         for (Suggestion record : records) {
-            solrSuggestionService.addSuggestion(record, false, false);
+            solrSuggestionStorageService.addSuggestion(record, false, false);
         }
-        solrSuggestionService.commit();
+        solrSuggestionStorageService.commit();
     }
 
     /**

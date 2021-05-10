@@ -59,6 +59,7 @@ import org.orcid.jaxb.model.v3.release.record.Qualification;
 import org.orcid.jaxb.model.v3.release.record.Record;
 import org.orcid.jaxb.model.v3.release.record.ResearcherUrl;
 import org.orcid.jaxb.model.v3.release.record.Work;
+import org.orcid.jaxb.model.v3.release.record.summary.Works;
 
 /**
  * Implementation of {@link OrcidClient}.
@@ -114,6 +115,23 @@ public class OrcidClientImpl implements OrcidClient {
     }
 
     @Override
+    public OrcidTokenResponseDTO getAccessToken() {
+        List<NameValuePair> params = new ArrayList<NameValuePair>();
+        params.add(new BasicNameValuePair("scope", "/read-public"));
+        params.add(new BasicNameValuePair("grant_type", "client_credentials"));
+        params.add(new BasicNameValuePair("client_id", orcidConfiguration.getClientId()));
+        params.add(new BasicNameValuePair("client_secret", orcidConfiguration.getClientSecret()));
+
+        HttpUriRequest httpUriRequest = RequestBuilder.post(orcidConfiguration.getTokenEndpointUrl())
+            .addHeader("Content-Type", "application/x-www-form-urlencoded")
+            .addHeader("Accept", "application/json")
+            .setEntity(new UrlEncodedFormEntity(params, Charset.defaultCharset()))
+            .build();
+
+        return executeAndParseJson(httpUriRequest, OrcidTokenResponseDTO.class);
+    }
+
+    @Override
     public Person getPerson(String accessToken, String orcid) {
         HttpUriRequest httpUriRequest = buildGetUriRequest(accessToken, "/" + orcid + "/person");
         return executeAndUnmarshall(httpUriRequest, false, Person.class);
@@ -126,12 +144,18 @@ public class OrcidClientImpl implements OrcidClient {
     }
 
     @Override
+    public Works getWorks(String accessToken, String orcid) {
+        HttpUriRequest httpUriRequest = buildGetUriRequest(accessToken, "/" + orcid + "/works");
+        return executeAndUnmarshall(httpUriRequest, false, Works.class);
+    }
+
+    @Override
     public <T> Optional<T> getObject(String accessToken, String orcid, String putCode, Class<T> clazz) {
         String path = PATHS_MAP.get(clazz);
         if (path == null) {
             throw new IllegalArgumentException("The given class is not an ORCID object's class: " + clazz);
         }
-        HttpUriRequest httpUriRequest = buildGetUriRequest(accessToken, "/" + orcid + path);
+        HttpUriRequest httpUriRequest = buildGetUriRequest(accessToken, "/" + orcid + path + "/" + putCode);
         return Optional.ofNullable(executeAndUnmarshall(httpUriRequest, true, clazz));
     }
 
@@ -315,5 +339,4 @@ public class OrcidClientImpl implements OrcidClient {
         String value = headers[0].getValue();
         return value.substring(value.lastIndexOf("/") + 1);
     }
-
 }

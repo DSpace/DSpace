@@ -31,6 +31,11 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.DiscoverResult;
+import org.dspace.discovery.SearchService;
+import org.dspace.discovery.SearchServiceException;
+import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -50,6 +55,9 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private SearchService searchService;
 
     @Override
     public void linkProfile(Context context, Item profile, OrcidTokenResponseDTO token)
@@ -114,21 +122,6 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
         itemService.setMetadataSingleValue(context, profile, "cris", "orcid", "sync-mode", null, value.name());
     }
 
-    private void updatePreferenceForSynchronizingWithOrcid(Context context, Item profile,
-        String metadataQualifier, List<String> values) throws SQLException {
-
-        if (!isLinkedToOrcid(profile)) {
-            throw new IllegalArgumentException("The given profile cannot be configured for the ORCID "
-                + "synchronization because it is not linked to any ORCID account: " + profile.getID());
-        }
-
-        itemService.clearMetadata(context, profile, "cris", "orcid", metadataQualifier, Item.ANY);
-        for (String value : values) {
-            itemService.addMetadata(context, profile, "cris", "orcid", metadataQualifier, null, value);
-        }
-
-    }
-
     @Override
     public boolean isSynchronizationEnabled(Item profile, Item item) {
 
@@ -143,7 +136,7 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
                 .isPresent();
         }
 
-        if (entityType.equals("Person")) {
+        if (entityType.equals(getProfileType())) {
             return profile.equals(item) && !isEmpty(getProfilePreferences(profile));
         }
 
@@ -181,6 +174,52 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
         return getOrcidAccessToken(item).isPresent() && getOrcid(item).isPresent();
     }
 
+    @Override
+    public OrcidProfileDisconnectionMode getDisconnectionMode() {
+        String value = configurationService.getProperty("orcid.disconnection.allowed-users");
+        if (!OrcidProfileDisconnectionMode.isValid(value)) {
+            return OrcidProfileDisconnectionMode.DISABLED;
+        }
+        return OrcidProfileDisconnectionMode.fromString(value);
+    }
+
+    @Override
+    public List<Item> findProfilesByOrcid(Context context, String orcid) {
+
+        try {
+
+            DiscoverQuery discoverQuery = new DiscoverQuery();
+
+            discoverQuery.setDSpaceObjectFilter(IndexableItem.TYPE);
+            discoverQuery.addFilterQueries("search.entitytype:" + getProfileType());
+            discoverQuery.addFilterQueries("person.identifier.orcid:" + orcid);
+
+            DiscoverResult discoverResult = searchService.search(context, discoverQuery);
+
+            return discoverResult.getIndexableObjects().stream()
+                .map(indexableObject -> ((IndexableItem) indexableObject).getIndexedObject())
+                .collect(Collectors.toList());
+
+        } catch (SearchServiceException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void updatePreferenceForSynchronizingWithOrcid(Context context, Item profile,
+        String metadataQualifier, List<String> values) throws SQLException {
+
+        if (!isLinkedToOrcid(profile)) {
+            throw new IllegalArgumentException("The given profile cannot be configured for the ORCID "
+                + "synchronization because it is not linked to any ORCID account: " + profile.getID());
+        }
+
+        itemService.clearMetadata(context, profile, "cris", "orcid", metadataQualifier, Item.ANY);
+        for (String value : values) {
+            itemService.addMetadata(context, profile, "cris", "orcid", metadataQualifier, null, value);
+        }
+
+    }
+
     private Optional<String> getOrcidAccessToken(Item item) {
         return getMetadataValue(item, "cris.orcid.access-token")
             .map(metadataValue -> metadataValue.getValue());
@@ -200,13 +239,8 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
             .filter(metadata -> metadataField.equals(metadata.getMetadataField().toString('.')));
     }
 
-    @Override
-    public OrcidProfileDisconnectionMode getDisconnectionMode() {
-        String value = configurationService.getProperty("orcid.disconnection.allowed-users");
-        if (!OrcidProfileDisconnectionMode.isValid(value)) {
-            return OrcidProfileDisconnectionMode.DISABLED;
-        }
-        return OrcidProfileDisconnectionMode.fromString(value);
+    private String getProfileType() {
+        return configurationService.getProperty("researcher-profile.type", "Person");
     }
 
 }

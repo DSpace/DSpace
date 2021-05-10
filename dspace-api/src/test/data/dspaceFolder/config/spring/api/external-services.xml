@@ -143,6 +143,11 @@
             </list>
         </property>
     </bean>
+    
+    <bean id="orcidPublicationDataProvider" class="org.dspace.external.provider.impl.OrcidPublicationDataProvider">
+        <property name="sourceIdentifier" value="orcidWorks"/>
+        <property name="fieldMapping" ref="orcidPublicationDataProviderFieldMapping"/>
+    </bean>
 
 </beans>
 

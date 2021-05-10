@@ -28,6 +28,7 @@
                 <property name="sourceName" value="reciter"></property>
             </bean>
         </entry>
+		<entry key="orcid" value-ref="orcidPublicationLoader" />
 	</util:map>
 
  </beans>

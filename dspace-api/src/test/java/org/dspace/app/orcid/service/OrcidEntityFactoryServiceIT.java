@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.orcid.jaxb.model.common.ContributorRole.AUTHOR;
+import static org.orcid.jaxb.model.common.ContributorRole.EDITOR;
 import static org.orcid.jaxb.model.common.FundingContributorRole.CO_LEAD;
 import static org.orcid.jaxb.model.common.FundingContributorRole.LEAD;
 import static org.orcid.jaxb.model.common.SequenceType.ADDITIONAL;
@@ -120,6 +121,7 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
             .withTitle("Test publication")
             .withAuthor("Walter White")
             .withAuthor("Jesse Pinkman", author.getID().toString())
+            .withEditor("Editor")
             .withIssueDate("2021-04-30")
             .withDescriptionAbstract("Publication description")
             .withLanguage("en_US")
@@ -150,8 +152,9 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
         assertThat(work.getUrl(), matches(urlEndsWith(publication.getHandle())));
 
         List<Contributor> contributors = work.getWorkContributors().getContributor();
-        assertThat(contributors, hasSize(2));
+        assertThat(contributors, hasSize(3));
         assertThat(contributors, hasItem(matches(contributor("Walter White", AUTHOR, FIRST))));
+        assertThat(contributors, hasItem(matches(contributor("Editor", EDITOR, FIRST))));
         assertThat(contributors, hasItem(matches(contributor("Jesse Pinkman", AUTHOR, ADDITIONAL,
             "0000-1111-2222-3333", "test@test.it"))));
 

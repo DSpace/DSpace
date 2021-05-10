@@ -12,6 +12,7 @@ import java.util.Optional;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.orcid.jaxb.model.v3.release.record.Person;
 import org.orcid.jaxb.model.v3.release.record.Record;
+import org.orcid.jaxb.model.v3.release.record.summary.Works;
 
 /**
  * Interface for classes that allow to contact ORCID.
@@ -20,6 +21,16 @@ import org.orcid.jaxb.model.v3.release.record.Record;
  *
  */
 public interface OrcidClient {
+
+    /**
+     * Retrieves an access token using a client-credentials OAuth flow, or 2-step
+     * OAuth.
+     *
+     * @param  code                 the authorization code
+     * @return                      the ORCID token
+     * @throws OrcidClientException if some error occurs during the exchange
+     */
+    OrcidTokenResponseDTO getAccessToken();
 
     /**
      * Exchange the authorization code for an ORCID iD and 3-legged access token.
@@ -50,6 +61,16 @@ public interface OrcidClient {
      * @throws OrcidClientException if some error occurs during the search
      */
     Record getRecord(String accessToken, String orcid);
+
+    /**
+     * Retrieves all the works related to the given orcid.
+     *
+     * @param  accessToken          the access token
+     * @param  orcid                the orcid id related to the works
+     * @return                      the Works
+     * @throws OrcidClientException if some error occurs during the search
+     */
+    Works getWorks(String accessToken, String orcid);
 
     /**
      * Retrieves an object from ORCID with the given putCode related to the given

@@ -7,24 +7,19 @@
  */
 package org.dspace.app.orcid.model.factory.impl;
 
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.dspace.app.orcid.model.factory.OrcidFactoryUtils.parseConfigurations;
 
 import java.io.ByteArrayOutputStream;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.EnumUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.orcid.model.OrcidEntityType;
+import org.dspace.app.orcid.model.OrcidWorkFieldMapping;
 import org.dspace.app.orcid.model.factory.OrcidCommonObjectFactory;
 import org.dspace.app.orcid.model.factory.OrcidEntityFactory;
 import org.dspace.content.Item;
@@ -32,7 +27,6 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.integration.crosswalks.CSLItemDataCrosswalk;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.util.SimpleMapConverter;
 import org.orcid.jaxb.model.common.CitationType;
 import org.orcid.jaxb.model.common.ContributorRole;
 import org.orcid.jaxb.model.common.LanguageCode;
@@ -63,7 +57,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class OrcidWorkFactory implements OrcidEntityFactory {
 
-
     private static final Logger LOGGER = LoggerFactory.getLogger(OrcidWorkFactory.class);
 
     @Autowired
@@ -72,31 +65,7 @@ public class OrcidWorkFactory implements OrcidEntityFactory {
     @Autowired
     private OrcidCommonObjectFactory orcidCommonObjectFactory;
 
-    private Map<String, ContributorRole> contributorFields = new HashMap<>();
-
-    private Map<String, String> externalIdentifierFields = new HashMap<>();
-
-    private String publicationDateField;
-
-    private String workTitleField;
-
-    private String workTypeField;
-
-    private String journalTitleField;
-
-    private String shortDescriptionField;
-
-    private String languageField;
-
-    private String subTitleField;
-
-    private CitationType citationType;
-
-    private SimpleMapConverter workTypeConverter;
-
-    private SimpleMapConverter languageConverter;
-
-    private Map<String, CSLItemDataCrosswalk> citationCrosswalks;
+    private OrcidWorkFieldMapping fieldMapping;
 
     @Override
     public OrcidEntityType getEntityType() {
@@ -120,13 +89,14 @@ public class OrcidWorkFactory implements OrcidEntityFactory {
     }
 
     private Title getJournalTitle(Context context, Item item) {
-        return getMetadataValue(context, item, journalTitleField)
+        return getMetadataValue(context, item, fieldMapping.getJournalTitleField())
             .filter(metadataValue -> isNotBlank(metadataValue.getValue()))
             .map(metadataValue -> new Title(metadataValue.getValue()))
             .orElse(null);
     }
 
     private WorkContributors getWorkContributors(Context context, Item item) {
+        Map<String, ContributorRole> contributorFields = fieldMapping.getContributorFields();
         List<Contributor> contributors = getMetadataValues(context, item, contributorFields.keySet()).stream()
             .map(metadataValue -> getContributor(context, metadataValue))
             .filter(Optional::isPresent)
@@ -136,12 +106,13 @@ public class OrcidWorkFactory implements OrcidEntityFactory {
     }
 
     private Optional<Contributor> getContributor(Context context, MetadataValue metadataValue) {
+        Map<String, ContributorRole> contributorFields = fieldMapping.getContributorFields();
         ContributorRole role = contributorFields.get(metadataValue.getMetadataField().toString('.'));
         return orcidCommonObjectFactory.createContributor(context, metadataValue, role);
     }
 
     private WorkTitle getWorkTitle(Context context, Item item) {
-        return getMetadataValue(context, item, workTitleField)
+        return getMetadataValue(context, item, fieldMapping.getTitleField())
             .filter(metadataValue -> isNotBlank(metadataValue.getValue()))
             .map(metadataValue -> getWorkTitle(context, item, metadataValue))
             .orElse(null);
@@ -155,20 +126,23 @@ public class OrcidWorkFactory implements OrcidEntityFactory {
     }
 
     private Subtitle getSubTitle(Context context, Item item) {
-        return getMetadataValue(context, item, subTitleField)
+        return getMetadataValue(context, item, fieldMapping.getSubTitleField())
             .map(MetadataValue::getValue)
             .map(Subtitle::new)
             .orElse(null);
     }
 
     private PublicationDate getPublicationDate(Context context, Item item) {
-        return getMetadataValue(context, item, publicationDateField)
+        return getMetadataValue(context, item, fieldMapping.getPublicationDateField())
             .flatMap(orcidCommonObjectFactory::createFuzzyDate)
             .map(PublicationDate::new)
             .orElse(null);
     }
 
     private ExternalIDs getWorkExternalIds(Context context, Item item) {
+
+        Map<String, String> externalIdentifierFields = fieldMapping.getExternalIdentifierFields();
+
         ExternalIDs externalIdentifiers = new ExternalIDs();
 
         if (externalIdentifierFields.containsKey(SIMPLE_HANDLE_PLACEHOLDER)) {
@@ -184,6 +158,7 @@ public class OrcidWorkFactory implements OrcidEntityFactory {
     }
 
     private ExternalID getExternalId(MetadataValue metadataValue) {
+        Map<String, String> externalIdentifierFields = fieldMapping.getExternalIdentifierFields();
         String metadataField = metadataValue.getMetadataField().toString('.');
         return getExternalId(externalIdentifierFields.get(metadataField), metadataValue.getValue());
     }
@@ -197,9 +172,9 @@ public class OrcidWorkFactory implements OrcidEntityFactory {
     }
 
     private WorkType getWorkType(Context context, Item item) {
-        return getMetadataValue(context, item, workTypeField)
+        return getMetadataValue(context, item, fieldMapping.getTypeField())
             .map(MetadataValue::getValue)
-            .map(type -> workTypeConverter != null ? workTypeConverter.getValue(type) : type)
+            .map(type -> fieldMapping.convertType(type))
             .flatMap(this::getWorkType)
             .orElse(null);
     }
@@ -223,26 +198,27 @@ public class OrcidWorkFactory implements OrcidEntityFactory {
 
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             citationCrosswalk.disseminate(context, item, out);
-            return new Citation(out.toString(), citationType);
+            return new Citation(out.toString(), fieldMapping.getCitationType());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     private CSLItemDataCrosswalk getCitationCrosswalk() {
-        return citationType != null ? citationCrosswalks.get(citationType.value()) : null;
+        CitationType citationType = fieldMapping.getCitationType();
+        return citationType != null ? fieldMapping.getCitationCrosswalks().get(citationType.value()) : null;
     }
 
     private String getShortDescription(Context context, Item item) {
-        return getMetadataValue(context, item, shortDescriptionField)
+        return getMetadataValue(context, item, fieldMapping.getShortDescriptionField())
             .map(MetadataValue::getValue)
             .orElse(null);
     }
 
     private String getLanguageCode(Context context, Item item) {
-        return getMetadataValue(context, item, languageField)
+        return getMetadataValue(context, item, fieldMapping.getLanguageField())
             .map(MetadataValue::getValue)
-            .map(language -> languageConverter != null ? languageConverter.getValue(language) : language)
+            .map(language -> fieldMapping.convertLanguage(language))
             .filter(language -> isValidLanguage(language))
             .orElse(null);
     }
@@ -290,149 +266,8 @@ public class OrcidWorkFactory implements OrcidEntityFactory {
         this.orcidCommonObjectFactory = orcidCommonObjectFactory;
     }
 
-    public Map<String, ContributorRole> getContributorFields() {
-        return contributorFields;
-    }
-
-    public void setContributorFields(String contributorFields) {
-        this.contributorFields = parseContributors(contributorFields);
-    }
-
-    public Map<String, String> getExternalIdentifierFields() {
-        return externalIdentifierFields;
-    }
-
-    public void setExternalIdentifierFields(String externalIdentifierFields) {
-        this.externalIdentifierFields = parseConfigurations(externalIdentifierFields);
-    }
-
-    public String getPublicationDateField() {
-        return publicationDateField;
-    }
-
-    public void setPublicationDateField(String publicationDateField) {
-        this.publicationDateField = publicationDateField;
-    }
-
-    public String getWorkTitleField() {
-        return workTitleField;
-    }
-
-    public void setWorkTitleField(String workTitleField) {
-        this.workTitleField = workTitleField;
-    }
-
-    public String getWorkTypeField() {
-        return workTypeField;
-    }
-
-    public void setWorkTypeField(String workTypeField) {
-        this.workTypeField = workTypeField;
-    }
-
-    public CitationType getCitationType() {
-        return citationType;
-    }
-
-    public void setCitationType(String citationType) {
-        this.citationType = parseCitationType(citationType);
-    }
-
-    public SimpleMapConverter getWorkTypeConverter() {
-        return workTypeConverter;
-    }
-
-    public void setWorkTypeConverter(SimpleMapConverter workTypeConverter) {
-        this.workTypeConverter = workTypeConverter;
-    }
-
-    public Map<String, CSLItemDataCrosswalk> getCitationCrosswalks() {
-        return citationCrosswalks;
-    }
-
-    public void setCitationCrosswalks(Map<String, CSLItemDataCrosswalk> citationCrosswalks) {
-        this.citationCrosswalks = citationCrosswalks;
-    }
-
-    public String getJournalTitleField() {
-        return journalTitleField;
-    }
-
-    public void setJournalTitleField(String journalTitleField) {
-        this.journalTitleField = journalTitleField;
-    }
-
-    public String getShortDescriptionField() {
-        return shortDescriptionField;
-    }
-
-    public void setShortDescriptionField(String shortDescriptionField) {
-        this.shortDescriptionField = shortDescriptionField;
-    }
-
-    public String getLanguageField() {
-        return languageField;
-    }
-
-    public void setLanguageField(String languageField) {
-        this.languageField = languageField;
-    }
-
-    public SimpleMapConverter getLanguageConverter() {
-        return languageConverter;
-    }
-
-    public void setLanguageConverter(SimpleMapConverter languageConverter) {
-        this.languageConverter = languageConverter;
-    }
-
-    public String getSubTitleField() {
-        return subTitleField;
-    }
-
-    public void setSubTitleField(String subTitleField) {
-        this.subTitleField = subTitleField;
-    }
-
-    private Map<String, ContributorRole> parseContributors(String contributors) {
-        Map<String, String> contributorsMap = parseConfigurations(contributors);
-        return contributorsMap.keySet().stream()
-            .collect(toMap(identity(), field -> parseContributorRole(contributorsMap.get(field))));
-    }
-
-    private CitationType parseCitationType(String citationType) {
-
-        if (StringUtils.isBlank(citationType)) {
-            return null;
-        }
-
-        try {
-            return CitationType.fromValue(citationType);
-        } catch (IllegalArgumentException ex) {
-            throw new IllegalArgumentException("The citation type " + citationType + " is invalid, "
-                + "allowed values are " + getAllowedCitationTypes(), ex);
-        }
-    }
-
-    private ContributorRole parseContributorRole(String contributorRole) {
-        try {
-            return ContributorRole.fromValue(contributorRole);
-        } catch (IllegalArgumentException ex) {
-            throw new IllegalArgumentException("The contributor role " + contributorRole +
-                " is invalid, allowed values are " + getAllowedContributorRoles(), ex);
-        }
-    }
-
-    private List<String> getAllowedCitationTypes() {
-        return Arrays.asList(CitationType.values()).stream()
-            .map(CitationType::value)
-            .collect(Collectors.toList());
-    }
-
-    private List<String> getAllowedContributorRoles() {
-        return Arrays.asList(ContributorRole.values()).stream()
-            .map(ContributorRole::value)
-            .collect(Collectors.toList());
+    public void setFieldMapping(OrcidWorkFieldMapping fieldMapping) {
+        this.fieldMapping = fieldMapping;
     }
 
 }

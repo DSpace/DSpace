@@ -15,7 +15,6 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.dspace.app.orcid.model.factory.OrcidFactoryUtils.parseConfigurations;
 import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
-import static org.orcid.jaxb.model.common.ContributorRole.AUTHOR;
 import static org.orcid.jaxb.model.common.SequenceType.ADDITIONAL;
 import static org.orcid.jaxb.model.common.SequenceType.FIRST;
 
@@ -214,7 +213,7 @@ public class OrcidCommonObjectFactoryImpl implements OrcidCommonObjectFactory {
     private ContributorAttributes getContributorAttributes(MetadataValue metadataValue, ContributorRole role) {
         ContributorAttributes attributes = new ContributorAttributes();
         attributes.setContributorRole(role);
-        attributes.setContributorSequence(role == AUTHOR && metadataValue.getPlace() == 0 ? FIRST : ADDITIONAL);
+        attributes.setContributorSequence(metadataValue.getPlace() == 0 ? FIRST : ADDITIONAL);
         return attributes;
     }
 

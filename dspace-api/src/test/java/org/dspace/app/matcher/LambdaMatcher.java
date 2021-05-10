@@ -11,6 +11,8 @@ import java.util.function.Predicate;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 
 /**
  * Matcher based on an {@link Predicate}.
@@ -29,6 +31,10 @@ public class LambdaMatcher<T> extends BaseMatcher<T> {
 
     public static <T> LambdaMatcher<T> matches(Predicate<T> matcher, String description) {
         return new LambdaMatcher<T>(matcher, description);
+    }
+
+    public static <T> Matcher<java.lang.Iterable<? super T>> has(Predicate<T> matcher) {
+        return Matchers.hasItem(matches(matcher));
     }
 
     private LambdaMatcher(Predicate<T> matcher, String description) {

@@ -38,23 +38,7 @@
     	<constructor-arg name="entityFactories">
     		<list>
     			<bean class="org.dspace.app.orcid.model.factory.impl.OrcidWorkFactory">
-					<property name="contributorFields" value="${orcid.mapping.work.contributors}" />
-					<property name="externalIdentifierFields" value="${orcid.mapping.work.external-ids}" />
-					<property name="publicationDateField" value="${orcid.mapping.work.publication-date}" />
-					<property name="workTitleField" value="${orcid.mapping.work.title}" />
-					<property name="journalTitleField" value="${orcid.mapping.work.journal-title}" />
-					<property name="shortDescriptionField" value="${orcid.mapping.work.short-description}" />
-					<property name="subTitleField" value="${orcid.mapping.work.sub-title}" />
-					<property name="languageField" value="${orcid.mapping.work.language}" />
-					<property name="languageConverter" ref="${orcid.mapping.work.language.converter}" />
-					<property name="workTypeField" value="${orcid.mapping.work.type}" />
-					<property name="workTypeConverter" ref="${orcid.mapping.work.type.converter}" />
-					<property name="citationType" value="${orcid.mapping.work.citation.type}" />
-					<property name="citationCrosswalks">
-						<util:map>
-							<entry key="bibtex" value-ref="cslItemDataCrosswalkBibtex" />
-						</util:map>
-					</property>
+    				<property name="fieldMapping" ref="orcidWorkFactoryFieldMapping" />
     			</bean>
     			<bean class="org.dspace.app.orcid.model.factory.impl.OrcidFundingFactory">
 					<property name="contributorFields" value="${orcid.mapping.funding.contributors}" />
@@ -67,6 +51,26 @@
     			</bean>
     		</list>
    		</constructor-arg>
+	</bean>
+	
+	<bean id="orcidWorkFactoryFieldMapping" class="org.dspace.app.orcid.model.OrcidWorkFieldMapping" >
+		<property name="contributorFields" value="${orcid.mapping.work.contributors}" />
+		<property name="externalIdentifierFields" value="${orcid.mapping.work.external-ids}" />
+		<property name="publicationDateField" value="${orcid.mapping.work.publication-date}" />
+		<property name="titleField" value="${orcid.mapping.work.title}" />
+		<property name="journalTitleField" value="${orcid.mapping.work.journal-title}" />
+		<property name="shortDescriptionField" value="${orcid.mapping.work.short-description}" />
+		<property name="subTitleField" value="${orcid.mapping.work.sub-title}" />
+		<property name="languageField" value="${orcid.mapping.work.language}" />
+		<property name="languageConverter" ref="${orcid.mapping.work.language.converter}" />
+		<property name="typeField" value="${orcid.mapping.work.type}" />
+		<property name="typeConverter" ref="${orcid.mapping.work.type.converter}" />
+		<property name="citationType" value="${orcid.mapping.work.citation.type}" />
+		<property name="citationCrosswalks">
+			<util:map>
+				<entry key="bibtex" value-ref="cslItemDataCrosswalkBibtex" />
+			</util:map>
+		</property>
 	</bean>
     
     <bean class="org.dspace.app.orcid.model.factory.impl.OrcidCommonObjectFactoryImpl">
@@ -142,16 +146,48 @@
     	</constructor-arg>
     </bean>
     
-    <bean name="mapConverterOrcidWorkType" class="org.dspace.util.SimpleMapConverter" init-method="init">
-		<property name="converterNameFile" value="mapConverter-orcid-work-types.properties" />
-		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
-		<property name="defaultValue" value="other"/>
-	</bean>
-    
-    <bean name="mapConverterOrcidLanguageCode" class="org.dspace.util.SimpleMapConverter" init-method="init">
-		<property name="converterNameFile" value="mapConverter-orcid-language-codes.properties" />
+    <bean name="mapConverterPublicationToOrcidWorkType" class="org.dspace.util.SimpleMapConverter" init-method="init">
+		<property name="converterNameFile" value="mapConverter-publication-to-orcid-work-types.properties" />
 		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
 		<property name="defaultValue" value=""/>
 	</bean>
+    
+    <bean name="mapConverterIsoToOrcidLanguageCode" class="org.dspace.util.SimpleMapConverter" init-method="init">
+		<property name="converterNameFile" value="mapConverter-iso-to-orcid-language-codes.properties" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+		<property name="defaultValue" value=""/>
+	</bean>
+	
+	<bean class="org.dspace.app.orcid.webhook.RetrieveOrcidPublicationAction" />
+	
+	<bean id="orcidPublicationDataProviderFieldMapping" class="org.dspace.app.orcid.model.OrcidWorkFieldMapping" >
+		<property name="contributorFields" value="${orcid.external-data.mapping.publication.contributors}" />
+		<property name="externalIdentifierFields" value="${orcid.external-data.mapping.publication.external-ids}" />
+		<property name="publicationDateField" value="${orcid.external-data.mapping.publication.issued-date}" />
+		<property name="titleField" value="${orcid.external-data.mapping.publication.title}" />
+		<property name="journalTitleField" value="${orcid.external-data.mapping.publication.is-part-of}" />
+		<property name="shortDescriptionField" value="${orcid.external-data.mapping.publication.description}" />
+		<property name="languageField" value="${orcid.external-data.mapping.publication.language}" />
+		<property name="languageConverter" ref="${orcid.external-data.mapping.publication.language.converter}" />
+		<property name="typeField" value="${orcid.external-data.mapping.publication.type}" />
+		<property name="typeConverter" ref="${orcid.external-data.mapping.publication.type.converter}" />
+	</bean>
+    
+    <bean name="mapConverterOrcidWorkToPublicationType" class="org.dspace.util.SimpleMapConverter" init-method="init">
+		<property name="converterNameFile" value="mapConverter-orcid-work-to-publication-types.properties" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+		<property name="defaultValue" value="Controlled Vocabulary for Resource Type Genres::other"/>
+	</bean>
+    
+    <bean name="mapConverterOrcidLanguageCodeToIso" class="org.dspace.util.SimpleMapConverter" init-method="init">
+		<property name="converterNameFile" value="mapConverter-orcid-language-codes-to-iso.properties" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+		<property name="defaultValue" value=""/>
+	</bean>
+    
+    <bean id="orcidPublicationLoader" class="org.dspace.app.suggestion.orcid.OrcidPublicationLoader">
+        <property name="sourceName" value="orcidWorks" />
+    	<property name="provider" ref="orcidPublicationDataProvider" />
+    </bean>
 
 </beans>

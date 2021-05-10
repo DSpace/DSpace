@@ -60,10 +60,10 @@ public abstract class SolrSuggestionProvider implements SuggestionProvider {
     protected SolrClient solrSuggestionClient;
 
     @Autowired
-    private ItemService itemService;
+    protected ItemService itemService;
 
     @Autowired
-    private SolrSuggestionStorageService solrSuggestionStorageService;
+    protected SolrSuggestionStorageService solrSuggestionStorageService;
 
     private String sourceName;
 
