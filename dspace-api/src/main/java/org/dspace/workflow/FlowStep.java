@@ -12,7 +12,7 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 
 /**
- * A workflow step.
+ * Linkage between a workflow step and some {@link org.dspace.curate.CurationTask}s.
  */
 public class FlowStep {
     public final String step;
@@ -20,10 +20,14 @@ public class FlowStep {
     public final List<Task> tasks = new ArrayList<>();
 
     /**
-     * Create a workflow step.
+     * Create a set of curation tasks to be linked to a named workflow step.
+     * If the name of a curation task queue is supplied, the tasks will be queued;
+     * otherwise they will execute as the workflow item is passing through the
+     * linked workflow step.
      *
-     * @param name name of the step.
-     * @param queue name of the step's associated queue (if any).
+     * @param name name of the workflow step.
+     * @param queue name of the associated curation queue in which tasks will run,
+     *              or {@code null} if these tasks should execute immediately.
      */
     public FlowStep(@NotNull String name, String queue) {
         this.step = name;
@@ -31,8 +35,8 @@ public class FlowStep {
     }
 
     /**
-     * Associate a task with this step.
-     * @param task a task to be applied in this step.
+     * Associate a curation task with the linked workflow step.
+     * @param task a curation task configuration to be applied in this step.
      */
     public void addTask(@NotNull Task task) {
         tasks.add(task);

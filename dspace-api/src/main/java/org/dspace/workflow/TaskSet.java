@@ -11,14 +11,15 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 
 /**
- * A collection of workflow tasks.
+ * A collection of {@link org.dspace.curate.CurationTask curation tasks} to be
+ * attached to a workflow.
  */
 public class TaskSet {
     public final String name;
     public final List<FlowStep> steps;
 
     /**
-     * Create a TaskSet.
+     * Create a name for a collection of {@link FlowStep}s.
      *
      * @param name name of this task set.
      * @param steps workflow steps in this task set.

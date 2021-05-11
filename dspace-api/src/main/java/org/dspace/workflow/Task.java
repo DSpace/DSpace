@@ -14,7 +14,16 @@ import java.util.Map;
 import javax.validation.constraints.NotNull;
 
 /**
- * A workflow task.
+ * An association between a {@link org.dspace.curate.CurationTask curation task}
+ * and the workflow system.  A single curation task may be associated with more
+ * than one workflow, and each association may be configured differently.
+ *
+ * <p>A curation task can be given {@link addPower "powers"} to affect the
+ * progress of a workflow.  For example, a curation task can cause a workflow
+ * item to be rejected if it fails.
+ *
+ * <p>A curation task can be associated with {@link addContact "contacts"}
+ * (email addresses) to be notified when the curation task returns a given status.
  */
 public class Task {
     public final String name;
@@ -22,26 +31,29 @@ public class Task {
     public final Map<String, List<String>> contacts = new HashMap<>();
 
     /**
-     * Create a task with a given name.
-     * @param name the task's name.
+     * Create an instance of an association with a given curation task.
+     * @param name the name of a curation task to be attached to some workflow.
      */
     public Task(@NotNull String name) {
         this.name = name;
     }
 
     /**
-     * Add a task power to this task.
-     * @param power the given power.  TODO should use schema-generated {@code enum}?
+     * Empower this attachment to affect a workflow in some way.
+     * @param power the given power.  See {@link org.dspace.curate.XmlWorkflowCuratorServiceImpl#curate}.
+     *              TODO should use schema-generated {@code enum}?
      */
     public void addPower(@NotNull String power) {
         powers.add(power);
     }
 
     /**
-     * Associate a contact with a given status.
+     * Associate a contact with a given curation status such as
+     * {@link org.dspace.curate.Curator#CURATE_ERROR}.
      *
-     * @param status the given status.  TODO should use schema-generated {@code enum}?
-     * @param contact the associated contact.
+     * @param status an exit status of the curation task.
+     *               TODO should use schema-generated {@code enum}?
+     * @param contact an address to be notified of this status.
      */
     public void addContact(@NotNull String status, @NotNull String contact) {
         List<String> sContacts = contacts.get(status);
@@ -53,8 +65,11 @@ public class Task {
     }
 
     /**
-     * Get the collection of contacts for a given status.
-     * @param status the given status.  TODO should use schema-generated {@code enum}?
+     * Get the collection of contacts for a given status such as
+     * {@link org.dspace.curate.Curator#CURATE_SUCCESS}.
+     *
+     * @param status the given status.
+     *               TODO should use schema-generated {@code enum}?
      * @return contacts associated with this status.
      */
     @NotNull
