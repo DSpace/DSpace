@@ -141,5 +141,31 @@
                 <common:day>01</common:day>
             </common:publication-date>
         </work:work-summary>
+        <work:work-summary put-code="277971" path="/0000-0001-9227-636X/work/277871" visibility="public" display-index="0">
+            <common:created-date>2014-01-22T19:11:57.151Z</common:created-date>
+            <common:last-modified-date>2015-06-19T19:14:25.924Z</common:last-modified-date>
+            <common:source>
+                <common:source-orcid>
+                    <common:uri>https://sandbox.orcid.org/0000-0002-4105-0763</common:uri>
+                    <common:path>0000-0002-4105-0763</common:path>
+                    <common:host>sandbox.orcid.org</common:host>
+                </common:source-orcid>
+                <common:source-client-id>
+                    <common:uri>https://sandbox.orcid.org/client/0000-0002-4105-0763</common:uri>
+                    <common:path>0000-0002-4105-0763</common:path>
+                    <common:host>sandbox.orcid.org</common:host>
+                </common:source-client-id>
+                <common:source-name>BU Profiles to ORCID Integration Site</common:source-name>
+            </common:source>
+            <work:title>
+                <common:title>Branch artery occlusion in a young man.</common:title>
+            </work:title>
+            <work:type>journal-article</work:type>
+            <common:publication-date>
+                <common:year>1985</common:year>
+                <common:month>07</common:month>
+                <common:day>01</common:day>
+            </common:publication-date>
+        </work:work-summary>
     </activities:group>
 </activities:works>

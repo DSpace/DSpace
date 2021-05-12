@@ -29,6 +29,8 @@ public final class OrcidConfiguration {
 
     private String tokenEndpointUrl;
 
+    private String webhookUrl;
+
     private String authorizeEndpointUrl;
 
     private String scopes;
@@ -95,6 +97,20 @@ public final class OrcidConfiguration {
 
     public String[] getScopes() {
         return StringUtils.isNotBlank(scopes) ? StringUtils.split(scopes, ",") : new String[] {};
+    }
+
+    /**
+     * @return the webhookUrl
+     */
+    public String getWebhookUrl() {
+        return webhookUrl;
+    }
+
+    /**
+     * @param webhookUrl the webhookUrl to set
+     */
+    public void setWebhookUrl(String webhookUrl) {
+        this.webhookUrl = webhookUrl;
     }
 
 }

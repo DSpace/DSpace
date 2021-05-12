@@ -23,14 +23,25 @@ import org.orcid.jaxb.model.v3.release.record.summary.Works;
 public interface OrcidClient {
 
     /**
-     * Retrieves an access token using a client-credentials OAuth flow, or 2-step
-     * OAuth.
+     * Retrieves an /read-public access token using a client-credentials OAuth flow,
+     * or 2-step OAuth.
      *
      * @param  code                 the authorization code
      * @return                      the ORCID token
      * @throws OrcidClientException if some error occurs during the exchange
      */
-    OrcidTokenResponseDTO getAccessToken();
+    OrcidTokenResponseDTO getReadPublicAccessToken();
+
+    /**
+     * Retrieves a /webhook access token using a client-credentials OAuth flow, or
+     * 2-step OAuth. A single token can be used to register webhooks for multiple
+     * records.
+     *
+     * @param  code                 the authorization code
+     * @return                      the ORCID token
+     * @throws OrcidClientException if some error occurs during the exchange
+     */
+    OrcidTokenResponseDTO getWebhookAccessToken();
 
     /**
      * Exchange the authorization code for an ORCID iD and 3-legged access token.
@@ -121,9 +132,32 @@ public interface OrcidClient {
      * @param  orcid                the orcid id
      * @param  putCode              the put code of the resource to delete
      * @param  path                 the path of the resource to delete
-     * @return                      the Work, if any
+     * @return                      the orcid response if no error occurs
      * @throws OrcidClientException if some error occurs during the search
      */
     OrcidResponse deleteByPutCode(String accessToken, String orcid, String putCode, String path);
+
+    /**
+     * Register a webhook against the user’s ORCID record with the given orcid id.
+     *
+     * @param  accessToken          the access token
+     * @param  orcid                the orcid id
+     * @param  url                  the webhook url
+     * @return                      the orcid response if no error occurs
+     * @throws OrcidClientException if some error occurs during the search
+     */
+    OrcidResponse registerWebhook(String accessToken, String orcid, String url);
+
+    /**
+     * Unregister the webhook related to the user’s ORCID record with the given
+     * orcid id.
+     *
+     * @param  accessToken          the access token
+     * @param  orcid                the orcid id
+     * @param  url                  the webhook url
+     * @return                      the orcid response if no error occurs
+     * @throws OrcidClientException if some error occurs during the search
+     */
+    OrcidResponse unregisterWebhook(String accessToken, String orcid, String url);
 
 }

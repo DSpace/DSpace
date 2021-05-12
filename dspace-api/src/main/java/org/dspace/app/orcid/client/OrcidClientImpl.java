@@ -17,7 +17,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -115,20 +117,13 @@ public class OrcidClientImpl implements OrcidClient {
     }
 
     @Override
-    public OrcidTokenResponseDTO getAccessToken() {
-        List<NameValuePair> params = new ArrayList<NameValuePair>();
-        params.add(new BasicNameValuePair("scope", "/read-public"));
-        params.add(new BasicNameValuePair("grant_type", "client_credentials"));
-        params.add(new BasicNameValuePair("client_id", orcidConfiguration.getClientId()));
-        params.add(new BasicNameValuePair("client_secret", orcidConfiguration.getClientSecret()));
+    public OrcidTokenResponseDTO getReadPublicAccessToken() {
+        return getClientCredentialsAccessToken("/read-public");
+    }
 
-        HttpUriRequest httpUriRequest = RequestBuilder.post(orcidConfiguration.getTokenEndpointUrl())
-            .addHeader("Content-Type", "application/x-www-form-urlencoded")
-            .addHeader("Accept", "application/json")
-            .setEntity(new UrlEncodedFormEntity(params, Charset.defaultCharset()))
-            .build();
-
-        return executeAndParseJson(httpUriRequest, OrcidTokenResponseDTO.class);
+    @Override
+    public OrcidTokenResponseDTO getWebhookAccessToken() {
+        return getClientCredentialsAccessToken("/webhook");
     }
 
     @Override
@@ -179,34 +174,72 @@ public class OrcidClientImpl implements OrcidClient {
 
     @Override
     public OrcidResponse deleteByPutCode(String accessToken, String orcid, String putCode, String path) {
-        return execute(buildDeleteUriRequest(accessToken, "/" + orcid + path + "/" + putCode), true);
+        String apiUrl = orcidConfiguration.getApiUrl();
+        return execute(buildDeleteUriRequest(accessToken, apiUrl, "/" + orcid + path + "/" + putCode), true);
     }
 
-    private HttpUriRequest buildGetUriRequest(String accessToken, String path) {
-        return get(orcidConfiguration.getApiUrl() + path.trim())
+    @Override
+    public OrcidResponse registerWebhook(String accessToken, String orcid, String url) {
+        String webhookUrl = orcidConfiguration.getWebhookUrl();
+        String encodedUrl = encodeUrl(url);
+        return execute(buildPutUriRequest(accessToken, webhookUrl, "/" + orcid + "/webhook/" + encodedUrl), false);
+    }
+
+    @Override
+    public OrcidResponse unregisterWebhook(String accessToken, String orcid, String url) {
+        String webhookUrl = orcidConfiguration.getWebhookUrl();
+        String encodedUrl = encodeUrl(url);
+        return execute(buildDeleteUriRequest(accessToken, webhookUrl, "/" + orcid + "/webhook/" + encodedUrl), true);
+    }
+
+    private OrcidTokenResponseDTO getClientCredentialsAccessToken(String scope) {
+        List<NameValuePair> params = new ArrayList<NameValuePair>();
+        params.add(new BasicNameValuePair("scope", scope));
+        params.add(new BasicNameValuePair("grant_type", "client_credentials"));
+        params.add(new BasicNameValuePair("client_id", orcidConfiguration.getClientId()));
+        params.add(new BasicNameValuePair("client_secret", orcidConfiguration.getClientSecret()));
+
+        HttpUriRequest httpUriRequest = RequestBuilder.post(orcidConfiguration.getTokenEndpointUrl())
+            .addHeader("Content-Type", "application/x-www-form-urlencoded")
+            .addHeader("Accept", "application/json")
+            .setEntity(new UrlEncodedFormEntity(params, Charset.defaultCharset()))
+            .build();
+
+        return executeAndParseJson(httpUriRequest, OrcidTokenResponseDTO.class);
+    }
+
+    private HttpUriRequest buildGetUriRequest(String accessToken, String relativePath) {
+        return get(orcidConfiguration.getApiUrl() + relativePath.trim())
             .addHeader("Content-Type", "application/x-www-form-urlencoded")
             .addHeader("Authorization", "Bearer " + accessToken)
             .build();
     }
 
-    private HttpUriRequest buildPostUriRequest(String accessToken, String path, Object object) {
-        return post(orcidConfiguration.getApiUrl() + path.trim())
+    private HttpUriRequest buildPostUriRequest(String accessToken, String relativePath, Object object) {
+        return post(orcidConfiguration.getApiUrl() + relativePath.trim())
             .addHeader("Content-Type", "application/vnd.orcid+xml")
             .addHeader("Authorization", "Bearer " + accessToken)
             .setEntity(convertToEntity(object))
             .build();
     }
 
-    private HttpUriRequest buildPutUriRequest(String accessToken, String path, Object object) {
-        return put(orcidConfiguration.getApiUrl() + path.trim())
+    private HttpUriRequest buildPutUriRequest(String accessToken, String relativePath, Object object) {
+        return put(orcidConfiguration.getApiUrl() + relativePath.trim())
             .addHeader("Content-Type", "application/vnd.orcid+xml")
             .addHeader("Authorization", "Bearer " + accessToken)
             .setEntity(convertToEntity(object))
             .build();
     }
 
-    private HttpUriRequest buildDeleteUriRequest(String accessToken, String path) {
-        return delete(orcidConfiguration.getApiUrl() + path.trim())
+    private HttpUriRequest buildPutUriRequest(String accessToken, String baseUrl, String relativePath) {
+        return put(baseUrl + relativePath.trim())
+            .addHeader("Content-Length", "0")
+            .addHeader("Authorization", "Bearer " + accessToken)
+            .build();
+    }
+
+    private HttpUriRequest buildDeleteUriRequest(String accessToken, String baseUrl, String relativePath) {
+        return delete(baseUrl + relativePath.trim())
             .addHeader("Authorization", "Bearer " + accessToken)
             .build();
     }
@@ -338,5 +371,13 @@ public class OrcidClientImpl implements OrcidClient {
         }
         String value = headers[0].getValue();
         return value.substring(value.lastIndexOf("/") + 1);
+    }
+
+    private String encodeUrl(String url) {
+        try {
+            return URLEncoder.encode(url, StandardCharsets.UTF_8.toString());
+        } catch (UnsupportedEncodingException e) {
+            throw new OrcidClientException(e);
+        }
     }
 }

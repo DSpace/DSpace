@@ -15,6 +15,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.codec.binary.StringUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.dspace.app.orcid.client.OrcidClient;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
@@ -87,9 +88,16 @@ public class OrcidRestController {
         response.sendRedirect(dspaceUiUrl.resolve(url).toString());
     }
 
-    @PostMapping(value = "/{orcid}/webhook")
+    @PostMapping(value = "/{orcid}/webhook/{token}")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public void webhook(HttpServletRequest request, @PathVariable(name = "orcid") String orcid) {
+    public void webhook(HttpServletRequest request, @PathVariable(name = "orcid") String orcid,
+        @PathVariable(name = "token") String token) {
+
+        String storedToken = configurationService.getProperty("orcid.webhook.token");
+        if (!StringUtils.equals(token, storedToken)) {
+            LOGGER.warn("Received a webhook callback with a wrong token: " + token);
+            return;
+        }
 
         try {
 

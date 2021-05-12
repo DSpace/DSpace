@@ -23,6 +23,7 @@ import org.dspace.app.orcid.model.OrcidEntityType;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.app.orcid.service.OrcidSynchronizationService;
+import org.dspace.app.orcid.service.OrcidWebhookService;
 import org.dspace.app.profile.OrcidEntitySyncPreference;
 import org.dspace.app.profile.OrcidProfileDisconnectionMode;
 import org.dspace.app.profile.OrcidProfileSyncPreference;
@@ -48,6 +49,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationService {
 
+
     @Autowired
     private ItemService itemService;
 
@@ -59,6 +61,9 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
 
     @Autowired
     private SearchService searchService;
+
+    @Autowired
+    private OrcidWebhookService orcidWebhookService;
 
     @Override
     public void linkProfile(Context context, Item profile, OrcidTokenResponseDTO token)
@@ -83,6 +88,11 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
 
     @Override
     public void unlinkProfile(Context context, Item profile) throws SQLException {
+
+        if (orcidWebhookService.isProfileRegistered(profile)) {
+            orcidWebhookService.unregister(context, profile);
+        }
+
         itemService.clearMetadata(context, profile, "person", "identifier", "orcid", Item.ANY);
         itemService.clearMetadata(context, profile, "cris", "orcid", "access-token", Item.ANY);
         itemService.clearMetadata(context, profile, "cris", "orcid", "refresh-token", Item.ANY);

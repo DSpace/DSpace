@@ -63,7 +63,6 @@
     <bean class="org.dspace.content.authority.MetadataAuthorityServiceImpl" lazy-init="true"/>
 
     <bean class="org.dspace.app.profile.ResearcherProfileServiceImpl"/>
-    <bean class="org.dspace.app.orcid.service.impl.OrcidSynchronizationServiceImpl"/>
     
     <bean class="org.dspace.app.profile.OrcidMetadataCopyingAction"/>
 

@@ -13,6 +13,7 @@ import org.dspace.app.orcid.service.OrcidHistoryService;
 import org.dspace.app.orcid.service.OrcidProfileSectionFactoryService;
 import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.app.orcid.service.OrcidSynchronizationService;
+import org.dspace.app.orcid.service.OrcidWebhookService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -29,6 +30,8 @@ public abstract class OrcidServiceFactory {
     public abstract OrcidQueueService getOrcidQueueService();
 
     public abstract OrcidSynchronizationService getOrcidSynchronizationService();
+
+    public abstract OrcidWebhookService getOrcidWebhookService();
 
     public abstract OrcidProfileSectionFactoryService getOrcidProfileSectionFactoryService();
 

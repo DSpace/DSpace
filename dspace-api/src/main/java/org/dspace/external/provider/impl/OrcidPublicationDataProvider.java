@@ -44,6 +44,7 @@ import org.orcid.jaxb.model.v3.release.record.SourceAware;
 import org.orcid.jaxb.model.v3.release.record.Work;
 import org.orcid.jaxb.model.v3.release.record.WorkContributors;
 import org.orcid.jaxb.model.v3.release.record.WorkTitle;
+import org.orcid.jaxb.model.v3.release.record.summary.WorkGroup;
 import org.orcid.jaxb.model.v3.release.record.summary.WorkSummary;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -120,7 +121,7 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
             return clientCredentialsAccessToken;
         }
 
-        OrcidTokenResponseDTO accessTokenResponse = orcidClient.getAccessToken();
+        OrcidTokenResponseDTO accessTokenResponse = orcidClient.getReadPublicAccessToken();
         clientCredentialsAccessToken = accessTokenResponse.getAccessToken();
 
         return clientCredentialsAccessToken;
@@ -141,8 +142,8 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
 
     private Stream<WorkSummary> findWorkSummaries(String accessToken, String orcid) {
         return orcidClient.getWorks(accessToken, orcid).getWorkGroup().stream()
+            .filter(workGroup -> allWorkSummariesHaveDifferentSourceClientId(workGroup))
             .flatMap(workGroup -> workGroup.getWorkSummary().stream())
-            .filter(workSummary -> hasDifferentSourceClientId(workSummary))
             .filter(workSummary -> workSummary.getPutCode() != null);
     }
 
@@ -177,6 +178,11 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
         }
 
         return externalDataObject;
+    }
+
+    private boolean allWorkSummariesHaveDifferentSourceClientId(WorkGroup workGroup) {
+        return workGroup.getWorkSummary().stream()
+            .allMatch(this::hasDifferentSourceClientId);
     }
 
     @SuppressWarnings("deprecation")

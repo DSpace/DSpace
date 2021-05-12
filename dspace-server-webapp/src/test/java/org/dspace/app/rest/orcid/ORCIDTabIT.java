@@ -176,6 +176,7 @@ public class ORCIDTabIT extends AbstractControllerIntegrationTest {
             .withPersonIdentifierFirstName("John")
             .withPersonIdentifierLastName("Smith")
             .withOrcidIdentifier("0000-1111-2222-3333")
+            .withOrcidAccessToken("0023a083-1844-47ee-ab12-d066e735e092")
             .withBirthDate("1999-11-22")
             .withEntityType(eTypePer.getLabel())
             .withCrisOwner(eperson.getFullName(), eperson.getID().toString())
@@ -186,6 +187,7 @@ public class ORCIDTabIT extends AbstractControllerIntegrationTest {
                 .withPersonIdentifierFirstName("Andrea")
                 .withPersonIdentifierLastName("Bollini")
                 .withOrcidIdentifier("0000-0002-9029-1854")
+            .withOrcidAccessToken("0023a083-1844-47ee-ab12-d066e735e092")
                 .withBirthDate("1980-08-04")
                 .withEntityType(eTypePer.getLabel())
                 .withCrisOwner(admin.getFullName(), admin.getID().toString())
@@ -196,6 +198,7 @@ public class ORCIDTabIT extends AbstractControllerIntegrationTest {
                 .withPersonIdentifierFirstName("Mario")
                 .withPersonIdentifierLastName("Rossi")
                 .withOrcidIdentifier("4444-3333-2222-1111")
+            .withOrcidAccessToken("0023a083-1844-47ee-ab12-d066e735e092")
                 .withBirthDate("1944-04-17")
                 .withEntityType(eTypePer.getLabel())
                 .build();

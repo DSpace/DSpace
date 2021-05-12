@@ -102,7 +102,7 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
         originalClientId = orcidConfiguration.getClientId();
         orcidConfiguration.setClientId("DSPACE-CRIS-CLIENT-ID");
 
-        when(orcidClientMock.getAccessToken()).thenReturn(buildTokenResponse(CLIENT_CREDENTIALS_TOKEN));
+        when(orcidClientMock.getReadPublicAccessToken()).thenReturn(buildTokenResponse(CLIENT_CREDENTIALS_TOKEN));
 
         when(orcidClientMock.getWorks(any(), eq(ORCID))).thenReturn(unmarshall("works.xml", Works.class));
 
@@ -169,7 +169,7 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
         assertThat(metadata, has(metadata("dc.type", "Controlled Vocabulary for "
             + "Resource Type Genres::text::periodical::journal")));
 
-        verify(orcidClientMock).getAccessToken();
+        verify(orcidClientMock).getReadPublicAccessToken();
         verify(orcidClientMock).getWorks(CLIENT_CREDENTIALS_TOKEN, ORCID);
         verify(orcidClientMock).getObject(CLIENT_CREDENTIALS_TOKEN, ORCID, "277904", Work.class);
         verify(orcidClientMock).getObject(CLIENT_CREDENTIALS_TOKEN, ORCID, "277902", Work.class);
@@ -217,7 +217,7 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
 
         List<ExternalDataObject> externalObjects = dataProvider.searchExternalDataObjects(ORCID, 0, -1);
         assertThat(externalObjects, hasSize(3));
-        verify(orcidClientMock).getAccessToken();
+        verify(orcidClientMock).getReadPublicAccessToken();
         verify(orcidClientMock).getWorks(CLIENT_CREDENTIALS_TOKEN, ORCID);
         verify(orcidClientMock).getObject(CLIENT_CREDENTIALS_TOKEN, ORCID, "277904", Work.class);
         verify(orcidClientMock).getObject(CLIENT_CREDENTIALS_TOKEN, ORCID, "277902", Work.class);
@@ -231,19 +231,19 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
         List<ExternalDataObject> externalObjects = dataProvider.searchExternalDataObjects(ORCID, 0, -1);
         assertThat(externalObjects, hasSize(3));
 
-        verify(orcidClientMock).getAccessToken();
+        verify(orcidClientMock).getReadPublicAccessToken();
 
         externalObjects = dataProvider.searchExternalDataObjects(ORCID, 0, -1);
         assertThat(externalObjects, hasSize(3));
 
-        verify(orcidClientMock, times(1)).getAccessToken();
+        verify(orcidClientMock, times(1)).getReadPublicAccessToken();
 
         dataProvider.setClientCredentialsAccessToken(null);
 
         externalObjects = dataProvider.searchExternalDataObjects(ORCID, 0, -1);
         assertThat(externalObjects, hasSize(3));
 
-        verify(orcidClientMock, times(2)).getAccessToken();
+        verify(orcidClientMock, times(2)).getReadPublicAccessToken();
 
     }
 
@@ -300,7 +300,7 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
         assertThat(metadata, has(metadata("dc.type", "Controlled Vocabulary for "
             + "Resource Type Genres::text::periodical::journal")));
 
-        verify(orcidClientMock).getAccessToken();
+        verify(orcidClientMock).getReadPublicAccessToken();
         verify(orcidClientMock).getObject(CLIENT_CREDENTIALS_TOKEN, ORCID, "277902", Work.class);
         verifyNoMoreInteractions(orcidClientMock);
     }

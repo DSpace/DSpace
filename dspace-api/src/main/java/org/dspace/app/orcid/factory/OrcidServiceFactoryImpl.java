@@ -13,6 +13,7 @@ import org.dspace.app.orcid.service.OrcidHistoryService;
 import org.dspace.app.orcid.service.OrcidProfileSectionFactoryService;
 import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.app.orcid.service.OrcidSynchronizationService;
+import org.dspace.app.orcid.service.OrcidWebhookService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -40,6 +41,9 @@ public class OrcidServiceFactoryImpl extends OrcidServiceFactory {
 
     @Autowired
     private MetadataSignatureGenerator metadataSignatureGenerator;
+
+    @Autowired
+    private OrcidWebhookService orcidWebhookService;
 
     @Override
     public OrcidHistoryService getOrcidHistoryService() {
@@ -69,6 +73,11 @@ public class OrcidServiceFactoryImpl extends OrcidServiceFactory {
     @Override
     public OrcidEntityFactoryService getOrcidEntityFactoryService() {
         return orcidEntityFactoryService;
+    }
+
+    @Override
+    public OrcidWebhookService getOrcidWebhookService() {
+        return orcidWebhookService;
     }
 
 }

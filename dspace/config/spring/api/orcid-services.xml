@@ -15,6 +15,9 @@
     <bean class="org.dspace.app.orcid.service.impl.OrcidQueueServiceImpl" />
     <bean class="org.dspace.app.orcid.service.impl.OrcidHistoryServiceImpl" />
     
+    <bean class="org.dspace.app.orcid.service.impl.OrcidSynchronizationServiceImpl"/>
+	<bean class="org.dspace.app.orcid.webhook.OrcidWebhookServiceImpl" />
+    
     <bean class="org.dspace.authenticate.OrcidAuthenticationBean" id="orcidAuthentication"/>
     
     <bean class="org.dspace.app.orcid.client.OrcidConfiguration">
@@ -25,6 +28,7 @@
     	<property name="clientSecret" value="${orcid.application-client-secret}" />
     	<property name="tokenEndpointUrl" value="${orcid.token-url}" />
     	<property name="authorizeEndpointUrl" value="${orcid.authorize-url}" />
+    	<property name="webhookUrl" value="${orcid.webhook-url}" />
     	<property name="scopes" value="${orcid.scope}" />
     </bean>
     
