@@ -82,23 +82,19 @@ public class SuggestionSourceRestRepositoryIT extends AbstractControllerIntegrat
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(get("/api/integration/suggestionsources")).andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.suggestionsources", Matchers.containsInAnyOrder(
-                    matchSuggestionSource("reciter", 10),
-                    matchSuggestionSource("scopus", 5),
-                    matchSuggestionSource("orcid", 1))))
-                .andExpect(jsonPath("$.page.size", is(20)))
-                .andExpect(jsonPath("$.page.totalElements", is(3)));
+                .andExpect(jsonPath("$._embedded.suggestionsources",
+                        Matchers.contains(matchSuggestionSource("reciter", 10), matchSuggestionSource("scopus", 5))))
+                .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(2)));
     }
 
     @Test
     public void findAllPaginationTest() throws Exception {
         buildSuggestionTargetsList();
         String adminToken = getAuthToken(admin.getEmail(), password);
-
         getClient(adminToken).perform(get("/api/integration/suggestionsources").param("size", "1"))
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.suggestionsources",
-                        Matchers.contains(matchSuggestionSource("orcid", 1))))
+                        Matchers.contains(matchSuggestionSource("reciter", 10))))
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.containsString("/api/integration/suggestionsources")))
                 .andExpect(jsonPath("$._links.next.href",
@@ -106,33 +102,29 @@ public class SuggestionSourceRestRepositoryIT extends AbstractControllerIntegrat
                                 Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$._links.last.href",
                         Matchers.allOf(Matchers.containsString("/api/integration/suggestionsources?"),
-                                Matchers.containsString("page=2"), Matchers.containsString("size=1"))))
+                                Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$._links.first.href",
                         Matchers.allOf(Matchers.containsString("/api/integration/suggestionsources?"),
                                 Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$._links.prev.href").doesNotExist()).andExpect(jsonPath("$.page.size", is(1)))
-                .andExpect(jsonPath("$.page.totalElements", is(3)));
-
+                .andExpect(jsonPath("$.page.totalElements", is(2)));
         getClient(adminToken).perform(get("/api/integration/suggestionsources").param("size", "1").param("page", "1"))
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.suggestionsources",
                         Matchers.contains(matchSuggestionSource("scopus", 5))))
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.containsString("/api/integration/suggestionsources")))
-                .andExpect(jsonPath("$._links.next.href",
-                    Matchers.allOf(Matchers.containsString("/api/integration/suggestionsources?"),
-                            Matchers.containsString("page=2"), Matchers.containsString("size=1"))))
+                .andExpect(jsonPath("$._links.next.href").doesNotExist())
                 .andExpect(jsonPath("$._links.last.href",
                         Matchers.allOf(Matchers.containsString("/api/integration/suggestionsources?"),
-                                Matchers.containsString("page=2"), Matchers.containsString("size=1"))))
+                                Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$._links.first.href",
                         Matchers.allOf(Matchers.containsString("/api/integration/suggestionsources?"),
                                 Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$._links.prev.href",
                         Matchers.allOf(Matchers.containsString("/api/integration/suggestionsources?"),
                                 Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
-                .andExpect(jsonPath("$.page.size", is(1)))
-                .andExpect(jsonPath("$.page.totalElements", is(3)));
+                .andExpect(jsonPath("$.page.size", is(1))).andExpect(jsonPath("$.page.totalElements", is(2)));
     }
 
     @Test

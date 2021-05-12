@@ -27,6 +27,7 @@ import org.dspace.app.profile.OrcidEntitySyncPreference;
 import org.dspace.app.profile.OrcidProfileDisconnectionMode;
 import org.dspace.app.profile.OrcidProfileSyncPreference;
 import org.dspace.app.profile.OrcidSynchronizationMode;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
@@ -76,6 +77,8 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
             itemService.addMetadata(context, profile, "cris", "orcid", "scope", null, scope);
         }
 
+        updateItem(context, profile);
+
     }
 
     @Override
@@ -84,6 +87,7 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
         itemService.clearMetadata(context, profile, "cris", "orcid", "access-token", Item.ANY);
         itemService.clearMetadata(context, profile, "cris", "orcid", "refresh-token", Item.ANY);
         itemService.clearMetadata(context, profile, "cris", "orcid", "scope", Item.ANY);
+        updateItem(context, profile);
 
         List<OrcidQueue> queueRecords = orcidQueueService.findByOwnerId(context, profile.getID());
         for (OrcidQueue queueRecord : queueRecords) {
@@ -241,6 +245,17 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
 
     private String getProfileType() {
         return configurationService.getProperty("researcher-profile.type", "Person");
+    }
+
+    private void updateItem(Context context, Item item) throws SQLException {
+        try {
+            context.turnOffAuthorisationSystem();
+            itemService.update(context, item);
+        } catch (AuthorizeException e) {
+            throw new RuntimeException(e);
+        } finally {
+            context.restoreAuthSystemState();
+        }
     }
 
 }
