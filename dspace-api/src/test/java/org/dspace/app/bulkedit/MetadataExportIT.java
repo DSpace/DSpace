@@ -101,7 +101,7 @@ public class MetadataExportIT
         }
     }
 
-    @Test(expected = ParseException.class)
+    @Test
     public void metadataExportToCsvTestUUID() throws Exception {
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context)
@@ -116,7 +116,8 @@ public class MetadataExportIT
             + testProps.get("test.exportcsv").toString();
 
         String[] args = new String[] {"metadata-export",
-            "-i", String.valueOf(item.getID())};
+            "-i", String.valueOf(item.getID()),
+            "-f", fileLocation};
         TestDSpaceRunnableHandler testDSpaceRunnableHandler
             = new TestDSpaceRunnableHandler();
 
@@ -128,7 +129,7 @@ public class MetadataExportIT
         assertTrue(fileContent.contains(String.valueOf(item.getID())));
     }
 
-    @Test(expected = ParseException.class)
+    @Test
     public void metadataExportToCsvTestUUIDParent() throws Exception {
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context)
@@ -143,7 +144,8 @@ public class MetadataExportIT
             + testProps.get("test.exportcsv").toString();
 
         String[] args = new String[] {"metadata-export",
-            "-i", String.valueOf(collection.getID())};
+            "-i", String.valueOf(collection.getID()),
+            "-f", fileLocation};
         TestDSpaceRunnableHandler testDSpaceRunnableHandler
             = new TestDSpaceRunnableHandler();
 
@@ -155,7 +157,7 @@ public class MetadataExportIT
         assertTrue(fileContent.contains(String.valueOf(item.getID())));
     }
 
-    @Test(expected = ParseException.class)
+    @Test
     public void metadataExportToCsvTestUUIDGrandParent() throws Exception {
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context)
@@ -170,7 +172,8 @@ public class MetadataExportIT
             + testProps.get("test.exportcsv").toString();
 
         String[] args = new String[] {"metadata-export",
-            "-i", String.valueOf(community.getID())};
+            "-i", String.valueOf(community.getID()),
+            "-f", fileLocation};
         TestDSpaceRunnableHandler testDSpaceRunnableHandler
             = new TestDSpaceRunnableHandler();
 
