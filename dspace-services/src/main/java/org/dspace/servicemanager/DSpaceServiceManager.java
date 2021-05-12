@@ -428,8 +428,7 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
                     // no luck, try the fall back option
                     log.warn(
                         "Unable to locate bean by name or id={}."
-                                + " Will try to look up bean by type next."
-                                + " BeansException: {}", name, e);
+                                + " Will try to look up bean by type next.", name, e);
                     service = null;
                 }
             } else {
@@ -439,8 +438,7 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
                 } catch (BeansException e) {
                     // no luck, try the fall back option
                     log.warn("Unable to locate bean by name or id={}."
-                            + " Will try to look up bean by type next."
-                            + " BeansException: {}", type.getName(), e);
+                            + " Will try to look up bean by type next.", type.getName(), e);
                     service = null;
                 }
             }
