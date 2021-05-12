@@ -52,7 +52,7 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
             }
             if (dso == null) {
                 throw new IllegalArgumentException(
-                    "Item '" + identifier + "' does not resolve to an item in your repository!");
+                    "DSO '" + identifier + "' does not resolve to a DSpace Object in your repository!");
             }
 
             if (dso.getType() == Constants.ITEM) {
@@ -68,7 +68,9 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
                 handler.logInfo("Exporting community '" + dso.getName() + "' (" + identifier + ")");
                 toExport = buildFromCommunity(context, (Community) dso);
             } else {
-                throw new IllegalArgumentException("Error identifying '" + identifier + "'");
+                throw new IllegalArgumentException(
+                    String.format("DSO with id '%s' (type: %s) can't be exported. Supported types: %s", identifier,
+                        Constants.typeText[dso.getType()], "Item | Collection | Community"));
             }
         }
 
