@@ -100,4 +100,85 @@ public class MetadataExportIT
             script.run();
         }
     }
+
+    @Test(expected = ParseException.class)
+    public void metadataExportToCsvTestUUID() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context)
+            .build();
+        Collection collection = CollectionBuilder.createCollection(context, community)
+            .build();
+        Item item = ItemBuilder.createItem(context, collection)
+            .withAuthor("Donald, Smith")
+            .build();
+        context.restoreAuthSystemState();
+        String fileLocation = configurationService.getProperty("dspace.dir")
+            + testProps.get("test.exportcsv").toString();
+
+        String[] args = new String[] {"metadata-export",
+            "-i", String.valueOf(item.getID())};
+        TestDSpaceRunnableHandler testDSpaceRunnableHandler
+            = new TestDSpaceRunnableHandler();
+
+        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl),
+            testDSpaceRunnableHandler, kernelImpl);
+        File file = new File(fileLocation);
+        String fileContent = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
+        assertTrue(fileContent.contains("Donald, Smith"));
+        assertTrue(fileContent.contains(String.valueOf(item.getID())));
+    }
+
+    @Test(expected = ParseException.class)
+    public void metadataExportToCsvTestUUIDParent() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context)
+            .build();
+        Collection collection = CollectionBuilder.createCollection(context, community)
+            .build();
+        Item item = ItemBuilder.createItem(context, collection)
+            .withAuthor("Donald, Smith")
+            .build();
+        context.restoreAuthSystemState();
+        String fileLocation = configurationService.getProperty("dspace.dir")
+            + testProps.get("test.exportcsv").toString();
+
+        String[] args = new String[] {"metadata-export",
+            "-i", String.valueOf(collection.getID())};
+        TestDSpaceRunnableHandler testDSpaceRunnableHandler
+            = new TestDSpaceRunnableHandler();
+
+        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl),
+            testDSpaceRunnableHandler, kernelImpl);
+        File file = new File(fileLocation);
+        String fileContent = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
+        assertTrue(fileContent.contains("Donald, Smith"));
+        assertTrue(fileContent.contains(String.valueOf(item.getID())));
+    }
+
+    @Test(expected = ParseException.class)
+    public void metadataExportToCsvTestUUIDGrandParent() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context)
+            .build();
+        Collection collection = CollectionBuilder.createCollection(context, community)
+            .build();
+        Item item = ItemBuilder.createItem(context, collection)
+            .withAuthor("Donald, Smith")
+            .build();
+        context.restoreAuthSystemState();
+        String fileLocation = configurationService.getProperty("dspace.dir")
+            + testProps.get("test.exportcsv").toString();
+
+        String[] args = new String[] {"metadata-export",
+            "-i", String.valueOf(community.getID())};
+        TestDSpaceRunnableHandler testDSpaceRunnableHandler
+            = new TestDSpaceRunnableHandler();
+
+        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl),
+            testDSpaceRunnableHandler, kernelImpl);
+        File file = new File(fileLocation);
+        String fileContent = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
+        assertTrue(fileContent.contains("Donald, Smith"));
+        assertTrue(fileContent.contains(String.valueOf(item.getID())));
+    }
 }
