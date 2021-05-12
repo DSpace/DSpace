@@ -8,10 +8,11 @@
 package org.dspace.app.orcid.service;
 
 import static org.apache.commons.lang.StringUtils.endsWith;
+import static org.dspace.app.matcher.LambdaMatcher.has;
 import static org.dspace.app.matcher.LambdaMatcher.matches;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -38,9 +39,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.orcid.jaxb.model.common.ContributorRole;
 import org.orcid.jaxb.model.common.FundingContributorRole;
+import org.orcid.jaxb.model.common.FundingType;
 import org.orcid.jaxb.model.common.Iso3166Country;
 import org.orcid.jaxb.model.common.Relationship;
 import org.orcid.jaxb.model.common.SequenceType;
+import org.orcid.jaxb.model.common.WorkType;
 import org.orcid.jaxb.model.v3.release.common.Contributor;
 import org.orcid.jaxb.model.v3.release.common.ContributorEmail;
 import org.orcid.jaxb.model.v3.release.common.ContributorOrcid;
@@ -145,6 +148,7 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
         assertThat(work.getPutCode(), nullValue());
         assertThat(work.getWorkCitation(), notNullValue());
         assertThat(work.getWorkCitation().getCitation(), containsString("Test publication"));
+        assertThat(work.getWorkType(), is(WorkType.BOOK));
         assertThat(work.getWorkTitle(), notNullValue());
         assertThat(work.getWorkTitle().getTitle(), notNullValue());
         assertThat(work.getWorkTitle().getTitle().getContent(), is("Test publication"));
@@ -153,19 +157,51 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
 
         List<Contributor> contributors = work.getWorkContributors().getContributor();
         assertThat(contributors, hasSize(3));
-        assertThat(contributors, hasItem(matches(contributor("Walter White", AUTHOR, FIRST))));
-        assertThat(contributors, hasItem(matches(contributor("Editor", EDITOR, FIRST))));
-        assertThat(contributors, hasItem(matches(contributor("Jesse Pinkman", AUTHOR, ADDITIONAL,
-            "0000-1111-2222-3333", "test@test.it"))));
+        assertThat(contributors, has(contributor("Walter White", AUTHOR, FIRST)));
+        assertThat(contributors, has(contributor("Editor", EDITOR, FIRST)));
+        assertThat(contributors, has(contributor("Jesse Pinkman", AUTHOR, ADDITIONAL,
+            "0000-1111-2222-3333", "test@test.it")));
 
         assertThat(work.getExternalIdentifiers(), notNullValue());
 
         List<ExternalID> externalIds = work.getExternalIdentifiers().getExternalIdentifier();
         assertThat(externalIds, hasSize(3));
-        assertThat(externalIds, hasItem(matches(externalId("doi", "doi-id"))));
-        assertThat(externalIds, hasItem(matches(externalId("eid", "scopus-id"))));
-        assertThat(externalIds, hasItem(matches(externalId("handle", publication.getHandle()))));
+        assertThat(externalIds, has(externalId("doi", "doi-id")));
+        assertThat(externalIds, has(externalId("eid", "scopus-id")));
+        assertThat(externalIds, has(externalId("handle", publication.getHandle())));
 
+    }
+
+    @Test
+    public void testEmptyWorkWithUnknownTypeCreation() {
+
+        context.turnOffAuthorisationSystem();
+
+        Item publication = ItemBuilder.createItem(context, publications)
+            .withType("TYPE")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        Activity activity = entityFactoryService.createOrcidObject(context, publication);
+        assertThat(activity, instanceOf(Work.class));
+
+        Work work = (Work) activity;
+        assertThat(work.getJournalTitle(), nullValue());
+        assertThat(work.getLanguageCode(), nullValue());
+        assertThat(work.getPublicationDate(), nullValue());
+        assertThat(work.getShortDescription(), nullValue());
+        assertThat(work.getPutCode(), nullValue());
+        assertThat(work.getWorkCitation(), notNullValue());
+        assertThat(work.getWorkType(), is(WorkType.OTHER));
+        assertThat(work.getWorkTitle(), nullValue());
+        assertThat(work.getWorkContributors(), notNullValue());
+        assertThat(work.getWorkContributors().getContributor(), empty());
+        assertThat(work.getExternalIdentifiers(), notNullValue());
+
+        List<ExternalID> externalIds = work.getExternalIdentifiers().getExternalIdentifier();
+        assertThat(externalIds, hasSize(1));
+        assertThat(externalIds, has(externalId("handle", publication.getHandle())));
     }
 
     @Test
@@ -209,6 +245,7 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
         assertThat(funding.getStartDate(), matches(date("2001", "03", "01")));
         assertThat(funding.getEndDate(), matches(date("2010", "03", "25")));
         assertThat(funding.getDescription(), is("This is a project to test orcid mapping"));
+        assertThat(funding.getType(), is(FundingType.GRANT));
         assertThat(funding.getUrl(), matches(urlEndsWith(project.getHandle())));
 
         Organization organization = funding.getOrganization();
@@ -226,16 +263,16 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
 
         List<FundingContributor> contributors = fundingContributors.getContributor();
         assertThat(contributors, hasSize(3));
-        assertThat(contributors, hasItem(matches(fundingContributor("Walter White", LEAD))));
-        assertThat(contributors, hasItem(matches(fundingContributor("Jesse Pinkman", LEAD, "test@test.it"))));
-        assertThat(contributors, hasItem(matches(fundingContributor("Mario Rossi", CO_LEAD))));
+        assertThat(contributors, has(fundingContributor("Walter White", LEAD)));
+        assertThat(contributors, has(fundingContributor("Jesse Pinkman", LEAD, "test@test.it")));
+        assertThat(contributors, has(fundingContributor("Mario Rossi", CO_LEAD)));
 
         assertThat(funding.getExternalIdentifiers(), notNullValue());
 
         List<ExternalID> externalIds = funding.getExternalIdentifiers().getExternalIdentifier();
         assertThat(externalIds, hasSize(2));
-        assertThat(externalIds, hasItem(matches(externalId("other-id", "888-666-444"))));
-        assertThat(externalIds, hasItem(matches(externalId("uri", "www.test.com"))));
+        assertThat(externalIds, has(externalId("other-id", "888-666-444")));
+        assertThat(externalIds, has(externalId("uri", "www.test.com")));
     }
 
     private Predicate<ExternalID> externalId(String type, String value) {

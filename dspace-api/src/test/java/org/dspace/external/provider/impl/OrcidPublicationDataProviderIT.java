@@ -30,6 +30,7 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.commons.codec.binary.StringUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.orcid.client.OrcidClient;
+import org.dspace.app.orcid.client.OrcidConfiguration;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -61,9 +62,13 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
 
     private OrcidPublicationDataProvider dataProvider;
 
+    private OrcidConfiguration orcidConfiguration;
+
     private OrcidClient orcidClient;
 
     private OrcidClient orcidClientMock;
+
+    private String originalClientId;
 
     private Collection persons;
 
@@ -85,11 +90,17 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
         dataProvider = new DSpace().getServiceManager()
             .getServiceByName("orcidPublicationDataProvider", OrcidPublicationDataProvider.class);
 
+        orcidConfiguration = new DSpace().getServiceManager()
+            .getServiceByName("org.dspace.app.orcid.client.OrcidConfiguration", OrcidConfiguration.class);
+
         orcidClientMock = mock(OrcidClient.class);
         orcidClient = dataProvider.getOrcidClient();
 
         dataProvider.setClientCredentialsAccessToken(null);
         dataProvider.setOrcidClient(orcidClientMock);
+
+        originalClientId = orcidConfiguration.getClientId();
+        orcidConfiguration.setClientId("DSPACE-CRIS-CLIENT-ID");
 
         when(orcidClientMock.getAccessToken()).thenReturn(buildTokenResponse(CLIENT_CREDENTIALS_TOKEN));
 
@@ -103,6 +114,7 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
     @After
     public void after() {
         dataProvider.setOrcidClient(orcidClient);
+        orcidConfiguration.setClientId(originalClientId);
     }
 
     @Test
