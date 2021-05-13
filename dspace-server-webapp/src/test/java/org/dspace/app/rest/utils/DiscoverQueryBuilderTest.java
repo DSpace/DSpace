@@ -113,7 +113,8 @@ public class DiscoverQueryBuilderTest {
                 any(), any(DiscoverQuery.class)))
             .then(invocation -> new FacetYearRange((DiscoverySearchFilterFacet) invocation.getArguments()[2]));
 
-        when(searchService.toFilterQuery(any(Context.class), any(String.class), any(String.class), any(String.class)))
+        when(searchService.toFilterQuery(any(Context.class), any(String.class), any(String.class), any(String.class),
+            any(DiscoveryConfiguration.class)))
             .then(invocation -> new DiscoverFilterQuery((String) invocation.getArguments()[1],
                 invocation.getArguments()[1] + ":\"" + invocation.getArguments()[3] + "\"",
                 (String) invocation.getArguments()[3]));
@@ -291,7 +292,8 @@ public class DiscoverQueryBuilderTest {
 
     @Test(expected = DSpaceBadRequestException.class)
     public void testInvalidSearchFilter2() throws Exception {
-        when(searchService.toFilterQuery(any(Context.class), any(String.class), any(String.class), any(String.class)))
+        when(searchService.toFilterQuery(any(Context.class), any(String.class), any(String.class), any(String.class),
+            any(DiscoveryConfiguration.class)))
             .thenThrow(SQLException.class);
 
         queryBuilder
