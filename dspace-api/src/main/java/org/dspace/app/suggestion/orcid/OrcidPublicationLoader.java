@@ -12,6 +12,7 @@ import static org.dspace.app.suggestion.SuggestionUtils.getFirstEntryByMetadatum
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -61,7 +62,7 @@ public class OrcidPublicationLoader extends SolrSuggestionProvider {
         solrSuggestionStorageService.commit();
     }
 
-    public List<Suggestion> convertToSuggestions(Item profile, List<ExternalDataObject> externalDataObjects) {
+    private List<Suggestion> convertToSuggestions(Item profile, List<ExternalDataObject> externalDataObjects) {
         return externalDataObjects.stream()
             .map(externalDataObject -> convertToSuggestion(profile, externalDataObject))
             .collect(Collectors.toList());
@@ -72,11 +73,14 @@ public class OrcidPublicationLoader extends SolrSuggestionProvider {
         suggestion.setDisplay(getFirstEntryByMetadatum(externalDataObject, "dc", "title", null));
         suggestion.getEvidences().add(buildSuggestionEvidence());
         suggestion.setExternalSourceUri(getExternalSourceUri(externalDataObject.getId()));
-        suggestion.getMetadata().add(buildMetadataValue("dc.title", externalDataObject));
-        suggestion.getMetadata().add(buildMetadataValue("dc.date.issued", externalDataObject));
-        suggestion.getMetadata().add(buildMetadataValue("dc.description.abstract", externalDataObject));
+
+        buildMetadataValue("dc.title", externalDataObject).ifPresent(suggestion.getMetadata()::add);
+        buildMetadataValue("dc.date.issued", externalDataObject).ifPresent(suggestion.getMetadata()::add);
+        buildMetadataValue("dc.description.abstract", externalDataObject).ifPresent(suggestion.getMetadata()::add);
+
         suggestion.getMetadata().addAll(buildMetadataValues("dc.source", externalDataObject));
         suggestion.getMetadata().addAll(buildMetadataValues("dc.contributor.author", externalDataObject));
+
         return suggestion;
     }
 
@@ -92,10 +96,13 @@ public class OrcidPublicationLoader extends SolrSuggestionProvider {
             .collect(Collectors.toList());
     }
 
-    private MetadataValueDTO buildMetadataValue(String metadataField, ExternalDataObject externalDataObject) {
+    private Optional<MetadataValueDTO> buildMetadataValue(String metadataField, ExternalDataObject externalDataObject) {
         MetadataFieldName field = new MetadataFieldName(metadataField);
         String value = getFirstEntryByMetadatum(externalDataObject, field.SCHEMA, field.ELEMENT, field.QUALIFIER);
-        return new MetadataValueDTO(field.SCHEMA, field.ELEMENT, field.QUALIFIER, null, value);
+        if (value == null) {
+            return Optional.empty();
+        }
+        return Optional.of(new MetadataValueDTO(field.SCHEMA, field.ELEMENT, field.QUALIFIER, null, value));
     }
 
     private String getExternalSourceUri(String recordId) {

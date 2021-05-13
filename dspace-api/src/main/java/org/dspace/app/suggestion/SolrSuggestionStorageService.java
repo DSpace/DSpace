@@ -8,14 +8,18 @@
 package org.dspace.app.suggestion;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.UUID;
 
 import org.apache.solr.client.solrj.SolrServerException;
+import org.dspace.core.Context;
 
 /**
  * Service to deal with the local suggestion solr core used by the
  * SolrSuggestionProvider(s)
  *
  * @author Andrea Bollini (andrea.bollini at 4science dot it)
+ * @author Luca Giamminonni (luca.giamminonni at 4science dot it)
  *
  */
 public interface SolrSuggestionStorageService {
@@ -84,7 +88,104 @@ public interface SolrSuggestionStorageService {
      */
     public void deleteTarget(SuggestionTarget target) throws SolrServerException, IOException;
 
+    /**
+     * Performs an explicit commit, causing pending documents to be committed for
+     * indexing.
+     *
+     * @throws SolrServerException
+     * @throws IOException
+     */
     void commit() throws SolrServerException, IOException;
 
+    /**
+     * Flag all the suggestion related to the given source and id as processed.
+     *
+     * @param  source              the source name
+     * @param  idPart              the id's last part
+     * @throws SolrServerException
+     * @throws IOException
+     */
     void flagAllSuggestionAsProcessed(String source, String idPart) throws SolrServerException, IOException;
+
+    /**
+     * Count all the targets related to the given source.
+     *
+     * @param  source              the source name
+     * @return                     the target's count
+     * @throws IOException
+     * @throws SolrServerException
+     */
+    long countAllTargets(Context context, String source) throws SolrServerException, IOException;
+
+    /**
+     * Count all the unprocessed suggestions related to the given source and target.
+     *
+     * @param  context             the DSpace Context
+     * @param  source              the source name
+     * @param  target              the target id
+     * @return                     the suggestion count
+     * @throws SolrServerException
+     * @throws IOException
+     */
+    long countUnprocessedSuggestionByTarget(Context context, String source, UUID target)
+        throws SolrServerException, IOException;
+
+    /**
+     * Find all the unprocessed suggestions related to the given source and target.
+     *
+     * @param  context             the DSpace Context
+     * @param  source              the source name
+     * @param  target              the target id
+     * @param  pageSize            the page size
+     * @param  offset              the page offset
+     * @param  ascending           true to retrieve the suggestions ordered by score
+     *                             ascending
+     * @return                     the found suggestions
+     * @throws SolrServerException
+     * @throws IOException
+     */
+    List<Suggestion> findAllUnprocessedSuggestions(Context context, String source, UUID target,
+        int pageSize, long offset, boolean ascending) throws SolrServerException, IOException;
+
+    /**
+     *
+     * Find all the suggestion targets related to the given source.
+     *
+     * @param  context             the DSpace Context
+     * @param  source              the source name
+     * @param  pageSize            the page size
+     * @param  offset              the page offset
+     * @return                     the found suggestion targets
+     * @throws SolrServerException
+     * @throws IOException
+     */
+    List<SuggestionTarget> findAllTargets(Context context, String source, int pageSize, long offset)
+        throws SolrServerException, IOException;
+
+    /**
+     * Find an unprocessed suggestion by the given source, target id and suggestion
+     * id.
+     *
+     * @param  context             the DSpace Context
+     * @param  source              the source name
+     * @param  target              the target id
+     * @param  id                  the suggestion id
+     * @return                     the suggestion, if any
+     * @throws SolrServerException
+     * @throws IOException
+     */
+    Suggestion findUnprocessedSuggestion(Context context, String source, UUID target, String id)
+        throws SolrServerException, IOException;
+
+    /**
+     * Find a suggestion target by the given source and target.
+     * 
+     * @param  context             the DSpace Context
+     * @param  source              the source name
+     * @param  target              the target id
+     * @return                     the suggestion target, if any
+     * @throws SolrServerException
+     * @throws IOException
+     */
+    SuggestionTarget findTarget(Context context, String source, UUID target) throws SolrServerException, IOException;
 }

@@ -61,6 +61,7 @@ import org.orcid.jaxb.model.v3.release.record.Qualification;
 import org.orcid.jaxb.model.v3.release.record.Record;
 import org.orcid.jaxb.model.v3.release.record.ResearcherUrl;
 import org.orcid.jaxb.model.v3.release.record.Work;
+import org.orcid.jaxb.model.v3.release.record.WorkBulk;
 import org.orcid.jaxb.model.v3.release.record.summary.Works;
 
 /**
@@ -142,6 +143,13 @@ public class OrcidClientImpl implements OrcidClient {
     public Works getWorks(String accessToken, String orcid) {
         HttpUriRequest httpUriRequest = buildGetUriRequest(accessToken, "/" + orcid + "/works");
         return executeAndUnmarshall(httpUriRequest, false, Works.class);
+    }
+
+    @Override
+    public WorkBulk getWorkBulk(String accessToken, String orcid, List<String> putCodes) {
+        String putCode = String.join(",", putCodes);
+        HttpUriRequest httpUriRequest = buildGetUriRequest(accessToken, "/" + orcid + "/works/" + putCode);
+        return executeAndUnmarshall(httpUriRequest, false, WorkBulk.class);
     }
 
     @Override

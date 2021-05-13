@@ -44,6 +44,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.orcid.jaxb.model.v3.release.record.Work;
+import org.orcid.jaxb.model.v3.release.record.WorkBulk;
 import org.orcid.jaxb.model.v3.release.record.summary.Works;
 
 /**
@@ -56,7 +57,7 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
 
     private static final String BASE_XML_DIR_PATH = "./target/testing/dspace/assetstore/orcid-works/";
 
-    private static final String CLIENT_CREDENTIALS_TOKEN = "32c83ccb-c6d5-4981-b6ea-6a34a36de8ab";
+    private static final String ACCESS_TOKEN = "32c83ccb-c6d5-4981-b6ea-6a34a36de8ab";
 
     private static final String ORCID = "0000-1111-2222-3333";
 
@@ -96,18 +97,21 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
         orcidClientMock = mock(OrcidClient.class);
         orcidClient = dataProvider.getOrcidClient();
 
-        dataProvider.setClientCredentialsAccessToken(null);
+        dataProvider.setReadPublicAccessToken(null);
         dataProvider.setOrcidClient(orcidClientMock);
 
         originalClientId = orcidConfiguration.getClientId();
         orcidConfiguration.setClientId("DSPACE-CRIS-CLIENT-ID");
 
-        when(orcidClientMock.getReadPublicAccessToken()).thenReturn(buildTokenResponse(CLIENT_CREDENTIALS_TOKEN));
+        when(orcidClientMock.getReadPublicAccessToken()).thenReturn(buildTokenResponse(ACCESS_TOKEN));
 
         when(orcidClientMock.getWorks(any(), eq(ORCID))).thenReturn(unmarshall("works.xml", Works.class));
 
         when(orcidClientMock.getObject(any(), eq(ORCID), any(), eq(Work.class)))
             .then((invocation) -> of(unmarshall("work-" + invocation.getArgument(2) + ".xml", Work.class)));
+
+        when(orcidClientMock.getWorkBulk(any(), eq(ORCID), any()))
+            .then((invocation) -> unmarshallWorkBulk(invocation.getArgument(2)));
 
     }
 
@@ -170,10 +174,8 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
             + "Resource Type Genres::text::periodical::journal")));
 
         verify(orcidClientMock).getReadPublicAccessToken();
-        verify(orcidClientMock).getWorks(CLIENT_CREDENTIALS_TOKEN, ORCID);
-        verify(orcidClientMock).getObject(CLIENT_CREDENTIALS_TOKEN, ORCID, "277904", Work.class);
-        verify(orcidClientMock).getObject(CLIENT_CREDENTIALS_TOKEN, ORCID, "277902", Work.class);
-        verify(orcidClientMock).getObject(CLIENT_CREDENTIALS_TOKEN, ORCID, "277871", Work.class);
+        verify(orcidClientMock).getWorks(ACCESS_TOKEN, ORCID);
+        verify(orcidClientMock).getWorkBulk(ACCESS_TOKEN, ORCID, List.of("277904", "277902", "277871"));
         verifyNoMoreInteractions(orcidClientMock);
 
     }
@@ -197,9 +199,7 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
         assertThat(externalObjects, hasSize(3));
 
         verify(orcidClientMock).getWorks(accessToken, ORCID);
-        verify(orcidClientMock).getObject(accessToken, ORCID, "277904", Work.class);
-        verify(orcidClientMock).getObject(accessToken, ORCID, "277902", Work.class);
-        verify(orcidClientMock).getObject(accessToken, ORCID, "277871", Work.class);
+        verify(orcidClientMock).getWorkBulk(accessToken, ORCID, List.of("277904", "277902", "277871"));
         verifyNoMoreInteractions(orcidClientMock);
     }
 
@@ -218,10 +218,8 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
         List<ExternalDataObject> externalObjects = dataProvider.searchExternalDataObjects(ORCID, 0, -1);
         assertThat(externalObjects, hasSize(3));
         verify(orcidClientMock).getReadPublicAccessToken();
-        verify(orcidClientMock).getWorks(CLIENT_CREDENTIALS_TOKEN, ORCID);
-        verify(orcidClientMock).getObject(CLIENT_CREDENTIALS_TOKEN, ORCID, "277904", Work.class);
-        verify(orcidClientMock).getObject(CLIENT_CREDENTIALS_TOKEN, ORCID, "277902", Work.class);
-        verify(orcidClientMock).getObject(CLIENT_CREDENTIALS_TOKEN, ORCID, "277871", Work.class);
+        verify(orcidClientMock).getWorks(ACCESS_TOKEN, ORCID);
+        verify(orcidClientMock).getWorkBulk(ACCESS_TOKEN, ORCID, List.of("277904", "277902", "277871"));
         verifyNoMoreInteractions(orcidClientMock);
     }
 
@@ -238,7 +236,7 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
 
         verify(orcidClientMock, times(1)).getReadPublicAccessToken();
 
-        dataProvider.setClientCredentialsAccessToken(null);
+        dataProvider.setReadPublicAccessToken(null);
 
         externalObjects = dataProvider.searchExternalDataObjects(ORCID, 0, -1);
         assertThat(externalObjects, hasSize(3));
@@ -256,24 +254,42 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
         assertThat(externalObjects, has((externalObject -> externalObject.getId().equals(ORCID + "::277902"))));
         assertThat(externalObjects, has((externalObject -> externalObject.getId().equals(ORCID + "::277871"))));
 
+        verify(orcidClientMock).getReadPublicAccessToken();
+        verify(orcidClientMock).getWorks(ACCESS_TOKEN, ORCID);
+        verify(orcidClientMock).getWorkBulk(ACCESS_TOKEN, ORCID, List.of("277904", "277902", "277871"));
+
         externalObjects = dataProvider.searchExternalDataObjects(ORCID, 0, 5);
         assertThat(externalObjects, hasSize(3));
         assertThat(externalObjects, has((externalObject -> externalObject.getId().equals(ORCID + "::277904"))));
         assertThat(externalObjects, has((externalObject -> externalObject.getId().equals(ORCID + "::277902"))));
         assertThat(externalObjects, has((externalObject -> externalObject.getId().equals(ORCID + "::277871"))));
 
+        verify(orcidClientMock, times(2)).getWorks(ACCESS_TOKEN, ORCID);
+        verify(orcidClientMock, times(2)).getWorkBulk(ACCESS_TOKEN, ORCID, List.of("277904", "277902", "277871"));
+
         externalObjects = dataProvider.searchExternalDataObjects(ORCID, 0, 2);
         assertThat(externalObjects, hasSize(2));
         assertThat(externalObjects, has((externalObject -> externalObject.getId().equals(ORCID + "::277904"))));
         assertThat(externalObjects, has((externalObject -> externalObject.getId().equals(ORCID + "::277902"))));
 
+        verify(orcidClientMock, times(3)).getWorks(ACCESS_TOKEN, ORCID);
+        verify(orcidClientMock).getWorkBulk(ACCESS_TOKEN, ORCID, List.of("277904", "277902"));
+
         externalObjects = dataProvider.searchExternalDataObjects(ORCID, 1, 1);
         assertThat(externalObjects, hasSize(1));
         assertThat(externalObjects, has((externalObject -> externalObject.getId().equals(ORCID + "::277902"))));
 
+        verify(orcidClientMock, times(4)).getWorks(ACCESS_TOKEN, ORCID);
+        verify(orcidClientMock).getObject(ACCESS_TOKEN, ORCID, "277902", Work.class);
+
         externalObjects = dataProvider.searchExternalDataObjects(ORCID, 2, 1);
         assertThat(externalObjects, hasSize(1));
         assertThat(externalObjects, has((externalObject -> externalObject.getId().equals(ORCID + "::277871"))));
+
+        verify(orcidClientMock, times(5)).getWorks(ACCESS_TOKEN, ORCID);
+        verify(orcidClientMock).getObject(ACCESS_TOKEN, ORCID, "277871", Work.class);
+
+        verifyNoMoreInteractions(orcidClientMock);
 
     }
 
@@ -301,7 +317,7 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
             + "Resource Type Genres::text::periodical::journal")));
 
         verify(orcidClientMock).getReadPublicAccessToken();
-        verify(orcidClientMock).getObject(CLIENT_CREDENTIALS_TOKEN, ORCID, "277902", Work.class);
+        verify(orcidClientMock).getObject(ACCESS_TOKEN, ORCID, "277902", Work.class);
         verifyNoMoreInteractions(orcidClientMock);
     }
 
@@ -326,6 +342,10 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
         OrcidTokenResponseDTO response = new OrcidTokenResponseDTO();
         response.setAccessToken(accessToken);
         return response;
+    }
+
+    private WorkBulk unmarshallWorkBulk(List<String> putCodes) throws Exception {
+        return unmarshall("workBulk-" + String.join("-", putCodes) + ".xml", WorkBulk.class);
     }
 
     @SuppressWarnings("unchecked")

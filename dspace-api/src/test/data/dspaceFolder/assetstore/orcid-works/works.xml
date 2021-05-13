@@ -59,7 +59,7 @@
     <activities:group>
         <common:last-modified-date>2015-06-19T19:14:26.327Z</common:last-modified-date>
         <common:external-ids/>
-        <work:work-summary put-code="277902" path="/0000-0001-9227-636X/work/277902" visibility="public" display-index="0">
+        <work:work-summary put-code="277902" path="/0000-0001-9227-636X/work/277902" visibility="public" display-index="1">
             <common:created-date>2014-01-22T19:11:57.159Z</common:created-date>
             <common:last-modified-date>2015-06-19T19:14:26.327Z</common:last-modified-date>
             <common:source>
@@ -85,29 +85,24 @@
                 <common:day>01</common:day>
             </common:publication-date>
         </work:work-summary>
-        <work:work-summary put-code="277871" path="/0000-0001-9227-636X/work/277871" visibility="public" display-index="0">
-            <common:created-date>2014-01-22T19:11:57.151Z</common:created-date>
-            <common:last-modified-date>2015-06-19T19:14:25.924Z</common:last-modified-date>
+        <work:work-summary put-code="287902" path="/0000-0001-9227-636X/work/277902" visibility="public" display-index="0">
+            <common:created-date>2014-01-22T19:11:57.159Z</common:created-date>
+            <common:last-modified-date>2015-06-19T19:14:26.327Z</common:last-modified-date>
             <common:source>
-                <common:source-orcid>
-                    <common:uri>https://sandbox.orcid.org/0000-0002-4105-0763</common:uri>
-                    <common:path>0000-0002-4105-0763</common:path>
-                    <common:host>sandbox.orcid.org</common:host>
-                </common:source-orcid>
                 <common:source-client-id>
-                    <common:uri>https://sandbox.orcid.org/client/0000-0002-4105-0763</common:uri>
-                    <common:path>0000-0002-4105-0763</common:path>
+                    <common:uri>https://sandbox.orcid.org/client/4Science</common:uri>
+                    <common:path>4Science</common:path>
                     <common:host>sandbox.orcid.org</common:host>
                 </common:source-client-id>
                 <common:source-name>BU Profiles to ORCID Integration Site</common:source-name>
             </common:source>
             <work:title>
-                <common:title>Branch artery occlusion in a young woman.</common:title>
+                <common:title>Another cautionary tale (4Science).</common:title>
             </work:title>
             <work:type>journal-article</work:type>
             <common:publication-date>
-                <common:year>1985</common:year>
-                <common:month>07</common:month>
+                <common:year>2011</common:year>
+                <common:month>05</common:month>
                 <common:day>01</common:day>
             </common:publication-date>
         </work:work-summary>
@@ -159,6 +154,36 @@
             </common:source>
             <work:title>
                 <common:title>Branch artery occlusion in a young man.</common:title>
+            </work:title>
+            <work:type>journal-article</work:type>
+            <common:publication-date>
+                <common:year>1985</common:year>
+                <common:month>07</common:month>
+                <common:day>01</common:day>
+            </common:publication-date>
+        </work:work-summary>
+    </activities:group>
+    <activities:group>
+        <common:last-modified-date>2015-06-19T19:14:26.108Z</common:last-modified-date>
+        <common:external-ids/>
+        <work:work-summary put-code="277871" path="/0000-0001-9227-636X/work/277871" visibility="public" display-index="0">
+            <common:created-date>2014-01-22T19:11:57.151Z</common:created-date>
+            <common:last-modified-date>2015-06-19T19:14:25.924Z</common:last-modified-date>
+            <common:source>
+                <common:source-orcid>
+                    <common:uri>https://sandbox.orcid.org/0000-0002-4105-0763</common:uri>
+                    <common:path>0000-0002-4105-0763</common:path>
+                    <common:host>sandbox.orcid.org</common:host>
+                </common:source-orcid>
+                <common:source-client-id>
+                    <common:uri>https://sandbox.orcid.org/client/0000-0002-4105-0763</common:uri>
+                    <common:path>0000-0002-4105-0763</common:path>
+                    <common:host>sandbox.orcid.org</common:host>
+                </common:source-client-id>
+                <common:source-name>BU Profiles to ORCID Integration Site</common:source-name>
+            </common:source>
+            <work:title>
+                <common:title>Branch artery occlusion in a young woman.</common:title>
             </work:title>
             <work:type>journal-article</work:type>
             <common:publication-date>

@@ -92,7 +92,7 @@ public class OrcidWebhookServiceImpl implements OrcidWebhookService {
 
     private String getWebhookUrl(String orcid) {
         String server = configurationService.getProperty("dspace.server.url");
-        String token = configurationService.getProperty("orcid.webhook.token");
+        String token = configurationService.getProperty("orcid.webhook.registration-token");
         return server + "/api/cris/orcid/" + orcid + "/webhook/" + token;
     }
 

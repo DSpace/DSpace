@@ -7,11 +7,13 @@
  */
 package org.dspace.app.orcid.client;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.orcid.jaxb.model.v3.release.record.Person;
 import org.orcid.jaxb.model.v3.release.record.Record;
+import org.orcid.jaxb.model.v3.release.record.WorkBulk;
 import org.orcid.jaxb.model.v3.release.record.summary.Works;
 
 /**
@@ -82,6 +84,17 @@ public interface OrcidClient {
      * @throws OrcidClientException if some error occurs during the search
      */
     Works getWorks(String accessToken, String orcid);
+
+    /**
+     * Retrieves all the works with the given putCodes related to the given orcid
+     *
+     * @param  accessToken          the access token
+     * @param  orcid                the orcid id
+     * @param  putCodes             the putCodes of the works to retrieve
+     * @return                      the Works
+     * @throws OrcidClientException if some error occurs during the search
+     */
+    WorkBulk getWorkBulk(String accessToken, String orcid, List<String> putCodes);
 
     /**
      * Retrieves an object from ORCID with the given putCode related to the given

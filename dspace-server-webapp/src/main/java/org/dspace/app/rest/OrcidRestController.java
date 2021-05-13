@@ -69,7 +69,7 @@ public class OrcidRestController {
     private List<OrcidWebhookAction> orcidWebhookActions;
 
     @GetMapping(value = "/{itemId}")
-    public void retrieveOrcidFromCode(HttpServletRequest request, HttpServletResponse response,
+    public void linkProfileFromCode(HttpServletRequest request, HttpServletResponse response,
         @RequestParam(name = "code") String code, @PathVariable(name = "itemId") String itemId,
         @RequestParam(name = "url") String url) throws Exception {
 
@@ -93,7 +93,7 @@ public class OrcidRestController {
     public void webhook(HttpServletRequest request, @PathVariable(name = "orcid") String orcid,
         @PathVariable(name = "token") String token) {
 
-        String storedToken = configurationService.getProperty("orcid.webhook.token");
+        String storedToken = configurationService.getProperty("orcid.webhook.registration-token");
         if (!StringUtils.equals(token, storedToken)) {
             LOGGER.warn("Received a webhook callback with a wrong token: " + token);
             return;
