@@ -49,7 +49,7 @@ public class WorkflowActionRestRepositoryIT extends AbstractControllerIntegratio
         String token = "nonValidToken";
         //When we call this facets endpoint
         getClient(token).perform(get(WORKFLOW_ACTIONS_ENDPOINT))
-            //We expect a 403 Forbidden status
+             //We expect a 401 Unauthorized status
             .andExpect(status().isUnauthorized());
     }
 
@@ -112,7 +112,7 @@ public class WorkflowActionRestRepositoryIT extends AbstractControllerIntegratio
         WorkflowActionConfig existentWorkflow = xmlWorkflowFactory.getActionByName(nameActionWithOptions);
         //When we call this facets endpoint
         getClient(token).perform(get(WORKFLOW_ACTIONS_ENDPOINT + "/" + nameActionWithOptions))
-            //We expect a 403 Forbidden status
+             //We expect a 401 Unauthorized status
             .andExpect(status().isUnauthorized());
     }
 
