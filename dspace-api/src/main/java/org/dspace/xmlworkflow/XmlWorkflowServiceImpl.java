@@ -76,9 +76,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * When an item is submitted and is somewhere in a workflow, it has a row in the
- * cwf_workflowitem table pointing to it.
+ * {@code cwf_workflowitem} table pointing to it.
  *
- * Once the item has completed the workflow it will be archived
+ * Once the item has completed the workflow it will be archived.
  *
  * @author Bram De Schouwer (bram.deschouwer at dot com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -617,7 +617,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                     .getMetadata(item, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
                 String title = "";
                 try {
-                    title = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
+                    title = I18nUtil.getMessage("org.dspace.xmlworkflow.XMLWorkflowService.untitled");
                 } catch (MissingResourceException e) {
                     title = "Untitled";
                 }
@@ -680,7 +680,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         if (StringUtils.isNotBlank(title)) {
             return title;
         } else {
-            return I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled ");
+            return I18nUtil.getMessage("org.dspace.xmlworkflow.XMLWorkflowService.untitled ");
         }
     }
 
@@ -694,7 +694,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
      * WORKFLOW TASK MANAGEMENT
      **********************************/
     /**
-     * Deletes all tasks from this workflowflowitem
+     * Deletes all tasks from a WorkflowItem.
      *
      * @param context the dspace context
      * @param wi      the workflow item for which we are to delete the tasks
