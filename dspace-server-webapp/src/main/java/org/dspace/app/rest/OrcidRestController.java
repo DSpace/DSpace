@@ -99,24 +99,32 @@ public class OrcidRestController {
             return;
         }
 
+        Context context = ContextUtil.obtainContext(request);
+
         try {
-
-            Context context = ContextUtil.obtainContext(request);
-
-            List<Item> profiles = orcidSynchronizationService.findProfilesByOrcid(context, orcid);
-            if (CollectionUtils.isEmpty(profiles)) {
-                LOGGER.warn("Received a webhook call from ORCID with an id not associated with any profile: " + orcid);
-                return;
-            }
-
-            for (Item profile : profiles) {
-                orcidWebhookActions.forEach(plugin -> plugin.perform(context, profile, orcid));
-            }
-
+            performWebhookActions(orcid, context);
         } catch (Exception ex) {
             LOGGER.error("An error occurs while processing the webhook call from ORCID", ex);
         }
 
+        try {
+            context.complete();
+        } catch (SQLException e) {
+            LOGGER.error("An error occurs closing the DSpace context", e);
+        }
+
+    }
+
+    private void performWebhookActions(String orcid, Context context) {
+        List<Item> profiles = orcidSynchronizationService.findProfilesByOrcid(context, orcid);
+        if (CollectionUtils.isEmpty(profiles)) {
+            LOGGER.warn("Received a webhook call from ORCID with an id not associated with any profile: " + orcid);
+            return;
+        }
+
+        for (Item profile : profiles) {
+            orcidWebhookActions.forEach(plugin -> plugin.perform(context, profile, orcid));
+        }
     }
 
     private Optional<ResearcherProfile> findResearcherProfile(Context context, UUID itemId) throws SQLException {

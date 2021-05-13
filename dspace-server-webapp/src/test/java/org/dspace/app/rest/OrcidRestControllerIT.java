@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import static java.util.Collections.emptyList;
+import static java.util.function.Predicate.not;
 import static org.dspace.app.matcher.LambdaMatcher.has;
 import static org.dspace.app.matcher.MetadataValueMatcher.with;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -31,7 +32,9 @@ import java.util.function.Predicate;
 
 import org.apache.commons.codec.binary.StringUtils;
 import org.dspace.app.orcid.client.OrcidClient;
+import org.dspace.app.orcid.exception.OrcidClientException;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
+import org.dspace.app.orcid.webhook.CheckOrcidAuthorization;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.suggestion.Suggestion;
@@ -41,6 +44,7 @@ import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
@@ -48,6 +52,7 @@ import org.dspace.services.ConfigurationService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.orcid.jaxb.model.v3.release.record.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -65,7 +70,8 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
     private final static String REFRESH_TOKEN = "0062a9eb-d4ec-4d94-9491-95dd75376d3e";
     private final static String[] ORCID_SCOPES = { "FirstScope", "SecondScope" };
 
-    private OrcidClient originalOrcidClient;
+    @Autowired
+    private OrcidClient orcidClient;
 
     private OrcidClient orcidClientMock = mock(OrcidClient.class);
 
@@ -82,12 +88,15 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
     @Autowired
     private OrcidPublicationLoader orcidPublicationLoader;
 
+    @Autowired
+    private CheckOrcidAuthorization checkOrcidAuthorization;
+
     private Collection profileCollection;
 
     @Before
     public void setup() {
-        originalOrcidClient = orcidRestController.getOrcidClient();
         orcidRestController.setOrcidClient(orcidClientMock);
+        checkOrcidAuthorization.setOrcidClient(orcidClientMock);
 
         originalExternalDataProvider = orcidPublicationLoader.getProvider();
         orcidPublicationLoader.setProvider(externalDataProviderMock);
@@ -111,7 +120,8 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
 
     @After
     public void after() throws Exception {
-        orcidRestController.setOrcidClient(originalOrcidClient);
+        orcidRestController.setOrcidClient(orcidClient);
+        checkOrcidAuthorization.setOrcidClient(orcidClient);
         orcidPublicationLoader.setProvider(originalExternalDataProvider);
     }
 
@@ -224,7 +234,7 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void testWebhook() throws Exception {
+    public void testWebhookPublicationRetrieving() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -301,6 +311,94 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
             .andExpect(status().isNoContent());
 
         verifyNoInteractions(externalDataProviderMock);
+    }
+
+    @Test
+    public void testWebhookWithStillValidAccessToken() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item profileItem = ItemBuilder.createItem(context, profileCollection)
+            .withTitle("Walter White")
+            .withOrcidIdentifier(ORCID)
+            .withOrcidAccessToken(ACCESS_TOKEN)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        when(externalDataProviderMock.searchExternalDataObjects(ORCID, 0, -1)).thenReturn(emptyList());
+        when(orcidClientMock.getPerson(ACCESS_TOKEN, ORCID)).thenReturn(new Person());
+
+        getClient().perform(post("/api/" + RestModel.CRIS + "/orcid/" + ORCID + "/webhook/" + getRegistrationToken()))
+            .andExpect(status().isNoContent());
+
+        verify(orcidClientMock).getPerson(ACCESS_TOKEN, ORCID);
+        verifyNoMoreInteractions(orcidClientMock);
+
+        profileItem = context.reloadEntity(profileItem);
+
+        assertThat(profileItem.getMetadata(), has(metadataField("cris.orcid.access-token")));
+
+    }
+
+    @Test
+    public void testWebhookWithInvalidAccessToken() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item profileItem = ItemBuilder.createItem(context, profileCollection)
+            .withTitle("Walter White")
+            .withOrcidIdentifier(ORCID)
+            .withOrcidAccessToken(ACCESS_TOKEN)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        when(externalDataProviderMock.searchExternalDataObjects(ORCID, 0, -1)).thenReturn(emptyList());
+        when(orcidClientMock.getPerson(ACCESS_TOKEN, ORCID)).thenThrow(new OrcidClientException(401, "Unauthorized"));
+
+        getClient().perform(post("/api/" + RestModel.CRIS + "/orcid/" + ORCID + "/webhook/" + getRegistrationToken()))
+            .andExpect(status().isNoContent());
+
+        verify(orcidClientMock).getPerson(ACCESS_TOKEN, ORCID);
+        verifyNoMoreInteractions(orcidClientMock);
+
+        profileItem = context.reloadEntity(profileItem);
+
+        assertThat(profileItem.getMetadata(), has(not(metadataField("cris.orcid.access-token"))));
+
+    }
+
+    @Test
+    public void testWebhookWithInternalServerErrorFromOrcid() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item profileItem = ItemBuilder.createItem(context, profileCollection)
+            .withTitle("Walter White")
+            .withOrcidIdentifier(ORCID)
+            .withOrcidAccessToken(ACCESS_TOKEN)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        when(externalDataProviderMock.searchExternalDataObjects(ORCID, 0, -1)).thenReturn(emptyList());
+        when(orcidClientMock.getPerson(ACCESS_TOKEN, ORCID)).thenThrow(new OrcidClientException(500, "ERROR"));
+
+        getClient().perform(post("/api/" + RestModel.CRIS + "/orcid/" + ORCID + "/webhook/" + getRegistrationToken()))
+            .andExpect(status().isNoContent());
+
+        verify(orcidClientMock).getPerson(ACCESS_TOKEN, ORCID);
+        verifyNoMoreInteractions(orcidClientMock);
+
+        profileItem = context.reloadEntity(profileItem);
+
+        assertThat(profileItem.getMetadata(), has(metadataField("cris.orcid.access-token")));
+
+    }
+
+    private Predicate<MetadataValue> metadataField(String metadataField) {
+        return metadataValue -> metadataValue.getMetadataField().toString('.').equals(metadataField);
     }
 
     private ExternalDataObject externalDataObject(String orcid, String putCode, String title, String date,

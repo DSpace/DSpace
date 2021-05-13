@@ -14,6 +14,8 @@ import org.dspace.app.suggestion.orcid.OrcidPublicationLoader;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
 /**
  * Implementation of {@link OrcidWebhookAction} that retrieve all the
@@ -22,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
+@Order(Ordered.LOWEST_PRECEDENCE)
 public class RetrieveOrcidPublicationAction implements OrcidWebhookAction {
 
     @Autowired

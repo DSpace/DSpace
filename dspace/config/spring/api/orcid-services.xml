@@ -163,6 +163,7 @@
 	</bean>
 	
 	<bean class="org.dspace.app.orcid.webhook.RetrieveOrcidPublicationAction" />
+	<bean class="org.dspace.app.orcid.webhook.CheckOrcidAuthorization" />
 	
 	<bean id="orcidPublicationDataProviderFieldMapping" class="org.dspace.app.orcid.model.OrcidWorkFieldMapping" >
 		<property name="contributorFields" value="${orcid.external-data.mapping.publication.contributors}" />
