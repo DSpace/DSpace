@@ -216,7 +216,9 @@
                     }
                 },
                 success : successHandler,
-                error : function() {
+                error : function(xhr) {
+                    // Check for an update to the CSRF Token & save to a MyHalBrowserCsrfToken cookie (if found)
+                    checkForUpdatedCSRFTokenInResponse(xhr);
                     toastr.error('The credentials you entered are invalid. Please try again.', 'Login Failed');
                 }
             });
