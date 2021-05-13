@@ -86,7 +86,7 @@ public class EmbeddedPageHeaderTest {
 
         Map<String,Object> links = embeddedPageHeader.getLinks();
         // "self" should be same as URL
-        assertEquals(dspaceURL, ((EmbeddedPageHeader.Href) links.get("self")).getHref());
+        assertEquals(dspaceURL + "?size=10", ((EmbeddedPageHeader.Href) links.get("self")).getHref());
         // "first" should not exist, as we are on the first page.
         assertFalse(links.containsKey("first"));
         // "prev" should not exist, as we are on the first page.

@@ -41,9 +41,9 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Test for the canViewVersions authorization feature
+ * Test for the canSeeVersions authorization feature
  */
-public class ViewVersionsFeatureIT extends AbstractControllerIntegrationTest {
+public class CanSeeVersionsFeatureIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private Utils utils;
@@ -68,7 +68,7 @@ public class ViewVersionsFeatureIT extends AbstractControllerIntegrationTest {
     private BitstreamRest bitstreamARest;
     private Bundle bundleA;
 
-    final String feature = "canViewVersions";
+    final String feature = "canSeeVersions";
 
     @Override
     @Before

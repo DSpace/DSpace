@@ -99,9 +99,11 @@ public class DiscoverConfigurationConverterTest {
         DiscoverySortFieldConfiguration discoverySortFieldConfiguration = new DiscoverySortFieldConfiguration();
         discoverySortFieldConfiguration.setMetadataField("title");
         discoverySortFieldConfiguration.setType("text");
+        discoverySortFieldConfiguration.setDefaultSortOrder(DiscoverySortFieldConfiguration.SORT_ORDER.asc);
         DiscoverySortFieldConfiguration discoverySortFieldConfiguration1 = new DiscoverySortFieldConfiguration();
         discoverySortFieldConfiguration1.setMetadataField("author");
         discoverySortFieldConfiguration1.setType("text");
+        discoverySortFieldConfiguration1.setDefaultSortOrder(DiscoverySortFieldConfiguration.SORT_ORDER.asc);
         LinkedList<DiscoverySortFieldConfiguration> mockedList = new LinkedList<>();
         mockedList.add(discoverySortFieldConfiguration);
         mockedList.add(discoverySortFieldConfiguration1);

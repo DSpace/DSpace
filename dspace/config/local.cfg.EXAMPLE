@@ -188,6 +188,7 @@ db.schema = public
 #plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.LDAPAuthentication
 
 # Shibboleth authentication/authorization. See authentication-shibboleth.cfg for default configuration.
+# Check also the cors settings below
 #plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.ShibAuthentication
 
 # X.509 certificate authentication. See authentication-x509.cfg for default configuration.
@@ -205,6 +206,9 @@ db.schema = public
 # Defaults to ${dspace.ui.url} if unspecified (as the UI must have access to the REST API).
 # Multiple allowed origin URLs may be comma separated. Wildcard value (*) is NOT SUPPORTED.
 # (Requires reboot of servlet container, e.g. Tomcat, to reload)
+# When an external authentication system is involved like Shibboleth some browsers (i.e. Safari) include
+# in the request the Origin header with the url of the IdP. In such case you need to allow also the IdP to
+# avoid trouble for such browsers (i.e.  rest.cors.allowed-origins = ${dspace.ui.url}, https://samltest.id )
 #rest.cors.allowed-origins = ${dspace.ui.url}
 
 #################################################
