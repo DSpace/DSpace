@@ -11,13 +11,13 @@ import static org.dspace.app.orcid.model.validator.OrcidValidationError.DISAMBIG
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.DISAMBIGUATED_ORGANIZATION_VALUE_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.DISAMBIGUATION_SOURCE_INVALID;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.DISAMBIGUATION_SOURCE_REQUIRED;
+import static org.dspace.app.orcid.model.validator.OrcidValidationError.EXTERNAL_ID_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_ADDRESS_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_CITY_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_COUNTRY_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_NAME_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.PROJECT_COORDINATOR_REQUIRED;
-import static org.dspace.app.orcid.model.validator.OrcidValidationError.PROJECT_EXTERNAL_ID_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.START_DATE_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.TITLE_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.TYPE_REQUIRED;
@@ -80,11 +80,11 @@ public class OrcidValidatorTest {
     }
 
     @Test
-    public void testWorkWithoutTitleAndType() {
+    public void testWorkWithoutTitleAndTypeAndExternalIds() {
 
         List<OrcidValidationError> errors = validator.validateWork(new Work());
-        assertThat(errors, hasSize(2));
-        assertThat(errors, containsInAnyOrder(TITLE_REQUIRED, TYPE_REQUIRED));
+        assertThat(errors, hasSize(3));
+        assertThat(errors, containsInAnyOrder(TITLE_REQUIRED, TYPE_REQUIRED, EXTERNAL_ID_REQUIRED));
     }
 
     @Test
@@ -92,6 +92,8 @@ public class OrcidValidatorTest {
 
         Work work = new Work();
         work.setWorkType(WorkType.DATA_SET);
+        work.setWorkExternalIdentifiers(new ExternalIDs());
+        work.getExternalIdentifiers().getExternalIdentifier().add(buildValidExternalID());
 
         List<OrcidValidationError> errors = validator.validateWork(work);
         assertThat(errors, hasSize(1));
@@ -104,6 +106,8 @@ public class OrcidValidatorTest {
         Work work = new Work();
         work.setWorkTitle(new WorkTitle());
         work.setWorkType(WorkType.DATA_SET);
+        work.setWorkExternalIdentifiers(new ExternalIDs());
+        work.getExternalIdentifiers().getExternalIdentifier().add(buildValidExternalID());
 
         List<OrcidValidationError> errors = validator.validateWork(work);
         assertThat(errors, hasSize(1));
@@ -117,6 +121,8 @@ public class OrcidValidatorTest {
         work.setWorkTitle(new WorkTitle());
         work.getWorkTitle().setTitle(new Title(null));
         work.setWorkType(WorkType.DATA_SET);
+        work.setWorkExternalIdentifiers(new ExternalIDs());
+        work.getExternalIdentifiers().getExternalIdentifier().add(buildValidExternalID());
 
         List<OrcidValidationError> errors = validator.validateWork(work);
         assertThat(errors, hasSize(1));
@@ -130,6 +136,8 @@ public class OrcidValidatorTest {
         work.setWorkTitle(new WorkTitle());
         work.getWorkTitle().setTitle(new Title(""));
         work.setWorkType(WorkType.DATA_SET);
+        work.setWorkExternalIdentifiers(new ExternalIDs());
+        work.getExternalIdentifiers().getExternalIdentifier().add(buildValidExternalID());
 
         List<OrcidValidationError> errors = validator.validateWork(work);
         assertThat(errors, hasSize(1));
@@ -142,10 +150,39 @@ public class OrcidValidatorTest {
         Work work = new Work();
         work.setWorkTitle(new WorkTitle());
         work.getWorkTitle().setTitle(new Title("Work title"));
+        work.setWorkExternalIdentifiers(new ExternalIDs());
+        work.getExternalIdentifiers().getExternalIdentifier().add(buildValidExternalID());
 
         List<OrcidValidationError> errors = validator.validateWork(work);
         assertThat(errors, hasSize(1));
         assertThat(errors, containsInAnyOrder(TYPE_REQUIRED));
+    }
+
+    @Test
+    public void testWorkWithoutExternalIds() {
+
+        Work work = new Work();
+        work.setWorkTitle(new WorkTitle());
+        work.getWorkTitle().setTitle(new Title("Work title"));
+        work.setWorkType(WorkType.DATA_SET);
+
+        List<OrcidValidationError> errors = validator.validateWork(work);
+        assertThat(errors, hasSize(1));
+        assertThat(errors, containsInAnyOrder(EXTERNAL_ID_REQUIRED));
+    }
+
+    @Test
+    public void testWorkWithEmptyExternalIds() {
+
+        Work work = new Work();
+        work.setWorkTitle(new WorkTitle());
+        work.getWorkTitle().setTitle(new Title("Work title"));
+        work.setWorkType(WorkType.DATA_SET);
+        work.setWorkExternalIdentifiers(new ExternalIDs());
+
+        List<OrcidValidationError> errors = validator.validateWork(work);
+        assertThat(errors, hasSize(1));
+        assertThat(errors, containsInAnyOrder(EXTERNAL_ID_REQUIRED));
     }
 
     @Test
@@ -155,6 +192,8 @@ public class OrcidValidatorTest {
         work.setWorkTitle(new WorkTitle());
         work.setWorkType(WorkType.DATA_SET);
         work.getWorkTitle().setTitle(new Title("Work title"));
+        work.setWorkExternalIdentifiers(new ExternalIDs());
+        work.getExternalIdentifiers().getExternalIdentifier().add(buildValidExternalID());
 
         List<OrcidValidationError> errors = validator.validateWork(work);
         assertThat(errors, empty());
@@ -165,7 +204,7 @@ public class OrcidValidatorTest {
 
         List<OrcidValidationError> errors = validator.validateFunding(new Funding());
         assertThat(errors, hasSize(3));
-        assertThat(errors, containsInAnyOrder(PROJECT_EXTERNAL_ID_REQUIRED,
+        assertThat(errors, containsInAnyOrder(EXTERNAL_ID_REQUIRED,
             PROJECT_COORDINATOR_REQUIRED, TITLE_REQUIRED));
     }
 
@@ -178,7 +217,7 @@ public class OrcidValidatorTest {
 
         List<OrcidValidationError> errors = validator.validateFunding(funding);
         assertThat(errors, hasSize(2));
-        assertThat(errors, containsInAnyOrder(PROJECT_EXTERNAL_ID_REQUIRED, PROJECT_COORDINATOR_REQUIRED));
+        assertThat(errors, containsInAnyOrder(EXTERNAL_ID_REQUIRED, PROJECT_COORDINATOR_REQUIRED));
     }
 
     @Test
@@ -201,7 +240,7 @@ public class OrcidValidatorTest {
 
         List<OrcidValidationError> errors = validator.validateFunding(funding);
         assertThat(errors, hasSize(2));
-        assertThat(errors, containsInAnyOrder(TITLE_REQUIRED, PROJECT_EXTERNAL_ID_REQUIRED));
+        assertThat(errors, containsInAnyOrder(TITLE_REQUIRED, EXTERNAL_ID_REQUIRED));
     }
 
     @Test
@@ -267,7 +306,7 @@ public class OrcidValidatorTest {
 
         List<OrcidValidationError> errors = validator.validateFunding(funding);
         assertThat(errors, hasSize(1));
-        assertThat(errors, containsInAnyOrder(PROJECT_EXTERNAL_ID_REQUIRED));
+        assertThat(errors, containsInAnyOrder(EXTERNAL_ID_REQUIRED));
     }
 
     @Test
@@ -501,6 +540,8 @@ public class OrcidValidatorTest {
         Work work = new Work();
         work.setWorkTitle(new WorkTitle());
         work.getWorkTitle().setTitle(new Title("Work title"));
+        work.setWorkExternalIdentifiers(new ExternalIDs());
+        work.getExternalIdentifiers().getExternalIdentifier().add(buildValidExternalID());
 
         List<OrcidValidationError> errors = validator.validate(work);
         assertThat(errors, hasSize(1));

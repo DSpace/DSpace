@@ -14,13 +14,13 @@ import static org.dspace.app.orcid.model.validator.OrcidValidationError.DISAMBIG
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.DISAMBIGUATED_ORGANIZATION_VALUE_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.DISAMBIGUATION_SOURCE_INVALID;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.DISAMBIGUATION_SOURCE_REQUIRED;
+import static org.dspace.app.orcid.model.validator.OrcidValidationError.EXTERNAL_ID_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_ADDRESS_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_CITY_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_COUNTRY_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_NAME_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.PROJECT_COORDINATOR_REQUIRED;
-import static org.dspace.app.orcid.model.validator.OrcidValidationError.PROJECT_EXTERNAL_ID_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.START_DATE_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.TITLE_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.TYPE_REQUIRED;
@@ -87,6 +87,12 @@ public class OrcidValidatorImpl implements OrcidValidator {
             errors.add(TYPE_REQUIRED);
         }
 
+        ExternalIDs externalIdentifiers = work.getExternalIdentifiers();
+
+        if (externalIdentifiers == null || isEmpty(externalIdentifiers.getExternalIdentifier())) {
+            errors.add(EXTERNAL_ID_REQUIRED);
+        }
+
         return errors;
     }
 
@@ -103,7 +109,7 @@ public class OrcidValidatorImpl implements OrcidValidator {
         ExternalIDs externalIdentifiers = funding.getExternalIdentifiers();
 
         if (externalIdentifiers == null || isEmpty(externalIdentifiers.getExternalIdentifier())) {
-            errors.add(PROJECT_EXTERNAL_ID_REQUIRED);
+            errors.add(EXTERNAL_ID_REQUIRED);
         }
 
         if (funding.getOrganization() == null) {

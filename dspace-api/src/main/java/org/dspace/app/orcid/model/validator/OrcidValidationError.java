@@ -16,7 +16,7 @@ package org.dspace.app.orcid.model.validator;
  */
 public enum OrcidValidationError {
 
-    PROJECT_EXTERNAL_ID_REQUIRED("project.external-id.required"),
+    EXTERNAL_ID_REQUIRED("external-id.required"),
     TITLE_REQUIRED("title.required"),
     TYPE_REQUIRED("type.required"),
     START_DATE_REQUIRED("start-date.required"),

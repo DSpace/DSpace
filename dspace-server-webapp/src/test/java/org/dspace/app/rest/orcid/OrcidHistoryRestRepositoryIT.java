@@ -128,7 +128,8 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
             .withAuthor("Josiah, Carberry")
             .withTitle("A Methodology for the Emulation of Architecture")
             .withIssueDate("2013-08-03")
-            .withType("Controlled Vocabulary for Resource Type Genres::text::book ")
+            .withType("Controlled Vocabulary for Resource Type Genres::text::book")
+            .withDoiIdentifier("10.1000/182")
             .build();
 
         context.restoreAuthSystemState();
