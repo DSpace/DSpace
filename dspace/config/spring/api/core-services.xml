@@ -65,6 +65,7 @@
     <bean class="org.dspace.app.profile.ResearcherProfileServiceImpl"/>
     
     <bean class="org.dspace.app.profile.OrcidMetadataCopyingAction"/>
+    <bean class="org.dspace.app.profile.OrcidProfileEnricher"/>
 
     <!-- Ensure PluginService is initialized properly via init() method -->
     <bean class="org.dspace.core.LegacyPluginServiceImpl" init-method="init"/>

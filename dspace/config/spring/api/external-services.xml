@@ -55,7 +55,7 @@
         <property name="orcidUrl" value="${orcid.domain-url}" />
         <property name="clientId" value="${orcid.application-client-id}" />
         <property name="clientSecret" value="${orcid.application-client-secret}" />
-        <property name="OAUTHUrl" value="${orcid.authorize-url}" />
+        <property name="OAUTHUrl" value="${orcid.token-url}" />
         <property name="orcidRestConnector" ref="orcidRestConnector"/>
         <property name="supportedEntityTypes">
             <list>
