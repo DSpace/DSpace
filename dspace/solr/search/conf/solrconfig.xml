@@ -103,7 +103,9 @@
                        initialSize="512"
                        autowarmCount="0"/>
 
-        <enableLazyFieldLoading>true</enableLazyFieldLoading>
+        <!-- CSTPER-617
+        https://issues.apache.org/jira/browse/SOLR-13034?jql=text%20~%20%22atomic%20update%20lazyfield%22 -->
+        <enableLazyFieldLoading>false</enableLazyFieldLoading>
         <queryResultWindowSize>20</queryResultWindowSize>
         <queryResultMaxDocsCached>200</queryResultMaxDocsCached>
         <useColdSearcher>false</useColdSearcher>
