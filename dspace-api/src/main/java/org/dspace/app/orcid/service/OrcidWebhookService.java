@@ -7,6 +7,7 @@
  */
 package org.dspace.app.orcid.service;
 
+import org.dspace.app.orcid.webhook.OrcidWebhookMode;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
@@ -17,6 +18,13 @@ import org.dspace.core.Context;
  *
  */
 public interface OrcidWebhookService {
+
+    /**
+     * Returns the configured ORCID webhook registration mode. If the configuration
+     * value has not been set or has been set incorrectly, this returns DISABLED.
+     * @return
+     */
+    public OrcidWebhookMode getOrcidWebhookMode();
 
     /**
      * Check if the given profile is already registered for ORCID webhook.

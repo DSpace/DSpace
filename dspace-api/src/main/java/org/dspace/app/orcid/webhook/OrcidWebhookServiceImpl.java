@@ -11,9 +11,11 @@ import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.dspace.app.orcid.webhook.OrcidWebhookMode.DISABLED;
 
 import java.sql.SQLException;
 
+import org.apache.commons.lang3.EnumUtils;
 import org.dspace.app.orcid.client.OrcidClient;
 import org.dspace.app.orcid.service.OrcidWebhookService;
 import org.dspace.content.Item;
@@ -39,6 +41,15 @@ public class OrcidWebhookServiceImpl implements OrcidWebhookService {
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Override
+    public OrcidWebhookMode getOrcidWebhookMode() {
+        String value = configurationService.getProperty("orcid.webhook.registration-mode", "disabled").toUpperCase();
+        if (!EnumUtils.isValidEnum(OrcidWebhookMode.class, value)) {
+            return DISABLED;
+        }
+        return OrcidWebhookMode.valueOf(value);
+    }
 
     @Override
     public boolean isProfileRegistered(Item profile) {

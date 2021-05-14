@@ -13,6 +13,7 @@ import static org.apache.commons.lang3.EnumUtils.isValidEnum;
 import static org.dspace.app.profile.OrcidEntitySyncPreference.DISABLED;
 
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,9 +35,7 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
-import org.dspace.discovery.DiscoverResult;
-import org.dspace.discovery.SearchService;
-import org.dspace.discovery.SearchServiceException;
+import org.dspace.discovery.DiscoverResultItemIterator;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +48,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationService {
 
-
     @Autowired
     private ItemService itemService;
 
@@ -58,9 +56,6 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
 
     @Autowired
     private ConfigurationService configurationService;
-
-    @Autowired
-    private SearchService searchService;
 
     @Autowired
     private OrcidWebhookService orcidWebhookService;
@@ -198,25 +193,17 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
     }
 
     @Override
-    public List<Item> findProfilesByOrcid(Context context, String orcid) {
+    public Iterator<Item> findProfilesByOrcid(Context context, String orcid) {
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.setDSpaceObjectFilter(IndexableItem.TYPE);
+        discoverQuery.addFilterQueries("search.entitytype:" + getProfileType());
+        discoverQuery.addFilterQueries("person.identifier.orcid:" + orcid);
+        return new DiscoverResultItemIterator(context, discoverQuery);
+    }
 
-        try {
-
-            DiscoverQuery discoverQuery = new DiscoverQuery();
-
-            discoverQuery.setDSpaceObjectFilter(IndexableItem.TYPE);
-            discoverQuery.addFilterQueries("search.entitytype:" + getProfileType());
-            discoverQuery.addFilterQueries("person.identifier.orcid:" + orcid);
-
-            DiscoverResult discoverResult = searchService.search(context, discoverQuery);
-
-            return discoverResult.getIndexableObjects().stream()
-                .map(indexableObject -> ((IndexableItem) indexableObject).getIndexedObject())
-                .collect(Collectors.toList());
-
-        } catch (SearchServiceException e) {
-            throw new RuntimeException(e);
-        }
+    @Override
+    public Iterator<Item> findProfilesWithOrcid(Context context) {
+        return findProfilesByOrcid(context, "*");
     }
 
     private void updatePreferenceForSynchronizingWithOrcid(Context context, Item profile,

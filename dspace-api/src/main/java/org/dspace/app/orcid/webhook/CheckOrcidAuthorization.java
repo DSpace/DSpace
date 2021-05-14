@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.dspace.app.orcid.client.OrcidClient;
 import org.dspace.app.orcid.exception.OrcidClientException;
+import org.dspace.app.orcid.service.OrcidWebhookService;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
@@ -42,6 +43,9 @@ public class CheckOrcidAuthorization implements OrcidWebhookAction {
     @Autowired
     private OrcidClient orcidClient;
 
+    @Autowired
+    private OrcidWebhookService orcidWebhookService;
+
     @Override
     public void perform(Context context, Item profile, String orcid) {
         String accessToken = getAccessToken(profile);
@@ -52,7 +56,13 @@ public class CheckOrcidAuthorization implements OrcidWebhookAction {
         try {
 
             if (isAccessTokenExpired(accessToken, orcid)) {
+
                 removeAccessToken(context, profile);
+
+                if (isWebhookConfiguredForOnlyLinkedProfiles() && orcidWebhookService.isProfileRegistered(profile)) {
+                    orcidWebhookService.unregister(context, profile);
+                }
+
             }
 
         } catch (Exception ex) {
@@ -79,6 +89,10 @@ public class CheckOrcidAuthorization implements OrcidWebhookAction {
             }
             return true;
         }
+    }
+
+    private boolean isWebhookConfiguredForOnlyLinkedProfiles() {
+        return orcidWebhookService.getOrcidWebhookMode() == OrcidWebhookMode.ONLY_LINKED;
     }
 
     public OrcidClient getOrcidClient() {

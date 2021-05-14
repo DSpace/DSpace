@@ -203,6 +203,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "cris", "orcid", "access-token", accessToken);
     }
 
+    public ItemBuilder withOrcidWebhook(String webhook) {
+        return addMetadataValue(item, "cris", "orcid", "webhook", webhook);
+    }
+
     public ItemBuilder withOrcidSynchronizationPublicationsPreference(OrcidEntitySyncPreference value) {
         return withOrcidSynchronizationPublicationsPreference(value.name());
     }

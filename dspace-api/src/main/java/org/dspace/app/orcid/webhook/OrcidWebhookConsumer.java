@@ -14,7 +14,6 @@ import static org.dspace.app.orcid.webhook.OrcidWebhookMode.DISABLED;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.lang3.EnumUtils;
 import org.dspace.app.orcid.factory.OrcidServiceFactory;
 import org.dspace.app.orcid.service.OrcidWebhookService;
 import org.dspace.content.Item;
@@ -59,7 +58,7 @@ public class OrcidWebhookConsumer implements Consumer {
     @Override
     public void consume(Context context, Event event) throws Exception {
 
-        OrcidWebhookMode webhookConfiguration = getWebhookConfiguration();
+        OrcidWebhookMode webhookConfiguration = orcidWebhookService.getOrcidWebhookMode();
         if (webhookConfiguration == DISABLED) {
             return;
         }
@@ -82,14 +81,6 @@ public class OrcidWebhookConsumer implements Consumer {
             orcidWebhookService.register(context, item);
         }
 
-    }
-
-    private OrcidWebhookMode getWebhookConfiguration() {
-        String value = configurationService.getProperty("orcid.webhook.registration-mode", "disabled").toUpperCase();
-        if (!EnumUtils.isValidEnum(OrcidWebhookMode.class, value)) {
-            return DISABLED;
-        }
-        return OrcidWebhookMode.valueOf(value);
     }
 
     private boolean isNotProfile(Item item) {

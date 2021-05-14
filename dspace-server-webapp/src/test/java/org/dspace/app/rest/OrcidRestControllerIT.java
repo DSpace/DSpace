@@ -15,6 +15,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -35,6 +37,7 @@ import org.dspace.app.orcid.client.OrcidClient;
 import org.dspace.app.orcid.exception.OrcidClientException;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.app.orcid.webhook.CheckOrcidAuthorization;
+import org.dspace.app.orcid.webhook.OrcidWebhookServiceImpl;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.suggestion.Suggestion;
@@ -91,12 +94,16 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
     @Autowired
     private CheckOrcidAuthorization checkOrcidAuthorization;
 
+    @Autowired
+    private OrcidWebhookServiceImpl orcidWebhookService;
+
     private Collection profileCollection;
 
     @Before
     public void setup() {
         orcidRestController.setOrcidClient(orcidClientMock);
         checkOrcidAuthorization.setOrcidClient(orcidClientMock);
+        orcidWebhookService.setOrcidClient(orcidClientMock);
 
         originalExternalDataProvider = orcidPublicationLoader.getProvider();
         orcidPublicationLoader.setProvider(externalDataProviderMock);
@@ -122,6 +129,7 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
     public void after() throws Exception {
         orcidRestController.setOrcidClient(orcidClient);
         checkOrcidAuthorization.setOrcidClient(orcidClient);
+        orcidWebhookService.setOrcidClient(orcidClient);
         orcidPublicationLoader.setProvider(originalExternalDataProvider);
     }
 
@@ -354,6 +362,8 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
+        configurationService.setProperty("orcid.webhook.registration-mode", "all");
+
         when(externalDataProviderMock.searchExternalDataObjects(ORCID, 0, -1)).thenReturn(emptyList());
         when(orcidClientMock.getPerson(ACCESS_TOKEN, ORCID)).thenThrow(new OrcidClientException(401, "Unauthorized"));
 
@@ -367,6 +377,73 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
 
         assertThat(profileItem.getMetadata(), has(not(metadataField("cris.orcid.access-token"))));
 
+    }
+
+    @Test
+    public void testWebhookWithInvalidAccessTokenAndOnlyLinkedWebhook() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item profileItem = ItemBuilder.createItem(context, profileCollection)
+            .withTitle("Walter White")
+            .withOrcidIdentifier(ORCID)
+            .withOrcidAccessToken(ACCESS_TOKEN)
+            .withOrcidWebhook("2020-02-01")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        configurationService.setProperty("orcid.webhook.registration-mode", "only_linked");
+
+        String webhookAccessToken = "b03a76e3-42af-45de-94ad-9d825141a152";
+
+        when(externalDataProviderMock.searchExternalDataObjects(ORCID, 0, -1)).thenReturn(emptyList());
+        when(orcidClientMock.getPerson(ACCESS_TOKEN, ORCID)).thenThrow(new OrcidClientException(401, "Unauthorized"));
+        when(orcidClientMock.getWebhookAccessToken()).thenReturn(buildOrcidTokenResponse(ORCID, webhookAccessToken));
+
+        getClient().perform(post("/api/" + RestModel.CRIS + "/orcid/" + ORCID + "/webhook/" + getRegistrationToken()))
+            .andExpect(status().isNoContent());
+
+        verify(orcidClientMock).getPerson(ACCESS_TOKEN, ORCID);
+        verify(orcidClientMock).getWebhookAccessToken();
+        verify(orcidClientMock).unregisterWebhook(eq(webhookAccessToken), eq(ORCID), any());
+        verifyNoMoreInteractions(orcidClientMock);
+
+        profileItem = context.reloadEntity(profileItem);
+
+        assertThat(profileItem.getMetadata(), has(not(metadataField("cris.orcid.access-token"))));
+    }
+
+    @Test
+    public void testWebhookWithInvalidAccessTokenAndOnlyLinkedWebhookWithoutPreviousRegistration() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item profileItem = ItemBuilder.createItem(context, profileCollection)
+            .withTitle("Walter White")
+            .withOrcidIdentifier(ORCID)
+            .withOrcidAccessToken(ACCESS_TOKEN)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        configurationService.setProperty("orcid.webhook.registration-mode", "only_linked");
+
+        String webhookAccessToken = "b03a76e3-42af-45de-94ad-9d825141a152";
+
+        when(externalDataProviderMock.searchExternalDataObjects(ORCID, 0, -1)).thenReturn(emptyList());
+        when(orcidClientMock.getPerson(ACCESS_TOKEN, ORCID)).thenThrow(new OrcidClientException(401, "Unauthorized"));
+        when(orcidClientMock.getWebhookAccessToken()).thenReturn(buildOrcidTokenResponse(ORCID, webhookAccessToken));
+
+        getClient().perform(post("/api/" + RestModel.CRIS + "/orcid/" + ORCID + "/webhook/" + getRegistrationToken()))
+            .andExpect(status().isNoContent());
+
+        verify(orcidClientMock).getPerson(ACCESS_TOKEN, ORCID);
+        verifyNoMoreInteractions(orcidClientMock);
+
+        profileItem = context.reloadEntity(profileItem);
+
+        assertThat(profileItem.getMetadata(), has(not(metadataField("cris.orcid.access-token"))));
     }
 
     @Test

@@ -9,14 +9,17 @@ package org.dspace.app.rest;
 
 import java.net.URI;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.StringUtils;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.IteratorUtils;
 import org.dspace.app.orcid.client.OrcidClient;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.app.orcid.service.OrcidSynchronizationService;
@@ -65,8 +68,15 @@ public class OrcidRestController {
     @Autowired
     private OrcidSynchronizationService orcidSynchronizationService;
 
-    @Autowired
+    @Autowired(required = false)
     private List<OrcidWebhookAction> orcidWebhookActions;
+
+    @PostConstruct
+    private void postConstruct() {
+        if (orcidWebhookActions == null) {
+            orcidWebhookActions = Collections.emptyList();
+        }
+    }
 
     @GetMapping(value = "/{itemId}")
     public void linkProfileFromCode(HttpServletRequest request, HttpServletResponse response,
@@ -116,13 +126,14 @@ public class OrcidRestController {
     }
 
     private void performWebhookActions(String orcid, Context context) {
-        List<Item> profiles = orcidSynchronizationService.findProfilesByOrcid(context, orcid);
-        if (CollectionUtils.isEmpty(profiles)) {
+        Iterator<Item> iterator = orcidSynchronizationService.findProfilesByOrcid(context, orcid);
+        if (IteratorUtils.isEmpty(iterator)) {
             LOGGER.warn("Received a webhook call from ORCID with an id not associated with any profile: " + orcid);
             return;
         }
 
-        for (Item profile : profiles) {
+        while (iterator.hasNext()) {
+            Item profile = iterator.next();
             orcidWebhookActions.forEach(plugin -> plugin.perform(context, profile, orcid));
         }
     }

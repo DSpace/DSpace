@@ -15,6 +15,7 @@ import static org.apache.commons.collections4.ListUtils.partition;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.dspace.content.Item.ANY;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -116,10 +117,9 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
     }
 
     private String getAccessToken(String orcid) {
-        return orcidSynchronizationService.findProfilesByOrcid(new Context(), orcid).stream()
-            .map(item -> getAccessToken(item))
-            .flatMap(Optional::stream)
-            .findFirst()
+        Iterator<Item> iterator = orcidSynchronizationService.findProfilesByOrcid(new Context(), orcid);
+        return Optional.ofNullable(iterator.hasNext() ? iterator.next() : null)
+            .flatMap(item -> getAccessToken(item))
             .orElseGet(() -> getReadPublicAccessToken());
     }
 
