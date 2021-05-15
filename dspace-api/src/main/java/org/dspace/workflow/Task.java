@@ -26,8 +26,13 @@ import javax.validation.constraints.NotNull;
  * (email addresses) to be notified when the curation task returns a given status.
  */
 public class Task {
+    /** Name of the curation task. */
     public final String name;
+
+    /** Effects of curation task completion on the workflow step. */
     public final List<String> powers = new ArrayList<>();
+
+    /** Contacts to be notified on a given completion status. */
     public final Map<String, List<String>> contacts = new HashMap<>();
 
     /**
