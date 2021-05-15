@@ -15,7 +15,10 @@ import javax.validation.constraints.NotNull;
  * attached to a workflow.
  */
 public class TaskSet {
+    /** Name of this TaskSet. */
     public final String name;
+
+    /** The {@link FlowStep}s assigned to this TaskSet. */
     public final List<FlowStep> steps;
 
     /**

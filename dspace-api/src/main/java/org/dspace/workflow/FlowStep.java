@@ -15,8 +15,13 @@ import javax.validation.constraints.NotNull;
  * Linkage between a workflow step and some {@link org.dspace.curate.CurationTask}s.
  */
 public class FlowStep {
+    /** Name of this workflow step. */
     public final String step;
+
+    /** Queue on which to run curation tasks, or {@code null} for immediate run. */
     public final String queue;
+
+    /** Curation tasks to be run in this workflow step. */
     public final List<Task> tasks = new ArrayList<>();
 
     /**

@@ -38,6 +38,7 @@ import org.xml.sax.SAXException;
  * @author mwood
  */
 public class CurationTaskConfig {
+    /** Name of the TaskSet that matches an unconfigured {@link TaskSet} name. */
     public static final String DEFAULT_TASKSET_NAME = "default";
 
     private final Map<String, TaskSet> collectionTasksetMap;
