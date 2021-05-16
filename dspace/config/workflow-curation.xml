@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<workflow-curation>
+<workflow-curation xmlns='https://dspace.org/workflow-curation'>
 
  <!-- workflow-curation assigns Curation Tasks to DSpace workflow steps.     -->
 

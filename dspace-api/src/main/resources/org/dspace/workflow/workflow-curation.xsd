@@ -8,8 +8,11 @@
     http://www.dspace.org/license/
 
 -->
-<xsd:schema xmlns:xsd='http://www.w3.org/2001/XMLSchema'
+<xsd:schema targetNamespace='https://dspace.org/workflow-curation'
+            elementFormDefault='qualified'
+            xmlns:xsd='http://www.w3.org/2001/XMLSchema'
             xmlns:jaxb='http://java.sun.com/xml/ns/jaxb'
+            xmlns='https://dspace.org/workflow-curation'
             jaxb:version='2.1'>
     <xsd:annotation>
 	<xsd:documentation>
