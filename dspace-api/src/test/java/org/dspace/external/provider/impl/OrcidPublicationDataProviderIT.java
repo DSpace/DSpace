@@ -134,8 +134,9 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
         assertThat(firstObject.getSource(), is("orcidWorks"));
 
         List<MetadataValueDTO> metadata = firstObject.getMetadata();
-        assertThat(metadata, hasSize(6));
-        assertThat(metadata, has(metadata("dc.date.issued", "2012-11-01")));
+        assertThat(metadata, hasSize(7));
+        assertThat(metadata, has(metadata("dc.date.issued", "2011")));
+        assertThat(metadata, has(metadata("dc.source", "Test Journal")));
         assertThat(metadata, has(metadata("dc.language.iso", "it")));
         assertThat(metadata, has(metadata("dc.type", "Controlled Vocabulary for Resource Type Genres::other")));
         assertThat(metadata, has(metadata("dc.identifier.doi", "10.11234.12")));

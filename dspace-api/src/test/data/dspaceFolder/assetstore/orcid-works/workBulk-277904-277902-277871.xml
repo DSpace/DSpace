@@ -19,12 +19,22 @@
 	    <work:title>
 	        <common:title>The elements of style and the survey of ophthalmology.</common:title>
 	    </work:title>
+	    <work:citation>
+	        <work:citation-type>bibtex</work:citation-type>
+	        <work:citation-value>@article{Test,
+					doi = {10.11234.12},
+					year = 2011,
+					month = {nov},
+					publisher = {Elsevier {BV}},
+					volume = {110},
+					pages = {71--83},
+					author = {Walter White},
+					title = {Title from Bibtex: The elements of style and the survey of ophthalmology.},
+					journal = {Test Journal}
+				}
+			</work:citation-value>
+	    </work:citation>
 	    <work:type>invention</work:type>
-	    <common:publication-date>
-	        <common:year>2012</common:year>
-	        <common:month>11</common:month>
-	        <common:day>01</common:day>
-	    </common:publication-date>
 	    <common:external-ids>
 			<common:external-id>
 				<common:external-id-type>agr</common:external-id-type>

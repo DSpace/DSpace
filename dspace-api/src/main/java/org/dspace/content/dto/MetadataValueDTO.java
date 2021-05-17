@@ -11,6 +11,7 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.Choices;
+import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 
 /**
  * This class acts as Data transfer object in which we can store data like in a regular MetadataValue object, but this
@@ -79,6 +80,13 @@ public class MetadataValueDTO {
         this.qualifier = qualifier;
         this.language = language;
         this.value = value;
+    }
+
+    public MetadataValueDTO(MetadatumDTO metadata) {
+        this.schema = metadata.getSchema();
+        this.element = metadata.getElement();
+        this.qualifier = metadata.getQualifier();
+        this.value = metadata.getValue();
     }
 
     public String getSchema() {

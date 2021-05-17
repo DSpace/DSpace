@@ -14,7 +14,11 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections4.ListUtils.partition;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.dspace.content.Item.ANY;
+import static org.orcid.jaxb.model.common.CitationType.FORMATTED_UNSPECIFIED;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +26,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.dspace.app.orcid.client.OrcidClient;
@@ -37,6 +42,9 @@ import org.dspace.core.Context;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.AbstractExternalDataProvider;
 import org.dspace.external.provider.ExternalDataProvider;
+import org.dspace.importer.external.datamodel.ImportRecord;
+import org.dspace.importer.external.metadatamapping.MetadatumDTO;
+import org.dspace.importer.external.service.ImportService;
 import org.orcid.jaxb.model.common.ContributorRole;
 import org.orcid.jaxb.model.common.WorkType;
 import org.orcid.jaxb.model.v3.release.common.Contributor;
@@ -44,6 +52,7 @@ import org.orcid.jaxb.model.v3.release.common.ContributorAttributes;
 import org.orcid.jaxb.model.v3.release.common.PublicationDate;
 import org.orcid.jaxb.model.v3.release.common.Subtitle;
 import org.orcid.jaxb.model.v3.release.common.Title;
+import org.orcid.jaxb.model.v3.release.record.Citation;
 import org.orcid.jaxb.model.v3.release.record.ExternalIDs;
 import org.orcid.jaxb.model.v3.release.record.SourceAware;
 import org.orcid.jaxb.model.v3.release.record.Work;
@@ -52,6 +61,8 @@ import org.orcid.jaxb.model.v3.release.record.WorkContributors;
 import org.orcid.jaxb.model.v3.release.record.WorkTitle;
 import org.orcid.jaxb.model.v3.release.record.summary.WorkGroup;
 import org.orcid.jaxb.model.v3.release.record.summary.WorkSummary;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -66,6 +77,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
 
+    private final static Logger LOGGER = LoggerFactory.getLogger(OrcidPublicationDataProvider.class);
+
     private final static int MAX_PUT_CODES_SIZE = 100;
 
     @Autowired
@@ -79,6 +92,9 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
 
     @Autowired
     private OrcidSynchronizationService orcidSynchronizationService;
+
+    @Autowired
+    private ImportService importService;
 
     private OrcidWorkFieldMapping fieldMapping;
 
@@ -222,6 +238,12 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
             addMetadataValues(externalDataObject, externalIdField, () -> getExternalIds(work, type));
         }
 
+        try {
+            addMetadataValuesFromCitation(externalDataObject, work.getWorkCitation());
+        } catch (Exception e) {
+            LOGGER.error("An error occurs reading the following citation: " + work.getWorkCitation().getCitation(), e);
+        }
+
         return externalDataObject;
     }
 
@@ -325,6 +347,45 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
             .map(contributor -> getContributorName(contributor))
             .flatMap(Optional::stream)
             .collect(Collectors.toList());
+    }
+
+    private void addMetadataValuesFromCitation(ExternalDataObject externalDataObject, Citation citation)
+        throws Exception {
+
+        if (citation == null || citation.getWorkCitationType() == FORMATTED_UNSPECIFIED) {
+            return;
+        }
+
+        getImportRecord(citation).ifPresent(importRecord -> enrichExternalDataObject(externalDataObject, importRecord));
+
+    }
+
+    private Optional<ImportRecord> getImportRecord(Citation citation) throws Exception {
+        File citationFile = File.createTempFile("temp", "." + citation.getWorkCitationType().value());
+        try (FileOutputStream outputStream = new FileOutputStream(citationFile)) {
+            IOUtils.write(citation.getCitation(), new FileOutputStream(citationFile), Charset.defaultCharset());
+            return Optional.ofNullable(importService.getRecord(citationFile, citationFile.getName()));
+        } finally {
+            citationFile.delete();
+        }
+    }
+
+    private void enrichExternalDataObject(ExternalDataObject externalDataObject, ImportRecord importRecord) {
+        importRecord.getValueList().stream()
+            .filter(metadata -> doesNotContains(externalDataObject, metadata))
+            .forEach(metadata -> addMetadata(externalDataObject, metadata));
+    }
+
+    private void addMetadata(ExternalDataObject externalDataObject, MetadatumDTO metadata) {
+        externalDataObject.addMetadata(new MetadataValueDTO(metadata));
+    }
+
+    private boolean doesNotContains(ExternalDataObject externalDataObject, MetadatumDTO metadata) {
+        return externalDataObject.getMetadata().stream()
+            .filter(metadataValue -> StringUtils.equals(metadataValue.getSchema(), metadata.getSchema()))
+            .filter(metadataValue -> StringUtils.equals(metadataValue.getElement(), metadata.getElement()))
+            .filter(metadataValue -> StringUtils.equals(metadataValue.getQualifier(), metadata.getQualifier()))
+            .findAny().isEmpty();
     }
 
     private boolean hasRole(Contributor contributor, ContributorRole role) {
