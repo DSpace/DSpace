@@ -950,7 +950,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .andExpect(jsonPath("$.orcid", is("0000-1111-2222-3333")))
             .andExpect(jsonPath("$.orcidSynchronization.mode", is("MANUAL")))
             .andExpect(jsonPath("$.orcidSynchronization.publicationsPreference", is("DISABLED")))
-            .andExpect(jsonPath("$.orcidSynchronization.projectsPreference", is("DISABLED")))
+            .andExpect(jsonPath("$.orcidSynchronization.fundingsPreference", is("DISABLED")))
             .andExpect(jsonPath("$.orcidSynchronization.profilePreferences", empty()));
 
         String itemId = getItemIdByProfileId(authToken, ePersonId);
@@ -1027,7 +1027,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
     }
 
     @Test
-    public void testPatchToSetOrcidSynchronizationPreferenceForProjects() throws Exception {
+    public void testPatchToSetOrcidSynchronizationPreferenceForFundings() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -1052,31 +1052,31 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(status().isCreated());
 
-        List<Operation> operations = asList(new ReplaceOperation("/orcid/projects", ALL.name()));
+        List<Operation> operations = asList(new ReplaceOperation("/orcid/fundings", ALL.name()));
 
         getClient(authToken).perform(patch("/api/cris/profiles/{id}", ePersonId)
             .content(getPatchContent(operations))
             .contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.orcidSynchronization.projectsPreference", is(ALL.name())));
+            .andExpect(jsonPath("$.orcidSynchronization.fundingsPreference", is(ALL.name())));
 
         getClient(authToken).perform(get("/api/cris/profiles/{id}", ePersonId))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.orcidSynchronization.projectsPreference", is(ALL.name())));
+            .andExpect(jsonPath("$.orcidSynchronization.fundingsPreference", is(ALL.name())));
 
-        operations = asList(new ReplaceOperation("/orcid/projects", MINE.name()));
+        operations = asList(new ReplaceOperation("/orcid/fundings", MINE.name()));
 
         getClient(authToken).perform(patch("/api/cris/profiles/{id}", ePersonId)
             .content(getPatchContent(operations))
             .contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.orcidSynchronization.projectsPreference", is(MINE.name())));
+            .andExpect(jsonPath("$.orcidSynchronization.fundingsPreference", is(MINE.name())));
 
         getClient(authToken).perform(get("/api/cris/profiles/{id}", ePersonId))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.orcidSynchronization.projectsPreference", is(MINE.name())));
+            .andExpect(jsonPath("$.orcidSynchronization.fundingsPreference", is(MINE.name())));
 
-        operations = asList(new ReplaceOperation("/orcid/projects", "INVALID_VALUE"));
+        operations = asList(new ReplaceOperation("/orcid/fundings", "INVALID_VALUE"));
 
         getClient(authToken).perform(patch("/api/cris/profiles/{id}", ePersonId)
             .content(getPatchContent(operations))

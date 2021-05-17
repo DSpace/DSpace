@@ -7,22 +7,18 @@
  */
 package org.dspace.app.orcid.model.factory.impl;
 
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.dspace.app.orcid.model.factory.OrcidFactoryUtils.parseConfigurations;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Currency;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.dspace.app.orcid.model.OrcidEntityType;
+import org.dspace.app.orcid.model.OrcidFundingFieldMapping;
 import org.dspace.app.orcid.model.factory.OrcidCommonObjectFactory;
 import org.dspace.app.orcid.model.factory.OrcidEntityFactory;
-import org.dspace.app.orcid.model.factory.OrcidFactoryUtils;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
@@ -30,6 +26,7 @@ import org.dspace.core.Context;
 import org.orcid.jaxb.model.common.FundingContributorRole;
 import org.orcid.jaxb.model.common.FundingType;
 import org.orcid.jaxb.model.common.Relationship;
+import org.orcid.jaxb.model.v3.release.common.Amount;
 import org.orcid.jaxb.model.v3.release.common.FuzzyDate;
 import org.orcid.jaxb.model.v3.release.common.Organization;
 import org.orcid.jaxb.model.v3.release.common.Title;
@@ -41,6 +38,8 @@ import org.orcid.jaxb.model.v3.release.record.Funding;
 import org.orcid.jaxb.model.v3.release.record.FundingContributor;
 import org.orcid.jaxb.model.v3.release.record.FundingContributors;
 import org.orcid.jaxb.model.v3.release.record.FundingTitle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -52,29 +51,19 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class OrcidFundingFactory implements OrcidEntityFactory {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrcidFundingFactory.class);
+
     @Autowired
     private ItemService itemService;
 
     @Autowired
     private OrcidCommonObjectFactory orcidCommonObjectFactory;
 
-    private Map<String, FundingContributorRole> contributorFields;
-
-    private Map<String, String> externalIdentifierFields;
-
-    private String titleField;
-
-    private String startDateField;
-
-    private String endDateField;
-
-    private String descriptionField;
-
-    private String organizationField;
+    private OrcidFundingFieldMapping fieldMapping;
 
     @Override
     public OrcidEntityType getEntityType() {
-        return OrcidEntityType.PROJECT;
+        return OrcidEntityType.FUNDING;
     }
 
     @Override
@@ -89,12 +78,13 @@ public class OrcidFundingFactory implements OrcidEntityFactory {
         funding.setTitle(getTitle(context, item));
         funding.setType(getType(context, item));
         funding.setUrl(getUrl(context, item));
+        funding.setAmount(getAmount(context, item));
         return funding;
     }
 
     private FundingContributors getContributors(Context context, Item item) {
         FundingContributors fundingContributors = new FundingContributors();
-        getMetadataValues(context, item, contributorFields.keySet()).stream()
+        getMetadataValues(context, item, fieldMapping.getContributorFields().keySet()).stream()
             .map(metadataValue -> getFundingContributor(context, metadataValue))
             .filter(Optional::isPresent)
             .map(Optional::get)
@@ -103,19 +93,20 @@ public class OrcidFundingFactory implements OrcidEntityFactory {
     }
 
     private Optional<FundingContributor> getFundingContributor(Context context, MetadataValue metadataValue) {
-        FundingContributorRole role = contributorFields.get(metadataValue.getMetadataField().toString('.'));
+        String metadataField = metadataValue.getMetadataField().toString('.');
+        FundingContributorRole role = fieldMapping.getContributorFields().get(metadataField);
         return orcidCommonObjectFactory.createFundingContributor(context, metadataValue, role);
     }
 
 
     private String getDescription(Context context, Item item) {
-        return getMetadataValue(context, item, descriptionField)
+        return getMetadataValue(context, item, fieldMapping.getDescriptionField())
             .map(MetadataValue::getValue)
             .orElse(null);
     }
 
     private FuzzyDate getEndDate(Context context, Item item) {
-        return getMetadataValue(context, item, endDateField)
+        return getMetadataValue(context, item, fieldMapping.getEndDateField())
             .flatMap(metadataValue -> orcidCommonObjectFactory.createFuzzyDate(metadataValue))
             .orElse(null);
     }
@@ -123,7 +114,7 @@ public class OrcidFundingFactory implements OrcidEntityFactory {
     private ExternalIDs getExternalIds(Context context, Item item) {
         ExternalIDs externalIdentifiers = new ExternalIDs();
 
-        getMetadataValues(context, item, externalIdentifierFields.keySet()).stream()
+        getMetadataValues(context, item, fieldMapping.getExternalIdentifierFields().keySet()).stream()
             .map(this::getExternalId)
             .forEach(externalIdentifiers.getExternalIdentifier()::add);
 
@@ -132,7 +123,7 @@ public class OrcidFundingFactory implements OrcidEntityFactory {
 
     private ExternalID getExternalId(MetadataValue metadataValue) {
         String metadataField = metadataValue.getMetadataField().toString('.');
-        return getExternalId(externalIdentifierFields.get(metadataField), metadataValue.getValue());
+        return getExternalId(fieldMapping.getExternalIdentifierFields().get(metadataField), metadataValue.getValue());
     }
 
     private ExternalID getExternalId(String type, String value) {
@@ -144,20 +135,19 @@ public class OrcidFundingFactory implements OrcidEntityFactory {
     }
 
     private Organization getOrganization(Context context, Item item) {
-        return getMetadataValue(context, item, organizationField)
+        return getMetadataValue(context, item, fieldMapping.getOrganizationField())
             .flatMap(metadataValue -> orcidCommonObjectFactory.createOrganization(context, metadataValue))
             .orElse(null);
     }
 
     private FuzzyDate getStartDate(Context context, Item item) {
-        return getMetadataValue(context, item, startDateField)
+        return getMetadataValue(context, item, fieldMapping.getStartDateField())
             .flatMap(metadataValue -> orcidCommonObjectFactory.createFuzzyDate(metadataValue))
             .orElse(null);
     }
 
     private FundingTitle getTitle(Context context, Item item) {
-        return getMetadataValue(context, item, titleField)
-            .filter(metadataValue -> isNotBlank(metadataValue.getValue()))
+        return getMetadataValue(context, item, fieldMapping.getTitleField())
             .map(metadataValue -> getFundingTitle(context, metadataValue))
             .orElse(null);
     }
@@ -169,11 +159,51 @@ public class OrcidFundingFactory implements OrcidEntityFactory {
     }
 
     private FundingType getType(Context context, Item item) {
-        return FundingType.GRANT;
+        return getMetadataValue(context, item, fieldMapping.getTypeField())
+            .map(type -> fieldMapping.convertType(type.getValue()))
+            .flatMap(this::getFundingType)
+            .orElse(null);
+    }
+
+    private Optional<FundingType> getFundingType(String type) {
+        try {
+            return Optional.ofNullable(FundingType.fromValue(type));
+        } catch (IllegalArgumentException ex) {
+            LOGGER.warn("The type {} is not valid for ORCID fundings", type);
+            return Optional.empty();
+        }
     }
 
     private Url getUrl(Context context, Item item) {
         return orcidCommonObjectFactory.createUrl(context, item).orElse(null);
+    }
+
+    private Amount getAmount(Context context, Item item) {
+        return getMetadataValue(context, item, fieldMapping.getAmountField())
+            .flatMap(amount -> getAmount(context, item, amount.getValue()))
+            .orElse(null);
+    }
+
+    private Optional<Amount> getAmount(Context context, Item item, String amount) {
+        return getMetadataValue(context, item, fieldMapping.getAmountCurrencyField())
+            .map(currency -> fieldMapping.convertAmountCurrency(currency.getValue()))
+            .filter(currency -> isValidCurrency(currency))
+            .map(currency -> getAmount(amount, currency));
+    }
+
+    private boolean isValidCurrency(String currency) {
+        try {
+            return currency != null && Currency.getInstance(currency) != null;
+        } catch (IllegalArgumentException ex) {
+            return false;
+        }
+    }
+
+    private Amount getAmount(String amount, String currency) {
+        Amount amountObj = new Amount();
+        amountObj.setContent(amount);
+        amountObj.setCurrencyCode(currency);
+        return amountObj;
     }
 
     private List<MetadataValue> getMetadataValues(Context context, Item item, Collection<String> metadataFields) {
@@ -183,84 +213,16 @@ public class OrcidFundingFactory implements OrcidEntityFactory {
     }
 
     private Optional<MetadataValue> getMetadataValue(Context context, Item item, String metadataField) {
-        return itemService.getMetadataByMetadataString(item, metadataField).stream().findFirst();
+        return itemService.getMetadataByMetadataString(item, metadataField).stream().findFirst()
+            .filter(metadataValue -> isNotBlank(metadataValue.getValue()));
     }
 
-    private Map<String, FundingContributorRole> parseContributors(String contributors) {
-        Map<String, String> contributorsMap = parseConfigurations(contributors);
-        return contributorsMap.keySet().stream()
-            .collect(toMap(identity(), field -> parseContributorRole(contributorsMap.get(field))));
+    public OrcidFundingFieldMapping getFieldMapping() {
+        return fieldMapping;
     }
 
-    private FundingContributorRole parseContributorRole(String contributorRole) {
-        try {
-            return FundingContributorRole.fromValue(contributorRole);
-        } catch (IllegalArgumentException ex) {
-            throw new IllegalArgumentException("The funding contributor role " + contributorRole +
-                " is invalid, allowed values are " + getAllowedContributorRoles(), ex);
-        }
-    }
-
-    private List<String> getAllowedContributorRoles() {
-        return Arrays.asList(FundingContributorRole.values()).stream()
-            .map(FundingContributorRole::value)
-            .collect(Collectors.toList());
-    }
-
-    public Map<String, String> getExternalIdentifierFields() {
-        return externalIdentifierFields;
-    }
-
-    public void setExternalIdentifierFields(String externalIdentifierFields) {
-        this.externalIdentifierFields = OrcidFactoryUtils.parseConfigurations(externalIdentifierFields);
-    }
-
-    public Map<String, FundingContributorRole> getContributorFields() {
-        return contributorFields;
-    }
-
-    public void setContributorFields(String contributorFields) {
-        this.contributorFields = parseContributors(contributorFields);
-    }
-
-    public String getTitleField() {
-        return titleField;
-    }
-
-    public void setTitleField(String titleField) {
-        this.titleField = titleField;
-    }
-
-    public String getStartDateField() {
-        return startDateField;
-    }
-
-    public void setStartDateField(String startDateField) {
-        this.startDateField = startDateField;
-    }
-
-    public String getEndDateField() {
-        return endDateField;
-    }
-
-    public void setEndDateField(String endDateField) {
-        this.endDateField = endDateField;
-    }
-
-    public String getDescriptionField() {
-        return descriptionField;
-    }
-
-    public void setDescriptionField(String descriptionField) {
-        this.descriptionField = descriptionField;
-    }
-
-    public String getOrganizationField() {
-        return organizationField;
-    }
-
-    public void setOrganizationField(String organizationField) {
-        this.organizationField = organizationField;
+    public void setFieldMapping(OrcidFundingFieldMapping fieldMapping) {
+        this.fieldMapping = fieldMapping;
     }
 
 }

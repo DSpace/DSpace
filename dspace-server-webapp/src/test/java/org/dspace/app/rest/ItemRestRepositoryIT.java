@@ -3677,7 +3677,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void testDeletionOfProjectToBeSynchronizedWithOrcid() throws Exception {
+    public void testDeletionOfFundingToBeSynchronizedWithOrcid() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -3690,9 +3690,9 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
             .withEntityType("Person")
             .build();
 
-        Collection projectCollection = CollectionBuilder.createCollection(context, parentCommunity)
-            .withName("Projects")
-            .withEntityType("Project")
+        Collection fundingCollection = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("Fundings")
+            .withEntityType("Funding")
             .build();
 
         Item firstProfile = ItemBuilder.createItem(context, profileCollection)
@@ -3700,7 +3700,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
             .withCrisOwner(eperson)
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
-            .withOrcidSynchronizationProjectsPreference(ALL)
+            .withOrcidSynchronizationFundingsPreference(ALL)
             .build();
 
         Item secondProfile = ItemBuilder.createItem(context, profileCollection)
@@ -3715,33 +3715,33 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
             .withCrisOwner(eperson)
             .withOrcidIdentifier("5555-1111-2222-3333")
             .withOrcidAccessToken("cb4d18a0-8d9a-40f1-b601-a417255c8d20")
-            .withOrcidSynchronizationProjectsPreference(ALL)
+            .withOrcidSynchronizationFundingsPreference(ALL)
             .build();
 
-        Item project = ItemBuilder.createItem(context, projectCollection)
-            .withTitle("Test project")
+        Item funding = ItemBuilder.createItem(context, fundingCollection)
+            .withTitle("Test funding")
             .build();
 
-        createOrcidQueue(context, firstProfile, project).build();
-        createOrcidQueue(context, secondProfile, project).build();
+        createOrcidQueue(context, firstProfile, funding).build();
+        createOrcidQueue(context, secondProfile, funding).build();
 
         List<OrcidHistory> historyRecords = new ArrayList<OrcidHistory>();
-        historyRecords.add(createOrcidHistory(context, firstProfile, project).build());
-        historyRecords.add(createOrcidHistory(context, firstProfile, project).withPutCode("12345").build());
-        historyRecords.add(createOrcidHistory(context, secondProfile, project).build());
-        historyRecords.add(createOrcidHistory(context, secondProfile, project).withPutCode("67891").build());
-        historyRecords.add(createOrcidHistory(context, thirdProfile, project).build());
+        historyRecords.add(createOrcidHistory(context, firstProfile, funding).build());
+        historyRecords.add(createOrcidHistory(context, firstProfile, funding).withPutCode("12345").build());
+        historyRecords.add(createOrcidHistory(context, secondProfile, funding).build());
+        historyRecords.add(createOrcidHistory(context, secondProfile, funding).withPutCode("67891").build());
+        historyRecords.add(createOrcidHistory(context, thirdProfile, funding).build());
 
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(delete("/api/core/items/" + project.getID()))
+        getClient(token).perform(delete("/api/core/items/" + funding.getID()))
             .andExpect(status().is(204));
 
         List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
         assertThat(orcidQueueRecords, hasSize(1));
-        assertThat(orcidQueueRecords, hasItem(matches(firstProfile, null, "Project", "12345", DELETE)));
+        assertThat(orcidQueueRecords, hasItem(matches(firstProfile, null, "Funding", "12345", DELETE)));
 
         for (OrcidHistory historyRecord : historyRecords) {
             historyRecord = context.reloadEntity(historyRecord);

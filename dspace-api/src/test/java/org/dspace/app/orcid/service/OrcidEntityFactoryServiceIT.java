@@ -73,7 +73,7 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
 
     private Collection publications;
 
-    private Collection projects;
+    private Collection fundings;
 
     @Before
     public void setup() {
@@ -101,9 +101,9 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
             .withEntityType("Publication")
             .build();
 
-        projects = CollectionBuilder.createCollection(context, parentCommunity)
+        fundings = CollectionBuilder.createCollection(context, parentCommunity)
             .withName("Collection")
-            .withEntityType("Project")
+            .withEntityType("Funding")
             .build();
 
         context.restoreAuthSystemState();
@@ -220,33 +220,40 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
             .withOrgUnitCrossrefIdentifier("12345")
             .build();
 
-        Item project = ItemBuilder.createItem(context, projects)
-            .withTitle("Test project")
-            .withProjectStartDate("2001-03")
-            .withProjectEndDate("2010-03-25")
-            .withProjectCoordinator("4Science", orgUnit.getID().toString())
-            .withProjectInvestigator("Walter White")
-            .withProjectInvestigator("Jesse Pinkman", investigator.getID().toString())
-            .withProjectCoinvestigators("Mario Rossi")
+        Item fundingItem = ItemBuilder.createItem(context, fundings)
+            .withTitle("Test funding")
+            .withType("Contract")
+            .withFundingStartDate("2001-03")
+            .withFundingEndDate("2010-03-25")
+            .withFunder("4Science", orgUnit.getID().toString())
+            .withFundingInvestigator("Walter White")
+            .withFundingInvestigator("Jesse Pinkman", investigator.getID().toString())
+            .withFundingCoInvestigator("Mario Rossi")
             .withInternalId("888-666-444")
-            .withUrlIdentifier("www.test.com")
-            .withDescriptionAbstract("This is a project to test orcid mapping")
+            .withFundingAwardUrl("www.test.com")
+            .withFundingIdentifier("000-111-333")
+            .withDescription("This is a funding to test orcid mapping")
+            .withAmount("200000")
+            .withAmountCurrency("Euro")
             .build();
 
         context.restoreAuthSystemState();
 
-        Activity activity = entityFactoryService.createOrcidObject(context, project);
+        Activity activity = entityFactoryService.createOrcidObject(context, fundingItem);
         assertThat(activity, instanceOf(Funding.class));
 
         Funding funding = (Funding) activity;
         assertThat(funding.getTitle(), notNullValue());
         assertThat(funding.getTitle().getTitle(), notNullValue());
-        assertThat(funding.getTitle().getTitle().getContent(), is("Test project"));
+        assertThat(funding.getTitle().getTitle().getContent(), is("Test funding"));
         assertThat(funding.getStartDate(), matches(date("2001", "03", "01")));
         assertThat(funding.getEndDate(), matches(date("2010", "03", "25")));
-        assertThat(funding.getDescription(), is("This is a project to test orcid mapping"));
-        assertThat(funding.getType(), is(FundingType.GRANT));
-        assertThat(funding.getUrl(), matches(urlEndsWith(project.getHandle())));
+        assertThat(funding.getDescription(), is("This is a funding to test orcid mapping"));
+        assertThat(funding.getType(), is(FundingType.CONTRACT));
+        assertThat(funding.getUrl(), matches(urlEndsWith(fundingItem.getHandle())));
+        assertThat(funding.getAmount(), notNullValue());
+        assertThat(funding.getAmount().getContent(), is("200000"));
+        assertThat(funding.getAmount().getCurrencyCode(), is("EUR"));
 
         Organization organization = funding.getOrganization();
         assertThat(organization, notNullValue());
@@ -270,9 +277,51 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
         assertThat(funding.getExternalIdentifiers(), notNullValue());
 
         List<ExternalID> externalIds = funding.getExternalIdentifiers().getExternalIdentifier();
-        assertThat(externalIds, hasSize(2));
+        assertThat(externalIds, hasSize(3));
         assertThat(externalIds, has(externalId("other-id", "888-666-444")));
         assertThat(externalIds, has(externalId("uri", "www.test.com")));
+        assertThat(externalIds, has(externalId("grant_number", "000-111-333")));
+    }
+
+    @Test
+    public void testFundingCreationWithoutAmountCurrency() {
+        context.turnOffAuthorisationSystem();
+
+        Item fundingItem = ItemBuilder.createItem(context, fundings)
+            .withTitle("Test funding")
+            .withType("Gift")
+            .withFundingStartDate("2001-03")
+            .withFundingEndDate("2010-03-25")
+            .withFundingInvestigator("Walter White")
+            .withAmount("200000")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        Activity activity = entityFactoryService.createOrcidObject(context, fundingItem);
+        assertThat(activity, instanceOf(Funding.class));
+
+        Funding funding = (Funding) activity;
+        assertThat(funding.getTitle(), notNullValue());
+        assertThat(funding.getTitle().getTitle(), notNullValue());
+        assertThat(funding.getTitle().getTitle().getContent(), is("Test funding"));
+        assertThat(funding.getStartDate(), matches(date("2001", "03", "01")));
+        assertThat(funding.getEndDate(), matches(date("2010", "03", "25")));
+        assertThat(funding.getDescription(), nullValue());
+        assertThat(funding.getType(), is(FundingType.GRANT));
+        assertThat(funding.getUrl(), matches(urlEndsWith(fundingItem.getHandle())));
+        assertThat(funding.getAmount(), nullValue());
+        assertThat(funding.getOrganization(), nullValue());
+
+        FundingContributors fundingContributors = funding.getContributors();
+        assertThat(fundingContributors, notNullValue());
+
+        List<FundingContributor> contributors = fundingContributors.getContributor();
+        assertThat(contributors, hasSize(1));
+        assertThat(contributors, has(fundingContributor("Walter White", LEAD)));
+
+        assertThat(funding.getExternalIdentifiers(), notNullValue());
+        assertThat(funding.getExternalIdentifiers().getExternalIdentifier(), empty());
     }
 
     private Predicate<ExternalID> externalId(String type, String value) {

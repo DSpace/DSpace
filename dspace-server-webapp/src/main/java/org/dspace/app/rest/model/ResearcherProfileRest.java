@@ -93,7 +93,7 @@ public class ResearcherProfileRest extends BaseObjectRest<UUID> {
 
         private String publicationsPreference;
 
-        private String projectsPreference;
+        private String fundingsPreference;
 
         private List<String> profilePreferences;
 
@@ -121,12 +121,12 @@ public class ResearcherProfileRest extends BaseObjectRest<UUID> {
             this.publicationsPreference = publicationsPreference;
         }
 
-        public String getProjectsPreference() {
-            return projectsPreference;
+        public String getFundingsPreference() {
+            return fundingsPreference;
         }
 
-        public void setProjectsPreference(String projectsPreference) {
-            this.projectsPreference = projectsPreference;
+        public void setFundingsPreference(String fundingsPreference) {
+            this.fundingsPreference = fundingsPreference;
         }
 
     }

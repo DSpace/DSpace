@@ -533,7 +533,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
-    public void testOrcidQueueRecordCreationForProject() throws Exception {
+    public void testOrcidQueueRecordCreationForFunding() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -541,14 +541,14 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
             .withTitle("Test User")
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
-            .withOrcidSynchronizationProjectsPreference(ALL)
+            .withOrcidSynchronizationFundingsPreference(ALL)
             .build();
 
-        Collection projectCollection = createCollection("Projects", "Project");
+        Collection fundingCollection = createCollection("Fundings", "Funding");
 
-        Item project = ItemBuilder.createItem(context, projectCollection)
-            .withTitle("Test project")
-            .withProjectCoordinator("Test User", profile.getID().toString())
+        Item funding = ItemBuilder.createItem(context, fundingCollection)
+            .withTitle("Test funding")
+            .withFundingInvestigator("Test User", profile.getID().toString())
             .build();
 
         context.restoreAuthSystemState();
@@ -556,9 +556,9 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
         assertThat(orcidQueueRecords, hasSize(1));
-        assertThat(orcidQueueRecords.get(0), matches(profile, project, "Project", null, INSERT));
+        assertThat(orcidQueueRecords.get(0), matches(profile, funding, "Funding", null, INSERT));
 
-        addMetadata(project, "dc", "type", null, "Project type", null);
+        addMetadata(funding, "dc", "type", null, "Funding type", null);
         context.commit();
 
         List<OrcidQueue> newOrcidQueueRecords = orcidQueueService.findAll(context);
@@ -568,7 +568,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
-    public void testOrcidQueueRecordCreationToUpdateProject() throws Exception {
+    public void testOrcidQueueRecordCreationToUpdateFunding() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -576,31 +576,31 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
             .withTitle("Test User")
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
-            .withOrcidSynchronizationProjectsPreference(ALL)
+            .withOrcidSynchronizationFundingsPreference(ALL)
             .build();
 
-        Collection projectCollection = createCollection("Projects", "Project");
+        Collection fundingCollection = createCollection("Fundings", "Funding");
 
-        Item project = ItemBuilder.createItem(context, projectCollection)
-            .withTitle("Test project")
+        Item funding = ItemBuilder.createItem(context, fundingCollection)
+            .withTitle("Test funding")
             .build();
 
-        createOrcidHistory(context, profile, project)
+        createOrcidHistory(context, profile, funding)
             .withPutCode("123456")
             .build();
 
-        addMetadata(project, "crispj", "coordinator", null, "Test User", profile.getID().toString());
+        addMetadata(funding, "crisfund", "coinvestigators", null, "Test User", profile.getID().toString());
 
         context.restoreAuthSystemState();
         context.commit();
 
         List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
         assertThat(orcidQueueRecords, hasSize(1));
-        assertThat(orcidQueueRecords.get(0), matches(profile, project, "Project", "123456", UPDATE));
+        assertThat(orcidQueueRecords.get(0), matches(profile, funding, "Funding", "123456", UPDATE));
     }
 
     @Test
-    public void testNoOrcidQueueRecordCreationOccursIfProjectSynchronizationIsDisabled() throws Exception {
+    public void testNoOrcidQueueRecordCreationOccursIfFundingSynchronizationIsDisabled() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -610,11 +610,11 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
             .build();
 
-        Collection projectCollection = createCollection("Projects", "Project");
+        Collection fundingCollection = createCollection("Fundings", "Funding");
 
-        Item project = ItemBuilder.createItem(context, projectCollection)
-            .withTitle("Test project")
-            .withProjectCoordinator("Test User", profile.getID().toString())
+        Item funding = ItemBuilder.createItem(context, fundingCollection)
+            .withTitle("Test funding")
+            .withFundingInvestigator("Test User", profile.getID().toString())
             .build();
 
         context.restoreAuthSystemState();
@@ -622,8 +622,8 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         assertThat(orcidQueueService.findAll(context), empty());
 
-        addMetadata(profile, "cris", "orcid", "sync-projects", DISABLED.name(), null);
-        addMetadata(project, "crispj", "partnerou", null, "Partner", null);
+        addMetadata(profile, "cris", "orcid", "sync-fundings", DISABLED.name(), null);
+        addMetadata(funding, "crispj", "partnerou", null, "Partner", null);
         context.commit();
 
         assertThat(orcidQueueService.findAll(context), empty());
@@ -639,12 +639,12 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
             .build();
 
-        Collection projectCollection = createCollection("Projects", "Project");
+        Collection fundingCollection = createCollection("Fundings", "Funding");
 
-        ItemBuilder.createItem(context, projectCollection)
-            .withTitle("Test project")
-            .withOrcidSynchronizationProjectsPreference(ALL)
-            .withProjectCoordinator("Test User", profile.getID().toString())
+        ItemBuilder.createItem(context, fundingCollection)
+            .withTitle("Test funding")
+            .withOrcidSynchronizationFundingsPreference(ALL)
+            .withFundingInvestigator("Test User", profile.getID().toString())
             .build();
 
         context.restoreAuthSystemState();
@@ -663,12 +663,12 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
             .withOrcidIdentifier("0000-1111-2222-3333")
             .build();
 
-        Collection projectCollection = createCollection("Projects", "Project");
+        Collection fundingCollection = createCollection("Fundings", "Funding");
 
-        ItemBuilder.createItem(context, projectCollection)
-            .withTitle("Test project")
-            .withOrcidSynchronizationProjectsPreference(ALL)
-            .withProjectCoordinator("Test User", profile.getID().toString())
+        ItemBuilder.createItem(context, fundingCollection)
+            .withTitle("Test funding")
+            .withOrcidSynchronizationFundingsPreference(ALL)
+            .withFundingInvestigator("Test User", profile.getID().toString())
             .build();
 
         context.restoreAuthSystemState();

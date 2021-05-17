@@ -16,11 +16,12 @@ package org.dspace.app.orcid.model.validator;
  */
 public enum OrcidValidationError {
 
+    AMOUNT_CURRENCY_REQUIRED("amount-currency.required"),
     EXTERNAL_ID_REQUIRED("external-id.required"),
     TITLE_REQUIRED("title.required"),
     TYPE_REQUIRED("type.required"),
     START_DATE_REQUIRED("start-date.required"),
-    PROJECT_COORDINATOR_REQUIRED("project.coordinator.required"),
+    FUNDER_REQUIRED("funder.required"),
     ORGANIZATION_REQUIRED("organization.required"),
     ORGANIZATION_NAME_REQUIRED("organization.name-required"),
     ORGANIZATION_ADDRESS_REQUIRED("organization.address-required"),

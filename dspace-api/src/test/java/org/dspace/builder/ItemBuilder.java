@@ -215,12 +215,12 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return setMetadataSingleValue(item, "cris", "orcid", "sync-publications", value);
     }
 
-    public ItemBuilder withOrcidSynchronizationProjectsPreference(OrcidEntitySyncPreference value) {
-        return withOrcidSynchronizationProjectsPreference(value.name());
+    public ItemBuilder withOrcidSynchronizationFundingsPreference(OrcidEntitySyncPreference value) {
+        return withOrcidSynchronizationFundingsPreference(value.name());
     }
 
-    public ItemBuilder withOrcidSynchronizationProjectsPreference(String value) {
-        return setMetadataSingleValue(item, "cris", "orcid", "sync-projects", value);
+    public ItemBuilder withOrcidSynchronizationFundingsPreference(String value) {
+        return setMetadataSingleValue(item, "cris", "orcid", "sync-fundings", value);
     }
 
     public ItemBuilder withOrcidSynchronizationProfilePreference(OrcidProfileSyncPreference value) {
@@ -584,6 +584,22 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "oairecerif", "funding", "identifier", identifier);
     }
 
+    public ItemBuilder withFundingInvestigator(String investigator) {
+        return addMetadataValue(item, "crisfund", "investigators", null, investigator);
+    }
+
+    public ItemBuilder withFundingInvestigator(String investigator, String authority) {
+        return addMetadataValue(item, "crisfund", "investigators", null, null, investigator, authority, 600);
+    }
+
+    public ItemBuilder withFundingCoInvestigator(String investigator) {
+        return addMetadataValue(item, "crisfund", "coinvestigators", null, investigator);
+    }
+
+    public ItemBuilder withFundingCoInvestigator(String investigator, String authority) {
+        return addMetadataValue(item, "crisfund", "coinvestigators", null, null, investigator, authority, 600);
+    }
+
     public ItemBuilder withAmount(String amount) {
         return addMetadataValue(item, "oairecerif", "amount", null, amount);
     }
@@ -598,6 +614,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withFundingEndDate(String endDate) {
         return addMetadataValue(item, "oairecerif", "funding", "endDate", endDate);
+    }
+
+    public ItemBuilder withFundingAwardUrl(String url) {
+        return addMetadataValue(item, "crisfund", "award", "url", url);
     }
 
     public ItemBuilder withCrisSourceId(String sourceId) {

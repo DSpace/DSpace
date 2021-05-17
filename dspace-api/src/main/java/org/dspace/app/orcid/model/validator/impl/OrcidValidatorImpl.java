@@ -10,17 +10,18 @@ package org.dspace.app.orcid.model.validator.impl;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.ArrayUtils.contains;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.dspace.app.orcid.model.validator.OrcidValidationError.AMOUNT_CURRENCY_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.DISAMBIGUATED_ORGANIZATION_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.DISAMBIGUATED_ORGANIZATION_VALUE_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.DISAMBIGUATION_SOURCE_INVALID;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.DISAMBIGUATION_SOURCE_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.EXTERNAL_ID_REQUIRED;
+import static org.dspace.app.orcid.model.validator.OrcidValidationError.FUNDER_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_ADDRESS_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_CITY_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_COUNTRY_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_NAME_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_REQUIRED;
-import static org.dspace.app.orcid.model.validator.OrcidValidationError.PROJECT_COORDINATOR_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.START_DATE_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.TITLE_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.TYPE_REQUIRED;
@@ -113,9 +114,13 @@ public class OrcidValidatorImpl implements OrcidValidator {
         }
 
         if (funding.getOrganization() == null) {
-            errors.add(PROJECT_COORDINATOR_REQUIRED);
+            errors.add(FUNDER_REQUIRED);
         } else {
             errors.addAll(validate(funding.getOrganization()));
+        }
+
+        if (funding.getAmount() != null && isBlank(funding.getAmount().getCurrencyCode())) {
+            errors.add(AMOUNT_CURRENCY_REQUIRED);
         }
 
         return errors;

@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.converter;
 
-import static org.dspace.app.orcid.model.OrcidEntityType.PROJECT;
+import static org.dspace.app.orcid.model.OrcidEntityType.FUNDING;
 import static org.dspace.app.orcid.model.OrcidEntityType.PUBLICATION;
 
 import java.util.List;
@@ -54,7 +54,7 @@ public class ResearcherProfileConverter implements DSpaceConverter<ResearcherPro
             OrcidSynchronizationRest orcidSynchronization = new OrcidSynchronizationRest();
             orcidSynchronization.setMode(getMode(item));
             orcidSynchronization.setProfilePreferences(getProfilePreferences(item));
-            orcidSynchronization.setProjectsPreference(getProjectsPreference(item));
+            orcidSynchronization.setFundingsPreference(getFundingsPreference(item));
             orcidSynchronization.setPublicationsPreference(getPublicationsPreference(item));
             researcherProfileRest.setOrcidSynchronization(orcidSynchronization);
         }
@@ -68,8 +68,8 @@ public class ResearcherProfileConverter implements DSpaceConverter<ResearcherPro
             .orElse(OrcidEntitySyncPreference.DISABLED.name());
     }
 
-    private String getProjectsPreference(Item item) {
-        return orcidSynchronizationService.getEntityPreference(item, PROJECT)
+    private String getFundingsPreference(Item item) {
+        return orcidSynchronizationService.getEntityPreference(item, FUNDING)
             .map(OrcidEntitySyncPreference::name)
             .orElse(OrcidEntitySyncPreference.DISABLED.name());
     }

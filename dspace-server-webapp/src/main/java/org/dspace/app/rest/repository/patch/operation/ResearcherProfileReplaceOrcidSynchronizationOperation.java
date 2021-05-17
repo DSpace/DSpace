@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.repository.patch.operation;
 
-import static org.dspace.app.orcid.model.OrcidEntityType.PROJECT;
+import static org.dspace.app.orcid.model.OrcidEntityType.FUNDING;
 import static org.dspace.app.orcid.model.OrcidEntityType.PUBLICATION;
 
 import java.sql.SQLException;
@@ -51,7 +51,7 @@ public class ResearcherProfileReplaceOrcidSynchronizationOperation extends Patch
 
     private static final String PUBLICATIONS_PREFERENCES = "/publications";
 
-    private static final String PROJECTS_PREFERENCES = "/projects";
+    private static final String FUNDINGS_PREFERENCES = "/fundings";
 
     private static final String PROFILE_PREFERENCES = "/profile";
 
@@ -81,8 +81,8 @@ public class ResearcherProfileReplaceOrcidSynchronizationOperation extends Patch
             case PUBLICATIONS_PREFERENCES:
                 synchronizationService.setEntityPreference(context, profileItem, PUBLICATION, parsePreference(value));
                 break;
-            case PROJECTS_PREFERENCES:
-                synchronizationService.setEntityPreference(context, profileItem, PROJECT, parsePreference(value));
+            case FUNDINGS_PREFERENCES:
+                synchronizationService.setEntityPreference(context, profileItem, FUNDING, parsePreference(value));
                 break;
             case PROFILE_PREFERENCES:
                 synchronizationService.setProfilePreference(context, profileItem, parseProfilePreferences(value));

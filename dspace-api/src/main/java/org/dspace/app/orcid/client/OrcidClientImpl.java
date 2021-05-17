@@ -86,7 +86,7 @@ public class OrcidClientImpl implements OrcidClient {
     private static Map<Class<?>, String> initializePathsMap() {
         Map<Class<?>, String> map = new HashMap<Class<?>, String>();
         map.put(Work.class, OrcidEntityType.PUBLICATION.getPath());
-        map.put(Funding.class, OrcidEntityType.PROJECT.getPath());
+        map.put(Funding.class, OrcidEntityType.FUNDING.getPath());
         map.put(Employment.class, OrcidProfileSectionType.AFFILIATION.getPath());
         map.put(Education.class, OrcidProfileSectionType.EDUCATION.getPath());
         map.put(Qualification.class, OrcidProfileSectionType.QUALIFICATION.getPath());

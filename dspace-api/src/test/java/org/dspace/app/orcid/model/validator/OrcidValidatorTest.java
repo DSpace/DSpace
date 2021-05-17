@@ -7,17 +7,18 @@
  */
 package org.dspace.app.orcid.model.validator;
 
+import static org.dspace.app.orcid.model.validator.OrcidValidationError.AMOUNT_CURRENCY_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.DISAMBIGUATED_ORGANIZATION_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.DISAMBIGUATED_ORGANIZATION_VALUE_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.DISAMBIGUATION_SOURCE_INVALID;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.DISAMBIGUATION_SOURCE_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.EXTERNAL_ID_REQUIRED;
+import static org.dspace.app.orcid.model.validator.OrcidValidationError.FUNDER_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_ADDRESS_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_CITY_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_COUNTRY_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_NAME_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_REQUIRED;
-import static org.dspace.app.orcid.model.validator.OrcidValidationError.PROJECT_COORDINATOR_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.START_DATE_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.TITLE_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.TYPE_REQUIRED;
@@ -40,6 +41,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.orcid.jaxb.model.common.Iso3166Country;
 import org.orcid.jaxb.model.common.Relationship;
 import org.orcid.jaxb.model.common.WorkType;
+import org.orcid.jaxb.model.v3.release.common.Amount;
 import org.orcid.jaxb.model.v3.release.common.Day;
 import org.orcid.jaxb.model.v3.release.common.DisambiguatedOrganization;
 import org.orcid.jaxb.model.v3.release.common.FuzzyDate;
@@ -204,8 +206,7 @@ public class OrcidValidatorTest {
 
         List<OrcidValidationError> errors = validator.validateFunding(new Funding());
         assertThat(errors, hasSize(3));
-        assertThat(errors, containsInAnyOrder(EXTERNAL_ID_REQUIRED,
-            PROJECT_COORDINATOR_REQUIRED, TITLE_REQUIRED));
+        assertThat(errors, containsInAnyOrder(EXTERNAL_ID_REQUIRED, FUNDER_REQUIRED, TITLE_REQUIRED));
     }
 
     @Test
@@ -217,7 +218,7 @@ public class OrcidValidatorTest {
 
         List<OrcidValidationError> errors = validator.validateFunding(funding);
         assertThat(errors, hasSize(2));
-        assertThat(errors, containsInAnyOrder(EXTERNAL_ID_REQUIRED, PROJECT_COORDINATOR_REQUIRED));
+        assertThat(errors, containsInAnyOrder(EXTERNAL_ID_REQUIRED, FUNDER_REQUIRED));
     }
 
     @Test
@@ -229,7 +230,7 @@ public class OrcidValidatorTest {
 
         List<OrcidValidationError> errors = validator.validateFunding(funding);
         assertThat(errors, hasSize(2));
-        assertThat(errors, containsInAnyOrder(TITLE_REQUIRED, PROJECT_COORDINATOR_REQUIRED));
+        assertThat(errors, containsInAnyOrder(TITLE_REQUIRED, FUNDER_REQUIRED));
     }
 
     @Test
@@ -478,6 +479,40 @@ public class OrcidValidatorTest {
         List<OrcidValidationError> errors = validator.validateFunding(funding);
         assertThat(errors, hasSize(1));
         assertThat(errors, containsInAnyOrder(DISAMBIGUATION_SOURCE_INVALID));
+    }
+
+    @Test
+    public void testFundingWithoutAmountCurrency() {
+        Funding funding = new Funding();
+        funding.setTitle(new FundingTitle());
+        funding.getTitle().setTitle(new Title("Title"));
+
+        funding.setExternalIdentifiers(new ExternalIDs());
+        funding.getExternalIdentifiers().getExternalIdentifier().add(buildValidExternalID());
+
+        funding.setOrganization(buildValidOrganization());
+
+        funding.setAmount(new Amount());
+        funding.getAmount().setContent("20000");
+
+        List<OrcidValidationError> errors = validator.validateFunding(funding);
+        assertThat(errors, hasSize(1));
+        assertThat(errors, containsInAnyOrder(AMOUNT_CURRENCY_REQUIRED));
+    }
+
+    @Test
+    public void testValidFunding() {
+        Funding funding = new Funding();
+        funding.setTitle(new FundingTitle());
+        funding.getTitle().setTitle(new Title("Title"));
+
+        funding.setExternalIdentifiers(new ExternalIDs());
+        funding.getExternalIdentifiers().getExternalIdentifier().add(buildValidExternalID());
+
+        funding.setOrganization(buildValidOrganization());
+
+        List<OrcidValidationError> errors = validator.validateFunding(funding);
+        assertThat(errors, empty());
     }
 
     @Test

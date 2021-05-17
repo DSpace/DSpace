@@ -18,7 +18,7 @@ import org.apache.commons.lang3.EnumUtils;
 public enum OrcidEntityType {
 
     PUBLICATION("/work"),
-    PROJECT("/funding");
+    FUNDING("/funding");
 
     private final String path;
 

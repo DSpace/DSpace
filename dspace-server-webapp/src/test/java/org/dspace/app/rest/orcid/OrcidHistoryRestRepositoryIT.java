@@ -710,12 +710,12 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     @Test
-    public void testCreationForProjectInsert() throws Exception {
+    public void testCreationForFundingInsert() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
-        Collection projects = CollectionBuilder.createCollection(context, parentCommunity)
-            .withEntityType("Project")
+        Collection fundings = CollectionBuilder.createCollection(context, parentCommunity)
+            .withEntityType("Funding")
             .withName("Collection 3")
             .build();
 
@@ -731,17 +731,17 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
             .withOrgUnitCrossrefIdentifier("12345")
             .build();
 
-        Item project = ItemBuilder.createItem(context, projects)
-            .withTitle("Test project")
-            .withProjectStartDate("2013-08-03")
+        Item funding = ItemBuilder.createItem(context, fundings)
+            .withTitle("Test funding")
+            .withFundingStartDate("2013-08-03")
             .withInternalId("888-666-444")
-            .withProjectCoordinator("4Science", orgUnit.getID().toString())
+            .withFunder("4Science", orgUnit.getID().toString())
             .build();
 
-        OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, profile, project)
-            .withDescription("Test project")
+        OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, profile, funding)
+            .withDescription("Test funding")
             .withOperation(OrcidOperation.INSERT)
-            .withRecordType("Project")
+            .withRecordType("Funding")
             .build();
 
         context.restoreAuthSystemState();
@@ -765,7 +765,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
                     hasJsonPath("$.ownerId", is(profile.getID().toString())),
-                    hasJsonPath("$.entityId", is(project.getID().toString())),
+                    hasJsonPath("$.entityId", is(funding.getID().toString())),
                     hasJsonPath("$.status", is(201)),
                     hasJsonPath("$.putCode", is("12345")),
                     hasJsonPath("$.type", is("orcidhistory")))));
@@ -782,22 +782,22 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
         Object sentObject = captor.getValue();
         assertThat(sentObject, instanceOf(Funding.class));
 
-        Funding funding = (Funding) sentObject;
-        assertThat(funding.getPutCode(), nullValue());
-        assertThat(funding.getTitle().getTitle().getContent(), is("Test project"));
-        assertThat(funding.getStartDate(), matches(date("2013", "08", "03")));
+        Funding sentFunding = (Funding) sentObject;
+        assertThat(sentFunding.getPutCode(), nullValue());
+        assertThat(sentFunding.getTitle().getTitle().getContent(), is("Test funding"));
+        assertThat(sentFunding.getStartDate(), matches(date("2013", "08", "03")));
 
         verifyNoMoreInteractions(orcidClientMock);
 
     }
 
     @Test
-    public void testCreationForProjectInsertWithOrcidClientException() throws Exception {
+    public void testCreationForFundingInsertWithOrcidClientException() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
-        Collection projects = CollectionBuilder.createCollection(context, parentCommunity)
-            .withEntityType("Project")
+        Collection fundings = CollectionBuilder.createCollection(context, parentCommunity)
+            .withEntityType("Funding")
             .withName("Collection 3")
             .build();
 
@@ -813,17 +813,17 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
             .withOrgUnitCrossrefIdentifier("12345")
             .build();
 
-        Item project = ItemBuilder.createItem(context, projects)
-            .withTitle("Test project")
-            .withProjectStartDate("2013-08-03")
+        Item funding = ItemBuilder.createItem(context, fundings)
+            .withTitle("Test funding")
+            .withFundingStartDate("2013-08-03")
             .withInternalId("888-666-444")
-            .withProjectCoordinator("4Science", orgUnit.getID().toString())
+            .withFunder("4Science", orgUnit.getID().toString())
             .build();
 
-        OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, profile, project)
-            .withDescription("Test project")
+        OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, profile, funding)
+            .withDescription("Test funding")
             .withOperation(OrcidOperation.INSERT)
-            .withRecordType("Project")
+            .withRecordType("Funding")
             .build();
 
         context.restoreAuthSystemState();
@@ -848,7 +848,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
                     hasJsonPath("$.ownerId", is(profile.getID().toString())),
-                    hasJsonPath("$.entityId", is(project.getID().toString())),
+                    hasJsonPath("$.entityId", is(funding.getID().toString())),
                     hasJsonPath("$.responseMessage", is("Invalid resource")),
                     hasJsonPath("$.status", is(400)),
                     hasJsonPath("$.putCode", nullValue()),
@@ -866,12 +866,12 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     @Test
-    public void testCreationForProjectInsertWithGenericException() throws Exception {
+    public void testCreationForFundingInsertWithGenericException() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
-        Collection projects = CollectionBuilder.createCollection(context, parentCommunity)
-            .withEntityType("Project")
+        Collection fundings = CollectionBuilder.createCollection(context, parentCommunity)
+            .withEntityType("Funding")
             .withName("Collection 3")
             .build();
 
@@ -887,17 +887,17 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
             .withOrgUnitCrossrefIdentifier("12345")
             .build();
 
-        Item project = ItemBuilder.createItem(context, projects)
-            .withTitle("Test project")
-            .withProjectStartDate("2013-08-03")
+        Item funding = ItemBuilder.createItem(context, fundings)
+            .withTitle("Test funding")
+            .withFundingStartDate("2013-08-03")
             .withInternalId("888-666-444")
-            .withProjectCoordinator("4Science", orgUnit.getID().toString())
+            .withFunder("4Science", orgUnit.getID().toString())
             .build();
 
-        OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, profile, project)
-            .withDescription("Test project")
+        OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, profile, funding)
+            .withDescription("Test funding")
             .withOperation(OrcidOperation.INSERT)
-            .withRecordType("Project")
+            .withRecordType("Funding")
             .build();
 
         context.restoreAuthSystemState();
@@ -922,7 +922,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
                     hasJsonPath("$.ownerId", is(profile.getID().toString())),
-                    hasJsonPath("$.entityId", is(project.getID().toString())),
+                    hasJsonPath("$.entityId", is(funding.getID().toString())),
                     hasJsonPath("$.responseMessage", is("GENERIC ERROR")),
                     hasJsonPath("$.status", is(500)),
                     hasJsonPath("$.putCode", nullValue()),
@@ -940,12 +940,12 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     @Test
-    public void testCreationForProjectUpdate() throws Exception {
+    public void testCreationForFundingUpdate() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
-        Collection projects = CollectionBuilder.createCollection(context, parentCommunity)
-            .withEntityType("Project")
+        Collection fundings = CollectionBuilder.createCollection(context, parentCommunity)
+            .withEntityType("Funding")
             .withName("Collection 3")
             .build();
 
@@ -961,17 +961,17 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
             .withOrgUnitCrossrefIdentifier("12345")
             .build();
 
-        Item project = ItemBuilder.createItem(context, projects)
-            .withTitle("Test project")
-            .withProjectStartDate("2013-08-03")
+        Item funding = ItemBuilder.createItem(context, fundings)
+            .withTitle("Test funding")
+            .withFundingStartDate("2013-08-03")
             .withInternalId("888-666-444")
-            .withProjectCoordinator("4Science", orgUnit.getID().toString())
+            .withFunder("4Science", orgUnit.getID().toString())
             .build();
 
-        OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, profile, project)
-            .withDescription("Test project")
+        OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, profile, funding)
+            .withDescription("Test funding")
             .withOperation(OrcidOperation.UPDATE)
-            .withRecordType("Project")
+            .withRecordType("Funding")
             .withPutCode("12345")
             .build();
 
@@ -997,7 +997,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
                     hasJsonPath("$.ownerId", is(profile.getID().toString())),
-                    hasJsonPath("$.entityId", is(project.getID().toString())),
+                    hasJsonPath("$.entityId", is(funding.getID().toString())),
                     hasJsonPath("$.status", is(200)),
                     hasJsonPath("$.putCode", is("12345")),
                     hasJsonPath("$.type", is("orcidhistory")))));
@@ -1014,20 +1014,20 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
         Object sentObject = captor.getValue();
         assertThat(sentObject, instanceOf(Funding.class));
 
-        Funding funding = (Funding) sentObject;
-        assertThat(funding.getPutCode(), is(12345L));
-        assertThat(funding.getTitle().getTitle().getContent(), is("Test project"));
-        assertThat(funding.getStartDate(), matches(date("2013", "08", "03")));
+        Funding sentFunding = (Funding) sentObject;
+        assertThat(sentFunding.getPutCode(), is(12345L));
+        assertThat(sentFunding.getTitle().getTitle().getContent(), is("Test funding"));
+        assertThat(sentFunding.getStartDate(), matches(date("2013", "08", "03")));
 
         verifyNoMoreInteractions(orcidClientMock);
 
     }
 
     @Test
-    public void testCreationForProjectDeletion() throws Exception {
+    public void testCreationForFundingDeletion() throws Exception {
 
         context.turnOffAuthorisationSystem();
-        OrcidQueue orcidQueue = createOrcidQueue(context, profile, "Description", "Project", "12345").build();
+        OrcidQueue orcidQueue = createOrcidQueue(context, profile, "Description", "Funding", "12345").build();
         context.restoreAuthSystemState();
 
         when(orcidClientMock.deleteByPutCode(ACCESS_TOKEN, ORCID, "12345", "/funding")).thenReturn(deletedResponse());
@@ -1066,12 +1066,12 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     @Test
-    public void testWithInvalidProject() throws Exception {
+    public void testWithInvalidFunding() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
-        Collection projects = CollectionBuilder.createCollection(context, parentCommunity)
-            .withEntityType("Project")
+        Collection fundings = CollectionBuilder.createCollection(context, parentCommunity)
+            .withEntityType("Funding")
             .withName("Collection 3")
             .build();
 
@@ -1086,17 +1086,17 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
             .withOrgUnitCrossrefIdentifier("12345")
             .build();
 
-        Item project = ItemBuilder.createItem(context, projects)
-            .withTitle("Test project")
-            .withProjectStartDate("2013-08-03")
+        Item funding = ItemBuilder.createItem(context, fundings)
+            .withTitle("Test funding")
+            .withFundingStartDate("2013-08-03")
             .withInternalId("888-666-444")
-            .withProjectCoordinator("4Science", orgUnit.getID().toString())
+            .withFunder("4Science", orgUnit.getID().toString())
             .build();
 
-        OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, profile, project)
-            .withDescription("Test project")
+        OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, profile, funding)
+            .withDescription("Test funding")
             .withOperation(OrcidOperation.INSERT)
-            .withRecordType("Project")
+            .withRecordType("Funding")
             .build();
 
         context.restoreAuthSystemState();
