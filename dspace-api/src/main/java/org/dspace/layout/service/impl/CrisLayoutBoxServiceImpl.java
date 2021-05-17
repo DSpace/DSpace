@@ -297,7 +297,9 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
     }
 
     private boolean hasOrcidSyncBoxContent(Context context, CrisLayoutBox box, List<MetadataValue> values) {
-        return isOwnProfile(context, values) && findFirstByMetadataField(values, "person.identifier.orcid") != null;
+        return isOwnProfile(context, values)
+            && findFirstByMetadataField(values, "person.identifier.orcid") != null
+            && findFirstByMetadataField(values, "cris.orcid.access-token") != null;
     }
 
     private boolean hasOrcidAuthorizationsBoxContent(Context context, CrisLayoutBox box, List<MetadataValue> values) {

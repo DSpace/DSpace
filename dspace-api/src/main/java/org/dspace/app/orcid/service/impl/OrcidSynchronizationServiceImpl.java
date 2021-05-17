@@ -13,6 +13,7 @@ import static org.apache.commons.lang3.EnumUtils.isValidEnum;
 import static org.dspace.app.profile.OrcidEntitySyncPreference.DISABLED;
 
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,14 +24,19 @@ import org.dspace.app.orcid.model.OrcidEntityType;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.app.orcid.service.OrcidSynchronizationService;
+import org.dspace.app.orcid.service.OrcidWebhookService;
 import org.dspace.app.profile.OrcidEntitySyncPreference;
 import org.dspace.app.profile.OrcidProfileDisconnectionMode;
 import org.dspace.app.profile.OrcidProfileSyncPreference;
 import org.dspace.app.profile.OrcidSynchronizationMode;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.DiscoverResultItemIterator;
+import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -51,6 +57,9 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
     @Autowired
     private ConfigurationService configurationService;
 
+    @Autowired
+    private OrcidWebhookService orcidWebhookService;
+
     @Override
     public void linkProfile(Context context, Item profile, OrcidTokenResponseDTO token)
         throws SQLException {
@@ -68,14 +77,22 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
             itemService.addMetadata(context, profile, "cris", "orcid", "scope", null, scope);
         }
 
+        updateItem(context, profile);
+
     }
 
     @Override
     public void unlinkProfile(Context context, Item profile) throws SQLException {
+
+        if (orcidWebhookService.isProfileRegistered(profile)) {
+            orcidWebhookService.unregister(context, profile);
+        }
+
         itemService.clearMetadata(context, profile, "person", "identifier", "orcid", Item.ANY);
         itemService.clearMetadata(context, profile, "cris", "orcid", "access-token", Item.ANY);
         itemService.clearMetadata(context, profile, "cris", "orcid", "refresh-token", Item.ANY);
         itemService.clearMetadata(context, profile, "cris", "orcid", "scope", Item.ANY);
+        updateItem(context, profile);
 
         List<OrcidQueue> queueRecords = orcidQueueService.findByOwnerId(context, profile.getID());
         for (OrcidQueue queueRecord : queueRecords) {
@@ -114,21 +131,6 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
         itemService.setMetadataSingleValue(context, profile, "cris", "orcid", "sync-mode", null, value.name());
     }
 
-    private void updatePreferenceForSynchronizingWithOrcid(Context context, Item profile,
-        String metadataQualifier, List<String> values) throws SQLException {
-
-        if (!isLinkedToOrcid(profile)) {
-            throw new IllegalArgumentException("The given profile cannot be configured for the ORCID "
-                + "synchronization because it is not linked to any ORCID account: " + profile.getID());
-        }
-
-        itemService.clearMetadata(context, profile, "cris", "orcid", metadataQualifier, Item.ANY);
-        for (String value : values) {
-            itemService.addMetadata(context, profile, "cris", "orcid", metadataQualifier, null, value);
-        }
-
-    }
-
     @Override
     public boolean isSynchronizationEnabled(Item profile, Item item) {
 
@@ -143,7 +145,7 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
                 .isPresent();
         }
 
-        if (entityType.equals("Person")) {
+        if (entityType.equals(getProfileType())) {
             return profile.equals(item) && !isEmpty(getProfilePreferences(profile));
         }
 
@@ -181,6 +183,44 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
         return getOrcidAccessToken(item).isPresent() && getOrcid(item).isPresent();
     }
 
+    @Override
+    public OrcidProfileDisconnectionMode getDisconnectionMode() {
+        String value = configurationService.getProperty("orcid.disconnection.allowed-users");
+        if (!OrcidProfileDisconnectionMode.isValid(value)) {
+            return OrcidProfileDisconnectionMode.DISABLED;
+        }
+        return OrcidProfileDisconnectionMode.fromString(value);
+    }
+
+    @Override
+    public Iterator<Item> findProfilesByOrcid(Context context, String orcid) {
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.setDSpaceObjectFilter(IndexableItem.TYPE);
+        discoverQuery.addFilterQueries("search.entitytype:" + getProfileType());
+        discoverQuery.addFilterQueries("person.identifier.orcid:" + orcid);
+        return new DiscoverResultItemIterator(context, discoverQuery);
+    }
+
+    @Override
+    public Iterator<Item> findProfilesWithOrcid(Context context) {
+        return findProfilesByOrcid(context, "*");
+    }
+
+    private void updatePreferenceForSynchronizingWithOrcid(Context context, Item profile,
+        String metadataQualifier, List<String> values) throws SQLException {
+
+        if (!isLinkedToOrcid(profile)) {
+            throw new IllegalArgumentException("The given profile cannot be configured for the ORCID "
+                + "synchronization because it is not linked to any ORCID account: " + profile.getID());
+        }
+
+        itemService.clearMetadata(context, profile, "cris", "orcid", metadataQualifier, Item.ANY);
+        for (String value : values) {
+            itemService.addMetadata(context, profile, "cris", "orcid", metadataQualifier, null, value);
+        }
+
+    }
+
     private Optional<String> getOrcidAccessToken(Item item) {
         return getMetadataValue(item, "cris.orcid.access-token")
             .map(metadataValue -> metadataValue.getValue());
@@ -200,13 +240,19 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
             .filter(metadata -> metadataField.equals(metadata.getMetadataField().toString('.')));
     }
 
-    @Override
-    public OrcidProfileDisconnectionMode getDisconnectionMode() {
-        String value = configurationService.getProperty("orcid.disconnection.allowed-users");
-        if (!OrcidProfileDisconnectionMode.isValid(value)) {
-            return OrcidProfileDisconnectionMode.DISABLED;
+    private String getProfileType() {
+        return configurationService.getProperty("researcher-profile.type", "Person");
+    }
+
+    private void updateItem(Context context, Item item) throws SQLException {
+        try {
+            context.turnOffAuthorisationSystem();
+            itemService.update(context, item);
+        } catch (AuthorizeException e) {
+            throw new RuntimeException(e);
+        } finally {
+            context.restoreAuthSystemState();
         }
-        return OrcidProfileDisconnectionMode.fromString(value);
     }
 
 }

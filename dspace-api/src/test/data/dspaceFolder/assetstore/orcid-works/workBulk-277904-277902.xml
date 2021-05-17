@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bulk:bulk xmlns:internal="http://www.orcid.org/ns/internal" xmlns:education="http://www.orcid.org/ns/education" xmlns:distinction="http://www.orcid.org/ns/distinction" xmlns:deprecated="http://www.orcid.org/ns/deprecated" xmlns:other-name="http://www.orcid.org/ns/other-name" xmlns:membership="http://www.orcid.org/ns/membership" xmlns:error="http://www.orcid.org/ns/error" xmlns:common="http://www.orcid.org/ns/common" xmlns:record="http://www.orcid.org/ns/record" xmlns:personal-details="http://www.orcid.org/ns/personal-details" xmlns:keyword="http://www.orcid.org/ns/keyword" xmlns:email="http://www.orcid.org/ns/email" xmlns:external-identifier="http://www.orcid.org/ns/external-identifier" xmlns:funding="http://www.orcid.org/ns/funding" xmlns:preferences="http://www.orcid.org/ns/preferences" xmlns:address="http://www.orcid.org/ns/address" xmlns:invited-position="http://www.orcid.org/ns/invited-position" xmlns:work="http://www.orcid.org/ns/work" xmlns:history="http://www.orcid.org/ns/history" xmlns:employment="http://www.orcid.org/ns/employment" xmlns:qualification="http://www.orcid.org/ns/qualification" xmlns:service="http://www.orcid.org/ns/service" xmlns:person="http://www.orcid.org/ns/person" xmlns:activities="http://www.orcid.org/ns/activities" xmlns:researcher-url="http://www.orcid.org/ns/researcher-url" xmlns:peer-review="http://www.orcid.org/ns/peer-review" xmlns:bulk="http://www.orcid.org/ns/bulk" xmlns:research-resource="http://www.orcid.org/ns/research-resource">
+	<work:work put-code="277904" path="/0000-0001-9227-636X/work/277904" visibility="public" xmlns:internal="http://www.orcid.org/ns/internal" xmlns:education="http://www.orcid.org/ns/education" xmlns:distinction="http://www.orcid.org/ns/distinction" xmlns:deprecated="http://www.orcid.org/ns/deprecated" xmlns:other-name="http://www.orcid.org/ns/other-name" xmlns:membership="http://www.orcid.org/ns/membership" xmlns:error="http://www.orcid.org/ns/error" xmlns:common="http://www.orcid.org/ns/common" xmlns:record="http://www.orcid.org/ns/record" xmlns:personal-details="http://www.orcid.org/ns/personal-details" xmlns:keyword="http://www.orcid.org/ns/keyword" xmlns:email="http://www.orcid.org/ns/email" xmlns:external-identifier="http://www.orcid.org/ns/external-identifier" xmlns:funding="http://www.orcid.org/ns/funding" xmlns:preferences="http://www.orcid.org/ns/preferences" xmlns:address="http://www.orcid.org/ns/address" xmlns:invited-position="http://www.orcid.org/ns/invited-position" xmlns:work="http://www.orcid.org/ns/work" xmlns:history="http://www.orcid.org/ns/history" xmlns:employment="http://www.orcid.org/ns/employment" xmlns:qualification="http://www.orcid.org/ns/qualification" xmlns:service="http://www.orcid.org/ns/service" xmlns:person="http://www.orcid.org/ns/person" xmlns:activities="http://www.orcid.org/ns/activities" xmlns:researcher-url="http://www.orcid.org/ns/researcher-url" xmlns:peer-review="http://www.orcid.org/ns/peer-review" xmlns:bulk="http://www.orcid.org/ns/bulk" xmlns:research-resource="http://www.orcid.org/ns/research-resource">
+	    <common:created-date>2014-01-22T19:11:57.160Z</common:created-date>
+	    <common:last-modified-date>2015-06-19T19:14:26.350Z</common:last-modified-date>
+	    <common:source>
+	        <common:source-orcid>
+	            <common:uri>https://sandbox.orcid.org/0000-0002-4105-0763</common:uri>
+	            <common:path>0000-0002-4105-0763</common:path>
+	            <common:host>sandbox.orcid.org</common:host>
+	        </common:source-orcid>
+	        <common:source-client-id>
+	            <common:uri>https://sandbox.orcid.org/client/0000-0002-4105-0763</common:uri>
+	            <common:path>0000-0002-4105-0763</common:path>
+	            <common:host>sandbox.orcid.org</common:host>
+	        </common:source-client-id>
+	        <common:source-name>BU Profiles to ORCID Integration Site</common:source-name>
+	    </common:source>
+	    <work:title>
+	        <common:title>The elements of style and the survey of ophthalmology.</common:title>
+	    </work:title>
+	    <work:citation>
+	        <work:citation-type>bibtex</work:citation-type>
+	        <work:citation-value>@article{Test,
+					doi = {10.11234.12},
+					year = 2011,
+					month = {nov},
+					publisher = {Elsevier {BV}},
+					volume = {110},
+					pages = {71--83},
+					author = {Walter White},
+					title = {Title from Bibtex: The elements of style and the survey of ophthalmology.},
+					journal = {Test Journal}
+				}
+			</work:citation-value>
+	    </work:citation>
+	    <work:type>invention</work:type>
+	    <common:external-ids>
+			<common:external-id>
+				<common:external-id-type>agr</common:external-id-type>
+				<common:external-id-value>work:external-identifier-id</common:external-id-value>			
+				<common:external-id-url>http://orcid.org</common:external-id-url>
+				<common:external-id-relationship>version-of</common:external-id-relationship>
+			</common:external-id>
+			<common:external-id>
+				<common:external-id-type>doi</common:external-id-type>
+				<common:external-id-value>10.11234.12</common:external-id-value>			
+				<common:external-id-url>http://orcid.org</common:external-id-url>
+				<common:external-id-relationship>self</common:external-id-relationship>
+			</common:external-id>
+		</common:external-ids>
+		<work:contributors>
+			<work:contributor>
+				<work:credit-name>Walter White</work:credit-name>
+				<work:contributor-email>walter@test.com</work:contributor-email>
+				<work:contributor-attributes>
+					<work:contributor-sequence>first</work:contributor-sequence>
+					<work:contributor-role>author</work:contributor-role>
+				</work:contributor-attributes>
+			</work:contributor>
+		</work:contributors>
+		<common:language-code>it</common:language-code>
+	</work:work>
+	<work:work put-code="277902" path="/0000-0001-9227-636X/work/277902" visibility="public" xmlns:internal="http://www.orcid.org/ns/internal" xmlns:education="http://www.orcid.org/ns/education" xmlns:distinction="http://www.orcid.org/ns/distinction" xmlns:deprecated="http://www.orcid.org/ns/deprecated" xmlns:other-name="http://www.orcid.org/ns/other-name" xmlns:membership="http://www.orcid.org/ns/membership" xmlns:error="http://www.orcid.org/ns/error" xmlns:common="http://www.orcid.org/ns/common" xmlns:record="http://www.orcid.org/ns/record" xmlns:personal-details="http://www.orcid.org/ns/personal-details" xmlns:keyword="http://www.orcid.org/ns/keyword" xmlns:email="http://www.orcid.org/ns/email" xmlns:external-identifier="http://www.orcid.org/ns/external-identifier" xmlns:funding="http://www.orcid.org/ns/funding" xmlns:preferences="http://www.orcid.org/ns/preferences" xmlns:address="http://www.orcid.org/ns/address" xmlns:invited-position="http://www.orcid.org/ns/invited-position" xmlns:work="http://www.orcid.org/ns/work" xmlns:history="http://www.orcid.org/ns/history" xmlns:employment="http://www.orcid.org/ns/employment" xmlns:qualification="http://www.orcid.org/ns/qualification" xmlns:service="http://www.orcid.org/ns/service" xmlns:person="http://www.orcid.org/ns/person" xmlns:activities="http://www.orcid.org/ns/activities" xmlns:researcher-url="http://www.orcid.org/ns/researcher-url" xmlns:peer-review="http://www.orcid.org/ns/peer-review" xmlns:bulk="http://www.orcid.org/ns/bulk" xmlns:research-resource="http://www.orcid.org/ns/research-resource">
+	    <common:created-date>2014-01-22T19:11:57.159Z</common:created-date>
+	    <common:last-modified-date>2015-06-19T19:14:26.327Z</common:last-modified-date>
+	    <common:source>
+	        <common:source-orcid>
+	            <common:uri>https://sandbox.orcid.org/0000-0002-4105-0763</common:uri>
+	            <common:path>0000-0002-4105-0763</common:path>
+	            <common:host>sandbox.orcid.org</common:host>
+	        </common:source-orcid>
+	        <common:source-client-id>
+	            <common:uri>https://sandbox.orcid.org/client/0000-0002-4105-0763</common:uri>
+	            <common:path>0000-0002-4105-0763</common:path>
+	            <common:host>sandbox.orcid.org</common:host>
+	        </common:source-client-id>
+	        <common:source-name>BU Profiles to ORCID Integration Site</common:source-name>
+	    </common:source>
+	    <work:title>
+	        <common:title>Another cautionary tale.</common:title>
+	    </work:title>
+		<work:journal-title>Journal title</work:journal-title>
+		<work:short-description>Short description</work:short-description>
+	    <work:type>journal-article</work:type>
+	    <common:publication-date>
+	        <common:year>2011</common:year>
+	        <common:month>05</common:month>
+	        <common:day>01</common:day>
+	    </common:publication-date>
+		<work:contributors>
+			<work:contributor>
+				<work:credit-name>Walter White</work:credit-name>
+				<work:contributor-email>walter@test.com</work:contributor-email>
+				<work:contributor-attributes>
+					<work:contributor-sequence>first</work:contributor-sequence>
+					<work:contributor-role>author</work:contributor-role>
+				</work:contributor-attributes>
+			</work:contributor>
+			<work:contributor>
+				<work:credit-name>John White</work:credit-name>
+				<work:contributor-email>john@test.com</work:contributor-email>
+				<work:contributor-attributes>
+					<work:contributor-sequence>additional</work:contributor-sequence>
+					<work:contributor-role>author</work:contributor-role>
+				</work:contributor-attributes>
+			</work:contributor>
+			<work:contributor>
+				<work:credit-name>Jesse Pinkman</work:credit-name>
+				<work:contributor-attributes>
+					<work:contributor-sequence>first</work:contributor-sequence>
+					<work:contributor-role>editor</work:contributor-role>
+				</work:contributor-attributes>
+			</work:contributor>
+		</work:contributors>
+	</work:work>
+</bulk:bulk>

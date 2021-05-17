@@ -7,22 +7,40 @@
  */
 package org.dspace.app.suggestion;
 
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
+
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrQuery.SortClause;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.response.FacetField;
+import org.apache.solr.client.solrj.response.FacetField.Count;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.dspace.content.Item;
+import org.dspace.content.dto.MetadataValueDTO;
+import org.dspace.content.service.ItemService;
+import org.dspace.core.Context;
+import org.dspace.core.exception.SQLRuntimeException;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.util.UUIDUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Service to deal with the local suggestion solr core used by the
@@ -32,7 +50,11 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  *
  */
 public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageService {
+
     protected SolrClient solrSuggestionClient;
+
+    @Autowired
+    private ItemService itemService;
 
     /**
      * Get solr client which use suggestion core
@@ -91,7 +113,8 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
 
     private String getFirstValue(Suggestion suggestion, String schema, String element, String qualifier) {
         return suggestion.getMetadata().stream()
-                .filter(st -> StringUtils.isNotBlank(st.getValue()) && StringUtils.equals(st.getSchema(), schema)
+            .filter(st -> StringUtils.isNotBlank(st.getValue())
+                && StringUtils.equals(st.getSchema(), schema)
                         && StringUtils.equals(st.getElement(), element)
                         && StringUtils.equals(st.getQualifier(), qualifier))
                 .map(st -> st.getValue()).findFirst().orElse(null);
@@ -145,5 +168,181 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
         getSolr().deleteByQuery(
                 SOURCE + ":" + target.getSource() + " AND " + TARGET_ID + ":" + target.getTarget().getID().toString());
         getSolr().commit();
+    }
+
+    @Override
+    public long countAllTargets(Context context, String source) throws SolrServerException, IOException {
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setRows(0);
+        solrQuery.setQuery(SOURCE + ":" + source);
+        solrQuery.addFilterQuery(PROCESSED + ":false");
+        solrQuery.setFacet(true);
+        solrQuery.setFacetMinCount(1);
+        solrQuery.addFacetField(TARGET_ID);
+        solrQuery.setFacetLimit(Integer.MAX_VALUE);
+        QueryResponse response = getSolr().query(solrQuery);
+        return response.getFacetField(TARGET_ID).getValueCount();
+    }
+
+    @Override
+    public long countUnprocessedSuggestionByTarget(Context context, String source, UUID target)
+        throws SolrServerException, IOException {
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setRows(0);
+        solrQuery.setQuery("*:*");
+        solrQuery.addFilterQuery(
+            SOURCE + ":" + source,
+            TARGET_ID + ":" + target.toString(),
+            PROCESSED + ":false");
+
+        QueryResponse response = getSolr().query(solrQuery);
+        return response.getResults().getNumFound();
+    }
+
+    @Override
+    public List<Suggestion> findAllUnprocessedSuggestions(Context context, String source, UUID target,
+        int pageSize, long offset, boolean ascending) throws SolrServerException, IOException {
+
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setRows(pageSize);
+        solrQuery.setStart((int) offset);
+        solrQuery.setQuery("*:*");
+        solrQuery.addFilterQuery(
+            SOURCE + ":" + source,
+            TARGET_ID + ":" + target.toString(),
+            PROCESSED + ":false");
+
+        if (ascending) {
+            solrQuery.addSort(SortClause.asc("trust"));
+        } else {
+            solrQuery.addSort(SortClause.desc("trust"));
+        }
+
+        solrQuery.addSort(SortClause.desc("date"));
+        solrQuery.addSort(SortClause.asc("title"));
+
+        QueryResponse response = getSolr().query(solrQuery);
+        List<Suggestion> suggestions = new ArrayList<Suggestion>();
+        for (SolrDocument solrDoc : response.getResults()) {
+            suggestions.add(convertSolrDoc(context, solrDoc, source));
+        }
+        return suggestions;
+
+    }
+
+    @Override
+    public List<SuggestionTarget> findAllTargets(Context context, String source, int pageSize, long offset)
+        throws SolrServerException, IOException {
+
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setRows(0);
+        solrQuery.setQuery(SOURCE + ":" + source);
+        solrQuery.addFilterQuery(PROCESSED + ":false");
+        solrQuery.setFacet(true);
+        solrQuery.setFacetMinCount(1);
+        solrQuery.addFacetField(TARGET_ID);
+        solrQuery.setFacetLimit((int) (pageSize + offset));
+        QueryResponse response = getSolr().query(solrQuery);
+        FacetField facetField = response.getFacetField(TARGET_ID);
+        List<SuggestionTarget> suggestionTargets = new ArrayList<SuggestionTarget>();
+        int idx = 0;
+        for (Count c : facetField.getValues()) {
+            if (idx < offset) {
+                idx++;
+                continue;
+            }
+            SuggestionTarget target = new SuggestionTarget();
+            target.setSource(source);
+            target.setTotal((int) c.getCount());
+            target.setTarget(findItem(context, c.getName()));
+            suggestionTargets.add(target);
+            idx++;
+        }
+        return suggestionTargets;
+
+    }
+
+    @Override
+    public Suggestion findUnprocessedSuggestion(Context context, String source, UUID target, String id)
+        throws SolrServerException, IOException {
+
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setRows(1);
+        solrQuery.setQuery("*:*");
+        solrQuery.addFilterQuery(
+            SOURCE + ":" + source,
+            TARGET_ID + ":" + target.toString(),
+            SUGGESTION_ID + ":\"" + id + "\"",
+            PROCESSED + ":false");
+
+        SolrDocumentList results = getSolr().query(solrQuery).getResults();
+        return isEmpty(results) ? null : convertSolrDoc(context, results.get(0), source);
+    }
+
+    @Override
+    public SuggestionTarget findTarget(Context context, String source, UUID target)
+        throws SolrServerException, IOException {
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setRows(0);
+        solrQuery.setQuery(SOURCE + ":" + source);
+        solrQuery.addFilterQuery(
+            TARGET_ID + ":" + target.toString(),
+            PROCESSED + ":false");
+        QueryResponse response = getSolr().query(solrQuery);
+        SuggestionTarget sTarget = new SuggestionTarget();
+        sTarget.setSource(source);
+        sTarget.setTotal((int) response.getResults().getNumFound());
+        Item itemTarget = findItem(context, target);
+        if (itemTarget != null) {
+            sTarget.setTarget(itemTarget);
+        } else {
+            return null;
+        }
+        return sTarget;
+    }
+
+    private Suggestion convertSolrDoc(Context context, SolrDocument solrDoc, String sourceName) {
+        Item target = findItem(context, (String) solrDoc.getFieldValue(TARGET_ID));
+
+        Suggestion suggestion = new Suggestion(sourceName, target, (String) solrDoc.getFieldValue(SUGGESTION_ID));
+        suggestion.setDisplay((String) solrDoc.getFieldValue(DISPLAY));
+        suggestion.getMetadata()
+            .add(new MetadataValueDTO("dc", "title", null, null, (String) solrDoc.getFieldValue(TITLE)));
+        suggestion.getMetadata()
+            .add(new MetadataValueDTO("dc", "date", "issued", null, (String) solrDoc.getFieldValue(DATE)));
+        suggestion.getMetadata().add(
+            new MetadataValueDTO("dc", "description", "abstract", null, (String) solrDoc.getFieldValue(ABSTRACT)));
+
+        suggestion.setExternalSourceUri((String) solrDoc.getFieldValue(EXTERNAL_URI));
+        if (solrDoc.containsKey(CATEGORY)) {
+            for (Object o : solrDoc.getFieldValues(CATEGORY)) {
+                suggestion.getMetadata().add(
+                    new MetadataValueDTO("dc", "source", null, null, (String) o));
+            }
+        }
+        if (solrDoc.containsKey(CONTRIBUTORS)) {
+            for (Object o : solrDoc.getFieldValues(CONTRIBUTORS)) {
+                suggestion.getMetadata().add(
+                    new MetadataValueDTO("dc", "contributor", "author", null, (String) o));
+            }
+        }
+        String evidencesJson = (String) solrDoc.getFieldValue(EVIDENCES);
+        Type listType = new TypeToken<ArrayList<SuggestionEvidence>>() {
+        }.getType();
+        List<SuggestionEvidence> evidences = new Gson().fromJson(evidencesJson, listType);
+        suggestion.getEvidences().addAll(evidences);
+        return suggestion;
+    }
+
+    private Item findItem(Context context, UUID itemId) {
+        try {
+            return itemService.find(context, itemId);
+        } catch (SQLException e) {
+            throw new SQLRuntimeException(e);
+        }
+    }
+
+    private Item findItem(Context context, String itemId) {
+        return findItem(context, UUIDUtils.fromString(itemId));
     }
 }

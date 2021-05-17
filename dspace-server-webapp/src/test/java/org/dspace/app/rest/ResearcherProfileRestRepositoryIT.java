@@ -27,6 +27,12 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -42,6 +48,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.jayway.jsonpath.JsonPath;
 import org.dspace.app.orcid.OrcidQueue;
+import org.dspace.app.orcid.client.OrcidClient;
+import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
+import org.dspace.app.orcid.webhook.OrcidWebhookServiceImpl;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
@@ -78,6 +87,9 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
     @Autowired
     private ItemService itemService;
+
+    @Autowired
+    private OrcidWebhookServiceImpl orcidWebhookService;
 
     private EPerson user;
 
@@ -1800,6 +1812,78 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         assertThat(getMetadataValues(profile, "cris.orcid.scope"), not(empty()));
     }
 
+    @Test
+    public void testProfileDisconnectionFromOrcidCauseOrcidWebhookUnregistration() throws Exception {
+
+        configurationService.setProperty("orcid.disconnection.allowed-users", "only_owner");
+
+        context.turnOffAuthorisationSystem();
+
+        String orcid = "0000-1111-2222-3333";
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+            .withCanLogin(true)
+            .withOrcid(orcid)
+            .withOrcidAccessToken("3de2e370-8aa9-4bbe-8d7e-f5b1577bdad4")
+            .withOrcidRefreshToken("6b29a03d-f494-4690-889f-2c0ddf26b82d")
+            .withOrcidScope("/read")
+            .withOrcidScope("/write")
+            .withEmail("test@email.it")
+            .withPassword(password)
+            .withNameInMetadata("Test", "User")
+            .build();
+
+        Item profile = createProfile(ePerson);
+
+        addMetadata(profile, "cris", "orcid", "webhook", "2020-02-02");
+
+        OrcidQueue firstQueueRecord = OrcidQueueBuilder.createOrcidQueue(context, profile, profile).build();
+        OrcidQueue secondQueueRecord = OrcidQueueBuilder.createOrcidQueue(context, profile, profile).build();
+
+        context.restoreAuthSystemState();
+
+        OrcidClient orcidClient = orcidWebhookService.getOrcidClient();
+        OrcidClient orcidClientMock = mock(OrcidClient.class);
+
+        String webhookAccessToken = "603315a5-cf2e-40ad-934a-24357a890bf9";
+        when(orcidClientMock.getWebhookAccessToken()).thenReturn(buildTokenResponse(webhookAccessToken));
+
+        try {
+
+            orcidWebhookService.setOrcidClient(orcidClientMock);
+
+            getClient(getAuthToken(ePerson.getEmail(), password))
+                .perform(patch("/api/cris/profiles/{id}", ePerson.getID().toString())
+                    .content(getPatchContent(asList(new RemoveOperation("/orcid"))))
+                    .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(ePerson.getID().toString())))
+                .andExpect(jsonPath("$.visible", is(false)))
+                .andExpect(jsonPath("$.type", is("profile")))
+                .andExpect(jsonPath("$.orcid").doesNotExist())
+                .andExpect(jsonPath("$.orcidSynchronization").doesNotExist());
+
+            assertThat(context.reloadEntity(firstQueueRecord), nullValue());
+            assertThat(context.reloadEntity(secondQueueRecord), nullValue());
+
+            profile = context.reloadEntity(profile);
+
+            assertThat(getMetadataValues(profile, "person.identifier.orcid"), empty());
+            assertThat(getMetadataValues(profile, "cris.orcid.access-token"), empty());
+            assertThat(getMetadataValues(profile, "cris.orcid.refresh-token"), empty());
+            assertThat(getMetadataValues(profile, "cris.orcid.scope"), empty());
+            assertThat(getMetadataValues(profile, "cris.orcid.webhook"), empty());
+
+            verify(orcidClientMock).getWebhookAccessToken();
+            verify(orcidClientMock).unregisterWebhook(eq(webhookAccessToken), eq(orcid), any());
+            verifyNoMoreInteractions(orcidClientMock);
+
+        } finally {
+            orcidWebhookService.setOrcidClient(orcidClient);
+        }
+
+    }
+
     private Item createProfile(EPerson ePerson) throws Exception {
 
         String authToken = getAuthToken(ePerson.getEmail(), password);
@@ -1834,5 +1918,20 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
     private <T> T readAttributeFromResponse(MvcResult result, String attribute) throws UnsupportedEncodingException {
         return JsonPath.read(result.getResponse().getContentAsString(), attribute);
+    }
+
+    private void addMetadata(Item item, String schema, String element, String qualifier,
+        String value) throws Exception {
+        context.turnOffAuthorisationSystem();
+        item = context.reloadEntity(item);
+        itemService.addMetadata(context, item, schema, element, qualifier, null, value, null, -1);
+        itemService.update(context, item);
+        context.restoreAuthSystemState();
+    }
+
+    private OrcidTokenResponseDTO buildTokenResponse(String accessToken) {
+        OrcidTokenResponseDTO response = new OrcidTokenResponseDTO();
+        response.setAccessToken(accessToken);
+        return response;
     }
 }

@@ -84,6 +84,11 @@
         <property name="description" value="Perform the bulk synchronization of all the BATCH configured ORCID entities placed in the ORCID queue"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.orcid.script.OrcidBulkSynchronization"/>
     </bean>
+    
+    <bean id="orcid-webhook" class="org.dspace.app.orcid.script.OrcidWebhookScriptConfiguration">
+        <property name="description" value="Simulates an ORCID webhook callback for all the profiles with an ORCID id set"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.orcid.script.OrcidWebhookScript"/>
+    </bean>
 
     <!-- Keep as last script; for test ScriptRestRepository#findOneScriptByNameTest -->
     <bean id="mock-script" class="org.dspace.scripts.MockDSpaceRunnableScriptConfiguration" scope="prototype">

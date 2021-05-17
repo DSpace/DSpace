@@ -91,4 +91,9 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.orcid.script.OrcidBulkSynchronization"/>
     </bean>
 
+    <bean id="orcid-webhook" class="org.dspace.app.orcid.script.OrcidWebhookScriptConfiguration">
+        <property name="description" value="Simulates an ORCID webhook callback for all the profiles with an ORCID id set"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.orcid.script.OrcidWebhookScript"/>
+    </bean>
+
 </beans>

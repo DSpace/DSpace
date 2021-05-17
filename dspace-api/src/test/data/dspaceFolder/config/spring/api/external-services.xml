@@ -91,6 +91,11 @@
         <property name="clientSecret" value="${orcid.application-client-secret}" />
         <property name="OAUTHUrl" value="${orcid.authorize-url}" />
         <property name="orcidRestConnector" ref="orcidRestConnector"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Person</value>
+            </list>
+        </property>
     </bean>
 
     <bean id="orcidRestConnector" class="org.dspace.external.OrcidRestConnector">
@@ -137,6 +142,16 @@
         <property name="metadataSource" ref="CrossRefImportService"/>
         <property name="sourceIdentifier" value="crossref"/>
         <property name="recordIdMetadata" value="dc.identifier.doi"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="orcidPublicationDataProvider" class="org.dspace.external.provider.impl.OrcidPublicationDataProvider">
+        <property name="sourceIdentifier" value="orcidWorks"/>
+        <property name="fieldMapping" ref="orcidPublicationDataProviderFieldMapping"/>
         <property name="supportedEntityTypes">
             <list>
                 <value>Publication</value>

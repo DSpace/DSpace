@@ -7,12 +7,18 @@
  */
 package org.dspace.app.orcid.factory;
 
+import static java.util.Collections.emptyList;
+
+import java.util.List;
+
 import org.dspace.app.orcid.service.MetadataSignatureGenerator;
 import org.dspace.app.orcid.service.OrcidEntityFactoryService;
 import org.dspace.app.orcid.service.OrcidHistoryService;
 import org.dspace.app.orcid.service.OrcidProfileSectionFactoryService;
 import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.app.orcid.service.OrcidSynchronizationService;
+import org.dspace.app.orcid.service.OrcidWebhookService;
+import org.dspace.app.orcid.webhook.OrcidWebhookAction;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -40,6 +46,12 @@ public class OrcidServiceFactoryImpl extends OrcidServiceFactory {
 
     @Autowired
     private MetadataSignatureGenerator metadataSignatureGenerator;
+
+    @Autowired
+    private OrcidWebhookService orcidWebhookService;
+
+    @Autowired(required = false)
+    private List<OrcidWebhookAction> orcidWebhookActions;
 
     @Override
     public OrcidHistoryService getOrcidHistoryService() {
@@ -69,6 +81,16 @@ public class OrcidServiceFactoryImpl extends OrcidServiceFactory {
     @Override
     public OrcidEntityFactoryService getOrcidEntityFactoryService() {
         return orcidEntityFactoryService;
+    }
+
+    @Override
+    public OrcidWebhookService getOrcidWebhookService() {
+        return orcidWebhookService;
+    }
+
+    @Override
+    public List<OrcidWebhookAction> getOrcidWebhookActions() {
+        return orcidWebhookActions != null ? orcidWebhookActions : emptyList();
     }
 
 }

@@ -55,7 +55,7 @@
         <property name="orcidUrl" value="${orcid.domain-url}" />
         <property name="clientId" value="${orcid.application-client-id}" />
         <property name="clientSecret" value="${orcid.application-client-secret}" />
-        <property name="OAUTHUrl" value="${orcid.authorize-url}" />
+        <property name="OAUTHUrl" value="${orcid.token-url}" />
         <property name="orcidRestConnector" ref="orcidRestConnector"/>
         <property name="supportedEntityTypes">
             <list>
@@ -205,5 +205,16 @@
         <property name="sourceIdentifier" value="openaire"/>
         <property name="recordIdMetadata" value="dc.identifier.other"/>
     </bean>
+    
+    <bean id="orcidPublicationDataProvider" class="org.dspace.external.provider.impl.OrcidPublicationDataProvider">
+        <property name="sourceIdentifier" value="orcidWorks"/>
+        <property name="fieldMapping" ref="orcidPublicationDataProviderFieldMapping"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+            </list>
+        </property>
+    </bean>
+    
 </beans>
 

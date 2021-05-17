@@ -571,7 +571,7 @@
          especially if the skipped fields are large compressed text
          fields.
     -->
-    <enableLazyFieldLoading>true</enableLazyFieldLoading>
+    <enableLazyFieldLoading>false</enableLazyFieldLoading>
 
    <!-- Use Filter For Sorted Query
 

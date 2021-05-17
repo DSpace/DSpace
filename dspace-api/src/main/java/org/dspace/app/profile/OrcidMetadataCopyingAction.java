@@ -23,6 +23,8 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
 /**
  * Implementation of {@link AfterResearcherProfileCreationAction} that copy the
@@ -31,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class OrcidMetadataCopyingAction implements AfterResearcherProfileCreationAction {
 
     @Autowired
