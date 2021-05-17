@@ -23,10 +23,12 @@ import org.apache.commons.collections4.IteratorUtils;
 import org.dspace.app.orcid.client.OrcidClient;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.app.orcid.service.OrcidSynchronizationService;
+import org.dspace.app.orcid.service.OrcidWebhookService;
 import org.dspace.app.orcid.webhook.OrcidWebhookAction;
 import org.dspace.app.profile.ResearcherProfile;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
@@ -67,6 +69,9 @@ public class OrcidRestController {
 
     @Autowired
     private OrcidSynchronizationService orcidSynchronizationService;
+
+    @Autowired
+    private OrcidWebhookService orcidWebhookService;
 
     @Autowired(required = false)
     private List<OrcidWebhookAction> orcidWebhookActions;
@@ -112,9 +117,12 @@ public class OrcidRestController {
         Context context = ContextUtil.obtainContext(request);
 
         try {
+            context.turnOffAuthorisationSystem();
             performWebhookActions(orcid, context);
         } catch (Exception ex) {
             LOGGER.error("An error occurs while processing the webhook call from ORCID", ex);
+        } finally {
+            context.restoreAuthSystemState();
         }
 
         try {
@@ -125,16 +133,18 @@ public class OrcidRestController {
 
     }
 
-    private void performWebhookActions(String orcid, Context context) {
+    private void performWebhookActions(String orcid, Context context) throws SQLException, AuthorizeException {
         Iterator<Item> iterator = orcidSynchronizationService.findProfilesByOrcid(context, orcid);
         if (IteratorUtils.isEmpty(iterator)) {
             LOGGER.warn("Received a webhook call from ORCID with an id not associated with any profile: " + orcid);
+            orcidWebhookService.unregister(context, orcid);
             return;
         }
 
         while (iterator.hasNext()) {
             Item profile = iterator.next();
             orcidWebhookActions.forEach(plugin -> plugin.perform(context, profile, orcid));
+            itemService.update(context, profile);
         }
     }
 

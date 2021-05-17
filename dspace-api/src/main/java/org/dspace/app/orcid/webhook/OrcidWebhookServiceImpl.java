@@ -76,10 +76,7 @@ public class OrcidWebhookServiceImpl implements OrcidWebhookService {
     @Override
     public void unregister(Context context, Item profile) {
 
-        String accessToken = getAccessToken();
-        String orcid = getOrcid(profile);
-        String webhookUrl = getWebhookUrl(orcid);
-        orcidClient.unregisterWebhook(accessToken, orcid, webhookUrl);
+        unregister(context, getOrcid(profile));
 
         try {
             itemService.clearMetadata(context, profile, "cris", "orcid", "webhook", Item.ANY);
@@ -87,6 +84,13 @@ public class OrcidWebhookServiceImpl implements OrcidWebhookService {
             throw new SQLRuntimeException(e);
         }
 
+    }
+
+    @Override
+    public void unregister(Context context, String orcid) {
+        String accessToken = getAccessToken();
+        String webhookUrl = getWebhookUrl(orcid);
+        orcidClient.unregisterWebhook(accessToken, orcid, webhookUrl);
     }
 
     private String getOrcid(Item profile) {

@@ -50,4 +50,12 @@ public interface OrcidWebhookService {
      * @param profile the profile to unregister
      */
     public void unregister(Context context, Item profile);
+
+    /**
+     * Unregister the ORCID webhook callback related to the given ORCID iD.
+     *
+     * @param context the DSpace context
+     * @param orcid   the orcid id to unregister
+     */
+    public void unregister(Context context, String orcid);
 }

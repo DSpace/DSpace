@@ -310,6 +310,21 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void testWebhookWithNoProfilesFound() throws Exception {
+
+        String webhookAccessToken = "b03a76e3-42af-45de-94ad-9d825141a152";
+        when(orcidClientMock.getWebhookAccessToken()).thenReturn(buildOrcidTokenResponse(ORCID, webhookAccessToken));
+
+        getClient().perform(post("/api/" + RestModel.CRIS + "/orcid/" + ORCID + "/webhook/" + getRegistrationToken()))
+            .andExpect(status().isNoContent());
+
+        verify(orcidClientMock).getWebhookAccessToken();
+        verify(orcidClientMock).unregisterWebhook(eq(webhookAccessToken), eq(ORCID), any());
+        verifyNoMoreInteractions(externalDataProviderMock, orcidClientMock);
+
+    }
+
+    @Test
     public void testWebhookWithWrongRegistrationToken() throws Exception {
 
         when(externalDataProviderMock.searchExternalDataObjects(ORCID, 0, -1)).thenReturn(emptyList());
@@ -358,6 +373,7 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
             .withTitle("Walter White")
             .withOrcidIdentifier(ORCID)
             .withOrcidAccessToken(ACCESS_TOKEN)
+            .withOrcidWebhook("2020-01-01")
             .build();
 
         context.restoreAuthSystemState();
@@ -412,6 +428,7 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
         profileItem = context.reloadEntity(profileItem);
 
         assertThat(profileItem.getMetadata(), has(not(metadataField("cris.orcid.access-token"))));
+        assertThat(profileItem.getMetadata(), has(not(metadataField("cris.orcid.webhook"))));
     }
 
     @Test

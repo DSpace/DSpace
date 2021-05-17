@@ -97,6 +97,7 @@ public class OrcidWebhookScript extends DSpaceRunnable<OrcidWebhookScriptConfigu
         try {
             orcidWebhookActions.forEach(plugin -> plugin.perform(context, profile, orcid));
             handler.logInfo("Processed profile with orcid id " + orcid + " with success");
+            itemService.update(context, profile);
         } catch (Exception ex) {
             handler.logError("An error occurs processing profile with orcid id "
                 + orcid + ": " + getRootCauseMessage(ex));
