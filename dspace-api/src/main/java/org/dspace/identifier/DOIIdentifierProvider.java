@@ -70,7 +70,8 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
     // TODO: move these to MetadataSchema or some such?
     public static final String MD_SCHEMA = "dc";
     public static final String DOI_ELEMENT = "identifier";
-    public static final String DOI_QUALIFIER = "uri";
+    public static final String URI_QUALIFIER = "uri";
+    public static final String DOI_QUALIFIER = "doi";
 
     public static final Integer TO_BE_REGISTERED = 1;
     public static final Integer TO_BE_RESERVED = 2;
@@ -1025,7 +1026,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         }
         Item item = (Item) dso;
 
-        List<MetadataValue> metadata = itemService.getMetadata(item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        List<MetadataValue> metadata = itemService.getMetadata(item, MD_SCHEMA, DOI_ELEMENT, URI_QUALIFIER, null);
         String leftPart = DOI.RESOLVER + SLASH + getPrefix() + SLASH + getNamespaceSeparator();
         for (MetadataValue id : metadata) {
             if (id.getValue().startsWith(leftPart)) {
@@ -1054,8 +1055,15 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         }
         Item item = (Item) dso;
 
-        itemService.addMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
+        itemService.addMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, URI_QUALIFIER, null,
             doiService.DOIToExternalForm(doi));
+        boolean saveToDoiQualifier = configurationService.getBooleanProperty(
+                "identifier.save.to.doi.metadata.enabled", true);
+        if (saveToDoiQualifier) {
+            itemService.clearMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+            itemService.addMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
+                    doiService.DOIToExternalForm(doi));
+        }
         try {
             itemService.update(context, item);
         } catch (SQLException | AuthorizeException ex) {
@@ -1082,7 +1090,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         }
         Item item = (Item) dso;
 
-        List<MetadataValue> metadata = itemService.getMetadata(item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        List<MetadataValue> metadata = itemService.getMetadata(item, MD_SCHEMA, DOI_ELEMENT, URI_QUALIFIER, null);
         List<String> remainder = new ArrayList<>();
 
         for (MetadataValue id : metadata) {
@@ -1091,9 +1099,14 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
             }
         }
 
-        itemService.clearMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
-        itemService.addMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
+        itemService.clearMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, URI_QUALIFIER, null);
+        itemService.addMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, URI_QUALIFIER, null,
                 remainder);
+        boolean saveToDoiQualifier = configurationService.getBooleanProperty(
+                "identifier.save.to.doi.metadata.enabled", true);
+        if (saveToDoiQualifier) {
+            itemService.clearMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        }
         itemService.update(context, item);
     }
 

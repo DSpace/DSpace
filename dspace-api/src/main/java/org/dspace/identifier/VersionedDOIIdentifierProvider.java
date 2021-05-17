@@ -284,7 +284,7 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
         String bareDoiRef = doiService.DOIToExternalForm(bareDoi);
 
         List<MetadataValue> identifiers = itemService
-            .getMetadata(item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, Item.ANY);
+            .getMetadata(item, MD_SCHEMA, DOI_ELEMENT, URI_QUALIFIER, Item.ANY);
         // We have to remove all DOIs referencing previous versions. To do that,
         // we store all identifiers we do not know in an array list, clear
         // dc.identifier.uri and add the safed identifiers.
@@ -302,8 +302,8 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
         // reset the metadata if neccessary.
         if (changed) {
             try {
-                itemService.clearMetadata(c, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, Item.ANY);
-                itemService.addMetadata(c, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, newIdentifiers);
+                itemService.clearMetadata(c, item, MD_SCHEMA, DOI_ELEMENT, URI_QUALIFIER, Item.ANY);
+                itemService.addMetadata(c, item, MD_SCHEMA, DOI_ELEMENT, URI_QUALIFIER, null, newIdentifiers);
                 itemService.update(c, item);
             } catch (SQLException ex) {
                 throw new RuntimeException("A problem with the database connection occured.", ex);

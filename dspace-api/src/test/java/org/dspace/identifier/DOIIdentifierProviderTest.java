@@ -186,7 +186,7 @@ public class DOIIdentifierProviderTest
         List<MetadataValue> metadata = itemService.getMetadata(item,
                                                                DOIIdentifierProvider.MD_SCHEMA,
                                                                DOIIdentifierProvider.DOI_ELEMENT,
-                                                               DOIIdentifierProvider.DOI_QUALIFIER,
+                                                               DOIIdentifierProvider.URI_QUALIFIER,
                                                                null);
         List<String> remainder = new ArrayList<>();
 
@@ -199,11 +199,11 @@ public class DOIIdentifierProviderTest
         itemService.clearMetadata(context, item,
                                   DOIIdentifierProvider.MD_SCHEMA,
                                   DOIIdentifierProvider.DOI_ELEMENT,
-                                  DOIIdentifierProvider.DOI_QUALIFIER,
+                                  DOIIdentifierProvider.URI_QUALIFIER,
                                   null);
         itemService.addMetadata(context, item, DOIIdentifierProvider.MD_SCHEMA,
                                 DOIIdentifierProvider.DOI_ELEMENT,
-                                DOIIdentifierProvider.DOI_QUALIFIER,
+                                DOIIdentifierProvider.URI_QUALIFIER,
                                 null,
                                 remainder);
 
@@ -251,7 +251,7 @@ public class DOIIdentifierProviderTest
         if (metadata) {
             itemService.addMetadata(context, item, DOIIdentifierProvider.MD_SCHEMA,
                                     DOIIdentifierProvider.DOI_ELEMENT,
-                                    DOIIdentifierProvider.DOI_QUALIFIER,
+                                    DOIIdentifierProvider.URI_QUALIFIER,
                                     null,
                                     doiService.DOIToExternalForm(doi));
             itemService.update(context, item);
@@ -314,7 +314,7 @@ public class DOIIdentifierProviderTest
 
         List<MetadataValue> metadata = itemService.getMetadata(item, DOIIdentifierProvider.MD_SCHEMA,
                                                                DOIIdentifierProvider.DOI_ELEMENT,
-                                                               DOIIdentifierProvider.DOI_QUALIFIER,
+                                                               DOIIdentifierProvider.URI_QUALIFIER,
                                                                null);
         boolean result = false;
         for (MetadataValue id : metadata) {
@@ -336,7 +336,7 @@ public class DOIIdentifierProviderTest
         context.turnOffAuthorisationSystem();
         itemService.addMetadata(context, item, DOIIdentifierProvider.MD_SCHEMA,
                                 DOIIdentifierProvider.DOI_ELEMENT,
-                                DOIIdentifierProvider.DOI_QUALIFIER,
+                                DOIIdentifierProvider.URI_QUALIFIER,
                                 null,
                                 doiService.DOIToExternalForm(doi));
         itemService.update(context, item);
@@ -357,7 +357,7 @@ public class DOIIdentifierProviderTest
         context.turnOffAuthorisationSystem();
         itemService.addMetadata(context, item, DOIIdentifierProvider.MD_SCHEMA,
                                 DOIIdentifierProvider.DOI_ELEMENT,
-                                DOIIdentifierProvider.DOI_QUALIFIER,
+                                DOIIdentifierProvider.URI_QUALIFIER,
                                 null,
                                 doiService.DOIToExternalForm(doi));
         itemService.update(context, item);
@@ -367,7 +367,7 @@ public class DOIIdentifierProviderTest
 
         List<MetadataValue> metadata = itemService.getMetadata(item, DOIIdentifierProvider.MD_SCHEMA,
                                                                DOIIdentifierProvider.DOI_ELEMENT,
-                                                               DOIIdentifierProvider.DOI_QUALIFIER,
+                                                               DOIIdentifierProvider.URI_QUALIFIER,
                                                                null);
         boolean foundDOI = false;
         for (MetadataValue id : metadata) {
@@ -455,7 +455,7 @@ public class DOIIdentifierProviderTest
         // assure that the right one was removed
         List<MetadataValue> metadata = itemService.getMetadata(item, DOIIdentifierProvider.MD_SCHEMA,
                                                                DOIIdentifierProvider.DOI_ELEMENT,
-                                                               DOIIdentifierProvider.DOI_QUALIFIER,
+                                                               DOIIdentifierProvider.URI_QUALIFIER,
                                                                null);
         boolean foundDOI1 = false;
         boolean foundDOI2 = false;
@@ -479,7 +479,7 @@ public class DOIIdentifierProviderTest
         // check it
         metadata = itemService.getMetadata(item, DOIIdentifierProvider.MD_SCHEMA,
                                            DOIIdentifierProvider.DOI_ELEMENT,
-                                           DOIIdentifierProvider.DOI_QUALIFIER,
+                                           DOIIdentifierProvider.URI_QUALIFIER,
                                            null);
         foundDOI1 = false;
         foundDOI2 = false;
@@ -696,7 +696,7 @@ public class DOIIdentifierProviderTest
         // assure that the right one was removed
         List<MetadataValue> metadata = itemService.getMetadata(item, DOIIdentifierProvider.MD_SCHEMA,
                                                                DOIIdentifierProvider.DOI_ELEMENT,
-                                                               DOIIdentifierProvider.DOI_QUALIFIER,
+                                                               DOIIdentifierProvider.URI_QUALIFIER,
                                                                null);
         boolean foundDOI1 = false;
         boolean foundDOI2 = false;
@@ -738,7 +738,7 @@ public class DOIIdentifierProviderTest
         // assure that the right one was removed
         List<MetadataValue> metadata = itemService.getMetadata(item, DOIIdentifierProvider.MD_SCHEMA,
                                                                DOIIdentifierProvider.DOI_ELEMENT,
-                                                               DOIIdentifierProvider.DOI_QUALIFIER,
+                                                               DOIIdentifierProvider.URI_QUALIFIER,
                                                                null);
         boolean foundDOI1 = false;
         boolean foundDOI2 = false;
