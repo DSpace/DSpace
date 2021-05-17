@@ -27,4 +27,18 @@
         <property name="itemService" ref="org.dspace.content.ItemServiceImpl"/>
         <property name="uploadConfigurationService" ref="uploadConfigurationService"/>
     </bean>
+    
+    <bean name="fundingHasAtLeastOneInvestigatorOrOneLeadOrganization" class="org.dspace.validation.LogicalStatementValidator">
+        <property name="errorKey" value="error.validation.fundingInvestigatorOrLeadOrganizationRequired"/>
+        <property name="metadataFields">
+           <list>
+               <value>crisfund.investigators</value>
+               <value>crisfund.coinvestigators</value>
+               <value>crisfund.leadorganizations</value>
+               <value>crisfund.leadcoorganizations</value>
+           </list>
+        </property>
+        <property name="filter" ref="funding-has-at-least-one-investigator-or-one-lead-organization_filter"/>
+    </bean>
+    
 </beans>

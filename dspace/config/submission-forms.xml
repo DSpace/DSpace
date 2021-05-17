@@ -2026,6 +2026,50 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <hint />
         </field>
       </row>
+      <row>
+        <field>
+          <dc-schema>crisfund</dc-schema>
+          <dc-element>investigators</dc-element>
+          <label>Investigator(s)</label>
+          <input-type>onebox</input-type>
+          <repeatable>true</repeatable>
+          <required />
+          <hint />
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>crisfund</dc-schema>
+          <dc-element>coinvestigators</dc-element>
+          <label>Co-Investigator(s)</label>
+          <input-type>onebox</input-type>
+          <repeatable>true</repeatable>
+          <required />
+          <hint />
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>crisfund</dc-schema>
+          <dc-element>leadorganizations</dc-element>
+          <label>Lead Organization(s)</label>
+          <input-type>onebox</input-type>
+          <repeatable>true</repeatable>
+          <required />
+          <hint />
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>crisfund</dc-schema>
+          <dc-element>leadcoorganizations</dc-element>
+          <label>Lead Co-Organization(s)</label>
+          <input-type>onebox</input-type>
+          <repeatable>true</repeatable>
+          <required />
+          <hint />
+        </field>
+      </row>
     </form>
     <form name="equipment">
       <row>

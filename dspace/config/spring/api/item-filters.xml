@@ -335,5 +335,66 @@
         </property>
     </bean>
 
+    <bean id="funding-has-at-least-one-investigator-or-one-lead-organization_filter" class="org.dspace.content.logic.DefaultFilter">
+        <property name="statement">
+            <bean class="org.dspace.content.logic.operator.Or">
+                <property name="statements">
+                    <list>
+                        <bean class="org.dspace.content.logic.operator.Not">
+                            <property name="statements">
+                                <ref bean="relationship-type-equals-funding_condition"/>
+                            </property>
+                        </bean>
+                        <ref bean="has-investigators-set_condition" />
+                        <ref bean="has-co-investigators-set_condition" />
+                        <ref bean="has-lead-organizations-set_condition" />
+                        <ref bean="has-lead-co-organizations-set_condition" />
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+    
+    <!-- dspace.entity.type is exactly Funding -->
+    <bean id="relationship-type-equals-funding_condition" class="org.dspace.content.logic.condition.MetadataValueMatchCondition">
+        <property name="parameters">
+            <map>
+                <entry key="field" value="dspace.entity.type" />
+                <entry key="pattern" value="^Funding" />
+            </map>
+        </property>
+    </bean>
+    
+    <bean id="has-investigators-set_condition" class="org.dspace.content.logic.condition.RequiredMetadataCondition">
+        <property name="parameters">
+            <map>
+                <entry key="field" value="crisfund.investigators" />
+            </map>
+        </property>
+    </bean>
+    
+    <bean id="has-co-investigators-set_condition" class="org.dspace.content.logic.condition.RequiredMetadataCondition">
+        <property name="parameters">
+            <map>
+                <entry key="field" value="crisfund.coinvestigators" />
+            </map>
+        </property>
+    </bean>
+    
+    <bean id="has-lead-organizations-set_condition" class="org.dspace.content.logic.condition.RequiredMetadataCondition">
+        <property name="parameters">
+            <map>
+                <entry key="field" value="crisfund.leadorganizations" />
+            </map>
+        </property>
+    </bean>
+    
+    <bean id="has-lead-co-organizations-set_condition" class="org.dspace.content.logic.condition.RequiredMetadataCondition">
+        <property name="parameters">
+            <map>
+                <entry key="field" value="crisfund.leadcoorganizations" />
+            </map>
+        </property>
+    </bean>
 
 </beans>

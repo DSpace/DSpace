@@ -16,4 +16,32 @@
         <scope_note></scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>crisfund</schema>
+        <element>investigators</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisfund</schema>
+        <element>coinvestigators</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisfund</schema>
+        <element>leadorganizations</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisfund</schema>
+        <element>leadcoorganizations</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
 </dspace-dc-types>
