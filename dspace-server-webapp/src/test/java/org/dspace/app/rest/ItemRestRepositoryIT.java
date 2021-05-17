@@ -1313,8 +1313,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().is(404));
 
         //Trying to get deleted item bitstream should fail with 404
-        getClient().perform(get("/api/core/biststreams/" + bitstream.getID()))
-                   .andExpect(status().is(404));
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
+                   .andExpect(status().is(401));
     }
 
     @Test
@@ -1382,8 +1382,91 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
             .andExpect(status().is(404));
 
         //Trying to get deleted item bitstream should fail with 404
-        getClient().perform(get("/api/core/biststreams/" + bitstream.getID()))
-            .andExpect(status().is(404));
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
+            .andExpect(status().is(401));
+    }
+
+    @Test
+    public void deleteOneArchivedTestAsOtherCollectionAdmin() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        // two collection administrators
+        EPerson col1Admin = EPersonBuilder.createEPerson(context)
+            .withCanLogin(true)
+            .withEmail("col1admin@email.com")
+            .withPassword(password)
+            .withNameInMetadata("Col1", "Admin")
+            .build();
+
+        EPerson col2Admin = EPersonBuilder.createEPerson(context)
+            .withCanLogin(true)
+            .withEmail("col2admin@email.com")
+            .withPassword(password)
+            .withNameInMetadata("Col2", "Admin")
+            .build();
+
+        // A community with two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection col1 = CollectionBuilder
+            .createCollection(context, parentCommunity)
+            .withName("Collection 1")
+            .withAdminGroup(col1Admin)
+            .build();
+        CollectionBuilder
+            .createCollection(context, parentCommunity)
+            .withName("Collection 2")
+            .withAdminGroup(col2Admin)
+            .build();
+
+        // One public item, one workspace item and one template item in the first collection.
+        Item publicItem = ItemBuilder.createItem(context, col1)
+            .withTitle("Public item 1")
+            .withIssueDate("2017-10-17")
+            .withAuthor("Smith, Donald").withAuthor("Doe, John")
+            .withSubject("ExtraEntry")
+            .build();
+
+        //Add a bitstream to an item in the first collection
+        String bitstreamContent = "ThisIsSomeDummyText";
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.
+                createBitstream(context, publicItem, is)
+                .withName("Bitstream1")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        // Check publicItem creation
+        getClient().perform(get("/api/core/items/" + publicItem.getID()))
+            .andExpect(status().isOk());
+
+        // Check publicItem bitstream creation (should be stored in bundle)
+        getClient().perform(get("/api/core/items/" + publicItem.getID() + "/bundles"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._links.self.href", Matchers
+                .containsString("/api/core/items/" + publicItem.getID() + "/bundles")));
+
+        // the admin of collection 2 will try to delete an item of collection 1
+        String token = getAuthToken(col2Admin.getEmail(), password);
+
+        // trying to delete the public item should fail
+        getClient(token).perform(delete("/api/core/items/" + publicItem.getID()))
+            .andExpect(status().isForbidden());
+
+        // the item should still exist
+        getClient().perform(get("/api/core/items/" + publicItem.getID()))
+            .andExpect(status().isOk());
+
+        // the bitstream should still exist
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
+            .andExpect(status().isOk());
     }
 
     @Test
