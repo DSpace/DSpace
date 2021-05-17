@@ -19,7 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.orcid.service.OrcidSynchronizationService;
 import org.dspace.app.profile.OrcidEntitySyncPreference;
 import org.dspace.app.profile.OrcidProfileSyncPreference;
-import org.dspace.app.profile.OrcidSyncMode;
+import org.dspace.app.profile.OrcidSynchronizationMode;
 import org.dspace.app.profile.ResearcherProfile;
 import org.dspace.app.profile.service.ResearcherProfileService;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
@@ -124,9 +124,9 @@ public class ResearcherProfileReplaceOrcidSynchronizationOperation extends Patch
         }
     }
 
-    private OrcidSyncMode parseMode(String value) {
+    private OrcidSynchronizationMode parseMode(String value) {
         try {
-            return OrcidSyncMode.valueOf(value.toUpperCase());
+            return OrcidSynchronizationMode.valueOf(value.toUpperCase());
         } catch (IllegalArgumentException ex) {
             throw new UnprocessableEntityException("Invalid synchronization mode value: " + value, ex);
         }

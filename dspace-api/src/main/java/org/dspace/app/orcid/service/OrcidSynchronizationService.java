@@ -14,8 +14,9 @@ import java.util.Optional;
 import org.dspace.app.orcid.model.OrcidEntityType;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.app.profile.OrcidEntitySyncPreference;
+import org.dspace.app.profile.OrcidProfileDisconnectionMode;
 import org.dspace.app.profile.OrcidProfileSyncPreference;
-import org.dspace.app.profile.OrcidSyncMode;
+import org.dspace.app.profile.OrcidSynchronizationMode;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
@@ -47,6 +48,15 @@ public interface OrcidSynchronizationService {
      * @throws SQLException if a SQL error occurs during the profile update
      */
     public void linkProfile(Context context, Item profile, OrcidTokenResponseDTO token) throws SQLException;
+
+    /**
+     * Disconnect the given profile from ORCID.
+     *
+     * @param  context      the relevant DSpace Context.
+     * @param  profile      the profile to disconnect
+     * @throws SQLException if a SQL error occurs during the profile update
+     */
+    public void unlinkProfile(Context context, Item profile) throws SQLException;
 
     /**
      * Set the synchronization preference for the given profile related to the given
@@ -86,7 +96,8 @@ public interface OrcidSynchronizationService {
      * @param  value        the new synchronization mode value
      * @throws SQLException if a SQL error occurs during the profile update
      */
-    public void setSynchronizationMode(Context context, Item profile, OrcidSyncMode value) throws SQLException;
+    public void setSynchronizationMode(Context context, Item profile, OrcidSynchronizationMode value)
+        throws SQLException;
 
     /**
      * Check if the given researcher profile item is configured to synchronize the
@@ -105,7 +116,7 @@ public interface OrcidSynchronizationService {
      * @param  profile the researcher profile item
      * @return         the synchronization mode
      */
-    Optional<OrcidSyncMode> getSynchronizationMode(Item profile);
+    Optional<OrcidSynchronizationMode> getSynchronizationMode(Item profile);
 
     /**
      * Returns the ORCID synchronization preference related to the given entity type
@@ -125,4 +136,12 @@ public interface OrcidSynchronizationService {
      * @return         the synchronization mode
      */
     List<OrcidProfileSyncPreference> getProfilePreferences(Item profile);
+
+    /**
+     * Returns the configuration ORCID profile's disconnection mode. If that mode is
+     * not configured or the configuration is wrong, the value DISABLED is returned.
+     *
+     * @return the disconnection mode
+     */
+    OrcidProfileDisconnectionMode getDisconnectionMode();
 }

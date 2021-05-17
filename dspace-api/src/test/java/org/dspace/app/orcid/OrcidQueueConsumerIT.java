@@ -110,7 +110,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
         assertThat(queueRecords, hasSize(1));
         assertThat(queueRecords.get(0), matches(profile, profile, "AFFILIATION", null,
-            containsString("4Science"), "Researcher at 4Science (2021-01-01)", INSERT));
+            containsString("4Science"), "Researcher at 4Science ( from 2021-01-01 to present )", INSERT));
 
         addMetadata(profile, "crisrp", "education", null, "High School", null);
         context.commit();
@@ -118,9 +118,9 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         queueRecords = orcidQueueService.findAll(context);
         assertThat(queueRecords, hasSize(2));
         assertThat(queueRecords, hasItem(matches(profile, profile, "AFFILIATION", null,
-            containsString("4Science"), "Researcher at 4Science (2021-01-01)", INSERT)));
+            containsString("4Science"), "Researcher at 4Science ( from 2021-01-01 to present )", INSERT)));
         assertThat(queueRecords, hasItem(matches(profile, profile, "EDUCATION", null,
-            containsString("High School"), "High School", INSERT)));
+            containsString("High School"), "High School ( from unspecified to present )", INSERT)));
     }
 
     @Test
@@ -735,15 +735,33 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
             .withAuthor("Another Test User", secondProfile.getID().toString())
             .build();
 
+        Item thirdPublication = ItemBuilder.createItem(context, publicationCollection)
+            .withTitle("Third Test publication")
+            .build();
+
         context.restoreAuthSystemState();
         context.commit();
 
-        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
-        assertThat(orcidQueueRecords, hasSize(3));
+        OrcidHistoryBuilder.createOrcidHistory(context, secondProfile, thirdPublication)
+            .withDescription("Third Test publication")
+            .withOperation(OrcidOperation.INSERT)
+            .withPutCode("12345")
+            .withStatus(201)
+            .build();
 
-        assertThat(orcidQueueRecords, hasItem(matches(firstProfile, firstPublication, "Publication", null, INSERT)));
-        assertThat(orcidQueueRecords, hasItem(matches(secondProfile, firstPublication, "Publication", null, INSERT)));
-        assertThat(orcidQueueRecords, hasItem(matches(secondProfile, secondPublication, "Publication", null, INSERT)));
+        addMetadata(thirdPublication, "dc", "contributor", "author", "Test User", firstProfile.getID().toString());
+        addMetadata(thirdPublication, "dc", "contributor", "author", "Another User", secondProfile.getID().toString());
+
+        context.commit();
+
+        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
+        assertThat(queueRecords, hasSize(5));
+
+        assertThat(queueRecords, hasItem(matches(firstProfile, firstPublication, "Publication", null, INSERT)));
+        assertThat(queueRecords, hasItem(matches(secondProfile, firstPublication, "Publication", null, INSERT)));
+        assertThat(queueRecords, hasItem(matches(secondProfile, secondPublication, "Publication", null, INSERT)));
+        assertThat(queueRecords, hasItem(matches(firstProfile, thirdPublication, "Publication", null, INSERT)));
+        assertThat(queueRecords, hasItem(matches(secondProfile, thirdPublication, "Publication", "12345", UPDATE)));
     }
 
     private void addMetadata(Item item, String schema, String element, String qualifier, String value,

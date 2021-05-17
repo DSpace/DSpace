@@ -44,6 +44,11 @@ public class OrcidQueueBuilder extends  AbstractBuilder<OrcidQueue, OrcidQueueSe
         return builder.createEntityInsertionRecord(context, owner, entity);
     }
 
+    public static OrcidQueueBuilder createOrcidQueue(Context context, Item owner, Item entity, String putCode) {
+        OrcidQueueBuilder builder = new OrcidQueueBuilder(context);
+        return builder.createEntityUpdateRecord(context, owner, entity, putCode);
+    }
+
     public static OrcidQueueBuilder createOrcidQueue(Context context, Item owner, String description,
         String type, String putCode) {
         OrcidQueueBuilder builder = new OrcidQueueBuilder(context);
@@ -55,6 +60,16 @@ public class OrcidQueueBuilder extends  AbstractBuilder<OrcidQueue, OrcidQueueSe
         try {
             this.context = context;
             this.orcidQueue = getService().createEntityDeletionRecord(context, owner, description, type, putCode);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return this;
+    }
+
+    private OrcidQueueBuilder createEntityUpdateRecord(Context context, Item owner, Item entity, String putCode) {
+        try {
+            this.context = context;
+            this.orcidQueue = getService().createEntityUpdateRecord(context, owner, entity, putCode);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

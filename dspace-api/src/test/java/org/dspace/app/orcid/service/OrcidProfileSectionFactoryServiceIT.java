@@ -186,10 +186,10 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
         assertThat(signatures, hasSize(2));
 
         String firstDescription = affiliationFactory.getDescription(context, item, signatures.get(0));
-        assertThat(firstDescription, is("Researcher at 4Science (2020-02)"));
+        assertThat(firstDescription, is("Researcher at 4Science ( from 2020-02 to present )"));
 
         String secondDescription = affiliationFactory.getDescription(context, item, signatures.get(1));
-        assertThat(secondDescription, is("Organization (2021-02, 2021-03-31)"));
+        assertThat(secondDescription, is("Organization ( from 2021-02 to 2021-03-31 )"));
     }
 
     @Test

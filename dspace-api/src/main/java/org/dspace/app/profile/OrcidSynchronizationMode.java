@@ -14,7 +14,7 @@ package org.dspace.app.profile;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public enum OrcidSyncMode {
+public enum OrcidSynchronizationMode {
 
     MANUAL,
     BATCH;

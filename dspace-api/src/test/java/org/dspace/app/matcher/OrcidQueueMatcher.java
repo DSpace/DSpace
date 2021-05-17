@@ -39,9 +39,12 @@ public class OrcidQueueMatcher extends TypeSafeMatcher<OrcidQueue> {
 
     private final Matcher<OrcidOperation> operationMatcher;
 
+    private final Matcher<Integer> attemptsMatcher;
+
     private OrcidQueueMatcher(Matcher<Item> ownerMatcher, Matcher<Item> entityMatcher,
         Matcher<String> recordTypeMatcher, Matcher<String> putCodeMatcher, Matcher<String> metadataMatcher,
-        Matcher<String> descriptionMatcher, Matcher<OrcidOperation> operationMatcher) {
+        Matcher<String> descriptionMatcher, Matcher<OrcidOperation> operationMatcher,
+        Matcher<Integer> attemptsMatcher) {
         this.ownerMatcher = ownerMatcher;
         this.entityMatcher = entityMatcher;
         this.recordTypeMatcher = recordTypeMatcher;
@@ -49,35 +52,42 @@ public class OrcidQueueMatcher extends TypeSafeMatcher<OrcidQueue> {
         this.metadataMatcher = metadataMatcher;
         this.descriptionMatcher = descriptionMatcher;
         this.operationMatcher = operationMatcher;
+        this.attemptsMatcher = attemptsMatcher;
     }
 
     public static OrcidQueueMatcher matches(Item owner, Item entity, String recordType, OrcidOperation operation) {
         return new OrcidQueueMatcher(is(owner), is(entity), is(recordType), anything(),
-            anything(), anything(), is(operation));
+            anything(), anything(), is(operation), anything());
+    }
+
+    public static OrcidQueueMatcher matches(Item owner, Item entity, String recordType,
+        OrcidOperation operation, int attempts) {
+        return new OrcidQueueMatcher(is(owner), is(entity), is(recordType), anything(),
+            anything(), anything(), is(operation), is(attempts));
     }
 
     public static OrcidQueueMatcher matches(Item owner, Item entity, String recordType,
         String putCode, OrcidOperation operation) {
         return new OrcidQueueMatcher(is(owner), is(entity), is(recordType), is(putCode),
-            anything(), anything(), is(operation));
+            anything(), anything(), is(operation), anything());
     }
 
     public static OrcidQueueMatcher matches(Item owner, Item entity, String recordType,
         String putCode, String metadata, String description, OrcidOperation operation) {
         return new OrcidQueueMatcher(is(owner), is(entity), is(recordType),
-            is(putCode), is(metadata), is(description), is(operation));
+            is(putCode), is(metadata), is(description), is(operation), anything());
     }
 
     public static OrcidQueueMatcher matches(Item item, String recordType,
         String putCode, String metadata, String description, OrcidOperation operation) {
         return new OrcidQueueMatcher(is(item), is(item), is(recordType),
-            is(putCode), is(metadata), is(description), is(operation));
+            is(putCode), is(metadata), is(description), is(operation), anything());
     }
 
     public static OrcidQueueMatcher matches(Item owner, Item entity, String recordType,
         String putCode, Matcher<String> metadata, String description, OrcidOperation operation) {
         return new OrcidQueueMatcher(is(owner), is(entity), is(recordType),
-            is(putCode), metadata, is(description), is(operation));
+            is(putCode), metadata, is(description), is(operation), anything());
     }
 
     @Override
@@ -89,6 +99,7 @@ public class OrcidQueueMatcher extends TypeSafeMatcher<OrcidQueue> {
             .appendText(", metadata ").appendDescriptionOf(metadataMatcher)
             .appendText(", description ").appendDescriptionOf(descriptionMatcher)
             .appendText(", operation ").appendDescriptionOf(operationMatcher)
+            .appendText(", attempts ").appendDescriptionOf(attemptsMatcher)
             .appendText(" and put code ").appendDescriptionOf(putCodeMatcher);
     }
 
@@ -100,7 +111,8 @@ public class OrcidQueueMatcher extends TypeSafeMatcher<OrcidQueue> {
             && metadataMatcher.matches(item.getMetadata())
             && putCodeMatcher.matches(item.getPutCode())
             && descriptionMatcher.matches(item.getDescription())
-            && operationMatcher.matches(item.getOperation());
+            && operationMatcher.matches(item.getOperation())
+            && attemptsMatcher.matches(item.getAttempts());
     }
 
     private static <T> Matcher<T> anything() {

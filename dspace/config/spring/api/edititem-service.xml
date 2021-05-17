@@ -20,15 +20,6 @@
                             </property>
                             <property name="submissionDefinition" value="publication-edit" />
                         </bean>
-                        <!--                        <bean class="org.dspace.content.edit.EditItemMode">-->
-                        <!--                            <property name="name" value="MODE2" />-->
-                        <!--                            <property name="security">-->
-                        <!--                              <value type="org.dspace.content.security.CrisSecurity">-->
-                        <!--                                OWNER-->
-                        <!--                              </value>-->
-                        <!--                            </property>-->
-                        <!--                            <property name="submissionDefinition" value="edit_owner_publication" />-->
-                        <!--                        </bean>-->
                     </list>
                 </entry>
                 <entry key="person">
@@ -40,37 +31,17 @@
                                     ADMIN
                                 </value>
                             </property>
+                            <property name="submissionDefinition" value="admin-person-edit" />
+                        </bean>
+                        <bean class="org.dspace.content.edit.EditItemMode">
+                            <property name="name" value="OWNER" />
+                            <property name="security">
+                                <value type="org.dspace.content.security.CrisSecurity">
+                                    OWNER
+                                </value>
+                            </property>
                             <property name="submissionDefinition" value="person-edit" />
                         </bean>
-                        <!--                        <bean class="org.dspace.content.edit.EditItemMode">-->
-                        <!--                            <property name="name" value="full" />-->
-                        <!--                            <property name="label" value="edititem.mode.test2" />-->
-                        <!--                            <property name="security">-->
-                        <!--                              <value type="org.dspace.content.security.CrisSecurity">-->
-                        <!--                                OWNER-->
-                        <!--                              </value>-->
-                        <!--                            </property>-->
-                        <!--                            <property name="submissionDefinition" value="person" />-->
-                        <!--                        </bean>-->
-                        <!--                        <bean class="org.dspace.content.edit.EditItemMode">-->
-                        <!--                            <property name="name" value="UPLOAD" />-->
-                        <!--                            <property name="security">-->
-                        <!--                              <value type="org.dspace.content.security.CrisSecurity">-->
-                        <!--                                CUSTOM-->
-                        <!--                              </value>-->
-                        <!--                            </property>-->
-                        <!--                            <property name="submissionDefinition" value="person_upload" />-->
-                        <!--                            <property name="groups">-->
-                        <!--                                <list>-->
-                        <!--                                    <value>cris.policy.group</value>-->
-                        <!--                                </list>-->
-                        <!--                            </property>-->
-                        <!--                            <property name="users">-->
-                        <!--                                <list>-->
-                        <!--                                    <value>cris.policy.eperson</value>-->
-                        <!--                                </list>-->
-                        <!--                            </property>-->
-                        <!--                        </bean>-->
                     </list>
                 </entry>
                 <entry key="equipment">

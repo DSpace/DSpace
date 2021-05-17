@@ -69,4 +69,11 @@ public class OrcidQueueDAOImpl extends AbstractHibernateDAO<OrcidQueue> implemen
         return query.getResultList();
     }
 
+    @Override
+    public List<OrcidQueue> findByAttemptsLessThan(Context context, int attempts) throws SQLException {
+        Query query = createQuery(context, "FROM OrcidQueue WHERE attempts IS NULL OR attempts < :attempts");
+        query.setParameter("attempts", attempts);
+        return query.getResultList();
+    }
+
 }

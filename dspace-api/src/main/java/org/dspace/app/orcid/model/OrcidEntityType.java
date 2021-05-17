@@ -9,6 +9,12 @@ package org.dspace.app.orcid.model;
 
 import org.apache.commons.lang3.EnumUtils;
 
+/**
+ * The entity types of the ORCID objects that can be synchronized.
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ */
 public enum OrcidEntityType {
 
     PUBLICATION("/work"),

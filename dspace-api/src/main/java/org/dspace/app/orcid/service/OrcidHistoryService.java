@@ -14,6 +14,7 @@ import java.util.Optional;
 
 import org.dspace.app.orcid.OrcidHistory;
 import org.dspace.app.orcid.OrcidQueue;
+import org.dspace.app.orcid.exception.OrcidValidationException;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
@@ -134,15 +135,17 @@ public interface OrcidHistoryService {
     /**
      * Synchronize the entity related to the given orcidQueue record with ORCID.
      *
-     * @param  context       DSpace context object
-     * @param  orcidQueue    the orcid queue record that has the references of the
-     *                       data to be synchronized
-     * @param  forceAddition to force the insert on the ORCID registry
-     * @return               the created orcid history record with the
-     *                       synchronization result
-     * @throws SQLException  if database error
+     * @param  context                  DSpace context object
+     * @param  orcidQueue               the orcid queue record that has the
+     *                                  references of the data to be synchronized
+     * @param  forceAddition            to force the insert on the ORCID registry
+     * @return                          the created orcid history record with the
+     *                                  synchronization result
+     * @throws SQLException             if database error
+     * @throws OrcidValidationException if the data to synchronize with ORCID is not
+     *                                  valid
      */
     public OrcidHistory synchronizeWithOrcid(Context context, OrcidQueue orcidQueue, boolean forceAddition)
-        throws SQLException;
+        throws SQLException, OrcidValidationException;
 
 }

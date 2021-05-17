@@ -119,19 +119,10 @@ public class OrcidAffiliationFactory extends AbstractOrcidProfileSectionFactory 
     }
 
     private String getDateDescription(MetadataValue startDate, MetadataValue endDate) {
-        List<String> dates = new ArrayList<String>();
-        if (isProcessableValue(startDate)) {
-            dates.add(startDate.getValue());
-        }
-        if (isProcessableValue(endDate)) {
-            dates.add(endDate.getValue());
-        }
-
-        if (dates.isEmpty()) {
-            return "";
-        }
-
-        return dates.stream().collect(Collectors.joining(", ", "(", ")"));
+        String dateDescription = "( from ";
+        dateDescription += isProcessableValue(startDate) ? startDate.getValue() + " to " : "unspecified to ";
+        dateDescription += isProcessableValue(endDate) ? endDate.getValue() + " )" : "present )";
+        return dateDescription;
     }
 
     private MetadataValue getMetadataValueByField(List<MetadataValue> metadataValues, String metadataField) {

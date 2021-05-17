@@ -24,7 +24,6 @@ import org.dspace.app.profile.OrcidProfileSyncPreference;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
-import org.orcid.jaxb.model.common.Iso3166Country;
 import org.orcid.jaxb.model.v3.release.common.Country;
 import org.orcid.jaxb.model.v3.release.common.Url;
 import org.orcid.jaxb.model.v3.release.record.Address;
@@ -70,7 +69,7 @@ public class OrcidSimpleValueObjectFactory extends AbstractOrcidProfileSectionFa
             throw new IllegalArgumentException("Metadata field not supported: " + currentMetadataField);
         }
 
-        return create(metadataValues.get(0));
+        return create(context, metadataValues.get(0));
     }
 
     @Override
@@ -90,10 +89,10 @@ public class OrcidSimpleValueObjectFactory extends AbstractOrcidProfileSectionFa
         return metadataValues.get(0).getValue();
     }
 
-    protected Object create(MetadataValue metadataValue) {
+    protected Object create(Context context, MetadataValue metadataValue) {
         switch (getProfileSectionType()) {
             case COUNTRY:
-                return createAddress(metadataValue);
+                return createAddress(context, metadataValue);
             case KEYWORDS:
                 return createKeyword(metadataValue);
             case OTHER_NAMES:
@@ -124,9 +123,15 @@ public class OrcidSimpleValueObjectFactory extends AbstractOrcidProfileSectionFa
         return keyword;
     }
 
-    private Address createAddress(MetadataValue metadataValue) {
+    private Address createAddress(Context context, MetadataValue metadataValue) {
+        return orcidCommonObjectFactory.createCountry(context, metadataValue)
+            .map(this::createAddress)
+            .orElse(null);
+    }
+
+    private Address createAddress(Country country) {
         Address address = new Address();
-        address.setCountry(new Country(Iso3166Country.fromValue(metadataValue.getValue())));
+        address.setCountry(country);
         return address;
     }
 
