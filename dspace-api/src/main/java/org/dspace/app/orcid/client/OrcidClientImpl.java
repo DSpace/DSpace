@@ -63,6 +63,7 @@ import org.orcid.jaxb.model.v3.release.record.ResearcherUrl;
 import org.orcid.jaxb.model.v3.release.record.Work;
 import org.orcid.jaxb.model.v3.release.record.WorkBulk;
 import org.orcid.jaxb.model.v3.release.record.summary.Works;
+import org.orcid.jaxb.model.v3.release.search.expanded.ExpandedSearch;
 
 /**
  * Implementation of {@link OrcidClient}.
@@ -198,6 +199,13 @@ public class OrcidClientImpl implements OrcidClient {
         String webhookUrl = orcidConfiguration.getWebhookUrl();
         String encodedUrl = encodeUrl(url);
         return execute(buildDeleteUriRequest(accessToken, webhookUrl, "/" + orcid + "/webhook/" + encodedUrl), true);
+    }
+
+    @Override
+    public ExpandedSearch expandedSearch(String accessToken, String query, int start, int rows) {
+        String queryParams = String.format("?q=%s&start=%s&rows=%s", query, start, rows);
+        HttpUriRequest httpUriRequest = buildGetUriRequest(accessToken, "/expanded-search" + queryParams);
+        return executeAndUnmarshall(httpUriRequest, false, ExpandedSearch.class);
     }
 
     private OrcidTokenResponseDTO getClientCredentialsAccessToken(String scope) {

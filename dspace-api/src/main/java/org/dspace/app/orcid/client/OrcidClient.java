@@ -15,6 +15,7 @@ import org.orcid.jaxb.model.v3.release.record.Person;
 import org.orcid.jaxb.model.v3.release.record.Record;
 import org.orcid.jaxb.model.v3.release.record.WorkBulk;
 import org.orcid.jaxb.model.v3.release.record.summary.Works;
+import org.orcid.jaxb.model.v3.release.search.expanded.ExpandedSearch;
 
 /**
  * Interface for classes that allow to contact ORCID.
@@ -172,5 +173,16 @@ public interface OrcidClient {
      * @throws OrcidClientException if some error occurs during the search
      */
     OrcidResponse unregisterWebhook(String accessToken, String orcid, String url);
+
+    /**
+     * Perform an expanded search with the given query and pagination.
+     *
+     * @param  accessToken the access token
+     * @param  query       the query
+     * @param  start       the start index
+     * @param  rows        the number of rows to retrieve
+     * @return             the expanded search result
+     */
+    ExpandedSearch expandedSearch(String accessToken, String query, int start, int rows);
 
 }
