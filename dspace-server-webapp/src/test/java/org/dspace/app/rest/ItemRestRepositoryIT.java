@@ -1313,8 +1313,10 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().is(404));
 
         //Trying to get deleted item bitstream should fail with 404
-        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
-                   .andExpect(status().is(401));
+        // NOTE: it currently does not work without an admin token
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/core/bitstreams/" + bitstream.getID()))
+                   .andExpect(status().is(404));
     }
 
     @Test
@@ -1382,8 +1384,10 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
             .andExpect(status().is(404));
 
         //Trying to get deleted item bitstream should fail with 404
-        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
-            .andExpect(status().is(401));
+        // NOTE: it currently does not work without an admin token
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/core/bitstreams/" + bitstream.getID()))
+            .andExpect(status().is(404));
     }
 
     @Test
