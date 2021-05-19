@@ -1193,7 +1193,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         String loginToken = getAuthToken(eperson.getEmail(), password);
         getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()
                 + "/content?authentication-token=" + loginToken))
-            .andExpect(status().isForbidden());
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -1204,7 +1204,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         Thread.sleep(1);
         getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()
                 + "/content?authentication-token=" + shortLivedToken))
-            .andExpect(status().isForbidden());
+            .andExpect(status().isUnauthorized());
     }
 
     @Test

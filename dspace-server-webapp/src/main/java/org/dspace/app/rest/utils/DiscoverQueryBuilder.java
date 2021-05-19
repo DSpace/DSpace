@@ -393,7 +393,8 @@ public class DiscoverQueryBuilder implements InitializingBean {
                 DiscoverFilterQuery filterQuery = searchService.toFilterQuery(context,
                                                                               filter.getIndexFieldName(),
                                                                               searchFilter.getOperator(),
-                                                                              searchFilter.getValue());
+                                                                              searchFilter.getValue(),
+                                                                              discoveryConfiguration);
 
                 if (filterQuery != null) {
                     filterQueries.add(filterQuery.getFilterQuery());
