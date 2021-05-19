@@ -92,9 +92,13 @@ public class OrcidAuthority extends ItemAuthority {
     }
 
     private String formatQuery(String text) {
-        return Arrays.stream(text.split(" "))
+        return Arrays.stream(replaceCommaWithSpace(text).split(" "))
             .map(name -> format("(given-names:%s+OR+family-name:%s+OR+other-names:%s)", name, name, name))
             .collect(Collectors.joining("+AND+"));
+    }
+
+    private String replaceCommaWithSpace(String text) {
+        return StringUtils.normalizeSpace(text.replaceAll(",", " "));
     }
 
     private Choice convertToChoice(ExpandedResult result) {

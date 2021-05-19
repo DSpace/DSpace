@@ -538,6 +538,41 @@ public class OrcidAuthorityIT extends AbstractControllerIntegrationTest {
 
     }
 
+    @Test
+    public void testWithLastNameAndFirstNameSeparatedByComma() throws Exception {
+
+        String expectedQuery = "(given-names:Wayne+OR+family-name:Wayne+OR+other-names:Wayne)"
+            + "+AND+(given-names:Bruce+OR+family-name:Bruce+OR+other-names:Bruce)";
+
+        when(orcidClientMock.expandedSearch(eq(READ_PUBLIC_TOKEN), eq(expectedQuery), anyInt(), anyInt()))
+            .thenReturn(expandedSearch(0l, List.of()));
+
+        List<ExpandedResult> orcidSearchResults = List.of(
+            expandedResult("Author", "From Orcid 1", "0000-1111-2222-3333"),
+            expandedResult("AUTHOR", "FROM ORCID 2", "0000-2222-3333-4444"),
+            expandedResult("Author", "From Orcid 3", "0000-5555-6666-7777"));
+
+        when(orcidClientMock.expandedSearch(READ_PUBLIC_TOKEN, expectedQuery, 0, 20))
+            .thenReturn(expandedSearch(3, orcidSearchResults));
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/submission/vocabularies/AuthorAuthority/entries")
+            .param("filter", "Wayne, Bruce"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.entries", containsInAnyOrder(
+                orcidEntry("Author From Orcid 1", REFERENCE, "0000-1111-2222-3333"),
+                orcidEntry("Author From Orcid 2", REFERENCE, "0000-2222-3333-4444"),
+                orcidEntry("Author From Orcid 3", REFERENCE, "0000-5555-6666-7777"))))
+            .andExpect(jsonPath("$.page.size", Matchers.is(20)))
+            .andExpect(jsonPath("$.page.totalPages", Matchers.is(1)))
+            .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
+
+        verify(orcidClientMock).getReadPublicAccessToken();
+        verify(orcidClientMock).expandedSearch(READ_PUBLIC_TOKEN, expectedQuery, 0, 20);
+        verifyNoMoreInteractions(orcidClientMock);
+
+    }
+
     private ExpandedSearch buildExpandedSearchFromSublist(List<ExpandedResult> totalResults, int start, int rows) {
         int total = totalResults.size();
         if (start > total) {
