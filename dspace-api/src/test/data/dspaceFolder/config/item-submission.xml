@@ -259,6 +259,7 @@
 	      <step id="publication_indexing" />
 	      <step id="publication_bibliographic_details" />
 	      <step id="publication_references" />
+	      <step id="detect-duplicate"/>
 	      <step id="upload" />
 	      <step id="license" />
 	    </submission-process>
