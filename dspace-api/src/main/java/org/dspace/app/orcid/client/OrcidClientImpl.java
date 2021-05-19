@@ -203,8 +203,15 @@ public class OrcidClientImpl implements OrcidClient {
 
     @Override
     public ExpandedSearch expandedSearch(String accessToken, String query, int start, int rows) {
-        String queryParams = String.format("?q=%s&start=%s&rows=%s", query, start, rows);
+        String queryParams = formatExpandedSearchParameters(query, start, rows);
         HttpUriRequest httpUriRequest = buildGetUriRequest(accessToken, "/expanded-search" + queryParams);
+        return executeAndUnmarshall(httpUriRequest, false, ExpandedSearch.class);
+    }
+
+    @Override
+    public ExpandedSearch expandedSearch(String query, int start, int rows) {
+        String queryParams = formatExpandedSearchParameters(query, start, rows);
+        HttpUriRequest httpUriRequest = buildGetUriRequestToPublicEndpoint("/expanded-search" + queryParams);
         return executeAndUnmarshall(httpUriRequest, false, ExpandedSearch.class);
     }
 
@@ -228,6 +235,12 @@ public class OrcidClientImpl implements OrcidClient {
         return get(orcidConfiguration.getApiUrl() + relativePath.trim())
             .addHeader("Content-Type", "application/x-www-form-urlencoded")
             .addHeader("Authorization", "Bearer " + accessToken)
+            .build();
+    }
+
+    private HttpUriRequest buildGetUriRequestToPublicEndpoint(String relativePath) {
+        return get(orcidConfiguration.getApiUrl() + relativePath.trim())
+            .addHeader("Content-Type", "application/x-www-form-urlencoded")
             .build();
     }
 
@@ -258,6 +271,10 @@ public class OrcidClientImpl implements OrcidClient {
         return delete(baseUrl + relativePath.trim())
             .addHeader("Authorization", "Bearer " + accessToken)
             .build();
+    }
+
+    private String formatExpandedSearchParameters(String query, int start, int rows) {
+        return String.format("?q=%s&start=%s&rows=%s", query, start, rows);
     }
 
     private <T> T executeAndParseJson(HttpUriRequest httpUriRequest, Class<T> clazz) {

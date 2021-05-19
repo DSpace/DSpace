@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.orcid.client.OrcidClient;
 import org.dspace.app.orcid.client.OrcidConfiguration;
 import org.dspace.app.orcid.factory.OrcidServiceFactory;
@@ -51,10 +52,6 @@ public class OrcidAuthority extends ItemAuthority {
     public Choices getMatches(String text, int start, int limit, String locale) {
         Choices itemChoices = super.getMatches(text, start, limit, locale);
 
-        if (!getOrcidConfiguration().isApiConfigured()) {
-            return itemChoices;
-        }
-
         int orcidSearchStart = start > itemChoices.total ? start - itemChoices.total : 0;
         int orcidSearchLimit = limit > itemChoices.values.length ? limit - itemChoices.values.length : 0;
 
@@ -75,12 +72,10 @@ public class OrcidAuthority extends ItemAuthority {
 
     private Choices performOrcidSearch(String text, int start, int rows) {
 
-        String accessToken = getAccessToken();
         String query = formatQuery(text);
+        ExpandedSearch searchResult = expandedSearch(query, start, rows);
 
-        ExpandedSearch searchResult = getOrcidClient().expandedSearch(accessToken, query, start, rows);
         List<ExpandedResult> searchResults = searchResult.getResults();
-
         int total = searchResult.getNumFound() != null ? searchResult.getNumFound().intValue() : searchResults.size();
 
         Choice[] choices = searchResults.stream()
@@ -99,6 +94,14 @@ public class OrcidAuthority extends ItemAuthority {
 
     private String replaceCommaWithSpace(String text) {
         return StringUtils.normalizeSpace(text.replaceAll(",", " "));
+    }
+
+    private ExpandedSearch expandedSearch(String query, int start, int rows) {
+        if (getOrcidConfiguration().isApiConfigured()) {
+            return getOrcidClient().expandedSearch(getAccessToken(), query, start, rows);
+        } else {
+            return getOrcidClient().expandedSearch(query, start, rows);
+        }
     }
 
     private Choice convertToChoice(ExpandedResult result) {

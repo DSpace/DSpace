@@ -15,7 +15,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -329,6 +328,7 @@ public class OrcidAuthorityIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void testWithErrorRetrivingAccessToken() throws Exception {
+
         configurationService.setProperty("orcid.authority.prefix", "will be referenced::ORCID::");
 
         context.turnOffAuthorisationSystem();
@@ -438,68 +438,81 @@ public class OrcidAuthorityIT extends AbstractControllerIntegrationTest {
     @Test
     public void testWithoutClientIdConfiguration() throws Exception {
 
+        configurationService.setProperty("orcid.authority.prefix", "will be generated::ORCID::");
+
         orcidConfiguration.setClientId(null);
 
         context.turnOffAuthorisationSystem();
 
-        Item orgUnit_1 = buildOrgUnit("OrgUnit_1");
-        Item orgUnit_2 = buildOrgUnit("OrgUnit_2");
-        Item author_1 = buildPerson("Author 1", orgUnit_1);
+        Item author_1 = buildPerson("Author 1");
         Item author_2 = buildPerson("Author 2");
-        Item author_3 = buildPerson("Author 3", orgUnit_2);
-        Item author_4 = buildPerson("Author 4", orgUnit_1);
 
         context.restoreAuthSystemState();
+
+        String expectedQuery = "(given-names:author+OR+family-name:author+OR+other-names:author)";
+
+        List<ExpandedResult> results = List.of(
+            expandedResult("Author", "From Orcid 1", "0000-1111-2222-3333"),
+            expandedResult("AUTHOR", "FROM ORCID 2", "0000-2222-3333-4444"));
+
+        when(orcidClientMock.expandedSearch(eq(expectedQuery), anyInt(), anyInt()))
+            .thenReturn(expandedSearch(2, results));
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/submission/vocabularies/AuthorAuthority/entries")
             .param("filter", "author"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.entries", containsInAnyOrder(
-                affiliationEntry(author_1, "Author 1", "OrgUnit_1::" + id(orgUnit_1)),
+                affiliationEntry(author_1, "Author 1", ""),
                 affiliationEntry(author_2, "Author 2", ""),
-                affiliationEntry(author_3, "Author 3", "OrgUnit_2::" + id(orgUnit_2)),
-                affiliationEntry(author_4, "Author 4", "OrgUnit_1::" + id(orgUnit_1)))))
+                orcidEntry("Author From Orcid 1", GENERATE, "0000-1111-2222-3333"),
+                orcidEntry("Author From Orcid 2", GENERATE, "0000-2222-3333-4444"))))
             .andExpect(jsonPath("$.page.size", Matchers.is(20)))
             .andExpect(jsonPath("$.page.totalPages", Matchers.is(1)))
             .andExpect(jsonPath("$.page.totalElements", Matchers.is(4)));
 
-        verifyNoInteractions(orcidClientMock);
+        verify(orcidClientMock).expandedSearch(expectedQuery, 0, 18);
+        verifyNoMoreInteractions(orcidClientMock);
     }
 
     @Test
     public void testWithoutClientSecretConfiguration() throws Exception {
 
+        configurationService.setProperty("orcid.authority.prefix", "will be generated::ORCID::");
+
         orcidConfiguration.setClientSecret(null);
 
         context.turnOffAuthorisationSystem();
 
-        Item orgUnit_1 = buildOrgUnit("OrgUnit_1");
-        Item orgUnit_2 = buildOrgUnit("OrgUnit_2");
-        Item author_1 = buildPerson("Author 1", orgUnit_1);
+        Item author_1 = buildPerson("Author 1");
         Item author_2 = buildPerson("Author 2");
-        Item author_3 = buildPerson("Author 3", orgUnit_2);
-        Item author_4 = buildPerson("Author 4", orgUnit_1);
 
         context.restoreAuthSystemState();
 
-        when(orcidClientMock.expandedSearch(eq(READ_PUBLIC_TOKEN), eq("author"), anyInt(), anyInt()))
-            .thenReturn(expandedSearch(0, List.of()));
+        String expectedQuery = "(given-names:author+OR+family-name:author+OR+other-names:author)";
+
+        List<ExpandedResult> results = List.of(
+            expandedResult("Author", "From Orcid 1", "0000-1111-2222-3333"),
+            expandedResult("AUTHOR", "FROM ORCID 2", "0000-2222-3333-4444"));
+
+        when(orcidClientMock.expandedSearch(eq(expectedQuery), anyInt(), anyInt()))
+            .thenReturn(expandedSearch(2, results));
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/submission/vocabularies/AuthorAuthority/entries")
             .param("filter", "author"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.entries", containsInAnyOrder(
-                affiliationEntry(author_1, "Author 1", "OrgUnit_1::" + id(orgUnit_1)),
+                affiliationEntry(author_1, "Author 1", ""),
                 affiliationEntry(author_2, "Author 2", ""),
-                affiliationEntry(author_3, "Author 3", "OrgUnit_2::" + id(orgUnit_2)),
-                affiliationEntry(author_4, "Author 4", "OrgUnit_1::" + id(orgUnit_1)))))
+                orcidEntry("Author From Orcid 1", GENERATE, "0000-1111-2222-3333"),
+                orcidEntry("Author From Orcid 2", GENERATE, "0000-2222-3333-4444"))))
             .andExpect(jsonPath("$.page.size", Matchers.is(20)))
             .andExpect(jsonPath("$.page.totalPages", Matchers.is(1)))
             .andExpect(jsonPath("$.page.totalElements", Matchers.is(4)));
 
-        verifyNoInteractions(orcidClientMock);
+        verify(orcidClientMock).expandedSearch(expectedQuery, 0, 18);
+        verifyNoMoreInteractions(orcidClientMock);
     }
 
     @Test

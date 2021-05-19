@@ -19,6 +19,8 @@ public final class OrcidConfiguration {
 
     private String apiUrl;
 
+    private String publicUrl;
+
     private String domainUrl;
 
     private String redirectUrl;
@@ -105,6 +107,14 @@ public final class OrcidConfiguration {
 
     public void setWebhookUrl(String webhookUrl) {
         this.webhookUrl = webhookUrl;
+    }
+
+    public String getPublicUrl() {
+        return publicUrl;
+    }
+
+    public void setPublicUrl(String publicUrl) {
+        this.publicUrl = publicUrl;
     }
 
     public boolean isApiConfigured() {

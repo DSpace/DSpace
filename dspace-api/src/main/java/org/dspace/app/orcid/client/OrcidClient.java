@@ -175,7 +175,8 @@ public interface OrcidClient {
     OrcidResponse unregisterWebhook(String accessToken, String orcid, String url);
 
     /**
-     * Perform an expanded search with the given query and pagination.
+     * Perform an expanded search with the given query and pagination using the api
+     * endpoint.
      *
      * @param  accessToken the access token
      * @param  query       the query
@@ -184,5 +185,17 @@ public interface OrcidClient {
      * @return             the expanded search result
      */
     ExpandedSearch expandedSearch(String accessToken, String query, int start, int rows);
+
+    /**
+     * Perform an expanded search with the given query and pagination using the
+     * public endpoint.
+     *
+     * @param  accessToken the access token
+     * @param  query       the query
+     * @param  start       the start index
+     * @param  rows        the number of rows to retrieve
+     * @return             the expanded search result
+     */
+    ExpandedSearch expandedSearch(String query, int start, int rows);
 
 }
