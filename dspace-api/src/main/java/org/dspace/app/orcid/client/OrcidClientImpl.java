@@ -63,6 +63,7 @@ import org.orcid.jaxb.model.v3.release.record.ResearcherUrl;
 import org.orcid.jaxb.model.v3.release.record.Work;
 import org.orcid.jaxb.model.v3.release.record.WorkBulk;
 import org.orcid.jaxb.model.v3.release.record.summary.Works;
+import org.orcid.jaxb.model.v3.release.search.expanded.ExpandedSearch;
 
 /**
  * Implementation of {@link OrcidClient}.
@@ -200,6 +201,20 @@ public class OrcidClientImpl implements OrcidClient {
         return execute(buildDeleteUriRequest(accessToken, webhookUrl, "/" + orcid + "/webhook/" + encodedUrl), true);
     }
 
+    @Override
+    public ExpandedSearch expandedSearch(String accessToken, String query, int start, int rows) {
+        String queryParams = formatExpandedSearchParameters(query, start, rows);
+        HttpUriRequest httpUriRequest = buildGetUriRequest(accessToken, "/expanded-search" + queryParams);
+        return executeAndUnmarshall(httpUriRequest, false, ExpandedSearch.class);
+    }
+
+    @Override
+    public ExpandedSearch expandedSearch(String query, int start, int rows) {
+        String queryParams = formatExpandedSearchParameters(query, start, rows);
+        HttpUriRequest httpUriRequest = buildGetUriRequestToPublicEndpoint("/expanded-search" + queryParams);
+        return executeAndUnmarshall(httpUriRequest, false, ExpandedSearch.class);
+    }
+
     private OrcidTokenResponseDTO getClientCredentialsAccessToken(String scope) {
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("scope", scope));
@@ -220,6 +235,12 @@ public class OrcidClientImpl implements OrcidClient {
         return get(orcidConfiguration.getApiUrl() + relativePath.trim())
             .addHeader("Content-Type", "application/x-www-form-urlencoded")
             .addHeader("Authorization", "Bearer " + accessToken)
+            .build();
+    }
+
+    private HttpUriRequest buildGetUriRequestToPublicEndpoint(String relativePath) {
+        return get(orcidConfiguration.getApiUrl() + relativePath.trim())
+            .addHeader("Content-Type", "application/x-www-form-urlencoded")
             .build();
     }
 
@@ -250,6 +271,10 @@ public class OrcidClientImpl implements OrcidClient {
         return delete(baseUrl + relativePath.trim())
             .addHeader("Authorization", "Bearer " + accessToken)
             .build();
+    }
+
+    private String formatExpandedSearchParameters(String query, int start, int rows) {
+        return String.format("?q=%s&start=%s&rows=%s", query, start, rows);
     }
 
     private <T> T executeAndParseJson(HttpUriRequest httpUriRequest, Class<T> clazz) {

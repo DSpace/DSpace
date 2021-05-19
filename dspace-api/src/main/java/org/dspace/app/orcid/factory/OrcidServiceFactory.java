@@ -9,6 +9,8 @@ package org.dspace.app.orcid.factory;
 
 import java.util.List;
 
+import org.dspace.app.orcid.client.OrcidClient;
+import org.dspace.app.orcid.client.OrcidConfiguration;
 import org.dspace.app.orcid.service.MetadataSignatureGenerator;
 import org.dspace.app.orcid.service.OrcidEntityFactoryService;
 import org.dspace.app.orcid.service.OrcidHistoryService;
@@ -43,6 +45,10 @@ public abstract class OrcidServiceFactory {
     public abstract OrcidEntityFactoryService getOrcidEntityFactoryService();
 
     public abstract List<OrcidWebhookAction> getOrcidWebhookActions();
+
+    public abstract OrcidClient getOrcidClient();
+
+    public abstract OrcidConfiguration getOrcidConfiguration();
 
     public static OrcidServiceFactory getInstance() {
         return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(

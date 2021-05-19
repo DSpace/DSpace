@@ -8,6 +8,7 @@
 package org.dspace.app.rest.matcher;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
@@ -39,7 +40,8 @@ public class ItemAuthorityMatcher {
                 hasJsonPath("$.display", is(display)),
                 hasJsonPath("$.value", is(value)),
                 hasJsonPath("$.type", is(type)),
-                hasJsonPath("$.otherInformation['data-" + otherInfMetadata + "']", is(metadataValue))
+                hasJsonPath("$.otherInformation", aMapWithSize(1)),
+                hasJsonPath("$.otherInformation['" + otherInfMetadata + "']", is(metadataValue))
         );
     }
 
@@ -51,9 +53,10 @@ public class ItemAuthorityMatcher {
                 hasJsonPath("$.display", is(display)),
                 hasJsonPath("$.value", is(value)),
                 hasJsonPath("$.type", is(type)),
+                hasJsonPath("$.otherInformation", aMapWithSize(2)),
                 allOf (
-                      hasJsonPath("$.otherInformation.data-dc_" + firstOtherMetadata, is(firstOtherValue)),
-                      hasJsonPath("$.otherInformation.data-dc_" + secondOtherMetadata, is(secondOtherValue))
+                      hasJsonPath("$.otherInformation." + firstOtherMetadata, is(firstOtherValue)),
+                      hasJsonPath("$.otherInformation." + secondOtherMetadata, is(secondOtherValue))
                 )
         );
     }

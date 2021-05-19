@@ -19,6 +19,8 @@ public final class OrcidConfiguration {
 
     private String apiUrl;
 
+    private String publicUrl;
+
     private String domainUrl;
 
     private String redirectUrl;
@@ -99,18 +101,24 @@ public final class OrcidConfiguration {
         return StringUtils.isNotBlank(scopes) ? StringUtils.split(scopes, ",") : new String[] {};
     }
 
-    /**
-     * @return the webhookUrl
-     */
     public String getWebhookUrl() {
         return webhookUrl;
     }
 
-    /**
-     * @param webhookUrl the webhookUrl to set
-     */
     public void setWebhookUrl(String webhookUrl) {
         this.webhookUrl = webhookUrl;
+    }
+
+    public String getPublicUrl() {
+        return publicUrl;
+    }
+
+    public void setPublicUrl(String publicUrl) {
+        this.publicUrl = publicUrl;
+    }
+
+    public boolean isApiConfigured() {
+        return !StringUtils.isAnyBlank(clientId, clientSecret);
     }
 
 }

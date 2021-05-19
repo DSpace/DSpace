@@ -11,6 +11,8 @@ import static java.util.Collections.emptyList;
 
 import java.util.List;
 
+import org.dspace.app.orcid.client.OrcidClient;
+import org.dspace.app.orcid.client.OrcidConfiguration;
 import org.dspace.app.orcid.service.MetadataSignatureGenerator;
 import org.dspace.app.orcid.service.OrcidEntityFactoryService;
 import org.dspace.app.orcid.service.OrcidHistoryService;
@@ -53,6 +55,12 @@ public class OrcidServiceFactoryImpl extends OrcidServiceFactory {
     @Autowired(required = false)
     private List<OrcidWebhookAction> orcidWebhookActions;
 
+    @Autowired
+    private OrcidClient orcidClient;
+
+    @Autowired
+    private OrcidConfiguration orcidConfiguration;
+
     @Override
     public OrcidHistoryService getOrcidHistoryService() {
         return orcidHistoryService;
@@ -91,6 +99,20 @@ public class OrcidServiceFactoryImpl extends OrcidServiceFactory {
     @Override
     public List<OrcidWebhookAction> getOrcidWebhookActions() {
         return orcidWebhookActions != null ? orcidWebhookActions : emptyList();
+    }
+
+    @Override
+    public OrcidClient getOrcidClient() {
+        return orcidClient;
+    }
+
+    @Override
+    public OrcidConfiguration getOrcidConfiguration() {
+        return orcidConfiguration;
+    }
+
+    public void setOrcidClient(OrcidClient orcidClient) {
+        this.orcidClient = orcidClient;
     }
 
 }

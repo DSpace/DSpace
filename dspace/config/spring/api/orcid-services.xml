@@ -22,6 +22,7 @@
     
     <bean class="org.dspace.app.orcid.client.OrcidConfiguration">
     	<property name="apiUrl" value="${orcid.api-url}" />
+    	<property name="publicUrl" value="${orcid.public-url}" />
     	<property name="domainUrl" value="${orcid.domain-url}" />
     	<property name="redirectUrl" value="${orcid.redirect-url}" />
     	<property name="clientId" value="${orcid.application-client-id}" />
