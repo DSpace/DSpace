@@ -144,12 +144,17 @@ public class CreateWorkspaceItemWithExternalSource extends DSpaceRunnable<
     private UUID getCollectionUUID() {
         switch (this.service) {
             case "scopus":
-                return UUID.fromString(configurationService.getProperty("scopus.importworkspaceitem.collection-id"));
+                return getUuid("scopus.importworkspaceitem.collection-id");
             case "wos":
-                return UUID.fromString(configurationService.getProperty("wos.importworkspaceitem.collection-id"));
+                return getUuid("wos.importworkspaceitem.collection-id");
             default:
         }
         return null;
+    }
+
+    private UUID getUuid(final String property) {
+        final String propertyValue = configurationService.getProperty(property);
+        return StringUtils.isBlank(propertyValue) ? null : UUID.fromString(propertyValue);
     }
 
     private EPerson findEPerson() throws SQLException {
