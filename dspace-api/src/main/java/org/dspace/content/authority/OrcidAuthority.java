@@ -16,10 +16,12 @@ import static org.dspace.authority.service.AuthorityValueService.SPLIT;
 import static org.dspace.content.authority.Choices.CF_AMBIGUOUS;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.orcid.client.OrcidClient;
 import org.dspace.app.orcid.client.OrcidConfiguration;
@@ -40,9 +42,11 @@ import org.slf4j.LoggerFactory;
  */
 public class OrcidAuthority extends ItemAuthority {
 
-    private static final String ORCID_EXTRA = "data-person_identifier_orcid";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(OrcidAuthority.class);
+
+    public static final String ORCID_EXTRA = "data-person_identifier_orcid";
+
+    public static final String INSTITUTION_EXTRA = "institution-affiliation-name";
 
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
@@ -105,10 +109,10 @@ public class OrcidAuthority extends ItemAuthority {
     }
 
     private Choice convertToChoice(ExpandedResult result) {
-        String orcid = result.getOrcidId();
         String title = getTitle(result);
-        String authority = composeAuthorityValue(orcid);
-        return new Choice(authority, title, title, Map.of(ORCID_EXTRA, orcid));
+        String authority = composeAuthorityValue(result.getOrcidId());
+        Map<String, String> extras = composeExtras(result);
+        return new Choice(authority, title, title, extras);
     }
 
     private String getTitle(ExpandedResult result) {
@@ -124,6 +128,18 @@ public class OrcidAuthority extends ItemAuthority {
     private String composeAuthorityValue(String orcid) {
         String prefix = configurationService.getProperty("orcid.authority.prefix", REFERENCE + "ORCID" + SPLIT);
         return prefix.endsWith(SPLIT) ? prefix + orcid : prefix + SPLIT + orcid;
+    }
+
+    private Map<String, String> composeExtras(ExpandedResult result) {
+        Map<String, String> extras = new HashMap<>();
+        extras.put(ORCID_EXTRA, result.getOrcidId());
+
+        String[] institutionNames = result.getInstitutionNames();
+        if (ArrayUtils.isNotEmpty(institutionNames)) {
+            extras.put(INSTITUTION_EXTRA, String.join(", ", institutionNames));
+        }
+
+        return extras;
     }
 
     private String getAccessToken() {

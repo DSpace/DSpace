@@ -97,15 +97,15 @@ public class ItemAuthorityIT extends AbstractControllerIntegrationTest {
                         .andExpect(jsonPath("$._embedded.entries", Matchers.containsInAnyOrder(
                             ItemAuthorityMatcher.matchItemAuthorityWithOtherInformations(author_1.getID().toString(),
                                 "Author 1", "Author 1", "vocabularyEntry",
-                                "oairecerif_author_affiliation", "OrgUnit_1::"
+                                "data-oairecerif_author_affiliation", "OrgUnit_1::"
                                     + orgUnit_1.getID()),
                             ItemAuthorityMatcher.matchItemAuthorityWithOtherInformations(author_2.getID().toString(),
                                 "Author 2", "Author 2", "vocabularyEntry",
-                                "oairecerif_author_affiliation", "OrgUnit_1::"
+                                "data-oairecerif_author_affiliation", "OrgUnit_1::"
                                     + orgUnit_1.getID()),
                             ItemAuthorityMatcher.matchItemAuthorityWithOtherInformations(author_3.getID().toString(),
                                 "Author 3", "Author 3", "vocabularyEntry",
-                                "oairecerif_author_affiliation", "OrgUnit_2::"
+                                "data-oairecerif_author_affiliation", "OrgUnit_2::"
                                     + orgUnit_2.getID())
                         )))
                         .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
@@ -172,14 +172,14 @@ public class ItemAuthorityIT extends AbstractControllerIntegrationTest {
                        .andExpect(jsonPath("$._embedded.entries", Matchers.containsInAnyOrder(
                                // filled with AuthorAuthority extra metadata generator
                                ItemAuthorityMatcher.matchItemAuthorityWithOtherInformations(author_1.getID().toString(),
-                               "Author 1(OrgUnit_1)", "Author 1", "vocabularyEntry", "oairecerif_author_affiliation",
-                               "OrgUnit_1::" + orgUnit_1.getID()),
+                               "Author 1(OrgUnit_1)", "Author 1", "vocabularyEntry",
+                               "data-oairecerif_author_affiliation", "OrgUnit_1::" + orgUnit_1.getID()),
                                ItemAuthorityMatcher.matchItemAuthorityWithOtherInformations(author_1.getID().toString(),
-                               "Author 1(OrgUnit_2)", "Author 1", "vocabularyEntry", "oairecerif_author_affiliation",
-                               "OrgUnit_2::" + orgUnit_2.getID()),
+                               "Author 1(OrgUnit_2)", "Author 1", "vocabularyEntry",
+                               "data-oairecerif_author_affiliation", "OrgUnit_2::" + orgUnit_2.getID()),
                                ItemAuthorityMatcher.matchItemAuthorityWithOtherInformations(author_2.getID().toString(),
-                               "Author 2(OrgUnit_2)", "Author 2", "vocabularyEntry", "oairecerif_author_affiliation",
-                               "OrgUnit_2::" + orgUnit_2.getID()),
+                               "Author 2(OrgUnit_2)", "Author 2", "vocabularyEntry",
+                               "data-oairecerif_author_affiliation", "OrgUnit_2::" + orgUnit_2.getID()),
                                // filled with EditorAuthority extra metadata generator
                                ItemAuthorityMatcher.matchItemAuthorityProperties(author_1.getID().toString(),
                                "Author 1", "Author 1", "vocabularyEntry"),
@@ -213,7 +213,7 @@ public class ItemAuthorityIT extends AbstractControllerIntegrationTest {
                        .andExpect(status().isOk())
                        .andExpect(jsonPath("$._embedded.entries", Matchers.contains(
                            ItemAuthorityMatcher.matchItemAuthorityWithOtherInformations(author_1.getID().toString(),
-                               "Author 1", "Author 1", "vocabularyEntry", "oairecerif_author_affiliation", "")
+                               "Author 1", "Author 1", "vocabularyEntry", "data-oairecerif_author_affiliation", "")
                        )))
                        .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
     }

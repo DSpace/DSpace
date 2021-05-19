@@ -55,8 +55,9 @@ import org.orcid.jaxb.model.v3.release.search.expanded.ExpandedSearch;
  */
 public class OrcidAuthorityIT extends AbstractControllerIntegrationTest {
 
-    private static final String AFFILIATION_INFO = "oairecerif_author_affiliation";
-    private static final String ORCID_INFO = "person_identifier_orcid";
+    private static final String AFFILIATION_INFO = "data-oairecerif_author_affiliation";
+    private static final String ORCID_INFO = OrcidAuthority.ORCID_EXTRA;
+    private static final String ORCID_INSTITUTION = OrcidAuthority.INSTITUTION_EXTRA;
 
     private static final String READ_PUBLIC_TOKEN = "062d9f30-7e11-47ef-bd95-eaa2f2452565";
 
@@ -157,8 +158,6 @@ public class OrcidAuthorityIT extends AbstractControllerIntegrationTest {
     @Test
     public void testWithWillBeReferencedAuthorityPrefix() throws Exception {
 
-        configurationService.setProperty("orcid.authority.prefix", "will be referenced::ORCID::");
-
         context.turnOffAuthorisationSystem();
 
         Item orgUnit_1 = buildOrgUnit("OrgUnit_1");
@@ -205,8 +204,6 @@ public class OrcidAuthorityIT extends AbstractControllerIntegrationTest {
     @Test
     public void testWithPagination() throws Exception {
 
-        configurationService.setProperty("orcid.authority.prefix", "will be referenced::ORCID");
-
         context.turnOffAuthorisationSystem();
 
         Item orgUnit_1 = buildOrgUnit("OrgUnit_1");
@@ -223,12 +220,12 @@ public class OrcidAuthorityIT extends AbstractControllerIntegrationTest {
             expandedResult("AUTHOR", "FROM ORCID 2", "0000-2222-3333-4444"),
             expandedResult("Author", "From Orcid 3", "0000-5555-6666-7777"));
 
-        String token = getAuthToken(eperson.getEmail(), password);
-
         String expectedQuery = "(given-names:author+OR+family-name:author+OR+other-names:author)";
 
         when(orcidClientMock.expandedSearch(eq(READ_PUBLIC_TOKEN), eq(expectedQuery), anyInt(), anyInt()))
             .thenAnswer((i) -> buildExpandedSearchFromSublist(results, i.getArgument(2), i.getArgument(3)));
+
+        String token = getAuthToken(eperson.getEmail(), password);
 
         getClient(token).perform(get("/api/submission/vocabularies/AuthorAuthority/entries")
             .param("filter", "author")
@@ -328,8 +325,6 @@ public class OrcidAuthorityIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void testWithErrorRetrivingAccessToken() throws Exception {
-
-        configurationService.setProperty("orcid.authority.prefix", "will be referenced::ORCID::");
 
         context.turnOffAuthorisationSystem();
 
@@ -586,6 +581,36 @@ public class OrcidAuthorityIT extends AbstractControllerIntegrationTest {
 
     }
 
+    @Test
+    public void testWithAffiliationExtra() throws Exception {
+
+        List<ExpandedResult> orcidSearchResults = List.of(
+            expandedResult("Author", "From Orcid 1", "0000-1111-2222-3333"),
+            expandedResult("AUTHOR", "FROM ORCID 2", "0000-2222-3333-4444", new String[] { "Org1", "Org2" }),
+            expandedResult("Author", "From Orcid 3", "0000-5555-6666-7777", new String[] { "Organization" }));
+
+        String expectedQuery = "(given-names:author+OR+family-name:author+OR+other-names:author)";
+
+        when(orcidClientMock.expandedSearch(READ_PUBLIC_TOKEN, expectedQuery, 0, 20))
+            .thenReturn(expandedSearch(3, orcidSearchResults));
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/submission/vocabularies/AuthorAuthority/entries")
+            .param("filter", "author"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.entries", containsInAnyOrder(
+                orcidEntry("Author From Orcid 1", REFERENCE, "0000-1111-2222-3333"),
+                orcidEntryWithInstitution("Author From Orcid 2", REFERENCE, "0000-2222-3333-4444", "Org1, Org2"),
+                orcidEntryWithInstitution("Author From Orcid 3", REFERENCE, "0000-5555-6666-7777", "Organization"))))
+            .andExpect(jsonPath("$.page.size", Matchers.is(20)))
+            .andExpect(jsonPath("$.page.totalPages", Matchers.is(1)))
+            .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
+
+        verify(orcidClientMock).getReadPublicAccessToken();
+        verify(orcidClientMock).expandedSearch(READ_PUBLIC_TOKEN, expectedQuery, 0, 20);
+        verifyNoMoreInteractions(orcidClientMock);
+    }
+
     private ExpandedSearch buildExpandedSearchFromSublist(List<ExpandedResult> totalResults, int start, int rows) {
         int total = totalResults.size();
         if (start > total) {
@@ -607,12 +632,17 @@ public class OrcidAuthorityIT extends AbstractControllerIntegrationTest {
         return expandedSearch;
     }
 
-    private ExpandedResult expandedResult(String givenName, String familyName, String orcid) {
+    private ExpandedResult expandedResult(String givenName, String familyName, String orcid, String[] institutions) {
         ExpandedResult result = new ExpandedResult();
         result.setGivenNames(givenName);
         result.setFamilyNames(familyName);
         result.setOrcidId(orcid);
+        result.setInstitutionNames(institutions);
         return result;
+    }
+
+    private ExpandedResult expandedResult(String givenName, String familyName, String orcid) {
+        return expandedResult(givenName, familyName, orcid, null);
     }
 
     private Item buildOrgUnit(String title) {
@@ -646,6 +676,13 @@ public class OrcidAuthorityIT extends AbstractControllerIntegrationTest {
         String authority = authorityPrefix + "ORCID::" + orcid;
         return ItemAuthorityMatcher.matchItemAuthorityWithOtherInformations(authority, title,
             title, "vocabularyEntry", ORCID_INFO, orcid);
+    }
+
+    private Matcher<? super Object> orcidEntryWithInstitution(String title, String authorityPrefix,
+        String orcid, String institutions) {
+        String authority = authorityPrefix + "ORCID::" + orcid;
+        return ItemAuthorityMatcher.matchItemAuthorityWithTwoMetadataInOtherInformations(authority, title,
+            title, "vocabularyEntry", ORCID_INFO, orcid, ORCID_INSTITUTION, institutions);
     }
 
     private String id(Item item) {

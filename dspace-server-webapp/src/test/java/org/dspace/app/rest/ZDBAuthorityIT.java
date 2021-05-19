@@ -33,23 +33,23 @@ public class ZDBAuthorityIT extends AbstractControllerIntegrationTest {
                 Matchers.containsInAnyOrder(
                     ItemAuthorityMatcher.matchItemAuthorityWithTwoMetadataInOtherInformations(
                         "will be generated::zdb::1447228-4", "Acta mathematica et informatica",
-                        "Acta mathematica et informatica", "vocabularyEntry", "relation_ispartof",
+                        "Acta mathematica et informatica", "vocabularyEntry", "data-dc_relation_ispartof",
                         "Acta mathematica et informatica::will be generated::zdb::1447228-4",
-                        "relation_issn", ""),
+                        "data-dc_relation_issn", ""),
                     ItemAuthorityMatcher.matchItemAuthorityWithTwoMetadataInOtherInformations(
                         "will be generated::zdb::1194912-0",
                         "Acta mathematica Universitatis Ostraviensis",
                         "Acta mathematica Universitatis Ostraviensis", "vocabularyEntry",
-                        "relation_ispartof",
+                        "data-dc_relation_ispartof",
                         "Acta mathematica Universitatis Ostraviensis::will be generated::zdb::1194912-0",
-                        "relation_issn", "1211-4774"),
+                        "data-dc_relation_issn", "1211-4774"),
                     ItemAuthorityMatcher.matchItemAuthorityWithTwoMetadataInOtherInformations(
                         "will be generated::zdb::2618143-5",
                         "Acta mathematica Universitatis Ostraviensis",
                         "Acta mathematica Universitatis Ostraviensis", "vocabularyEntry",
-                        "relation_ispartof",
+                        "data-dc_relation_ispartof",
                         "Acta mathematica Universitatis Ostraviensis::will be generated::zdb::2618143-5",
-                        "relation_issn", ""))))
+                        "data-dc_relation_issn", ""))))
             .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
     }
 
