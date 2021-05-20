@@ -17,6 +17,7 @@ import java.util.List;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.authority.Choices;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
@@ -127,8 +128,10 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
         context.turnOffAuthorisationSystem();
 
         // Here we add the first set of metadata to the item
-        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, one");
-        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, two");
+        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, one",
+            null, Choices.CF_UNSET);
+        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, two",
+            null, Choices.CF_UNSET);
 
         // Here we create the first Relationship to the item
         Relationship relationship = relationshipService
@@ -150,15 +153,20 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
         context.turnOffAuthorisationSystem();
 
         // This is where we add the second set of metadata values
-        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, three");
-        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, four");
+        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, three",
+            null, Choices.CF_UNSET);
+        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, four",
+            null, Choices.CF_UNSET);
 
         // Here we create an Item so that we can create another relationship with this item
         WorkspaceItem authorIs = workspaceItemService.create(context, col, false);
         Item secondAuthorItem = installItemService.installItem(context, authorIs);
-        itemService.addMetadata(context, secondAuthorItem, "dspace", "entity", "type", null, "Person");
-        itemService.addMetadata(context, secondAuthorItem, "person", "familyName", null, null, "familyNameTwo");
-        itemService.addMetadata(context, secondAuthorItem, "person", "givenName", null, null, "firstNameTwo");
+        itemService.addMetadata(context, secondAuthorItem, "dspace", "entity", "type", null, "Person",
+            null, Choices.CF_UNSET);
+        itemService.addMetadata(context, secondAuthorItem, "person", "familyName", null, null, "familyNameTwo",
+            null, Choices.CF_UNSET);
+        itemService.addMetadata(context, secondAuthorItem, "person", "givenName", null, null, "firstNameTwo",
+            null, Choices.CF_UNSET);
         Relationship relationshipTwo = relationshipService
             .create(context, item, secondAuthorItem, isAuthorOfPublication, -1, -1);
 
@@ -193,8 +201,10 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
         context.turnOffAuthorisationSystem();
 
         // Here we add the first set of metadata to the item
-        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, one");
-        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, two");
+        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, one",
+            null, Choices.CF_UNSET);
+        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, two",
+            null, Choices.CF_UNSET);
 
         // Here we create the first Relationship to the item with the specific leftPlace: 2
         Relationship relationship = relationshipService.create(context, item, authorItem, isAuthorOfPublication, 2, -1);
@@ -215,16 +225,21 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
         context.turnOffAuthorisationSystem();
 
         // This is where we add the second set of metadata values
-        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, three");
-        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, four");
+        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, three",
+            null, Choices.CF_UNSET);
+        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, four",
+            null, Choices.CF_UNSET);
 
         // Here we create an Item so that we can create another relationship with this item. We'll give this
         // Relationship a specific place as well
         WorkspaceItem authorIs = workspaceItemService.create(context, col, false);
         Item secondAuthorItem = installItemService.installItem(context, authorIs);
-        itemService.addMetadata(context, secondAuthorItem, "dspace", "entity", "type", null, "Person");
-        itemService.addMetadata(context, secondAuthorItem, "person", "familyName", null, null, "familyNameTwo");
-        itemService.addMetadata(context, secondAuthorItem, "person", "givenName", null, null, "firstNameTwo");
+        itemService.addMetadata(context, secondAuthorItem, "dspace", "entity", "type", null, "Person",
+            null, Choices.CF_UNSET);
+        itemService.addMetadata(context, secondAuthorItem, "person", "familyName", null, null, "familyNameTwo",
+            null, Choices.CF_UNSET);
+        itemService.addMetadata(context, secondAuthorItem, "person", "givenName", null, null, "firstNameTwo",
+            null, Choices.CF_UNSET);
         Relationship relationshipTwo = relationshipService
             .create(context, item, secondAuthorItem, isAuthorOfPublication, 5, -1);
 
@@ -261,9 +276,12 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
         context.turnOffAuthorisationSystem();
 
         // Here we add the first set of metadata to the item
-        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, one");
-        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, two");
-        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, three");
+        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, one",
+            null, Choices.CF_UNSET);
+        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, two",
+            null, Choices.CF_UNSET);
+        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, three",
+            null, Choices.CF_UNSET);
 
         // Get a specific metadatavlaue to remove
         MetadataValue metadataValueToRemove = itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY)
@@ -307,8 +325,10 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
         context.turnOffAuthorisationSystem();
 
         // Add two extra mdv
-        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, four");
-        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, five");
+        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, four",
+            null, Choices.CF_UNSET);
+        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, five",
+            null, Choices.CF_UNSET);
 
         //This is author "test, four" that we're removing
         metadataValueToRemove = itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).get(3);
@@ -365,9 +385,12 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
         context.turnOffAuthorisationSystem();
 
         // Add metadata and relationships to the item
-        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, one");
-        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, two");
-        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, three");
+        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, one",
+            null, Choices.CF_UNSET);
+        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, two",
+            null, Choices.CF_UNSET);
+        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, three",
+            null, Choices.CF_UNSET);
 
         Relationship relationship = relationshipService
             .create(context, item, authorItem, isAuthorOfPublication, -1, -1);
