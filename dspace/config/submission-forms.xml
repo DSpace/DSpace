@@ -1384,6 +1384,7 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
           <required />
+          <readonly>all</readonly>
           <hint>Settable by connecting the entity with ORCID</hint>
         </field>
       </row>
