@@ -860,11 +860,17 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
     protected DiscoverResult retrieveResult(Context context, DiscoverQuery query)
         throws SQLException, SolrServerException, IOException, SearchServiceException {
+        // we use valid and executeLimit to manage reload of solr query if we found some stale objects
         boolean valid = false;
+        int executeLimit = 0;
         DiscoverResult result = null;
         SolrQuery solrQuery = resolveToSolrQuery(context, query);
-        while (!valid) {
+        while (!valid && executeLimit <= 10) {
+            executeLimit++;
             result = new DiscoverResult();
+            // if we found a stale object then skip execution of the remaining code
+            boolean zombieFound = false;
+            // use zombieDocs to collect stale found objects
             List<String> zombieDocs = new ArrayList<String>();
             QueryResponse solrQueryResponse = solrSearchCore.getSolr().query(solrQuery,
                           solrSearchCore.REQUEST_METHOD);
@@ -881,24 +887,31 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     if (indexableObject != null) {
                         result.addIndexableObject(indexableObject);
                     } else {
-                        log.error(LogManager.getHeader(context,
-                                "Error while retrieving DSpace object from discovery index",
+                        log.warn(LogManager.getHeader(context,
+                                "Stale entry found in Discovery index,"
+                              + " as we could not find the DSpace object it refers to. ",
                                 "Unique identifier: " + doc.getFirstValue(SearchUtils.RESOURCE_UNIQUE_ID)));
-                        zombieDocs.add((String) doc.getFirstValue(SearchUtils.RESOURCE_UNIQUE_ID));
+                        // Enables solr to remove documents related to items not on database anymore (Stale)
+                        // during search process. Default value is 'true'
+                        if (configurationService.getBooleanProperty("solr.removestale")) {
+                            zombieDocs.add((String) doc.getFirstValue(SearchUtils.RESOURCE_UNIQUE_ID));
+                            zombieFound = true;
+                        }
                         continue;
                     }
-                    DiscoverResult.SearchDocument resultDoc = new DiscoverResult.SearchDocument();
-                    //Add information about our search fields
-                    for (String field : searchFields) {
-                        List<String> valuesAsString = new ArrayList<>();
-                        for (Object o : doc.getFieldValues(field)) {
-                            valuesAsString.add(String.valueOf(o));
+                    if (!zombieFound) {
+                        DiscoverResult.SearchDocument resultDoc = new DiscoverResult.SearchDocument();
+                        // Add information about our search fields
+                        for (String field : searchFields) {
+                            List<String> valuesAsString = new ArrayList<>();
+                            for (Object o : doc.getFieldValues(field)) {
+                                valuesAsString.add(String.valueOf(o));
+                            }
+                            resultDoc.addSearchField(field, valuesAsString.toArray(new String[valuesAsString.size()]));
                         }
-                        resultDoc.addSearchField(field, valuesAsString.toArray(new String[valuesAsString.size()]));
+                        result.addSearchDocument(indexableObject, resultDoc);
                     }
-                    result.addSearchDocument(indexableObject, resultDoc);
-
-                    if (solrQueryResponse.getHighlighting() != null) {
+                    if (solrQueryResponse.getHighlighting() != null && !zombieFound) {
                         Map<String, List<String>> highlightedFields = solrQueryResponse.getHighlighting().get(
                             indexableObject.getUniqueIndexID());
                         if (MapUtils.isNotEmpty(highlightedFields)) {
@@ -922,7 +935,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
                 //Resolve our facet field values
                 List<FacetField> facetFields = solrQueryResponse.getFacetFields();
-                if (facetFields != null) {
+                if (facetFields != null && !zombieFound) {
                     for (int i = 0; i < facetFields.size(); i++) {
                         FacetField facetField = facetFields.get(i);
                         DiscoverFacetField facetFieldConfig = query.getFacetFields().get(i);
@@ -959,7 +972,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     }
                 }
 
-                if (solrQueryResponse.getFacetQuery() != null) {
+                if (solrQueryResponse.getFacetQuery() != null && !zombieFound) {
                     // just retrieve the facets in the order they where requested!
                     // also for the date we ask it in proper (reverse) order
                     // At the moment facet queries are only used for dates
@@ -991,13 +1004,16 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     }
                 }
 
-                if (solrQueryResponse.getSpellCheckResponse() != null) {
+                if (solrQueryResponse.getSpellCheckResponse() != null && !zombieFound) {
                     String recommendedQuery = solrQueryResponse.getSpellCheckResponse().getCollatedResult();
                     if (StringUtils.isNotBlank(recommendedQuery)) {
                         result.setSpellCheckQuery(recommendedQuery);
                     }
                 }
             }
+            // If any stale entries are found in the current page of results,
+            // we remove those stale entries and rerun the same query again.
+            // Otherwise, the query is valid and the results are returned.
             if (zombieDocs.size() != 0) {
                 log.info("Cleaning " + zombieDocs.size() + " stale objects from Discovery Index");
                 solrSearchCore.getSolr().deleteById(zombieDocs);
@@ -1005,6 +1021,13 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             } else {
                 valid = true;
             }
+        }
+        if (!valid && executeLimit == 10) {
+            String message = "The Discovery (Solr) index has a large number of stale entries,"
+                    + " and we could not complete this request. Please reindex all content"
+                    + " to remove these stale entries (e.g. dspace index-discovery -f).";
+            log.fatal(message);
+            throw new RuntimeException(message);
         }
         return result;
     }
