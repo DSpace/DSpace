@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static com.google.common.net.UrlEscapers.urlPathSegmentEscaper;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
@@ -5764,7 +5765,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                    .andExpect(jsonPath("$._embedded.values[0].label", is("Smith, Donald")))
                    .andExpect(jsonPath("$._embedded.values[0].count", is(1)))
                    .andExpect(jsonPath("$._embedded.values[0]._links.search.href",
-                        containsString("api/discover/search/objects?query=Donald&f.author=Smith, Donald,equals")))
+                        containsString("api/discover/search/objects?query=Donald&f.author=" +
+                                urlPathSegmentEscaper().escape("Smith, Donald,equals")
+                        )))
                    .andExpect(jsonPath("$._embedded.values").value(Matchers.hasSize(1)));
 
     }
@@ -5817,7 +5820,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                    .andExpect(jsonPath("$._embedded.values[0].label", is("2017 - 2020")))
                    .andExpect(jsonPath("$._embedded.values[0].count", is(3)))
                    .andExpect(jsonPath("$._embedded.values[0]._links.search.href",
-                        containsString("api/discover/search/objects?dsoType=Item&f.dateIssued=[2017 TO 2020],equals")))
+                        containsString("api/discover/search/objects?dsoType=Item&f.dateIssued=" +
+                                urlPathSegmentEscaper().escape("[2017 TO 2020],equals")
+                        )))
                    .andExpect(jsonPath("$._embedded.values").value(Matchers.hasSize(1)));
 
     }
