@@ -7,6 +7,8 @@
  */
 package org.dspace.app.util;
 
+import static org.apache.commons.lang3.StringUtils.equalsAnyIgnoreCase;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -252,21 +254,17 @@ public class DCInput {
     }
 
     /**
-     * Is this DCInput for display in readonly mode in the given scope?
-     * If the scope differ from which in visibility field then we use the out attribute
-     * of the visibility element. Possible values are: hidden (default) and readonly.
-     * If the DCInput is visible in the scope then this methods must return false
+     * Check if this DCInput should be read only for the given scope. To be
+     * read-only a dc input must be visible and the read-only field must be either
+     * equal to the input scope or equal to 'all'.
      *
-     * @param scope String identifying the scope that this input's readonly visibility
-     *              should be tested for
-     * @return whether the input should be displayed in a readonly way or fully hidden
+     * @param  scope String identifying the scope that this input's readonly
+     *               visibility should be tested for
+     * @return       whether the input should be displayed in a readonly way or
+     *               fully hidden
      */
     public boolean isReadOnly(String scope) {
-        if (isVisible(scope)) {
-            return false;
-        } else {
-            return readOnly != null && readOnly.equalsIgnoreCase("readonly");
-        }
+        return isVisible(scope) && readOnly != null && equalsAnyIgnoreCase(readOnly, scope, "all");
     }
 
 

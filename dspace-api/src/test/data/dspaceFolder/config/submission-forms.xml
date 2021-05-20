@@ -1644,6 +1644,85 @@ You can leave out the day and/or month if they aren't applicable.</hint>
        </field>
      </row>
 	</form>
+	
+	<form name="testVisibility">
+		<row>
+			<field>
+         		<dc-schema>dc</dc-schema>
+         		<dc-element>title</dc-element>
+         		<dc-qualifier></dc-qualifier>
+         		<repeatable>false</repeatable>
+         		<label>Title</label>
+         		<input-type>onebox</input-type>
+			</field>
+			<field>
+         		<dc-schema>dc</dc-schema>
+         		<dc-element>date</dc-element>
+         		<dc-qualifier>issued</dc-qualifier>
+         		<repeatable>false</repeatable>
+         		<label>Date of Issue</label>
+         		<input-type>date</input-type>
+         		<visibility>submission</visibility>
+         		<readonly>submission</readonly>
+			</field>
+			<field>
+         		<dc-schema>dc</dc-schema>
+         		<dc-element>type</dc-element>
+         		<repeatable>true</repeatable>
+         		<label>Type</label>
+         		<input-type>onebox</input-type>
+         		<visibility>submission</visibility>
+			</field>
+			<field>
+         		<dc-schema>dc</dc-schema>
+         		<dc-element>language</dc-element>
+         		<dc-qualifier>iso</dc-qualifier>
+         		<repeatable>true</repeatable>
+         		<label>Language</label>
+         		<input-type>onebox</input-type>
+         		<readonly>all</readonly>
+			</field>
+			<field>
+         		<dc-schema>dc</dc-schema>
+         		<dc-element>contributor</dc-element>
+         		<dc-qualifier>author</dc-qualifier>
+         		<repeatable>true</repeatable>
+         		<label>Author(s)</label>
+         		<input-type>onebox</input-type>
+         		<readonly>workflow</readonly>
+			</field>
+			<field>
+         		<dc-schema>dc</dc-schema>
+         		<dc-element>contributor</dc-element>
+         		<dc-qualifier>editor</dc-qualifier>
+         		<repeatable>true</repeatable>
+         		<label>Editor(s)</label>
+         		<input-type>onebox</input-type>
+         		<visibility>submission</visibility>
+         		<readonly>all</readonly>
+			</field>
+			<field>
+         		<dc-schema>dc</dc-schema>
+         		<dc-element>subject</dc-element>
+         		<repeatable>true</repeatable>
+         		<label>Subject(s)</label>
+         		<input-type>onebox</input-type>
+         		<visibility>workflow</visibility>
+         		<readonly>workflow</readonly>
+			</field>
+			<field>
+         		<dc-schema>dc</dc-schema>
+         		<dc-element>description</dc-element>
+         		<repeatable>false</repeatable>
+         		<label>Description</label>
+         		<input-type>onebox</input-type>
+         		<visibility>workflow</visibility>
+         		<readonly>submission</readonly>
+			</field>
+     	</row>
+	</form>
+	
+	
  </form-definitions>
 
 

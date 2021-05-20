@@ -10,6 +10,7 @@ package org.dspace.app.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import org.apache.commons.collections4.MapUtils;
 import org.dspace.app.rest.RestResourceController;
 
 /**
@@ -64,7 +65,7 @@ public class SubmissionSectionRest extends BaseObjectRest<String> {
     }
 
     public void setVisibility(SubmissionVisibilityRest visibility) {
-        if (visibility != null && (visibility.getMain() != null || visibility.getOther() != null)) {
+        if (visibility != null && (MapUtils.isNotEmpty(visibility.getVisibilities()))) {
             this.visibility = visibility;
         }
     }
