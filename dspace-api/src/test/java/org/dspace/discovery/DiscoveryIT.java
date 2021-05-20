@@ -465,7 +465,7 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         // disability solr to remove documents related to items not on database anymore (Stale)
-        configurationService.setProperty("solr.removestale", false);
+        configurationService.setProperty("discovery.removestale.attempts", -1);
 
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
