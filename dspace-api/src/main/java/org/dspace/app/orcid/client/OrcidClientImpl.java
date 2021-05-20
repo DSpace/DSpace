@@ -239,7 +239,7 @@ public class OrcidClientImpl implements OrcidClient {
     }
 
     private HttpUriRequest buildGetUriRequestToPublicEndpoint(String relativePath) {
-        return get(orcidConfiguration.getApiUrl() + relativePath.trim())
+        return get(orcidConfiguration.getPublicUrl() + relativePath.trim())
             .addHeader("Content-Type", "application/x-www-form-urlencoded")
             .build();
     }
