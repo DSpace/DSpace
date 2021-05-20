@@ -862,11 +862,12 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         throws SQLException, SolrServerException, IOException, SearchServiceException {
         // we use valid and executeLimit to manage reload of solr query if we found some stale objects
         boolean valid = false;
-        int executeLimit = 0;
+        int executionCount = 0;
         DiscoverResult result = null;
         SolrQuery solrQuery = resolveToSolrQuery(context, query);
-        while (!valid && executeLimit <= 10) {
-            executeLimit++;
+        int maxAttempts = configurationService.getIntProperty("discovery.removestale.attempts", 3);
+        do {
+            executionCount++;
             result = new DiscoverResult();
             // if we found a stale object then skip execution of the remaining code
             boolean zombieFound = false;
@@ -887,13 +888,14 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     if (indexableObject != null) {
                         result.addIndexableObject(indexableObject);
                     } else {
+                        // log has warn because we try to fix the issue
                         log.warn(LogManager.getHeader(context,
                                 "Stale entry found in Discovery index,"
                               + " as we could not find the DSpace object it refers to. ",
                                 "Unique identifier: " + doc.getFirstValue(SearchUtils.RESOURCE_UNIQUE_ID)));
                         // Enables solr to remove documents related to items not on database anymore (Stale)
-                        // during search process. Default value is 'true'
-                        if (configurationService.getBooleanProperty("solr.removestale")) {
+                        // if maxAttemps is greater than 0 cleanup the index on each step
+                        if (maxAttempts >= 0) {
                             zombieDocs.add((String) doc.getFirstValue(SearchUtils.RESOURCE_UNIQUE_ID));
                             zombieFound = true;
                         }
@@ -1021,8 +1023,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             } else {
                 valid = true;
             }
-        }
-        if (!valid && executeLimit == 10) {
+        } while (!valid && executionCount <= maxAttempts);
+
+        if (!valid && executionCount == maxAttempts) {
             String message = "The Discovery (Solr) index has a large number of stale entries,"
                     + " and we could not complete this request. Please reindex all content"
                     + " to remove these stale entries (e.g. dspace index-discovery -f).";
