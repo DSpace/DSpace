@@ -21,7 +21,6 @@ import java.util.Map;
 import org.dspace.app.orcid.client.OrcidClient;
 import org.dspace.app.orcid.factory.OrcidServiceFactory;
 import org.dspace.app.orcid.factory.OrcidServiceFactoryImpl;
-import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.app.rest.matcher.ItemAuthorityMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
