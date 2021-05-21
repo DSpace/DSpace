@@ -16,13 +16,13 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Script configuration for {@link OrcidWebhookScript}.
+ * Script configuration for {@link OrcidBulkPush}.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
- * @param  <T> the type of OrcidWebhookScript
+ * @param  <T> the OrcidBulkPush type
  */
-public class OrcidWebhookScriptConfiguration<T extends OrcidWebhookScript> extends ScriptConfiguration<T> {
+public class OrcidBulkPushScriptConfiguration<T extends OrcidBulkPush> extends ScriptConfiguration<T> {
 
     @Autowired
     private AuthorizeService authorizeService;
@@ -53,9 +53,9 @@ public class OrcidWebhookScriptConfiguration<T extends OrcidWebhookScript> exten
         if (options == null) {
             Options options = new Options();
 
-            options.addOption("l", "linked", false, "to simulates the callback only for linked profiles");
-            options.getOption("l").setType(boolean.class);
-            options.getOption("l").setRequired(false);
+            options.addOption("f", "force", false, "force the synchronization ignoring maximum attempts");
+            options.getOption("f").setType(boolean.class);
+            options.getOption("f").setRequired(false);
 
             super.options = options;
         }
