@@ -11,12 +11,18 @@
  * The WorkspaceItem wraps an uninstalled {@link Item} while it is in the user's
  * workspace.
  *
- * <p>A {@link WorkspaceItem} enters a workflow by presenting
- * it to {@link XmlWorkflowService#start}.  This places the wrapped Item
- * into a new {@link WorkflowItem} and links the WorkflowItem to objects which
- * represent its state of progress through the workflow of its owning Collection.
- *
- * <p>TODO More to follow....
+ * <p>A {@link WorkspaceItem} enters a workflow by being presented to
+ * {@link XmlWorkflowService#start}.  This causes the wrapped Item to be
+ * unwrapped and re-wrapped into a new {@link WorkflowItem}, and links the
+ * WorkflowItem to objects which represent its state of progress through the
+ * workflow of its owning Collection.
+ * 
+ * <p>The WorkflowItem proceeds through a sequence of
+ * {@link org.dspace.xmlworkflow.state.Step "steps"}.  Each step is configured
+ * with "actions" and a {@link Role} which is to carry out the actions.  A Role
+ * is configured with lists of {@code Group}s and {@code EPerson}s who will be
+ * notified, when the item has entered the step, that there is a review task
+ * awaiting them.
  */
 
 package org.dspace.xmlworkflow;
