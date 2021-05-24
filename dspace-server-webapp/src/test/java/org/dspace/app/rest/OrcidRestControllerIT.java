@@ -374,6 +374,7 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
             .withOrcidIdentifier(ORCID)
             .withOrcidAccessToken(ACCESS_TOKEN)
             .withOrcidWebhook("2020-01-01")
+            .withOrcidAuthenticated("2020-02-01")
             .build();
 
         context.restoreAuthSystemState();
@@ -392,6 +393,7 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
         profileItem = context.reloadEntity(profileItem);
 
         assertThat(profileItem.getMetadata(), has(not(metadataField("cris.orcid.access-token"))));
+        assertThat(profileItem.getMetadata(), has(not(metadataField("cris.orcid.authenticated"))));
 
     }
 
@@ -405,6 +407,7 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
             .withOrcidIdentifier(ORCID)
             .withOrcidAccessToken(ACCESS_TOKEN)
             .withOrcidWebhook("2020-02-01")
+            .withOrcidAuthenticated("2020-02-01")
             .build();
 
         context.restoreAuthSystemState();
@@ -428,6 +431,7 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
         profileItem = context.reloadEntity(profileItem);
 
         assertThat(profileItem.getMetadata(), has(not(metadataField("cris.orcid.access-token"))));
+        assertThat(profileItem.getMetadata(), has(not(metadataField("cris.orcid.authenticated"))));
         assertThat(profileItem.getMetadata(), has(not(metadataField("cris.orcid.webhook"))));
     }
 
@@ -461,6 +465,7 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
         profileItem = context.reloadEntity(profileItem);
 
         assertThat(profileItem.getMetadata(), has(not(metadataField("cris.orcid.access-token"))));
+        assertThat(profileItem.getMetadata(), has(not(metadataField("cris.orcid.authenticated"))));
     }
 
     @Test
@@ -472,6 +477,7 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
             .withTitle("Walter White")
             .withOrcidIdentifier(ORCID)
             .withOrcidAccessToken(ACCESS_TOKEN)
+            .withOrcidAuthenticated("2020-02-01")
             .build();
 
         context.restoreAuthSystemState();
@@ -488,6 +494,7 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
         profileItem = context.reloadEntity(profileItem);
 
         assertThat(profileItem.getMetadata(), has(metadataField("cris.orcid.access-token")));
+        assertThat(profileItem.getMetadata(), has(metadataField("cris.orcid.authenticated")));
 
     }
 

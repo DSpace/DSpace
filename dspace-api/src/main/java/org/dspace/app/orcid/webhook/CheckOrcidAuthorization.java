@@ -78,6 +78,7 @@ public class CheckOrcidAuthorization implements OrcidWebhookAction {
 
     private void removeAccessToken(Context context, Item profile) throws SQLException {
         itemService.clearMetadata(context, profile, "cris", "orcid", "access-token", Item.ANY);
+        itemService.clearMetadata(context, profile, "cris", "orcid", "authenticated", Item.ANY);
     }
 
     private boolean isAccessTokenExpired(String accessToken, String orcid) {

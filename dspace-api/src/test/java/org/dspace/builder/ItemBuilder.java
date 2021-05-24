@@ -207,6 +207,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "cris", "orcid", "webhook", webhook);
     }
 
+    public ItemBuilder withOrcidAuthenticated(String authenticated) {
+        return addMetadataValue(item, "cris", "orcid", "authenticated", authenticated);
+    }
+
     public ItemBuilder withOrcidSynchronizationPublicationsPreference(OrcidEntitySyncPreference value) {
         return withOrcidSynchronizationPublicationsPreference(value.name());
     }

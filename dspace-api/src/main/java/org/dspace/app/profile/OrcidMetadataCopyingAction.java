@@ -7,6 +7,9 @@
  */
 package org.dspace.app.profile;
 
+import static java.time.LocalDateTime.now;
+import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
+import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 import static org.dspace.content.Item.ANY;
 
 import java.sql.SQLException;
@@ -52,6 +55,11 @@ public class OrcidMetadataCopyingAction implements AfterResearcherProfileCreatio
         copyMetadataValues(context, owner, "eperson.orcid.refresh-token", item, "cris.orcid.refresh-token");
         copyMetadataValues(context, owner, "eperson.orcid.scope", item, "cris.orcid.scope");
 
+        if (isLinkedToOrcid(owner)) {
+            String currentDate = ISO_DATE_TIME.format(now());
+            itemService.setMetadataSingleValue(context, item, "cris", "orcid", "authenticated", null, currentDate);
+        }
+
     }
 
     private void copyMetadataValues(Context context, EPerson ePerson, String ePersonMetadataField, Item item,
@@ -66,6 +74,11 @@ public class OrcidMetadataCopyingAction implements AfterResearcherProfileCreatio
         itemService.clearMetadata(context, item, metadata.SCHEMA, metadata.ELEMENT, metadata.QUALIFIER, ANY);
         itemService.addMetadata(context, item, metadata.SCHEMA, metadata.ELEMENT, metadata.QUALIFIER, null, values);
 
+    }
+
+    private boolean isLinkedToOrcid(EPerson ePerson) {
+        return isNotEmpty(getMetadataValues(ePerson, "eperson.orcid"))
+            && isNotEmpty(getMetadataValues(ePerson, "eperson.orcid.access-token"));
     }
 
     private List<String> getMetadataValues(EPerson ePerson, String metadataField) {

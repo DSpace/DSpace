@@ -7,9 +7,12 @@
  */
 package org.dspace.app.orcid.service.impl;
 
+import static java.time.LocalDateTime.now;
+import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static java.util.List.of;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.EnumUtils.isValidEnum;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.dspace.app.profile.OrcidEntitySyncPreference.DISABLED;
 
 import java.sql.SQLException;
@@ -77,6 +80,11 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
             itemService.addMetadata(context, profile, "cris", "orcid", "scope", null, scope);
         }
 
+        if (isBlank(itemService.getMetadataFirstValue(profile, "cris", "orcid", "authenticated", Item.ANY))) {
+            String currentDate = ISO_DATE_TIME.format(now());
+            itemService.setMetadataSingleValue(context, profile, "cris", "orcid", "authenticated", null, currentDate);
+        }
+
         updateItem(context, profile);
 
     }
@@ -92,6 +100,7 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
         itemService.clearMetadata(context, profile, "cris", "orcid", "access-token", Item.ANY);
         itemService.clearMetadata(context, profile, "cris", "orcid", "refresh-token", Item.ANY);
         itemService.clearMetadata(context, profile, "cris", "orcid", "scope", Item.ANY);
+        itemService.clearMetadata(context, profile, "cris", "orcid", "authenticated", Item.ANY);
         updateItem(context, profile);
 
         List<OrcidQueue> queueRecords = orcidQueueService.findByOwnerId(context, profile.getID());

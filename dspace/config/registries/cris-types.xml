@@ -109,6 +109,13 @@
 
     <dc-type>
         <schema>cris</schema>
+        <element>orcid</element>
+        <qualifier>authenticated</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
         <element>harvesting</element>
         <qualifier>email</qualifier>
         <scope_note></scope_note>
