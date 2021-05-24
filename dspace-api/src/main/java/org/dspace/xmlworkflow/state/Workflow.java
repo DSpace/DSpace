@@ -21,8 +21,7 @@ import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Class that contains all the steps and roles involved in a certain
- * configured workflow
+ * Contains all the steps involved in a certain configured workflow.
  *
  * @author Bram De Schouwer (bram.deschouwer at dot com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
