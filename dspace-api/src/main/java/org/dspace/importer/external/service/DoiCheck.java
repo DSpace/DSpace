@@ -41,7 +41,7 @@ public class DoiCheck {
     }
 
 
-    private static String purgeDoiValue(final String query) {
+    public static String purgeDoiValue(final String query) {
         String value = query.replaceAll(",", "");
         for (final String prefix : DOI_PREFIXES) {
             value = value.replaceAll(prefix, "");

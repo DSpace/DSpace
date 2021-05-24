@@ -817,12 +817,8 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
 
         String authToken = getAuthToken(submitter.getEmail(), password);
 
-        try {
-            configurationService.setProperty("cris-consumer.skip-empty-authority", true);
-            submitItemViaRest(authToken, wsitem.getID());
-        } finally {
-            configurationService.setProperty("cris-consumer.skip-empty-authority", false);
-        }
+        configurationService.setProperty("cris-consumer.skip-empty-authority", true);
+        submitItemViaRest(authToken, wsitem.getID());
 
         // verify the dc.contributor.author and dc.contributor.editor authority value
         ItemRest item = getItemViaRestByID(authToken, wsitem.getItem().getID());
