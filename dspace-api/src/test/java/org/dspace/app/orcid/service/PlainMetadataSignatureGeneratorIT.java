@@ -8,6 +8,8 @@
 package org.dspace.app.orcid.service;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
@@ -117,6 +119,34 @@ public class PlainMetadataSignatureGeneratorIT extends AbstractIntegrationTestWi
         assertThat(metadataValues, hasSize(1));
         assertThat(metadataValues, containsInAnyOrder(description));
 
+    }
+
+    @Test
+    public void testSignatureGenerationWithManyEqualsMetadataValues() {
+        context.turnOffAuthorisationSystem();
+
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("Item title")
+            .withDescription("Description")
+            .withAuthor("Jesse Pinkman")
+            .withAuthor("Jesse Pinkman")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        MetadataValue firstAuthor = getMetadata(item, "dc.contributor.author", 0);
+        String firstSignature = generator.generate(context, List.of(firstAuthor));
+        assertThat(firstSignature, notNullValue());
+        assertThat(firstSignature, equalTo("dc.contributor.author::Jesse Pinkman"));
+
+        MetadataValue secondAuthor = getMetadata(item, "dc.contributor.author", 1);
+        String secondSignature = generator.generate(context, List.of(secondAuthor));
+        assertThat(secondSignature, notNullValue());
+        assertThat(secondSignature, equalTo("dc.contributor.author::Jesse Pinkman"));
+
+        List<MetadataValue> metadataValues = generator.findBySignature(context, item, firstSignature);
+        assertThat(metadataValues, hasSize(1));
+        assertThat(metadataValues, anyOf(contains(firstAuthor), contains(secondAuthor)));
     }
 
     private MetadataValue getMetadata(Item item, String metadataField, int place) {
