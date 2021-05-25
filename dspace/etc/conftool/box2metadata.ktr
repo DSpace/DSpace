@@ -552,11 +552,6 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Filter rows 2</from>
-      <to>Select values 2</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
       <from>fakekey</from>
       <to>Stream lookup</to>
       <enabled>Y</enabled>
@@ -627,12 +622,12 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>build-jsonpatch 2 2</from>
-      <to>Write to log 3</to>
+      <from>Filter rows 2</from>
+      <to>Select values 2</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Write to log 3</from>
+      <from>build-jsonpatch 2 2</from>
       <to>Identify last row in a stream</to>
       <enabled>Y</enabled>
     </hop>
@@ -993,7 +988,7 @@
     <stoponempty>N</stoponempty>
     <filefield/>
     <sheetfield/>
-    <sheetrownumfield/>
+    <sheetrownumfield>rownr</sheetrownumfield>
     <rownumfield/>
     <sheetfield/>
     <filefield/>
@@ -1267,7 +1262,7 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>608</xloc>
+      <xloc>400</xloc>
       <yloc>288</yloc>
       <draw>Y</draw>
     </GUI>
@@ -1382,7 +1377,7 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>512</xloc>
+      <xloc>208</xloc>
       <yloc>288</yloc>
       <draw>Y</draw>
     </GUI>
@@ -1742,6 +1737,7 @@ var queryBoxesURL = getVariable("host", "") + "/api/layout/boxes/search/findByEn
     <fields>
       <field>
         <name>groupsout</name>
+        <rename/>
       </field>
       <select_unspecified>N</select_unspecified>
     </fields>
@@ -1942,6 +1938,68 @@ var queryBoxesURL = getVariable("host", "") + "/api/layout/boxes/search/findByEn
     </GUI>
   </step>
   <step>
+    <name>Sort metadata in group</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>//Script here
+var groups = JSON.parse(groupsout);
+var leads = JSON.parse(leadsout);
+
+for (i = 0; i &lt; leads.length; i++) {
+	groups[leads[i]].sort(function compareFn(a, b) { 
+			if (a.priority &lt; b.priority) {
+				return -1;
+			} else {
+				return 1;
+			}
+	});
+	for (j = 0; j &lt; groups[leads[i]].length; j++) {
+		delete groups[leads[i]][j].priority;	
+	}
+}
+
+var groupsout2 = JSON.stringify(groups);
+</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields>
+      <field>
+        <name>groupsout2</name>
+        <rename>groupsout2</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1120</xloc>
+      <yloc>144</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
     <name>Stream lookup</name>
     <type>StreamLookup</type>
     <description/>
@@ -2118,6 +2176,73 @@ var queryBoxesURL = getVariable("host", "") + "/api/layout/boxes/search/findByEn
     <GUI>
       <xloc>736</xloc>
       <yloc>912</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Write to log 2</name>
+    <type>WriteToLog</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <loglevel>log_level_basic</loglevel>
+    <displayHeader>Y</displayHeader>
+    <limitRows>N</limitRows>
+    <limitRowsNumber>0</limitRowsNumber>
+    <logmessage/>
+    <fields>
+      </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>720</xloc>
+      <yloc>368</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Write to log 3</name>
+    <type>WriteToLog</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <loglevel>log_level_basic</loglevel>
+    <displayHeader>Y</displayHeader>
+    <limitRows>N</limitRows>
+    <limitRowsNumber>0</limitRowsNumber>
+    <logmessage/>
+    <fields>
+      <field>
+        <name>log</name>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>304</xloc>
+      <yloc>352</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2311,8 +2436,12 @@ if (STYLE_VALUE != null) {
 }
 op.value.bitstream = new Object();
 op.value.bitstream.bundle = BUNDLE;
-op.value.bitstream.metadataField = METADATA;
-op.value.bitstream.metadataValue = VALUE;
+if (METADATA != null) {
+	op.value.bitstream.metadataField = METADATA;
+}
+if (VALUE != null) {
+	op.value.bitstream.metadataValue = VALUE;
+}
 op.op = "add";
 op.path = "/rows/" + ROW + "/fields/-";
 out[0] = op;
@@ -2507,23 +2636,25 @@ jsonpatch = JSON.stringify(out);
         <jsScript_name>Script 1</jsScript_name>
         <jsScript_script>//Script here
 var groups = new Object();
+var leads = new Array();
 var data = JSON.parse(outputValue).value;
 var log = "";
 for (i = 0; i &lt; data.length; i++) {
 log += " iteration " + i;
 log += " --> " + data[i].parent;
 log += " --> " + data[i].entity;
-	if (groups[data[i].entity + ":" + data[i].parent] == undefined) {
-	   groups[data[i].entity + ":" + data[i].parent] = new Array();
-	}
 	var lead = data[i].entity + ":" + data[i].parent;
+	if (groups[lead] == undefined) {
+	   groups[lead] = new Array();
+	   leads.push(lead);
+	}
 	delete data[i].parent;
 	delete data[i].entity;
 	groups[lead].push(data[i]);
 }
 
 var groupsout = JSON.stringify(groups);
-</jsScript_script>
+var leadsout = JSON.stringify(leads);</jsScript_script>
       </jsScript>
     </jsScripts>
     <fields>
@@ -2543,76 +2674,9 @@ var groupsout = JSON.stringify(groups);
         <precision>-1</precision>
         <replace>N</replace>
       </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>320</xloc>
-      <yloc>288</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>build-jsonpatch 2 3</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>N</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>
-      <jsScript>
-        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>//Script here
-var out = new Array();
-var op = new Object();
-op.value = new Object();
-op.value.leading = METADATA;
-op.value.elements = JSON.parse(outputValue).value;
-//op.value.elements = new Array();
-//var out = JSON.parse(outputValue).value;
-
-//for (i = 0; i &lt; out.lenght; i++) {
-//	op.value.elements.push(out[i]);
-//}
-if (LABEL != null) {
-	op.value.label = LABEL;
-}
-if (STYLE != null) {
-	op.value.style = STYLE;
-}
-if (RENDERING != null) {
-	op.value.rendering = RENDERING;
-}
-if (STYLE_LABEL != null) {
-	op.value.styleLabel = STYLE_LABEL;
-}
-if (STYLE_VALUE != null) {
-	op.value.styleValue = STYLE_VALUE;
-}
-op.op = "add";
-op.path = "/rows/" + ROW + "/fields/-";
-out[0] = op;
-jsonpatch = JSON.stringify(out);
-</jsScript_script>
-      </jsScript>
-    </jsScripts>
-    <fields>
       <field>
-        <name>jsonpatch</name>
-        <rename>jsonpatch</rename>
+        <name>leadsout</name>
+        <rename>leadsout</rename>
         <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
@@ -2628,8 +2692,8 @@ jsonpatch = JSON.stringify(out);
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1160</xloc>
-      <yloc>290</yloc>
+      <xloc>208</xloc>
+      <yloc>416</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2764,8 +2828,8 @@ jsonpatch = JSON.stringify(out);
       </output>
     </remotesteps>
     <GUI>
-      <xloc>208</xloc>
-      <yloc>288</yloc>
+      <xloc>48</xloc>
+      <yloc>416</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -3026,73 +3090,6 @@ jsonpatch = JSON.stringify(out);
     <GUI>
       <xloc>848</xloc>
       <yloc>416</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Write to log 2</name>
-    <type>WriteToLog</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <loglevel>log_level_basic</loglevel>
-    <displayHeader>Y</displayHeader>
-    <limitRows>N</limitRows>
-    <limitRowsNumber>0</limitRowsNumber>
-    <logmessage/>
-    <fields>
-      </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>720</xloc>
-      <yloc>368</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Write to log 3</name>
-    <type>WriteToLog</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <loglevel>log_level_basic</loglevel>
-    <displayHeader>Y</displayHeader>
-    <limitRows>N</limitRows>
-    <limitRowsNumber>0</limitRowsNumber>
-    <logmessage/>
-    <fields>
-      <field>
-        <name>log</name>
-      </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>400</xloc>
-      <yloc>288</yloc>
       <draw>Y</draw>
     </GUI>
   </step>

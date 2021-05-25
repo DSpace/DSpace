@@ -98,8 +98,8 @@ public class CrisLayoutBoxMetadataConfigurationAddOperation<D> extends PatchOper
                         layoutField = fieldService.create(context, layoutField);
                         // if it has nested metadata-group
                         if (v.get("fieldType").asText().equalsIgnoreCase("metadatagroup")) {
-                                     //save nested metadata
-                            saveNestedMetadata(context, position, v.get("metadatagroup"), layoutField);
+                             //save nested metadata
+                            saveNestedMetadata(context, v.get("metadatagroup"), layoutField);
                         }
 
                     }
@@ -109,7 +109,7 @@ public class CrisLayoutBoxMetadataConfigurationAddOperation<D> extends PatchOper
                     layoutField = fieldService.create(context, layoutField);
                     if (value.get("fieldType").asText().equalsIgnoreCase("metadatagroup")) {
                         //save nested metadata
-                        saveNestedMetadata(context, position, value.get("metadatagroup"), layoutField);
+                        saveNestedMetadata(context, value.get("metadatagroup"), layoutField);
                     }
                 }
             } catch (UnprocessableEntityException e) {
@@ -195,10 +195,13 @@ public class CrisLayoutBoxMetadataConfigurationAddOperation<D> extends PatchOper
 
         field.setRow(row);
         field.setBox(box);
-
-        MetadataField metadataField = metadataService.findByString(context, metadataType, '.');
-        if (metadataField == null) {
-            throw new UnprocessableEntityException("MetadataField <" + metadataType + "> not exsists!");
+        MetadataField metadataField = null;
+        if (metadataType != null) {
+            metadataField = metadataService.findByString(context, metadataType, '.');
+        }
+        if (metadataField == null
+                && (!StringUtils.equalsIgnoreCase(fieldType.asText(), "bitstream") || metadataType != null)) {
+            throw new UnprocessableEntityException("MetadataField <" + metadataType + "> not exists!");
         }
         field.setMetadataField(metadataField);
 
@@ -264,10 +267,10 @@ public class CrisLayoutBoxMetadataConfigurationAddOperation<D> extends PatchOper
         return value;
     }
 
-    private void saveNestedMetadata( Context context, Integer position,
-                                     JsonNode metadatagroup, CrisLayoutField crisLayoutField)
+    private void saveNestedMetadata(Context context, JsonNode metadatagroup, CrisLayoutField crisLayoutField)
         throws SQLException, AuthorizeException {
         if (metadatagroup.get("elements") != null  && metadatagroup.get("elements").isArray() ) {
+            int priority = 0;
             // search if nested metadata exists
             for (JsonNode v : metadatagroup.get("elements")) {
                 CrisMetadataGroup nestedField = new CrisMetadataGroup();
@@ -309,29 +312,10 @@ public class CrisLayoutBoxMetadataConfigurationAddOperation<D> extends PatchOper
                 if (styleValueNode != null && !styleValueNode.isNull() && styleValueNode.asText() != null) {
                     nestedField.setStyleValue(styleValueNode.asText());
                 }
-                Integer priority = 0;
-                List<CrisMetadataGroup> nested_fields = crisLayoutMetadataGroupService.
-                    findNestedFieldByFieldId(context,crisLayoutField.getID()) ;
-                if (nested_fields != null && !nested_fields.isEmpty()) {
-                    if (position == null || position > nested_fields.size()) {
-                        position = nested_fields.size();
-                    }
-                    priority = position;
-                    nested_fields.add(position, nestedField);
-                    for (int i = position + 1; i < nested_fields.size(); i++) {
-
-
-                        nested_fields.get(i).setPriority(
-                            nested_fields.get(i).getPriority() + 1);
-                    }
-                    crisLayoutMetadataGroupService
-                        .update(context, nested_fields.subList(position + 1, nested_fields.size()));
-                } else {
-                    priority = 0;
-                }
                 nestedField.setPriority(priority);
                 nestedField.setCrisLayoutField(crisLayoutField);
                 crisLayoutMetadataGroupService.create(context, nestedField);
+                priority++;
             }
 
         }
