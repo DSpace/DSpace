@@ -197,7 +197,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("person-xml-cerif");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("person-cerif-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -251,7 +251,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("person-xml-cerif");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("person-cerif-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -590,7 +590,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("publication-xml");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("publication-cerif-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -664,7 +664,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("publication-xml");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("publication-cerif-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -714,7 +714,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("publication-xml");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("publication-cerif-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -812,7 +812,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("project-xml");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("project-cerif-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -940,7 +940,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("project-xml");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("project-cerif-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -1053,7 +1053,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("orgUnit-xml");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("orgUnit-cerif-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -1146,7 +1146,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("orgUnit-xml");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("orgUnit-cerif-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -1248,7 +1248,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("equipment-xml");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("equipment-cerif-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -1326,7 +1326,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("equipment-xml");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("equipment-cerif-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -1363,7 +1363,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("funding-xml");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("funding-cerif-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -1451,7 +1451,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("funding-xml");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("funding-cerif-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
