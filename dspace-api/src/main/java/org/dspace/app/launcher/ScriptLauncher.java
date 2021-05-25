@@ -10,12 +10,16 @@ package org.dspace.app.launcher;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.core.Context;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.factory.ScriptServiceFactory;
@@ -318,11 +322,53 @@ public class ScriptLauncher {
     }
 
     /**
-     * Display the commands that the current launcher config file knows about
-     *
+     * Display the commands that are defined in launcher.xml and/or the script service.
      * @param commandConfigs configs as Document
      */
     private static void display(Document commandConfigs) {
+        // usage
+        System.out.println("Usage: dspace [command-name] {parameters}");
+
+        // commands from launcher.xml
+        Collection<Element> launcherCommands = getLauncherCommands(commandConfigs);
+        if (launcherCommands.size() > 0) {
+            System.out.println("\nCommands from launcher.xml");
+            for (Element command : launcherCommands) {
+                displayCommand(
+                    command.getChild("name").getValue(),
+                    command.getChild("description").getValue()
+                );
+            }
+        }
+
+        // commands from script service
+        Collection<ScriptConfiguration> serviceCommands = getServiceCommands();
+        if (serviceCommands.size() > 0) {
+            System.out.println("\nCommands from script service");
+            for (ScriptConfiguration command : serviceCommands) {
+                displayCommand(
+                    command.getName(),
+                    command.getDescription()
+                );
+            }
+        }
+    }
+
+    /**
+     * Display a single command using a fixed format. Used by {@link #display}.
+     * @param name the name that can be used to invoke the command
+     * @param description the description of the command
+     */
+    private static void displayCommand(String name, String description) {
+        System.out.format(" - %s: %s\n", name, description);
+    }
+
+    /**
+     * Get a sorted collection of the commands that are specified in launcher.xml. Used by {@link #display}.
+     * @param commandConfigs the contexts of launcher.xml
+     * @return sorted collection of commands
+     */
+    private static Collection<Element> getLauncherCommands(Document commandConfigs) {
         // List all command elements
         List<Element> commands = commandConfigs.getRootElement().getChildren("command");
 
@@ -334,11 +380,32 @@ public class ScriptLauncher {
             sortedCommands.put(command.getChild("name").getValue(), command);
         }
 
-        // Display the sorted list
-        System.out.println("Usage: dspace [command-name] {parameters}");
-        for (Element command : sortedCommands.values()) {
-            System.out.println(" - " + command.getChild("name").getValue() +
-                                   ": " + command.getChild("description").getValue());
-        }
+        return sortedCommands.values();
     }
+
+    /**
+     * Get a sorted collection of the commands that are defined as beans. Used by {@link #display}.
+     * @return sorted collection of commands
+     */
+    private static Collection<ScriptConfiguration> getServiceCommands() {
+        ScriptService scriptService = ScriptServiceFactory.getInstance().getScriptService();
+
+        Context throwAwayContext = new Context();
+
+        throwAwayContext.turnOffAuthorisationSystem();
+        List<ScriptConfiguration> scriptConfigurations = scriptService.getScriptConfigurations(throwAwayContext);
+        throwAwayContext.restoreAuthSystemState();
+
+        try {
+            throwAwayContext.complete();
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+            throwAwayContext.abort();
+        }
+
+        scriptConfigurations.sort(Comparator.comparing(ScriptConfiguration::getName));
+
+        return scriptConfigurations;
+    }
+
 }
