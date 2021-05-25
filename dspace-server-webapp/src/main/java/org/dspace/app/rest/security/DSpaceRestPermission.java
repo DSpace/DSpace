@@ -18,7 +18,8 @@ public enum DSpaceRestPermission {
     WRITE(Constants.WRITE),
     DELETE(Constants.DELETE),
     ADD(Constants.ADD),
-    ADMIN(Constants.ADMIN);
+    ADMIN(Constants.ADMIN),
+    STATUS(Constants.READ);
 
     private int dspaceApiActionId;
 
