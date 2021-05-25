@@ -1,0 +1,34 @@
+<Products>
+	<Product xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
+		<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types">http://purl.org/coar/resource_type/c_ddb1</Type>
+		<Name>First DataSet</Name>
+		<Creators>
+		  <Creator>
+	         <DisplayName>Walter White</DisplayName>
+	         <Affiliation>
+	            <OrgUnit>
+	         	</OrgUnit>
+	         </Affiliation>
+	      </Creator>
+	    </Creators>
+	    <Publishers>
+	    	<Publisher> <OrgUnit> <Name>Publisher</Name> </OrgUnit> </Publisher>
+	    </Publishers>
+	    <Keyword>DataSet</Keyword>
+		<OriginatesFrom> <Project> <Title>Test Project</Title> </Project> </OriginatesFrom>
+		<GeneratedBy> <Equipment> <Name>First Equipment</Name> </Equipment> </GeneratedBy>
+		<GeneratedBy> <Equipment> <Name>Second Equipment</Name> </Equipment> </GeneratedBy>
+	</Product>
+	<Product xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
+		<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types">http://purl.org/coar/resource_type/c_ddb1</Type>
+		<Name>Second DataSet</Name>
+		<Creators>
+	    </Creators>
+	    <Publishers>
+	    	<Publisher> <OrgUnit> <Name>Publisher</Name> </OrgUnit> </Publisher>
+	    </Publishers>
+	    <Keyword>DataSet</Keyword>
+		<OriginatesFrom> <Project> <Title>First Project</Title> </Project> </OriginatesFrom>
+		<OriginatesFrom> <Project> <Title>Second Project</Title> </Project> </OriginatesFrom>
+	</Product>
+</Products>

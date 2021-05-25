@@ -7,10 +7,11 @@
  */
 package org.dspace.content.integration.crosswalks.evaluators;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
@@ -32,7 +33,6 @@ public class AuthorityNotBlankCondition extends ConditionEvaluator {
     @Override
     public boolean doTest(Context context, Item item, String condition) {
 
-
         String[] conditionSections = condition.split("\\.");
         if (conditionSections.length != 2) {
             throw new IllegalArgumentException("Invalid authority condition: " + condition);
@@ -45,7 +45,9 @@ public class AuthorityNotBlankCondition extends ConditionEvaluator {
             return false;
         }
 
-        return StringUtils.isNotBlank(metadata.get(0).getAuthority());
+        return metadata.stream()
+            .map(metadataValue -> metadataValue.getAuthority())
+            .allMatch(authority -> isNotBlank(authority));
     }
 
 }

@@ -51,6 +51,12 @@
 				<entry key="funding-csv" value-ref="csvCrosswalkFunding"></entry>
 				<entry key="funding-xls" value-ref="xlsCrosswalkFunding"></entry>
 				
+				<entry key="patent-cerif-xml" value-ref="referCrosswalkPatentCerifXml"></entry>
+				
+				<entry key="dataSet-cerif-xml" value-ref="referCrosswalkDataSetCerifXml"></entry>
+				
+				<entry key="event-cerif-xml" value-ref="referCrosswalkEventCerifXml"></entry>
+				
 				<entry key="collection-xls" value-ref="xlsCrosswalkCollection"></entry>
 			</map>
 		</constructor-arg>
@@ -217,6 +223,36 @@
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
 		<property name="converter" ref="jsonValueConverter" />
 		<property name="linesPostProcessor" ref="jsonPostProcessor" />
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkPatentCerifXml">
+		<property name="templateFileName" value="crosswalks/template/patent-cerif-xml.template"/>
+		<property name="mimeType" value="application/xml; charset=UTF-8"/>
+		<property name="fileName" value="patent.xml"/>
+		<property name="entityType" value="Patent"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/patents-xml.template"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+		<property name="converter" ref="xmlValueConverter" />
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkDataSetCerifXml">
+		<property name="templateFileName" value="crosswalks/template/dataSet-cerif-xml.template"/>
+		<property name="mimeType" value="application/xml; charset=UTF-8"/>
+		<property name="fileName" value="dataSet.xml"/>
+		<property name="entityType" value="DataSet"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/dataSets-xml.template"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+		<property name="converter" ref="xmlValueConverter" />
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkEventCerifXml">
+		<property name="templateFileName" value="crosswalks/template/event-cerif-xml.template"/>
+		<property name="mimeType" value="application/xml; charset=UTF-8"/>
+		<property name="fileName" value="event.xml"/>
+		<property name="entityType" value="Event"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/events-xml.template"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+		<property name="converter" ref="xmlValueConverter" />
 	</bean>
 
 	<bean class="org.dspace.content.integration.crosswalks.DocumentCrosswalk" id="pdfCrosswalkPerson">
@@ -422,6 +458,7 @@
 			<map>
 				<entry key="coarTypes" value-ref="mapConverterCoarTypes" />
 				<entry key="fundingTypes" value-ref="mapConverterFundingTypes" />
+				<entry key="eventTypes" value-ref="mapConverterEventTypes" />
 				<entry key="orgUnitTypes" value-ref="mapConverterOrgUnitTypes" />
 				<entry key="coarToPublicationTypes" value-ref="mapConverterCoarToPublicationTypes" />
 				<entry key="cerifToOrgUnitTypes" value-ref="mapConverterCerifToOrgUnitTypes" />
@@ -446,6 +483,12 @@
 		<property name="converterNameFile" value="mapConverter-orgUnitTypes.properties" />
 		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
 		<property name="defaultValue" value="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_OrgUnit_Types"/>
+	</bean>
+
+	<bean name="mapConverterEventTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
+		<property name="converterNameFile" value="mapConverter-eventTypes.properties" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+		<property name="defaultValue" value=""/>
 	</bean>
 	
 	<bean name="mapConverterCoarToPublicationTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">

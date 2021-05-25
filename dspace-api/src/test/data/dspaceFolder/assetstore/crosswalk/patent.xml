@@ -1,0 +1,41 @@
+<Patent xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
+   <Type xmlns="https://www.openaire.eu/cerif-profile/vocab/COAR_Patent_Types">http://purl.org/coar/resource_type/c_15cd</Type>
+   <Title>Test patent</Title>
+   <RegistrationDate>2021-01-01</RegistrationDate>
+   <Issuer> <OrgUnit> <Name>First publisher</Name> </OrgUnit> </Issuer>
+   <Issuer> <OrgUnit> <Name>Second publisher</Name> </OrgUnit> </Issuer>
+   <PatentNumber>12345-666</PatentNumber>
+   <Inventors>
+	  <Inventor>
+         <DisplayName>Walter White</DisplayName>
+		 <Person id="b6ff8101-05ec-49c5-bd12-cba7894012b7" />
+         <Affiliation>
+            <OrgUnit>
+         	   <Name>4Science</Name>
+         	</OrgUnit>
+         </Affiliation>
+      </Inventor>
+	  <Inventor>
+         <DisplayName>Jesse Pinkman</DisplayName>
+         <Affiliation>
+            <OrgUnit>
+         	</OrgUnit>
+         </Affiliation>
+      </Inventor>
+	  <Inventor>
+         <DisplayName>John Smith</DisplayName>
+         <Affiliation>
+            <OrgUnit>
+         	   <Name>4Science</Name>
+         	</OrgUnit>
+         </Affiliation>
+      </Inventor>
+   </Inventors>
+   <Holders>
+      <Holder> <OrgUnit> <Name>Test Organization</Name> </OrgUnit> </Holder>
+   </Holders>
+   <Abstract>This is a patent</Abstract>
+   <Predecessor>
+      <Patent> <Title>Another patent</Title> </Patent>
+   </Predecessor>
+</Patent>

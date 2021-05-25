@@ -1,0 +1,34 @@
+<Events>
+	<Event xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
+		<Type scheme="https://w3id.org/cerif/vocab/EventTypes">https://w3id.org/cerif/vocab/EventTypes#Conference</Type>
+		<Acronym>FE</Acronym>
+		<Name>First Event</Name>
+		<Place>Milan</Place>
+		<Country>Italy</Country>
+		<StartDate>2020-01-01</StartDate>
+		<EndDate>2020-01-05</EndDate>
+	    <Keyword>test</Keyword>
+	    <Organizer> <OrgUnit> <Name>Organizer</Name> </OrgUnit> </Organizer>
+	    <Sponsor> <Project> <Title>Sponsor</Title> </Project> </Sponsor>
+	</Event>
+	<Event xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
+		<Type scheme="https://w3id.org/cerif/vocab/EventTypes">https://w3id.org/cerif/vocab/EventTypes#Workshop</Type>
+		<Acronym>SE</Acronym>
+		<Name>Second Event</Name>
+		<Place>Terni</Place>
+		<StartDate>2021-01-01</StartDate>
+		<EndDate>2021-01-05</EndDate>
+	    <Organizer> <Project> <Title>Organizer</Title> </Project> </Organizer>
+	</Event>
+	<Event xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
+		<Type scheme="https://w3id.org/cerif/vocab/EventTypes">https://w3id.org/cerif/vocab/EventTypes</Type>
+		<Acronym>TE</Acronym>
+		<Name>Third Event</Name>
+		<Place>Rome</Place>
+		<Country>Italy</Country>
+		<StartDate>2020-06-01</StartDate>
+		<EndDate>2020-06-05</EndDate>
+	    <Sponsor> <Project> <Title>Sponsor</Title> </Project> </Sponsor>
+	    <Partner> <Project> <Title>Partner</Title> </Project> </Partner>
+	</Event>
+</Events>

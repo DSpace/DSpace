@@ -175,6 +175,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return withCrisOwner(ePerson.getFullName(), ePerson.getID().toString());
     }
 
+    public ItemBuilder withUriIdentifier(String uri) {
+        return addMetadataValue(item, "dc", "identifier", "uri", uri);
+    }
+
     public ItemBuilder withDoiIdentifier(String doi) {
         return addMetadataValue(item, "dc", "identifier", "doi", doi);
     }
@@ -347,6 +351,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "description", "abstract", description);
     }
 
+    public ItemBuilder withDescriptionVersion(String version) {
+        return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "description", "version", version);
+    }
+
     public ItemBuilder withPersonEducation(String education) {
         return addMetadataValue(item, "crisrp", "education", null, education);
     }
@@ -467,6 +475,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "dc", "relation", "publication", publication);
     }
 
+    public ItemBuilder withRelationPatent(String patent) {
+        return addMetadataValue(item, "dc", "relation", "patent", patent);
+    }
+
     public ItemBuilder withRelationDoi(String doi) {
         return addMetadataValue(item, "dc", "relation", "doi", doi);
     }
@@ -497,6 +509,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withRelationEquipment(String equipment) {
         return addMetadataValue(item, "dc", "relation", "equipment", equipment);
+    }
+
+    public ItemBuilder withRelationEquipment(String equipment, String authority) {
+        return addMetadataValue(item, "dc", "relation", "equipment", null, equipment, authority, 600);
     }
 
     public ItemBuilder withVolume(String volume) {
@@ -622,6 +638,50 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withCrisSourceId(String sourceId) {
         return addMetadataValue(item, "cris", "sourceId", null, sourceId);
+    }
+
+    public ItemBuilder withRightsHolder(String rightsHolder) {
+        return addMetadataValue(item, "dcterms", "rightsHolder", null, rightsHolder);
+    }
+
+    public ItemBuilder withEventPlace(String place) {
+        return addMetadataValue(item, "oairecerif", "event", "place", place);
+    }
+
+    public ItemBuilder withEventCountry(String country) {
+        return addMetadataValue(item, "oairecerif", "event", "country", country);
+    }
+
+    public ItemBuilder withEventStartDate(String startDate) {
+        return addMetadataValue(item, "oairecerif", "event", "startDate", startDate);
+    }
+
+    public ItemBuilder withEventEndDate(String endDate) {
+        return addMetadataValue(item, "oairecerif", "event", "endDate", endDate);
+    }
+
+    public ItemBuilder withEventOrgUnitOrganizer(String organizer) {
+        return addMetadataValue(item, "crisevent", "organizerou", null, organizer);
+    }
+
+    public ItemBuilder withEventProjectOrganizer(String organizer) {
+        return addMetadataValue(item, "crisevent", "organizerpj", null, organizer);
+    }
+
+    public ItemBuilder withEventOrgUnitSponsor(String sponsor) {
+        return addMetadataValue(item, "crisevent", "sponsorou", null, sponsor);
+    }
+
+    public ItemBuilder withEventProjectSponsor(String sponsor) {
+        return addMetadataValue(item, "crisevent", "sponsorpj", null, sponsor);
+    }
+
+    public ItemBuilder withEventOrgUnitPartner(String partner) {
+        return addMetadataValue(item, "crisevent", "partnerou", null, partner);
+    }
+
+    public ItemBuilder withEventProjectPartner(String partner) {
+        return addMetadataValue(item, "crisevent", "partnerpj", null, partner);
     }
 
     public ItemBuilder withHandle(String handle) {

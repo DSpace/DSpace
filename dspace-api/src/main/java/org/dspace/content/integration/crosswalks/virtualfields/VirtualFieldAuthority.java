@@ -8,6 +8,7 @@
 package org.dspace.content.integration.crosswalks.virtualfields;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
@@ -38,7 +39,16 @@ public class VirtualFieldAuthority implements VirtualField {
 
         return itemService.getMetadataByMetadataString(item, metadataField).stream()
             .map(MetadataValue::getAuthority)
+            .map(authority -> isGenerateAuthority(authority) || isReferenceAuthority(authority) ? null : authority)
             .toArray(String[]::new);
+    }
+
+    private boolean isGenerateAuthority(String authority) {
+        return StringUtils.startsWith(authority, AuthorityValueService.GENERATE);
+    }
+
+    private boolean isReferenceAuthority(String authority) {
+        return StringUtils.startsWith(authority, AuthorityValueService.REFERENCE);
     }
 
 }

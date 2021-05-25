@@ -1,0 +1,38 @@
+<Product xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
+	<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types">http://purl.org/coar/resource_type/c_ddb1</Type>
+	<Language>EN</Language>
+	<Name>Test DataSet</Name>
+	<VersionInfo>V-01</VersionInfo>
+	<DOI>10.11234.12</DOI>
+	<Creators>
+	  <Creator>
+         <DisplayName>Walter White</DisplayName>
+         <Affiliation>
+            <OrgUnit>
+         	</OrgUnit>
+         </Affiliation>
+      </Creator>
+	  <Creator>
+         <DisplayName>Jesse Pinkman</DisplayName>
+		 <Person id="94f05c08-6273-4a9e-b6cd-002fd8669fa0" />
+         <Affiliation>
+            <OrgUnit>
+         	   <Name>4Science</Name>
+         	</OrgUnit>
+         </Affiliation>
+      </Creator>
+    </Creators>
+    <Publishers>
+    	<Publisher> <OrgUnit> <Name>Publisher</Name> </OrgUnit> </Publisher>
+    </Publishers>
+	<Description>This is a DataSet</Description>
+    <Keyword>DataSet</Keyword>
+    <Keyword>Keyword</Keyword>
+   	<OriginatesFrom>
+      	<Project id="mock-id">
+			<Acronym>T-PRJ</Acronym>
+         	<Title>Test Project</Title>
+      	</Project>
+	</OriginatesFrom>
+	<GeneratedBy> <Equipment> <Name>Test Equipment</Name> </Equipment> </GeneratedBy>
+</Product>

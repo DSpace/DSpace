@@ -1,0 +1,17 @@
+<Event xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="@virtual.id@">
+	<Type scheme="https://w3id.org/cerif/vocab/EventTypes">@virtual.mapConverter.eventTypes.dc-type@</Type>
+	<Acronym>@oairecerif.acronym@</Acronym>
+	<Name>@dc.title@</Name>
+	<Place>@oairecerif.event.place@</Place>
+	<Country>@oairecerif.event.country@</Country>
+	<StartDate>@oairecerif.event.startDate@</StartDate>
+	<EndDate>@oairecerif.event.endDate@</EndDate>
+	<Description>@dc.description.abstract@</Description>
+    <Keyword>@dc.subject@</Keyword>
+    <Organizer> <OrgUnit> <Name>@crisevent.organizerou@</Name> </OrgUnit> </Organizer>
+    <Organizer> <Project> <Title>@crisevent.organizerpj@</Title> </Project> </Organizer>
+    <Sponsor> <OrgUnit> <Name>@crisevent.sponsorou@</Name> </OrgUnit> </Sponsor>
+    <Sponsor> <Project> <Title>@crisevent.sponsorpj@</Title> </Project> </Sponsor>
+    <Partner> <OrgUnit> <Name>@crisevent.partnerou@</Name> </OrgUnit> </Partner>
+    <Partner> <Project> <Title>@crisevent.partnerpj@</Title> </Project> </Partner>
+</Event>
