@@ -33,6 +33,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -1882,6 +1883,77 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             orcidWebhookService.setOrcidClient(orcidClient);
         }
 
+    }
+
+    @Test
+    public void researcherProfileClaim() throws Exception {
+        String id = user.getID().toString();
+        String name = user.getName();
+
+        context.turnOffAuthorisationSystem();
+
+        final Item person = ItemBuilder.createItem(context, personCollection)
+                                      .withFullName("Doe, John")
+                                      .build();
+
+        final Item otherPerson = ItemBuilder.createItem(context, personCollection)
+                                       .withFullName("Smith, Jane")
+                                       .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(user.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/cris/profiles/")
+                                         .contentType(TEXT_URI_LIST)
+                                         .content("http://localhost:8080/server/api/core/items/" + person.getID().toString()))
+                            .andExpect(status().isCreated())
+                            .andExpect(jsonPath("$.id", is(id)))
+                            .andExpect(jsonPath("$.type", is("profile")))
+                            .andExpect(jsonPath("$",
+                                                matchLinks("http://localhost/api/cris/profiles/" + user.getID(), "item", "eperson")));
+
+        getClient(authToken).perform(get("/api/cris/profiles/{id}", id))
+                            .andExpect(status().isOk());
+
+        getClient(authToken).perform(get("/api/cris/profiles/{id}/item", id))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.type", is("item")))
+                            .andExpect(jsonPath("$.metadata", matchMetadata("cris.owner", name, id, 0)))
+                            .andExpect(jsonPath("$.metadata", matchMetadata("cris.sourceId", id, 0)))
+                            .andExpect(jsonPath("$.metadata", matchMetadata("dspace.entity.type", "Person", 0)));
+
+        getClient(authToken).perform(get("/api/cris/profiles/{id}/eperson", id))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.type", is("eperson")))
+                            .andExpect(jsonPath("$.name", is(name)));
+
+        // trying to claim another profile
+        getClient(authToken).perform(post("/api/cris/profiles/")
+                                         .contentType(TEXT_URI_LIST)
+                                         .content("http://localhost:8080/server/api/core/items/" + otherPerson.getID().toString()))
+                            .andExpect(status().isConflict());
+
+        // other person trying to claim same profile
+        context.turnOffAuthorisationSystem();
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withCanLogin(true)
+                                        .withEmail("foo@bar.baz")
+                                        .withPassword(password)
+                                        .withNameInMetadata("Test", "User")
+                                        .build();
+
+        context.restoreAuthSystemState();
+
+        final String ePersonToken = getAuthToken(ePerson.getEmail(), password);
+
+        getClient(ePersonToken).perform(post("/api/cris/profiles/")
+                                         .contentType(TEXT_URI_LIST)
+                                         .content("http://localhost:8080/server/api/core/items/" + person.getID().toString()))
+                            .andExpect(status().isBadRequest());
+
+        getClient(authToken).perform(delete("/api/cris/profiles/{id}", id))
+                            .andExpect(status().isNoContent());
     }
 
     private Item createProfile(EPerson ePerson) throws Exception {
