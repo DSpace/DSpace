@@ -46,7 +46,6 @@ import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.utils.DSpace;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -55,7 +54,6 @@ import org.junit.Test;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-@Ignore
 public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
     private static final String BASE_OUTPUT_DIR_PATH = "./target/testing/dspace/assetstore/crosswalk/";
