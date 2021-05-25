@@ -83,7 +83,7 @@ public class PlainMetadataSignatureGeneratorIT extends AbstractIntegrationTestWi
         String signature = generator.generate(context, List.of(author, affiliation));
         assertThat(signature, notNullValue());
 
-        String expectedSignature = "dc.contributor.author::Jesse Pinkman::d285b110-e8fd-4f71-80b5-2e9267c27dfb/"
+        String expectedSignature = "dc.contributor.author::Jesse Pinkman::d285b110-e8fd-4f71-80b5-2e9267c27dfb§§"
             + "oairecerif.author.affiliation::" + CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
 
         assertThat(signature, equalTo(expectedSignature));
@@ -106,6 +106,7 @@ public class PlainMetadataSignatureGeneratorIT extends AbstractIntegrationTestWi
             .withTitle("Item title")
             .withDescription("Description")
             .withAuthor("Jesse Pinkman")
+            .withUrlIdentifier("https://www.4science.it/en")
             .build();
 
         context.restoreAuthSystemState();
@@ -118,6 +119,14 @@ public class PlainMetadataSignatureGeneratorIT extends AbstractIntegrationTestWi
         List<MetadataValue> metadataValues = generator.findBySignature(context, item, signature);
         assertThat(metadataValues, hasSize(1));
         assertThat(metadataValues, containsInAnyOrder(description));
+
+        MetadataValue url = getMetadata(item, "oairecerif.identifier.url", 0);
+        signature = generator.generate(context, List.of(url));
+        assertThat(signature, equalTo("oairecerif.identifier.url::https://www.4science.it/en"));
+
+        metadataValues = generator.findBySignature(context, item, signature);
+        assertThat(metadataValues, hasSize(1));
+        assertThat(metadataValues, containsInAnyOrder(url));
 
     }
 
