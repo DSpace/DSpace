@@ -40,7 +40,7 @@ import org.dspace.core.Context;
  */
 public class PlainMetadataSignatureGeneratorImpl implements MetadataSignatureGenerator {
 
-    private static final String SIGNATURE_SECTIONS_SEPARATOR = "/";
+    private static final String SIGNATURE_SECTIONS_SEPARATOR = "§§";
     private static final String METADATA_SECTIONS_SEPARATOR = "::";
 
     @Override

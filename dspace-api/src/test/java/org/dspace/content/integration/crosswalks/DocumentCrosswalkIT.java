@@ -13,6 +13,7 @@ import static org.dspace.builder.ItemBuilder.createItem;
 import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.isEmptyString;
 import static org.hamcrest.Matchers.not;
 
@@ -44,7 +45,6 @@ import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
 import org.dspace.core.CrisConstants;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -53,7 +53,6 @@ import org.junit.Test;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-@Ignore
 public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
     private static final String BASE_OUTPUT_DIR_PATH = "./target/testing/dspace/assetstore/crosswalk/";
@@ -472,6 +471,31 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             streamCrosswalkDefault.disseminate(context, funding, out);
             assertThat(out.toString(), not(isEmptyString()));
             assertThatPdfHasContent(out, content -> assertThatFundingDocumentHasContent(content));
+        }
+
+    }
+
+    @Test
+    public void testPdfCrosswalkPersonDisseminateWithEmptyPerson() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item personItem = ItemBuilder.createItem(context, collection)
+            .withEntityType("Person")
+            .withTitle("Test user")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        StreamDisseminationCrosswalk streamCrosswalkDefault = (StreamDisseminationCrosswalk) CoreServiceFactory
+            .getInstance().getPluginService().getNamedPlugin(StreamDisseminationCrosswalk.class, "person-pdf");
+
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            streamCrosswalkDefault.disseminate(context, personItem, out);
+            assertThat(out.toString(), not(isEmptyString()));
+            assertThatPdfHasContent(out, content -> {
+                assertThat(content, equalTo("Test user\n"));
+            });
         }
 
     }

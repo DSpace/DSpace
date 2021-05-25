@@ -50,7 +50,7 @@ public class OrcidHistorySendToOrcidRestPermissionEvaluatorPlugin extends RestOb
         if (!DSpaceRestPermission.ADD.equals(restPermission)) {
             return false;
         }
-        if (!targetType.equals(OrcidQueueRestPermissionEvaluatorPlugin.ORCID)) {
+        if (!targetType.equals(OrcidQueueAndHistoryRestPermissionEvaluatorPlugin.ORCID_HISTORY)) {
             return false;
         }
 

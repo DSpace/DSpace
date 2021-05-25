@@ -55,7 +55,7 @@ public class OrcidSimpleValueObjectFactory extends AbstractOrcidProfileSectionFa
     public Object create(Context context, List<MetadataValue> metadataValues) {
 
         if (CollectionUtils.isEmpty(metadataValues)) {
-            return null;
+            throw new IllegalArgumentException("No metadata values provided to create ORCID object with simple value");
         }
 
         if (metadataValues.size() > 1) {
