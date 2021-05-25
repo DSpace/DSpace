@@ -60,6 +60,7 @@ import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
+import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.configuration.DiscoveryMoreLikeThisConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
@@ -1069,9 +1070,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             return new ArrayList<>(0);
         }
     }
-
     @Override
-    public DiscoverFilterQuery toFilterQuery(Context context, String field, String operator, String value)
+    public DiscoverFilterQuery toFilterQuery(Context context, String field, String operator, String value,
+        DiscoveryConfiguration config)
         throws SQLException {
         DiscoverFilterQuery result = new DiscoverFilterQuery();
 
@@ -1081,7 +1082,14 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
 
             if (operator.endsWith("equals")) {
-                filterQuery.append("_keyword");
+                final boolean isStandardField
+                    = Optional.ofNullable(config)
+                              .flatMap(c -> Optional.ofNullable(c.getSidebarFacet(field)))
+                              .map(facet -> facet.getType().equals(DiscoveryConfigurationParameters.TYPE_STANDARD))
+                              .orElse(false);
+                if (!isStandardField) {
+                    filterQuery.append("_keyword");
+                }
             } else if (operator.endsWith("authority")) {
                 filterQuery.append("_authority");
             }
