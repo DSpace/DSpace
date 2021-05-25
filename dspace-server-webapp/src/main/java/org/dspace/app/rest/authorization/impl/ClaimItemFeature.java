@@ -11,14 +11,17 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.profile.ResearcherProfile;
 import org.dspace.app.profile.service.ResearcherProfileService;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.ItemRest;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
@@ -63,12 +66,28 @@ public class ClaimItemFeature implements AuthorizationFeature {
 
         if (!(object instanceof ItemRest) ||
                 Objects.isNull(context.getCurrentUser()) ||
+                hasAlreadyAProfileWithClone(context) ||
                 Objects.isNull(configurationService.getArrayProperty("claimable.collection.uuid"))) {
             return false;
         }
         String id = ((ItemRest) object).getId();
         Item item = itemService.find(context, UUID.fromString(id));
         return claimable(context, item);
+    }
+
+    private boolean hasAlreadyAProfileWithClone(Context context) {
+        try {
+
+            ResearcherProfile profile = researcherProfileService.findById(context, context.getCurrentUser().getID());
+            return Optional.ofNullable(profile)
+                .map(p -> Objects.nonNull(p.getItem()))
+                .orElse(false);
+
+        } catch (SQLException | AuthorizeException e) {
+            LOG.warn("Error while checking if eperson has a ResearcherProfileAssociated: {}",
+                     e.getMessage(), e);
+            return false;
+        }
     }
 
     private boolean claimable(final Context context, Item item) throws SQLException {

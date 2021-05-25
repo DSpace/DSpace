@@ -61,9 +61,11 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.OrcidQueueBuilder;
 import org.dspace.content.Collection;
+import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
@@ -1956,6 +1958,63 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
                             .andExpect(status().isNoContent());
     }
 
+    @Test
+    public void testCloneFromExternalSourceRecordNotFound() throws Exception {
+
+        String authToken = getAuthToken(user.getEmail(), password);
+
+        getClient(authToken)
+            .perform(post("/api/cris/profiles/").contentType(TEXT_URI_LIST)
+                                                .content("http://localhost:8080/server/api/integration/externalsources/orcid/entryValues/FAKE"))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testCloneFromExternalSourceMultipleUri() throws Exception {
+
+        String authToken = getAuthToken(user.getEmail(), password);
+
+        getClient(authToken)
+            .perform(post("/api/cris/profiles/").contentType(TEXT_URI_LIST)
+                                                .content("http://localhost:8080/server/api/integration/externalsources/orcid/entryValues/id \n "
+                                                             + "http://localhost:8080/server/api/integration/externalsources/dspace/entryValues/id"))
+            .andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    public void testCloneFromExternalProfileAlreadyAssociated() throws Exception {
+
+        String id = user.getID().toString();
+        String authToken = getAuthToken(user.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/cris/profiles/").contentType(MediaType.APPLICATION_JSON_VALUE))
+                            .andExpect(status().isCreated()).andExpect(jsonPath("$.id", is(id.toString())))
+                            .andExpect(jsonPath("$.visible", is(false))).andExpect(jsonPath("$.type", is("profile")));
+
+        getClient(authToken)
+            .perform(post("/api/cris/profiles/").contentType(TEXT_URI_LIST)
+                                                .content("http://localhost:8080/server/api/integration/externalsources/orcid/entryValues/id"))
+            .andExpect(status().isConflict());
+    }
+
+    @Test
+    public void testCloneFromExternalCollectionNotSet() throws Exception {
+
+        configurationService.setProperty("researcher-profile.collection.uuid", "not-existing");
+        String id = user.getID().toString();
+        String authToken = getAuthToken(user.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/cris/profiles/").contentType(MediaType.APPLICATION_JSON_VALUE))
+                            .andExpect(status().isCreated()).andExpect(jsonPath("$.id", is(id.toString())))
+                            .andExpect(jsonPath("$.visible", is(false))).andExpect(jsonPath("$.type", is("profile")));
+
+        getClient(authToken)
+            .perform(post("/api/cris/profiles/").contentType(TEXT_URI_LIST)
+                                                .content("http://localhost:8080/server/api/integration/externalsources/orcid/entryValues/id \n "
+                                                             + "http://localhost:8080/server/api/integration/externalsources/dspace/entryValues/id"))
+            .andExpect(status().isBadRequest());
+    }
     private Item createProfile(EPerson ePerson) throws Exception {
 
         String authToken = getAuthToken(ePerson.getEmail(), password);
@@ -2005,5 +2064,9 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         OrcidTokenResponseDTO response = new OrcidTokenResponseDTO();
         response.setAccessToken(accessToken);
         return response;
+    }
+
+    private EntityType createEntityType(String entityType) {
+        return EntityTypeBuilder.createEntityTypeBuilder(context, entityType).build();
     }
 }
