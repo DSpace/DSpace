@@ -6,17 +6,12 @@
          	<DOI>doi:10.3972/test</DOI>
       	</Publication>
    	</PublishedIn>
-   	<Publishers>
-   		<Publisher>
-			<OrgUnit />
-   		</Publisher>
-   	</Publishers>
    	<PublicationDate>2020-01-01</PublicationDate>
    	<DOI>doi:111.111/publication</DOI>
+    <ISI-Number>111-222-333</ISI-Number>
+    <SCP-Number>99999999</SCP-Number>
+    <ISSN>2049-3630</ISSN>
    	<ISBN>978-3-16-148410-0</ISBN>
-   	<ISSN>2049-3630</ISSN>
-   	<ISI-Number>111-222-333</ISI-Number>
-   	<SCP-Number>99999999</SCP-Number>
    	<Authors>
       	<Author>
         	<DisplayName>John Smith</DisplayName>
@@ -45,6 +40,11 @@
 	      	</Affiliation>
    	  	</Editor>
 	</Editors>
+    <Publishers>
+        <Publisher>
+            <OrgUnit />
+        </Publisher>
+    </Publishers>
    	<OriginatesFrom>
       	<Project id="mock-id">
 			<Acronym>TP</Acronym>
@@ -54,8 +54,8 @@
          	<Funded>
 				<By>
 					<OrgUnit id="mock-id">
+                        <Acronym>TFO</Acronym>
 						<Name>Test Funder</Name>
-						<Acronym>TFO</Acronym>
 					</OrgUnit>
 				</By>
 				<As>
@@ -81,4 +81,7 @@
    	</OriginatesFrom>
 	<PresentedAt> <Event> <Name>The best Conference</Name> </Event> </PresentedAt>
 	<References> <Product> <Name>DataSet</Name> </Product> </References>
+	<Access xmlns="http://purl.org/coar/access_right" 
+    >
+    </Access>
 </Publication>

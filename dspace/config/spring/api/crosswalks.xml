@@ -34,6 +34,7 @@
 				<entry key="project-csv" value-ref="csvCrosswalkProject"></entry>
 				<entry key="project-xls" value-ref="xlsCrosswalkProject"></entry>
 
+				<entry key="orgUnit-xml" value-ref="referCrosswalkOrgUnitXml"></entry>
 				<entry key="orgUnit-cerif-xml" value-ref="referCrosswalkOrgUnitCerifXml"></entry>
 				<entry key="orgUnit-json" value-ref="referCrosswalkOrgUnitJson"></entry>
 				<entry key="orgUnit-pdf" value-ref="pdfCrosswalkOrgUnit"></entry>
@@ -184,6 +185,16 @@
 		<property name="linesPostProcessor" ref="jsonPostProcessor" />
 	</bean>
 
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkOrgUnitXml">
+		<property name="templateFileName" value="crosswalks/template/orgUnit-xml.template"/>
+		<property name="mimeType" value="application/xml; charset=UTF-8"/>
+		<property name="fileName" value="orgUnit.xml"/>
+		<property name="entityType" value="OrgUnit"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/orgUnits-xml.template"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+		<property name="converter" ref="xmlValueConverter" />
+	</bean>
+
 	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkOrgUnitCerifXml">
 		<property name="templateFileName" value="crosswalks/template/orgUnit-cerif-xml.template"/>
 		<property name="mimeType" value="application/xml; charset=UTF-8"/>
@@ -301,7 +312,7 @@
 		<property name="fileName" value="orgUnit.pdf"/>
 		<property name="mimeType" value="application/pdf"/>
 		<property name="entityType" value="OrgUnit"/>
-		<property name="referCrosswalk" ref="referCrosswalkOrgUnitCerifXml"/>
+		<property name="referCrosswalk" ref="referCrosswalkOrgUnitXml"/>
 	</bean>
 
 	<bean class="org.dspace.content.integration.crosswalks.DocumentCrosswalk" id="pdfCrosswalkFunding">
@@ -461,6 +472,7 @@
 				<entry key="fundingTypes" value-ref="mapConverterFundingTypes" />
 				<entry key="eventTypes" value-ref="mapConverterEventTypes" />
 				<entry key="orgUnitTypes" value-ref="mapConverterOrgUnitTypes" />
+				<entry key="accessRight" value-ref="mapConverterAccessRight" />
 				<entry key="coarToPublicationTypes" value-ref="mapConverterCoarToPublicationTypes" />
 				<entry key="cerifToOrgUnitTypes" value-ref="mapConverterCerifToOrgUnitTypes" />
 				<entry key="cerifToFundingTypes" value-ref="mapConverterCerifToFundingTypes" />
@@ -490,6 +502,12 @@
 		<property name="converterNameFile" value="mapConverter-eventTypes.properties" />
 		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
 		<property name="defaultValue" value=""/>
+	</bean>
+	
+	<bean name="mapConverterAccessRight" class="org.dspace.util.SimpleMapConverter" init-method="init">
+	    <property name="converterNameFile" value="mapConverter-accessRight.properties" />
+	    <property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+	    <property name="defaultValue" value=""/>
 	</bean>
 	
 	<bean name="mapConverterCoarToPublicationTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">

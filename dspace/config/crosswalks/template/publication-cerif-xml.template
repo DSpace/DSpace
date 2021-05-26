@@ -56,7 +56,6 @@
         </Publisher>
     </Publishers>
     <License>@dc.rights.uri@</License>
-    <Subject scheme="http://purl.org/pe-repo/ocde/ford">@perucris.subject.ocde@</Subject>
     <Keyword>@dc.subject@</Keyword>
    	<Abstract>@dc.description.abstract@</Abstract>
    	@relation.dc-relation-project.start@

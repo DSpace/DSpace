@@ -1,0 +1,24 @@
+<OrgUnit id="@virtual.id@">
+	<Name>@dc.title@</Name>
+	<Name>@organization.legalName@</Name>
+	<Acronym>@oairecerif.acronym@</Acronym>
+	<Type scheme="https://w3id.org/cerif/vocab/OrganisationTypes">@virtual.mapConverter.orgUnitTypes.dc-type@</Type>
+	<PartOf>
+		@relation.organization-parentOrganization.start@
+		<OrgUnit id="@virtual.id@">
+			<Name>@dc.title@</Name>
+			<Acronym>@oairecerif.acronym@</Acronym>
+		</OrgUnit>
+		@relation.organization-parentOrganization.end@
+		@if.not.authority.organization-parentOrganization.start@
+		<OrgUnit> <Name>@organization.parentOrganization@</Name> </OrgUnit>
+		@if.not.authority.organization-parentOrganization.end@
+	</PartOf>
+	<Identifier>@organization.identifier@</Identifier>
+	<Identifier type="URL">@oairecerif.identifier.url@</Identifier>
+	<People>
+		@relation.people.start@
+		<Person displayName="@dc.title@"/>
+		@relation.people.end@
+	</People>
+</OrgUnit>
