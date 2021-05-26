@@ -18,7 +18,7 @@
 
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
-	<!-- Additional item.compile plugin to enrich field with information about Creative Commons License metadata -->
-	<bean id="CCElementAdditional"
-	class="org.dspace.xoai.app.CCElementAdditional"/>
+	<!-- Additional item.compile plugin to enrich field with information about 
+		Creative Commons License metadata -->
+	<bean class="org.dspace.xoai.app.CCElementItemCompilePlugin"/>
 </beans>

@@ -96,7 +96,8 @@ public class XOAI {
     private final static ConfigurationService configurationService = DSpaceServicesFactory
             .getInstance().getConfigurationService();
 
-    private List<XOAIItemCompilePlugin> xOAIItemCompilePlugins;
+    @Autowired(required = false)
+    private List<XOAIExtensionItemCompilePlugin> extensionPlugins = Collections.EMPTY_LIST;
 
     private List<String> getFileFormats(Item item) {
         List<String> formats = new ArrayList<>();
@@ -461,8 +462,8 @@ public class XOAI {
         Metadata metadata = retrieveMetadata(context, item);
 
         // Do any additional metadata element, depends on the plugins
-        for (XOAIItemCompilePlugin xOAIItemCompilePlugin : getxOAIItemCompilePlugins()) {
-            metadata = xOAIItemCompilePlugin.additionalMetadata(context, metadata, item);
+        for (XOAIExtensionItemCompilePlugin plugin : extensionPlugins) {
+            metadata = plugin.additionalMetadata(context, metadata, item);
         }
 
         metadata.write(xmlContext);
@@ -709,20 +710,4 @@ public class XOAI {
         }
     }
 
-    /**
-     * Do any additional content on "item.compile" field, depends on the plugins
-     * 
-     * @return
-     */
-    public List<XOAIItemCompilePlugin> getxOAIItemCompilePlugins() {
-        if (xOAIItemCompilePlugins == null) {
-            xOAIItemCompilePlugins = DSpaceServicesFactory.getInstance().getServiceManager()
-                    .getServicesByType(XOAIItemCompilePlugin.class);
-        }
-        return xOAIItemCompilePlugins;
-    }
-
-    public void setxOAIItemCompilePlugins(List<XOAIItemCompilePlugin> xOAIItemCompilePlugins) {
-        this.xOAIItemCompilePlugins = xOAIItemCompilePlugins;
-    }
 }

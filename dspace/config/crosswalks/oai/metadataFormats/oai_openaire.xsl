@@ -1644,7 +1644,7 @@
         </xsl:if>
     </xsl:template>
 
-	<!-- License CC splitter -->
+	<!-- Prepare data for CC License -->
 	<xsl:variable name="ccstart">
 		<xsl:value-of select="doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name='issued']/doc:element/doc:field[@name='value']/text()"/>
 	</xsl:variable>
@@ -1658,10 +1658,9 @@
 					select="$ccstart"/>
 			</xsl:attribute>
 			<xsl:attribute name="uri">
-				<xsl:value-of
-					select="substring-after(./text(),'|||')" />
-		</xsl:attribute>
-			<xsl:value-of select="substring-before(./text(),'|||')"/>
+				<xsl:value-of select="./doc:field[@name='uri']/text()" />
+		    </xsl:attribute>
+			<xsl:value-of select="./doc:field[@name='namei']/text()" />
 		</oaire:licenseCondition>
 	</xsl:template>
 
