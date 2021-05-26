@@ -85,6 +85,12 @@ public class XmlWorkflowCuratorServiceImpl
     protected XmlWorkflowItemService workflowItemService;
 
     @Override
+    public boolean needsCuration(Context c, XmlWorkflowItem wfi)
+            throws SQLException, IOException {
+        return getFlowStep(c, wfi) != null;
+    }
+
+    @Override
     public boolean doCuration(Context c, XmlWorkflowItem wfi)
             throws AuthorizeException, IOException, SQLException {
         Curator curator = new Curator();

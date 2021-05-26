@@ -26,6 +26,18 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  */
 public interface XmlWorkflowCuratorService {
     /**
+     * Should this item be curated?
+     *
+     * @param c current DSpace session.
+     * @param wfi the item in question.
+     * @return true if the item is in a workflow step.
+     * @throws IOException passed through.
+     * @throws SQLException passed through.
+     */
+    public boolean needsCuration(Context c, XmlWorkflowItem wfi)
+            throws IOException, SQLException;
+
+    /**
      * Determines and executes curation on a Workflow item.
      *
      * @param c the context
