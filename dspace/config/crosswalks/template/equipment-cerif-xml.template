@@ -1,0 +1,9 @@
+<Equipment xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="@virtual.id@">
+    <Type>@dc.type@</Type>
+    <Acronym>@oairecerif.acronym@</Acronym>
+	<Name>@dc.title@</Name>
+	<Identifier type="Institution assigned unique equipment identifier">@oairecerif.internalid@</Identifier>
+	<Description>@dc.description@</Description>
+	<Owner> <OrgUnit> <Name>@crisequipment.ownerou@</Name> </OrgUnit> </Owner>
+	<Owner> <Person displayName="@crisequipment.ownerrp@" ></Person> </Owner>
+</Equipment>

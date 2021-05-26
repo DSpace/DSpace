@@ -565,17 +565,21 @@
         <!-- This condition determines if an OAI document is of one of the types
         	 required by OpenAIRE for CRIS System. -->
         <CustomCondition id="crisObjectTypeCondition">
-            <Class>org.dspace.xoai.filter.DSpaceEntityTypeFilter</Class>
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
             <Configuration>
-            	<string name="relationShipType">dspace.entity.type</string>
+                <string name="field">dspace.entity.type</string>
+                <string name="operator">contains</string>
                 <list name="values">
-                    <string>item</string>
-                    <string>project</string>
-                    <string>rp</string>
-                    <string>ou</string>
-                    <string>journals</string>
-                    <string>events</string>
-                    <string>equipment</string>
+                    <string>Publication</string>
+                    <string>Project</string>
+                    <string>Funding</string>
+                    <string>Product</string>
+                    <string>Patent</string>
+                    <string>Person</string>
+                    <string>OrgUnit</string>
+                    <string>Journal</string>
+                    <string>Event</string>
+                    <string>Equipment</string>
                 </list>
             </Configuration>
         </CustomCondition>
@@ -661,7 +665,7 @@
             <Configuration>
                 <string name="field">dspace.entity.type</string>
                 <string name="operator">equal</string>
-				<string name="value">Publications</string>
+				<string name="value">Publication</string>
 			</Configuration>
         </CustomCondition>
         <CustomCondition id="productSetFilter">
@@ -669,7 +673,7 @@
             <Configuration>
                 <string name="field">dspace.entity.type</string>
                 <string name="operator">equal</string>
-				<string name="value">Products</string>
+				<string name="value">Product</string>
             </Configuration>
         </CustomCondition>
         <CustomCondition id="patentSetFilter">
@@ -677,56 +681,78 @@
             <Configuration>
                 <string name="field">dspace.entity.type</string>
                 <string name="operator">equal</string>
-				<string name="value">Patents</string>
+				<string name="value">Patent</string>
             </Configuration>
         </CustomCondition>
         <CustomCondition id="researcherSetFilter">
-            <Class>org.dspace.xoai.filter.DSpaceEntityTypeFilter</Class>
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
             <Configuration>
-            	<string name="relationShipType">dspace.entity.type</string>
-                <string name="value">rp</string>
+                <string name="field">dspace.entity.type</string>
+                <string name="operator">contains</string>
+                <list name="values">
+                    <string>Person</string>
+                </list>
             </Configuration>
         </CustomCondition>
         <CustomCondition id="orgUnitSetFilter">
-            <Class>org.dspace.xoai.filter.DSpaceEntityTypeFilter</Class>
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
             <Configuration>
-            	<string name="relationShipType">dspace.entity.type</string>
-                <string name="value">ou</string>
+                <string name="field">dspace.entity.type</string>
+                <string name="operator">contains</string>
+                <list name="values">
+                    <string>OrgUnit</string>
+                </list>
             </Configuration>
         </CustomCondition>
+
         <CustomCondition id="projectSetFilter">
-            <Class>org.dspace.xoai.filter.DSpaceEntityTypeFilter</Class>
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
             <Configuration>
-            	<string name="relationShipType">dspace.entity.type</string>
-                <string name="value">project</string>
+                <string name="field">dspace.entity.type</string>
+                <string name="operator">contains</string>
+                <list name="values">
+                    <string>Project</string>
+                </list>
             </Configuration>
 		</CustomCondition>
         <CustomCondition id="journalSetFilter">
-            <Class>org.dspace.xoai.filter.DSpaceEntityTypeFilter</Class>
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
             <Configuration>
-            	<string name="relationShipType">dspace.entity.type</string>
-                <string name="value">journals</string>
+                <string name="field">dspace.entity.type</string>
+                <string name="operator">contains</string>
+                <list name="values">
+                    <string>Journal</string>
+                </list>
             </Configuration>
 		</CustomCondition>
         <CustomCondition id="eventSetFilter">
-            <Class>org.dspace.xoai.filter.DSpaceEntityTypeFilter</Class>
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
             <Configuration>
-            	<string name="relationShipType">dspace.entity.type</string>
-                <string name="value">events</string>
+                <string name="field">dspace.entity.type</string>
+                <string name="operator">contains</string>
+                <list name="values">
+                    <string>Event</string>
+                </list>
             </Configuration>
 		</CustomCondition>
         <CustomCondition id="equipmentSetFilter">
-            <Class>org.dspace.xoai.filter.DSpaceEntityTypeFilter</Class>
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
             <Configuration>
-            	<string name="relationShipType">dspace.entity.type</string>
-                <string name="value">equipment</string>
+                <string name="field">dspace.entity.type</string>
+                <string name="operator">contains</string>
+                <list name="values">
+                    <string>Equipment</string>
+                </list>
             </Configuration>
 		</CustomCondition>
         <CustomCondition id="fundingSetFilter">
-            <Class>org.dspace.xoai.filter.DSpaceEntityTypeFilter</Class>
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
             <Configuration>
-            	<string name="relationShipType">dspace.entity.type</string>
-                <string name="value">funding</string>
+                <string name="field">dspace.entity.type</string>
+                <string name="operator">contains</string>
+                <list name="values">
+                    <string>Funding</string>
+                </list>
             </Configuration>
 		</CustomCondition>
         <!-- NOTE to use the flat metadata comment in the previous and use the follow  configuration -->

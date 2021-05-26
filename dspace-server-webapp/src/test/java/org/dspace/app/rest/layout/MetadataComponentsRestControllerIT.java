@@ -224,17 +224,6 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
         Map<String, Object> values_row_nested = new HashMap<String, Object>();
         List<Map<String, Object>> metadataValuesNested = new ArrayList<Map<String, Object>>();
 
-        // second nested metadata
-        values2.put("metadata", "oairecerif.author.affiliation");
-        values2.put("label", "Affiliation");
-        values2.put("rendering", "crisref");
-        values2.put("fieldType", "metadata");
-        values2.put("style", "row");
-        values2.put("styleLabel", "col");
-        values2.put("styleValue", "col");
-        metadataValues.add(values2);
-
-
         // first nested metadata
         values1.put("metadata", "dc.contributor.author");
         values1.put("label", "Name");
@@ -244,6 +233,16 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
         values1.put("styleLabel", "col");
         values1.put("styleValue", "col");
         metadataValues.add(values1);
+
+        // second nested metadata
+        values2.put("metadata", "oairecerif.author.affiliation");
+        values2.put("label", "Affiliation");
+        values2.put("rendering", "crisref");
+        values2.put("fieldType", "metadata");
+        values2.put("style", "row");
+        values2.put("styleLabel", "col");
+        values2.put("styleValue", "col");
+        metadataValues.add(values2);
 
         metadataGroup.put("elements", metadataValues);
         metadataGroup.put("leading", "dc.contributor.author");
