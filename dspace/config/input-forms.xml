@@ -678,18 +678,6 @@
 					<type-bind>Libro</type-bind>
 				</field>
 
-				<!-- Dossier -->
-				<field>
-					<dc-schema>sedici</dc-schema>
-					<dc-element>relation</dc-element>
-					<dc-qualifier>dossier</dc-qualifier>
-					<label>Nombre del Dossier</label>
-					<input-type>textarea</input-type>
-					<hint>Nombre de la sección Dossier en la que el artículo se encuentra</hint>
-					<type-bind>Articulo</type-bind>
-					<visibility-on-group>Bibliotecarios</visibility-on-group>
-				</field>
-
 				<!-- Evaluación -->
 				<field>
 					<dc-schema>sedici</dc-schema>
