@@ -22,7 +22,7 @@
     <!-- Temporarily commented out: DSC-70 should be solved -->
     <!--    <bean id="CCElementAdditional"-->
     <!--          class="org.dspace.xoai.app.CCElementAdditional"/>-->
-    <bean id="XOAIItemCompilePluginImplementation" class="org.dspace.xoai.app.XOAIItemCompilePluginImplementation">
+    <bean id="xoaiCerifGenerator" class="org.dspace.xoai.app.XOAICerifItemCompilePlugin">
         <property name="generator" value="xml-cerif"/>
         <property name="fieldName" value="openaire"/>
     </bean>

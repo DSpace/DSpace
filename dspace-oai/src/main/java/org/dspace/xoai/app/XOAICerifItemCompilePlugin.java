@@ -26,12 +26,13 @@ import org.dspace.xoai.util.ItemUtils;
 
 
 /**
- * Utility class to attach xml element to solr oai field for xml presentation of data space object
+ * Utility class to enrich content of 'item.compile' solr document field, which adds a metadata containing cerif representation
+ * of a DSpace item.
  *
  */
-public class XOAIItemCompilePluginImplementation implements XOAIItemCompilePlugin {
+public class XOAICerifItemCompilePlugin implements XOAIItemCompilePlugin {
 
-    private static final Logger log = LogManager.getLogger(XOAIItemCompilePluginImplementation.class);
+    private static final Logger log = LogManager.getLogger(XOAICerifItemCompilePlugin.class);
 
     private String generator;
     private String fieldName;
