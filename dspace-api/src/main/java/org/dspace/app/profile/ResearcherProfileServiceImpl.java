@@ -14,6 +14,7 @@ import static org.dspace.eperson.Group.ANONYMOUS;
 import java.io.IOException;
 import java.net.URI;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -192,7 +193,7 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
         final String path = uri.getPath();
         final UUID uuid = UUIDUtils.fromString(path.substring(path.lastIndexOf("/") + 1 ));
         Item item = itemService.find(context, uuid);
-        if (Objects.isNull(item) || !item.isArchived() || item.isWithdrawn()) {
+        if (Objects.isNull(item) || !item.isArchived() || item.isWithdrawn() || notClaimableEntityType(item)) {
             throw new IllegalArgumentException("Provided uri does not represent a valid Item to be claimed");
         }
         final String existingOwner = itemService.getMetadataFirstValue(item, "cris", "owner",
@@ -209,6 +210,12 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
 
         context.restoreAuthSystemState();
         return new ResearcherProfile(item);
+    }
+
+    private boolean notClaimableEntityType(final Item item) {
+        final String entityType = itemService.getEntityType(item);
+        return Arrays.stream(configurationService.getArrayProperty("claimable.entityType"))
+                     .noneMatch(entityType::equals);
     }
 
     private Item findResearcherProfileItemById(Context context, UUID id) throws SQLException, AuthorizeException {

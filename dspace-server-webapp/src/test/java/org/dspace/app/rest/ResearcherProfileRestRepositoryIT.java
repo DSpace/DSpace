@@ -61,11 +61,9 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
-import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.OrcidQueueBuilder;
 import org.dspace.content.Collection;
-import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
@@ -130,6 +128,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .build();
 
         configurationService.setProperty("researcher-profile.collection.uuid", personCollection.getID().toString());
+        configurationService.setProperty("claimable.entityType", "Person");
 
         context.setCurrentUser(user);
 
@@ -1959,6 +1958,31 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
     }
 
     @Test
+    public void claimForNotAllowedEntityType() throws Exception {
+        String id = user.getID().toString();
+        String name = user.getName();
+
+        context.turnOffAuthorisationSystem();
+
+        final Collection publications = CollectionBuilder.createCollection(context, parentCommunity)
+                                                        .withEntityType("Publication")
+                                                        .build();
+
+        final Item publication = ItemBuilder.createItem(context, publications)
+                                       .withTitle("title")
+                                       .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(user.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/cris/profiles/")
+                                         .contentType(TEXT_URI_LIST)
+                                         .content("http://localhost:8080/server/api/core/items/" + publication.getID().toString()))
+                            .andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void testCloneFromExternalSourceRecordNotFound() throws Exception {
 
         String authToken = getAuthToken(user.getEmail(), password);
@@ -2066,7 +2090,4 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         return response;
     }
 
-    private EntityType createEntityType(String entityType) {
-        return EntityTypeBuilder.createEntityTypeBuilder(context, entityType).build();
-    }
 }

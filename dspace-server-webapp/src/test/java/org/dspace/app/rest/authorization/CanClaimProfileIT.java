@@ -37,10 +37,10 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class CanClaimProfileIT extends AbstractControllerIntegrationTest {
 
-    private Collection notClaimableCollection;
+//    private Collection notClaimableCollection;
     private Item collectionAProfile;
     private Item collectionBProfile;
-    private Item notClaimableCollectionProfile;
+//    private Item notClaimableCollectionProfile;
     private Item publication;
 
     @Autowired
@@ -57,6 +57,8 @@ public class CanClaimProfileIT extends AbstractControllerIntegrationTest {
 
     private AuthorizationFeature claimProfileFeature;
 
+    private Collection personCollection;
+
     @Override
     @Before
     public void setUp() throws Exception {
@@ -65,29 +67,29 @@ public class CanClaimProfileIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
 
         Community community = CommunityBuilder.createCommunity(context).withName("Community").build();
-        final Collection claimableCollectionA =
+        personCollection =
             CollectionBuilder.createCollection(context, community).withEntityType("Person")
                              .withName("claimableA").build();
         final Collection claimableCollectionB =
             CollectionBuilder.createCollection(context, community).withEntityType("Person")
                              .withName("claimableB").build();
 
-        notClaimableCollection = CollectionBuilder.createCollection(context, community).withEntityType("Person")
-                                                  .withName("notClaimable").build();
+//        notClaimableCollection = CollectionBuilder.createCollection(context, community).withEntityType("Person")
+//                                                  .withName("notClaimable").build();
         Collection publicationCollection =
             CollectionBuilder.createCollection(context, community).withEntityType("Publication")
                              .withName("notClaimable").build();
 
-        collectionAProfile = ItemBuilder.createItem(context, claimableCollectionA).build();
+        collectionAProfile = ItemBuilder.createItem(context, personCollection).build();
         collectionBProfile = ItemBuilder.createItem(context, claimableCollectionB).build();
 
         publication = ItemBuilder.createItem(context, publicationCollection).build();
 
-        notClaimableCollectionProfile = ItemBuilder.createItem(context, notClaimableCollection).build();
+//        notClaimableCollectionProfile = ItemBuilder.createItem(context, notClaimableCollection).build();
 
         configurationService.addPropertyValue("claimable.entityType", "Person");
-        configurationService.addPropertyValue("claimable.collection.uuid", claimableCollectionA.getID().toString());
-        configurationService.addPropertyValue("claimable.collection.uuid", claimableCollectionB.getID().toString());
+//        configurationService.addPropertyValue("claimable.collection.uuid", personCollection.getID().toString());
+//        configurationService.addPropertyValue("claimable.collection.uuid", claimableCollectionB.getID().toString());
 
         context.restoreAuthSystemState();
 
@@ -126,12 +128,12 @@ public class CanClaimProfileIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void profileNotInClaimableCollection() throws Exception {
+    public void notClaimableEntity() throws Exception {
 
         String token = getAuthToken(context.getCurrentUser().getEmail(), password);
 
         getClient(token).perform(get("/api/authz/authorizations/search/object")
-                                     .param("uri", uri(notClaimableCollectionProfile))
+                                     .param("uri", uri(publication))
                                      .param("eperson", context.getCurrentUser().getID().toString())
                                      .param("feature", claimProfileFeature.getName()))
                         .andExpect(status().isOk())
@@ -145,7 +147,7 @@ public class CanClaimProfileIT extends AbstractControllerIntegrationTest {
 
         context.turnOffAuthorisationSystem();
 
-        Item ownedItem = ItemBuilder.createItem(context, notClaimableCollection)
+        Item ownedItem = ItemBuilder.createItem(context, personCollection)
                                     .withCrisOwner("owner", "ownerAuthority").build();
         context.restoreAuthSystemState();
 

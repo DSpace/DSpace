@@ -24,7 +24,6 @@ import org.dspace.app.rest.model.ItemRest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
-import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.slf4j.Logger;
@@ -48,17 +47,14 @@ public class ClaimItemFeature implements AuthorizationFeature {
     private final ItemService itemService;
     private final ResearcherProfileService researcherProfileService;
     private final ConfigurationService configurationService;
-    private final RelationshipService relationshipService;
 
     @Autowired
     public ClaimItemFeature(ItemService itemService,
                             ResearcherProfileService researcherProfileService,
-                            ConfigurationService configurationService,
-                            final RelationshipService relationshipService) {
+                            ConfigurationService configurationService) {
         this.itemService = itemService;
         this.researcherProfileService = researcherProfileService;
         this.configurationService = configurationService;
-        this.relationshipService = relationshipService;
     }
 
     @Override
@@ -66,8 +62,7 @@ public class ClaimItemFeature implements AuthorizationFeature {
 
         if (!(object instanceof ItemRest) ||
                 Objects.isNull(context.getCurrentUser()) ||
-                hasAlreadyAProfileWithClone(context) ||
-                Objects.isNull(configurationService.getArrayProperty("claimable.collection.uuid"))) {
+                hasAlreadyAProfileWithClone(context)) {
             return false;
         }
         String id = ((ItemRest) object).getId();
@@ -90,11 +85,11 @@ public class ClaimItemFeature implements AuthorizationFeature {
         }
     }
 
-    private boolean claimable(final Context context, Item item) throws SQLException {
+    private boolean claimable(final Context context, Item item)  {
         if (unClaimableEntityType(item) || alreadyInARelation(context, item)) {
             return false;
         }
-        return supportedCollection(item);
+        return true;
     }
 
     private boolean alreadyInARelation(final Context context, final Item item) {
@@ -113,16 +108,6 @@ public class ClaimItemFeature implements AuthorizationFeature {
         return itemService.getMetadataByMetadataString(item, "dspace.entity.type")
                           .stream()
                           .noneMatch(mv -> claimableEntityTypes.contains(mv.getValue()));
-    }
-
-    private boolean supportedCollection(Item item) {
-        List<String> claimableItemCollections =
-            Arrays.asList(configurationService.getArrayProperty("claimable.collection.uuid"));
-
-        return item.getCollections()
-                   .stream()
-                   .map(c -> c.getID().toString())
-                   .anyMatch(claimableItemCollections::contains);
     }
 
     @Override
