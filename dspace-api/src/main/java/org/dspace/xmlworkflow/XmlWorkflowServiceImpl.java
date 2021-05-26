@@ -241,9 +241,10 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     //TODO: this is currently not used in our notifications. Look at the code used by the original WorkflowManager
 
     /**
-     * startWithoutNotify() starts the workflow normally, but disables
-     * notifications (useful for large imports,) for the first workflow step -
+     * Start the workflow normally, but disables
+     * notifications (useful for large imports) for the first workflow step -
      * subsequent notifications happen normally.
+     *
      * @param context the current DSpace session.
      * @param wsi the submitted Item entering workflow.
      */
@@ -295,15 +296,29 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         }
     }
 
-
+    /**
+     * Activate the first step in a workflow for a WorkflowItem.
+     * If the step has no UI then execute it as well.
+     *
+     * @param context current DSpace session.
+     * @param wf workflow being traversed.
+     * @param firstStep the step to be activated.
+     * @param wfi the item upon which to activate the step.
+     * @throws AuthorizeException passed through.
+     * @throws IOException passed through.
+     * @throws SQLException passed through.
+     * @throws WorkflowException passed through.
+     * @throws WorkflowConfigurationException unused.
+     */
     protected void activateFirstStep(Context context, Workflow wf, Step firstStep, XmlWorkflowItem wfi)
-        throws AuthorizeException, IOException, SQLException, WorkflowException, WorkflowConfigurationException {
+            throws AuthorizeException, IOException, SQLException, WorkflowException, WorkflowConfigurationException {
         WorkflowActionConfig firstActionConfig = firstStep.getUserSelectionMethod();
         firstActionConfig.getProcessingAction().activate(context, wfi);
         log.info(LogManager.getHeader(context, "start_workflow",
-                                      firstActionConfig.getProcessingAction() + " workflow_item_id="
-                                          + wfi.getID() + "item_id=" + wfi.getItem().getID() + "collection_id="
-                                          + wfi.getCollection().getID()));
+                firstActionConfig.getProcessingAction()
+                        + " workflow_item_id=" + wfi.getID()
+                        + "item_id=" + wfi.getItem().getID()
+                        + "collection_id=" + wfi.getCollection().getID()));
 
         // record the start of the workflow w/provenance message
         recordStart(context, wfi.getItem(), firstActionConfig.getProcessingAction());
@@ -311,24 +326,46 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         //Fire an event !
         logWorkflowEvent(context, firstStep.getWorkflow().getID(), null, null, wfi, null, firstStep, firstActionConfig);
 
-        //If we don't have a UI activate it
+        // Perform curation tasks if needed.
+        if (!xmlWorkflowCuratorService.doCuration(context, wfi)) {
+            // don't proceed - either curation tasks queued, or item rejected
+            log.info(LogManager.getHeader(context, "start_workflow",
+                    "workflow_item_id=" + wfi.getID()
+                            + ",item_id=" + wfi.getItem().getID()
+                            + ",collection_id=" + wfi.getCollection().getID()
+                            + ",current_action=" + firstActionConfig.getId()
+                            + ",doCuration=false"));
+            return;
+        }
+
+        //If we don't have a UI then execute the action.
         if (!firstActionConfig.requiresUI()) {
             ActionResult outcome = firstActionConfig.getProcessingAction().execute(context, wfi, firstStep, null);
             processOutcome(context, null, wf, firstStep, firstActionConfig, outcome, wfi, true);
         }
     }
 
-    /*
-     * Executes an action and returns the next.
-     */
     @Override
     public WorkflowActionConfig doState(Context c, EPerson user,
             HttpServletRequest request, int workflowItemId, Workflow workflow,
             WorkflowActionConfig currentActionConfig)
             throws SQLException, AuthorizeException, IOException,
             MessagingException, WorkflowException {
+        XmlWorkflowItem wi = xmlWorkflowItemService.find(c, workflowItemId);
+
+        // Perform curation tasks if needed.
+        if (!xmlWorkflowCuratorService.doCuration(c, wi)) {
+            // don't proceed - either curation tasks queued, or item rejected
+            log.info(LogManager.getHeader(c, "advance_workflow",
+                    "workflow_item_id=" + wi.getID()
+                            + ",item_id=" + wi.getItem().getID()
+                            + ",collection_id=" + wi.getCollection().getID()
+                            + ",current_action=" + currentActionConfig.getId()
+                            + ",doCuration=false"));
+            return currentActionConfig;
+        }
+
         try {
-            XmlWorkflowItem wi = xmlWorkflowItemService.find(c, workflowItemId);
             Step currentStep = currentActionConfig.getStep();
             if (currentActionConfig.getProcessingAction().isAuthorized(c, request, wi)) {
                 ActionResult outcome = currentActionConfig.getProcessingAction().execute(c, wi, currentStep, request);
@@ -339,15 +376,15 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                 }
                 c.addEvent(new Event(Event.MODIFY, Constants.ITEM, wi.getItem().getID(), null,
                         itemService.getIdentifiers(c, wi.getItem())));
-                xmlWorkflowCuratorService.doCuration(c, wi);
                 return processOutcome(c, user, workflow, currentStep, currentActionConfig, outcome, wi, false);
             } else {
                 throw new AuthorizeException("You are not allowed to to perform this task.");
             }
         } catch (WorkflowConfigurationException e) {
             log.error(LogManager.getHeader(c, "error while executing state",
-                                           "workflow:  " + workflow.getID() + " action: " + currentActionConfig
-                                               .getId() + " workflowItemId: " + workflowItemId), e);
+                    "workflow:  " + workflow.getID()
+                            + " action: " + currentActionConfig.getId()
+                            + " workflowItemId: " + workflowItemId), e);
             WorkflowUtils.sendAlert(request, e);
             throw new WorkflowException(e);
         }
@@ -693,15 +730,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     /***********************************
      * WORKFLOW TASK MANAGEMENT
      **********************************/
-    /**
-     * Deletes all tasks from a WorkflowItem.
-     *
-     * @param context the dspace context
-     * @param wi      the workflow item for which we are to delete the tasks
-     * @throws SQLException       An exception that provides information on a database access error or other errors.
-     * @throws AuthorizeException Exception indicating the current user of the context does not have permission
-     *                            to perform a particular action.
-     */
+
     @Override
     public void deleteAllTasks(Context context, XmlWorkflowItem wi) throws SQLException, AuthorizeException {
         deleteAllPooledTasks(context, wi);
@@ -724,9 +753,6 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         }
     }
 
-    /*
-     * Deletes an eperson from the taskpool of a step
-     */
     @Override
     public void deletePooledTask(Context context, XmlWorkflowItem wi, PoolTask task)
         throws SQLException, AuthorizeException {
@@ -751,9 +777,6 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                 itemService.getIdentifiers(c, wi.getItem())));
     }
 
-    /*
-     * Creates a task pool for a given step
-     */
     @Override
     public void createPoolTasks(Context context, XmlWorkflowItem wi, RoleMembers assignees, Step step,
                                 WorkflowActionConfig action)
@@ -783,9 +806,6 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         }
     }
 
-    /*
-     * Claims an action for a given eperson
-     */
     @Override
     public void createOwnedTask(Context context, XmlWorkflowItem wi, Step step, WorkflowActionConfig action, EPerson e)
         throws SQLException, AuthorizeException {
@@ -959,7 +979,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     }
 
     @Override
-   public WorkspaceItem sendWorkflowItemBackSubmission(Context context, XmlWorkflowItem wi, EPerson e,
+    public WorkspaceItem sendWorkflowItemBackSubmission(Context context, XmlWorkflowItem wi, EPerson e,
                                                         String provenance,
                                                         String rejection_message)
         throws SQLException, AuthorizeException,
