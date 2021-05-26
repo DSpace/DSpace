@@ -260,6 +260,6 @@
             <bean class='org.dspace.xmlworkflow.state.actions.processingaction.NoAction'/>
         </property>
         <property name='requiresUI'
-                  value='true'/>
+                  value='false'/>
     </bean>
 </beans>
