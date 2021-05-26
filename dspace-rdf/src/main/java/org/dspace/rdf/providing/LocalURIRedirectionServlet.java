@@ -86,7 +86,8 @@ public class LocalURIRedirectionServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-
+        // use object's reported handle for redirect (just in case user provided handle had odd characters)
+        handle = dso.getHandle();
         // close the context and send forward.
         context.abort();
         Negotiator.sendRedirect(response, handle, "", requestedMimeType, true);

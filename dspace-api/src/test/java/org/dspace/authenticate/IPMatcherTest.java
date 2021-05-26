@@ -153,6 +153,14 @@ public class IPMatcherTest {
         assertFalse(ipMatcher.match("0:0:0:0:0:0:0:1"));
     }
 
+    @Test
+    public void testIPv6FullMaskMatching() throws Exception {
+        final IPMatcher ipMatcher = new IPMatcher("::2/128");
+
+        assertTrue(ipMatcher.match("0:0:0:0:0:0:0:2"));
+        assertFalse(ipMatcher.match("0:0:0:0:0:0:0:1"));
+    }
+
 
     @Test
     public void testAsteriskMatchingSuccess() throws Exception {

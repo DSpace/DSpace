@@ -17,17 +17,17 @@ services:
     environment:
       DSPACE_HOST: dspace-angular
       DSPACE_NAMESPACE: /
-      DSPACE_PORT: '3000'
+      DSPACE_PORT: '4000'
       DSPACE_SSL: "false"
     image: dspace/dspace-angular:latest
     networks:
       dspacenet: {}
     ports:
-    - published: 3000
-      target: 3000
+    - published: 4000
+      target: 4000
     - published: 9876
       target: 9876
     stdin_open: true
     tty: true
     volumes:
-    - ./dspace/src/main/docker-compose/environment.dev.js:/app/config/environment.dev.js
+    - ./dspace/src/main/docker-compose/environment.dev.ts:/app/src/environments/environment.dev.ts

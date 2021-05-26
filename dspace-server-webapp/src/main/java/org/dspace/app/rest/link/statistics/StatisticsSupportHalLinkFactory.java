@@ -13,6 +13,7 @@ import org.dspace.app.rest.StatisticsRestController;
 import org.dspace.app.rest.link.HalLinkFactory;
 import org.dspace.app.rest.model.hateoas.StatisticsSupportResource;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +23,7 @@ public class StatisticsSupportHalLinkFactory
     protected void addLinks(StatisticsSupportResource halResource, Pageable pageable, LinkedList<Link> list)
         throws Exception {
 
-        list.add(buildLink(Link.REL_SELF, getMethodOn().getStatisticsSupport()));
+        list.add(buildLink(IanaLinkRelations.SELF.value(), getMethodOn().getStatisticsSupport()));
         list.add(buildLink("viewevents", getMethodOn().getViewEvents()));
         list.add(buildLink("searchevents", getMethodOn().getSearchEvents()));
     }

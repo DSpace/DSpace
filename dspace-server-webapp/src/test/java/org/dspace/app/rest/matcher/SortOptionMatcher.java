@@ -48,4 +48,10 @@ public class SortOptionMatcher {
         );
     }
 
+    public static Matcher<? super Object> sortOptionMatcher(String name, String sortDirection) {
+        return allOf(
+            hasJsonPath("$.name", is(name)),
+            hasJsonPath("$.sortOrder", is(sortDirection))
+        );
+    }
 }

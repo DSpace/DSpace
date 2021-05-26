@@ -1,0 +1,80 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+       default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
+
+    <context:annotation-config/>
+    <!-- allows us to use spring annotations in beans -->
+
+    <util:map id="csvMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+              value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
+        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
+            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
+            what metadatafield is generated.
+        </description>
+        <entry key-ref="dcTitle" value-ref="charSepTitleContrib" />
+        <entry key-ref="dcAuthors" value-ref="charSepAuthorsContrib" />
+        <entry key-ref="dcIssued" value-ref="charSepDateContrib" />
+		<entry key-ref="dcJournal" value-ref="charSepJournalContrib" />
+		<entry key-ref="dcAbstract" value-ref="charSepAbstractContrib" />    
+		<entry key-ref="dcJissn" value-ref="charSepJissnContrib" />    
+		<entry key-ref="dcSubtype" value-ref="charSepTypeContrib" />    
+    </util:map>
+
+    <util:map id="tsvMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+              value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
+        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
+            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
+            what metadatafield is generated.
+        </description>
+        <entry key-ref="dcTitle" value-ref="charSepTitleContrib" />
+        <entry key-ref="dcAuthors" value-ref="charSepAuthorsContrib" />
+        <entry key-ref="dcIssued" value-ref="charSepDateContrib" />
+		<entry key-ref="dcJournal" value-ref="charSepJournalContrib" />
+		<entry key-ref="dcAbstract" value-ref="charSepAbstractContrib" />    
+		<entry key-ref="dcJissn" value-ref="charSepJissnContrib" />    
+		<entry key-ref="dcSubtype" value-ref="charSepTypeContrib" />    
+    </util:map>
+
+
+    <bean id="charSepTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+        <property name="field" ref="dcTitle"/>
+        <property name="key" value="0" />
+    </bean>
+
+    <bean id="charSepAuthorsContrib" class="org.dspace.importer.external.metadatamapping.contributor.EnhancedSimpleMetadataContributor">
+        <property name="field" ref="dcAuthors"/>
+        <property name="key" value="1" />
+    </bean>
+
+    <bean id="charSepDateContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+        <property name="field" ref="dcIssued"/>
+        <property name="key" value="2" />
+    </bean>
+    
+    <bean id="charSepJournalContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+        <property name="field" ref="dcJournal"/>
+        <property name="key" value="3" />
+    </bean>
+    
+    <bean id="charSepAbstractContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+        <property name="field" ref="dcAbstract"/>
+        <property name="key" value="4" />
+    </bean>
+
+    <bean id="charSepJissnContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+        <property name="field" ref="dcJissn"/>
+        <property name="key" value="5" />
+    </bean>
+
+    <bean id="charSepTypeContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+        <property name="field" ref="dcSubtype"/>
+        <property name="key" value="6" />
+    </bean>
+
+</beans>

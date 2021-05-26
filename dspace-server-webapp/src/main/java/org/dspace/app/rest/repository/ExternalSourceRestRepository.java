@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -72,11 +73,13 @@ public class ExternalSourceRestRepository extends DSpaceRestRepository<ExternalS
             .searchExternalDataObjects(externalSourceName, query, Math.toIntExact(pageable.getOffset()),
                     pageable.getPageSize());
         int numberOfResults = externalDataService.getNumberOfResults(externalSourceName, query);
+
         return converter.toRestPage(externalDataObjects, pageable, numberOfResults,
                                     utils.obtainProjection());
     }
 
     @Override
+    @PreAuthorize("permitAll()")
     public ExternalSourceRest findOne(Context context, String externalSourceName) {
         ExternalDataProvider externalDataProvider = externalDataService.getExternalDataProvider(externalSourceName);
         if (externalDataProvider == null) {
@@ -87,10 +90,10 @@ public class ExternalSourceRestRepository extends DSpaceRestRepository<ExternalS
     }
 
     @Override
+    @PreAuthorize("permitAll()")
     public Page<ExternalSourceRest> findAll(Context context, Pageable pageable) {
         List<ExternalDataProvider> externalSources = externalDataService.getExternalDataProviders();
-        return converter.toRestPage(externalSources, pageable, externalSources.size(),
-                                    utils.obtainProjection());
+        return converter.toRestPage(externalSources, pageable, utils.obtainProjection());
     }
 
     public Class<ExternalSourceRest> getDomainClass() {

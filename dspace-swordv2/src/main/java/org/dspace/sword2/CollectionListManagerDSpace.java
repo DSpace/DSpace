@@ -22,7 +22,6 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowItem;
@@ -43,6 +42,7 @@ public class CollectionListManagerDSpace extends DSpaceSwordAPI
     protected WorkflowItemService workflowItemService = WorkflowServiceFactory
         .getInstance().getWorkflowItemService();
 
+    @Override
     public Feed listCollectionContents(IRI colIRI,
                                        AuthCredentials authCredentials, SwordConfiguration swordConfig)
         throws SwordServerException, SwordError, SwordAuthException {
@@ -84,8 +84,8 @@ public class CollectionListManagerDSpace extends DSpaceSwordAPI
         for (Item item : items) {
             Entry entry = feed.addEntry();
             entry.setId(urlManager.getEditIRI(item).toString());
-            String title = this.stringMetadata(item, ConfigurationManager
-                .getProperty("swordv2-server", "title.field"));
+            String title = this.stringMetadata(item, configurationService
+                .getProperty("swordv2-server.title.field"));
             title = title == null ? "Untitled" : title;
             entry.setTitle(title);
             entry.addLink(

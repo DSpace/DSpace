@@ -10,17 +10,14 @@ package org.dspace.app.rest.repository;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
@@ -34,7 +31,6 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -71,7 +67,7 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'BITSTREAM', 'READ')")
+    @PreAuthorize("hasPermission(#id, 'BITSTREAM', 'METADATA_READ')")
     public BitstreamRest findOne(Context context, UUID id) {
         Bitstream bit = null;
         try {
@@ -95,22 +91,7 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<BitstreamRest> findAll(Context context, Pageable pageable) {
-        List<Bitstream> bit = new ArrayList<Bitstream>();
-        Iterator<Bitstream> it = null;
-        int total = 0;
-        try {
-            total = bs.countTotal(context);
-            it = bs.findAll(context, pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
-            while (it.hasNext()) {
-                bit.add(it.next());
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-        Projection projection = utils.obtainProjection();
-        Page<BitstreamRest> page = new PageImpl<>(bit, pageable, total)
-                .map((bitstream) -> converter.toRest(bitstream, projection));
-        return page;
+        throw new RepositoryMethodNotImplementedException(BitstreamRest.NAME, "findAll");
     }
 
     @Override

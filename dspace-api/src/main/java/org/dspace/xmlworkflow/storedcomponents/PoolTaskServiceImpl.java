@@ -126,6 +126,19 @@ public class PoolTaskServiceImpl implements PoolTaskService {
     }
 
     @Override
+    public void deleteByEperson(Context context, EPerson ePerson)
+        throws SQLException, AuthorizeException, IOException {
+        List<PoolTask> tasks = findByEperson(context, ePerson);
+        //Use an iterator to remove the tasks !
+        Iterator<PoolTask> iterator = tasks.iterator();
+        while (iterator.hasNext()) {
+            PoolTask poolTask = iterator.next();
+            iterator.remove();
+            delete(context, poolTask);
+        }
+    }
+
+    @Override
     public List<PoolTask> findByEPerson(Context context, EPerson ePerson) throws SQLException {
         return poolTaskDAO.findByEPerson(context, ePerson);
     }

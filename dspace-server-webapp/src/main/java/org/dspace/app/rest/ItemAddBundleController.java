@@ -33,7 +33,7 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -87,9 +87,9 @@ public class ItemAddBundleController {
      */
     @RequestMapping(method = RequestMethod.POST)
     @PreAuthorize("hasPermission(#uuid, 'ITEM', 'ADD')")
-    public ResponseEntity<ResourceSupport> addBundleToItem(@PathVariable UUID uuid,
-                                                           HttpServletRequest request,
-                                                           HttpServletResponse response)
+    public ResponseEntity<RepresentationModel<?>> addBundleToItem(@PathVariable UUID uuid,
+                                                                  HttpServletRequest request,
+                                                                  HttpServletResponse response)
             throws SQLException, AuthorizeException {
         Context context = ContextUtil.obtainContext(request);
 

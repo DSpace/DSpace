@@ -7,70 +7,72 @@
  */
 package org.dspace.scripts;
 
-import java.sql.SQLException;
+import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.core.Context;
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.eperson.EPerson;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
- * This abstract class is the class that should be extended by each script.
- * it provides the basic variables to be hold by the script as well as the means to initialize, parse and run the script
- * Every DSpaceRunnable that is implemented in this way should be defined in the scripts.xml config file as a bean
+ * This is the class that should be extended for each Script. This class will contain the logic needed to run and it'll
+ * fetch the information that it needs from the {@link ScriptConfiguration} provided through the diamond operators.
+ * This will be the dspaceRunnableClass for the {@link ScriptConfiguration} beans. Specifically created for each
+ * script
+ * @param <T>
  */
-public abstract class DSpaceRunnable implements Runnable {
+public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements Runnable {
 
-    /**
-     * The name of the script
-     */
-    private String name;
-    /**
-     * The description of the script
-     */
-    private String description;
     /**
      * The CommandLine object for the script that'll hold the information
      */
     protected CommandLine commandLine;
+
     /**
-     * The possible options for this script
+     * This EPerson identifier variable is the uuid of the eperson that's running the script
      */
-    protected Options options;
+    private UUID epersonIdentifier;
+
     /**
      * The handler that deals with this script. This handler can currently either be a RestDSpaceRunnableHandler or
      *  a CommandlineDSpaceRunnableHandler depending from where the script is called
      */
     protected DSpaceRunnableHandler handler;
 
-    @Autowired
-    private AuthorizeService authorizeService;
+    /**
+     * This method will return the Configuration that the implementing DSpaceRunnable uses
+     * @return  The {@link ScriptConfiguration} that this implementing DspaceRunnable uses
+     */
+    public abstract T getScriptConfiguration();
 
-    public String getName() {
-        return name;
+
+    private void setHandler(DSpaceRunnableHandler dSpaceRunnableHandler) {
+        this.handler = dSpaceRunnableHandler;
     }
 
-    @Required
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    @Required
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Options getOptions() {
-        return options;
+    /**
+     * This method sets the appropriate DSpaceRunnableHandler depending on where it was ran from and it parses
+     * the arguments given to the script
+     * @param args                  The arguments given to the script
+     * @param dSpaceRunnableHandler The DSpaceRunnableHandler object that defines from where the script was ran
+     * @param currentUser
+     * @throws ParseException       If something goes wrong
+     */
+    public void initialize(String[] args, DSpaceRunnableHandler dSpaceRunnableHandler,
+                           EPerson currentUser) throws ParseException {
+        if (currentUser != null) {
+            this.setEpersonIdentifier(currentUser.getID());
+        }
+        this.setHandler(dSpaceRunnableHandler);
+        this.parse(args);
     }
 
     /**
@@ -80,18 +82,16 @@ public abstract class DSpaceRunnable implements Runnable {
      * @throws ParseException   If something goes wrong
      */
     private void parse(String[] args) throws ParseException {
-        commandLine = new DefaultParser().parse(getOptions(), args);
+        commandLine = new DefaultParser().parse(getScriptConfiguration().getOptions(), args);
         setup();
     }
 
     /**
-     * This method will call upon the {@link DSpaceRunnableHandler#printHelp(Options, String)} method with the script's
-     * options and name
+     * This method has to be included in every script and handles the setup of the script by parsing the CommandLine
+     * and setting the variables
+     * @throws ParseException   If something goes wrong
      */
-    public void printHelp() {
-        handler.printHelp(options, name);
-    }
-
+    public abstract void setup() throws ParseException;
 
     /**
      * This is the run() method from the Runnable interface that we implement. This method will handle the running
@@ -108,22 +108,6 @@ public abstract class DSpaceRunnable implements Runnable {
         }
     }
 
-    private void setHandler(DSpaceRunnableHandler dSpaceRunnableHandler) {
-        this.handler = dSpaceRunnableHandler;
-    }
-
-    /**
-     * This method sets the appropriate DSpaceRunnableHandler depending on where it was ran from and it parses
-     * the arguments given to the script
-     * @param args                  The arguments given to the script
-     * @param dSpaceRunnableHandler The DSpaceRunnableHandler object that defines from where the script was ran
-     * @throws ParseException       If something goes wrong
-     */
-    public void initialize(String[] args, DSpaceRunnableHandler dSpaceRunnableHandler) throws ParseException {
-        this.setHandler(dSpaceRunnableHandler);
-        this.parse(args);
-    }
-
     /**
      * This method has to be included in every script and this will be the main execution block for the script that'll
      * contain all the logic needed
@@ -132,25 +116,46 @@ public abstract class DSpaceRunnable implements Runnable {
     public abstract void internalRun() throws Exception;
 
     /**
-     * This method has to be included in every script and handles the setup of the script by parsing the CommandLine
-     * and setting the variables
-     * @throws ParseException   If something goes wrong
+     * This method will call upon the {@link DSpaceRunnableHandler#printHelp(Options, String)} method with the script's
+     * options and name
      */
-    public abstract void setup() throws ParseException;
+    public void printHelp() {
+        handler.printHelp(getScriptConfiguration().getOptions(), getScriptConfiguration().getName());
+    }
 
     /**
-     * This method will return if the script is allowed to execute in the given context. This is by default set
-     * to the currentUser in the context being an admin, however this can be overwritten by each script individually
-     * if different rules apply
-     * @param context   The relevant DSpace context
-     * @return          A boolean indicating whether the script is allowed to execute or not
+     * This method will traverse all the options and it'll grab options defined as an InputStream type to then save
+     * the filename specified by that option in a list of Strings that'll be returned in the end
+     * @return  The list of Strings representing filenames from the options given to the script
      */
-    public boolean isAllowedToExecute(Context context) {
-        try {
-            return authorizeService.isAdmin(context);
-        } catch (SQLException e) {
-            handler.logError("Error occured when trying to verify permissions for script: " + name);
+    public List<String> getFileNamesFromInputStreamOptions() {
+        List<String> fileNames = new LinkedList<>();
+
+        for (Option option : getScriptConfiguration().getOptions().getOptions()) {
+            if (option.getType() == InputStream.class &&
+                StringUtils.isNotBlank(commandLine.getOptionValue(option.getOpt()))) {
+                fileNames.add(commandLine.getOptionValue(option.getOpt()));
+            }
         }
-        return false;
+
+        return fileNames;
+    }
+
+    /**
+     * Generic getter for the epersonIdentifier
+     * This EPerson identifier variable is the uuid of the eperson that's running the script
+     * @return the epersonIdentifier value of this DSpaceRunnable
+     */
+    public UUID getEpersonIdentifier() {
+        return epersonIdentifier;
+    }
+
+    /**
+     * Generic setter for the epersonIdentifier
+     * This EPerson identifier variable is the uuid of the eperson that's running the script
+     * @param epersonIdentifier   The epersonIdentifier to be set on this DSpaceRunnable
+     */
+    public void setEpersonIdentifier(UUID epersonIdentifier) {
+        this.epersonIdentifier = epersonIdentifier;
     }
 }

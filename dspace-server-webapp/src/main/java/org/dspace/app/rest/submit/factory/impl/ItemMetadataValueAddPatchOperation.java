@@ -8,16 +8,28 @@
 package org.dspace.app.rest.submit.factory.impl;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.LateObjectEvaluator;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.Relationship;
+import org.dspace.content.RelationshipMetadataValue;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.services.model.Request;
+import org.dspace.core.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
@@ -66,12 +78,21 @@ import org.springframework.util.Assert;
  */
 public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOperation<Item> {
 
+    /**
+     * log4j category
+     */
+    private static final Logger log =
+            org.apache.logging.log4j.LogManager.getLogger(ItemMetadataValueAddPatchOperation.class);
+
     @Autowired
     ItemService itemService;
 
+    @Autowired
+    RelationshipService relationshipService;
+
     @Override
-    void add(Context context, Request currentRequest, InProgressSubmission source, String path, Object value)
-        throws SQLException {
+    void add(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path, Object value)
+            throws SQLException {
         String[] split = getAbsolutePath(path).split("/");
         // if split size is one so we have a call to initialize or replace
         if (split.length == 1) {
@@ -105,6 +126,102 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
                         break;
                 }
             }
+        }
+
+    }
+
+    protected void replaceValue(Context context, Item source, String target, List<MetadataValueRest> list)
+            throws SQLException {
+        String[] metadata = Utils.tokenize(target);
+
+        // fetch pre-existent metadata
+        List<MetadataValue> preExistentMetadata =
+                getDSpaceObjectService().getMetadata(source, metadata[0], metadata[1], metadata[2], Item.ANY);
+
+        // fetch pre-existent relationships
+        Map<Integer, Relationship> preExistentRelationships = preExistentRelationships(context, preExistentMetadata);
+
+        // clear all plain metadata
+        getDSpaceObjectService().clearMetadata(context, source, metadata[0], metadata[1], metadata[2], Item.ANY);
+        // remove all deleted relationships
+        for (Relationship rel : preExistentRelationships.values()) {
+            try {
+                Optional<MetadataValueRest> stillPresent = list.stream()
+                    .filter(ll -> ll.getAuthority() != null &&  rel.getID().equals(getRelId(ll.getAuthority())))
+                    .findAny();
+                if (stillPresent.isEmpty()) {
+                    relationshipService.delete(context, rel);
+                }
+            } catch (AuthorizeException e) {
+                e.printStackTrace();
+                throw new RuntimeException("Authorize Exception during relationship deletion.");
+            }
+        }
+
+        // create plain metadata / move relationships in the list order
+
+        // if a virtual value is present in the list, it must be present in preExistentRelationships too.
+        // (with this operator virtual value can only be moved or deleted).
+        int idx = 0;
+        for (MetadataValueRest ll : list) {
+            if (StringUtils.startsWith(ll.getAuthority(), Constants.VIRTUAL_AUTHORITY_PREFIX)) {
+
+                Optional<MetadataValue> preExistentMv = preExistentMetadata.stream().filter(mvr ->
+                    StringUtils.equals(ll.getAuthority(), mvr.getAuthority())).findFirst();
+
+                if (!preExistentMv.isPresent()) {
+                    throw new UnprocessableEntityException(
+                            "Relationship with authority=" + ll.getAuthority() + " not found");
+                }
+
+                final RelationshipMetadataValue rmv = (RelationshipMetadataValue) preExistentMv.get();
+                final Relationship rel = preExistentRelationships.get(rmv.getRelationshipId());
+                this.updateRelationshipPlace(context, source, idx, rel);
+
+            } else {
+                getDSpaceObjectService()
+                        .addMetadata(context, source, metadata[0], metadata[1], metadata[2],
+                                ll.getLanguage(), ll.getValue(), ll.getAuthority(), ll.getConfidence(), idx);
+            }
+            idx++;
+        }
+    }
+
+    /**
+     * Retrieve Relationship Objects from a List of MetadataValue.
+     */
+    private Map<Integer, Relationship> preExistentRelationships(Context context,
+            List<MetadataValue> preExistentMetadata) throws SQLException {
+        Map<Integer, Relationship> relationshipsMap = new HashMap<Integer, Relationship>();
+        for (MetadataValue ll : preExistentMetadata) {
+            if (ll instanceof RelationshipMetadataValue) {
+                Relationship relationship = relationshipService
+                        .find(context, ((RelationshipMetadataValue) ll).getRelationshipId());
+                if (relationship != null) {
+                    relationshipsMap.put(relationship.getID(), relationship);
+                }
+            }
+        }
+        return relationshipsMap;
+    }
+
+    private Integer getRelId(String authority) {
+        final int relId = Integer.parseInt(authority.split(Constants.VIRTUAL_AUTHORITY_PREFIX)[1]);
+        return relId;
+    }
+
+    private void updateRelationshipPlace(Context context, Item dso, int place, Relationship rs) {
+
+        try {
+            if (rs.getLeftItem() == dso) {
+                rs.setLeftPlace(place);
+            } else {
+                rs.setRightPlace(place);
+            }
+            relationshipService.update(context, rs);
+        } catch (Exception e) {
+            //should not occur, otherwise metadata can't be updated either
+            log.error("An error occurred while moving " + rs.getID() + " for item " + dso.getID(), e);
         }
 
     }

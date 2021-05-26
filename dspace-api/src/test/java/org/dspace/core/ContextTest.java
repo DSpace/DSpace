@@ -10,9 +10,9 @@ package org.dspace.core;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.spy;
@@ -130,7 +130,7 @@ public class ContextTest extends AbstractUnitTest {
     public void testGetCurrentLocale() {
         //NOTE: CurrentLocale is not initialized in AbstractUnitTest. So it should be DEFAULTLOCALE
         assertThat("testGetCurrentLocale 0", context.getCurrentLocale(), notNullValue());
-        assertThat("testGetCurrentLocale 1", context.getCurrentLocale(), equalTo(I18nUtil.DEFAULTLOCALE));
+        assertThat("testGetCurrentLocale 1", context.getCurrentLocale(), equalTo(I18nUtil.getDefaultLocale()));
     }
 
     /**

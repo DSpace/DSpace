@@ -14,6 +14,7 @@ import org.dspace.app.rest.link.HalLinkFactory;
 import org.dspace.app.rest.model.SearchConfigurationRest;
 import org.dspace.app.rest.model.hateoas.SearchConfigurationResource;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +33,7 @@ public class SearchConfigurationResourceHalLinkFactory
 
         if (data != null) {
 
-            list.add(buildLink(Link.REL_SELF, getMethodOn()
+            list.add(buildLink(IanaLinkRelations.SELF.value(), getMethodOn()
                 .getSearchConfiguration(data.getScope(), data.getConfiguration())));
 
             list.add(buildLink("objects", getMethodOn().getSearchObjects(null, null, null, null, null, null)));

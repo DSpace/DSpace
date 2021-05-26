@@ -21,15 +21,15 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.matcher.HarvesterMetadataMatcher;
 import org.dspace.app.rest.matcher.MetadataConfigsMatcher;
 import org.dspace.app.rest.model.HarvestTypeEnum;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.Constants;

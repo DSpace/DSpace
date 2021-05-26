@@ -27,7 +27,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -57,7 +58,7 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(Item.class);
+    private static final Logger log = LogManager.getLogger();
 
     /**
      * Wild card for Dublin Core metadata qualifiers/languages
@@ -111,6 +112,16 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
 
     @Transient
     private transient ItemService itemService;
+
+    /**
+     * True if anything else was changed since last metadata retrieval()
+     * (to drive metadata cache)
+     */
+    @Transient
+    private boolean modifiedMetadataCache = true;
+
+    @Transient
+    private List<MetadataValue> cachedMetadata = new ArrayList<>();
 
     /**
      * Protected constructor, create object using:
@@ -372,5 +383,24 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
             itemService = ContentServiceFactory.getInstance().getItemService();
         }
         return itemService;
+    }
+
+    @Override
+    protected void setMetadataModified() {
+        super.setMetadataModified();
+        modifiedMetadataCache = true;
+    }
+
+    public boolean isModifiedMetadataCache() {
+        return modifiedMetadataCache;
+    }
+
+    protected List<MetadataValue> getCachedMetadata() {
+        return cachedMetadata;
+    }
+
+    protected void setCachedMetadata(List<MetadataValue> cachedMetadata) {
+        this.cachedMetadata = cachedMetadata;
+        modifiedMetadataCache = false;
     }
 }

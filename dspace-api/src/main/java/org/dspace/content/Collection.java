@@ -7,11 +7,14 @@
  */
 package org.dspace.content;
 
+import static org.dspace.content.service.DSpaceObjectService.MD_LICENSE;
+
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nonnull;
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -46,7 +49,6 @@ import org.hibernate.proxy.HibernateProxyHelper;
  * effect.
  *
  * @author Robert Tansley
- * @version $Revision$
  */
 @Entity
 @Table(name = "collection")
@@ -87,22 +89,10 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
         joinColumns = {@JoinColumn(name = "collection_id")},
         inverseJoinColumns = {@JoinColumn(name = "community_id")}
     )
-    private Set<Community> communities = new HashSet<>();
+    private final Set<Community> communities = new HashSet<>();
 
     @Transient
     private transient CollectionService collectionService;
-
-    // Keys for accessing Collection metadata
-    @Transient
-    public static final String COPYRIGHT_TEXT = "copyright_text";
-    @Transient
-    public static final String INTRODUCTORY_TEXT = "introductory_text";
-    @Transient
-    public static final String SHORT_DESCRIPTION = "short_description";
-    @Transient
-    public static final String SIDEBAR_TEXT = "side_bar_text";
-    @Transient
-    public static final String PROVENANCE_TEXT = "provenance_description";
 
     /**
      * Protected constructor, create object using:
@@ -207,10 +197,17 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * Get the license that users must grant before submitting to this
      * collection.
      *
-     * @return the license for this collection
+     * @return the license for this collection. Never null.
      */
+    @Nonnull
     public String getLicenseCollection() {
-        return getCollectionService().getMetadata(this, "license");
+        String license = getCollectionService()
+                .getMetadataFirstValue(this, CollectionService.MD_LICENSE, Item.ANY);
+        if (null == license) {
+            return "";
+        } else {
+            return license;
+        }
     }
 
     /**
@@ -222,7 +219,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * @throws SQLException if database error
      */
     public void setLicense(Context context, String license) throws SQLException {
-        getCollectionService().setMetadata(context, this, "license", license);
+        getCollectionService().setMetadataSingleValue(context, this, MD_LICENSE, Item.ANY, license);
     }
 
     /**

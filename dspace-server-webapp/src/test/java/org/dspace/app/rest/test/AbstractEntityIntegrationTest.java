@@ -7,8 +7,8 @@
  */
 package org.dspace.app.rest.test;
 
-import org.dspace.app.rest.builder.EntityTypeBuilder;
-import org.dspace.app.rest.builder.RelationshipTypeBuilder;
+import org.dspace.builder.EntityTypeBuilder;
+import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.content.EntityType;
 import org.dspace.content.service.EntityTypeService;
 import org.junit.Before;
@@ -37,6 +37,7 @@ public class AbstractEntityIntegrationTest extends AbstractControllerIntegration
      * in relationship-types.xml
      */
     @Before
+    @Override
     public void setUp() throws Exception {
         super.setUp();
 
@@ -102,6 +103,11 @@ public class AbstractEntityIntegrationTest extends AbstractControllerIntegration
                                                               "isPublicationOfJournalIssue",
                                                               "isJournalIssueOfPublication", 0, null, 0,
                                                               1).build();
+
+        RelationshipTypeBuilder.createRelationshipTypeBuilder(context, orgUnit, orgUnit, "isParentOrgUnitOf",
+                                                              "isChildOrgUnitOf", null,
+                                                              1, null, null)
+                               .build();
 
         context.restoreAuthSystemState();
     }

@@ -12,7 +12,7 @@ import org.dspace.app.rest.ExternalSourcesRestController;
 /**
  * This class serves as a REST representation for an entry of external data
  */
-public class ExternalSourceEntryRest extends BaseObjectRest<String> {
+public class ExternalSourceEntryRest extends RestAddressableModel {
 
     public static final String NAME = "externalSourceEntry";
     public static final String PLURAL_NAME = "externalSourceEntries";

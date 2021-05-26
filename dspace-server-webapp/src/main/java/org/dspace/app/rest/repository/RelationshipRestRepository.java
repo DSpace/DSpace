@@ -16,7 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
@@ -40,6 +41,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -48,7 +50,7 @@ import org.springframework.stereotype.Component;
 @Component(RelationshipRest.CATEGORY + "." + RelationshipRest.NAME)
 public class RelationshipRestRepository extends DSpaceRestRepository<RelationshipRest, Integer> {
 
-    private static final Logger log = Logger.getLogger(RelationshipRestRepository.class);
+    private static final Logger log = LogManager.getLogger();
 
     private static final String ALL = "all";
     private static final String LEFT = "left";
@@ -71,9 +73,15 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
     private RequestService requestService;
 
     @Override
+    @PreAuthorize("permitAll()")
     public RelationshipRest findOne(Context context, Integer integer) {
         try {
-            return converter.toRest(relationshipService.find(context, integer), utils.obtainProjection());
+            Relationship relationship = relationshipService.find(context, integer);
+
+            if (relationship == null) {
+                return null;
+            }
+            return converter.toRest(relationship, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -117,15 +125,6 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
                 Relationship relationship = relationshipService.create(context, leftItem, rightItem,
                                                                        relationshipType, -1, -1,
                                                                        leftwardValue, rightwardValue);
-                // The above if check deals with the case that a Relationship can be created if the user has write
-                // rights on one of the two items. The following updateItem calls can however call the
-                // ItemService.update() functions which would fail if the user doesn't have permission on both items.
-                // Since we allow this creation to happen under these circumstances, we need to turn off the
-                // authorization system here so that this failure doesn't happen when the items need to be update
-                context.turnOffAuthorisationSystem();
-                relationshipService.updateItem(context, relationship.getLeftItem());
-                relationshipService.updateItem(context, relationship.getRightItem());
-                context.restoreAuthSystemState();
                 return converter.toRest(relationship, utils.obtainProjection());
             } else {
                 throw new AccessDeniedException("You do not have write rights on this relationship's items");
@@ -354,7 +353,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
                 if (relationshipType.getLeftwardType().equalsIgnoreCase(label)) {
                     isLeft = true;
                 }
-                total += relationshipService.countByItemAndRelationshipType(context, item, relationshipType);
+                total += relationshipService.countByItemAndRelationshipType(context, item, relationshipType, isLeft);
                 relationships.addAll(relationshipService.findByItemAndRelationshipType(context, item, relationshipType,
                         isLeft, pageable.getPageSize(), Math.toIntExact(pageable.getOffset())));
             }

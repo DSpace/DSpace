@@ -113,6 +113,13 @@ public class RelationshipType implements ReloadableEntity<Integer> {
      */
     @Column(name = "copy_to_right", nullable = false)
     private boolean copyToRight;
+
+    /**
+     * The value indicating whether relationships of this type should be ignored on the right/left/neither.
+     */
+    @Column(name = "tilted")
+    private Tilted tilted;
+
     /**
      * Protected constructor, create object using:
      * {@link org.dspace.content.service.RelationshipTypeService#create(Context)} }
@@ -285,6 +292,26 @@ public class RelationshipType implements ReloadableEntity<Integer> {
      */
     public void setCopyToRight(boolean copyToRight) {
         this.copyToRight = copyToRight;
+    }
+
+    /**
+     * Generic getter for tilted
+     * @return the tilted value of this RelationshipType
+     */
+    public Tilted getTilted() {
+        return tilted;
+    }
+
+    /**
+     * Generic setter for tilted
+     * @param tilted   The tilted to be set on this RelationshipType
+     */
+    public void setTilted(Tilted tilted) {
+        this.tilted = tilted;
+    }
+
+    public enum Tilted {
+        NONE, LEFT, RIGHT;
     }
 
     /**

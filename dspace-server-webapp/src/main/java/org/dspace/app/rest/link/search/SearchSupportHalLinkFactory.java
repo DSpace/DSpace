@@ -13,6 +13,7 @@ import org.dspace.app.rest.DiscoveryRestController;
 import org.dspace.app.rest.link.HalLinkFactory;
 import org.dspace.app.rest.model.hateoas.SearchSupportResource;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +27,7 @@ public class SearchSupportHalLinkFactory extends HalLinkFactory<SearchSupportRes
 
     protected void addLinks(SearchSupportResource halResource, Pageable pageable, LinkedList<Link> list)
         throws Exception {
-        list.add(buildLink(Link.REL_SELF, getMethodOn()
+        list.add(buildLink(IanaLinkRelations.SELF.value(), getMethodOn()
             .getSearchSupport(null, null)));
         list.add(buildLink("search", getMethodOn().getSearchConfiguration(null, null)));
         list.add(buildLink("facets", getMethodOn().getFacetsConfiguration(null, null, pageable)));

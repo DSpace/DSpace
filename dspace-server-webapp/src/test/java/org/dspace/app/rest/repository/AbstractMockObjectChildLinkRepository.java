@@ -34,6 +34,6 @@ abstract class AbstractMockObjectChildLinkRepository
             children.add(MockObject.create(102));
         }
         Pageable pageable = utils.getPageable(optionalPageable);
-        return converter.toRestPage(children, pageable, children.size(), projection);
+        return converter.toRestPage(children, pageable, projection);
     }
 }

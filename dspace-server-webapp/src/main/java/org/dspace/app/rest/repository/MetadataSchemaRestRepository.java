@@ -45,6 +45,7 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
     MetadataSchemaService metadataSchemaService;
 
     @Override
+    @PreAuthorize("permitAll()")
     public MetadataSchemaRest findOne(Context context, Integer id) {
         MetadataSchema metadataSchema = null;
         try {
@@ -62,7 +63,7 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
     public Page<MetadataSchemaRest> findAll(Context context, Pageable pageable) {
         try {
             List<MetadataSchema> metadataSchemas = metadataSchemaService.findAll(context);
-            return converter.toRestPage(utils.getPage(metadataSchemas, pageable), utils.obtainProjection());
+            return converter.toRestPage(metadataSchemas, pageable, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

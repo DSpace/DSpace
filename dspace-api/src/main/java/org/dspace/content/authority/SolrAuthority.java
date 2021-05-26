@@ -7,14 +7,18 @@
  */
 package org.dspace.content.authority;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -24,8 +28,8 @@ import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.SolrAuthorityInterface;
 import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authority.service.AuthorityValueService;
-import org.dspace.content.Collection;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.core.NameAwarePlugin;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -35,18 +39,27 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * @author Mark Diggory (markd at atmire dot com)
  */
 public class SolrAuthority implements ChoiceAuthority {
+    /** the name assigned to the specific instance by the PluginService, @see {@link NameAwarePlugin} **/
+    private String authorityName;
 
+    /**
+     * the metadata managed by the plugin instance, derived from its authority name
+     * in the form schema_element_qualifier
+     */
+    private String field;
     protected SolrAuthorityInterface source =
         DSpaceServicesFactory.getInstance().getServiceManager()
                              .getServiceByName("AuthoritySource", SolrAuthorityInterface.class);
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SolrAuthority.class);
+    private static final Logger log = LogManager.getLogger(SolrAuthority.class);
 
-    protected boolean externalResults = false;
-    protected final AuthorityValueService authorityValueService = AuthorityServiceFactory.getInstance()
-                                                                                         .getAuthorityValueService();
+    protected final AuthorityValueService authorityValueService
+            = AuthorityServiceFactory.getInstance().getAuthorityValueService();
 
-    public Choices getMatches(String field, String text, Collection collection, int start, int limit, String locale,
+    protected final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    public Choices getMatches(String text, int start, int limit, String locale,
                               boolean bestMatch) {
         if (limit == 0) {
             limit = 10;
@@ -80,9 +93,6 @@ public class SolrAuthority implements ChoiceAuthority {
         queryArgs.set(CommonParams.START, start);
         //We add one to our facet limit so that we know if there are more matches
         int maxNumberOfSolrResults = limit + 1;
-        if (externalResults) {
-            maxNumberOfSolrResults = ConfigurationManager.getIntProperty("xmlui.lookup.select.size", 12);
-        }
         queryArgs.set(CommonParams.ROWS, maxNumberOfSolrResults);
 
         String sortField = "value";
@@ -120,13 +130,15 @@ public class SolrAuthority implements ChoiceAuthority {
                     }
                 }
 
-                if (externalResults && StringUtils.isNotBlank(text)) {
+                if (StringUtils.isNotBlank(text)) {
                     int sizeFromSolr = alreadyPresent.size();
-                    int maxExternalResults = limit <= 10 ? Math.max(limit - sizeFromSolr, 2) : Math
-                        .max(limit - 10 - sizeFromSolr, 2) + limit - 10;
+                    int maxExternalResults = sizeFromSolr < limit ? limit + 1 : sizeFromSolr + 1;
+                    // force an upper limit for external results
+                    if (maxExternalResults > 10) {
+                        maxExternalResults = 10;
+                    }
                     addExternalResults(text, choices, alreadyPresent, maxExternalResults);
                 }
-
 
                 // hasMore = (authDocs.size() == (limit + 1));
                 hasMore = true;
@@ -134,7 +146,7 @@ public class SolrAuthority implements ChoiceAuthority {
 
 
             int confidence;
-            if (choices.size() == 0) {
+            if (choices.isEmpty()) {
                 confidence = Choices.CF_NOTFOUND;
             } else if (choices.size() == 1) {
                 confidence = Choices.CF_UNCERTAIN;
@@ -144,7 +156,7 @@ public class SolrAuthority implements ChoiceAuthority {
 
             result = new Choices(choices.toArray(new Choice[choices.size()]), start,
                                  hasMore ? max : choices.size() + start, confidence, hasMore);
-        } catch (Exception e) {
+        } catch (IOException | SolrServerException e) {
             log.error("Error while retrieving authority values {field: " + field + ", prefix:" + text + "}", e);
             result = new Choices(true);
         }
@@ -156,8 +168,9 @@ public class SolrAuthority implements ChoiceAuthority {
                                       int max) {
         if (source != null) {
             try {
+             // max has been already adapted to consider the need to filter already found entries
                 List<AuthorityValue> values = source
-                    .queryAuthorities(text, max * 2); // max*2 because results get filtered
+                    .queryAuthorities(text, max);
 
                 // filtering loop
                 Iterator<AuthorityValue> iterator = values.iterator();
@@ -181,7 +194,6 @@ public class SolrAuthority implements ChoiceAuthority {
             } catch (Exception e) {
                 log.error("Error", e);
             }
-            this.externalResults = false;
         } else {
             log.warn("external source for authority not configured");
         }
@@ -193,13 +205,13 @@ public class SolrAuthority implements ChoiceAuthority {
     }
 
     @Override
-    public Choices getMatches(String field, String text, Collection collection, int start, int limit, String locale) {
-        return getMatches(field, text, collection, start, limit, locale, true);
+    public Choices getMatches(String text, int start, int limit, String locale) {
+        return getMatches(text, start, limit, locale, true);
     }
 
     @Override
-    public Choices getBestMatch(String field, String text, Collection collection, String locale) {
-        Choices matches = getMatches(field, text, collection, 0, 1, locale, false);
+    public Choices getBestMatch(String text, String locale) {
+        Choices matches = getMatches(text, 0, 1, locale, false);
         if (matches.values.length != 0 && !matches.values[0].value.equalsIgnoreCase(text)) {
             matches = new Choices(false);
         }
@@ -207,7 +219,7 @@ public class SolrAuthority implements ChoiceAuthority {
     }
 
     @Override
-    public String getLabel(String field, String key, String locale) {
+    public String getLabel(String key, String locale) {
         try {
             if (log.isDebugEnabled()) {
                 log.debug("requesting label for key " + key + " using locale " + locale);
@@ -259,7 +271,7 @@ public class SolrAuthority implements ChoiceAuthority {
                     return label;
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException | SolrServerException e) {
             log.error("error occurred while trying to get label for key " + key, e);
         }
 
@@ -273,7 +285,22 @@ public class SolrAuthority implements ChoiceAuthority {
         return manager.getServiceByName(AuthoritySearchService.class.getName(), AuthoritySearchService.class);
     }
 
-    public void addExternalResultsInNextMatches() {
-        this.externalResults = true;
+    @Override
+    public void setPluginInstanceName(String name) {
+        authorityName = name;
+        for (Entry conf : configurationService.getProperties().entrySet()) {
+            if (StringUtils.startsWith((String) conf.getKey(), ChoiceAuthorityServiceImpl.CHOICES_PLUGIN_PREFIX)
+                    && StringUtils.equals((String) conf.getValue(), authorityName)) {
+                field = ((String) conf.getKey()).substring(ChoiceAuthorityServiceImpl.CHOICES_PLUGIN_PREFIX.length())
+                        .replace(".", "_");
+                // exit the look immediately as we have found it
+                break;
+            }
+        }
+    }
+
+    @Override
+    public String getPluginInstanceName() {
+        return authorityName;
     }
 }

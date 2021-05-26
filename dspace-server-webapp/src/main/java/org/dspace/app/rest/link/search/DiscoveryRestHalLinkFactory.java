@@ -28,7 +28,7 @@ public abstract class DiscoveryRestHalLinkFactory<T> extends HalLinkFactory<T, D
     public UriComponentsBuilder buildSearchBaseLink(final DiscoveryResultsRest data) {
         try {
             UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn()
-                    .getSearchObjects(data.getQuery(), data.getDsoType(),
+                    .getSearchObjects(data.getQuery(), data.getDsoTypes(),
                             data.getScope(), data.getConfiguration(),
                             null, null));
 
@@ -43,7 +43,7 @@ public abstract class DiscoveryRestHalLinkFactory<T> extends HalLinkFactory<T, D
         try {
             UriComponentsBuilder uriBuilder = uriBuilder(
                     getMethodOn().getFacetValues(data.getFacetEntry().getName(), data.getPrefix(), data.getQuery(),
-                            data.getDsoType(), data.getScope(), data.getConfiguration(), null, null));
+                            data.getDsoTypes(), data.getScope(), data.getConfiguration(), null, null));
 
             return addFilterParams(uriBuilder, data);
         } catch (Exception ex) {
@@ -54,7 +54,7 @@ public abstract class DiscoveryRestHalLinkFactory<T> extends HalLinkFactory<T, D
 
     protected UriComponentsBuilder buildSearchFacetsBaseLink(final SearchResultsRest data) {
         try {
-            UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn().getFacets(data.getQuery(), data.getDsoType(),
+            UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn().getFacets(data.getQuery(), data.getDsoTypes(),
                     data.getScope(), data.getConfiguration(), null, null));
 
             uriBuilder = addSortingParms(uriBuilder, data);

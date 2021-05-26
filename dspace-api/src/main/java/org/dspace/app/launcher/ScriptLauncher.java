@@ -10,15 +10,22 @@ package org.dspace.app.launcher;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.commons.cli.ParseException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.dspace.core.Context;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.scripts.handler.impl.CommandLineDSpaceRunnableHandler;
+import org.dspace.scripts.service.ScriptService;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.services.RequestService;
@@ -34,7 +41,7 @@ import org.jdom.input.SAXBuilder;
  */
 public class ScriptLauncher {
 
-    private static final Logger log = Logger.getLogger(ScriptLauncher.class);
+    private static final Logger log = LogManager.getLogger();
 
     /**
      * The service manager kernel
@@ -44,7 +51,8 @@ public class ScriptLauncher {
     /**
      * Default constructor
      */
-    private ScriptLauncher() { }
+    private ScriptLauncher() {
+    }
 
     /**
      * Execute the DSpace script launcher
@@ -54,7 +62,7 @@ public class ScriptLauncher {
      * @throws FileNotFoundException if file doesn't exist
      */
     public static void main(String[] args)
-        throws FileNotFoundException, IOException {
+        throws FileNotFoundException, IOException, IllegalAccessException, InstantiationException {
         // Initialise the service manager kernel
         try {
             kernelImpl = DSpaceKernelInit.getKernel(null);
@@ -107,13 +115,18 @@ public class ScriptLauncher {
      * @param commandConfigs        The Document
      * @param dSpaceRunnableHandler The DSpaceRunnableHandler for this execution
      * @param kernelImpl            The relevant DSpaceKernelImpl
-     * @return                      A 1 or 0 depending on whether the script failed or passed respectively
+     * @return A 1 or 0 depending on whether the script failed or passed respectively
      */
     public static int handleScript(String[] args, Document commandConfigs,
-                                       DSpaceRunnableHandler dSpaceRunnableHandler,
-                                       DSpaceKernelImpl kernelImpl) {
+                                   DSpaceRunnableHandler dSpaceRunnableHandler,
+                                   DSpaceKernelImpl kernelImpl) throws InstantiationException, IllegalAccessException {
         int status;
-        DSpaceRunnable script = ScriptServiceFactory.getInstance().getScriptService().getScriptForName(args[0]);
+        ScriptService scriptService = ScriptServiceFactory.getInstance().getScriptService();
+        ScriptConfiguration scriptConfiguration = scriptService.getScriptConfiguration(args[0]);
+        DSpaceRunnable script = null;
+        if (scriptConfiguration != null) {
+            script = scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfiguration);
+        }
         if (script != null) {
             status = executeScript(args, dSpaceRunnableHandler, script);
         } else {
@@ -127,12 +140,12 @@ public class ScriptLauncher {
      * @param args                  The arguments of the script with the script name as first place in the array
      * @param dSpaceRunnableHandler The relevant DSpaceRunnableHandler
      * @param script                The script to be executed
-     * @return                      A 1 or 0 depending on whether the script failed or passed respectively
+     * @return A 1 or 0 depending on whether the script failed or passed respectively
      */
     private static int executeScript(String[] args, DSpaceRunnableHandler dSpaceRunnableHandler,
                                      DSpaceRunnable script) {
         try {
-            script.initialize(args, dSpaceRunnableHandler);
+            script.initialize(args, dSpaceRunnableHandler, null);
             script.run();
             return 0;
         } catch (ParseException e) {
@@ -309,11 +322,53 @@ public class ScriptLauncher {
     }
 
     /**
-     * Display the commands that the current launcher config file knows about
-     *
+     * Display the commands that are defined in launcher.xml and/or the script service.
      * @param commandConfigs configs as Document
      */
     private static void display(Document commandConfigs) {
+        // usage
+        System.out.println("Usage: dspace [command-name] {parameters}");
+
+        // commands from launcher.xml
+        Collection<Element> launcherCommands = getLauncherCommands(commandConfigs);
+        if (launcherCommands.size() > 0) {
+            System.out.println("\nCommands from launcher.xml");
+            for (Element command : launcherCommands) {
+                displayCommand(
+                    command.getChild("name").getValue(),
+                    command.getChild("description").getValue()
+                );
+            }
+        }
+
+        // commands from script service
+        Collection<ScriptConfiguration> serviceCommands = getServiceCommands();
+        if (serviceCommands.size() > 0) {
+            System.out.println("\nCommands from script service");
+            for (ScriptConfiguration command : serviceCommands) {
+                displayCommand(
+                    command.getName(),
+                    command.getDescription()
+                );
+            }
+        }
+    }
+
+    /**
+     * Display a single command using a fixed format. Used by {@link #display}.
+     * @param name the name that can be used to invoke the command
+     * @param description the description of the command
+     */
+    private static void displayCommand(String name, String description) {
+        System.out.format(" - %s: %s\n", name, description);
+    }
+
+    /**
+     * Get a sorted collection of the commands that are specified in launcher.xml. Used by {@link #display}.
+     * @param commandConfigs the contexts of launcher.xml
+     * @return sorted collection of commands
+     */
+    private static Collection<Element> getLauncherCommands(Document commandConfigs) {
         // List all command elements
         List<Element> commands = commandConfigs.getRootElement().getChildren("command");
 
@@ -325,11 +380,32 @@ public class ScriptLauncher {
             sortedCommands.put(command.getChild("name").getValue(), command);
         }
 
-        // Display the sorted list
-        System.out.println("Usage: dspace [command-name] {parameters}");
-        for (Element command : sortedCommands.values()) {
-            System.out.println(" - " + command.getChild("name").getValue() +
-                                   ": " + command.getChild("description").getValue());
-        }
+        return sortedCommands.values();
     }
+
+    /**
+     * Get a sorted collection of the commands that are defined as beans. Used by {@link #display}.
+     * @return sorted collection of commands
+     */
+    private static Collection<ScriptConfiguration> getServiceCommands() {
+        ScriptService scriptService = ScriptServiceFactory.getInstance().getScriptService();
+
+        Context throwAwayContext = new Context();
+
+        throwAwayContext.turnOffAuthorisationSystem();
+        List<ScriptConfiguration> scriptConfigurations = scriptService.getScriptConfigurations(throwAwayContext);
+        throwAwayContext.restoreAuthSystemState();
+
+        try {
+            throwAwayContext.complete();
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+            throwAwayContext.abort();
+        }
+
+        scriptConfigurations.sort(Comparator.comparing(ScriptConfiguration::getName));
+
+        return scriptConfigurations;
+    }
+
 }

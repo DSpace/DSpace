@@ -13,6 +13,7 @@ import java.util.UUID;
 import org.dspace.app.rest.model.HarvestedCollectionRest;
 import org.dspace.app.rest.model.hateoas.HarvestedCollectionResource;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +32,7 @@ public class HarvestedCollectionHalLinkFactory
         if (data != null) {
             list.add(
                 buildLink(
-                    Link.REL_SELF,
+                    IanaLinkRelations.SELF.value(),
                     getMethodOn().get(UUID.fromString(data.getCollectionRest().getUuid()), null, null)
                 )
             );

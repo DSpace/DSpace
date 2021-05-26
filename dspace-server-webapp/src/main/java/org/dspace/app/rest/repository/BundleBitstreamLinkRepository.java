@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
@@ -52,8 +51,7 @@ public class BundleBitstreamLinkRepository extends AbstractDSpaceRestRepository
                 throw new ResourceNotFoundException("No such bundle: " + bundleId);
             }
             Pageable pageable = utils.getPageable(optionalPageable);
-            Page<Bitstream> page = utils.getPage(bundle.getBitstreams(), pageable);
-            return converter.toRestPage(page, projection);
+            return converter.toRestPage(bundle.getBitstreams(), pageable, projection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

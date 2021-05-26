@@ -13,22 +13,20 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import org.springframework.hateoas.Identifiable;
 
 /**
- * Base class for any REST resource that need to be addressable
+ * Base class for any REST resource that need to be addressable and identifiable (via an ID)
  *
  * @param <T> the class of the resource identifier
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public abstract class BaseObjectRest<T extends Serializable> extends RestAddressableModel implements Identifiable<T> {
+public abstract class BaseObjectRest<T extends Serializable> extends RestAddressableModel {
 
     protected T id;
 
     @JsonInclude(Include.NON_EMPTY)
     private List<ErrorRest> errors;
 
-    @Override
     public T getId() {
         return id;
     }

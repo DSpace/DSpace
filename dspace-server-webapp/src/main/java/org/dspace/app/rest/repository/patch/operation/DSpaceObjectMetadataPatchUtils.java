@@ -39,7 +39,7 @@ public final class DSpaceObjectMetadataPatchUtils {
     /**
      * Path in json body of patch that uses these metadata operations
      */
-    protected static final String OPERATION_METADATA_PATH = "/metadata";
+    public static final String OPERATION_METADATA_PATH = "/metadata";
 
     private DSpaceObjectMetadataPatchUtils() {
     }
