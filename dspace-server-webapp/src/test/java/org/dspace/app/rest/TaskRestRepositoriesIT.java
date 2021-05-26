@@ -9,6 +9,7 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Pattern;
 
 import org.dspace.app.rest.matcher.ClaimedTaskMatcher;
 import org.dspace.app.rest.matcher.EPersonMatcher;
@@ -50,6 +52,9 @@ import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.service.ItemService;
+import org.dspace.curate.MarkerTask;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -78,6 +83,8 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
     @Autowired
     private XmlWorkflowFactory xmlWorkflowFactory;
 
+    @Autowired
+    private ItemService itemService;
 
     @Test
     /**
@@ -1768,6 +1775,66 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(status().isNotFound());
     }
 
+    /**
+     * Test of curation tasks attached to a workflow step.
+     * See {@link MarkerTask}.
+     * @throws java.lang.Exception passed through.
+     */
+    @Test
+    public void curationTest()
+            throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        // A submitter;
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword(password)
+                .build();
+
+        // A containment hierarchy;
+        Community community = CommunityBuilder.createCommunity(context)
+                .withName("Community")
+                .build();
+        final String CURATION_COLLECTION_HANDLE = "123456789/curation-test-1";
+        Collection collection = CollectionBuilder
+                .createCollection(context, community, CURATION_COLLECTION_HANDLE)
+                .withName("Collection")
+                .build();
+
+        // A workflow configuration for the test Collection;
+        // See test/dspaceFolder/config/spring/api/workflow.xml
+
+        // A curation task attached to the workflow;
+        // See test/dspaceFolder/config/workflow-curation.xml
+        // This should include MarkerTask.
+
+        // A workflow item;
+        context.setCurrentUser(submitter);
+        XmlWorkflowItem wfi = WorkflowItemBuilder.createWorkflowItem(context, collection)
+                .withTitle("Test of workflow curation")
+                .withIssueDate("2021-05-14")
+                .withSubject("Testing")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        //** THEN **
+
+        // Search the Item's provenance for MarkerTask's name.
+        List<MetadataValue> provenance = itemService.getMetadata(wfi.getItem(),
+                MarkerTask.SCHEMA, MarkerTask.ELEMENT, MarkerTask.QUALIFIER, MarkerTask.LANGUAGE);
+        Pattern markerPattern = Pattern.compile(MarkerTask.class.getCanonicalName());
+        boolean found = false;
+        for (MetadataValue record : provenance) {
+            if (markerPattern.matcher(record.getValue()).lookingAt()) {
+                found = true;
+                break;
+            }
+        }
+        assertThat("Item should have been curated", found);
+    }
+
     @Test
     /**
      * Test the run over a complete workflow
@@ -1830,7 +1897,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String reviewer3Token = getAuthToken(reviewer3.getEmail(), password);
         String adminToken = getAuthToken(admin.getEmail(), password);
 
-        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
 
         Step step = xmlWorkflowFactory.getStepByName("reviewstep");
         // step 1
@@ -2004,7 +2071,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
         String adminToken = getAuthToken(admin.getEmail(), password);
 
-        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
 
         // step 1
         getClient(reviewer1Token).perform(get("/api/workflow/pooltasks/search/findByUser")
@@ -2101,7 +2168,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
 
-        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
 
         // step 1
         getClient(reviewer1Token).perform(get("/api/workflow/pooltasks/search/findByUser")
@@ -2188,7 +2255,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String reviewer2Token = getAuthToken(reviewer2.getEmail(), password);
         String adminToken = getAuthToken(admin.getEmail(), password);
 
-        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
 
         // step 2
         getClient(reviewer2Token).perform(get("/api/workflow/pooltasks/search/findByUser")
@@ -2286,8 +2353,8 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String reviewer2Token = getAuthToken(reviewer2.getEmail(), password);
         String adminToken = getAuthToken(admin.getEmail(), password);
 
-        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
-        AtomicReference<Integer> idRefClaimedTask = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+        AtomicReference<Integer> idRefClaimedTask = new AtomicReference<>();
 
         // step 2
         getClient(reviewer2Token).perform(get("/api/workflow/pooltasks/search/findByUser")
@@ -2380,7 +2447,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String reviewer3Token = getAuthToken(reviewer3.getEmail(), password);
         String adminToken = getAuthToken(admin.getEmail(), password);
 
-        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
 
         // step 3
         getClient(reviewer3Token).perform(get("/api/workflow/pooltasks/search/findByUser")
@@ -2473,7 +2540,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String reviewer3Token = getAuthToken(reviewer3.getEmail(), password);
         String adminToken = getAuthToken(admin.getEmail(), password);
 
-        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
 
         // step 3
         getClient(reviewer3Token).perform(get("/api/workflow/pooltasks/search/findByUser")
@@ -2556,7 +2623,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String reviewer3Token = getAuthToken(reviewer3.getEmail(), password);
         String adminToken = getAuthToken(admin.getEmail(), password);
 
-        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
 
         // step 3
         getClient(reviewer3Token).perform(get("/api/workflow/pooltasks/search/findByUser")
@@ -2703,7 +2770,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         String reviewer2Token = getAuthToken(reviewer2.getEmail(), password);
 
-        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
 
         // step 2
         getClient(reviewer2Token).perform(get("/api/workflow/pooltasks/search/findByUser")
@@ -2726,8 +2793,8 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String authToken = getAuthToken(eperson.getEmail(), password);
 
         // a simple patch to update an existent metadata
-        List<Operation> updateTitle = new ArrayList<Operation>();
-        Map<String, String> value = new HashMap<String, String>();
+        List<Operation> updateTitle = new ArrayList<>();
+        Map<String, String> value = new HashMap<>();
         value.put("value", "New Title");
         updateTitle.add(new ReplaceOperation("/sections/traditionalpageone/dc.title/0", value));
 
@@ -2850,7 +2917,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
 
-        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
 
         // step 1
         getClient(reviewer1Token).perform(get("/api/workflow/pooltasks/search/findByUser")
@@ -2880,8 +2947,8 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String authToken = getAuthToken(eperson.getEmail(), password);
 
         // a simple patch to update an existent metadata
-        List<Operation> updateTitle = new ArrayList<Operation>();
-        Map<String, String> value = new HashMap<String, String>();
+        List<Operation> updateTitle = new ArrayList<>();
+        Map<String, String> value = new HashMap<>();
         value.put("value", "New Title");
         updateTitle.add(new ReplaceOperation("/sections/traditionalpageone/dc.title/0", value));
 
@@ -4230,7 +4297,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         String adminToken = getAuthToken(admin.getEmail(), password);
 
-        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
 
         Step step = xmlWorkflowFactory.getStepByName("reviewstep");
 
