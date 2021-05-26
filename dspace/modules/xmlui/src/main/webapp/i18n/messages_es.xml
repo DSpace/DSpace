@@ -3110,6 +3110,8 @@ Cuando se usa QDC para los elementos de DSpace se recomienda el uso de crosswalk
 <message key="sedici.comunidades.redmuseos.info">Material perteneciente a la red de museos de la UNLP</message>
 <message key="sedici.comunidades.ehidrica.nombre">Emergencia hídrica</message>
 <message key="sedici.comunidades.ehidrica.info">Trabajos dentro del Plan de Gestión Integrada de Riesgos de Desastres</message>
+<message key="sedici.comunidades.dataset.nombre">Conjuntos de datos</message>
+<message key="sedici.comunidades.dataset.info">Datos primarios alojados en el repositorio</message>
 
 <message key="sedici.noticias.head">Noticias</message>
 <message key="sedici.noticias.titulo">Lista de noticias</message>

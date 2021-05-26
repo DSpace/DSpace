@@ -3574,7 +3574,11 @@ h1.communities_header {
 	background-image: url(../../images/icono_ehidrica.png);
 }
 
-#icono_tesis, #icono_eventos, #icono_libros, #icono_revistas, #icono_redunci, #icono_radio, #icono_rea, #icono_ehidrica, #icono_redmuseos{
+#icono_dataset a {
+    background-image: url(../../images/icono_dataset.png);
+}
+
+#icono_tesis, #icono_eventos, #icono_libros, #icono_revistas, #icono_redunci, #icono_radio, #icono_rea, #icono_ehidrica, #icono_redmuseos, #icono_dataset{
 padding-left:5px;
 }
 

@@ -2729,6 +2729,8 @@
 	<message key="sedici.comunidades.tesis.embargo">Documento Embarcado</message>
 	<message key="sedici.comunidades.tesis.info">Teses, pós-graduação e outros documentos</message>
 	<message key="sedici.comunidades.tesis.nombre">Teses</message>
+    <message key="sedici.comunidades.dataset.nombre">Conjuntos de dados</message>
+    <message key="sedici.comunidades.dataset.info">Dados primários hospedados no repositório</message>	
 	<message key="sedici.EPerson.string-too-long">O campo {0} excedeu o máximo de {1} caracteres e foi cortado</message>
 	<message key="sedici.errorDescription.badRequest">A solicitação feita não parece correcta. Isso provavelmente ocorre devido a erros nos parâmetros usados.</message>
 	<message key="sedici.errorDescription.generalNote">Se você acha que há um problema que precisa ser resolvido ou deseja fazer uma pergunta, não hesite em entrar em contato conosco pelo e-mail info@sedici.unlp.edu.ar</message>

@@ -2912,6 +2912,8 @@
 <message key="sedici.comunidades.redmuseos.info">Material belonging to the UNLP museum network</message>
 <message key="sedici.comunidades.ehidrica.nombre">Hydric emergency</message>
 <message key="sedici.comunidades.ehidrica.info">Jobs within the Plan of Integrated Management of Disaster's Risk</message>
+<message key="sedici.comunidades.dataset.nombre">Dataset</message>
+<message key="sedici.comunidades.dataset.info">Primary data hosted at repository</message>
 
 <message key="sedici.noticias.head">News</message>
 <message key="sedici.noticias.titulo">News list</message>
