@@ -83,7 +83,7 @@ public class ItemUtils {
     private ItemUtils() {
     }
 
-    private static Element getElement(List<Element> list, String name) {
+    public static Element getElement(List<Element> list, String name) {
         for (Element e : list) {
             if (name.equals(e.getName())) {
                 return e;
@@ -93,13 +93,13 @@ public class ItemUtils {
         return null;
     }
 
-    private static Element create(String name) {
+    public static Element create(String name) {
         Element e = new Element();
         e.setName(name);
         return e;
     }
 
-    private static Element.Field createValue(String name, String value) {
+    public static Element.Field createValue(String name, String value) {
         Element.Field e = new Element.Field();
         e.setValue(value);
         e.setName(name);

@@ -11,6 +11,7 @@
 			<map>
 				<entry key="bibtex" value-ref="cslItemDataCrosswalkBibtex"></entry>
 				<entry key="endnote" value-ref="referCrosswalkEndnote"></entry>
+				
 				<entry key="publication-cerif-xml" value-ref="referCrosswalkPublicationCerifXml"></entry>
 				<entry key="publication-json" value-ref="cslItemDataCrosswalkJson"></entry>
 				<entry key="publication-pdf" value-ref="pdfCrosswalkPublication"></entry>

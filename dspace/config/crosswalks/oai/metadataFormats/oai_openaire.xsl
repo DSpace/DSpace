@@ -90,7 +90,9 @@
             <!-- oaire:citation* -->
             <xsl:apply-templates
                 select="doc:metadata/doc:element[@name='oaire']/doc:element[@name='citation']" mode="oaire"/>
-
+			<!-- CREATIVE COMMON LICENSE -->
+			<xsl:apply-templates
+				select="doc:metadata/doc:element[@name='others']/doc:field[@name='cc']" mode="oaire" />
         </oaire:resource>
     </xsl:template>
 
@@ -1642,7 +1644,26 @@
         </xsl:if>
     </xsl:template>
 
-
+	<!-- License CC splitter -->
+	<xsl:variable name="ccstart">
+		<xsl:value-of select="doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name='issued']/doc:element/doc:field[@name='value']/text()"/>
+	</xsl:variable>
+	
+	<xsl:template
+		match="doc:element[@name='others']/doc:field[@name='cc']"
+		mode="oaire">
+		<oaire:licenseCondition>
+			<xsl:attribute name="startDate">
+				<xsl:value-of
+					select="$ccstart"/>
+			</xsl:attribute>
+			<xsl:attribute name="uri">
+				<xsl:value-of
+					select="substring-after(./text(),'|||')" />
+		</xsl:attribute>
+			<xsl:value-of select="substring-before(./text(),'|||')"/>
+		</oaire:licenseCondition>
+	</xsl:template>
 
     <!-- ignore all non specified text values or attributes -->
     <xsl:template match="text()|@*"/>

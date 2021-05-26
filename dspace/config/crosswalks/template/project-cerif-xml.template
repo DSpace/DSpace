@@ -5,13 +5,12 @@
 	<Identifier type="URL">@oairecerif.identifier.url@</Identifier>
 	<StartDate>@oairecerif.project.startDate@</StartDate>
 	<EndDate>@oairecerif.project.endDate@</EndDate>
-	<Status>@oairecerif.project.status@</Status>
 	<Consortium>
 		<Coordinator>
 			@relation.crispj-coordinator.start@
 			<OrgUnit id="@virtual.id@">
+                <Acronym>@oairecerif.acronym@</Acronym>
 				<Name>@dc.title@</Name>
-				<Acronym>@oairecerif.acronym@</Acronym>
 			</OrgUnit>
 			@relation.crispj-coordinator.end@
 			@if.not.authority.crispj-coordinator.start@
@@ -21,8 +20,8 @@
 		<Partner>
 			@relation.crispj-partnerou.start@
 			<OrgUnit id="@virtual.id@">
+                <Acronym>@oairecerif.acronym@</Acronym>
 				<Name>@dc.title@</Name>
-				<Acronym>@oairecerif.acronym@</Acronym>
 			</OrgUnit>
 			@relation.crispj-partnerou.end@
 			@if.not.authority.crispj-partnerou.start@
@@ -32,8 +31,8 @@
 		<Member>
 			@relation.crispj-organization.start@
 			<OrgUnit id="@virtual.id@">
+                <Acronym>@oairecerif.acronym@</Acronym>
 				<Name>@dc.title@</Name>
-				<Acronym>@oairecerif.acronym@</Acronym>
 			</OrgUnit>
 			@relation.crispj-organization.end@
 			@if.not.authority.crispj-organization.start@
@@ -49,18 +48,13 @@
 			<Person displayName="@crispj.coinvestigators@" />
 		</Member>
 	</Team>
-	<Uses>
-		<Equipment>
-			<Name>@dc.relation.equipment@</Name>
-		</Equipment>
-	</Uses>
 	@relation.grants.start@
 	<Funded>
 		<By>
 			@relation.oairecerif-funder.start@
 			<OrgUnit id="@virtual.id@">
+                <Acronym>@oairecerif.acronym@</Acronym>
 				<Name>@dc.title@</Name>
-				<Acronym>@oairecerif.acronym@</Acronym>
 			</OrgUnit>
 			@relation.oairecerif-funder.end@
 			@if.not.authority.oairecerif-funder.start@
@@ -77,8 +71,15 @@
 		</As>
 	</Funded>
 	@relation.grants.end@
+    <Subject scheme="http://purl.org/pe-repo/ocde/ford">@perucris.subject.ocde@</Subject>
 	<Keyword>@dc.subject@</Keyword>
 	<Abstract>@dc.description.abstract@</Abstract>
+    <Status>@oairecerif.project.status@</Status>
+    <Uses>
+        <Equipment>
+            <Name>@dc.relation.equipment@</Name>
+        </Equipment>
+    </Uses>
 	<OAMandate 
 		mandated="@oairecerif.oamandate@" 
 		URL="@oairecerif.oamandate.url@" 
