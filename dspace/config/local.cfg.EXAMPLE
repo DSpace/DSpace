@@ -33,11 +33,15 @@
 dspace.dir=/dspace
 
 # URL of DSpace backend ('server' webapp). Include port number etc.
-# This is where REST API and all enabled server modules (OAI-PMH, SWORD, SWORDv2, RDF, etc) will respond
+# DO NOT end it with '/'.
+# This is where REST API and all enabled server modules (OAI-PMH, SWORD,
+# SWORDv2, RDF, etc) will respond.
 dspace.server.url = http://localhost:8080/server
 
-# URL of DSpace frontend (Angular UI). Include port number etc
-# This is used by the backend to provide links in emails, RSS feeds, Sitemaps, etc.
+# URL of DSpace frontend (Angular UI). Include port number etc.
+# DO NOT end it with '/'.
+# This is used by the backend to provide links in emails, RSS feeds, Sitemaps,
+# etc.
 dspace.ui.url = http://localhost:4000
 
 # Name of the site
