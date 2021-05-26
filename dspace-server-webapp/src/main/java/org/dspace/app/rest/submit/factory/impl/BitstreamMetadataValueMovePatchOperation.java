@@ -8,7 +8,9 @@
 package org.dspace.app.rest.submit.factory.impl;
 
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
+import org.dspace.app.rest.utils.BitstreamMetadataValuePathUtils;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.InProgressSubmission;
@@ -17,7 +19,6 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -35,12 +36,17 @@ public class BitstreamMetadataValueMovePatchOperation extends MetadataValueMoveP
     @Autowired
     ItemService itemService;
 
+    // this is wired in the pring-dspace-core-services.xml
+    BitstreamMetadataValuePathUtils bitstreamMetadataValuePathUtils;
+
     @Override
-    void move(Context context, Request currentRequest, InProgressSubmission source, String path, String from)
-        throws Exception {
+    void move(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path, String from)
+            throws Exception {
         //"path": "/sections/upload/files/0/metadata/dc.title/2"
         //"abspath": "/files/0/metadata/dc.title/2"
-        String[] splitTo = getAbsolutePath(path).split("/");
+        String absolutePath = getAbsolutePath(path);
+        String[] splitTo = absolutePath.split("/");
+        bitstreamMetadataValuePathUtils.validate(absolutePath);
         Item item = source.getItem();
         List<Bundle> bundle = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
         for (Bundle bb : bundle) {
@@ -72,4 +78,7 @@ public class BitstreamMetadataValueMovePatchOperation extends MetadataValueMoveP
         return bitstreamService;
     }
 
+    public void setBitstreamMetadataValuePathUtils(BitstreamMetadataValuePathUtils bitstreamMetadataValuePathUtils) {
+        this.bitstreamMetadataValuePathUtils = bitstreamMetadataValuePathUtils;
+    }
 }

@@ -42,7 +42,7 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
 
     @Test
     public void findAllRelationshipTypesTest() throws SQLException {
-        assertEquals(11, relationshipTypeService.findAll(context).size());
+        assertEquals(12, relationshipTypeService.findAll(context).size());
     }
 
     @Test
@@ -142,7 +142,7 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
                    //We expect a 200 OK status
                    .andExpect(status().isOk())
                    //The type has to be 'discover'
-                   .andExpect(jsonPath("$.page.totalElements", is(11)))
+                   .andExpect(jsonPath("$.page.totalElements", is(12)))
                    //There needs to be a self link to this endpoint
                    .andExpect(jsonPath("$._links.self.href", containsString("api/core/relationshiptypes")))
                    //We have 4 facets in the default configuration, they need to all be present in the embedded section
@@ -157,7 +157,8 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(7)),
                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(8)),
                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(9)),
-                       RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(10)))
+                       RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(10)),
+                       RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(11)))
                    ));
     }
 

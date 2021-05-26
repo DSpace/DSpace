@@ -8,6 +8,7 @@
 package org.dspace.services.email;
 
 import java.util.Properties;
+import javax.annotation.PostConstruct;
 import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
@@ -16,14 +17,13 @@ import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 import javax.naming.NoInitialContextException;
 
-import org.dspace.kernel.mixins.InitializedService;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.EmailService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Provides mail sending services through JavaMail.  If a {@link javax.mail.Session}
@@ -34,7 +34,7 @@ import org.springframework.beans.factory.annotation.Required;
  */
 public class EmailServiceImpl
     extends Authenticator
-    implements EmailService, InitializedService {
+    implements EmailService {
     private static final Logger logger = LoggerFactory.getLogger(EmailServiceImpl.class);
 
     private Session session = null;
@@ -46,8 +46,7 @@ public class EmailServiceImpl
      *
      * @param cfg the configurationService object
      */
-    @Autowired
-    @Required
+    @Autowired(required = true)
     public void setCfg(ConfigurationService cfg) {
         this.cfg = cfg;
     }
@@ -62,7 +61,7 @@ public class EmailServiceImpl
         return session;
     }
 
-    @Override
+    @PostConstruct
     public void init() {
         // See if there is already a Session in our environment
         String sessionName = cfg.getProperty("mail.session.name");
@@ -106,7 +105,7 @@ public class EmailServiceImpl
                     props.put(key, value);
                 }
             }
-            if (null == cfg.getProperty("mail.server.username")) {
+            if (StringUtils.isBlank(cfg.getProperty("mail.server.username"))) {
                 session = Session.getInstance(props);
             } else {
                 props.put("mail.smtp.auth", "true");
@@ -124,5 +123,13 @@ public class EmailServiceImpl
         return new PasswordAuthentication(
             cfg.getProperty("mail.server.username"),
             cfg.getProperty("mail.server.password"));
+    }
+
+    /**
+     * Force a new initialization of the session, useful for testing purpose
+     */
+    public void reset() {
+        session = null;
+        init();
     }
 }

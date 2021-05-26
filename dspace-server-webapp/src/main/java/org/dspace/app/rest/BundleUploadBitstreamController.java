@@ -31,7 +31,7 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -86,9 +86,11 @@ public class BundleUploadBitstreamController {
      */
     @RequestMapping(method = RequestMethod.POST, headers = "content-type=multipart/form-data")
     @PreAuthorize("hasPermission(#uuid, 'BUNDLE', 'ADD') && hasPermission(#uuid, 'BUNDLE', 'WRITE')")
-    public ResponseEntity<ResourceSupport> uploadBitstream(HttpServletRequest request, @PathVariable UUID uuid,
-                                           @RequestParam("file") MultipartFile uploadfile,
-                                           @RequestParam(value = "properties", required = false) String properties) {
+    public ResponseEntity<RepresentationModel<?>> uploadBitstream(
+            HttpServletRequest request,
+            @PathVariable UUID uuid,
+            @RequestParam("file") MultipartFile uploadfile,
+            @RequestParam(value = "properties", required = false) String properties) {
 
         Context context = ContextUtil.obtainContext(request);
         Bundle bundle = null;

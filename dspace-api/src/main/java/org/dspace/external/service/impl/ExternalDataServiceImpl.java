@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
@@ -32,7 +32,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class ExternalDataServiceImpl implements ExternalDataService {
 
-    private static final Logger log = Logger.getLogger(ExternalDataServiceImpl.class);
+    private static final Logger log
+            = org.apache.logging.log4j.LogManager.getLogger();
 
     @Autowired
     private List<ExternalDataProvider> externalDataProviders;
@@ -95,9 +96,6 @@ public class ExternalDataServiceImpl implements ExternalDataService {
                                                                     ExternalDataObject externalDataObject,
                                                                     Collection collection)
         throws AuthorizeException, SQLException {
-        if (!authorizeService.isAdmin(context)) {
-            throw new AuthorizeException("You have to be an admin to create an Item from an ExternalDataObject");
-        }
         WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, true);
         Item item = workspaceItem.getItem();
         for (MetadataValueDTO metadataValueDTO : externalDataObject.getMetadata()) {

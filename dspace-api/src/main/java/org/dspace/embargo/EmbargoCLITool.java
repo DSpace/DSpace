@@ -7,16 +7,19 @@
  */
 package org.dspace.embargo;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 import org.apache.logging.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -98,7 +101,7 @@ public class EmbargoCLITool {
         options.addOption("h", "help", false, "help");
         CommandLine line = null;
         try {
-            line = new PosixParser().parse(options, argv);
+            line = new DefaultParser().parse(options, argv);
         } catch (ParseException e) {
             System.err.println("Command error: " + e.getMessage());
             new HelpFormatter().printHelp(EmbargoServiceImpl.class.getName(), options);
@@ -206,7 +209,7 @@ public class EmbargoCLITool {
                         embargoService.checkEmbargo(context, item);
                     }
                 }
-            } catch (Exception e) {
+            } catch (IOException | SQLException | AuthorizeException e) {
                 log.error("Failed attempting to lift embargo, item=" + item.getHandle() + ": ", e);
                 System.err.println("Failed attempting to lift embargo, item=" + item.getHandle() + ": " + e);
                 status = true;

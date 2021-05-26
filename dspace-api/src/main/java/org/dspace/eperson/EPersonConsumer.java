@@ -12,7 +12,6 @@ import java.util.UUID;
 import javax.mail.MessagingException;
 
 import org.apache.logging.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
@@ -22,6 +21,8 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Class for handling updates to EPersons
@@ -35,9 +36,12 @@ public class EPersonConsumer implements Consumer {
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(EPersonConsumer.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(EPersonConsumer.class);
 
-    protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    protected EPersonService ePersonService
+            = EPersonServiceFactory.getInstance().getEPersonService();
+    protected ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
      * Initalise the consumer
@@ -69,7 +73,7 @@ public class EPersonConsumer implements Consumer {
             case Constants.EPERSON:
                 if (et == Event.CREATE) {
                     // Notify of new user registration
-                    String notifyRecipient = ConfigurationManager.getProperty("registration.notify");
+                    String notifyRecipient = configurationService.getProperty("registration.notify");
                     if (notifyRecipient == null) {
                         notifyRecipient = "";
                     }
@@ -82,8 +86,8 @@ public class EPersonConsumer implements Consumer {
                                 .getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "registration_notify"));
                             adminEmail.addRecipient(notifyRecipient);
 
-                            adminEmail.addArgument(ConfigurationManager.getProperty("dspace.name"));
-                            adminEmail.addArgument(ConfigurationManager.getProperty("dspace.ui.url"));
+                            adminEmail.addArgument(configurationService.getProperty("dspace.name"));
+                            adminEmail.addArgument(configurationService.getProperty("dspace.ui.url"));
                             adminEmail.addArgument(eperson.getFirstName() + " " + eperson.getLastName()); // Name
                             adminEmail.addArgument(eperson.getEmail());
                             adminEmail.addArgument(new Date());

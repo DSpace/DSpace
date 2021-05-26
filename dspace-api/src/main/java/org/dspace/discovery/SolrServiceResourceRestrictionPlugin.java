@@ -21,6 +21,7 @@ import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -28,11 +29,16 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.discovery.indexobject.IndexableClaimedTask;
 import org.dspace.discovery.indexobject.IndexableDSpaceObject;
+import org.dspace.discovery.indexobject.IndexableInProgressSubmission;
+import org.dspace.discovery.indexobject.IndexablePoolTask;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
+import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -61,22 +67,37 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
 
     @Override
     public void additionalIndex(Context context, IndexableObject idxObj, SolrInputDocument document) {
+        DSpaceObject dso = null;
         if (idxObj instanceof IndexableDSpaceObject) {
-            DSpaceObject dso = ((IndexableDSpaceObject) idxObj).getIndexedObject();
+            dso = ((IndexableDSpaceObject) idxObj).getIndexedObject();
+        } else if (idxObj instanceof IndexableInProgressSubmission) {
+            final InProgressSubmission inProgressSubmission
+                    = ((IndexableInProgressSubmission) idxObj).getIndexedObject();
+            dso = inProgressSubmission.getItem();
+        } else if (idxObj instanceof IndexablePoolTask) {
+            final PoolTask poolTask = ((IndexablePoolTask) idxObj).getIndexedObject();
+            dso = poolTask.getWorkflowItem().getItem();
+        } else if (idxObj instanceof IndexableClaimedTask) {
+            final ClaimedTask claimedTask = ((IndexableClaimedTask) idxObj).getIndexedObject();
+            dso = claimedTask.getWorkflowItem().getItem();
+        }
+        if (dso != null) {
             try {
                 List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, dso, Constants.READ);
                 for (ResourcePolicy resourcePolicy : policies) {
-                    String fieldValue;
-                    if (resourcePolicy.getGroup() != null) {
-                        //We have a group add it to the value
-                        fieldValue = "g" + resourcePolicy.getGroup().getID();
-                    } else {
-                        //We have an eperson add it to the value
-                        fieldValue = "e" + resourcePolicy.getEPerson().getID();
+                    if (resourcePolicyService.isDateValid(resourcePolicy)) {
+                        String fieldValue;
+                        if (resourcePolicy.getGroup() != null) {
+                            //We have a group add it to the value
+                            fieldValue = "g" + resourcePolicy.getGroup().getID();
+                        } else {
+                            //We have an eperson add it to the value
+                            fieldValue = "e" + resourcePolicy.getEPerson().getID();
 
+                        }
+
+                        document.addField("read", fieldValue);
                     }
-
-                    document.addField("read", fieldValue);
 
                     //remove the policy from the cache to save memory
                     context.uncacheEntity(resourcePolicy);
@@ -88,15 +109,18 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                         List<ResourcePolicy> policiesAdmin = authorizeService
                                      .getPoliciesActionFilter(context, dso, Constants.ADMIN);
                         for (ResourcePolicy resourcePolicy : policiesAdmin) {
-                            String fieldValue;
-                            if (resourcePolicy.getGroup() != null) {
-                                // We have a group add it to the value
-                                fieldValue = "g" + resourcePolicy.getGroup().getID();
-                            } else {
-                                // We have an eperson add it to the value
-                                fieldValue = "e" + resourcePolicy.getEPerson().getID();
+                            if (resourcePolicyService.isDateValid(resourcePolicy)) {
+                                String fieldValue;
+                                if (resourcePolicy.getGroup() != null) {
+                                    // We have a group add it to the value
+                                    fieldValue = "g" + resourcePolicy.getGroup().getID();
+                                } else {
+                                    // We have an eperson add it to the value
+                                    fieldValue = "e" + resourcePolicy.getEPerson().getID();
+                                }
+                                document.addField("read", fieldValue);
+                                document.addField("admin", fieldValue);
                             }
-                            document.addField("read", fieldValue);
 
                             // remove the policy from the cache to save memory
                             context.uncacheEntity(resourcePolicy);
@@ -106,7 +130,8 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                 }
             } catch (SQLException e) {
                 log.error(LogManager.getHeader(context, "Error while indexing resource policies",
-                                               "DSpace object: (id " + dso.getID() + " type " + dso.getType() + ")"));
+                                               "DSpace object: (id " + dso.getID() + " type " + dso.getType() + ")"
+                ));
             }
         }
     }
@@ -114,13 +139,6 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
     @Override
     public void additionalSearchParameters(Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery) {
         try {
-            // skip workspace and workflow queries as security for it them is builtin in the SolrServiceImpl
-            if (StringUtils.startsWith(discoveryQuery.getDiscoveryConfigurationName(),
-                    SolrServiceImpl.DISCOVER_WORKSPACE_CONFIGURATION_NAME)
-                    || StringUtils.startsWith(discoveryQuery.getDiscoveryConfigurationName(),
-                            SolrServiceImpl.DISCOVER_WORKFLOW_CONFIGURATION_NAME)) {
-                return;
-            }
             if (!authorizeService.isAdmin(context)) {
                 StringBuilder resourceQuery = new StringBuilder();
                 //Always add the anonymous group id to the query
@@ -143,14 +161,15 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
 
                 resourceQuery.append(")");
 
-                if (authorizeService.isCommunityAdmin(context)
-                    || authorizeService.isCollectionAdmin(context)) {
+                String locations = DSpaceServicesFactory.getInstance()
+                                                          .getServiceManager()
+                                                          .getServiceByName(SearchService.class.getName(),
+                                                                            SearchService.class)
+                                                          .createLocationQueryForAdministrableItems(context);
+
+                if (StringUtils.isNotBlank(locations)) {
                     resourceQuery.append(" OR ");
-                    resourceQuery.append(DSpaceServicesFactory.getInstance()
-                                                              .getServiceManager()
-                                                              .getServiceByName(SearchService.class.getName(),
-                                                                                SearchService.class)
-                                                              .createLocationQueryForAdministrableItems(context));
+                    resourceQuery.append(locations);
                 }
 
                 solrQuery.addFilterQuery(resourceQuery.toString());

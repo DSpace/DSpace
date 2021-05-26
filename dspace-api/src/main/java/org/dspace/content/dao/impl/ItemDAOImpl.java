@@ -109,6 +109,17 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     }
 
     @Override
+    public Iterator<Item> findBySubmitter(Context context, EPerson eperson, boolean retrieveAllItems)
+        throws SQLException {
+        if (!retrieveAllItems) {
+            return findBySubmitter(context, eperson);
+        }
+        Query query = createQuery(context, "FROM Item WHERE submitter= :submitter");
+        query.setParameter("submitter", eperson);
+        return iterate(query);
+    }
+
+    @Override
     public Iterator<Item> findBySubmitter(Context context, EPerson eperson, MetadataField metadataField, int limit)
         throws SQLException {
         StringBuilder query = new StringBuilder();

@@ -15,9 +15,9 @@ import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
@@ -53,7 +53,7 @@ public class Harvest {
 
     public static void main(String[] argv) throws Exception {
         // create an options object and populate it
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
 
         Options options = new Options();
 
@@ -402,11 +402,7 @@ public class Harvest {
             context.setCurrentUser(eperson);
             harvester.runHarvest();
             context.complete();
-        } catch (SQLException e) {
-            throw new IllegalStateException("Failed to run harvester", e);
-        } catch (AuthorizeException e) {
-            throw new IllegalStateException("Failed to run harvester", e);
-        } catch (IOException e) {
+        } catch (SQLException | AuthorizeException | IOException e) {
             throw new IllegalStateException("Failed to run harvester", e);
         }
 

@@ -18,7 +18,7 @@ import org.dspace.app.rest.AuthenticationRestController;
 public class AuthnRest extends BaseObjectRest<Integer> {
 
     public static final String NAME = "authn";
-    public static final String CATEGORY = "authn";
+    public static final String CATEGORY = RestAddressableModel.AUTHENTICATION;
 
     public String getCategory() {
         return CATEGORY;

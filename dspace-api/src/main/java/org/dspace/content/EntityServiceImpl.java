@@ -44,14 +44,14 @@ public class EntityServiceImpl implements EntityService {
     public Entity findByItemId(Context context, UUID itemId, Integer limit, Integer offset) throws SQLException {
 
         Item item = itemService.find(context, itemId);
-        List<Relationship> relationshipList = relationshipService.findByItem(context, item, limit, offset);
+        List<Relationship> relationshipList = relationshipService.findByItem(context, item, limit, offset, true);
         return new Entity(item, relationshipList);
     }
 
     @Override
     public EntityType getType(Context context, Entity entity) throws SQLException {
         Item item = entity.getItem();
-        List<MetadataValue> list = itemService.getMetadata(item, "relationship", "type", null, Item.ANY, false);
+        List<MetadataValue> list = itemService.getMetadata(item, "dspace", "entity", "type", Item.ANY, false);
         if (!list.isEmpty()) {
             return entityTypeService.findByEntityType(context, list.get(0).getValue());
         } else {

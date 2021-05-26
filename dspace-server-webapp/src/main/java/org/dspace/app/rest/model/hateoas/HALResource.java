@@ -8,18 +8,20 @@
 package org.dspace.app.rest.model.hateoas;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.Resource;
 
 /**
  * The abstract, generic class for the HalResources
  */
-public abstract class HALResource<T> extends Resource<T> {
+public abstract class HALResource<T> extends EntityModel<T> {
 
     public HALResource(T content) {
         super(content);
@@ -46,9 +48,19 @@ public abstract class HALResource<T> extends Resource<T> {
     }
 
     @Override
-    public void add(Link link) {
+    public EntityModel<T> add(Link link) {
         if (!hasLink(link.getRel())) {
-            super.add(link);
+            return super.add(link);
+        } else {
+            String name = link.getName();
+            if (StringUtils.isNotBlank(name)) {
+                List<Link> list = this.getLinks(link.getRel());
+                // If a link of this name doesn't already exist in the list, add it
+                if (!list.stream().anyMatch((l -> StringUtils.equalsIgnoreCase(l.getName(), name)))) {
+                    super.add(link);
+                }
+            }
         }
+        return this;
     }
 }

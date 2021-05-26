@@ -67,6 +67,7 @@ public class CommunitySubcommunityLinkRepository extends AbstractDSpaceRestRepos
             discoverQuery.addFilterQueries("location.parent:" + communityId);
             discoverQuery.setStart(Math.toIntExact(pageable.getOffset()));
             discoverQuery.setMaxResults(pageable.getPageSize());
+            discoverQuery.setSortField("dc.title_sort", DiscoverQuery.SORT_ORDER.asc);
             DiscoverResult resp = searchService.search(context, scopeObject, discoverQuery);
             long tot = resp.getTotalSearchResults();
             for (IndexableObject solrCommunities : resp.getIndexableObjects()) {

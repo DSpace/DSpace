@@ -7,30 +7,29 @@
  */
 package org.dspace.storage.rdbms.migration;
 
-import java.sql.Connection;
-
-import org.flywaydb.core.api.migration.MigrationChecksumProvider;
-import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
+import org.flywaydb.core.api.migration.BaseJavaMigration;
+import org.flywaydb.core.api.migration.Context;
 
 /**
  * Migration class that will drop the public key for the dspace objects, the integer based key will be moved to a UUID
  *
  * @author kevinvandevelde at atmire.com
  */
-public class V6_0_2015_03_06__DS_2701_Dso_Uuid_Migration implements JdbcMigration, MigrationChecksumProvider {
+public class V6_0_2015_03_06__DS_2701_Dso_Uuid_Migration extends BaseJavaMigration {
 
     private int checksum = -1;
 
 
     @Override
-    public void migrate(Connection connection) throws Exception {
-        checksum += MigrationUtils.dropDBConstraint(connection, "eperson", "eperson_id", "pkey");
-        checksum += MigrationUtils.dropDBConstraint(connection, "epersongroup", "eperson_group_id", "pkey");
-        checksum += MigrationUtils.dropDBConstraint(connection, "community", "community_id", "pkey");
-        checksum += MigrationUtils.dropDBConstraint(connection, "collection", "collection_id", "pkey");
-        checksum += MigrationUtils.dropDBConstraint(connection, "item", "item_id", "pkey");
-        checksum += MigrationUtils.dropDBConstraint(connection, "bundle", "bundle_id", "pkey");
-        checksum += MigrationUtils.dropDBConstraint(connection, "bitstream", "bitstream_id", "pkey");
+    public void migrate(Context context) throws Exception {
+        checksum += MigrationUtils.dropDBConstraint(context.getConnection(), "eperson", "eperson_id", "pkey");
+        checksum += MigrationUtils.dropDBConstraint(context.getConnection(), "epersongroup",
+                                                    "eperson_group_id", "pkey");
+        checksum += MigrationUtils.dropDBConstraint(context.getConnection(), "community", "community_id", "pkey");
+        checksum += MigrationUtils.dropDBConstraint(context.getConnection(), "collection", "collection_id", "pkey");
+        checksum += MigrationUtils.dropDBConstraint(context.getConnection(), "item", "item_id", "pkey");
+        checksum += MigrationUtils.dropDBConstraint(context.getConnection(), "bundle", "bundle_id", "pkey");
+        checksum += MigrationUtils.dropDBConstraint(context.getConnection(), "bitstream", "bitstream_id", "pkey");
     }
 
     @Override

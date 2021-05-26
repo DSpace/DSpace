@@ -8,6 +8,7 @@
 package org.dspace.app.rest.test;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.rest.Application;
 import org.dspace.app.rest.utils.DSpaceConfigurationInitializer;
 import org.dspace.app.rest.utils.DSpaceKernelInitializer;
@@ -102,6 +103,7 @@ public class AbstractWebClientIntegrationTest extends AbstractIntegrationTestWit
      * @param path path to perform GET against
      * @param username Username (may be null to perform an unauthenticated POST)
      * @param password Password
+     * @param requestEntity unknown -- not used.
      * @return ResponseEntity with a String body
      */
     public ResponseEntity<String> postResponseAsString(String path, String username, String password,

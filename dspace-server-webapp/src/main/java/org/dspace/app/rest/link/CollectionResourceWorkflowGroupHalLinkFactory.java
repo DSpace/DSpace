@@ -47,9 +47,9 @@ public class CollectionResourceWorkflowGroupHalLinkFactory
         Map<String, Role> roles = WorkflowUtils.getCollectionRoles(collection);
         UUID resourceUuid = UUID.fromString(halResource.getContent().getUuid());
         for (Map.Entry<String, Role> entry : roles.entrySet()) {
-            list.add(buildLink("workflowGroups/" + entry.getKey(), getMethodOn()
+            list.add(buildLink("workflowGroups", getMethodOn()
                 .getWorkflowGroupForRole(resourceUuid, null, null,
-                                         entry.getKey())));
+                                         entry.getKey())).withName(entry.getKey()));
         }
     }
 

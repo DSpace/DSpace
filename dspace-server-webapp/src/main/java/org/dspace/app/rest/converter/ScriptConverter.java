@@ -15,7 +15,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.app.rest.model.ParameterRest;
 import org.dspace.app.rest.model.ScriptRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,18 +23,18 @@ import org.springframework.stereotype.Component;
  * of {@link ScriptRest}
  */
 @Component
-public class ScriptConverter implements DSpaceConverter<DSpaceRunnable, ScriptRest> {
+public class ScriptConverter implements DSpaceConverter<ScriptConfiguration, ScriptRest> {
 
     @Override
-    public ScriptRest convert(DSpaceRunnable script, Projection projection) {
+    public ScriptRest convert(ScriptConfiguration scriptConfiguration, Projection projection) {
         ScriptRest scriptRest = new ScriptRest();
         scriptRest.setProjection(projection);
-        scriptRest.setDescription(script.getDescription());
-        scriptRest.setId(script.getName());
-        scriptRest.setName(script.getName());
+        scriptRest.setDescription(scriptConfiguration.getDescription());
+        scriptRest.setId(scriptConfiguration.getName());
+        scriptRest.setName(scriptConfiguration.getName());
 
         List<ParameterRest> parameterRestList = new LinkedList<>();
-        for (Option option : CollectionUtils.emptyIfNull(script.getOptions().getOptions())) {
+        for (Option option : CollectionUtils.emptyIfNull(scriptConfiguration.getOptions().getOptions())) {
             ParameterRest parameterRest = new ParameterRest();
             parameterRest.setDescription(option.getDescription());
             parameterRest.setName((option.getOpt() != null ? "-" + option.getOpt() : "--" + option.getLongOpt()));
@@ -49,7 +49,7 @@ public class ScriptConverter implements DSpaceConverter<DSpaceRunnable, ScriptRe
     }
 
     @Override
-    public Class<DSpaceRunnable> getModelClass() {
-        return DSpaceRunnable.class;
+    public Class<ScriptConfiguration> getModelClass() {
+        return ScriptConfiguration.class;
     }
 }

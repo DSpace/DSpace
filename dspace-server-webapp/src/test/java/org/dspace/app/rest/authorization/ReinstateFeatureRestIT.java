@@ -7,22 +7,24 @@
  */
 package org.dspace.app.rest.authorization;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.dspace.app.rest.authorization.impl.ReinstateFeature;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
-import org.dspace.app.rest.builder.WorkflowItemBuilder;
-import org.dspace.app.rest.builder.WorkspaceItemBuilder;
-import org.dspace.app.rest.converter.ConverterService;
+import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.matcher.AuthorizationMatcher;
 import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.projection.DefaultProjection;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.utils.Utils;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.WorkflowItemBuilder;
+import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -46,7 +48,7 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
     private AuthorizationFeatureService authorizationFeatureService;
 
     @Autowired
-    private ConverterService converterService;
+    private ItemConverter itemConverter;
 
     @Autowired
     private ConfigurationService configurationService;
@@ -71,7 +73,7 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
         Item item = ItemBuilder.createItem(context, col).withTitle("Withdrawn item").withdrawn().build();
         context.restoreAuthSystemState();
 
-        ItemRest itemRest = converterService.toRest(item, converterService.getProjection(DefaultProjection.NAME));
+        ItemRest itemRest = itemConverter.convert(item, Projection.DEFAULT);
         String itemUri = utils.linkToSingleResource(itemRest, "self").getHref();
         Authorization authAdminWithdraw = new Authorization(admin, reinstateFeature, itemRest);
 
@@ -82,13 +84,14 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
                     .andExpect(jsonPath("$",
                             Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminWithdraw))));
 
-        getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", itemUri)
                 .param("eperson", admin.getID().toString())
                 .param("feature", reinstateFeature.getName()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$",
-                    Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminWithdraw))));
+            .andExpect(jsonPath("$._embedded.authorizations", contains(
+                    Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminWithdraw))))
+            );
     }
 
     @Test
@@ -100,7 +103,7 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
         Item item = ItemBuilder.createItem(context, col).withTitle("Withdrawn item").withdrawn().build();
         context.restoreAuthSystemState();
 
-        ItemRest itemRest = converterService.toRest(item, converterService.getProjection(DefaultProjection.NAME));
+        ItemRest itemRest = itemConverter.convert(item, Projection.DEFAULT);
         String itemUri = utils.linkToSingleResource(itemRest, "self").getHref();
         Authorization authAdminWithdraw = new Authorization(eperson, reinstateFeature, itemRest);
 
@@ -111,13 +114,14 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
                     .andExpect(jsonPath("$",
                             Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminWithdraw))));
 
-        getClient(comAdminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(comAdminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", itemUri)
                 .param("eperson", eperson.getID().toString())
                 .param("feature", reinstateFeature.getName()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$",
-                    Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminWithdraw))));
+            .andExpect(jsonPath("$._embedded.authorizations", contains(
+                    Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminWithdraw))))
+            );
 
         // verify that the property core.authorization.collection-admin.item.reinstatiate = false is respected
         // the community admins should be still authorized
@@ -127,13 +131,14 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$",
                         Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminWithdraw))));
 
-        getClient(comAdminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(comAdminToken).perform(get("/api/authz/authorizations/search/object")
             .param("uri", itemUri)
             .param("eperson", eperson.getID().toString())
             .param("feature", reinstateFeature.getName()))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$",
-                Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminWithdraw))));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.authorizations", contains(
+                        Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminWithdraw))))
+        );
 
         // now verify that the property core.authorization.community-admin.item.reinstatiate = false is respected
         // and also community admins are blocked
@@ -143,11 +148,11 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
         getClient(comAdminToken).perform(get("/api/authz/authorizations/" + authAdminWithdraw.getID()))
                     .andExpect(status().isNotFound());
 
-        getClient(comAdminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(comAdminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", itemUri)
                 .param("eperson", eperson.getID().toString())
                 .param("feature", reinstateFeature.getName()))
-            .andExpect(status().isNoContent());
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
@@ -159,7 +164,7 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
         Item item = ItemBuilder.createItem(context, col).withTitle("Withdrawn item").withdrawn().build();
         context.restoreAuthSystemState();
 
-        ItemRest itemRest = converterService.toRest(item, converterService.getProjection(DefaultProjection.NAME));
+        ItemRest itemRest = itemConverter.convert(item, Projection.DEFAULT);
         String itemUri = utils.linkToSingleResource(itemRest, "self").getHref();
         Authorization authAdminWithdraw = new Authorization(eperson, reinstateFeature, itemRest);
 
@@ -170,23 +175,24 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
                     .andExpect(jsonPath("$",
                             Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminWithdraw))));
 
-        getClient(colAdminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(colAdminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", itemUri)
                 .param("eperson", eperson.getID().toString())
                 .param("feature", reinstateFeature.getName()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$",
-                    Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminWithdraw))));
+            .andExpect(jsonPath("$._embedded.authorizations", contains(
+                    Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminWithdraw))))
+            );
         // verify that the property core.authorization.collection-admin.item.reinstatiate = false is respected
         configurationService.setProperty("core.authorization.collection-admin.item.reinstatiate", false);
         getClient(colAdminToken).perform(get("/api/authz/authorizations/" + authAdminWithdraw.getID()))
                     .andExpect(status().isNotFound());
 
-        getClient(colAdminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(colAdminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", itemUri)
                 .param("eperson", eperson.getID().toString())
                 .param("feature", reinstateFeature.getName()))
-            .andExpect(status().isNoContent());
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
@@ -197,7 +203,7 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
         Item item = ItemBuilder.createItem(context, col).withTitle("Withdrawn item").withdrawn().build();
         context.restoreAuthSystemState();
 
-        ItemRest itemRest = converterService.toRest(item, converterService.getProjection(DefaultProjection.NAME));
+        ItemRest itemRest = itemConverter.convert(item, Projection.DEFAULT);
         String itemUri = utils.linkToSingleResource(itemRest, "self").getHref();
         Authorization authEpersonWithdraw = new Authorization(eperson, reinstateFeature, itemRest);
         Authorization authAnonymousWithdraw = new Authorization(null, reinstateFeature, itemRest);
@@ -207,20 +213,20 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
         getClient(epersonToken).perform(get("/api/authz/authorizations/" + authEpersonWithdraw.getID()))
                     .andExpect(status().isNotFound());
 
-        getClient(epersonToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", itemUri)
                 .param("eperson", eperson.getID().toString())
                 .param("feature", reinstateFeature.getName()))
-            .andExpect(status().isNoContent());
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         // check the authorization for the anonymous user
         getClient().perform(get("/api/authz/authorizations/" + authAnonymousWithdraw.getID()))
                 .andExpect(status().isNotFound());
 
-        getClient().perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient().perform(get("/api/authz/authorizations/search/object")
             .param("uri", itemUri)
             .param("feature", reinstateFeature.getName()))
-        .andExpect(status().isNoContent());
+        .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
@@ -236,14 +242,11 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
         WorkflowItem wfItem = WorkflowItemBuilder.createWorkflowItem(context, col).withTitle("A workflow item").build();
         context.restoreAuthSystemState();
 
-        ItemRest archivedItemRest = converterService.toRest(archivedItem,
-                converterService.getProjection(DefaultProjection.NAME));
+        ItemRest archivedItemRest = itemConverter.convert(archivedItem, Projection.DEFAULT);
         String archivedItemUri = utils.linkToSingleResource(archivedItemRest, "self").getHref();
-        ItemRest wsItemRest = converterService.toRest(wsItem.getItem(),
-                converterService.getProjection(DefaultProjection.NAME));
+        ItemRest wsItemRest = itemConverter.convert(wsItem.getItem(), Projection.DEFAULT);
         String wsItemUri = utils.linkToSingleResource(wsItemRest, "self").getHref();
-        ItemRest wfItemRest = converterService.toRest(wfItem.getItem(),
-                converterService.getProjection(DefaultProjection.NAME));
+        ItemRest wfItemRest = itemConverter.convert(wfItem.getItem(), Projection.DEFAULT);
         String wfItemUri = utils.linkToSingleResource(wfItemRest, "self").getHref();
 
         Authorization authWithdrawnItem = new Authorization(admin, reinstateFeature, archivedItemRest);
@@ -254,28 +257,28 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
         getClient(adminToken).perform(get("/api/authz/authorizations/" + authWithdrawnItem.getID()))
                     .andExpect(status().isNotFound());
 
-        getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", archivedItemUri)
                 .param("eperson", eperson.getID().toString())
                 .param("feature", reinstateFeature.getName()))
-            .andExpect(status().isNoContent());
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         getClient(adminToken).perform(get("/api/authz/authorizations/" + authWsItem.getID()))
             .andExpect(status().isNotFound());
 
-        getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", wsItemUri)
                 .param("eperson", eperson.getID().toString())
                 .param("feature", reinstateFeature.getName()))
-            .andExpect(status().isNoContent());
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         getClient(adminToken).perform(get("/api/authz/authorizations/" + authWFItem.getID()))
             .andExpect(status().isNotFound());
 
-        getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", wfItemUri)
                 .param("eperson", eperson.getID().toString())
                 .param("feature", reinstateFeature.getName()))
-            .andExpect(status().isNoContent());
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 }

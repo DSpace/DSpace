@@ -12,10 +12,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
 
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -210,7 +210,7 @@ public class OpenSearchControllerIT extends AbstractControllerIntegrationTest {
                    .andExpect(xpath("OpenSearchDescription/LongName").string("DSpace at My University"))
                    .andExpect(xpath("OpenSearchDescription/Description")
                        .string("DSpace at My University DSpace repository")
-                   )
+        )
         ;
         /* Expected response for the service document is:
             <?xml version="1.0" encoding="UTF-8"?>

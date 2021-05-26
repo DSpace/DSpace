@@ -35,7 +35,6 @@ import org.dspace.identifier.ezid.Transform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Provide service for DOIs through DataCite using the EZID service.
@@ -148,6 +147,10 @@ public class EZIDIdentifierProvider
         throws IdentifierException {
         log.debug("register {}", dso);
 
+        if (!(dso instanceof Item)) {
+            // DOI are currently assigned only to Item
+            return null;
+        }
         DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
         List<MetadataValue> identifiers = dsoService.getMetadata(dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
         for (MetadataValue identifier : identifiers) {
@@ -171,6 +174,10 @@ public class EZIDIdentifierProvider
     public void register(Context context, DSpaceObject object, String identifier) {
         log.debug("register {} as {}", object, identifier);
 
+        if (!(object instanceof Item)) {
+            // DOI are currently assigned only to Item
+            return;
+        }
         EZIDResponse response;
         try {
             EZIDRequest request = requestFactory.getInstance(loadAuthority(),
@@ -598,7 +605,7 @@ public class EZIDIdentifierProvider
      *
      * @param aCrosswalk map of metadata fields to EZID keys
      */
-    @Required
+    @Autowired(required = true)
     public void setCrosswalk(Map<String, String> aCrosswalk) {
         crosswalk = aCrosswalk;
     }
@@ -625,7 +632,7 @@ public class EZIDIdentifierProvider
         this.DATACITE_XML_CROSSWALK = DATACITE_XML_CROSSWALK;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setRequestFactory(EZIDRequestFactory aRequestFactory) {
         requestFactory = aRequestFactory;
     }

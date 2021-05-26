@@ -12,13 +12,15 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -33,9 +35,13 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.services.ConfigurationService;
+import org.dspace.utils.DSpace;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -169,6 +175,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         // Below settings default to Full Admin Rights (but not Community Admin rights)
         // Allow full Admin perms
         when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
+        when(authorizeServiceSpy.isAdmin(context, eperson)).thenReturn(true);
 
         //Test that a full Admin can create a Community without a parent (Top-Level Community)
         Community created = communityService.create(null, context);
@@ -206,6 +213,14 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     public void testCreateWithValidHandle() throws Exception {
         // Allow full Admin perms
         when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
+        doReturn(true).when(authorizeServiceSpy).isAdmin(eq(context), any(EPerson.class));
+
+        // provide additional prefixes to the configuration in order to support them
+        final ConfigurationService configurationService = new DSpace().getConfigurationService();
+        String handleAdditionalPrefixes = configurationService.getProperty("handle.additional.prefixes");
+
+        try {
+        configurationService.setProperty("handle.additional.prefixes", "987654321");
 
         // test creating community with a specified handle which is NOT already in use
         // (this handle should not already be used by system, as it doesn't start with "1234567689" prefix)
@@ -214,6 +229,10 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         // check that community was created, and that its handle was set to proper value
         assertThat("testCreateWithValidHandle 0", created, notNullValue());
         assertThat("testCreateWithValidHandle 1", created.getHandle(), equalTo("987654321/100c"));
+
+        } finally {
+            configurationService.setProperty("handle.additional.prefixes", handleAdditionalPrefixes);
+        }
     }
 
 
@@ -298,20 +317,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     }
 
     /**
-     * Test of getMetadata method, of class Community.
-     */
-    @Test
-    public void testGetMetadata() {
-        //by default all empty values will return ""
-        assertThat("testGetMetadata 0", communityService.getMetadata(c, "name"), equalTo(""));
-        assertThat("testGetMetadata 1", communityService.getMetadata(c, "short_description"), equalTo(""));
-        assertThat("testGetMetadata 2", communityService.getMetadata(c, "introductory_text"), equalTo(""));
-        assertThat("testGetMetadata 4", communityService.getMetadata(c, "copyright_text"), equalTo(""));
-        assertThat("testGetMetadata 5", communityService.getMetadata(c, "side_bar_text"), equalTo(""));
-    }
-
-    /**
      * Test of setMetadata method, of class Community.
+     * @throws java.sql.SQLException if metadata cannot be set.
      */
     @Test
     public void testSetMetadata() throws SQLException {
@@ -321,17 +328,27 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         String copy = "copyright declaration";
         String sidebar = "side bar text";
 
-        communityService.setMetadata(context, c, "name", name);
-        communityService.setMetadata(context, c, "short_description", sdesc);
-        communityService.setMetadata(context, c, "introductory_text", itext);
-        communityService.setMetadata(context, c, "copyright_text", copy);
-        communityService.setMetadata(context, c, "side_bar_text", sidebar);
+        communityService.setMetadataSingleValue(context, c,
+                CommunityService.MD_NAME, null, name);
+        communityService.setMetadataSingleValue(context, c,
+                CommunityService.MD_SHORT_DESCRIPTION, null, sdesc);
+        communityService.setMetadataSingleValue(context, c,
+                CommunityService.MD_INTRODUCTORY_TEXT, null, itext);
+        communityService.setMetadataSingleValue(context, c,
+                CommunityService.MD_COPYRIGHT_TEXT, null, copy);
+        communityService.setMetadataSingleValue(context, c,
+                CommunityService.MD_SIDEBAR_TEXT, null, sidebar);
 
-        assertThat("testSetMetadata 0", communityService.getMetadata(c, "name"), equalTo(name));
-        assertThat("testSetMetadata 1", communityService.getMetadata(c, "short_description"), equalTo(sdesc));
-        assertThat("testSetMetadata 2", communityService.getMetadata(c, "introductory_text"), equalTo(itext));
-        assertThat("testSetMetadata 4", communityService.getMetadata(c, "copyright_text"), equalTo(copy));
-        assertThat("testSetMetadata 5", communityService.getMetadata(c, "side_bar_text"), equalTo(sidebar));
+        assertEquals("Name not set properly.", name,
+                communityService.getMetadataFirstValue(c, CommunityService.MD_NAME, Item.ANY));
+        assertEquals("Short description not set properly.", sdesc,
+                communityService.getMetadataFirstValue(c, CommunityService.MD_SHORT_DESCRIPTION, Item.ANY));
+        assertEquals("Introductory text not set properly.", itext,
+                communityService.getMetadataFirstValue(c, CommunityService.MD_INTRODUCTORY_TEXT, Item.ANY));
+        assertEquals("Copyright text not set properly.", copy,
+                communityService.getMetadataFirstValue(c, CommunityService.MD_COPYRIGHT_TEXT, Item.ANY));
+        assertEquals("Sidebar text not set properly.", sidebar,
+                communityService.getMetadataFirstValue(c, CommunityService.MD_SIDEBAR_TEXT, Item.ANY));
     }
 
     /**
@@ -580,7 +597,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     public void testGetAllCollections() throws Exception {
         //empty by default
         assertThat("testGetAllCollections 0", communityService.getAllCollections(context, c), notNullValue());
-        assertTrue("testGetAllCollections 1", communityService.getAllCollections(context, c).size() == 0);
+        assertTrue("testGetAllCollections 1", communityService.getAllCollections(context, c).isEmpty());
 
         //community has a collection and a subcommunity, subcommunity has a collection
         context.turnOffAuthorisationSystem();
@@ -602,6 +619,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     public void testCreateCollectionAuth() throws Exception {
         // Allow current Community ADD perms
         doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADD);
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADD, true);
 
         Collection result = collectionService.create(context, c);
         assertThat("testCreateCollectionAuth 0", result, notNullValue());
@@ -628,6 +646,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     public void testAddCollectionAuth() throws Exception {
         // Allow current Community ADD perms
         doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADD);
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADD, true);
 
         Collection col = collectionService.create(context, c);
         c.addCollection(col);
@@ -929,7 +948,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     @SuppressWarnings("ObjectEqualsNull")
     public void testEquals() throws SQLException, AuthorizeException {
         // Allow full Admin perms (just to create top-level community)
-        when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
+        doReturn(true).when(authorizeServiceSpy).isAdmin(eq(context));
+        doReturn(true).when(authorizeServiceSpy).isAdmin(eq(context), any(EPerson.class));
 
         assertFalse("testEquals 0", c.equals(null));
         assertFalse("testEquals 1", c.equals(communityService.create(null, context)));
@@ -1013,7 +1033,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
                    equalTo(c));
         assertThat("testGetAdminObject 1", (Community) communityService.getAdminObject(context, c, Constants.ADD),
                    equalTo(c));
-        assertThat("testGetAdminObject 2", communityService.getAdminObject(context, c, Constants.DELETE), nullValue());
+        assertThat("testGetAdminObject 2", (Community) communityService.getAdminObject(context, c, Constants.DELETE),
+                   equalTo(c));
         assertThat("testGetAdminObject 3", (Community) communityService.getAdminObject(context, c, Constants.ADMIN),
                    equalTo(c));
     }

@@ -27,7 +27,6 @@ public class RelationshipRest extends BaseObjectRest<Integer> {
     @JsonIgnore
     private UUID rightId;
 
-    private int relationshipTypeId;
     private RelationshipTypeRest relationshipType;
     private int leftPlace;
     private int rightPlace;
@@ -88,14 +87,6 @@ public class RelationshipRest extends BaseObjectRest<Integer> {
 
     public void setRightPlace(int rightPlace) {
         this.rightPlace = rightPlace;
-    }
-
-    public int getRelationshipTypeId() {
-        return relationshipTypeId;
-    }
-
-    public void setRelationshipTypeId(int relationshipTypeId) {
-        this.relationshipTypeId = relationshipTypeId;
     }
 
     public String getRightwardValue() {

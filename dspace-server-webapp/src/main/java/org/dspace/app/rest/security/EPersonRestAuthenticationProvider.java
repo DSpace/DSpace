@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.service.AuthorizeService;
@@ -46,6 +47,8 @@ import org.springframework.stereotype.Component;
 public class EPersonRestAuthenticationProvider implements AuthenticationProvider {
 
     private static final Logger log = LoggerFactory.getLogger(EPersonRestAuthenticationProvider.class);
+
+    public static final String MANAGE_ACCESS_GROUP = "MANAGE_ACCESS_GROUP";
 
     @Autowired
     private AuthenticationService authenticationService;
@@ -126,7 +129,7 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
             //Pass the eperson ID to the request service
             requestService.setCurrentUserId(ePerson.getID());
 
-            return new DSpaceAuthentication(ePerson, getGrantedAuthorities(context, ePerson));
+            return new DSpaceAuthentication(ePerson, getGrantedAuthorities(context));
 
         } else {
             log.info(
@@ -135,19 +138,26 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
         }
     }
 
-    public List<GrantedAuthority> getGrantedAuthorities(Context context, EPerson eperson) {
+    public List<GrantedAuthority> getGrantedAuthorities(Context context) {
         List<GrantedAuthority> authorities = new LinkedList<>();
-
+        EPerson eperson = context.getCurrentUser();
         if (eperson != null) {
             boolean isAdmin = false;
+            boolean isCommunityAdmin = false;
+            boolean isCollectionAdmin = false;
             try {
                 isAdmin = authorizeService.isAdmin(context, eperson);
+                isCommunityAdmin = authorizeService.isCommunityAdmin(context);
+                isCollectionAdmin = authorizeService.isCollectionAdmin(context);
             } catch (SQLException e) {
                 log.error("SQL error while checking for admin rights", e);
             }
 
             if (isAdmin) {
                 authorities.add(new SimpleGrantedAuthority(ADMIN_GRANT));
+            } else if ((isCommunityAdmin && AuthorizeUtil.canCommunityAdminManageAccounts())
+                       || (isCollectionAdmin && AuthorizeUtil.canCollectionAdminManageAccounts())) {
+                authorities.add(new SimpleGrantedAuthority(MANAGE_ACCESS_GROUP));
             }
 
             authorities.add(new SimpleGrantedAuthority(AUTHENTICATED_GRANT));

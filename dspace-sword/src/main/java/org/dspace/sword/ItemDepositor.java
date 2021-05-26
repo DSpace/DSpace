@@ -25,8 +25,9 @@ import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.purl.sword.base.Deposit;
 import org.purl.sword.base.ErrorCodes;
 import org.purl.sword.base.SWORDErrorException;
@@ -44,6 +45,9 @@ public class ItemDepositor extends Depositor {
     protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory
         .getInstance().getBitstreamFormatService();
 
+    private final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
+
     private Item item;
 
     public ItemDepositor(SWORDService swordService, DSpaceObject dso)
@@ -59,6 +63,7 @@ public class ItemDepositor extends Depositor {
         this.item = (Item) dso;
     }
 
+    @Override
     public DepositResult doDeposit(Deposit deposit)
         throws SWORDErrorException, DSpaceSWORDException {
         // get the things out of the service that we need
@@ -108,8 +113,8 @@ public class ItemDepositor extends Depositor {
                 // for a moment
                 context.turnOffAuthorisationSystem();
 
-                String bundleName = ConfigurationManager
-                    .getProperty("sword-server", "bundle.name");
+                String bundleName = configurationService
+                    .getProperty("sword-server.bundle.name");
                 if (StringUtils.isBlank(bundleName)) {
                     bundleName = "SWORD";
                 }
@@ -175,6 +180,7 @@ public class ItemDepositor extends Depositor {
         return result;
     }
 
+    @Override
     public void undoDeposit(DepositResult result) throws DSpaceSWORDException {
         try {
             SWORDContext sc = swordService.getSwordContext();

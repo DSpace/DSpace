@@ -13,10 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.Logger;
-import org.orcid.jaxb.model.record_v2.Person;
-import org.orcid.jaxb.model.search_v2.Result;
-import org.orcid.jaxb.model.search_v2.Search;
+import org.orcid.jaxb.model.v3.release.record.Person;
+import org.orcid.jaxb.model.v3.release.search.Result;
+import org.orcid.jaxb.model.v3.release.search.Search;
 import org.xml.sax.SAXException;
+
 
 /**
  * @author Antoine Snyers (antoine at atmire.com)
@@ -36,7 +37,7 @@ public class XMLtoBio extends Converter<List<Result>> {
         List<Result> bios = new ArrayList<>();
         try {
             Search search = (Search) unmarshall(xml, Search.class);
-            bios = search.getResult();
+            bios = search.getResults();
         } catch (SAXException | URISyntaxException e) {
             log.error(e);
         }
@@ -52,6 +53,7 @@ public class XMLtoBio extends Converter<List<Result>> {
         }
         return 0;
     }
+
     public Person convertSinglePerson(InputStream xml) {
         Person person = null;
         try {

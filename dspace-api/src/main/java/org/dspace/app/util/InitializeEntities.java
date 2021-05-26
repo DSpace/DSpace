@@ -18,10 +18,10 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,9 +48,9 @@ public class InitializeEntities {
 
     private final static Logger log = LogManager.getLogger();
 
-    private RelationshipTypeService relationshipTypeService;
-    private RelationshipService relationshipService;
-    private EntityTypeService entityTypeService;
+    private final RelationshipTypeService relationshipTypeService;
+    private final RelationshipService relationshipService;
+    private final EntityTypeService entityTypeService;
 
 
     private InitializeEntities() {
@@ -62,14 +62,14 @@ public class InitializeEntities {
     /**
      * The main method for this script
      *
-     * @param argv  The commandline arguments given with this command
+     * @param argv  The command line arguments given with this command
      * @throws SQLException         If something goes wrong with the database
      * @throws AuthorizeException   If something goes wrong with permissions
      * @throws ParseException       If something goes wrong with the parsing
      */
     public static void main(String[] argv) throws SQLException, AuthorizeException, ParseException {
         InitializeEntities initializeEntities = new InitializeEntities();
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
         Options options = createCommandLineOptions();
         CommandLine line = parser.parse(options,argv);
         String fileLocation = getFileLocationFromCommandLine(line);
@@ -146,6 +146,14 @@ public class InitializeEntities {
                         copyToRight = Boolean.valueOf(copyToRightNode.getTextContent());
                     }
 
+                    Node tiltedNode = eElement.getElementsByTagName("tilted").item(0);
+                    RelationshipType.Tilted tilted;
+                    if (tiltedNode == null) {
+                        tilted = RelationshipType.Tilted.NONE;
+                    } else {
+                        tilted = RelationshipType.Tilted.valueOf(tiltedNode.getTextContent().toUpperCase());
+                    }
+
                     NodeList leftCardinalityList = eElement.getElementsByTagName("leftCardinality");
                     NodeList rightCardinalityList = eElement.getElementsByTagName("rightCardinality");
 
@@ -170,7 +178,8 @@ public class InitializeEntities {
                     }
                     populateRelationshipType(context, leftType, rightType, leftwardType, rightwardType,
                                              leftCardinalityMin, leftCardinalityMax,
-                                             rightCardinalityMin, rightCardinalityMax, copyToLeft, copyToRight);
+                                             rightCardinalityMin, rightCardinalityMax, copyToLeft, copyToRight,
+                                             tilted);
 
 
                 }
@@ -190,7 +199,7 @@ public class InitializeEntities {
     private void populateRelationshipType(Context context, String leftType, String rightType, String leftwardType,
                                           String rightwardType, String leftCardinalityMin, String leftCardinalityMax,
                                           String rightCardinalityMin, String rightCardinalityMax,
-                                          Boolean copyToLeft, Boolean copyToRight)
+                                          Boolean copyToLeft, Boolean copyToRight, RelationshipType.Tilted tilted)
         throws SQLException, AuthorizeException {
 
         EntityType leftEntityType = entityTypeService.findByEntityType(context,leftType);
@@ -231,10 +240,11 @@ public class InitializeEntities {
             relationshipTypeService.create(context, leftEntityType, rightEntityType, leftwardType, rightwardType,
                                            leftCardinalityMinInteger, leftCardinalityMaxInteger,
                                            rightCardinalityMinInteger, rightCardinalityMaxInteger,
-                                           copyToLeft, copyToRight);
+                                           copyToLeft, copyToRight, tilted);
         } else {
             relationshipType.setCopyToLeft(copyToLeft);
             relationshipType.setCopyToRight(copyToRight);
+            relationshipType.setTilted(tilted);
             relationshipType.setLeftMinCardinality(leftCardinalityMinInteger);
             relationshipType.setLeftMaxCardinality(leftCardinalityMaxInteger);
             relationshipType.setRightMinCardinality(rightCardinalityMinInteger);

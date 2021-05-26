@@ -11,12 +11,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -228,6 +230,12 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Override
     public Iterator<Item> findBySubmitter(Context context, EPerson eperson) throws SQLException {
         return itemDAO.findBySubmitter(context, eperson);
+    }
+
+    @Override
+    public Iterator<Item> findBySubmitter(Context context, EPerson eperson, boolean retrieveAllItems)
+        throws SQLException {
+        return itemDAO.findBySubmitter(context, eperson, retrieveAllItems);
     }
 
     @Override
@@ -679,7 +687,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         // Remove relationships
         for (Relationship relationship : relationshipService.findByItem(context, item)) {
-            relationshipService.delete(context, relationship, false, false);
+            relationshipService.forceDelete(context, relationship, false, false);
         }
 
         // Remove bundles
@@ -1100,19 +1108,7 @@ prevent the generation of resource policy entry values with null dspace_object a
                 }
                 break;
             case Constants.DELETE:
-                if (item.getOwningCollection() != null) {
-                    if (AuthorizeConfiguration.canCollectionAdminPerformItemDeletion()) {
-                        adminObject = collection;
-                    } else if (AuthorizeConfiguration.canCommunityAdminPerformItemDeletion()) {
-                        adminObject = community;
-                    }
-                } else {
-                    if (AuthorizeConfiguration.canCollectionAdminManageTemplateItem()) {
-                        adminObject = collection;
-                    } else if (AuthorizeConfiguration.canCommunityAdminManageCollectionTemplateItem()) {
-                        adminObject = community;
-                    }
-                }
+                adminObject = item;
                 break;
             case Constants.WRITE:
                 // if it is a template item we need to check the
@@ -1334,42 +1330,59 @@ prevent the generation of resource policy entry values with null dspace_object a
     @Override
     public List<MetadataValue> getMetadata(Item item, String schema, String element, String qualifier, String lang,
                                            boolean enableVirtualMetadata) {
-        //Fields of the relation schema are virtual metadata
-        //except for relation.type which is the type of item in the model
-        if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName()) && !StringUtils.equals(element, "type")) {
-
-            List<RelationshipMetadataValue> relationMetadata = relationshipMetadataService
-                .getRelationshipMetadata(item, false);
-            List<MetadataValue> listToReturn = new LinkedList<>();
-            for (MetadataValue metadataValue : relationMetadata) {
-                if (StringUtils.equals(metadataValue.getMetadataField().getElement(), element)) {
-                    listToReturn.add(metadataValue);
-                }
-            }
-            listToReturn = sortMetadataValueList(listToReturn);
-
-            return listToReturn;
-
-        } else {
-            List<MetadataValue> dbMetadataValues = super.getMetadata(item, schema, element, qualifier, lang);
+        if (!enableVirtualMetadata) {
+            log.debug("Called getMetadata for " + item.getID() + " without enableVirtualMetadata");
+            return super.getMetadata(item, schema, element, qualifier, lang);
+        }
+        if (item.isModifiedMetadataCache()) {
+            log.debug("Called getMetadata for " + item.getID() + " with invalid cache");
+            //rebuild cache
+            List<MetadataValue> dbMetadataValues = item.getMetadata();
 
             List<MetadataValue> fullMetadataValueList = new LinkedList<>();
-            if (enableVirtualMetadata) {
-                fullMetadataValueList.addAll(relationshipMetadataService.getRelationshipMetadata(item, true));
-
-            }
+            fullMetadataValueList.addAll(relationshipMetadataService.getRelationshipMetadata(item, true));
             fullMetadataValueList.addAll(dbMetadataValues);
 
-            List<MetadataValue> finalList = new LinkedList<>();
-            for (MetadataValue metadataValue : fullMetadataValueList) {
-                if (match(schema, element, qualifier, lang, metadataValue)) {
-                    finalList.add(metadataValue);
-                }
-            }
-            finalList = sortMetadataValueList(finalList);
-            return finalList;
+            item.setCachedMetadata(sortMetadataValueList(fullMetadataValueList));
         }
 
+        log.debug("Called getMetadata for " + item.getID() + " based on cache");
+        // Build up list of matching values based on the cache
+        List<MetadataValue> values = new ArrayList<>();
+        for (MetadataValue dcv : item.getCachedMetadata()) {
+            if (match(schema, element, qualifier, lang, dcv)) {
+                values.add(dcv);
+            }
+        }
+
+        // Create an array of matching values
+        return values;
+    }
+
+    /**
+     * Supports moving metadata by adding the metadata value or updating the place of the relationship
+     */
+    @Override
+    protected void moveSingleMetadataValue(Context context, Item dso, int place, MetadataValue rr) {
+        if (rr instanceof RelationshipMetadataValue) {
+            try {
+                //Retrieve the applicable relationship
+                Relationship rs = relationshipService.find(context,
+                        ((RelationshipMetadataValue) rr).getRelationshipId());
+                if (rs.getLeftItem() == dso) {
+                    rs.setLeftPlace(place);
+                } else {
+                    rs.setRightPlace(place);
+                }
+                relationshipService.update(context, rs);
+            } catch (Exception e) {
+                //should not occur, otherwise metadata can't be updated either
+                log.error("An error occurred while moving " + rr.getAuthority() + " for item " + dso.getID(), e);
+            }
+        } else {
+            //just move the metadata
+            rr.setPlace(place);
+        }
     }
 
     /**
@@ -1392,6 +1405,26 @@ prevent the generation of resource policy entry values with null dspace_object a
         Stream<MetadataValue> metadataValueStream = listToReturn.stream().sorted(comparator);
         listToReturn = metadataValueStream.collect(Collectors.toList());
         return listToReturn;
+    }
+
+    @Override
+    public MetadataValue addMetadata(Context context, Item dso, String schema, String element, String qualifier,
+            String lang, String value, String authority, int confidence, int place) throws SQLException {
+
+        // We will not verify that they are valid entries in the registry
+        // until update() is called.
+        MetadataField metadataField = metadataFieldService.findByElement(context, schema, element, qualifier);
+        if (metadataField == null) {
+            throw new SQLException(
+                "bad_dublin_core schema=" + schema + "." + element + "." + qualifier + ". Metadata field does not " +
+                "exist!");
+        }
+
+        final Supplier<Integer> placeSupplier =  () -> place;
+
+        return addMetadata(context, dso, metadataField, lang, Arrays.asList(value),
+                Arrays.asList(authority), Arrays.asList(confidence), placeSupplier)
+                .stream().findFirst().orElse(null);
     }
 
 

@@ -35,7 +35,6 @@ public class DSpace401AuthenticationEntryPoint implements AuthenticationEntryPoi
         response.setHeader("WWW-Authenticate",
                 restAuthenticationService.getWwwAuthenticateHeaderValue(request, response));
 
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-                authException.getMessage());
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication is required");
     }
 }

@@ -14,8 +14,8 @@ import static org.mockito.Mockito.doReturn;
 
 import java.net.URI;
 
-import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.test.AbstractWebClientIntegrationTest;
+import org.dspace.builder.CommunityBuilder;
 import org.dspace.content.Community;
 import org.dspace.content.service.SiteService;
 import org.dspace.rdf.RDFUtil;

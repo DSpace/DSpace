@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<search:search num-found="1" xmlns:search="http://www.orcid.org/ns/search" xmlns:common="http://www.orcid.org/ns/common">
+    <search:result>
+        <common:orcid-identifier>
+            <common:uri>https://orcid.org/0000-0002-9029-1854</common:uri>
+            <common:path>0000-0002-9029-1854</common:path>
+            <common:host>orcid.org</common:host>
+        </common:orcid-identifier>
+    </search:result>
+</search:search>

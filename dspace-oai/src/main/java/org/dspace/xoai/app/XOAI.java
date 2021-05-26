@@ -30,8 +30,8 @@ import com.lyncode.xoai.dataprovider.xml.XmlOutputContext;
 import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
@@ -214,7 +214,7 @@ public class XOAI {
         try {
             SolrQuery params = new SolrQuery("item.willChangeStatus:true").addField("item.id");
             SolrDocumentList documents = DSpaceSolrSearch.query(solrServerResolver.getServer(), params);
-            List<Item> items = new LinkedList<Item>();
+            List<Item> items = new LinkedList<>();
             for (int i = 0; i < documents.getNumFound(); i++) {
                 Item item = itemService.find(context,
                         UUID.fromString((String) documents.get(i).getFieldValue("item.id")));
@@ -339,7 +339,7 @@ public class XOAI {
      * @throws SQLException
      */
     private Date getMostRecentModificationDate(Item item) throws SQLException {
-        List<Date> dates = new LinkedList<Date>();
+        List<Date> dates = new LinkedList<>();
         List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, item, Constants.READ);
         for (ResourcePolicy policy : policies) {
             if ((policy.getGroup() != null) && (policy.getGroup().getName().equals("Anonymous"))) {
@@ -563,7 +563,7 @@ public class XOAI {
         Context ctx = null;
 
         try {
-            CommandLineParser parser = new PosixParser();
+            CommandLineParser parser = new DefaultParser();
             Options options = new Options();
             options.addOption("c", "clear", false, "Clear index before indexing");
             options.addOption("o", "optimize", false,

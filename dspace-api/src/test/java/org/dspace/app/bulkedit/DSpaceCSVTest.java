@@ -8,7 +8,7 @@
 package org.dspace.app.bulkedit;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.io.BufferedWriter;
@@ -18,6 +18,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.junit.Test;
@@ -67,7 +68,7 @@ public class DSpaceCSVTest extends AbstractUnitTest {
             out = null;
 
             // Test the CSV parsing was OK
-            DSpaceCSV dcsv = new DSpaceCSV(new File(filename), context);
+            DSpaceCSV dcsv = new DSpaceCSV(FileUtils.openInputStream(new File(filename)), context);
             String[] lines = dcsv.getCSVLinesAsStringArray();
             assertThat("testDSpaceCSV Good CSV", lines.length, equalTo(8));
 
@@ -96,7 +97,7 @@ public class DSpaceCSVTest extends AbstractUnitTest {
 
             // Test the CSV parsing was OK
             try {
-                dcsv = new DSpaceCSV(new File(filename), context);
+                dcsv = new DSpaceCSV(FileUtils.openInputStream(new File(filename)), context);
                 lines = dcsv.getCSVLinesAsStringArray();
 
                 fail("An exception should have been thrown due to bad CSV");
@@ -124,7 +125,7 @@ public class DSpaceCSVTest extends AbstractUnitTest {
 
             // Test the CSV parsing was OK
             try {
-                dcsv = new DSpaceCSV(new File(filename), context);
+                dcsv = new DSpaceCSV(FileUtils.openInputStream(new File(filename)), context);
                 lines = dcsv.getCSVLinesAsStringArray();
 
                 fail("An exception should have been thrown due to bad CSV");

@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -25,6 +26,8 @@ import org.junit.Test;
  */
 public class RootRestResourceControllerIT extends AbstractControllerIntegrationTest {
 
+    private static final String ROOT_REST_SERVER_URL = "http://localhost/api";
+
     @Test
     public void serverPropertiesTest() throws Exception {
       //When we call the root endpoint
@@ -33,9 +36,9 @@ public class RootRestResourceControllerIT extends AbstractControllerIntegrationT
                    .andExpect(status().isOk())
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$.dspaceURL", Matchers.is("http://localhost:3000")))
+                   .andExpect(jsonPath("$.dspaceUI", Matchers.is("http://localhost:4000")))
                    .andExpect(jsonPath("$.dspaceName", Matchers.is("DSpace at My University")))
-                   .andExpect(jsonPath("$.dspaceRest", Matchers.is(BASE_REST_SERVER_URL)))
+                   .andExpect(jsonPath("$.dspaceServer", Matchers.is(BASE_REST_SERVER_URL)))
                    .andExpect(jsonPath("$.type", Matchers.is("root")));
     }
 
@@ -49,7 +52,8 @@ public class RootRestResourceControllerIT extends AbstractControllerIntegrationT
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
                    //Check that all required root links are present and that they are absolute
-                   .andExpect(jsonPath("$._links.authorities.href", startsWith(BASE_REST_SERVER_URL)))
+                   .andExpect(jsonPath("$._links.vocabularies.href", startsWith(BASE_REST_SERVER_URL)))
+                   .andExpect(jsonPath("$._links.vocabularyEntryDetails.href", startsWith(BASE_REST_SERVER_URL)))
                    .andExpect(jsonPath("$._links.bitstreamformats.href", startsWith(BASE_REST_SERVER_URL)))
                    .andExpect(jsonPath("$._links.bitstreams.href", startsWith(BASE_REST_SERVER_URL)))
                    .andExpect(jsonPath("$._links.browses.href", startsWith(BASE_REST_SERVER_URL)))
@@ -68,6 +72,7 @@ public class RootRestResourceControllerIT extends AbstractControllerIntegrationT
                    .andExpect(jsonPath("$._links.submissionuploads.href", startsWith(BASE_REST_SERVER_URL)))
                    .andExpect(jsonPath("$._links.workspaceitems.href", startsWith(BASE_REST_SERVER_URL)))
                    .andExpect(jsonPath("$._links.authn.href", startsWith(BASE_REST_SERVER_URL)))
+                   .andExpect(jsonPath("$._links.self.href", equalTo(ROOT_REST_SERVER_URL)))
         ;
     }
 

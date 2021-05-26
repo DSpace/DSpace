@@ -12,6 +12,8 @@ import java.sql.SQLException;
 import java.util.UUID;
 
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.app.util.AuthorizeUtil;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -44,6 +46,9 @@ public class GroupRestPermissionEvaluatorPlugin extends RestObjectPermissionEval
     @Autowired
     private EPersonService ePersonService;
 
+    @Autowired
+    AuthorizeService authorizeService;
+
     @Override
     public boolean hasDSpacePermission(Authentication authentication, Serializable targetId,
                                  String targetType, DSpaceRestPermission permission) {
@@ -57,14 +62,22 @@ public class GroupRestPermissionEvaluatorPlugin extends RestObjectPermissionEval
 
         Request request = requestService.getCurrentRequest();
         Context context = ContextUtil.obtainContext(request.getServletRequest());
-        EPerson ePerson = null;
+        EPerson ePerson = context.getCurrentUser();
         try {
-            ePerson = ePersonService.findByEmail(context, (String) authentication.getPrincipal());
             UUID dsoId = UUID.fromString(targetId.toString());
 
             Group group = groupService.find(context, dsoId);
 
-            if (groupService.isMember(context, ePerson, group)) {
+            // anonymous user
+            if (ePerson == null) {
+                return false;
+            } else if (groupService.isMember(context, ePerson, group)) {
+                return true;
+            } else if (authorizeService.isCommunityAdmin(context)
+                       && AuthorizeUtil.canCommunityAdminManageAccounts()) {
+                return true;
+            } else if (authorizeService.isCollectionAdmin(context)
+                    && AuthorizeUtil.canCollectionAdminManageAccounts()) {
                 return true;
             }
 

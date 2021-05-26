@@ -163,9 +163,10 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         }
     }
 
-    @SearchRestMethod(name = "findAuthorizedByCommunity")
-    public Page<CollectionRest> findAuthorizedByCommunity(
-        @Parameter(value = "uuid", required = true) UUID communityUuid, Pageable pageable) {
+    @SearchRestMethod(name = "findSubmitAuthorizedByCommunity")
+    public Page<CollectionRest> findSubmitAuthorizedByCommunity(
+        @Parameter(value = "uuid", required = true) UUID communityUuid, Pageable pageable,
+        @Parameter(value = "query") String q) {
         try {
             Context context = obtainContext();
             Community com = communityService.find(context, communityUuid);
@@ -174,20 +175,43 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
                     CommunityRest.CATEGORY + "." + CommunityRest.NAME + " with id: " + communityUuid
                         + " not found");
             }
-            List<Collection> collections = cs.findAuthorized(context, com, Constants.ADD);
-            return converter.toRestPage(utils.getPage(collections, pageable), utils.obtainProjection());
+            List<Collection> collections = cs.findCollectionsWithSubmit(q, context, com,
+                                              Math.toIntExact(pageable.getOffset()),
+                                              Math.toIntExact(pageable.getPageSize()));
+            int tot = cs.countCollectionsWithSubmit(q, context, com);
+            return converter.toRestPage(collections, pageable, tot , utils.obtainProjection());
+        } catch (SQLException | SearchServiceException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @SearchRestMethod(name = "findSubmitAuthorized")
+    public Page<CollectionRest> findSubmitAuthorized(@Parameter(value = "query") String q,
+                                                Pageable pageable) throws SearchServiceException {
+        try {
+            Context context = obtainContext();
+            List<Collection> collections = cs.findCollectionsWithSubmit(q, context, null,
+                                              Math.toIntExact(pageable.getOffset()),
+                                              Math.toIntExact(pageable.getPageSize()));
+            int tot = cs.countCollectionsWithSubmit(q, context, null);
+            return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
-    @SearchRestMethod(name = "findAuthorized")
-    public Page<CollectionRest> findAuthorized(Pageable pageable) {
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @SearchRestMethod(name = "findAdminAuthorized")
+    public Page<CollectionRest> findAdminAuthorized (
+        Pageable pageable, @Parameter(value = "query") String query) {
         try {
             Context context = obtainContext();
-            List<Collection> collections = cs.findAuthorizedOptimized(context, Constants.ADD);
-            return converter.toRestPage(utils.getPage(collections, pageable), utils.obtainProjection());
-        } catch (SQLException e) {
+            List<Collection> collections = authorizeService.findAdminAuthorizedCollection(context, query,
+                Math.toIntExact(pageable.getOffset()),
+                Math.toIntExact(pageable.getPageSize()));
+            long tot = authorizeService.countAdminAuthorizedCollection(context, query);
+            return converter.toRestPage(collections, pageable, tot , utils.obtainProjection());
+        } catch (SearchServiceException | SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -237,7 +261,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             }
             collection = cs.create(context, parent);
             cs.update(context, collection);
-            metadataConverter.setMetadata(context, collection, collectionRest.getMetadata());
+            metadataConverter.mergeMetadata(context, collection, collectionRest.getMetadata());
         } catch (SQLException e) {
             throw new RuntimeException("Unable to create new Collection under parent Community " + id, e);
         }
