@@ -34,7 +34,7 @@
         <property name="prefixToNamespaceMapping" ref="arxivBasePrefixToNamespaceMapping"/>
     </bean>
     <bean id="arxiv.identifier.other" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier.other"/>
+        <constructor-arg value="dc.identifier.arxiv"/>
     </bean>
 
 

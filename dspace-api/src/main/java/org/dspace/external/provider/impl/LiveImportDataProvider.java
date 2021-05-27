@@ -82,8 +82,9 @@ public class LiveImportDataProvider extends AbstractExternalDataProvider {
     @Override
     public Optional<ExternalDataObject> getExternalDataObject(String id) {
         try {
-            ExternalDataObject externalDataObject = getExternalDataObject(querySource.getRecord(id));
-            return Optional.of(externalDataObject);
+            ImportRecord record = querySource.getRecord(id);
+            ExternalDataObject externalDataObject = getExternalDataObject(record);
+            return Optional.ofNullable(externalDataObject);
         } catch (MetadataSourceException e) {
             throw new RuntimeException(
                     "The live import provider " + querySource.getImportSource() + " throws an exception", e);
@@ -127,9 +128,8 @@ public class LiveImportDataProvider extends AbstractExternalDataProvider {
      * @return
      */
     private ExternalDataObject getExternalDataObject(ImportRecord record) {
-        //return 400 if no record were found
-        if (record == null) {
-            throw new IllegalArgumentException("No record found for query or id");
+        if (record == null || getFirstValue(record, recordIdMetadata) == null) {
+            return null;
         }
         ExternalDataObject externalDataObject = new ExternalDataObject(sourceIdentifier);
         String id = getFirstValue(record, recordIdMetadata);
