@@ -7,18 +7,35 @@
  */
 package org.dspace.app.orcid.service.impl;
 
-import java.sql.SQLException;
-import java.util.List;
-import java.util.UUID;
+import static org.apache.commons.lang3.ArrayUtils.contains;
+import static org.dspace.app.profile.OrcidEntitySyncPreference.DISABLED;
+import static org.springframework.util.StringUtils.capitalize;
 
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.orcid.OrcidOperation;
 import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.dao.OrcidQueueDAO;
+import org.dspace.app.orcid.model.OrcidEntityType;
+import org.dspace.app.orcid.service.OrcidHistoryService;
 import org.dspace.app.orcid.service.OrcidQueueService;
+import org.dspace.app.profile.OrcidEntitySyncPreference;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataFieldName;
+import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.DiscoverResultItemIterator;
+import org.dspace.discovery.indexobject.IndexableItem;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -33,7 +50,16 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     private OrcidQueueDAO orcidQueueDAO;
 
     @Autowired
+    private OrcidHistoryService orcidHistoryService;
+
+    @Autowired
     private ItemService itemService;
+
+    @Autowired
+    private ChoiceAuthorityService choiceAuthorityService;
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     @Override
     public List<OrcidQueue> findByOwnerId(Context context, UUID ownerId) throws SQLException {
@@ -64,6 +90,16 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     @Override
     public List<OrcidQueue> findAll(Context context) throws SQLException {
         return orcidQueueDAO.findAll(context, OrcidQueue.class);
+    }
+
+    @Override
+    public OrcidQueue create(Context context, Item owner, Item entity) throws SQLException {
+        Optional<String> putCode = orcidHistoryService.findLastPutCode(context, owner, entity);
+        if (putCode.isPresent()) {
+            return createEntityUpdateRecord(context, owner, entity, putCode.get());
+        } else {
+            return createEntityInsertionRecord(context, owner, entity);
+        }
     }
 
     @Override
@@ -157,6 +193,14 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     }
 
     @Override
+    public void deleteByOwnerAndRecordType(Context context, Item owner, String recordType) throws SQLException {
+        List<OrcidQueue> records = orcidQueueDAO.findByOwnerAndRecordType(context, owner, recordType);
+        for (OrcidQueue record : records) {
+            orcidQueueDAO.delete(context, record);
+        }
+    }
+
+    @Override
     public OrcidQueue find(Context context, int id) throws SQLException {
         return orcidQueueDAO.findByID(context, OrcidQueue.class, id);
     }
@@ -164,6 +208,49 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     @Override
     public void update(Context context, OrcidQueue orcidQueue) throws SQLException {
         orcidQueueDAO.save(context, orcidQueue);
+    }
+
+    @Override
+    public void recalculateOrcidQueue(Context context, Item owner, OrcidEntityType orcidEntityType,
+        OrcidEntitySyncPreference preference) throws SQLException {
+
+        String entityType = capitalize(orcidEntityType.name().toLowerCase());
+        if (preference == DISABLED) {
+            deleteByOwnerAndRecordType(context, owner, entityType);
+        } else {
+            Iterator<Item> entities = findAllEntitiesLinkableWith(context, owner, entityType);
+            while (entities.hasNext()) {
+                create(context, owner, entities.next());
+            }
+        }
+
+    }
+
+    private Iterator<Item> findAllEntitiesLinkableWith(Context context, Item owner, String entityType) {
+
+        String ownerType = itemService.getMetadataFirstValue(owner, "dspace", "entity", "type", Item.ANY);
+
+        String query = choiceAuthorityService.getAuthorityControlledFieldsByEntityType(ownerType).stream()
+            .map(metadataField -> metadataField.replaceAll("_", "."))
+            .filter(metadataField -> shouldNotBeIgnoredForOrcid(metadataField))
+            .map(metadataField -> metadataField + "_allauthority: \"" + owner.getID().toString() + "\"")
+            .collect(Collectors.joining(" OR "));
+
+        if (StringUtils.isEmpty(query)) {
+            return Collections.emptyIterator();
+        }
+
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.addDSpaceObjectFilter(IndexableItem.TYPE);
+        discoverQuery.addFilterQueries(query);
+        discoverQuery.addFilterQueries("search.entitytype:" + entityType);
+
+        return new DiscoverResultItemIterator(context, discoverQuery);
+
+    }
+
+    private boolean shouldNotBeIgnoredForOrcid(String metadataField) {
+        return !contains(configurationService.getArrayProperty("orcid.linkable-metadata-fields.ignore"), metadataField);
     }
 
     private String getMetadataValue(Item item, String metadatafield) {
