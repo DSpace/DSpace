@@ -14,9 +14,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrServerException;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.Dataset;
 import org.dspace.statistics.content.filter.StatisticsFilter;
+import org.dspace.statistics.factory.StatisticsServiceFactory;
+import org.dspace.statistics.service.SolrLoggerService;
 
 /**
  * Encapsulates all data to render the statistics
@@ -29,12 +40,18 @@ public abstract class StatisticsDisplay {
     private String id;
     private StatisticsData statisticsData;
     private String title;
-
+    protected final SolrLoggerService solrLoggerService = StatisticsServiceFactory.getInstance().getSolrLoggerService();
+    protected final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+    protected final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    protected final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
     /**
      * css information used to position the display object in a html page
      **/
     private List<String> css;
-
 
     public void setTitle(String title) {
         this.title = title;
@@ -84,9 +101,10 @@ public abstract class StatisticsDisplay {
     }
 
     public Dataset getDataset(Context context, int facetMinCount) throws SQLException, SolrServerException, IOException,
-        ParseException {
+            ParseException {
         return statisticsData.createDataset(context, facetMinCount);
     }
+
 
     public void addCss(String style) {
         if (style != null) {

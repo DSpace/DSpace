@@ -7,6 +7,7 @@
  */
 package org.dspace.app.profile.service;
 
+import java.net.URI;
 import java.sql.SQLException;
 import java.util.UUID;
 
@@ -72,4 +73,14 @@ public interface ResearcherProfileService {
      */
     public void changeVisibility(Context context, ResearcherProfile profile, boolean visible)
         throws AuthorizeException, SQLException;
+
+    /**
+     * Claims and links an eperson to an existing DSpaceObject
+     * @param context the relevant DSpace Context.
+     * @param ePerson the ePerson
+     * @param uri uri of existing DSpaceObject to be linked to the eperson
+     * @return
+     */
+    ResearcherProfile claim(Context context, EPerson ePerson, URI uri)
+        throws SQLException, AuthorizeException, SearchServiceException;
 }

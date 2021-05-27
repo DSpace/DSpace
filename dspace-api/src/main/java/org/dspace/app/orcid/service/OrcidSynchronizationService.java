@@ -67,12 +67,15 @@ public interface OrcidSynchronizationService {
      * @param  profile                  the researcher profile to update
      * @param  entityType               the orcid entity type
      * @param  value                    the new synchronization preference value
+     * @return                          true if the value has actually been updated,
+     *                                  false if the value to be set is the same as
+     *                                  the one already configured
      * @throws SQLException             if a SQL error occurs during the profile
      *                                  update
      * @throws IllegalArgumentException if the given researcher profile is no linked
      *                                  with an ORCID account
      */
-    public void setEntityPreference(Context context, Item profile, OrcidEntityType entityType,
+    public boolean setEntityPreference(Context context, Item profile, OrcidEntityType entityType,
         OrcidEntitySyncPreference value) throws SQLException;
 
     /**
@@ -81,12 +84,15 @@ public interface OrcidSynchronizationService {
      * @param  context                  the relevant DSpace Context.
      * @param  profile                  the researcher profile to update
      * @param  value                    the new synchronization preference value
+     * @return                          true if the value has actually been updated,
+     *                                  false if the value to be set is the same as
+     *                                  the one already configured
      * @throws SQLException             if a SQL error occurs during the profile
      *                                  update
      * @throws IllegalArgumentException if the given researcher profile is no linked
      *                                  with an ORCID account
      */
-    public void setProfilePreference(Context context, Item profile,
+    public boolean setProfilePreference(Context context, Item profile,
         List<OrcidProfileSyncPreference> values) throws SQLException;
 
     /**
@@ -95,9 +101,12 @@ public interface OrcidSynchronizationService {
      * @param  context      the relevant DSpace Context.
      * @param  profile      the researcher profile to update
      * @param  value        the new synchronization mode value
+     * @return              true if the value has actually been updated, false if
+     *                      the value to be set is the same as the one already
+     *                      configured
      * @throws SQLException if a SQL error occurs during the profile update
      */
-    public void setSynchronizationMode(Context context, Item profile, OrcidSynchronizationMode value)
+    public boolean setSynchronizationMode(Context context, Item profile, OrcidSynchronizationMode value)
         throws SQLException;
 
     /**

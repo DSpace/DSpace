@@ -66,7 +66,9 @@ public class StatisticsRestRepository extends DSpaceRestRepository<UsageReportRe
     @PreAuthorize("hasPermission(#uri, 'usagereportsearch', 'READ')")
     @SearchRestMethod(name = "object")
     public Page<UsageReportRest> findByObject(@Parameter(value = "uri", required = true) String uri,
-            @Parameter(value = "category") String category, Pageable pageable) {
+            @Parameter(value = "category") String category, Pageable pageable,
+                                              @Parameter(value = "startDate") String startDate,
+                                              @Parameter(value = "endDate") String endDate) {
         UUID uuid = UUID.fromString(StringUtils.substringAfterLast(uri, "/"));
         List<UsageReportRest> usageReportsOfItem = null;
         try {
@@ -78,7 +80,7 @@ public class StatisticsRestRepository extends DSpaceRestRepository<UsageReportRe
             if (category != null && !usageReportUtils.categoryExists(dso, category)) {
                 throw new IllegalArgumentException("The specified category doesn't exists: " + category);
             }
-            usageReportsOfItem = usageReportUtils.getUsageReportsOfDSO(context, dso, category);
+            usageReportsOfItem = usageReportUtils.getUsageReportsOfDSO(context, dso, category, startDate, endDate);
         } catch (SQLException | ParseException | SolrServerException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

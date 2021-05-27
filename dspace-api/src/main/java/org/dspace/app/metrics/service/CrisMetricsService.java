@@ -59,11 +59,12 @@ public interface CrisMetricsService {
      * @param metricType      the CrisMetric type
      * @param resourceId      the uuid of an DSpace resource
      * @param startDate       date from which the period is to be extended
-     * @param piriod          period can be either a week or a month [week or month].
+     * @param period          period can be either a week or a month [week or month].
      * @return
      * @throws SQLException   if database error
      */
-    public Optional<CrisMetrics> getCrisMetricByPeriod(Context context, String metricType, UUID resourceId,
-           Date startDate,  String period) throws SQLException;
+    public Optional<CrisMetrics> getCrisMetricByPeriod(Context context,
+                                                       String metricType, UUID resourceId,
+                                                       Date startDate,  String period) throws SQLException;
 
 }
