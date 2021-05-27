@@ -541,12 +541,6 @@
 			<xsl:with-param name="elements" select="dim:field[@element='relation' and @qualifier='event'] "/>
 		</xsl:call-template>
 
-		<!-- relation.dossier row -->
-		<xsl:call-template name="render-normal-field">
-			<xsl:with-param name="name" select="'relation-dossier'"/>
-			<xsl:with-param name="elements" select="dim:field[@element='relation' and @qualifier='dossier'] "/>
-		</xsl:call-template>
-
 		<!-- originInfo row -->
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'originInfo'"/>

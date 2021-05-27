@@ -866,7 +866,6 @@
 		  	sedici.contributor.juror^0.1
 		  	dc.relation.isPartOf^0.1
 		  	sedici.relation.event^0.1
-		  	sedici.relation.dossier^0.1
 		  	sedici.identifier.handle^0.01
 		  	sedici.identifier.issn^0.01
 		  	sedici.identifier.isbn^0.01
@@ -892,7 +891,6 @@
 		  	sedici.contributor.juror^0.1
 		  	dc.relation.isPartOf^0.1
 		  	sedici.relation.event^0.1
-		  	sedici.relation.dossier^0.1
 		  	search_text^0.001
 		</str>
 		<str name="fl">
