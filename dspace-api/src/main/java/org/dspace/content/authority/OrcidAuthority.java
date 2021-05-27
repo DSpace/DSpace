@@ -13,7 +13,6 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.text.WordUtils.capitalizeFully;
 import static org.dspace.authority.service.AuthorityValueService.REFERENCE;
 import static org.dspace.authority.service.AuthorityValueService.SPLIT;
-import static org.dspace.content.authority.Choices.CF_AMBIGUOUS;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -65,7 +64,7 @@ public class OrcidAuthority extends ItemAuthority {
             int total = itemChoices.total + orcidChoices.total;
 
             Choice[] choices = addAll(itemChoices.values, orcidChoices.values);
-            return new Choices(choices, start, total, CF_AMBIGUOUS, total > (start + limit), 0);
+            return new Choices(choices, start, total, calculateConfidence(choices), total > (start + limit), 0);
 
         } catch (Exception ex) {
             LOGGER.error("An error occurs performing profiles search on ORCID registry", ex);
@@ -86,7 +85,7 @@ public class OrcidAuthority extends ItemAuthority {
             .map(this::convertToChoice)
             .toArray(Choice[]::new);
 
-        return new Choices(choices, start, total, CF_AMBIGUOUS, total > (start + rows), 0);
+        return new Choices(choices, start, total, calculateConfidence(choices), total > (start + rows), 0);
 
     }
 

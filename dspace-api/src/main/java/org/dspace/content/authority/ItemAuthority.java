@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
@@ -131,7 +132,7 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
             results = choiceList.toArray(results);
             long numFound = queryResponse.getResults().getNumFound();
 
-            return new Choices(results, start, (int) numFound, Choices.CF_AMBIGUOUS,
+            return new Choices(results, start, (int) numFound, calculateConfidence(results),
                                numFound > (start + limit), 0);
 
         } catch (Exception e) {
@@ -206,6 +207,10 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
         }
 
         return externalSource;
+    }
+
+    protected int calculateConfidence(Choice[] choices) {
+        return ArrayUtils.isNotEmpty(choices) ? Choices.CF_AMBIGUOUS : Choices.CF_UNSET;
     }
 
     private boolean hasValidExternalSource(String sourceIdentifier) {
