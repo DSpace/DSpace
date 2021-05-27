@@ -47,8 +47,9 @@ public class CrisMetricsMatcher {
 
     public static Matcher<? super Object> matchCrisDynamicMetrics(UUID itemUuid, String type) {
         return allOf(
-                hasJsonPath("$.id",
-                        itemUuid != null ? is(itemUuid.toString() + ":" + type) : Matchers.endsWith("-" + type)),
+                hasJsonPath("$.id", itemUuid != null ?
+                                        is(itemUuid.toString() + ":" + type) :
+                                        Matchers.endsWith("-" + type)),
                 hasJsonPath("$.metricType", is(type)), hasJsonPath("$.type", is(CrisMetricsRest.NAME)));
     }
 
@@ -57,5 +58,4 @@ public class CrisMetricsMatcher {
         String format = utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ"));
         return format;
     }
-
 }

@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocumentList;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.authority.factory.ItemAuthorityServiceFactory;
@@ -118,27 +119,30 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
 
         try {
             QueryResponse queryResponse = solr.query(solrQuery);
-            List<Choice> choiceList = queryResponse.getResults()
-                .stream()
-                .map(doc ->  {
-                    String title = ((ArrayList<String>) doc.getFieldValue("dc.title")).get(0);
-                    Map<String, String> extras = ItemAuthorityUtils.buildExtra(getPluginInstanceName(), doc);
-                    return new Choice((String) doc.getFieldValue("search.resourceid"),
-                        title,
-                        title, extras);
-                }).collect(Collectors.toList());
-
+            List<Choice> choiceList = getChoiceListFromQueryResults(queryResponse.getResults());
             Choice[] results = new Choice[choiceList.size()];
             results = choiceList.toArray(results);
             long numFound = queryResponse.getResults().getNumFound();
 
-            return new Choices(results, start, (int) numFound, calculateConfidence(results),
+            return new Choices(results, start, (int) numFound, Choices.CF_AMBIGUOUS,
                                numFound > (start + limit), 0);
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return new Choices(Choices.CF_UNSET);
         }
+    }
+
+    private List<Choice> getChoiceListFromQueryResults(SolrDocumentList results) {
+        return results
+        .stream()
+        .map(doc ->  {
+            String title = ((ArrayList<String>) doc.getFieldValue("dc.title")).get(0);
+            Map<String, String> extras = ItemAuthorityUtils.buildExtra(getPluginInstanceName(), doc);
+            return new Choice((String) doc.getFieldValue("search.resourceid"),
+                title,
+                title, extras);
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -207,6 +211,42 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
         }
 
         return externalSource;
+    }
+
+    @Override
+    public Map<String, String> getExtra(String key, String locale) {
+
+        SolrClient solr = searchService.getSolrSearchCore().getSolr();
+        if (Objects.isNull(solr)) {
+            log.error("unable to find solr instance");
+            return new HashMap<String, String>();
+        }
+
+        String entityType = getLinkedEntityType();
+
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setQuery("*:*");
+        solrQuery.addFilterQuery("search.resourceid:" + key);
+
+        customAuthorityFilters.stream()
+            .flatMap(caf -> caf.getFilterQueries(entityType).stream())
+            .forEach(solrQuery::addFilterQuery);
+
+        try {
+            QueryResponse queryResponse = solr.query(solrQuery);
+            List<Choice> choiceList = getChoiceListFromQueryResults(queryResponse.getResults());
+            if (choiceList.isEmpty()) {
+                log.warn("No documents found for key=" + key);
+                return new HashMap<String, String>();
+            }
+
+            return choiceList.iterator().next().extras;
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+
+        return new HashMap<String, String>();
     }
 
     protected int calculateConfidence(Choice[] choices) {

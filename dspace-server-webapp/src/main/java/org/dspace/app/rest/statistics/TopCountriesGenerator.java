@@ -36,10 +36,10 @@ public class TopCountriesGenerator extends AbstractTopSolrStatsFieldGenerator {
      * @param dso     DSO we want usage report of the TopCountries on the given DSO
      * @return Rest object containing the TopCountries usage report on the given DSO
      */
-    public UsageReportRest createUsageReport(Context context, DSpaceObject dso) {
+    public UsageReportRest createUsageReport(Context context, DSpaceObject dso, String startDate, String endDate) {
         Dataset dataset;
         try {
-            dataset = this.getTypeStatsDataset(context, dso, "countryCode", 1);
+            dataset = this.getTypeStatsDataset(context, dso, "countryCode", startDate, endDate);
         } catch (SQLException | IOException | ParseException | SolrServerException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -52,6 +52,7 @@ public class TopCountriesGenerator extends AbstractTopSolrStatsFieldGenerator {
         }
         return usageReportRest;
     }
+
 
     @Override
     public String getReportType() {

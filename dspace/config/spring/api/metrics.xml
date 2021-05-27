@@ -83,7 +83,10 @@
         <property name="hideNoMentions" value="${altmetric.hideNoMentions:#{null}}" />
         <property name="linkTarget" value="${altmetric.linkTarget:#{null}}" />
     </bean>
-
+    <bean class="org.dspace.metrics.embeddable.impl.DefaultViewEmbeddableMetricProvider">
+    </bean>
+    <bean class="org.dspace.metrics.embeddable.impl.DefaultDownloadEmbeddableProvider">
+    </bean>
     <!-- 
         VALIDATORS
      -->

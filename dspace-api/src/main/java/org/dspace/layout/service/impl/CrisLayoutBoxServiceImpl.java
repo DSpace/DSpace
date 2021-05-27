@@ -10,6 +10,7 @@ package org.dspace.layout.service.impl;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -284,7 +285,12 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
         if (box.getMetric2box().isEmpty()) {
             return false;
         }
-        final Set<String> boxTypes = box.getMetric2box().stream().map(mb -> mb.getType()).collect(Collectors.toSet());
+//        final Set<String> boxTypes = box.getMetric2box().stream().map(mb -> mb.getType()).collect(Collectors.toSet());
+        final Set<String> boxTypes = new HashSet<>();
+        box.getMetric2box().forEach(b -> {
+            boxTypes.add(b.getType());
+            crisMetricService.embeddableFallback(b.getType()).ifPresent(boxTypes::add);
+        });
         if (this.crisMetricService.getEmbeddableMetrics(context, itemUuid).stream()
             .filter(m -> boxTypes.contains(m.getMetricType())).count() > 0) {
             return true;
