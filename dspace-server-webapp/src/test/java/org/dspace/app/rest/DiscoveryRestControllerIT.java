@@ -1150,7 +1150,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         parentCommunity = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parentCommunity).build();
         ItemBuilder.createItem(context, collection)
-                .withAuthor("Atmire & friends")
+                .withAuthor("DSpace & friends")
                 .build();
 
         context.restoreAuthSystemState();
@@ -1164,7 +1164,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._embedded.facets", hasItem(allOf(
                         hasJsonPath("$.name", is("author")),
                         hasJsonPath("$._embedded.values", hasItem(
-                                hasJsonPath("$._links.search.href", containsString("Atmire%20%26%20friends"))
+                                hasJsonPath("$._links.search.href", containsString("DSpace%20%26%20friends"))
                         ))
                 ))));
     }
@@ -1177,7 +1177,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         parentCommunity = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parentCommunity).build();
         ItemBuilder.createItem(context, collection)
-                .withAuthor("Atmire & friends")
+                .withAuthor("DSpace & friends")
                 .build();
 
         context.restoreAuthSystemState();
@@ -1189,8 +1189,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                         .param("size", "20"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.entries", hasItem(allOf(
-                        hasJsonPath("$.value", is("Atmire & friends")),
-                        hasJsonPath("$._links.items.href", containsString("Atmire%20%26%20friends"))
+                        hasJsonPath("$.value", is("DSpace & friends")),
+                        hasJsonPath("$._links.items.href", containsString("DSpace%20%26%20friends"))
                 ))));
     }
 
