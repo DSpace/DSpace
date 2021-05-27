@@ -41,10 +41,18 @@ public class UsageReportUtils {
     private StatisticsReportsConfiguration configuration;
 
     public static final String TOTAL_VISITS_REPORT_ID = "TotalVisits";
+    public static final String TOTAL_VISITS_REPORT_ID_RELATION = "TotalVisitsRelation";
+    public static final String TOP_ITEMS_REPORT_RELATION = "TopItemsRelation";
+    public static final String TOTAL_DOWNLOADS_REPORT_ID_RELATION = "TotalDownloadsRelation";
+    public static final String TOTAL_VISITS_PER_MONTH_REPORT_ID_RELATION = "TotalVisitPerPeriodRelation";
     public static final String TOTAL_VISITS_PER_MONTH_REPORT_ID = "TotalVisitsPerMonth";
     public static final String TOTAL_DOWNLOADS_REPORT_ID = "TotalDownloads";
     public static final String TOP_COUNTRIES_REPORT_ID = "TopCountries";
+    public static final String TOP_COUNTRIES_REPORT_ID_RELATION = "TopCountriesRelation";
     public static final String TOP_CITIES_REPORT_ID = "TopCities";
+    public static final String TOP_CITIES_REPORT_ID_RELATION = "TopCitiesRelation";
+    public static final String TOTAL_VISITS_TOTAL_DOWNLOADS = "TotalVisitsAndDownloads";
+    public static final String TOTAL_VISITS_TOTAL_DOWNLOADS_RELATION = "TotalViewsDownloadsRelation";
 
     /**
      * Get list of usage reports that are applicable to the DSO (of given UUID)
@@ -54,7 +62,7 @@ public class UsageReportUtils {
      * @param category  if not null, limit the reports to the ones included in the specified category
      * @return List of usage reports, applicable to the given DSO
      */
-    public List<UsageReportRest> getUsageReportsOfDSO(Context context, DSpaceObject dso, String category)
+    public List<UsageReportRest> getUsageReportsOfDSO(Context context, DSpaceObject dso, String category, String startDate, String endDate)
         throws SQLException, ParseException, SolrServerException, IOException {
         List<UsageReportCategoryRest> categories = configuration.getCategories(dso);
         List<String> reportIds = new ArrayList();
@@ -64,7 +72,7 @@ public class UsageReportUtils {
                 for (Entry<String, UsageReportGenerator> entry : cat.getReports().entrySet()) {
                     if (!reportIds.contains(entry.getKey())) {
                         reportIds.add(entry.getKey());
-                        reports.add(createUsageReport(context, dso, entry.getKey()));
+                        reports.add(createUsageReport(context, dso, entry.getKey(), startDate, endDate));
                     }
                 }
             }
@@ -84,6 +92,7 @@ public class UsageReportUtils {
         }
         if (dso instanceof Item || dso instanceof Bitstream) {
             reports.add(TOTAL_DOWNLOADS_REPORT_ID);
+            reports.add(TOTAL_VISITS_TOTAL_DOWNLOADS);
         }
         return reports;
     }
@@ -111,10 +120,10 @@ public class UsageReportUtils {
      * @return Rest object containing the stat usage report, see {@link UsageReportRest}
      */
     public UsageReportRest createUsageReport(Context context, DSpaceObject dso, String reportId)
-        throws ParseException, SolrServerException, IOException {
+            throws ParseException, SolrServerException, IOException, SQLException {
         UsageReportGenerator generator = configuration.getReportGenerator(dso, reportId);
         if (generator != null) {
-            UsageReportRest usageReportRest = generator.createUsageReport(context, dso);
+            UsageReportRest usageReportRest = generator.createUsageReport(context, dso, null, null);
             usageReportRest.setId(dso.getID() + "_" + reportId);
             usageReportRest.setReportType(generator.getReportType());
             usageReportRest.setViewMode(generator.getViewMode());
@@ -125,7 +134,21 @@ public class UsageReportUtils {
                     + "TotalDownloads, TopCountries, TopCities");
         }
     }
-
+    public UsageReportRest createUsageReport(Context context, DSpaceObject dso, String reportId, String startDate, String endDate)
+            throws ParseException, SolrServerException, IOException, SQLException {
+        UsageReportGenerator generator = configuration.getReportGenerator(dso, reportId);
+        if (generator != null) {
+            UsageReportRest usageReportRest = generator.createUsageReport(context, dso, startDate, endDate);
+            usageReportRest.setId(dso.getID() + "_" + reportId);
+            usageReportRest.setReportType(generator.getReportType());
+            usageReportRest.setViewMode(generator.getViewMode());
+            return usageReportRest;
+        } else {
+            throw new ResourceNotFoundException("The given report id can't be resolved: " + reportId + "; "
+                    + "available reports: TotalVisits, TotalVisitsPerMonth, "
+                    + "TotalDownloads, TopCountries, TopCities");
+        }
+    }
     public boolean categoryExists(DSpaceObject dso, String category) {
         List<UsageReportCategoryRest> categories = configuration.getCategories(dso);
         if (categories != null) {
