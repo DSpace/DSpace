@@ -62,7 +62,9 @@ public class UsageReportUtils {
      * @param category  if not null, limit the reports to the ones included in the specified category
      * @return List of usage reports, applicable to the given DSO
      */
-    public List<UsageReportRest> getUsageReportsOfDSO(Context context, DSpaceObject dso, String category, String startDate, String endDate)
+    public List<UsageReportRest> getUsageReportsOfDSO(Context context,
+                                                      DSpaceObject dso, String category,
+                                                      String startDate, String endDate)
         throws SQLException, ParseException, SolrServerException, IOException {
         List<UsageReportCategoryRest> categories = configuration.getCategories(dso);
         List<String> reportIds = new ArrayList();
@@ -134,7 +136,8 @@ public class UsageReportUtils {
                     + "TotalDownloads, TopCountries, TopCities");
         }
     }
-    public UsageReportRest createUsageReport(Context context, DSpaceObject dso, String reportId, String startDate, String endDate)
+    public UsageReportRest createUsageReport(Context context, DSpaceObject dso, String reportId,
+                                             String startDate, String endDate)
             throws ParseException, SolrServerException, IOException, SQLException {
         UsageReportGenerator generator = configuration.getReportGenerator(dso, reportId);
         if (generator != null) {
