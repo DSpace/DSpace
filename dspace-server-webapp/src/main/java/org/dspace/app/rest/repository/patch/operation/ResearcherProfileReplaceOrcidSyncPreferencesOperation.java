@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.orcid.model.OrcidEntityType;
+import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.app.orcid.service.OrcidSynchronizationService;
 import org.dspace.app.profile.OrcidEntitySyncPreference;
 import org.dspace.app.profile.OrcidProfileSyncPreference;
@@ -27,6 +29,7 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -45,7 +48,7 @@ import org.springframework.stereotype.Component;
  * </code>
  */
 @Component
-public class ResearcherProfileReplaceOrcidSynchronizationOperation extends PatchOperation<ResearcherProfile> {
+public class ResearcherProfileReplaceOrcidSyncPreferencesOperation extends PatchOperation<ResearcherProfile> {
 
     private static final String OPERATION_ORCID_SYNCH = "/orcid";
 
@@ -63,42 +66,78 @@ public class ResearcherProfileReplaceOrcidSynchronizationOperation extends Patch
     @Autowired
     private OrcidSynchronizationService synchronizationService;
 
+    @Autowired
+    private ItemService itemService;
+
+    @Autowired
+    private OrcidQueueService orcidQueueService;
+
     @Override
     public ResearcherProfile perform(Context context, ResearcherProfile profile, Operation operation)
         throws SQLException {
 
         String path = StringUtils.removeStart(operation.getPath(), OPERATION_ORCID_SYNCH);
+        String value = getNewValueFromOperation(operation);
+
+        Item profileItem = profile.getItem();
+
+        context.turnOffAuthorisationSystem();
+
+        try {
+
+            boolean updated = updatePreferences(context, path, value, profileItem);
+
+            if (updated) {
+                reloadOrcidQueue(context, path, value, profileItem);
+            }
+
+            return profileService.findById(context, profile.getId());
+
+        } catch (AuthorizeException e) {
+            throw new RESTAuthorizationException(e);
+        } finally {
+            context.restoreAuthSystemState();
+        }
+
+    }
+
+    private String getNewValueFromOperation(Operation operation) {
         Object valueObject = operation.getValue();
         if (valueObject == null | !(valueObject instanceof String)) {
             throw new UnprocessableEntityException("The /orcid value must be a string");
         }
+        return (String) valueObject;
+    }
 
-        String value = (String) valueObject;
-
-        Item profileItem = profile.getItem();
-
+    private boolean updatePreferences(Context context, String path, String value, Item profileItem)
+        throws SQLException {
         switch (path) {
             case PUBLICATIONS_PREFERENCES:
-                synchronizationService.setEntityPreference(context, profileItem, PUBLICATION, parsePreference(value));
-                break;
+                OrcidEntitySyncPreference preference = parsePreference(value);
+                return synchronizationService.setEntityPreference(context, profileItem, PUBLICATION, preference);
             case FUNDINGS_PREFERENCES:
-                synchronizationService.setEntityPreference(context, profileItem, FUNDING, parsePreference(value));
-                break;
+                OrcidEntitySyncPreference fundingPreference = parsePreference(value);
+                return synchronizationService.setEntityPreference(context, profileItem, FUNDING, fundingPreference);
             case PROFILE_PREFERENCES:
-                synchronizationService.setProfilePreference(context, profileItem, parseProfilePreferences(value));
-                break;
+                List<OrcidProfileSyncPreference> profilePreferences = parseProfilePreferences(value);
+                return synchronizationService.setProfilePreference(context, profileItem, profilePreferences);
             case MODE_PREFERENCES:
-                synchronizationService.setSynchronizationMode(context, profileItem, parseMode(value));
-                break;
+                return synchronizationService.setSynchronizationMode(context, profileItem, parseMode(value));
             default:
                 throw new UnprocessableEntityException("Invalid path starting with " + OPERATION_ORCID_SYNCH);
         }
+    }
 
-        try {
-            return profileService.findById(context, profile.getId());
-        } catch (AuthorizeException e) {
-            throw new RESTAuthorizationException(e);
+    private void reloadOrcidQueue(Context context, String path, String value, Item profileItem)
+        throws SQLException, AuthorizeException {
+
+        if (path.equals(PUBLICATIONS_PREFERENCES) || path.equals(FUNDINGS_PREFERENCES)) {
+            OrcidEntitySyncPreference preference = parsePreference(value);
+            OrcidEntityType entityType = path.equals(PUBLICATIONS_PREFERENCES) ? PUBLICATION : FUNDING;
+            orcidQueueService.recalculateOrcidQueue(context, profileItem, entityType, preference);
         }
+
+        itemService.update(context, profileItem);
     }
 
     @Override

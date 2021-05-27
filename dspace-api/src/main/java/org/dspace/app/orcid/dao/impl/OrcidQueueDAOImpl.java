@@ -70,6 +70,14 @@ public class OrcidQueueDAOImpl extends AbstractHibernateDAO<OrcidQueue> implemen
     }
 
     @Override
+    public List<OrcidQueue> findByOwnerAndRecordType(Context context, Item owner, String type) throws SQLException {
+        Query query = createQuery(context, "FROM OrcidQueue WHERE owner = :owner AND recordType = :type");
+        query.setParameter("owner", owner);
+        query.setParameter("type", type);
+        return query.getResultList();
+    }
+
+    @Override
     public List<OrcidQueue> findByAttemptsLessThan(Context context, int attempts) throws SQLException {
         Query query = createQuery(context, "FROM OrcidQueue WHERE attempts IS NULL OR attempts < :attempts");
         query.setParameter("attempts", attempts);
