@@ -37,10 +37,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class CanClaimProfileIT extends AbstractControllerIntegrationTest {
 
-//    private Collection notClaimableCollection;
     private Item collectionAProfile;
     private Item collectionBProfile;
-//    private Item notClaimableCollectionProfile;
     private Item publication;
 
     @Autowired
@@ -74,8 +72,6 @@ public class CanClaimProfileIT extends AbstractControllerIntegrationTest {
             CollectionBuilder.createCollection(context, community).withEntityType("Person")
                              .withName("claimableB").build();
 
-//        notClaimableCollection = CollectionBuilder.createCollection(context, community).withEntityType("Person")
-//                                                  .withName("notClaimable").build();
         Collection publicationCollection =
             CollectionBuilder.createCollection(context, community).withEntityType("Publication")
                              .withName("notClaimable").build();
@@ -85,11 +81,7 @@ public class CanClaimProfileIT extends AbstractControllerIntegrationTest {
 
         publication = ItemBuilder.createItem(context, publicationCollection).build();
 
-//        notClaimableCollectionProfile = ItemBuilder.createItem(context, notClaimableCollection).build();
-
         configurationService.addPropertyValue("claimable.entityType", "Person");
-//        configurationService.addPropertyValue("claimable.collection.uuid", personCollection.getID().toString());
-//        configurationService.addPropertyValue("claimable.collection.uuid", claimableCollectionB.getID().toString());
 
         context.restoreAuthSystemState();
 
