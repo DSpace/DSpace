@@ -233,7 +233,7 @@ public class ItemConverter
         for (CrisLayoutBox box : boxes) {
             List<CrisLayoutField> crisLayoutFields = box.getLayoutFields();
             for (CrisLayoutField field : crisLayoutFields) {
-                if (field.getMetadataField().equals(metadataField)
+                if (metadataField.equals(field.getMetadataField())
                     && box.getSecurity() != LayoutSecurity.PUBLIC.getValue()) {
                     boxesWithMetadataField.add(box);
                 }
@@ -257,7 +257,8 @@ public class ItemConverter
             if (box.getSecurity() == LayoutSecurity.PUBLIC.getValue()) {
                 List<CrisLayoutField> crisLayoutFields = box.getLayoutFields();
                 for (CrisLayoutField field : crisLayoutFields) {
-                    publicMetadata.add(field.getMetadataField());
+                    Optional.ofNullable(field.getMetadataField())
+                            .ifPresent(publicMetadata::add);
                 }
             }
         }
