@@ -2193,7 +2193,6 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-originInfo">Origem</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-record-source">Os dados deste registro foram obtidos de</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-relation-book-title">Pertence a um livro</message>
-	<message key="xmlui.dri2xhtml.METS-1.0.item-relation-dossier">Dossiê</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-relation-event">Evento</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-relation-isPartOfSeries">Série</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-relation-journal">Revista</message>
