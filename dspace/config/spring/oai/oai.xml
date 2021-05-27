@@ -23,7 +23,7 @@
     <!--    <bean id="CCElementAdditional"-->
     <!--          class="org.dspace.xoai.app.CCElementAdditional"/>-->
     <bean id="xoaiCerifGenerator" class="org.dspace.xoai.app.XOAICerifItemCompilePlugin">
-        <property name="generator" value="xml-cerif"/>
+        <property name="generator" value="cerif-xml"/>
         <property name="fieldName" value="openaire"/>
     </bean>
 </beans>
