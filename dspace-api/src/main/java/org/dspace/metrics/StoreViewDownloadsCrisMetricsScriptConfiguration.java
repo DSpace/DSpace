@@ -47,14 +47,8 @@ public class StoreViewDownloadsCrisMetricsScriptConfiguration<T extends StoreVie
     @Override
     public Options getOptions() {
         if (options == null) {
-            Options options = new Options();
 
-            options.addOption("s", "service", true,
-                    "the name of the external service to use: scopus, wos, scopus-person, wos-person");
-            options.getOption("s").setType(String.class);
-            options.getOption("s").setRequired(true);
-
-            super.options = options;
+            super.options = new Options();
         }
         return options;
     }
