@@ -18,9 +18,7 @@ import org.dspace.app.rest.utils.UsageReportUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.handle.service.HandleService;
 import org.dspace.statistics.Dataset;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This report generator provides download data
@@ -28,10 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class TotalDownloadsGenerator extends TotalVisitGenerator {
-
-    @Autowired
-    private HandleService handleService;
-
     /**
      * Create a stat usage report for the amount of TotalDownloads on the files of an Item or of a Bitstream,
      * containing a point for each bitstream of the item that has been visited at least once or one point for the
@@ -45,15 +39,15 @@ public class TotalDownloadsGenerator extends TotalVisitGenerator {
      *                bitstream itself
      * @return Rest object containing the TotalDownloads usage report on the given Item/Bitstream
      */
-    public UsageReportRest createUsageReport(Context context, DSpaceObject dso) {
+    public UsageReportRest createUsageReport(Context context, DSpaceObject dso, String startDate, String endDate) {
         if (dso instanceof org.dspace.content.Bitstream) {
-            return super.createUsageReport(context, dso);
+            return super.createUsageReport(context, dso, startDate, endDate);
         }
 
         if (dso instanceof org.dspace.content.Item) {
             Dataset dataset;
             try {
-                dataset = this.getDSOStatsDataset(context, dso, 1, Constants.BITSTREAM);
+                dataset = this.getDSOStatsDataset(context, dso, Constants.BITSTREAM, startDate, endDate);
             } catch (SQLException | IOException | ParseException | SolrServerException e) {
                 throw new RuntimeException(e.getMessage(), e);
             }

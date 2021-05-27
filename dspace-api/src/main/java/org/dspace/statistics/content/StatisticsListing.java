@@ -7,7 +7,6 @@
  */
 package org.dspace.statistics.content;
 
-
 /**
  * Encapsulates all data to render the statistics as a list
  *
@@ -25,4 +24,6 @@ public class StatisticsListing extends StatisticsDisplay {
     public String getType() {
         return "listing";
     }
+
+
 }

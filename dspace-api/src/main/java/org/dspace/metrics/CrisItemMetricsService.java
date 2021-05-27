@@ -61,6 +61,14 @@ public interface CrisItemMetricsService {
     Optional<EmbeddableCrisMetrics> getEmbeddableById(Context context, String id) throws SQLException;
 
     /**
+     * Checks and return if a given metric type, has an embeddable fallback. I.e. metric type view
+     * has 'embedded-view' as embeddable fallback metric
+     * @param metricType
+     * @return
+     */
+    Optional<String> embeddableFallback(String metricType);
+
+    /**
      * find a {@link CrisMetrics} given a metricId
      * @param context
      * @param metricId

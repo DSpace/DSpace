@@ -70,6 +70,11 @@
         <property name="dspaceRunnableClass" value="org.dspace.metrics.UpdateCrisMetricsWithExternalSourceCli"/>
     </bean>
 
+    <bean id="store-metrics" class="org.dspace.metrics.StoreViewDownloadsCrisMetricsCliScriptConfiguration">
+        <property name="description" value="Perform the metrics storage"/>
+        <property name="dspaceRunnableClass" value="org.dspace.metrics.StoreViewDownloadsCrisMetricsCli"/>
+    </bean>
+
     <bean id="update-metrics-in-solr" class="org.dspace.metrics.UpdateCrisMetricsInSolrDocCliScriptConfiguration">
         <property name="description" value="Perform the metrics update in SOLR documents"/>
         <property name="dspaceRunnableClass" value="org.dspace.metrics.UpdateCrisMetricsInSolrDocCli"/>

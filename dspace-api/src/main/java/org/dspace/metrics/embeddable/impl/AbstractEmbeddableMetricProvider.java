@@ -83,6 +83,11 @@ public abstract class AbstractEmbeddableMetricProvider implements EmbeddableMetr
         return item.getID() + DYNAMIC_ID_SEPARATOR + this.getMetricType();
     }
 
+    @Override
+    public boolean fallbackOf(final String metricType) {
+        return false;
+    }
+
     public boolean isEnabled() {
         return enabled;
     }
