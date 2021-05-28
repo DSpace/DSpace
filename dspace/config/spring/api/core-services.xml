@@ -22,6 +22,7 @@
     <bean class="org.dspace.app.util.MetadataExposureServiceImpl"/>
     <bean class="org.dspace.app.util.OpenSearchServiceImpl"/>
     <bean class="org.dspace.app.util.WebAppServiceImpl"/>
+    <bean class="org.dspace.app.util.DSpaceObjectUtilsImpl"/>
 
     <bean class="org.dspace.authenticate.AuthenticationServiceImpl"/>
 

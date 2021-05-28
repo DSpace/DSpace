@@ -426,10 +426,9 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
                     service = (T) applicationContext.getBean(name, type);
                 } catch (BeansException e) {
                     // no luck, try the fall back option
-                    log.info(
+                    log.warn(
                         "Unable to locate bean by name or id={}."
-                                + " Will try to look up bean by type next."
-                                + " BeansException: {}", name, e.getMessage());
+                                + " Will try to look up bean by type next.", name, e);
                     service = null;
                 }
             } else {
@@ -438,9 +437,8 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
                     service = (T) applicationContext.getBean(type.getName(), type);
                 } catch (BeansException e) {
                     // no luck, try the fall back option
-                    log.info("Unable to locate bean by name or id={}."
-                            + " Will try to look up bean by type next."
-                            + " BeansException: {}", type.getName(), e.getMessage());
+                    log.warn("Unable to locate bean by name or id={}."
+                            + " Will try to look up bean by type next.", type.getName(), e);
                     service = null;
                 }
             }

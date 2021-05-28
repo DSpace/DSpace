@@ -82,7 +82,7 @@
         <Logger name='org.dspace.services'
                 level='ERROR'/>
         <Logger name='org.dspace.servicemanager'
-                level='ERROR'/>
+                level='WARN'/>
         <Logger name='org.dspace.providers'
                 level='ERROR'/>
         <Logger name='org.dspace.utils'
