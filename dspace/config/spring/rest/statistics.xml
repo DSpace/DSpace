@@ -325,8 +325,6 @@
                 <entry key="TopCitiesPersonResearchoutputs" value-ref="topCitiesGeneratorRelationPersonResearchoutputs"/>
                 <entry key="TopCountriesPersonResearchoutputs" value-ref="topCountriesGeneratorRelationPersonResearchoutputs"/>
                 <entry key="TotalVisitPerPeriodPersonResearchoutputs" value-ref="totalVisitPerPeriodGeneratorRelationPersonResearchoutputs"/>
-
-                <entry key="TotalVisits" value-ref="totalVisitGenerator"/>
             </map>
         </property>
     </bean>
