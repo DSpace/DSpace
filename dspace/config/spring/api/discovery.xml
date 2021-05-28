@@ -2250,7 +2250,6 @@
             <list>
                 <value>crispj.investigator</value>
                 <value>crispj.coinvestigators</value>
-                <value>oairecerif.fundingProgram</value>
             </list>
         </property>
         <property name="facetLimit" value="5"/>
