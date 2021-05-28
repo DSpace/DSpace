@@ -49,6 +49,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
@@ -2200,7 +2201,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
      */
     public void lookupScopusMetadataTest() throws Exception {
         ConfigurationService configService = DSpaceServicesFactory.getInstance().getConfigurationService();
-        String apikey = configService.getProperty("submission.lookup.scopus.apikey");
+        String apikey = configService.getProperty("scopus.apikey");
         context.turnOffAuthorisationSystem();
 
         //** GIVEN **
@@ -2222,33 +2223,35 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // create a list of values to use in add operation
         List<Map<String, String>> values = new ArrayList<Map<String, String>>();
         Map<String, String> value = new HashMap<String, String>();
-        value.put("value", "10.1016/j.joi.2016.11.006");
+        value.put("value", "2-s2.0-85009909030");
         values.add(value);
-        addId.add(new AddOperation("/sections/traditionalpageone/dc.identifier.doi", values));
+        addId.add(new AddOperation("/sections/traditionalpageone/dc.identifier.scopus", values));
 
         String patchBody = getPatchContent(addId);
 
-        if (apikey == null || apikey.equals("")) {
+        if (StringUtils.isBlank(apikey)) {
             getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                     .andExpect(status().isOk())
                     // testing lookup
-                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.doi'][0].value",
-                        is("10.1016/j.joi.2016.11.006")));
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.scopus'][0].value",
+                        is("2-s2.0-85009909030")));
 
                 // verify that the patch changes have been persisted
                 getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                     .andExpect(status().isOk())
                     // testing lookup
-                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.doi'][0].value",
-                        is("10.1016/j.joi.2016.11.006")));
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.scopus'][0].value",
+                        is("2-s2.0-85009909030")));
         } else {
             getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                     .andExpect(status().isOk())
                     // testing lookup
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.scopus'][0].value",
+                            is("2-s2.0-85009909030")))
                     .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.doi'][0].value",
                         is("10.1016/j.joi.2016.11.006")))
                     .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
@@ -2283,6 +2286,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                 .andExpect(status().isOk())
                 // testing lookup
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.scopus'][0].value",
+                        is("2-s2.0-85009909030")))
                 .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.doi'][0].value",
                         is("10.1016/j.joi.2016.11.006")))
                     .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
@@ -2323,8 +2328,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
      */
     public void lookupWOSMetadataTest() throws Exception {
         ConfigurationService configService = DSpaceServicesFactory.getInstance().getConfigurationService();
-        String wosUser = configService.getProperty("submission.lookup.webofknowledge.user");
-        String wosPassword = configService.getProperty("submission.lookup.webofknowledge.password");
+        String wosApiKey = configService.getProperty("wos.apiKey");
         context.turnOffAuthorisationSystem();
 
         //** GIVEN **
@@ -2352,7 +2356,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         String patchBody = getPatchContent(addId);
 
-        if (wosUser == null || wosUser.equals("") || wosPassword == null ||  wosPassword.equals("")) {
+        if (StringUtils.isBlank(wosApiKey)) {
             getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))

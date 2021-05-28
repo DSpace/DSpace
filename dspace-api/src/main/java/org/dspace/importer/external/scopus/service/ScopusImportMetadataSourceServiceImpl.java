@@ -214,8 +214,6 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
         public Integer call() throws Exception {
             String proxyHost = configurationService.getProperty("http.proxy.host");
             String proxyPort = configurationService.getProperty("http.proxy.port");
-//            String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
-//            String instKey = configurationService.getProperty("submission.lookup.scopus.instkey");
             if (StringUtils.isNotBlank(apiKey)) {
                 HttpGet method = null;
                 try {
@@ -285,9 +283,7 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
             String queryString = "EID(" + eid.replace("!", "/") + ")";
             String proxyHost = configurationService.getProperty("http.proxy.host");
             String proxyPort = configurationService.getProperty("http.proxy.port");
-//            String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
-//            String instKey = configurationService.getProperty("submission.lookup.scopus.instkey");
-            if (apiKey != null && !apiKey.equals("")) {
+            if (StringUtils.isNotBlank(apiKey)) {
                 HttpGet method = null;
                 try {
                     HttpClientBuilder hcBuilder = HttpClients.custom();
@@ -386,8 +382,6 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
             String proxyHost = configurationService.getProperty("http.proxy.host");
             String proxyPort = configurationService.getProperty("http.proxy.port");
-//            String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
-//            String instKey = configurationService.getProperty("submission.lookup.scopus.instkey");
             if (apiKey != null && !apiKey.equals("")) {
                 HttpGet method = null;
                 try {
@@ -464,8 +458,6 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
             Integer count = query.getParameterAsClass("count", Integer.class);
             String proxyHost = configurationService.getProperty("http.proxy.host");
             String proxyPort = configurationService.getProperty("http.proxy.port");
-//            String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
-//            String instKey = configurationService.getProperty("submission.lookup.scopus.instkey");
             if (apiKey != null && !apiKey.equals("")) {
                 HttpGet method = null;
                 try {
