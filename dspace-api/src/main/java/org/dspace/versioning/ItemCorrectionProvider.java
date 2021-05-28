@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * @author Giuseppe Digilio (giuseppe.digilio at 4science.it)
  */
+//FIXME be sure AbstractVersionProvider is not implementing ItemVersionProvider
 public class ItemCorrectionProvider extends AbstractVersionProvider {
 
     Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemCorrectionProvider.class);
@@ -66,10 +67,16 @@ public class ItemCorrectionProvider extends AbstractVersionProvider {
     public XmlWorkflowItem updateNativeItemWithCorrection(Context context, XmlWorkflowItem workflowItem,
             Item correctionItem, Item nativeItem) throws AuthorizeException, IOException, SQLException {
 
+        // save entity type
+        MetadataValue entityType = itemService.getMetadata(nativeItem, "dspace", "entity", "type", Item.ANY).get(0);
         // clear all metadata entries from native item
         itemService.clearMetadata(context, nativeItem, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
         // copy metadata from corrected item to native item
         copyMetadata(context, nativeItem, correctionItem);
+        // restore entity type
+        itemService.addMetadata(context, nativeItem, entityType.getMetadataField(), entityType.getLanguage(),
+                entityType.getValue(), entityType.getAuthority(), entityType.getConfidence());
+
         context.turnOffAuthorisationSystem();
         // copy bundles and bitstreams of native item
         updateBundlesAndBitstreams(context, correctionItem, nativeItem);

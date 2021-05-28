@@ -16,7 +16,6 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Collection;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.Relationship;
@@ -28,7 +27,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
@@ -86,29 +84,11 @@ public class ItemCorrectionService {
      */
     public WorkspaceItem createWorkspaceItemByItem(Context context, UUID itemUUID) throws Exception {
         WorkspaceItem wsi = null;
-        Collection collection = null;
 
         Item item = itemService.find(context, itemUUID);
 
         if (item != null) {
-            try {
-                final List<Collection> findAuthorizedOptimized = collectionService.findAuthorizedOptimized(context,
-                        Constants.ADD);
-                for (Collection itemCollection : item.getCollections()) {
-                    if (findAuthorizedOptimized.contains(itemCollection)) {
-                        collection = itemCollection;
-                        break;
-                    }
-                }
-
-                if (collection == null) {
-                    throw new AuthorizeException("No collection suitable for submission for the current user");
-                }
-
-                wsi = correctionItemProvider.createNewItemAndAddItInWorkspace(context, collection, item);
-            } catch (IOException | SQLException e) {
-                throw new RuntimeException(e.getMessage(), e);
-            }
+            wsi = correctionItemProvider.createNewItemAndAddItInWorkspace(context, item.getOwningCollection(), item);
         } else {
             throw new Exception("Item " + itemUUID + " is not found");
         }
