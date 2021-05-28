@@ -11,6 +11,7 @@ import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static java.util.Arrays.asList;
 import static java.util.UUID.fromString;
+import static org.dspace.app.matcher.LambdaMatcher.has;
 import static org.dspace.app.matcher.MetadataValueMatcher.with;
 import static org.dspace.app.profile.OrcidEntitySyncPreference.ALL;
 import static org.dspace.app.profile.OrcidEntitySyncPreference.MINE;
@@ -22,6 +23,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
@@ -33,6 +35,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -45,11 +48,13 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
 
 import com.jayway.jsonpath.JsonPath;
 import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.client.OrcidClient;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
+import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.app.orcid.webhook.OrcidWebhookServiceImpl;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.AddOperation;
@@ -57,6 +62,7 @@ import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.RemoveOperation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
@@ -69,6 +75,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.dspace.util.UUIDUtils;
+import org.junit.After;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -90,6 +97,9 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
     @Autowired
     private OrcidWebhookServiceImpl orcidWebhookService;
+
+    @Autowired
+    private OrcidQueueService orcidQueueService;
 
     private EPerson user;
 
@@ -127,11 +137,20 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .build();
 
         configurationService.setProperty("researcher-profile.collection.uuid", personCollection.getID().toString());
+        configurationService.setProperty("claimable.entityType", "Person");
 
         context.setCurrentUser(user);
 
         context.restoreAuthSystemState();
 
+    }
+
+    @After
+    public void after() throws SQLException, AuthorizeException {
+        List<OrcidQueue> records = orcidQueueService.findAll(context);
+        for (OrcidQueue record : records) {
+            orcidQueueService.delete(context, record);
+        }
     }
 
     /**
@@ -1884,6 +1903,259 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
     }
 
+    @Test
+    public void testOrcidSynchronizationPreferenceUpdateForceOrcidQueueRecalculation() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+            .withCanLogin(true)
+            .withOrcid("0000-1111-2222-3333")
+            .withOrcidAccessToken("3de2e370-8aa9-4bbe-8d7e-f5b1577bdad4")
+            .withOrcidRefreshToken("6b29a03d-f494-4690-889f-2c0ddf26b82d")
+            .withOrcidScope("/read")
+            .withOrcidScope("/write")
+            .withEmail("test@email.it")
+            .withPassword(password)
+            .withNameInMetadata("Test", "User")
+            .build();
+
+        UUID ePersonId = ePerson.getID();
+
+        Item profile = createProfile(ePerson);
+
+        UUID profileItemId = profile.getID();
+
+        Collection publications = createCollection("Publications", "Publication");
+
+        Item publication = createPublication(publications, "Test publication", profile);
+
+        Collection fundings = createCollection("Fundings", "Funding");
+
+        Item firstFunding = createFundingWithInvestigator(fundings, "First funding", profile);
+        Item secondFunding = createFundingWithCoInvestigator(fundings, "Second funding", profile);
+
+        context.restoreAuthSystemState();
+
+        // no preferences configured, so no orcid queue records created
+        assertThat(orcidQueueService.findByOwnerId(context, profileItemId), empty());
+
+        String authToken = getAuthToken(ePerson.getEmail(), password);
+
+        getClient(authToken).perform(patch("/api/cris/profiles/{id}", ePersonId.toString())
+            .content(getPatchContent(asList(new ReplaceOperation("/orcid/publications", "ALL"))))
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isOk());
+
+        List<OrcidQueue> queueRecords = orcidQueueService.findByOwnerId(context, profileItemId);
+        assertThat(queueRecords, hasSize(1));
+        assertThat(queueRecords, has(orcidQueueRecordWithEntity(publication)));
+
+        getClient(authToken).perform(patch("/api/cris/profiles/{id}", ePersonId.toString())
+            .content(getPatchContent(asList(new ReplaceOperation("/orcid/fundings", "ALL"))))
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isOk());
+
+        queueRecords = orcidQueueService.findByOwnerId(context, profileItemId);
+        assertThat(queueRecords, hasSize(3));
+        assertThat(queueRecords, has(orcidQueueRecordWithEntity(publication)));
+        assertThat(queueRecords, has(orcidQueueRecordWithEntity(firstFunding)));
+        assertThat(queueRecords, has(orcidQueueRecordWithEntity(secondFunding)));
+
+        getClient(authToken).perform(patch("/api/cris/profiles/{id}", ePersonId.toString())
+            .content(getPatchContent(asList(new ReplaceOperation("/orcid/publications", "DISABLED"))))
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isOk());
+
+        queueRecords = orcidQueueService.findByOwnerId(context, profileItemId);
+        assertThat(queueRecords, hasSize(2));
+        assertThat(queueRecords, has(orcidQueueRecordWithEntity(firstFunding)));
+        assertThat(queueRecords, has(orcidQueueRecordWithEntity(secondFunding)));
+
+        getClient(authToken).perform(patch("/api/cris/profiles/{id}", ePersonId.toString())
+            .content(getPatchContent(asList(new ReplaceOperation("/orcid/fundings", "DISABLED"))))
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isOk());
+
+        assertThat(orcidQueueService.findByOwnerId(context, profileItemId), empty());
+
+        configurationService.setProperty("orcid.linkable-metadata-fields.ignore", "crisfund.coinvestigators");
+
+        getClient(authToken).perform(patch("/api/cris/profiles/{id}", ePersonId.toString())
+            .content(getPatchContent(asList(new ReplaceOperation("/orcid/fundings", "ALL"))))
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isOk());
+
+        queueRecords = orcidQueueService.findByOwnerId(context, profileItemId);
+        assertThat(queueRecords, hasSize(1));
+        assertThat(queueRecords, has(orcidQueueRecordWithEntity(firstFunding)));
+
+        // verify that no ORCID queue recalculation is done if the preference does not change
+        getClient(authToken).perform(patch("/api/cris/profiles/{id}", ePersonId.toString())
+            .content(getPatchContent(asList(new ReplaceOperation("/orcid/fundings", "ALL"))))
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isOk());
+
+        List<OrcidQueue> newRecords = orcidQueueService.findByOwnerId(context, profileItemId);
+        assertThat(newRecords, hasSize(1));
+        assertThat(queueRecords.get(0).getID(), is(newRecords.get(0).getID()));
+
+    }
+
+    @Test
+    public void researcherProfileClaim() throws Exception {
+        String id = user.getID().toString();
+        String name = user.getName();
+
+        context.turnOffAuthorisationSystem();
+
+        final Item person = ItemBuilder.createItem(context, personCollection)
+                                      .withFullName("Doe, John")
+                                      .build();
+
+        final Item otherPerson = ItemBuilder.createItem(context, personCollection)
+                                       .withFullName("Smith, Jane")
+                                       .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(user.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/cris/profiles/")
+                                         .contentType(TEXT_URI_LIST)
+                                         .content("http://localhost:8080/server/api/core/items/" + person.getID().toString()))
+                            .andExpect(status().isCreated())
+                            .andExpect(jsonPath("$.id", is(id)))
+                            .andExpect(jsonPath("$.type", is("profile")))
+                            .andExpect(jsonPath("$",
+                                                matchLinks("http://localhost/api/cris/profiles/" + user.getID(), "item", "eperson")));
+
+        getClient(authToken).perform(get("/api/cris/profiles/{id}", id))
+                            .andExpect(status().isOk());
+
+        getClient(authToken).perform(get("/api/cris/profiles/{id}/item", id))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.type", is("item")))
+                            .andExpect(jsonPath("$.metadata", matchMetadata("cris.owner", name, id, 0)))
+                            .andExpect(jsonPath("$.metadata", matchMetadata("cris.sourceId", id, 0)))
+                            .andExpect(jsonPath("$.metadata", matchMetadata("dspace.entity.type", "Person", 0)));
+
+        getClient(authToken).perform(get("/api/cris/profiles/{id}/eperson", id))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.type", is("eperson")))
+                            .andExpect(jsonPath("$.name", is(name)));
+
+        // trying to claim another profile
+        getClient(authToken).perform(post("/api/cris/profiles/")
+                                         .contentType(TEXT_URI_LIST)
+                                         .content("http://localhost:8080/server/api/core/items/" + otherPerson.getID().toString()))
+                            .andExpect(status().isConflict());
+
+        // other person trying to claim same profile
+        context.turnOffAuthorisationSystem();
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withCanLogin(true)
+                                        .withEmail("foo@bar.baz")
+                                        .withPassword(password)
+                                        .withNameInMetadata("Test", "User")
+                                        .build();
+
+        context.restoreAuthSystemState();
+
+        final String ePersonToken = getAuthToken(ePerson.getEmail(), password);
+
+        getClient(ePersonToken).perform(post("/api/cris/profiles/")
+                                         .contentType(TEXT_URI_LIST)
+                                         .content("http://localhost:8080/server/api/core/items/" + person.getID().toString()))
+                            .andExpect(status().isBadRequest());
+
+        getClient(authToken).perform(delete("/api/cris/profiles/{id}", id))
+                            .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void claimForNotAllowedEntityType() throws Exception {
+        String id = user.getID().toString();
+        String name = user.getName();
+
+        context.turnOffAuthorisationSystem();
+
+        final Collection publications = CollectionBuilder.createCollection(context, parentCommunity)
+                                                        .withEntityType("Publication")
+                                                        .build();
+
+        final Item publication = ItemBuilder.createItem(context, publications)
+                                       .withTitle("title")
+                                       .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(user.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/cris/profiles/")
+                                         .contentType(TEXT_URI_LIST)
+                                         .content("http://localhost:8080/server/api/core/items/" + publication.getID().toString()))
+                            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testCloneFromExternalSourceRecordNotFound() throws Exception {
+
+        String authToken = getAuthToken(user.getEmail(), password);
+
+        getClient(authToken)
+            .perform(post("/api/cris/profiles/").contentType(TEXT_URI_LIST)
+                                                .content("http://localhost:8080/server/api/integration/externalsources/orcid/entryValues/FAKE"))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testCloneFromExternalSourceMultipleUri() throws Exception {
+
+        String authToken = getAuthToken(user.getEmail(), password);
+
+        getClient(authToken)
+            .perform(post("/api/cris/profiles/").contentType(TEXT_URI_LIST)
+                                                .content("http://localhost:8080/server/api/integration/externalsources/orcid/entryValues/id \n "
+                                                             + "http://localhost:8080/server/api/integration/externalsources/dspace/entryValues/id"))
+            .andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    public void testCloneFromExternalProfileAlreadyAssociated() throws Exception {
+
+        String id = user.getID().toString();
+        String authToken = getAuthToken(user.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/cris/profiles/").contentType(MediaType.APPLICATION_JSON_VALUE))
+                            .andExpect(status().isCreated()).andExpect(jsonPath("$.id", is(id.toString())))
+                            .andExpect(jsonPath("$.visible", is(false))).andExpect(jsonPath("$.type", is("profile")));
+
+        getClient(authToken)
+            .perform(post("/api/cris/profiles/").contentType(TEXT_URI_LIST)
+                                                .content("http://localhost:8080/server/api/integration/externalsources/orcid/entryValues/id"))
+            .andExpect(status().isConflict());
+    }
+
+    @Test
+    public void testCloneFromExternalCollectionNotSet() throws Exception {
+
+        configurationService.setProperty("researcher-profile.collection.uuid", "not-existing");
+        String id = user.getID().toString();
+        String authToken = getAuthToken(user.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/cris/profiles/").contentType(MediaType.APPLICATION_JSON_VALUE))
+                            .andExpect(status().isCreated()).andExpect(jsonPath("$.id", is(id.toString())))
+                            .andExpect(jsonPath("$.visible", is(false))).andExpect(jsonPath("$.type", is("profile")));
+
+        getClient(authToken)
+            .perform(post("/api/cris/profiles/").contentType(TEXT_URI_LIST)
+                                                .content("http://localhost:8080/server/api/integration/externalsources/orcid/entryValues/id \n "
+                                                             + "http://localhost:8080/server/api/integration/externalsources/dspace/entryValues/id"))
+            .andExpect(status().isBadRequest());
+    }
+
     private Item createProfile(EPerson ePerson) throws Exception {
 
         String authToken = getAuthToken(ePerson.getEmail(), password);
@@ -1929,9 +2201,42 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         context.restoreAuthSystemState();
     }
 
+    private Collection createCollection(String name, String entityType) throws SQLException {
+        return CollectionBuilder.createCollection(context, context.reloadEntity(parentCommunity))
+            .withName(name)
+            .withEntityType(entityType)
+            .build();
+    }
+
+    private Item createPublication(Collection collection, String title, Item author) {
+        return ItemBuilder.createItem(context, collection)
+            .withTitle(title)
+            .withAuthor(author.getName(), author.getID().toString())
+            .build();
+    }
+
+    private Item createFundingWithInvestigator(Collection collection, String title, Item investigator) {
+        return ItemBuilder.createItem(context, collection)
+            .withTitle(title)
+            .withFundingInvestigator(investigator.getName(), investigator.getID().toString())
+            .build();
+    }
+
+    private Item createFundingWithCoInvestigator(Collection collection, String title, Item investigator) {
+        return ItemBuilder.createItem(context, collection)
+            .withTitle(title)
+            .withFundingCoInvestigator(investigator.getName(), investigator.getID().toString())
+            .build();
+    }
+
+    private Predicate<OrcidQueue> orcidQueueRecordWithEntity(Item entity) {
+        return orcidQueue -> entity.equals(orcidQueue.getEntity());
+    }
+
     private OrcidTokenResponseDTO buildTokenResponse(String accessToken) {
         OrcidTokenResponseDTO response = new OrcidTokenResponseDTO();
         response.setAccessToken(accessToken);
         return response;
     }
+
 }

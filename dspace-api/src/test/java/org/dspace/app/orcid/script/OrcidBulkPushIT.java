@@ -60,12 +60,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Integration tests for {@link OrcidBulkSynchronization}.
+ * Integration tests for {@link OrcidBulkPush}.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public class OrcidBulkSynchronizationIT extends AbstractIntegrationTestWithDatabase {
+public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
 
     private Collection profileCollection;
 
@@ -445,7 +445,7 @@ public class OrcidBulkSynchronizationIT extends AbstractIntegrationTestWithDatab
     }
 
     private TestDSpaceRunnableHandler runBulkSynchronization(boolean forceSynchronization) throws Exception {
-        String[] args = new String[] { "orcid-bulk-synchronization" };
+        String[] args = new String[] { "orcid-bulk-push" };
         args = forceSynchronization ? ArrayUtils.add(args, "-f") : args;
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);

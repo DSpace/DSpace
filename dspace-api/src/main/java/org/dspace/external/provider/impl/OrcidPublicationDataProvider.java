@@ -61,6 +61,7 @@ import org.orcid.jaxb.model.v3.release.record.WorkContributors;
 import org.orcid.jaxb.model.v3.release.record.WorkTitle;
 import org.orcid.jaxb.model.v3.release.record.summary.WorkGroup;
 import org.orcid.jaxb.model.v3.release.record.summary.WorkSummary;
+import org.orcid.jaxb.model.v3.release.record.summary.Works;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,9 +113,8 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
         String[] idSections = id.split("::");
         String orcid = idSections[0];
         String putCode = idSections[1];
-        String accessToken = getAccessToken(orcid);
 
-        return orcidClient.getObject(accessToken, orcid, putCode, Work.class)
+        return getWork(orcid, putCode)
             .filter(work -> hasDifferentSourceClientId(work))
             .filter(work -> work.getPutCode() != null)
             .map(work -> convertToExternalDataObject(orcid, work));
@@ -122,8 +122,7 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
 
     @Override
     public List<ExternalDataObject> searchExternalDataObjects(String orcid, int start, int limit) {
-        String accessToken = getAccessToken(orcid);
-        return findWorks(accessToken, orcid, start, limit).stream()
+        return findWorks(orcid, start, limit).stream()
             .map(work -> convertToExternalDataObject(orcid, work))
             .collect(Collectors.toList());
     }
@@ -132,11 +131,75 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
         return StringUtils.isBlank(id) || id.split("::").length != 2;
     }
 
+    private List<Work> findWorks(String orcid, int start, int limit) {
+        List<WorkSummary> workSummaries = findWorkSummaries(orcid, start, limit);
+        return findWorks(orcid, workSummaries);
+    }
+
+    private List<WorkSummary> findWorkSummaries(String orcid, int start, int limit) {
+        return getWorks(orcid).getWorkGroup().stream()
+            .filter(workGroup -> allWorkSummariesHaveDifferentSourceClientId(workGroup))
+            .map(workGroup -> getPreferredWorkSummary(workGroup))
+            .flatMap(Optional::stream)
+            .skip(start)
+            .limit(limit > 0 ? limit : Long.MAX_VALUE)
+            .collect(Collectors.toList());
+    }
+
+    private List<Work> findWorks(String orcid, List<WorkSummary> workSummaries) {
+
+        List<String> workPutCodes = getPutCodes(workSummaries);
+
+        if (CollectionUtils.isEmpty(workPutCodes)) {
+            return emptyList();
+        }
+
+        if (workPutCodes.size() == 1) {
+            return getWork(orcid, workPutCodes.get(0)).stream().collect(Collectors.toList());
+        }
+
+        return partition(workPutCodes, MAX_PUT_CODES_SIZE).stream()
+            .map(putCodes -> getWorkBulk(orcid, putCodes))
+            .flatMap(workBulk -> getWorks(workBulk).stream())
+            .collect(Collectors.toList());
+    }
+
+    private Optional<Work> getWork(String orcid, String putCode) {
+        if (orcidConfiguration.isApiConfigured()) {
+            String accessToken = getAccessToken(orcid);
+            return orcidClient.getObject(accessToken, orcid, putCode, Work.class);
+        } else {
+            return orcidClient.getObject(orcid, putCode, Work.class);
+        }
+    }
+
+    private Works getWorks(String orcid) {
+        if (orcidConfiguration.isApiConfigured()) {
+            String accessToken = getAccessToken(orcid);
+            return orcidClient.getWorks(accessToken, orcid);
+        } else {
+            return orcidClient.getWorks(orcid);
+        }
+    }
+
+    private WorkBulk getWorkBulk(String orcid, List<String> putCodes) {
+        if (orcidConfiguration.isApiConfigured()) {
+            String accessToken = getAccessToken(orcid);
+            return orcidClient.getWorkBulk(accessToken, orcid, putCodes);
+        } else {
+            return orcidClient.getWorkBulk(orcid, putCodes);
+        }
+    }
+
     private String getAccessToken(String orcid) {
         Iterator<Item> iterator = orcidSynchronizationService.findProfilesByOrcid(new Context(), orcid);
         return Optional.ofNullable(iterator.hasNext() ? iterator.next() : null)
             .flatMap(item -> getAccessToken(item))
             .orElseGet(() -> getReadPublicAccessToken());
+    }
+
+    private Optional<String> getAccessToken(Item item) {
+        return ofNullable(itemService.getMetadataFirstValue(item, "cris", "orcid", "access-token", ANY));
     }
 
     private String getReadPublicAccessToken() {
@@ -148,45 +211,6 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
         readPublicAccessToken = accessTokenResponse.getAccessToken();
 
         return readPublicAccessToken;
-    }
-
-    private Optional<String> getAccessToken(Item item) {
-        return ofNullable(itemService.getMetadataFirstValue(item, "cris", "orcid", "access-token", ANY));
-    }
-
-    private List<Work> findWorks(String accessToken, String orcid, int start, int limit) {
-        List<WorkSummary> workSummaries = findWorkSummaries(accessToken, orcid, start, limit);
-        return findWorks(accessToken, orcid, workSummaries);
-    }
-
-    private List<WorkSummary> findWorkSummaries(String accessToken, String orcid, int start, int limit) {
-        return orcidClient.getWorks(accessToken, orcid).getWorkGroup().stream()
-            .filter(workGroup -> allWorkSummariesHaveDifferentSourceClientId(workGroup))
-            .map(workGroup -> getPreferredWorkSummary(workGroup))
-            .flatMap(Optional::stream)
-            .skip(start)
-            .limit(limit > 0 ? limit : Long.MAX_VALUE)
-            .collect(Collectors.toList());
-    }
-
-    private List<Work> findWorks(String accessToken, String orcid, List<WorkSummary> workSummaries) {
-
-        List<String> workPutCodes = getPutCodes(workSummaries);
-
-        if (CollectionUtils.isEmpty(workPutCodes)) {
-            return emptyList();
-        }
-
-        if (workPutCodes.size() == 1) {
-            String putCode = workPutCodes.get(0);
-            return orcidClient.getObject(accessToken, orcid, putCode, Work.class)
-                .stream().collect(Collectors.toList());
-        }
-
-        return partition(workPutCodes, MAX_PUT_CODES_SIZE).stream()
-            .map(putCodes -> orcidClient.getWorkBulk(accessToken, orcid, putCodes))
-            .flatMap(workBulk -> getWorks(workBulk).stream())
-            .collect(Collectors.toList());
     }
 
     private List<Work> getWorks(WorkBulk workBulk) {
@@ -248,8 +272,7 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
     }
 
     private boolean allWorkSummariesHaveDifferentSourceClientId(WorkGroup workGroup) {
-        return workGroup.getWorkSummary().stream()
-            .allMatch(this::hasDifferentSourceClientId);
+        return workGroup.getWorkSummary().stream().allMatch(this::hasDifferentSourceClientId);
     }
 
     @SuppressWarnings("deprecation")
@@ -417,7 +440,7 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
 
     @Override
     public int getNumberOfResults(String orcid) {
-        return findWorkSummaries(getAccessToken(orcid), orcid, 0, -1).size();
+        return findWorkSummaries(orcid, 0, -1).size();
     }
 
     public void setSourceIdentifier(String sourceIdentifier) {

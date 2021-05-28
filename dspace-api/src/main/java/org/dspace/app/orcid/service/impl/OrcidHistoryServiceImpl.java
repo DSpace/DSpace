@@ -183,7 +183,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         } catch (OrcidClientException ex) {
             return createHistoryRecordFromOrcidError(context, orcidQueue, operation, ex);
         } catch (RuntimeException ex) {
-            LOGGER.warn("An unexpected error occurs during the orcid synchronization", ex);
+            LOGGER.warn("An unexpected error occurs during the orcid synchronization of ORCID queue " + orcidQueue, ex);
             return createHistoryRecordFromGenericError(context, orcidQueue, operation, ex);
         }
 

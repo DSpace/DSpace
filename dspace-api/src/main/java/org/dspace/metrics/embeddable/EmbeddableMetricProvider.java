@@ -70,4 +70,11 @@ public interface EmbeddableMetricProvider {
      */
     String getId(Context context, Item item);
 
+    /**
+     * Returns if metric supplied by this provider is a fallback of
+     * type passed in input
+     * @param metricType
+     * @return
+     */
+    boolean fallbackOf(String metricType);
 }

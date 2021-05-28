@@ -158,7 +158,7 @@ public class XlsCollectionCrosswalkIT extends AbstractIntegrationTestWithDatabas
         String[] mainSheetFirstRow = { firstItemId, "doi:111.111/publication", "99999999",
             "111-222-333", "", "", "", "2049-3630", "", "", "", "http://localhost:4000/handle/123456789/001",
             "978-3-16-148410-0", "Test Publication", "Alternative publication title", "2020-01-01",
-            "Controlled Vocabulary for Resource Type Genres::text::review", "en$$2$$500", "test||export",
+            "Controlled Vocabulary for Resource Type Genres::text::review", "en", "test||export",
             "Description Abstract", "Published in publication", "ISBN-01", "doi:10.3972/test", "Journal", "", "", "",
             "", "", "", "", "", "", "", "The best Conference", "DataSet", "", "Description" };
         String[] mainSheetSecondRow = { secondItemId, "", "SCOPUS-002", "ISI-002", "", "",

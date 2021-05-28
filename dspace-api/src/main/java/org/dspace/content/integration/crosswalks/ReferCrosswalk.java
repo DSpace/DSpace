@@ -297,7 +297,9 @@ public class ReferCrosswalk implements ItemExportCrosswalk {
 
             List<String> metadataValues = getMetadataValuesForLine(context, templateLine, item);
             for (String metadataValue : metadataValues) {
-                appendLine(lines, templateLine, metadataValue);
+                if (isNotBlank(metadataValue)) {
+                    appendLine(lines, templateLine, metadataValue);
+                }
             }
         }
     }

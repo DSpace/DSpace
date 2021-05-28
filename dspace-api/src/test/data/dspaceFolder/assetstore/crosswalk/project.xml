@@ -5,12 +5,11 @@
 	<Identifier type="URL">www.project.test</Identifier>
 	<StartDate>2020-01-01</StartDate>
 	<EndDate>2020-12-31</EndDate>
-	<Status>OPEN</Status>
 	<Consortium>
 		<Coordinator>
 			<OrgUnit id="mock-id">
+                <Acronym>COU</Acronym>
 				<Name>Coordinator OrgUnit</Name>
-				<Acronym>COU</Acronym>
 			</OrgUnit>
 		</Coordinator>
 		<Partner>
@@ -29,11 +28,6 @@
 			<Person displayName="Second coinvestigator" />
 		</Member>
 	</Team>
-	<Uses>
-		<Equipment>
-			<Name>Test equipment</Name>
-		</Equipment>
-	</Uses>
 	<Funded>
 		<By>
 			<OrgUnit>
@@ -50,6 +44,12 @@
 	<Keyword>project</Keyword>
 	<Keyword>test</Keyword>
 	<Abstract>This is a project to test the export</Abstract>
+    <Status>OPEN</Status>
+    <Uses>
+        <Equipment>
+            <Name>Test equipment</Name>
+        </Equipment>
+    </Uses>
 	<OAMandate 
 		mandated="true" 
 		URL="oamandate-url" 

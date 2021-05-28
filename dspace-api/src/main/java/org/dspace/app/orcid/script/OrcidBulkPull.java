@@ -28,13 +28,13 @@ import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.utils.DSpace;
 
 /**
- * Script that simulates receiving an ORCID webhook callback to all profiles
- * with orcid or with both the orcid and the access token.
+ * Perform a bulk pull from the ORCID registry for all profiles with orcid or
+ * with both the orcid and the access token.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public class OrcidWebhookScript extends DSpaceRunnable<OrcidWebhookScriptConfiguration<OrcidWebhookScript>> {
+public class OrcidBulkPull extends DSpaceRunnable<OrcidBulkPullScriptConfiguration<OrcidBulkPull>> {
 
     private List<OrcidWebhookAction> orcidWebhookActions;
 
@@ -129,9 +129,9 @@ public class OrcidWebhookScript extends DSpaceRunnable<OrcidWebhookScriptConfigu
 
     @Override
     @SuppressWarnings("unchecked")
-    public OrcidWebhookScriptConfiguration<OrcidWebhookScript> getScriptConfiguration() {
-        return new DSpace().getServiceManager().getServiceByName("orcid-webhook",
-            OrcidWebhookScriptConfiguration.class);
+    public OrcidBulkPullScriptConfiguration<OrcidBulkPull> getScriptConfiguration() {
+        return new DSpace().getServiceManager().getServiceByName("orcid-bulk-pull",
+            OrcidBulkPullScriptConfiguration.class);
     }
 
 

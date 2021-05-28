@@ -14,10 +14,14 @@ import java.text.ParseException;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.discovery.configuration.DiscoveryConfiguration;
+import org.dspace.discovery.configuration.DiscoveryConfigurationService;
 import org.dspace.statistics.Dataset;
-import org.dspace.statistics.content.DatasetTypeGenerator;
-import org.dspace.statistics.content.StatisticsDataVisits;
-import org.dspace.statistics.content.StatisticsListing;
+import org.dspace.statistics.ObjectCount;
+import org.dspace.statistics.content.StatisticsDatasetDisplay;
+import org.dspace.statistics.factory.StatisticsServiceFactory;
+import org.dspace.statistics.service.SolrLoggerService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This report generator provides methods useful to build report around a solr stats field.
@@ -25,6 +29,9 @@ import org.dspace.statistics.content.StatisticsListing;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public abstract class AbstractTopSolrStatsFieldGenerator extends AbstractUsageReportGenerator {
+    protected final SolrLoggerService solrLoggerService = StatisticsServiceFactory.getInstance().getSolrLoggerService();
+    @Autowired
+    private DiscoveryConfigurationService discoveryConfigurationService;
     /**
      * Retrieves the stats dataset of a given dso, with a given axisType (example countryCode, city), which
      * corresponds to a solr field, and a given facetMinCount limit (usually either 0 or 1, 0 if we want a data point
@@ -34,16 +41,53 @@ public abstract class AbstractTopSolrStatsFieldGenerator extends AbstractUsageRe
      * @param dso            DSO we want the stats dataset of
      * @param typeAxisString String of the type we want on the axis of the dataset (corresponds to solr field),
      *                       examples: countryCode, city
-     * @param facetMinCount  Minimum amount of results on a facet data point for it to be added to dataset
+     * @param startDate      String to filter the start date of statistic
+     * @param endDate        String to filter the end date of statistic
      * @return Stats dataset with the given type on the axis, of the given DSO and with given facetMinCount
      */
-    Dataset getTypeStatsDataset(Context context, DSpaceObject dso, String typeAxisString, int facetMinCount)
-        throws SQLException, IOException, ParseException, SolrServerException {
-        StatisticsListing statListing = new StatisticsListing(new StatisticsDataVisits(dso));
-        DatasetTypeGenerator typeAxis = new DatasetTypeGenerator();
-        typeAxis.setType(typeAxisString);
-        typeAxis.setMax(getMaxResults());
-        statListing.addDatasetGenerator(typeAxis);
-        return statListing.getDataset(context, facetMinCount);
+
+    Dataset getTypeStatsDataset(Context context, DSpaceObject dso, String typeAxisString, String startDate,
+                                String endDate)
+            throws SQLException, IOException, ParseException, SolrServerException {
+        StatisticsDatasetDisplay statisticsDatasetDisplay = new StatisticsDatasetDisplay();
+        Dataset dataset;
+        String query = "";
+        boolean hasValidRelation = false;
+        if (getRelation() != null) {
+            DiscoveryConfiguration discoveryConfiguration = discoveryConfigurationService
+                                                                .getDiscoveryConfigurationByName(getRelation());
+            if (discoveryConfiguration == null) {
+                // not valid because not found bean with this relation configuration name
+                hasValidRelation = false;
+
+            } else {
+                hasValidRelation = true;
+                query = statisticsDatasetDisplay
+                            .composeQueryWithInverseRelation(dso, discoveryConfiguration.getDefaultFilterQueries());
+            }
+        }
+        if (!hasValidRelation) {
+            if (dso.getType() != -1) {
+                query += "type: " + dso.getType();
+            }
+            query += (query.equals("") ? "" : " AND ");
+            query += "id:" + dso.getID();
+        }
+        String filter_query = statisticsDatasetDisplay
+                                  .composeFilterQuery(startDate, endDate, hasValidRelation, dso.getType());
+        ObjectCount[] topCounts = solrLoggerService.queryFacetField(query, filter_query, typeAxisString,
+                getMaxResults(), false, null, 1);
+        dataset = new Dataset(1, topCounts.length);
+        for (int i = 0; i < topCounts.length; i++) {
+            ObjectCount count = topCounts[i];
+            dataset.setColLabel(i, statisticsDatasetDisplay
+                                       .getResultName(typeAxisString, count.getValue(),
+                                                      dso, dso.getType(), -1, context));
+            dataset.setColLabelAttr(i, statisticsDatasetDisplay
+                                           .getAttributes(count.getValue(),
+                                                          dso, dso.getType(), context));
+            dataset.addValueToMatrix(0, i, count.getCount());
+        }
+        return dataset;
     }
 }

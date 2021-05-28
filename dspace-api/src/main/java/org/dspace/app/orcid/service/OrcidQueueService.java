@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dspace.app.orcid.OrcidQueue;
+import org.dspace.app.orcid.model.OrcidEntityType;
+import org.dspace.app.profile.OrcidEntitySyncPreference;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -23,6 +25,19 @@ import org.dspace.core.Context;
  *
  */
 public interface OrcidQueueService {
+
+    /**
+     * Create an OrcidQueue record with the given owner and entity. The type of
+     * operation is calculated based on whether or not the given entity was already
+     * pushed to the ORCID registry.
+     *
+     * @param  context      DSpace context object
+     * @param  owner        the owner item
+     * @param  entity       the entity item
+     * @return              the stored record
+     * @throws SQLException if an SQL error occurs
+     */
+    public OrcidQueue create(Context context, Item owner, Item entity) throws SQLException;
 
     /**
      * Create an OrcidQueue record with the given owner and entity to push new data
@@ -199,6 +214,16 @@ public interface OrcidQueueService {
     public void deleteByEntityAndRecordType(Context context, Item entity, String recordType) throws SQLException;
 
     /**
+     * Delete all the OrcidQueue records with the given owner and record type.
+     *
+     * @param  context      DSpace context object
+     * @param  owner        the owner item
+     * @param  recordType   the record type
+     * @throws SQLException if database error occurs
+     */
+    public void deleteByOwnerAndRecordType(Context context, Item owner, String recordType) throws SQLException;
+
+    /**
      * Get an OrcidQueue from the database.
      *
      * @param  context      DSpace context object
@@ -216,4 +241,18 @@ public interface OrcidQueueService {
      * @throws SQLException       if database error
      */
     public void update(Context context, OrcidQueue orcidQueue) throws SQLException;
+
+    /**
+     * Recalculates the ORCID queue records linked to the given owner as regards the
+     * entities of the given type. The recalculation is done based on the preference
+     * indicated.
+     *
+     * @param  context      context
+     * @param  owner        the owner
+     * @param  entityType   the entity type related to the records to recalculate
+     * @param  preference   the preference value on which to base the recalculation
+     * @throws SQLException if database error
+     */
+    public void recalculateOrcidQueue(Context context, Item owner, OrcidEntityType entityType,
+        OrcidEntitySyncPreference preference) throws SQLException;
 }

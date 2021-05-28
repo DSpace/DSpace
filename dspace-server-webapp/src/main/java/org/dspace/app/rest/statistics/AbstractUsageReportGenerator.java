@@ -15,6 +15,7 @@ package org.dspace.app.rest.statistics;
 public abstract class AbstractUsageReportGenerator implements UsageReportGenerator {
     private String viewMode = "table";
     private int maxResults = 100;
+    private String relation;
 
     public void setViewMode(String viewMode) {
         this.viewMode = viewMode;
@@ -31,4 +32,13 @@ public abstract class AbstractUsageReportGenerator implements UsageReportGenerat
     public int getMaxResults() {
         return maxResults;
     }
+
+    public String getRelation() {
+        return relation;
+    }
+
+    public void setRelation(String relation) {
+        this.relation = relation;
+    }
 }
+

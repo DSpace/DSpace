@@ -46,6 +46,8 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,6 +63,8 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
     private OrcidQueueService orcidQueueService = OrcidServiceFactory.getInstance().getOrcidQueueService();
 
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
+    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     private Collection profileCollection;
 
@@ -637,13 +641,13 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         Item profile = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
+            .withOrcidSynchronizationFundingsPreference(ALL)
             .build();
 
         Collection fundingCollection = createCollection("Fundings", "Funding");
 
         ItemBuilder.createItem(context, fundingCollection)
             .withTitle("Test funding")
-            .withOrcidSynchronizationFundingsPreference(ALL)
             .withFundingInvestigator("Test User", profile.getID().toString())
             .build();
 
@@ -661,13 +665,13 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         Item profile = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
             .withOrcidIdentifier("0000-1111-2222-3333")
+            .withOrcidSynchronizationFundingsPreference(ALL)
             .build();
 
         Collection fundingCollection = createCollection("Fundings", "Funding");
 
         ItemBuilder.createItem(context, fundingCollection)
             .withTitle("Test funding")
-            .withOrcidSynchronizationFundingsPreference(ALL)
             .withFundingInvestigator("Test User", profile.getID().toString())
             .build();
 
@@ -762,6 +766,99 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         assertThat(queueRecords, hasItem(matches(secondProfile, secondPublication, "Publication", null, INSERT)));
         assertThat(queueRecords, hasItem(matches(firstProfile, thirdPublication, "Publication", null, INSERT)));
         assertThat(queueRecords, hasItem(matches(secondProfile, thirdPublication, "Publication", "12345", UPDATE)));
+    }
+
+    @Test
+    public void testOrcidQueueRecalculationOnProfilePreferenceUpdate() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item profile = ItemBuilder.createItem(context, profileCollection)
+            .withTitle("Test User")
+            .withOrcidIdentifier("0000-0000-0012-2345")
+            .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
+            .withSubject("Math")
+            .withOrcidSynchronizationProfilePreference(BIOGRAPHICAL)
+            .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        List<OrcidQueue> records = orcidQueueService.findAll(context);
+        assertThat(records, hasSize(1));
+        assertThat(records, hasItem(matches(profile, "KEYWORDS", null, "dc.subject::Math", "Math", INSERT)));
+
+        addMetadata(profile, "person", "identifier", "rid", "ID", null);
+        addMetadata(profile, "cris", "orcid", "sync-profile", IDENTIFIERS.name(), null);
+
+        context.commit();
+
+        records = orcidQueueService.findAll(context);
+        assertThat(records, hasSize(2));
+        assertThat(records, hasItem(matches(profile, "KEYWORDS", null, "dc.subject::Math", "Math", INSERT)));
+        assertThat(records, hasItem(matches(profile, "EXTERNAL_IDS", null, "person.identifier.rid::ID", "ID", INSERT)));
+
+        removeMetadata(profile, "cris", "orcid", "sync-profile");
+
+        context.commit();
+
+        assertThat(orcidQueueService.findAll(context), empty());
+
+    }
+
+    @Test
+    public void testWithMetadataFieldToIgnore() throws Exception {
+        configurationService.addPropertyValue("orcid.linkable-metadata-fields.ignore", "dc.contributor.author");
+        configurationService.addPropertyValue("orcid.linkable-metadata-fields.ignore", "crisfund.coinvestigators");
+
+        context.turnOffAuthorisationSystem();
+
+        Item profile = ItemBuilder.createItem(context, profileCollection)
+            .withTitle("Test User")
+            .withOrcidIdentifier("0000-0000-0012-2345")
+            .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
+            .withOrcidSynchronizationFundingsPreference(ALL)
+            .withOrcidSynchronizationPublicationsPreference(ALL)
+            .build();
+
+        Collection publicationCollection = createCollection("Publications", "Publication");
+
+        Item firstPublication = ItemBuilder.createItem(context, publicationCollection)
+            .withTitle("Another Test publication")
+            .withEditor("Test User", profile.getID().toString())
+            .build();
+
+        Item secondPublication = ItemBuilder.createItem(context, publicationCollection)
+            .withTitle("Another Test publication")
+            .withAuthor("Test User", profile.getID().toString())
+            .withEditor("Test User", profile.getID().toString())
+            .build();
+
+        ItemBuilder.createItem(context, publicationCollection)
+            .withTitle("Test publication")
+            .withAuthor("Test User", profile.getID().toString())
+            .build();
+
+        Collection fundingCollection = createCollection("Fundings", "Funding");
+
+        Item firstFunding = ItemBuilder.createItem(context, fundingCollection)
+            .withTitle("Test funding")
+            .withFundingInvestigator("Test User", profile.getID().toString())
+            .build();
+
+        ItemBuilder.createItem(context, fundingCollection)
+            .withTitle("Another funding")
+            .withFundingCoInvestigator("Test User", profile.getID().toString())
+            .build();
+
+        context.restoreAuthSystemState();
+
+        List<OrcidQueue> records = orcidQueueService.findAll(context);
+        assertThat(records, hasSize(3));
+        assertThat(records, hasItem(matches(profile, firstPublication, "Publication", null, INSERT)));
+        assertThat(records, hasItem(matches(profile, secondPublication, "Publication", null, INSERT)));
+        assertThat(records, hasItem(matches(profile, firstFunding, "Funding", null, INSERT)));
+
     }
 
     private void addMetadata(Item item, String schema, String element, String qualifier, String value,

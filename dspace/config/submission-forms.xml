@@ -179,6 +179,7 @@
           <repeatable>false</repeatable>
           <required>You must enter at least the affiliation.</required>
           <hint />
+          <style>col-xs-12 col-lg-6 order-0</style>
         </field>
         <field>
           <dc-schema>oairecerif</dc-schema>
@@ -189,6 +190,7 @@
           <repeatable>false</repeatable>
           <required />
           <hint />
+          <style>col-xs-12 col-lg-6 order-2</style>
         </field>
         <field>
           <dc-schema>oairecerif</dc-schema>
@@ -199,6 +201,7 @@
           <repeatable>false</repeatable>
           <required />
           <hint />
+          <style>col-xs-12 col-lg-6 order-3</style>
         </field>
         <field>
           <dc-schema>oairecerif</dc-schema>
@@ -209,6 +212,7 @@
           <repeatable>false</repeatable>
           <required />
           <hint />
+          <style>col-xs-12 col-lg-6 order-1</style>
         </field>
       </row>
     </form>
@@ -222,6 +226,7 @@
           <repeatable>false</repeatable>
           <required>You must enter at least the qualification title.</required>
           <hint />
+          <style>col-12</style>
         </field>
         <field>
           <dc-schema>crisrp</dc-schema>
@@ -232,6 +237,7 @@
           <repeatable>false</repeatable>
           <required />
           <hint />
+          <style>col-12 col-lg-6</style>
         </field>
         <field>
           <dc-schema>crisrp</dc-schema>
@@ -242,6 +248,7 @@
           <repeatable>false</repeatable>
           <required />
           <hint />
+          <style>col-12 col-lg-6</style>
         </field>
       </row>
     </form>
@@ -255,6 +262,7 @@
           <repeatable>false</repeatable>
           <required>You must enter at least the education title.</required>
           <hint />
+          <style>col-xs-12 col-lg-6 order-0</style>
         </field>
         <field>
           <dc-schema>crisrp</dc-schema>
@@ -265,6 +273,7 @@
           <repeatable>false</repeatable>
           <required />
           <hint />
+          <style>col-xs-12 col-lg-6 order-2</style>
         </field>
         <field>
           <dc-schema>crisrp</dc-schema>
@@ -275,6 +284,7 @@
           <repeatable>false</repeatable>
           <required />
           <hint />
+          <style>col-xs-12 col-lg-6 order-3</style>
         </field>
         <field>
           <dc-schema>crisrp</dc-schema>
@@ -285,6 +295,7 @@
           <repeatable>false</repeatable>
           <required />
           <hint />
+          <style>col-xs-12 col-lg-6 order-1</style>
         </field>
       </row>
     </form>
@@ -1297,6 +1308,7 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <repeatable>false</repeatable>
           <required />
           <hint />
+          <style>col-12 col-lg-6</style>
         </field>
         <field>
           <dc-schema>oairecerif</dc-schema>
@@ -1307,6 +1319,7 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <repeatable>false</repeatable>
           <required />
           <hint />
+          <style>col-12 col-lg-6</style>
         </field>
       </row>
       <row>

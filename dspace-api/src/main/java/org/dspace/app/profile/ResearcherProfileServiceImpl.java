@@ -12,14 +12,18 @@ import static org.dspace.core.Constants.READ;
 import static org.dspace.eperson.Group.ANONYMOUS;
 
 import java.io.IOException;
+import java.net.URI;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.exception.ResourceConflictException;
 import org.dspace.app.profile.service.AfterResearcherProfileCreationAction;
 import org.dspace.app.profile.service.ResearcherProfileService;
@@ -170,6 +174,48 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
             authorizeService.removeGroupPolicies(context, item, anonymous);
         }
 
+    }
+
+    @Override
+    public ResearcherProfile claim(final Context context, final EPerson ePerson, final URI uri)
+        throws SQLException, AuthorizeException, SearchServiceException {
+        Item profileItem = findResearcherProfileItemById(context, ePerson.getID());
+        if (profileItem != null) {
+            ResearcherProfile profile = new ResearcherProfile(profileItem);
+            throw new ResourceConflictException("A profile is already linked to the provided User", profile);
+        }
+
+        Collection collection = findProfileCollection(context);
+        if (collection == null) {
+            throw new IllegalStateException("No collection found for researcher profiles");
+        }
+
+        final String path = uri.getPath();
+        final UUID uuid = UUIDUtils.fromString(path.substring(path.lastIndexOf("/") + 1 ));
+        Item item = itemService.find(context, uuid);
+        if (Objects.isNull(item) || !item.isArchived() || item.isWithdrawn() || notClaimableEntityType(item)) {
+            throw new IllegalArgumentException("Provided uri does not represent a valid Item to be claimed");
+        }
+        final String existingOwner = itemService.getMetadataFirstValue(item, "cris", "owner",
+                                                                       null, null);
+
+        if (StringUtils.isNotBlank(existingOwner)) {
+            throw new IllegalArgumentException("Item with provided uri has already an owner");
+        }
+
+        context.turnOffAuthorisationSystem();
+        itemService.addMetadata(context, item, "cris", "owner", null, null, ePerson.getName(),
+                                ePerson.getID().toString(), CF_ACCEPTED);
+        itemService.addMetadata(context, item, "cris", "sourceId", null, null, ePerson.getID().toString());
+
+        context.restoreAuthSystemState();
+        return new ResearcherProfile(item);
+    }
+
+    private boolean notClaimableEntityType(final Item item) {
+        final String entityType = itemService.getEntityType(item);
+        return Arrays.stream(configurationService.getArrayProperty("claimable.entityType"))
+                     .noneMatch(entityType::equals);
     }
 
     private Item findResearcherProfileItemById(Context context, UUID id) throws SQLException, AuthorizeException {

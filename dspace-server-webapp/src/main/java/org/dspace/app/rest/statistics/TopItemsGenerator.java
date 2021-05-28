@@ -9,22 +9,29 @@ package org.dspace.app.rest.statistics;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.ParseException;
+import java.util.List;
+import java.util.UUID;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.rest.model.UsageReportPointDsoTotalVisitsRest;
 import org.dspace.app.rest.model.UsageReportRest;
 import org.dspace.app.rest.utils.UsageReportUtils;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.Site;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.handle.service.HandleService;
-import org.dspace.statistics.Dataset;
-import org.dspace.statistics.content.DatasetDSpaceObjectGenerator;
-import org.dspace.statistics.content.StatisticsDataVisits;
-import org.dspace.statistics.content.StatisticsListing;
+import org.dspace.discovery.configuration.DiscoveryConfiguration;
+import org.dspace.discovery.configuration.DiscoveryConfigurationService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.statistics.ObjectCount;
+import org.dspace.statistics.content.StatisticsDatasetDisplay;
+import org.dspace.statistics.factory.StatisticsServiceFactory;
+import org.dspace.statistics.service.SolrLoggerService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -33,47 +40,87 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class TopItemsGenerator extends AbstractUsageReportGenerator {
-
     @Autowired
-    private HandleService handleService;
-
+    private DiscoveryConfigurationService discoveryConfigurationService;
+    protected final SolrLoggerService solrLoggerService = StatisticsServiceFactory.getInstance().getSolrLoggerService();
+    protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected static final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
     /**
      * Create stat usage report of the items most popular over the entire site or a
      * specific community, collection
      *
-     * @param context DSpace context
-     * @param dso     DSO we want the stats dataset of
+     * @param context   DSpace context
+     * @param root      DSO we want the stats dataset of
+     * @param startDate String to filter the start date of statistic
+     * @param endDate   String to filter the end date of statistic
      * @return Usage report with top most popular items
      */
-    public UsageReportRest createUsageReport(Context context, DSpaceObject root) {
-        StatisticsListing statListing = new StatisticsListing(
-                new StatisticsDataVisits(root instanceof Site ? null : root));
-        // Adding a new generator for our top 10 items without a name length delimiter
-        DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
-        // TODO make max nr of top items (views wise)? Must be set
-        dsoAxis.addDsoChild(Constants.ITEM, 10, false, -1);
-        statListing.addDatasetGenerator(dsoAxis);
-        Dataset dataset;
+    public UsageReportRest createUsageReport(Context context, DSpaceObject root, String startDate, String endDate) {
         try {
-            dataset = statListing.getDataset(context, 1);
-            UsageReportRest usageReportRest = new UsageReportRest();
-            for (int i = 0; i < dataset.getColLabels().size(); i++) {
-                UsageReportPointDsoTotalVisitsRest totalVisitPoint = new UsageReportPointDsoTotalVisitsRest();
-                totalVisitPoint.setType("item");
-                String urlOfItem = dataset.getColLabelsAttrs().get(i).get("url");
-                if (urlOfItem != null) {
-                    String handle = StringUtils.substringAfterLast(urlOfItem, "handle/");
-                    if (handle != null) {
-                        DSpaceObject dso = handleService.resolveToObject(context, handle);
-                        totalVisitPoint.setId(dso != null ? dso.getID().toString() : urlOfItem);
-                        totalVisitPoint.setLabel(dso != null ? dso.getName() : urlOfItem);
-                        totalVisitPoint.addValue("views", Integer.valueOf(dataset.getMatrix()[0][i]));
-                        usageReportRest.addPoint(totalVisitPoint);
+            StatisticsDatasetDisplay statisticsDatasetDisplay = new StatisticsDatasetDisplay();
+            boolean hasValidRelation = false;
+            String query = "";
+            //if no relation property for generator
+            if (getRelation() != null) {
+                DiscoveryConfiguration discoveryConfiguration  = discoveryConfigurationService
+                                                                     .getDiscoveryConfigurationByName(getRelation());
+                if (discoveryConfiguration == null) {
+                    // not valid because not found bean with this relation configuration name
+                    hasValidRelation = false;
+
+                } else {
+                    hasValidRelation = true;
+                    query = statisticsDatasetDisplay
+                                .composeQueryWithInverseRelation(root,
+                                                                 discoveryConfiguration.getDefaultFilterQueries());
+                }
+            }
+            if (!hasValidRelation) {
+                query += "type: " + Constants.ITEM;
+                if (root != null) {
+                    if (!(root instanceof Site)) {
+                        query += " AND ";
+                        query += "id:" + root.getID() ;
                     }
                 }
             }
+            String filter_query = statisticsDatasetDisplay
+                                      .composeFilterQuery(startDate, endDate, hasValidRelation, Constants.ITEM);
+            ObjectCount[] topCounts = solrLoggerService.queryFacetField(query, filter_query, "id",
+                    getMaxResults(), false, null, 1);
+            UsageReportRest usageReportRest = new UsageReportRest();
+            // if no data
+            if (topCounts.length == 0) {
+                UsageReportPointDsoTotalVisitsRest totalVisitPoint = new UsageReportPointDsoTotalVisitsRest();
+                totalVisitPoint.addValue("views", 0);
+                totalVisitPoint.setType("item");
+                usageReportRest.addPoint(totalVisitPoint);
+            }
+            for (ObjectCount count : topCounts) {
+                String legacyNote = "";
+                String dsoId;
+                dsoId = UUID.fromString(count.getValue()).toString();
+                if (dsoId == null && root != null && !(root instanceof Site) && count.getValue() == null) {
+                    dsoId = root.getID().toString();
+                }
+                Item item = itemService.findByIdOrLegacyId(context, dsoId);
+                String name = "untitled";
+                List<MetadataValue> vals = itemService.getMetadata(item, "dc", "title", null, Item.ANY);
+                if (vals != null && 0 < vals.size()) {
+                    name = vals.get(0).getValue();
+                }
+                UsageReportPointDsoTotalVisitsRest totalVisitPoint = new UsageReportPointDsoTotalVisitsRest();
+                totalVisitPoint.setType("item");
+                if (item != null) {
+                    totalVisitPoint.setId(item.getID().toString());
+                    totalVisitPoint.setLabel(name + legacyNote);
+                    totalVisitPoint.addValue("views", (int) count.getCount());
+                    usageReportRest.addPoint(totalVisitPoint);
+                }
+            }
             return usageReportRest;
-        } catch (SQLException | SolrServerException | IOException | ParseException e) {
+        } catch (SQLException | SolrServerException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -82,4 +129,6 @@ public class TopItemsGenerator extends AbstractUsageReportGenerator {
     public String getReportType() {
         return UsageReportUtils.TOTAL_VISITS_REPORT_ID;
     }
+
+
 }

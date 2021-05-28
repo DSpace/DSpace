@@ -11,7 +11,9 @@ import static java.util.Comparator.comparing;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.orcid.service.MetadataSignatureGenerator;
@@ -38,7 +40,7 @@ import org.dspace.core.Context;
  */
 public class PlainMetadataSignatureGeneratorImpl implements MetadataSignatureGenerator {
 
-    private static final String SIGNATURE_SECTIONS_SEPARATOR = "/";
+    private static final String SIGNATURE_SECTIONS_SEPARATOR = "§§";
     private static final String METADATA_SECTIONS_SEPARATOR = "::";
 
     @Override
@@ -51,9 +53,9 @@ public class PlainMetadataSignatureGeneratorImpl implements MetadataSignatureGen
 
     @Override
     public List<MetadataValue> findBySignature(Context context, Item item, String signature) {
-        String[] signatureSections = getSignatureSections(signature);
-        return item.getMetadata().stream()
-            .filter(metadataValue -> matchSignature(context, metadataValue, signatureSections))
+        return getSignatureSections(signature)
+            .map(signatureSection -> findFirstBySignatureSection(context, item, signatureSection))
+            .flatMap(metadataValue -> metadataValue.stream())
             .collect(Collectors.toList());
     }
 
@@ -67,13 +69,18 @@ public class PlainMetadataSignatureGeneratorImpl implements MetadataSignatureGen
         }
     }
 
-    private boolean matchSignature(Context context, MetadataValue metadataValue, String[] signatureSections) {
-        return Arrays.stream(signatureSections)
-            .anyMatch(signatureSection -> generate(context, List.of(metadataValue)).equals(signatureSection));
+    private Optional<MetadataValue> findFirstBySignatureSection(Context context, Item item, String signatureSection) {
+        return item.getMetadata().stream()
+            .filter(metadataValue -> matchSignature(context, metadataValue, signatureSection))
+            .findFirst();
     }
 
-    private String[] getSignatureSections(String signature) {
-        return StringUtils.split(signature, SIGNATURE_SECTIONS_SEPARATOR);
+    private boolean matchSignature(Context context, MetadataValue metadataValue, String signatureSection) {
+        return generate(context, List.of(metadataValue)).equals(signatureSection);
+    }
+
+    private Stream<String> getSignatureSections(String signature) {
+        return Arrays.stream(StringUtils.split(signature, SIGNATURE_SECTIONS_SEPARATOR));
     }
 
     private String getField(MetadataValue metadataValue) {

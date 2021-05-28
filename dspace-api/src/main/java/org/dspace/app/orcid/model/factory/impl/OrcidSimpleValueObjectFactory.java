@@ -55,7 +55,7 @@ public class OrcidSimpleValueObjectFactory extends AbstractOrcidProfileSectionFa
     public Object create(Context context, List<MetadataValue> metadataValues) {
 
         if (CollectionUtils.isEmpty(metadataValues)) {
-            return null;
+            throw new IllegalArgumentException("No metadata values provided to create ORCID object with simple value");
         }
 
         if (metadataValues.size() > 1) {
@@ -83,10 +83,7 @@ public class OrcidSimpleValueObjectFactory extends AbstractOrcidProfileSectionFa
     @Override
     public String getDescription(Context context, Item item, String signature) {
         List<MetadataValue> metadataValues = metadataSignatureGenerator.findBySignature(context, item, signature);
-        if (CollectionUtils.isEmpty(metadataValues) || metadataValues.size() > 1) {
-            return null;
-        }
-        return metadataValues.get(0).getValue();
+        return CollectionUtils.isNotEmpty(metadataValues) ? metadataValues.get(0).getValue() : null;
     }
 
     protected Object create(Context context, MetadataValue metadataValue) {

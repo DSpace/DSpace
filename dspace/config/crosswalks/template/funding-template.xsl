@@ -128,7 +128,7 @@
 		<fo:block font-size="16pt" font-weight="bold" margin-top="8mm" >
 			<xsl:value-of select="$label" /> 
 		</fo:block>
-		<fo:block margin-bottom="2mm" margin-top="-4mm">
+		<fo:block>
 			<fo:leader leader-pattern="rule" leader-length="100%" rule-style="solid" />         
 		</fo:block>
 	</xsl:template>

@@ -7,6 +7,10 @@
  */
 package org.dspace.app.rest;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -14,6 +18,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.HashMap;
 import java.util.Map;
 
+import org.dspace.app.orcid.client.OrcidClient;
+import org.dspace.app.orcid.factory.OrcidServiceFactory;
+import org.dspace.app.orcid.factory.OrcidServiceFactoryImpl;
 import org.dspace.app.rest.matcher.ItemAuthorityMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
@@ -30,7 +37,9 @@ import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.orcid.jaxb.model.v3.release.search.expanded.ExpandedSearch;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -48,6 +57,22 @@ public class ItemAuthorityIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private ChoiceAuthorityService choiceAuthorityService;
+
+    @Autowired
+    private OrcidClient orcidClient;
+
+    private OrcidClient orcidClientMock = mock(OrcidClient.class);
+
+    @Before
+    public void setup() {
+        ((OrcidServiceFactoryImpl) OrcidServiceFactory.getInstance()).setOrcidClient(orcidClientMock);
+        when(orcidClientMock.expandedSearch(any(), anyInt(), anyInt())).thenReturn(new ExpandedSearch());
+    }
+
+    @After
+    public void after() {
+        ((OrcidServiceFactoryImpl) OrcidServiceFactory.getInstance()).setOrcidClient(orcidClient);
+    }
 
     @Test
     public void singleItemAuthorityTest() throws Exception {

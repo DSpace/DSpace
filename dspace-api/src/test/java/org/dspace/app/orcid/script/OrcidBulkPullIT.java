@@ -48,12 +48,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Integration tests for {@link OrcidWebhookScript}.
+ * Integration tests for {@link OrcidBulkPull}.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public class OrcidWebhookScriptIT extends AbstractIntegrationTestWithDatabase {
+public class OrcidBulkPullIT extends AbstractIntegrationTestWithDatabase {
 
     private OrcidPublicationLoader orcidPublicationLoader;
 
@@ -101,7 +101,7 @@ public class OrcidWebhookScriptIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
-    public void testWebhookScript() throws Exception {
+    public void testPull() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -181,7 +181,7 @@ public class OrcidWebhookScriptIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
-    public void testWebhookScriptWithError() throws Exception {
+    public void testPullWithError() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -259,7 +259,7 @@ public class OrcidWebhookScriptIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
-    public void testWebhookScriptWithOnlyLinkedOption() throws Exception {
+    public void testPullWithOnlyLinkedOption() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -316,7 +316,7 @@ public class OrcidWebhookScriptIT extends AbstractIntegrationTestWithDatabase {
     }
 
     private TestDSpaceRunnableHandler runWebhook(boolean onlyLinkedProfiles) throws Exception {
-        String[] args = new String[] { "orcid-webhook" };
+        String[] args = new String[] { "orcid-bulk-pull" };
         args = onlyLinkedProfiles ? ArrayUtils.add(args, "-l") : args;
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);

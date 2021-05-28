@@ -46,10 +46,9 @@ import org.slf4j.LoggerFactory;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public class OrcidBulkSynchronization
-    extends DSpaceRunnable<OrcidBulkSynchronizationScriptConfiguration<OrcidBulkSynchronization>> {
+public class OrcidBulkPush extends DSpaceRunnable<OrcidBulkPushScriptConfiguration<OrcidBulkPush>> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrcidBulkSynchronization.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrcidBulkPush.class);
 
     private OrcidQueueService orcidQueueService;
 
@@ -274,9 +273,9 @@ public class OrcidBulkSynchronization
 
     @Override
     @SuppressWarnings("unchecked")
-    public OrcidBulkSynchronizationScriptConfiguration<OrcidBulkSynchronization> getScriptConfiguration() {
-        return new DSpace().getServiceManager().getServiceByName("orcid-bulk-synchronization",
-            OrcidBulkSynchronizationScriptConfiguration.class);
+    public OrcidBulkPushScriptConfiguration<OrcidBulkPush> getScriptConfiguration() {
+        return new DSpace().getServiceManager().getServiceByName("orcid-bulk-push",
+            OrcidBulkPushScriptConfiguration.class);
     }
 
 }

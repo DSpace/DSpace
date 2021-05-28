@@ -120,7 +120,7 @@ public class CollectionExportIT extends AbstractIntegrationTestWithDatabase {
                 "dc.subject", "dc.description.abstract", "dc.relation", "dc.relation.patent",
                 "dc.relation.references"));
             assertThat(getRowValues(sheet.getRow(1), 18), contains(item.getID().toString(), "Test patent", "",
-                "2020-01-01", "White, Walter", "", "", "", "", "", "", "", "it$$6$$500", "test||export", "", "", "",
+                "2020-01-01", "White, Walter", "", "", "", "", "", "", "", "it", "test||export", "", "", "",
                 ""));
 
         }

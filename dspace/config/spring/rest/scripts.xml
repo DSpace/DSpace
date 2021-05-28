@@ -64,14 +64,14 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.suggestion.OAIREPublicationLoaderRunnable"/>
     </bean>
     
-    <bean id="orcid-bulk-synchronization" class="org.dspace.app.orcid.script.OrcidBulkSynchronizationScriptConfiguration" primary="true">
+    <bean id="orcid-bulk-push" class="org.dspace.app.orcid.script.OrcidBulkPushScriptConfiguration" primary="true">
         <property name="description" value="Perform the bulk synchronization of all the BATCH configured ORCID entities placed in the ORCID queue"/>
-        <property name="dspaceRunnableClass" value="org.dspace.app.orcid.script.OrcidBulkSynchronization"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.orcid.script.OrcidBulkPush"/>
     </bean>
     
-    <bean id="orcid-webhook" class="org.dspace.app.orcid.script.OrcidWebhookScriptConfiguration" primary="true">
-        <property name="description" value="Simulates an ORCID webhook callback for all the profiles with an ORCID id set"/>
-        <property name="dspaceRunnableClass" value="org.dspace.app.orcid.script.OrcidWebhookScript"/>
+    <bean id="orcid-bulk-pull" class="org.dspace.app.orcid.script.OrcidBulkPullScriptConfiguration" primary="true">
+        <property name="description" value="Perform a bulk pull from the ORCID registry for all the profiles with an ORCID id set"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.orcid.script.OrcidBulkPull"/>
     </bean>
 
 </beans>
