@@ -202,38 +202,60 @@ public class EpoIdMetadataContributor implements MetadataContributor<OMElement> 
         private Map<String, String> namespaces;
 
 
-        private final String DOCDB = "docdb";
-        private final String EPODOC = "epodoc";
-        private final String ORIGIN = "origin";
+        public static final String DOCDB = "docdb";
+        public static final String EPODOC = "epodoc";
+        public static final String ORIGIN = "origin";
 
 
         public EpoDocumentId(OMElement documentId, Map<String, String> namespaces) throws JaxenException {
             this.namespaces = namespaces;
-            this.documentIdType = buildDocumentIdType(documentId);
-            this.country = buildCountry(documentId);
-            this.docNumber = buildDocNumber(documentId);
-            this.kind = buildKind(documentId);
-            this.date = buildDate(documentId);
+            OMElement preferredId = null;
+            AXIOMXPath xpath = new AXIOMXPath("//ns:document-id[@document-id-type=\"epodoc\"]");
+            if (namespaces != null) {
+                for (Entry<String, String> entry : namespaces.entrySet()) {
+                    xpath.addNamespace(entry.getKey(), entry.getValue());
+                }
+            }
+            List<Object> nodes = xpath.selectNodes(documentId);
+            if (nodes != null && nodes.size() > 0) {
+                preferredId = (OMElement) nodes.get(0);
+            } else {
+                xpath = new AXIOMXPath("//ns:document-id");
+                if (namespaces != null) {
+                    for (Entry<String, String> entry : namespaces.entrySet()) {
+                        xpath.addNamespace(entry.getKey(), entry.getValue());
+                    }
+                }
+                nodes = xpath.selectNodes(documentId);
+                if (nodes != null && nodes.size() > 0) {
+                    preferredId = (OMElement) nodes.get(0);
+                }
+            }
+            this.documentIdType = buildDocumentIdType(preferredId);
+            this.country = buildCountry(preferredId);
+            this.docNumber = buildDocNumber(preferredId);
+            this.kind = buildKind(preferredId);
+            this.date = buildDate(preferredId);
         }
 
         private String buildDocumentIdType(OMElement documentId) throws JaxenException {
-            return getElement(documentId, "//ns:document-id/@document-id-type");
+            return getElement(documentId, "./@document-id-type");
         }
 
         private String buildCountry(OMElement documentId) throws JaxenException {
-            return getElement(documentId, "//ns:country");
+            return getElement(documentId, "./ns:country");
         }
 
         private String buildDocNumber(OMElement documentId) throws JaxenException {
-            return getElement(documentId, "//ns:doc-number");
+            return getElement(documentId, "./ns:doc-number");
         }
 
         private String buildKind(OMElement documentId) throws JaxenException {
-            return getElement(documentId, "//ns:kind");
+            return getElement(documentId, "./ns:kind");
         }
 
         private String buildDate(OMElement documentId) throws JaxenException {
-            return getElement(documentId, "//ns:date");
+            return getElement(documentId, "./ns:date");
         }
 
 
@@ -257,11 +279,10 @@ public class EpoIdMetadataContributor implements MetadataContributor<OMElement> 
         }
 
         public String getIdAndType() {
-            if (DOCDB.equals(documentIdType)) {
-                return documentIdType + ":" + country + "." + docNumber + "." + kind;
-
-            } else if (EPODOC.equals(documentIdType)) {
+            if (EPODOC.equals(documentIdType)) {
                 return documentIdType + ":" + docNumber + ((kind != null) ? kind : "");
+            } else if (DOCDB.equals(documentIdType)) {
+                return documentIdType + ":" + country + "." + docNumber + "." + kind;
             } else {
                 return "";
             }
@@ -269,6 +290,9 @@ public class EpoIdMetadataContributor implements MetadataContributor<OMElement> 
 
 
         private String getElement(OMElement documentId, String axiomPath) throws JaxenException {
+            if (documentId == null) {
+                return "";
+            }
             AXIOMXPath xpath = new AXIOMXPath(axiomPath);
             if (namespaces != null) {
                 for (Entry<String, String> entry : namespaces.entrySet()) {

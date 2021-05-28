@@ -159,4 +159,7 @@ public class LiveImportDataProvider extends AbstractExternalDataProvider {
         return id;
     }
 
+    public QuerySource getQuerySource() {
+        return querySource;
+    }
 }

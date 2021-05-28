@@ -20,6 +20,8 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
+import org.dspace.external.provider.impl.LiveImportDataProvider;
+import org.dspace.importer.external.epo.service.EpoImportMetadataSourceServiceImpl;
 
 /**
  * This is the basic implementation for the MetadataListener interface.
@@ -87,6 +89,25 @@ public class SimpleMetadataListener implements MetadataListener {
     protected String generateExternalId(Context context, ExternalDataProvider prov, Item item,
             Set<String> changedMetadata, String m) {
         List<MetadataValue> metadataByMetadataString = itemService.getMetadataByMetadataString(item, m);
+        //FIXME move to a subclass / introduce a factory to retrieve a custom generator by provider
+        if (prov instanceof LiveImportDataProvider
+                && ((LiveImportDataProvider) prov).getQuerySource() instanceof EpoImportMetadataSourceServiceImpl) {
+            EpoImportMetadataSourceServiceImpl epoProv = (EpoImportMetadataSourceServiceImpl)
+                    ((LiveImportDataProvider) prov).getQuerySource();
+            String dateFiledMd = epoProv.getDateFiled().getField();
+            String applicationNumberMd = epoProv.getApplicationNumber().getField();
+            if (StringUtils.equals(m, dateFiledMd)
+                    || StringUtils.equals(m, applicationNumberMd)) {
+                List<MetadataValue> dateFiled = itemService.getMetadataByMetadataString(item, dateFiledMd);
+                List<MetadataValue> applicNo = itemService.getMetadataByMetadataString(item, applicationNumberMd);
+                if (dateFiled != null && dateFiled.size() == 1 && applicNo != null && applicNo.size() == 1) {
+                    return applicNo.get(0).getValue() + EpoImportMetadataSourceServiceImpl.APP_NO_DATE_SEPARATOR
+                            + dateFiled.get(0).getValue();
+                }
+            } else {
+                return null;
+            }
+        }
         // only suggest an identifier if there is exactly one value for the metadata. If
         // there are more values it is highly probable that a lookup was already
         // performed when the first value was added
