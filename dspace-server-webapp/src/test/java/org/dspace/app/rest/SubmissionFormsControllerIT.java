@@ -763,12 +763,16 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
             .andExpect(jsonPath("$.type", is("submissionform")))
             .andExpect(jsonPath("$.rows[0].fields", contains(
                 matchFormWithoutVisibility("Title"),
-                matchFormWithVisibility("Date of Issue", Map.of("submission", "read-only", "workflow", "hidden")),
-                matchFormWithVisibility("Type", Map.of("workflow", "hidden")),
-                matchFormWithVisibility("Language", Map.of("submission", "read-only", "workflow", "read-only")),
-                matchFormWithVisibility("Author(s)", Map.of("workflow", "read-only")),
-                matchFormWithVisibility("Editor(s)", Map.of("submission", "read-only", "workflow", "hidden")),
-                matchFormWithVisibility("Subject(s)", Map.of("submission", "hidden", "workflow", "read-only")),
+                matchFormWithVisibility("Date of Issue",
+                    Map.of("submission", "read-only", "workflow", "hidden", "edit", "hidden")),
+                matchFormWithVisibility("Type", Map.of("workflow", "hidden", "edit", "hidden")),
+                matchFormWithVisibility("Language",
+                    Map.of("submission", "read-only", "workflow", "read-only", "edit", "read-only")),
+                matchFormWithVisibility("Author(s)", Map.of("workflow", "read-only", "edit", "read-only")),
+                matchFormWithVisibility("Editor(s)",
+                    Map.of("submission", "read-only", "workflow", "hidden", "edit", "hidden")),
+                matchFormWithVisibility("Subject(s)",
+                    Map.of("submission", "hidden", "workflow", "read-only", "edit", "read-only")),
                 matchFormWithVisibility("Description", Map.of("submission", "hidden"))
             )));
     }

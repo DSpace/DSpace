@@ -69,13 +69,17 @@ public class SubmissionSectionConverter implements DSpaceConverter<SubmissionSte
         SubmissionVisibilityRest submissionVisibilityRest = new SubmissionVisibilityRest();
 
         for (ScopeEnum scope : ScopeEnum.values()) {
-            VisibilityEnum visibilityToSet = scope == currentScope ? visibility : visibilityOutside;
+            VisibilityEnum visibilityToSet = sameScopes(scope, currentScope) ? visibility : visibilityOutside;
             if (visibilityToSet != null) {
                 submissionVisibilityRest.addVisibility(scope, visibilityToSet);
             }
         }
 
         return submissionVisibilityRest;
+    }
+
+    private boolean sameScopes(ScopeEnum firstScope, ScopeEnum secondScope) {
+        return firstScope.getText().equals(secondScope.getText());
     }
 
     @Override

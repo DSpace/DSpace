@@ -22,12 +22,19 @@ public enum ScopeEnum {
     SUBMISSION("submission"),
 
     @JsonProperty("workflow")
-    WORKFLOW("workflow");
+    WORKFLOW("workflow"),
+
+    @JsonProperty("edit")
+    EDIT("workflow");
 
     private String text;
 
     ScopeEnum(String text) {
         this.text = text;
+    }
+
+    public String getText() {
+        return text;
     }
 
     @Override

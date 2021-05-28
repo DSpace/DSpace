@@ -196,9 +196,9 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
     private SubmissionVisibilityRest getVisibility(DCInput dcinput) {
         SubmissionVisibilityRest submissionVisibility = new SubmissionVisibilityRest();
         for (ScopeEnum scope : ScopeEnum.values()) {
-            if (!dcinput.isVisible(scope.toString())) {
+            if (!dcinput.isVisible(scope.getText())) {
                 submissionVisibility.addVisibility(scope, VisibilityEnum.HIDDEN);
-            } else if (dcinput.isReadOnly(scope.toString())) {
+            } else if (dcinput.isReadOnly(scope.getText())) {
                 submissionVisibility.addVisibility(scope, VisibilityEnum.READ_ONLY);
             }
         }
