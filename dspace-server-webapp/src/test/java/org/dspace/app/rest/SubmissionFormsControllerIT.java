@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.app.rest.matcher.SubmissionFormFieldMatcher.matchFormWithVisibility;
+import static org.dspace.app.rest.matcher.SubmissionFormFieldMatcher.matchFormWithoutVisibility;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -18,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Locale;
+import java.util.Map;
 
 import org.dspace.app.rest.matcher.SubmissionFormFieldMatcher;
 import org.dspace.app.rest.repository.SubmissionFormRestRepository;
@@ -64,9 +67,9 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                    .andExpect(status().isOk())
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
-                   //The configuration file for the test env includes 25 forms
+                   //The configuration file for the test env includes 26 forms
                    .andExpect(jsonPath("$.page.size", is(20)))
-                   .andExpect(jsonPath("$.page.totalElements", equalTo(25)))
+                   .andExpect(jsonPath("$.page.totalElements", equalTo(26)))
                    .andExpect(jsonPath("$.page.totalPages", equalTo(2)))
                    .andExpect(jsonPath("$.page.number", is(0)))
                    .andExpect(
@@ -83,7 +86,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.page.size", is(20)))
-                .andExpect(jsonPath("$.page.totalElements", equalTo(25)))
+                .andExpect(jsonPath("$.page.totalElements", equalTo(26)))
                 .andExpect(jsonPath("$.page.totalPages", equalTo(2)))
                 .andExpect(jsonPath("$.page.number", is(0)))
                 .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL
@@ -717,7 +720,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                          Matchers.containsString("/api/config/submissionforms?"),
                          Matchers.containsString("page=12"), Matchers.containsString("size=2"))))
                  .andExpect(jsonPath("$.page.size", is(2)))
-                 .andExpect(jsonPath("$.page.totalElements", equalTo(25)))
+                 .andExpect(jsonPath("$.page.totalElements", equalTo(26)))
                  .andExpect(jsonPath("$.page.totalPages", equalTo(13)))
                  .andExpect(jsonPath("$.page.number", is(0)));
 
@@ -744,8 +747,33 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                          Matchers.containsString("/api/config/submissionforms?"),
                          Matchers.containsString("page=12"), Matchers.containsString("size=2"))))
                  .andExpect(jsonPath("$.page.size", is(2)))
-                 .andExpect(jsonPath("$.page.totalElements", equalTo(25)))
+                 .andExpect(jsonPath("$.page.totalElements", equalTo(26)))
                  .andExpect(jsonPath("$.page.totalPages", equalTo(13)))
                  .andExpect(jsonPath("$.page.number", is(1)));
+    }
+
+    @Test
+    public void visibilityTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/config/submissionforms/testVisibility"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.id", is("testVisibility")))
+            .andExpect(jsonPath("$.name", is("testVisibility")))
+            .andExpect(jsonPath("$.type", is("submissionform")))
+            .andExpect(jsonPath("$.rows[0].fields", contains(
+                matchFormWithoutVisibility("Title"),
+                matchFormWithVisibility("Date of Issue",
+                    Map.of("submission", "read-only", "workflow", "hidden", "edit", "hidden")),
+                matchFormWithVisibility("Type", Map.of("workflow", "hidden", "edit", "hidden")),
+                matchFormWithVisibility("Language",
+                    Map.of("submission", "read-only", "workflow", "read-only", "edit", "read-only")),
+                matchFormWithVisibility("Author(s)", Map.of("workflow", "read-only", "edit", "read-only")),
+                matchFormWithVisibility("Editor(s)",
+                    Map.of("submission", "read-only", "workflow", "hidden", "edit", "hidden")),
+                matchFormWithVisibility("Subject(s)",
+                    Map.of("submission", "hidden", "workflow", "read-only", "edit", "read-only")),
+                matchFormWithVisibility("Description", Map.of("submission", "hidden"))
+            )));
     }
 }

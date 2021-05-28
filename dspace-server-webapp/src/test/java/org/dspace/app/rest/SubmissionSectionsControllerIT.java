@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest;
 
+import static java.util.Map.of;
+import static org.dspace.app.rest.matcher.SubmissionSectionMatcher.matches;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -26,7 +28,7 @@ import org.junit.Test;
 public class SubmissionSectionsControllerIT extends AbstractControllerIntegrationTest {
 
     @Test
-    public void findAll() throws Exception {
+    public void testFindAll() throws Exception {
         //When we call the root endpoint as anonymous user
         getClient().perform(get("/api/config/submissionsections"))
                    //The status has to be 403 Not Authorized
@@ -54,6 +56,29 @@ public class SubmissionSectionsControllerIT extends AbstractControllerIntegratio
                    .andExpect(jsonPath("$._embedded.submissionsections", hasSize(greaterThanOrEqualTo(1))
                    ))
         ;
+    }
+
+    @Test
+    public void testFindOne() throws Exception {
+
+        getClient().perform(get("/api/config/submissionsections/collection"))
+            .andExpect(status().isUnauthorized());
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/config/submissionsections/collection"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", matches("collection", true, "collection",
+                of("submission", "hidden", "workflow", "hidden", "edit", "hidden"))));
+
+        getClient(token).perform(get("/api/config/submissionsections/traditionalpageone"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", matches("traditionalpageone", true, "submission-form")));
+
+        getClient(token).perform(get("/api/config/submissionsections/license"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", matches("license", true, "license",
+                of("workflow", "read-only", "edit", "read-only"))));
     }
 
 }

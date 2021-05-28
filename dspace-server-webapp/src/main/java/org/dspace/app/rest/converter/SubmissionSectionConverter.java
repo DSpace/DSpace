@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.model.ScopeEnum;
 import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.rest.model.SubmissionVisibilityRest;
 import org.dspace.app.rest.model.VisibilityEnum;
@@ -38,8 +39,7 @@ public class SubmissionSectionConverter implements DSpaceConverter<SubmissionSte
         sp.setHeader(step.getHeading());
         sp.setSectionType(step.getType());
         sp.setId(step.getId());
-        sp.setVisibility(new SubmissionVisibilityRest(VisibilityEnum.fromString(step.getVisibility()),
-                                                      VisibilityEnum.fromString(step.getVisibilityOutside())));
+        sp.setVisibility(getVisibility(step));
         return sp;
     }
 
@@ -52,6 +52,34 @@ public class SubmissionSectionConverter implements DSpaceConverter<SubmissionSte
             throw new RuntimeException(e);
         }
         return step;
+    }
+
+    private SubmissionVisibilityRest getVisibility(SubmissionStepConfig step) {
+        ScopeEnum currentScope = ScopeEnum.fromString(step.getScope());
+        if (currentScope == null) {
+            return null;
+        }
+
+        VisibilityEnum visibility = VisibilityEnum.fromString(step.getVisibility());
+        VisibilityEnum visibilityOutside = VisibilityEnum.fromString(step.getVisibilityOutside());
+        if (visibilityOutside == null) {
+            visibilityOutside = VisibilityEnum.HIDDEN;
+        }
+
+        SubmissionVisibilityRest submissionVisibilityRest = new SubmissionVisibilityRest();
+
+        for (ScopeEnum scope : ScopeEnum.values()) {
+            VisibilityEnum visibilityToSet = sameScopes(scope, currentScope) ? visibility : visibilityOutside;
+            if (visibilityToSet != null) {
+                submissionVisibilityRest.addVisibility(scope, visibilityToSet);
+            }
+        }
+
+        return submissionVisibilityRest;
+    }
+
+    private boolean sameScopes(ScopeEnum firstScope, ScopeEnum secondScope) {
+        return firstScope.getText().equals(secondScope.getText());
     }
 
     @Override

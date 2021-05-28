@@ -13,6 +13,8 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
+import java.util.Map;
+
 import org.hamcrest.Matcher;
 
 /**
@@ -213,5 +215,32 @@ public class SubmissionFormFieldMatcher {
             hasJsonPath("$.hints", containsString(hints)),
             hasNoJsonPath("$.input.type"),
             hasNoJsonPath("$.selectableMetadata"));
+    }
+
+    /**
+     * Check the json representation of a submission form to verify that it has the
+     * expected label and the expected visibilities.
+     *
+     * @param  label      the label to check
+     * @param  visibility the visibilities to check
+     * @return            a Matcher for all the condition above
+     */
+    public static Matcher<? super Object> matchFormWithVisibility(String label, Map<String, String> visibility) {
+        return allOf(
+            hasJsonPath("$.label", containsString(label)),
+            hasJsonPath("$.visibility", is(visibility)));
+    }
+
+    /**
+     * Check the json representation of a submission form to verify that it has the
+     * expected label and it has not the visibility attribute.
+     *
+     * @param  label the label to check
+     * @return       a Matcher for all the condition above
+     */
+    public static Matcher<? super Object> matchFormWithoutVisibility(String label) {
+        return allOf(
+            hasJsonPath("$.label", containsString(label)),
+            hasNoJsonPath("$.visibility"));
     }
 }

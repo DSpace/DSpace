@@ -96,10 +96,7 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
         inputField.setStyle(dcinput.getStyle());
         inputField.setMandatoryMessage(dcinput.getWarning());
         inputField.setMandatory(dcinput.isRequired());
-        inputField.setScope(ScopeEnum.fromString(dcinput.getScope()));
-        inputField.setVisibility(new SubmissionVisibilityRest(
-            VisibilityEnum.fromString(dcinput.isReadOnly("submission") ? "read-only" : null),
-            VisibilityEnum.fromString(dcinput.isReadOnly("workflow") ? "read-only" : null)));
+        inputField.setVisibility(getVisibility(dcinput));
         inputField.setRepeatable(dcinput.isRepeatable());
         if (dcinput.getLanguage()) {
             int idx = 1;
@@ -194,6 +191,18 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
             inputField.setSelectableRelationship(selectableRelationship);
         }
         return inputField;
+    }
+
+    private SubmissionVisibilityRest getVisibility(DCInput dcinput) {
+        SubmissionVisibilityRest submissionVisibility = new SubmissionVisibilityRest();
+        for (ScopeEnum scope : ScopeEnum.values()) {
+            if (!dcinput.isVisible(scope.getText())) {
+                submissionVisibility.addVisibility(scope, VisibilityEnum.HIDDEN);
+            } else if (dcinput.isReadOnly(scope.getText())) {
+                submissionVisibility.addVisibility(scope, VisibilityEnum.READ_ONLY);
+            }
+        }
+        return submissionVisibility;
     }
 
     /**

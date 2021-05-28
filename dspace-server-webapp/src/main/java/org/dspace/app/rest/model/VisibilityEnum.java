@@ -8,6 +8,8 @@
 
 package org.dspace.app.rest.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * The possible restriction options for the visibility attributes in the
  * SubmissionPanel resource and SubmissionForm's fields
@@ -15,7 +17,12 @@ package org.dspace.app.rest.model;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public enum VisibilityEnum {
-    HIDDEN("hidden"), READONLY("read-only"), EDITABLE("editable");
+
+    @JsonProperty("hidden")
+    HIDDEN("hidden"),
+
+    @JsonProperty("read-only")
+    READ_ONLY("read-only");
 
     private String text;
 
