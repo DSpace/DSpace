@@ -89,7 +89,7 @@
             <min>0</min>
         </leftCardinality>
         <rightCardinality>
-            <min>1</min>
+            <min>0</min>
         </rightCardinality>
     </type>
     <type>
@@ -101,8 +101,7 @@
             <min>0</min>
         </leftCardinality>
         <rightCardinality>
-            <min>1</min>
-            <max>1</max>
+            <min>0</min>
         </rightCardinality>
     </type>
     <type>
@@ -128,7 +127,6 @@
         </leftCardinality>
         <rightCardinality>
             <min>0</min>
-            <max>1</max>
         </rightCardinality>
         <copyToRight>true</copyToRight>
     </type>

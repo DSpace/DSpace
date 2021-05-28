@@ -46,9 +46,11 @@
 	         <required></required>
 	       </field>
        </row>
-   </form>      
-   
+   </form>
+
    <form name="traditionalpageone">
+            <!-- NOTE: this Author <row> is customized from the default submission-forms.xml in order to make it
+                 easier to test Entity functionality -->
             <row>
                 <relation-field>
                     <relationship-type>isAuthorOfPublication</relationship-type>
@@ -182,7 +184,7 @@ it, please enter the types and the actual numbers or codes.</hint>
        </field>
      </row>
 	</form>
-	
+
 	<form name="traditionalpagetwo">
      <row>
        <field>
@@ -310,7 +312,7 @@ it, please enter the types and the actual numbers or codes.</hint>
         </field>
       </row>
    </form>
-    
+
    <form name="sampleauthority">
      <row>
 		<field>
@@ -347,7 +349,7 @@ it, please enter the types and the actual numbers or codes.</hint>
             <required></required>
         </field>
      </row>
-  </form>   
+  </form>
  </form-definitions>
 
 
