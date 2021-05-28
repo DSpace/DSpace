@@ -1,0 +1,20 @@
+<Event xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
+	<Type scheme="https://w3id.org/cerif/vocab/EventTypes">https://w3id.org/cerif/vocab/EventTypes#Conference</Type>
+	<Acronym>TE</Acronym>
+	<Name>Test Event</Name>
+	<Place>Milan</Place>
+	<Country>Italy</Country>
+	<StartDate>2020-01-01</StartDate>
+	<EndDate>2020-01-05</EndDate>
+	<Description>This is a test event</Description>
+    <Keyword>test</Keyword>
+    <Keyword>event</Keyword>
+    <Organizer> <OrgUnit> <Name>First Organizer</Name> </OrgUnit> </Organizer>
+    <Organizer> <OrgUnit> <Name>Second Organizer</Name> </OrgUnit> </Organizer>
+    <Organizer> <Project> <Title>Third Organizer</Title> </Project> </Organizer>
+    <Sponsor> <OrgUnit> <Name>First Sponsor</Name> </OrgUnit> </Sponsor>
+    <Sponsor> <Project> <Title>Second Sponsor</Title> </Project> </Sponsor>
+    <Partner> <OrgUnit> <Name>First Partner</Name> </OrgUnit> </Partner>
+    <Partner> <Project> <Title>Second Partner</Title> </Project> </Partner>
+    <Partner> <Project> <Title>Third Partner</Title> </Project> </Partner>
+</Event>

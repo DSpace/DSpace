@@ -46,7 +46,6 @@ import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.utils.DSpace;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -55,7 +54,6 @@ import org.junit.Test;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-@Ignore
 public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
     private static final String BASE_OUTPUT_DIR_PATH = "./target/testing/dspace/assetstore/crosswalk/";
@@ -199,7 +197,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("person-xml-cerif");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("person-cerif-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -253,7 +251,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("person-xml-cerif");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("person-cerif-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -592,7 +590,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("publication-xml");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("publication-cerif-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -666,7 +664,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("publication-xml");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("publication-cerif-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -716,7 +714,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("publication-xml");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("publication-cerif-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -814,7 +812,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("project-xml");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("project-cerif-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -942,7 +940,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("project-xml");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("project-cerif-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -1055,7 +1053,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("orgUnit-xml");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("orgUnit-cerif-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -1148,7 +1146,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("orgUnit-xml");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("orgUnit-cerif-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -1250,7 +1248,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("equipment-xml");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("equipment-cerif-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -1328,7 +1326,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("equipment-xml");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("equipment-cerif-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -1365,7 +1363,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("funding-xml");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("funding-cerif-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -1453,7 +1451,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("funding-xml");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("funding-cerif-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -1514,6 +1512,245 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             String expectedContent = IOUtils.toString(fis, Charset.defaultCharset());
             compareEachLine(out.toString(), expectedContent);
         }
+    }
+
+    @Test
+    public void testPatentCerifXmlDisseminate() throws Exception {
+
+        Item patent = ItemBuilder.createItem(context, collection)
+            .withEntityType("Patent")
+            .withTitle("Test patent")
+            .withIssueDate("2021-01-01")
+            .withPublisher("First publisher")
+            .withPublisher("Second publisher")
+            .withPatentNo("12345-666")
+            .withAuthor("Walter White", "b6ff8101-05ec-49c5-bd12-cba7894012b7")
+            .withAuthorAffiliation("4Science")
+            .withAuthor("Jesse Pinkman")
+            .withAuthorAffiliation(PLACEHOLDER_PARENT_METADATA_VALUE)
+            .withAuthor("John Smith", "will be referenced::ORCID::0000-0000-0012-3456")
+            .withAuthorAffiliation("4Science")
+            .withRightsHolder("Test Organization")
+            .withDescriptionAbstract("This is a patent")
+            .withRelationPatent("Another patent")
+            .build();
+
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("patent-cerif-xml");
+        assertThat(referCrossWalk, notNullValue());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        referCrossWalk.disseminate(context, patent, out);
+
+        try (FileInputStream fis = getFileInputStream("patent.xml")) {
+            String expectedContent = IOUtils.toString(fis, Charset.defaultCharset());
+            compareEachLine(out.toString(), expectedContent);
+        }
+
+    }
+
+    @Test
+    public void testManyPatentsCerifXmlDisseminate() throws Exception {
+
+        Item firstPatent = ItemBuilder.createItem(context, collection)
+            .withEntityType("Patent")
+            .withTitle("Test patent")
+            .withIssueDate("2021-01-01")
+            .withPublisher("Publisher")
+            .withPatentNo("12345-666")
+            .build();
+
+        Item secondPatent = ItemBuilder.createItem(context, collection)
+            .withEntityType("Patent")
+            .withTitle("Second patent")
+            .withIssueDate("2011-01-01")
+            .withPublisher("First publisher")
+            .withPublisher("Second publisher")
+            .withPatentNo("12345-777")
+            .withAuthor("Walter White")
+            .withAuthorAffiliation("4Science")
+            .withRelationPatent("Another patent")
+            .build();
+
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("patent-cerif-xml");
+        assertThat(referCrossWalk, notNullValue());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        referCrossWalk.disseminate(context, Arrays.asList(firstPatent, secondPatent).iterator(), out);
+
+        try (FileInputStream fis = getFileInputStream("patents.xml")) {
+            String expectedContent = IOUtils.toString(fis, Charset.defaultCharset());
+            compareEachLine(out.toString(), expectedContent);
+        }
+
+    }
+
+    @Test
+    public void testDataSetCerifXmlDisseminate() throws Exception {
+
+        Item project = ItemBuilder.createItem(context, collection)
+            .withEntityType("Project")
+            .withTitle("Test Project")
+            .withAcronym("T-PRJ")
+            .build();
+
+        Item dataSet = ItemBuilder.createItem(context, collection)
+            .withEntityType("DataSet")
+            .withTitle("Test DataSet")
+            .withLanguage("EN")
+            .withDescriptionVersion("V-01")
+            .withDoiIdentifier("10.11234.12")
+            .withAuthor("Walter White")
+            .withAuthorAffiliation(PLACEHOLDER_PARENT_METADATA_VALUE)
+            .withAuthor("Jesse Pinkman", "94f05c08-6273-4a9e-b6cd-002fd8669fa0")
+            .withAuthorAffiliation("4Science")
+            .withPublisher("Publisher")
+            .withDescriptionAbstract("This is a DataSet")
+            .withSubject("DataSet")
+            .withSubject("Keyword")
+            .withRelationProject("Test Project", project.getID().toString())
+            .withRelationEquipment("Test Equipment")
+            .build();
+
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("dataSet-cerif-xml");
+        assertThat(referCrossWalk, notNullValue());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        referCrossWalk.disseminate(context, dataSet, out);
+
+        try (FileInputStream fis = getFileInputStream("dataSet.xml")) {
+            String expectedContent = IOUtils.toString(fis, Charset.defaultCharset());
+            compareEachLine(out.toString(), expectedContent);
+        }
+
+    }
+
+    @Test
+    public void testManyDataSetsCerifXmlDisseminate() throws Exception {
+
+        Item firstDataSet = ItemBuilder.createItem(context, collection)
+            .withEntityType("DataSet")
+            .withTitle("First DataSet")
+            .withAuthor("Walter White")
+            .withAuthorAffiliation(PLACEHOLDER_PARENT_METADATA_VALUE)
+            .withPublisher("Publisher")
+            .withSubject("DataSet")
+            .withRelationProject("Test Project")
+            .withRelationEquipment("First Equipment")
+            .withRelationEquipment("Second Equipment")
+            .build();
+
+        Item secondDataSet = ItemBuilder.createItem(context, collection)
+            .withEntityType("DataSet")
+            .withTitle("Second DataSet")
+            .withPublisher("Publisher")
+            .withSubject("DataSet")
+            .withRelationProject("First Project")
+            .withRelationProject("Second Project")
+            .build();
+
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("dataSet-cerif-xml");
+        assertThat(referCrossWalk, notNullValue());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        referCrossWalk.disseminate(context, Arrays.asList(firstDataSet, secondDataSet).iterator(), out);
+
+        try (FileInputStream fis = getFileInputStream("dataSets.xml")) {
+            String expectedContent = IOUtils.toString(fis, Charset.defaultCharset());
+            compareEachLine(out.toString(), expectedContent);
+        }
+
+    }
+
+    @Test
+    public void testEventCerifXmlDisseminate() throws Exception {
+
+        Item event = ItemBuilder.createItem(context, collection)
+            .withEntityType("Event")
+            .withTitle("Test Event")
+            .withType("Conference")
+            .withAcronym("TE")
+            .withEventPlace("Milan")
+            .withEventCountry("Italy")
+            .withEventStartDate("2020-01-01")
+            .withEventEndDate("2020-01-05")
+            .withDescriptionAbstract("This is a test event")
+            .withSubject("test")
+            .withSubject("event")
+            .withEventOrgUnitOrganizer("First Organizer")
+            .withEventOrgUnitOrganizer("Second Organizer")
+            .withEventProjectOrganizer("Third Organizer")
+            .withEventOrgUnitSponsor("First Sponsor")
+            .withEventProjectSponsor("Second Sponsor")
+            .withEventOrgUnitPartner("First Partner")
+            .withEventProjectPartner("Second Partner")
+            .withEventProjectPartner("Third Partner")
+            .build();
+
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("event-cerif-xml");
+        assertThat(referCrossWalk, notNullValue());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        referCrossWalk.disseminate(context, event, out);
+
+        try (FileInputStream fis = getFileInputStream("event.xml")) {
+            String expectedContent = IOUtils.toString(fis, Charset.defaultCharset());
+            compareEachLine(out.toString(), expectedContent);
+        }
+
+    }
+
+    @Test
+    public void testManyEventsCerifXmlDisseminate() throws Exception {
+
+        Item firstEvent = ItemBuilder.createItem(context, collection)
+            .withEntityType("Event")
+            .withTitle("First Event")
+            .withType("Conference")
+            .withAcronym("FE")
+            .withEventPlace("Milan")
+            .withEventCountry("Italy")
+            .withEventStartDate("2020-01-01")
+            .withEventEndDate("2020-01-05")
+            .withSubject("test")
+            .withEventOrgUnitOrganizer("Organizer")
+            .withEventProjectSponsor("Sponsor")
+            .build();
+
+        Item secondEvent = ItemBuilder.createItem(context, collection)
+            .withEntityType("Event")
+            .withTitle("Second Event")
+            .withType("Workshop")
+            .withAcronym("SE")
+            .withEventPlace("Terni")
+            .withEventStartDate("2021-01-01")
+            .withEventEndDate("2021-01-05")
+            .withEventProjectOrganizer("Organizer")
+            .build();
+
+        Item thirdEvent = ItemBuilder.createItem(context, collection)
+            .withEntityType("Event")
+            .withTitle("Third Event")
+            .withType("Unspecified")
+            .withAcronym("TE")
+            .withEventPlace("Rome")
+            .withEventCountry("Italy")
+            .withEventStartDate("2020-06-01")
+            .withEventEndDate("2020-06-05")
+            .withEventProjectSponsor("Sponsor")
+            .withEventProjectPartner("Partner")
+            .build();
+
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("event-cerif-xml");
+        assertThat(referCrossWalk, notNullValue());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        referCrossWalk.disseminate(context, Arrays.asList(firstEvent, secondEvent, thirdEvent).iterator(), out);
+
+        try (FileInputStream fis = getFileInputStream("events.xml")) {
+            String expectedContent = IOUtils.toString(fis, Charset.defaultCharset());
+            compareEachLine(out.toString(), expectedContent);
+        }
+
     }
 
     private void compareEachLine(String result, String expectedResult) {

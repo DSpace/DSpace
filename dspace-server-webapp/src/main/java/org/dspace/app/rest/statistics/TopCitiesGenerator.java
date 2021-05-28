@@ -36,10 +36,10 @@ public class TopCitiesGenerator extends AbstractTopSolrStatsFieldGenerator {
      * @param dso     DSO we want usage report of the TopCities on the given DSO
      * @return Rest object containing the TopCities usage report on the given DSO
      */
-    public UsageReportRest createUsageReport(Context context, DSpaceObject dso) {
+    public UsageReportRest createUsageReport(Context context, DSpaceObject dso, String startDate, String endDate) {
         Dataset dataset;
         try {
-            dataset = this.getTypeStatsDataset(context, dso, "city", 1);
+            dataset = this.getTypeStatsDataset(context, dso, "city", startDate, endDate);
         } catch (SQLException | IOException | ParseException | SolrServerException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -52,6 +52,7 @@ public class TopCitiesGenerator extends AbstractTopSolrStatsFieldGenerator {
         }
         return usageReportRest;
     }
+
 
     @Override
     public String getReportType() {

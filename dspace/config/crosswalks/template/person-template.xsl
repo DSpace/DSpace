@@ -90,83 +90,109 @@
 						<xsl:value-of select="biography" />
 					</fo:block>
 			    	
-					<xsl:call-template name="section-title">
-				    	<xsl:with-param name="label" select="'Affiliations'" />
-			    	</xsl:call-template>        
-					<xsl:for-each select="affiliations/affiliation">
-						<fo:block font-size="10pt">
-							<xsl:value-of select="role" /> at <xsl:value-of select="name" />
-							from <xsl:value-of select="start-date" />
-							<xsl:if test="end-date/text()">
-							 to <xsl:value-of select="end-date" />
-							</xsl:if>
-						</fo:block>
-					</xsl:for-each>
+			    	<xsl:if test="affiliations/affiliation">
+			    	
+						<xsl:call-template name="section-title">
+					    	<xsl:with-param name="label" select="'Affiliations'" />
+				    	</xsl:call-template>
+			    	        
+						<xsl:for-each select="affiliations/affiliation">
+							<fo:block font-size="10pt">
+								<xsl:value-of select="role" /> at <xsl:value-of select="name" />
+								from <xsl:value-of select="start-date" />
+								<xsl:if test="end-date/text()">
+								 to <xsl:value-of select="end-date" />
+								</xsl:if>
+							</fo:block>
+						</xsl:for-each>
 					
-					<xsl:call-template name="section-title">
-				    	<xsl:with-param name="label" select="'Education'" />
-			    	</xsl:call-template>    
-					<xsl:for-each select="educations/education">
-						<fo:block font-size="10pt">
-							<xsl:value-of select="role" /> at <xsl:value-of select="name" />
-							from <xsl:value-of select="start-date" />
-							<xsl:if test="end-date/text()">
-							 to <xsl:value-of select="end-date" />
-							</xsl:if>
-						</fo:block>
-					</xsl:for-each>
+			    	</xsl:if>
+			    	
+			    	<xsl:if test="educations/education">
 					
-					<xsl:call-template name="section-title">
-				    	<xsl:with-param name="label" select="'Qualifications'" />
-			    	</xsl:call-template>
-					<xsl:for-each select="qualifications/qualification">
-						<fo:block font-size="10pt">
-							<xsl:value-of select="name" /> from <xsl:value-of select="start-date" />
-							<xsl:if test="end-date/text()">
-							 to <xsl:value-of select="end-date" />
-							</xsl:if>
-						</fo:block>
-					</xsl:for-each>
+						<xsl:call-template name="section-title">
+					    	<xsl:with-param name="label" select="'Education'" />
+				    	</xsl:call-template>   
+				    	 
+						<xsl:for-each select="educations/education">
+							<fo:block font-size="10pt">
+								<xsl:value-of select="role" /> at <xsl:value-of select="name" />
+								from <xsl:value-of select="start-date" />
+								<xsl:if test="end-date/text()">
+								 to <xsl:value-of select="end-date" />
+								</xsl:if>
+							</fo:block>
+						</xsl:for-each>
+					
+					</xsl:if>
+					
+			    	<xsl:if test="qualifications/qualification">
+					
+						<xsl:call-template name="section-title">
+					    	<xsl:with-param name="label" select="'Qualifications'" />
+				    	</xsl:call-template>
+				    	
+						<xsl:for-each select="qualifications/qualification">
+							<fo:block font-size="10pt">
+								<xsl:value-of select="name" /> from <xsl:value-of select="start-date" />
+								<xsl:if test="end-date/text()">
+								 to <xsl:value-of select="end-date" />
+								</xsl:if>
+							</fo:block>
+						</xsl:for-each>
+					
+					</xsl:if>
+					
+			    	<xsl:if test="publications/publication">
+			    	
+						<xsl:call-template name="section-title">
+					    	<xsl:with-param name="label" select="'Publications'" />
+				    	</xsl:call-template>
 
-					<xsl:call-template name="section-title">
-				    	<xsl:with-param name="label" select="'Publications'" />
-			    	</xsl:call-template>
-			    	<xsl:for-each select="publications/publication">
-						<fo:block font-size="10pt">
-							<xsl:for-each select="authors/author">
-								<xsl:value-of select="current()" />
-							    <xsl:if test="position() != last()"> and </xsl:if>
-							</xsl:for-each>
-							<xsl:text> </xsl:text>
-							<xsl:if test="date-issued">
-								<xsl:text>(</xsl:text>
-								<xsl:value-of select="date-issued" />
-								<xsl:text>)</xsl:text>
-							</xsl:if>
-							<xsl:text>. </xsl:text>
-							<fo:inline font-style="italic" >
-								<xsl:value-of select="title" /> 
-							</fo:inline >
-						</fo:block>
-					</xsl:for-each>
+				    	<xsl:for-each select="publications/publication">
+							<fo:block font-size="10pt">
+								<xsl:for-each select="authors/author">
+									<xsl:value-of select="current()" />
+								    <xsl:if test="position() != last()"> and </xsl:if>
+								</xsl:for-each>
+								<xsl:text> </xsl:text>
+								<xsl:if test="date-issued">
+									<xsl:text>(</xsl:text>
+									<xsl:value-of select="date-issued" />
+									<xsl:text>)</xsl:text>
+								</xsl:if>
+								<xsl:text>. </xsl:text>
+								<fo:inline font-style="italic" >
+									<xsl:value-of select="title" /> 
+								</fo:inline >
+							</fo:block>
+						</xsl:for-each>
+				    	
+			    	</xsl:if>
+			    	
+			    	
+	  				<xsl:if test="( count(working-groups/working-group) &gt; 0 ) or ( count(interests/interest) &gt; 0 ) or ( count(knows-languages/language) &gt; 0 )">
 					
-					<xsl:call-template name="section-title">
-				    	<xsl:with-param name="label" select="'Other informations'" />
-			    	</xsl:call-template>
-					<xsl:call-template name="print-values">
-				    	<xsl:with-param name="label" select="'Working groups'" />
-				    	<xsl:with-param name="values" select="working-groups/working-group" />
-			    	</xsl:call-template>
-					<xsl:call-template name="print-values">
-				    	<xsl:with-param name="label" select="'Interests'" />
-				    	<xsl:with-param name="values" select="interests/interest" />
-			    	</xsl:call-template>
-					<xsl:call-template name="print-values">
-				    	<xsl:with-param name="label" select="'Knows languages'" />
-				    	<xsl:with-param name="values" select="knows-languages/language" />
-			    	</xsl:call-template>
+						<xsl:call-template name="section-title">
+					    	<xsl:with-param name="label" select="'Other informations'" />
+				    	</xsl:call-template>
+						<xsl:call-template name="print-values">
+					    	<xsl:with-param name="label" select="'Working groups'" />
+					    	<xsl:with-param name="values" select="working-groups/working-group" />
+				    	</xsl:call-template>
+						<xsl:call-template name="print-values">
+					    	<xsl:with-param name="label" select="'Interests'" />
+					    	<xsl:with-param name="values" select="interests/interest" />
+				    	</xsl:call-template>
+						<xsl:call-template name="print-values">
+					    	<xsl:with-param name="label" select="'Knows languages'" />
+					    	<xsl:with-param name="values" select="knows-languages/language" />
+				    	</xsl:call-template>
+			    	
+			    	</xsl:if>
 			    	
 	  				<xsl:if test="personal-sites/personal-site">
+	  				
 				    	<fo:block font-size="10pt" margin-top="2mm">
 				    		<fo:inline font-weight="bold" text-align="right" >
 								Personal sites:
@@ -182,6 +208,7 @@
 								</xsl:for-each>
 							</fo:inline >
 						</fo:block>
+						
 					</xsl:if>
 
 				</fo:flow>
@@ -210,7 +237,7 @@
 		<fo:block font-size="16pt" font-weight="bold" margin-top="8mm" >
 			<xsl:value-of select="$label" /> 
 		</fo:block>
-		<fo:block margin-bottom="2mm" margin-top="-4mm">
+		<fo:block>
 			<fo:leader leader-pattern="rule" leader-length="100%" rule-style="solid" />         
 		</fo:block>
 	</xsl:template>

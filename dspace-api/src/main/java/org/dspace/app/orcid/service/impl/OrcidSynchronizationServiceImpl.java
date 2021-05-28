@@ -14,14 +14,17 @@ import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.EnumUtils.isValidEnum;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.dspace.app.profile.OrcidEntitySyncPreference.DISABLED;
+import static org.dspace.content.Item.ANY;
 
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.codec.binary.StringUtils;
 import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.model.OrcidEntityType;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
@@ -110,26 +113,26 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
     }
 
     @Override
-    public void setEntityPreference(Context context, Item profile, OrcidEntityType type,
+    public boolean setEntityPreference(Context context, Item profile, OrcidEntityType type,
         OrcidEntitySyncPreference value) throws SQLException {
         String metadataQualifier = "sync-" + type.name().toLowerCase() + "s";
-        updatePreferenceForSynchronizingWithOrcid(context, profile, metadataQualifier, of(value.name()));
+        return updatePreferenceForSynchronizingWithOrcid(context, profile, metadataQualifier, of(value.name()));
     }
 
     @Override
-    public void setProfilePreference(Context context, Item profile, List<OrcidProfileSyncPreference> values)
+    public boolean setProfilePreference(Context context, Item profile, List<OrcidProfileSyncPreference> values)
         throws SQLException {
 
         List<String> valuesAsString = values.stream()
             .map(OrcidProfileSyncPreference::name)
             .collect(Collectors.toList());
 
-        updatePreferenceForSynchronizingWithOrcid(context, profile, "sync-profile", valuesAsString);
+        return updatePreferenceForSynchronizingWithOrcid(context, profile, "sync-profile", valuesAsString);
 
     }
 
     @Override
-    public void setSynchronizationMode(Context context, Item profile, OrcidSynchronizationMode value)
+    public boolean setSynchronizationMode(Context context, Item profile, OrcidSynchronizationMode value)
         throws SQLException {
 
         if (!isLinkedToOrcid(profile)) {
@@ -137,7 +140,16 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
                 + "synchronization because it is not linked to any ORCID account: " + profile.getID());
         }
 
-        itemService.setMetadataSingleValue(context, profile, "cris", "orcid", "sync-mode", null, value.name());
+        String newValue = value.name();
+        String oldValue = itemService.getMetadataFirstValue(profile, "cris", "orcid", "sync-mode", Item.ANY);
+
+        if (StringUtils.equals(oldValue, newValue)) {
+            return false;
+        } else {
+            itemService.setMetadataSingleValue(context, profile, "cris", "orcid", "sync-mode", null, value.name());
+            return true;
+        }
+
     }
 
     @Override
@@ -215,7 +227,7 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
         return findProfilesByOrcid(context, "*");
     }
 
-    private void updatePreferenceForSynchronizingWithOrcid(Context context, Item profile,
+    private boolean updatePreferenceForSynchronizingWithOrcid(Context context, Item profile,
         String metadataQualifier, List<String> values) throws SQLException {
 
         if (!isLinkedToOrcid(profile)) {
@@ -223,11 +235,25 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
                 + "synchronization because it is not linked to any ORCID account: " + profile.getID());
         }
 
-        itemService.clearMetadata(context, profile, "cris", "orcid", metadataQualifier, Item.ANY);
+        List<String> oldValues = itemService.getMetadata(profile, "cris", "orcid", metadataQualifier, ANY).stream()
+            .map(metadataValue -> metadataValue.getValue())
+            .collect(Collectors.toList());
+
+        if (containsSameValues(oldValues, values)) {
+            return false;
+        }
+
+        itemService.clearMetadata(context, profile, "cris", "orcid", metadataQualifier, ANY);
         for (String value : values) {
             itemService.addMetadata(context, profile, "cris", "orcid", metadataQualifier, null, value);
         }
 
+        return true;
+
+    }
+
+    private boolean containsSameValues(List<String> firstList, List<String> secondList) {
+        return new HashSet<>(firstList).equals(new HashSet<>(secondList));
     }
 
     private Optional<String> getOrcidAccessToken(Item item) {

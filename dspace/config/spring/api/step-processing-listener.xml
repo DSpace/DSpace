@@ -22,6 +22,21 @@
                         <ref bean="arxivLiveImportDataProvider"/>
                     </list>
                 </entry>
+                <entry key="dc.identifier.doi">
+                    <list>
+                        <ref bean="crossRefLiveImportDataProvider"/>
+                    </list>
+                </entry>
+                <entry key="dc.identifier.adsbibcode">
+                    <list>
+                        <ref bean="adsLiveImportDataProvider" />
+                    </list>
+                </entry>
+                <entry key="dc.identifier.isi">
+                    <list>
+                        <ref bean="wosLiveImportDataProvider" />
+                    </list>
+                </entry>
 	        </map>           
         </property>
     </bean>

@@ -41,7 +41,7 @@ public class OrcidQueueRestRepository extends DSpaceRestRepository<OrcidQueueRes
     private OrcidQueueService orcidQueueService;
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'ORCID', 'READ')")
+    @PreAuthorize("hasPermission(#id, 'ORCID_QUEUE', 'READ')")
     public OrcidQueueRest findOne(Context context, Integer id) {
         OrcidQueue orcidQueue = null;
         try {
@@ -61,7 +61,7 @@ public class OrcidQueueRestRepository extends DSpaceRestRepository<OrcidQueueRes
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'ORCID', 'DELETE')")
+    @PreAuthorize("hasPermission(#id, 'ORCID_QUEUE', 'DELETE')")
     protected void delete(Context context, Integer id) throws AuthorizeException {
         OrcidQueue orcidQueue = null;
         try {
@@ -77,7 +77,7 @@ public class OrcidQueueRestRepository extends DSpaceRestRepository<OrcidQueueRes
     }
 
     @SearchRestMethod(name = "findByOwner")
-    @PreAuthorize("hasPermission(#ownerId, 'ORCID_SEARCH', 'READ')")
+    @PreAuthorize("hasPermission(#ownerId, 'ORCID_QUEUE_SEARCH', 'READ')")
     public Page<OrcidQueueRest> findByOwnerId(@Parameter(value = "ownerId", required = true) String ownerId,
         Pageable pageable) {
 

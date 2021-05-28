@@ -12,23 +12,17 @@
          	<DOI>@dc.relation.doi@</DOI>
       	</Publication>
    	</PublishedIn>
-   	<Publishers>
-   		<Publisher>
-			<DisplayName>@dc.publisher@</DisplayName>
-			<OrgUnit />
-   		</Publisher>
-   	</Publishers>
    	<PublicationDate>@dc.date.issued@</PublicationDate>
 	<Volume>@oaire.citation.volume@</Volume>
 	<Issue>@oaire.citation.issue@</Issue>
    	<StartPage>@oaire.citation.startPage@</StartPage>
    	<EndPage>@oaire.citation.endPage@</EndPage>
    	<DOI>@dc.identifier.doi@</DOI>
+    <PMCID>@dc.identifier.pmid@</PMCID>
+    <ISI-Number>@dc.identifier.isi@</ISI-Number>
+    <SCP-Number>@dc.identifier.scopus@</SCP-Number>
+    <ISSN>@dc.identifier.issn@</ISSN>
    	<ISBN>@dc.identifier.isbn@</ISBN>
-   	<ISSN>@dc.identifier.issn@</ISSN>
-   	<ISI-Number>@dc.identifier.isi@</ISI-Number>
-   	<SCP-Number>@dc.identifier.scopus@</SCP-Number>
-   	<Keyword>@dc.subject@</Keyword>
    	<Authors>
    		@group.dc-contributor-author.start@
       	<Author>
@@ -55,6 +49,14 @@
    	  	</Editor>
    	    @group.dc-contributor-editor.end@
 	</Editors>
+    <Publishers>
+        <Publisher>
+            <DisplayName>@dc.publisher@</DisplayName>
+            <OrgUnit />
+        </Publisher>
+    </Publishers>
+    <License>@dc.rights.uri@</License>
+    <Keyword>@dc.subject@</Keyword>
    	<Abstract>@dc.description.abstract@</Abstract>
    	@relation.dc-relation-project.start@
    	<OriginatesFrom>
@@ -68,8 +70,8 @@
 				<By>
 					@relation.oairecerif-funder.start@
 					<OrgUnit id="@virtual.id@">
+                        <Acronym>@oairecerif.acronym@</Acronym>
 						<Name>@dc.title@</Name>
-						<Acronym>@oairecerif.acronym@</Acronym>
 					</OrgUnit>
 					@relation.oairecerif-funder.end@
 					@if.not.authority.oairecerif-funder.start@
@@ -104,5 +106,11 @@
    	</OriginatesFrom>
    	@relation.dc-relation-funding.end@
 	<PresentedAt> <Event> <Name>@dc.relation.conference@</Name> </Event> </PresentedAt>
+    <Coverage> <Event> <Name>@dc.coverage.publication@</Name> </Event> </Coverage>
 	<References> <Product> <Name>@dc.relation.dataset@</Name> </Product> </References>
+	<Access xmlns="http://purl.org/coar/access_right" 
+        endDate="@oairecerif.access.embargoEnd@"
+    >
+        @virtual.mapConverter.accessRight.oairecerif-access@
+    </Access>
 </Publication>

@@ -627,11 +627,6 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Stream lookup 4</from>
-      <to>Filter rows 2 2 2 2 2</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
       <from>log-box2metadata-metadataerror</from>
       <to>Abort BOX2METADATA-METADATA</to>
       <enabled>Y</enabled>
@@ -639,11 +634,6 @@
     <hop>
       <from>Filter rows 2 2 2 2 2</from>
       <to>log-box2metadata-metadataerror</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>isMetadataField</from>
-      <to>isBitstreamField</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
@@ -679,6 +669,26 @@
     <hop>
       <from>log-box2metadata-invalidattribute</from>
       <to>Abort BOX2METADATA-INVALIDATTRIBUTE</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>isMetadataField</from>
+      <to>isMetadataGroupField</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>isMetadataGroupField</from>
+      <to>isBitstreamField</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Stream lookup 4</from>
+      <to>isNOTBitstreamField</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>isNOTBitstreamField</from>
+      <to>Filter rows 2 2 2 2 2</to>
       <enabled>Y</enabled>
     </hop>
   </order>
@@ -938,8 +948,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>336</xloc>
-      <yloc>1264</yloc>
+      <xloc>512</xloc>
+      <yloc>1344</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2863,8 +2873,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>336</xloc>
-      <yloc>1184</yloc>
+      <xloc>304</xloc>
+      <yloc>1344</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2880,7 +2890,7 @@
       <schema_name/>
     </partitioning>
     <send_true_to>invalid-metadata-attribute</send_true_to>
-    <send_false_to>isBitstreamField</send_false_to>
+    <send_false_to>isMetadataGroupField</send_false_to>
     <compare>
       <condition>
         <negated>N</negated>
@@ -2909,6 +2919,50 @@
     <GUI>
       <xloc>336</xloc>
       <yloc>1088</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>isMetadataGroupField</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <send_true_to/>
+    <send_false_to>isBitstreamField</send_false_to>
+    <compare>
+      <condition>
+        <negated>N</negated>
+        <leftvalue>FIELDTYPE</leftvalue>
+        <function>=</function>
+        <rightvalue/>
+        <value>
+          <name>constant</name>
+          <type>String</type>
+          <text>METADATAGROUP</text>
+          <length>-1</length>
+          <precision>-1</precision>
+          <isnull>N</isnull>
+          <mask/>
+        </value>
+      </condition>
+    </compare>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>304</xloc>
+      <yloc>1200</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -3274,6 +3328,50 @@ var metadatakey = schema + "." + element + (qualifier != null?"."+qualifier:"");
     <GUI>
       <xloc>1152</xloc>
       <yloc>16</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>isNOTBitstreamField</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <send_true_to>Filter rows 2 2 2 2 2</send_true_to>
+    <send_false_to/>
+    <compare>
+      <condition>
+        <negated>N</negated>
+        <leftvalue>FIELDTYPE</leftvalue>
+        <function>&lt;></function>
+        <rightvalue/>
+        <value>
+          <name>constant</name>
+          <type>String</type>
+          <text>BITSTREAM</text>
+          <length>-1</length>
+          <precision>-1</precision>
+          <isnull>N</isnull>
+          <mask/>
+        </value>
+      </condition>
+    </compare>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>480</xloc>
+      <yloc>1008</yloc>
       <draw>Y</draw>
     </GUI>
   </step>

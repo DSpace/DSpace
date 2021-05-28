@@ -36,6 +36,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.CrisLayoutField;
+import org.dspace.layout.CrisLayoutFieldMetadata;
 import org.dspace.layout.LayoutSecurity;
 import org.dspace.layout.service.CrisLayoutBoxAccessService;
 import org.dspace.layout.service.CrisLayoutBoxService;
@@ -233,8 +234,8 @@ public class ItemConverter
         for (CrisLayoutBox box : boxes) {
             List<CrisLayoutField> crisLayoutFields = box.getLayoutFields();
             for (CrisLayoutField field : crisLayoutFields) {
-                if (field.getMetadataField().equals(metadataField)
-                    && box.getSecurity() != LayoutSecurity.PUBLIC.getValue()) {
+                if (field instanceof CrisLayoutFieldMetadata && field.getMetadataField().equals(metadataField)
+                        && box.getSecurity() != LayoutSecurity.PUBLIC.getValue()) {
                     boxesWithMetadataField.add(box);
                 }
             }
@@ -257,7 +258,9 @@ public class ItemConverter
             if (box.getSecurity() == LayoutSecurity.PUBLIC.getValue()) {
                 List<CrisLayoutField> crisLayoutFields = box.getLayoutFields();
                 for (CrisLayoutField field : crisLayoutFields) {
-                    publicMetadata.add(field.getMetadataField());
+                    if (field instanceof CrisLayoutFieldMetadata) {
+                        publicMetadata.add(field.getMetadataField());
+                    }
                 }
             }
         }

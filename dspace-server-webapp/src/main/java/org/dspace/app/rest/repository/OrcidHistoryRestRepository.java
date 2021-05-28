@@ -46,7 +46,7 @@ public class OrcidHistoryRestRepository extends DSpaceRestRepository<OrcidHistor
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'ORCID', 'READ')")
+    @PreAuthorize("hasPermission(#id, 'ORCID_HISTORY', 'READ')")
     public OrcidHistoryRest findOne(Context context, Integer id) {
         OrcidHistory orcidHistory = null;
         try {
@@ -61,7 +61,7 @@ public class OrcidHistoryRestRepository extends DSpaceRestRepository<OrcidHistor
     }
 
     @Override
-    @PreAuthorize("hasPermission(#list, 'ORCID', 'ADD')")
+    @PreAuthorize("hasPermission(#list, 'ORCID_HISTORY', 'ADD')")
     protected OrcidHistoryRest createAndReturn(Context context, List<String> list)
            throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
         OrcidHistory orcidHistory = null;

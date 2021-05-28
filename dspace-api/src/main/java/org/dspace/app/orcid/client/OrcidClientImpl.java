@@ -147,6 +147,12 @@ public class OrcidClientImpl implements OrcidClient {
     }
 
     @Override
+    public Works getWorks(String orcid) {
+        HttpUriRequest httpUriRequest = buildGetUriRequestToPublicEndpoint("/" + orcid + "/works");
+        return executeAndUnmarshall(httpUriRequest, false, Works.class);
+    }
+
+    @Override
     public WorkBulk getWorkBulk(String accessToken, String orcid, List<String> putCodes) {
         String putCode = String.join(",", putCodes);
         HttpUriRequest httpUriRequest = buildGetUriRequest(accessToken, "/" + orcid + "/works/" + putCode);
@@ -154,30 +160,35 @@ public class OrcidClientImpl implements OrcidClient {
     }
 
     @Override
+    public WorkBulk getWorkBulk(String orcid, List<String> putCodes) {
+        String putCode = String.join(",", putCodes);
+        HttpUriRequest httpUriRequest = buildGetUriRequestToPublicEndpoint("/" + orcid + "/works/" + putCode);
+        return executeAndUnmarshall(httpUriRequest, false, WorkBulk.class);
+    }
+
+    @Override
     public <T> Optional<T> getObject(String accessToken, String orcid, String putCode, Class<T> clazz) {
-        String path = PATHS_MAP.get(clazz);
-        if (path == null) {
-            throw new IllegalArgumentException("The given class is not an ORCID object's class: " + clazz);
-        }
+        String path = getOrcidPathFromOrcidObjectType(clazz);
         HttpUriRequest httpUriRequest = buildGetUriRequest(accessToken, "/" + orcid + path + "/" + putCode);
         return Optional.ofNullable(executeAndUnmarshall(httpUriRequest, true, clazz));
     }
 
     @Override
+    public <T> Optional<T> getObject(String orcid, String putCode, Class<T> clazz) {
+        String path = getOrcidPathFromOrcidObjectType(clazz);
+        HttpUriRequest httpUriRequest = buildGetUriRequestToPublicEndpoint("/" + orcid + path + "/" + putCode);
+        return Optional.ofNullable(executeAndUnmarshall(httpUriRequest, true, clazz));
+    }
+
+    @Override
     public OrcidResponse push(String accessToken, String orcid, Object object) {
-        String path = PATHS_MAP.get(object.getClass());
-        if (path == null) {
-            throw new IllegalArgumentException("The given object is not an ORCID object: " + object.getClass());
-        }
+        String path = getOrcidPathFromOrcidObjectType(object.getClass());
         return execute(buildPostUriRequest(accessToken, "/" + orcid + path, object), false);
     }
 
     @Override
     public OrcidResponse update(String accessToken, String orcid, Object object, String putCode) {
-        String path = PATHS_MAP.get(object.getClass());
-        if (path == null) {
-            throw new IllegalArgumentException("The given object is not an ORCID object: " + object.getClass());
-        }
+        String path = getOrcidPathFromOrcidObjectType(object.getClass());
         return execute(buildPutUriRequest(accessToken, "/" + orcid + path + "/" + putCode, object), false);
     }
 
@@ -275,6 +286,14 @@ public class OrcidClientImpl implements OrcidClient {
 
     private String formatExpandedSearchParameters(String query, int start, int rows) {
         return String.format("?q=%s&start=%s&rows=%s", query, start, rows);
+    }
+
+    private String getOrcidPathFromOrcidObjectType(Class<?> clazz) {
+        String path = PATHS_MAP.get(clazz);
+        if (path == null) {
+            throw new IllegalArgumentException("The given class is not an ORCID object's class: " + clazz);
+        }
+        return path;
     }
 
     private <T> T executeAndParseJson(HttpUriRequest httpUriRequest, Class<T> clazz) {

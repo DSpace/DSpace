@@ -102,16 +102,22 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
 
         originalClientId = orcidConfiguration.getClientId();
         orcidConfiguration.setClientId("DSPACE-CRIS-CLIENT-ID");
+        orcidConfiguration.setClientSecret("DSPACE-CRIS-CLIENT-SECRET");
 
         when(orcidClientMock.getReadPublicAccessToken()).thenReturn(buildTokenResponse(ACCESS_TOKEN));
 
         when(orcidClientMock.getWorks(any(), eq(ORCID))).thenReturn(unmarshall("works.xml", Works.class));
+        when(orcidClientMock.getWorks(eq(ORCID))).thenReturn(unmarshall("works.xml", Works.class));
 
         when(orcidClientMock.getObject(any(), eq(ORCID), any(), eq(Work.class)))
             .then((invocation) -> of(unmarshall("work-" + invocation.getArgument(2) + ".xml", Work.class)));
+        when(orcidClientMock.getObject(eq(ORCID), any(), eq(Work.class)))
+            .then((invocation) -> of(unmarshall("work-" + invocation.getArgument(1) + ".xml", Work.class)));
 
         when(orcidClientMock.getWorkBulk(any(), eq(ORCID), any()))
             .then((invocation) -> unmarshallWorkBulk(invocation.getArgument(2)));
+        when(orcidClientMock.getWorkBulk(eq(ORCID), any()))
+            .then((invocation) -> unmarshallWorkBulk(invocation.getArgument(1)));
 
     }
 
@@ -325,6 +331,28 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
     @Test(expected = IllegalArgumentException.class)
     public void testGetExternalDataObjectWithInvalidId() {
         dataProvider.getExternalDataObject("id");
+    }
+
+    @Test
+    public void testSearchWithoutApiKeysConfigured() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        orcidConfiguration.setClientSecret(null);
+
+        ItemBuilder.createItem(context, persons)
+            .withTitle("Profile")
+            .withOrcidIdentifier(ORCID)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        List<ExternalDataObject> externalObjects = dataProvider.searchExternalDataObjects(ORCID, 0, -1);
+        assertThat(externalObjects, hasSize(3));
+
+        verify(orcidClientMock).getWorks(ORCID);
+        verify(orcidClientMock).getWorkBulk(ORCID, List.of("277904", "277902", "277871"));
+        verifyNoMoreInteractions(orcidClientMock);
     }
 
     private Predicate<MetadataValueDTO> metadata(String metadataField, String value) {

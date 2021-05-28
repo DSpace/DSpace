@@ -87,6 +87,15 @@ public interface OrcidClient {
     Works getWorks(String accessToken, String orcid);
 
     /**
+     * Retrieves all the works related to the given orcid.
+     *
+     * @param  orcid                the orcid id related to the works
+     * @return                      the Works
+     * @throws OrcidClientException if some error occurs during the search
+     */
+    Works getWorks(String orcid);
+
+    /**
      * Retrieves all the works with the given putCodes related to the given orcid
      *
      * @param  accessToken          the access token
@@ -96,6 +105,16 @@ public interface OrcidClient {
      * @throws OrcidClientException if some error occurs during the search
      */
     WorkBulk getWorkBulk(String accessToken, String orcid, List<String> putCodes);
+
+    /**
+     * Retrieves all the works with the given putCodes related to the given orcid
+     *
+     * @param  orcid                the orcid id
+     * @param  putCodes             the putCodes of the works to retrieve
+     * @return                      the Works
+     * @throws OrcidClientException if some error occurs during the search
+     */
+    WorkBulk getWorkBulk(String orcid, List<String> putCodes);
 
     /**
      * Retrieves an object from ORCID with the given putCode related to the given
@@ -111,6 +130,20 @@ public interface OrcidClient {
      *                                  ORCID object
      */
     <T> Optional<T> getObject(String accessToken, String orcid, String putCode, Class<T> clazz);
+
+    /**
+     * Retrieves an object from ORCID with the given putCode related to the given
+     * orcid using the public API.
+     *
+     * @param  orcid                    the orcid id
+     * @param  putCode                  the object's put code
+     * @param  clazz                    the object's class
+     * @return                          the Object, if any
+     * @throws OrcidClientException     if some error occurs during the search
+     * @throws IllegalArgumentException if the given object class is not an valid
+     *                                  ORCID object
+     */
+    <T> Optional<T> getObject(String orcid, String putCode, Class<T> clazz);
 
     /**
      * Push the given object to ORCID.

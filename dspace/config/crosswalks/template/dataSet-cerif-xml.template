@@ -1,0 +1,46 @@
+<Product xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="@virtual.id@">
+	<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types">http://purl.org/coar/resource_type/c_ddb1</Type>
+	<Language>@dc.language.iso@</Language>
+	<Name>@dc.title@</Name>
+	<VersionInfo>@dc.description.version@</VersionInfo>
+	<DOI>@dc.identifier.doi@</DOI>
+	<Creators>
+      @group.dc-contributor-author.start@
+	  <Creator>
+         <DisplayName>@dc.contributor.author@</DisplayName>
+		 <Person id="@virtual.authority.dc-contributor-author@" />
+         <Affiliation>
+            <OrgUnit>
+         	   <Name>@oairecerif.author.affiliation@</Name>
+         	</OrgUnit>
+         </Affiliation>
+      </Creator>
+   	  @group.dc-contributor-author.end@
+    </Creators>
+    <Publishers>
+    	<Publisher> <OrgUnit> <Name>@dc.publisher@</Name> </OrgUnit> </Publisher>
+    </Publishers>
+	<Description>@dc.description.abstract@</Description>
+    <Keyword>@dc.subject@</Keyword>
+	@relation.dc-relation-project.start@
+   	<OriginatesFrom>
+      	<Project id="@virtual.id@">
+			<Acronym>@oairecerif.acronym@</Acronym>
+         	<Title>@dc.title@</Title>
+      	</Project>
+	</OriginatesFrom>
+   	@relation.dc-relation-project.end@
+	@if.not.authority.dc-relation-project.start@
+	<OriginatesFrom> <Project> <Title>@dc.relation.project@</Title> </Project> </OriginatesFrom>
+	@if.not.authority.dc-relation-project.end@
+	@relation.dc-relation-equipment.start@
+	<GeneratedBy>
+		<Equipment id="@virtual.id@">
+			<Name>@dc.title@</Name>
+		</Equipment>
+	</GeneratedBy>
+	@relation.dc-relation-equipment.end@
+	@if.not.authority.dc-relation-equipment.start@
+	<GeneratedBy> <Equipment> <Name>@dc.relation.equipment@</Name> </Equipment> </GeneratedBy>
+	@if.not.authority.dc-relation-equipment.end@
+</Product>
