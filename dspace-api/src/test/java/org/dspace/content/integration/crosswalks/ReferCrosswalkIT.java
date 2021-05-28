@@ -1594,7 +1594,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .build();
 
         Item dataSet = ItemBuilder.createItem(context, collection)
-            .withEntityType("DataSet")
+            .withEntityType("Dataset")
             .withTitle("Test DataSet")
             .withLanguage("EN")
             .withDescriptionVersion("V-01")
@@ -1628,7 +1628,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
     public void testManyDataSetsCerifXmlDisseminate() throws Exception {
 
         Item firstDataSet = ItemBuilder.createItem(context, collection)
-            .withEntityType("DataSet")
+            .withEntityType("Dataset")
             .withTitle("First DataSet")
             .withAuthor("Walter White")
             .withAuthorAffiliation(PLACEHOLDER_PARENT_METADATA_VALUE)
@@ -1640,7 +1640,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .build();
 
         Item secondDataSet = ItemBuilder.createItem(context, collection)
-            .withEntityType("DataSet")
+            .withEntityType("Dataset")
             .withTitle("Second DataSet")
             .withPublisher("Publisher")
             .withSubject("DataSet")
