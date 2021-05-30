@@ -31,7 +31,7 @@ import org.dspace.xoai.util.ItemUtils;
  * Additional xml is written into a node named "cerif." + value of field name passed in plugin configuration
  *
  */
-public class XOAICerifItemCompilePlugin implements XOAIItemCompilePlugin {
+public class XOAICerifItemCompilePlugin implements XOAIExtensionItemCompilePlugin {
 
     private static final Logger log = LogManager.getLogger(XOAICerifItemCompilePlugin.class);
 
