@@ -190,22 +190,22 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
                                                    "forming schema.element.qualifier metadata field name");
             }
             filterQueries.add(searchService.toFilterQuery(context, MetadataFieldIndexFactoryImpl.FIELD_NAME_VARIATIONS,
-                OPERATOR_EQUALS, query).getFilterQuery() + "*");
+                OPERATOR_EQUALS, query, null).getFilterQuery() + "*");
         }
         if (StringUtils.isNotBlank(schemaName)) {
             filterQueries.add(
                 searchService.toFilterQuery(context, MetadataFieldIndexFactoryImpl.SCHEMA_FIELD_NAME, OPERATOR_EQUALS,
-                    schemaName).getFilterQuery());
+                    schemaName, null).getFilterQuery());
         }
         if (StringUtils.isNotBlank(elementName)) {
             filterQueries.add(
                 searchService.toFilterQuery(context, MetadataFieldIndexFactoryImpl.ELEMENT_FIELD_NAME, OPERATOR_EQUALS,
-                    elementName).getFilterQuery());
+                    elementName, null).getFilterQuery());
         }
         if (StringUtils.isNotBlank(qualifierName)) {
             filterQueries.add(searchService
                 .toFilterQuery(context, MetadataFieldIndexFactoryImpl.QUALIFIER_FIELD_NAME, OPERATOR_EQUALS,
-                    qualifierName).getFilterQuery());
+                    qualifierName, null).getFilterQuery());
         }
 
         DiscoverQuery discoverQuery = new DiscoverQuery();

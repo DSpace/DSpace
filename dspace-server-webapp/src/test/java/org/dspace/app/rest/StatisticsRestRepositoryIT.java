@@ -231,10 +231,9 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         authorizeService.removeAllPolicies(context, itemNotVisitedWithBitstreams);
         // We request a dso's TotalVisits usage stat report with unvalid token
         getClient("unvalidToken").perform(
-                get("/api/statistics/usagereports/" +
-                        itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_VISITS_REPORT_ID))
-                // ** THEN **
-                .andExpect(status().isForbidden());
+            get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_VISITS_REPORT_ID))
+                                 // ** THEN **
+                                 .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -892,10 +891,10 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         authorizeService.removeAllPolicies(context, itemNotVisitedWithBitstreams);
         // We request a dso's TotalVisits usage stat report with unvalid token
         getClient("unvalidToken")
-                .perform(get("/api/statistics/usagereports/search/object?uri=http://localhost:8080/server/api/core" +
-                        "/items/" + itemNotVisitedWithBitstreams.getID()))
-                // ** THEN **
-                .andExpect(status().isForbidden());
+            .perform(get("/api/statistics/usagereports/search/object?uri=http://localhost:8080/server/api/core" +
+                         "/items/" + itemNotVisitedWithBitstreams.getID()))
+            // ** THEN **
+            .andExpect(status().isUnauthorized());
     }
 
     @Test

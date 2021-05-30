@@ -113,7 +113,7 @@ public class Utils {
     /**
      * The default page size, if unspecified in the request.
      */
-    private static final int DEFAULT_PAGE_SIZE = 20;
+    public static final int DEFAULT_PAGE_SIZE = 20;
 
     /**
      * The maximum number of embed levels to allow.
