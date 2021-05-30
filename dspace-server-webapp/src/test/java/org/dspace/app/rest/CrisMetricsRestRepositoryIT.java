@@ -288,10 +288,14 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
         getClient(tokenEperson).perform(get("/api/core/items/" + itemA.getID() + "/metrics"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.metrics").value(Matchers.hasSize(0)))
+                .andExpect(jsonPath("$._embedded.metrics").value(Matchers.hasSize(2)))
+                .andExpect(jsonPath("$._embedded.metrics").value(Matchers.containsInAnyOrder(
+                        CrisMetricsMatcher.matchCrisDynamicMetrics(itemA.getID(), "embedded-view"),
+                        CrisMetricsMatcher.matchCrisDynamicMetrics(itemA.getID(), "embedded-download")
+                        )))
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.containsString("api/core/items/" + itemA.getID() + "/metrics")))
-                .andExpect(jsonPath("$.page.totalElements", is(0)));
+                .andExpect(jsonPath("$.page.totalElements", is(2)));
     }
 
     @Test
@@ -379,9 +383,9 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
 
         Date date = calendar.getTime();
 
-        String remark = "{identifier:2-s2.0-67349162500, link:https://www.scopus.com/inward/citedby.uri?"
+        String remark = "{\"identifier\":\"2-s2.0-67349162500\", \"detailUrl\":\"https://www.scopus.com/inward/citedby.uri?"
                 + "partnerIDu003dHzOxMe3bu0026scpu003d67349162500u0026originu003dinward"
-                + "pmid:19406218,doi:10.1016/j.gene.2009.04.019}";
+                + "\",\"pmid\":\"19406218\",\"doi\":\"10.1016/j.gene.2009.04.019\"}";
 
         CrisMetrics metric = CrisMetricsBuilder.createCrisMetrics(context, itemA)
                 .withAcquisitionDate(date)
@@ -423,11 +427,12 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
                         CrisMetricsMatcher.matchCrisMetrics(metric2),
                         CrisMetricsMatcher.matchCrisMetrics(metric3),
                         CrisMetricsMatcher.matchCrisDynamicMetrics(itemA.getID(), "google-scholar"),
-                        CrisMetricsMatcher.matchCrisDynamicMetrics(itemA.getID(), "altmetric")
+                        CrisMetricsMatcher.matchCrisDynamicMetrics(itemA.getID(), "altmetric"),
+                        CrisMetricsMatcher.matchCrisDynamicMetrics(itemA.getID(), "embedded-download")
                 )))
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.containsString("api/core/items/" + itemA.getID() + "/metrics")))
-                .andExpect(jsonPath("$.page.totalElements", is(5)));
+                .andExpect(jsonPath("$.page.totalElements", is(6)));
     }
 
     @Test
@@ -472,9 +477,9 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
         calendar.set(Calendar.MONTH, 9);
         calendar.set(Calendar.DATE, 31);
         Date date = calendar.getTime();
-        String remark = "{identifier:2-s2.0-67349162500, link:https://www.scopus.com/inward/citedby.uri?"
+        String remark = "{\"identifier\":\"2-s2.0-67349162500\", \"detailUrl\":\"https://www.scopus.com/inward/citedby.uri?"
                 + "partnerIDu003dHzOxMe3bu0026scpu003d67349162500u0026originu003dinward"
-                + "pmid:19406218,doi:10.1016/j.gene.2009.04.019}";
+                + "\",\"pmid\":\"19406218\",\"doi\":\"10.1016/j.gene.2009.04.019\"}";
         CrisMetrics metric = CrisMetricsBuilder.createCrisMetrics(context, itemA)
                 .withAcquisitionDate(date)
                 .withMetricType("ScopusCitation")
@@ -492,24 +497,6 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
         context.restoreAuthSystemState();
         //save all metrics on solr search core
         String[] args = new String[]{"update-metrics-in-solr"};
-        String remark_view = configurationService.getProperty("dspace.ui.url") + "statistics/items/" + itemA.getID();
-        // view metric
-        CrisMetrics crisMetricsEmbeddedView = new CrisMetrics();
-        crisMetricsEmbeddedView.setId(3);
-        crisMetricsEmbeddedView.setResource(itemA);
-        crisMetricsEmbeddedView.setAcquisitionDate(new Date());
-        crisMetricsEmbeddedView.setMetricType("view");
-        crisMetricsEmbeddedView.setLast(true);
-        // download metric
-        CrisMetrics crisMetricsEmbeddedDownload = new CrisMetrics();
-        crisMetricsEmbeddedDownload.setId(4);
-        crisMetricsEmbeddedDownload.setResource(itemA);
-        crisMetricsEmbeddedDownload.setAcquisitionDate(new Date());
-        crisMetricsEmbeddedDownload.setMetricType("download");
-        crisMetricsEmbeddedDownload.setLast(true);
-        // add metrics only in solr
-        searchService.updateMetrics(context, crisMetricsEmbeddedView);
-        searchService.updateMetrics(context, crisMetricsEmbeddedDownload);
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
         int status = handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin);
         assertEquals(0, status);
@@ -543,9 +530,9 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
         calendar.set(Calendar.MONTH, 9);
         calendar.set(Calendar.DATE, 31);
         Date date = calendar.getTime();
-        String remark = "{identifier:2-s2.0-67349162500, link:https://www.scopus.com/inward/citedby.uri?"
+        String remark = "{\"identifier\":\"2-s2.0-67349162500\", \"detailUrl\":\"https://www.scopus.com/inward/citedby.uri?"
                 + "partnerIDu003dHzOxMe3bu0026scpu003d67349162500u0026originu003dinward"
-                + "pmid:19406218,doi:10.1016/j.gene.2009.04.019}";
+                + "\",\"pmid\":\"19406218\",\"doi\":\"10.1016/j.gene.2009.04.019\"}";
         CrisMetrics metric = CrisMetricsBuilder.createCrisMetrics(context, itemA)
                 .withAcquisitionDate(date)
                 .withMetricType("ScopusCitation")

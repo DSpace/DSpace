@@ -10,18 +10,26 @@ package org.dspace.app.rest;
 import static org.apache.commons.codec.CharEncoding.UTF_8;
 import static org.apache.commons.io.IOUtils.toInputStream;
 import static org.dspace.app.rest.utils.UsageReportUtils.TOP_CITIES_REPORT_ID;
-import static org.dspace.app.rest.utils.UsageReportUtils.TOP_CITIES_REPORT_ID_RELATION;
+import static org.dspace.app.rest.utils.UsageReportUtils.TOP_CITIES_REPORT_ID_RELATION_ORGUNIT_RP_RESEARCHOUTPUTS;
+import static org.dspace.app.rest.utils.UsageReportUtils.TOP_CITIES_REPORT_ID_RELATION_PERSON_RESEARCHOUTPUTS;
 import static org.dspace.app.rest.utils.UsageReportUtils.TOP_COUNTRIES_REPORT_ID;
-import static org.dspace.app.rest.utils.UsageReportUtils.TOP_COUNTRIES_REPORT_ID_RELATION;
-import static org.dspace.app.rest.utils.UsageReportUtils.TOP_ITEMS_REPORT_RELATION;
+import static org.dspace.app.rest.utils.UsageReportUtils.TOP_COUNTRIES_REPORT_ID_RELATION_ORGUNIT_RP_RESEARCHOUTPUTS;
+import static org.dspace.app.rest.utils.UsageReportUtils.TOP_COUNTRIES_REPORT_ID_RELATION_PERSON_RESEARCHOUTPUTS;
+import static org.dspace.app.rest.utils.UsageReportUtils.TOP_ITEMS_REPORT_RELATION_ORGUNIT_RP_RESEARCHOUTPUTS;
 import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_DOWNLOADS_REPORT_ID;
-import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_DOWNLOADS_REPORT_ID_RELATION;
+import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_DOWNLOADS_REPORT_ID_RELATION_ORGUNIT_RP_RESEARCHOUTPUTS;
+//import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_DOWNLOADS_REPORT_ID_RELATION_PERSON_RESEARCHOUTPUTS;
 import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_VISITS_PER_MONTH_REPORT_ID;
-import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_VISITS_PER_MONTH_REPORT_ID_RELATION;
+import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_VISITS_PER_MONTH_REPORT_ID_RELATION_ORGUNIT_RP_RESEARCHOUTPUTS;
+import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_VISITS_PER_MONTH_REPORT_ID_RELATION_PERSON_RESEARCHOUTPUTS;
 import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_VISITS_REPORT_ID;
-import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_VISITS_REPORT_ID_RELATION;
+//import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_VISITS_REPORT_ID_RELATION_ORGUNIT_PROJECTS;
+import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_VISITS_REPORT_ID_RELATION_ORGUNIT_RP_RESEARCHOUTPUTS;
+import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_VISITS_REPORT_ID_RELATION_PERSON_PROJECTS;
+import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_VISITS_REPORT_ID_RELATION_PERSON_RESEARCHOUTPUTS;
 import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_VISITS_TOTAL_DOWNLOADS;
-import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_VISITS_TOTAL_DOWNLOADS_RELATION;
+import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_VISITS_TOTAL_DOWNLOADS_RELATION_ORGUNIT_RP_RESEARCHOUTPUTS;
+//import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_VISITS_TOTAL_DOWNLOADS_RELATION_PERSON_RESEARCHOUTPUTS;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -1574,7 +1582,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         UsageReportPointDsoTotalVisitsRest totalVisitRelation = new UsageReportPointDsoTotalVisitsRest();
         totalVisitRelation.addValue("views", 3);
         totalVisitRelation.setType("item");
-        totalVisitRelation.setLabel(person.getName());
+        totalVisitRelation.setLabel("Views");
         totalVisitRelation.setId(person.getID().toString());
         //create expected report points for visits with relation
         UsageReportPointDsoTotalVisitsRest expectedPointTotal = new UsageReportPointDsoTotalVisitsRest();
@@ -1582,6 +1590,12 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         expectedPointTotal.setType("item");
         expectedPointTotal.setLabel(person.getName());
         expectedPointTotal.setId(person.getID().toString());
+
+        UsageReportPointDsoTotalVisitsRest totalVisitRelationProjects = new UsageReportPointDsoTotalVisitsRest();
+        totalVisitRelationProjects.addValue("views", 0);
+        totalVisitRelationProjects.setType("item");
+        totalVisitRelation.setLabel("Views");
+        totalVisitRelationProjects.setId(person.getID().toString());
 
         //create expected report points for city visits
         UsageReportPointCityRest expectedPointCity = new UsageReportPointCityRest();
@@ -1609,36 +1623,40 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                 .andExpect(jsonPath("$._embedded.usagereports", not(empty())))
                 .andExpect(jsonPath("$._embedded.usagereports", Matchers.containsInAnyOrder(
                         UsageReportMatcher.matchUsageReport(person.getID() + "_" +
-                                                                TOTAL_VISITS_REPORT_ID,
-                                                            TOTAL_VISITS_REPORT_ID,
-                                                            Arrays.asList(expectedPointTotal)),
+                                    TOTAL_VISITS_REPORT_ID,
+                                    TOTAL_VISITS_REPORT_ID,
+                                    Arrays.asList(expectedPointTotal)),
                         UsageReportMatcher.matchUsageReport(person.getID() + "_" +
-                                                                TOTAL_VISITS_REPORT_ID_RELATION,
-                                                            TOTAL_VISITS_REPORT_ID,
-                                                            Arrays.asList(totalVisitRelation)),
+                                    TOTAL_VISITS_REPORT_ID_RELATION_PERSON_RESEARCHOUTPUTS,
+                                    TOTAL_VISITS_REPORT_ID,
+                                    Arrays.asList(totalVisitRelation)),
                         UsageReportMatcher.matchUsageReport(person.getID() + "_" +
-                                                                TOTAL_VISITS_PER_MONTH_REPORT_ID,
-                                                            TOTAL_VISITS_PER_MONTH_REPORT_ID,
-                                                            this.getListOfVisitsPerMonthsPoints(1)),
+                                    TOTAL_VISITS_PER_MONTH_REPORT_ID,
+                                    TOTAL_VISITS_PER_MONTH_REPORT_ID,
+                                    this.getListOfVisitsPerMonthsPoints(1)),
                         UsageReportMatcher.matchUsageReport(person.getID() + "_" +
-                                                                TOTAL_VISITS_PER_MONTH_REPORT_ID_RELATION,
-                                                            TOTAL_VISITS_PER_MONTH_REPORT_ID,
-                                                            this.getListOfVisitsPerMonthsPoints(3)),
+                                    TOTAL_VISITS_PER_MONTH_REPORT_ID_RELATION_PERSON_RESEARCHOUTPUTS,
+                                    TOTAL_VISITS_PER_MONTH_REPORT_ID,
+                                    this.getListOfVisitsPerMonthsPoints(3)),
                         UsageReportMatcher.matchUsageReport(person.getID() + "_" +
-                                                                TOP_CITIES_REPORT_ID, TOP_CITIES_REPORT_ID,
-                                                            Arrays.asList(expectedPointCity)),
+                                    TOP_CITIES_REPORT_ID, TOP_CITIES_REPORT_ID,
+                                    Arrays.asList(expectedPointCity)),
                         UsageReportMatcher.matchUsageReport(person.getID() + "_" +
-                                                                TOP_CITIES_REPORT_ID_RELATION,
-                                                            TOP_CITIES_REPORT_ID,
-                                                            Arrays.asList(expectedPointCityWithRelation)),
+                                    TOP_CITIES_REPORT_ID_RELATION_PERSON_RESEARCHOUTPUTS,
+                                    TOP_CITIES_REPORT_ID,
+                                    Arrays.asList(expectedPointCityWithRelation)),
                         UsageReportMatcher.matchUsageReport(person.getID() + "_" +
-                                                                TOP_COUNTRIES_REPORT_ID,
-                                                            TOP_COUNTRIES_REPORT_ID,
-                                                            Arrays.asList(expectedPointCountry)),
+                                    TOP_COUNTRIES_REPORT_ID,
+                                    TOP_COUNTRIES_REPORT_ID,
+                                    Arrays.asList(expectedPointCountry)),
                         UsageReportMatcher.matchUsageReport(person.getID() + "_" +
-                                                                TOP_COUNTRIES_REPORT_ID_RELATION,
-                                                            TOP_COUNTRIES_REPORT_ID,
-                                                            Arrays.asList(expectedPointCountryWithRelation))
+                                    TOP_COUNTRIES_REPORT_ID_RELATION_PERSON_RESEARCHOUTPUTS,
+                                    TOP_COUNTRIES_REPORT_ID,
+                                    Arrays.asList(expectedPointCountryWithRelation)),
+                        UsageReportMatcher.matchUsageReport(person.getID() + "_" +
+                                    TOTAL_VISITS_REPORT_ID_RELATION_PERSON_PROJECTS,
+                                    TOTAL_VISITS_REPORT_ID,
+                                    Arrays.asList(totalVisitRelationProjects))
                 )));
     }
     //test for inverse relation between orgunit and publication
@@ -1714,7 +1732,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         UsageReportPointDsoTotalVisitsRest totalVisitRelation = new UsageReportPointDsoTotalVisitsRest();
         totalVisitRelation.addValue("views", 3);
         totalVisitRelation.setType("item");
-        totalVisitRelation.setLabel("4Science");
+        totalVisitRelation.setLabel("Views");
         totalVisitRelation.setId(orgUnit.getID().toString());
         //create expected report points for city visits with relation
         UsageReportPointCityRest expectedPointCityWithRelation = new UsageReportPointCityRest();
@@ -1768,39 +1786,38 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
 
         getClient(adminToken)
                 .perform(get("/api/statistics/usagereports/search/object?uri=http://localhost:8080/server/api/core" +
-                        "/items/" + orgUnit.getID().toString()))
+                        "/items/" + orgUnit.getID().toString())
+                            .param("size", "50"))
                 // ** THEN **
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.usagereports", not(empty())))
-                .andExpect(jsonPath("$._embedded.usagereports", Matchers.containsInAnyOrder(
+                .andExpect(jsonPath("$._embedded.usagereports", Matchers.hasItems(
                         UsageReportMatcher.matchUsageReport(orgUnit.getID() + "_" +
-                                                                TOTAL_VISITS_REPORT_ID_RELATION,
-                                                            TOTAL_VISITS_REPORT_ID,
-                                                            Arrays.asList(totalVisitRelation)),
+                                        TOTAL_VISITS_REPORT_ID_RELATION_ORGUNIT_RP_RESEARCHOUTPUTS,
+                                        TOTAL_VISITS_REPORT_ID,
+                                        Arrays.asList(totalVisitRelation)),
                         UsageReportMatcher.matchUsageReport(orgUnit.getID() + "_" +
-                                                                TOTAL_VISITS_PER_MONTH_REPORT_ID_RELATION,
-                                                            TOTAL_VISITS_PER_MONTH_REPORT_ID,
-                                                            this.getListOfVisitsPerMonthsPoints(3)),
+                                        TOTAL_VISITS_PER_MONTH_REPORT_ID_RELATION_ORGUNIT_RP_RESEARCHOUTPUTS,
+                                        TOTAL_VISITS_PER_MONTH_REPORT_ID,
+                                        this.getListOfVisitsPerMonthsPoints(3)),
                         UsageReportMatcher.matchUsageReport(orgUnit.getID() + "_" +
-                                                                TOP_CITIES_REPORT_ID_RELATION,
-                                                            TOP_CITIES_REPORT_ID,
-                                                            Arrays.asList(expectedPointCityWithRelation)),
+                                        TOP_CITIES_REPORT_ID_RELATION_ORGUNIT_RP_RESEARCHOUTPUTS,
+                                        TOP_CITIES_REPORT_ID,
+                                        Arrays.asList(expectedPointCityWithRelation)),
                         UsageReportMatcher.matchUsageReport(orgUnit.getID() + "_" +
-                                                                TOP_COUNTRIES_REPORT_ID_RELATION,
-                                                            TOP_COUNTRIES_REPORT_ID,
-                                                            Arrays.asList(expectedPointCountryWithRelation)),
-
-
+                                        TOP_COUNTRIES_REPORT_ID_RELATION_ORGUNIT_RP_RESEARCHOUTPUTS,
+                                        TOP_COUNTRIES_REPORT_ID,
+                                        Arrays.asList(expectedPointCountryWithRelation)),
                         UsageReportMatcher.matchUsageReport(orgUnit.getID() + "_" +
-                                                                TOP_ITEMS_REPORT_RELATION,
-                                                            TOTAL_VISITS_REPORT_ID, points),
+                                        TOP_ITEMS_REPORT_RELATION_ORGUNIT_RP_RESEARCHOUTPUTS,
+                                        TOTAL_VISITS_REPORT_ID, points),
                         UsageReportMatcher.matchUsageReport(orgUnit.getID() + "_" +
-                                                                TOTAL_DOWNLOADS_REPORT_ID_RELATION,
-                                                            TOTAL_DOWNLOADS_REPORT_ID, totalDownloadsPoints),
+                                        TOTAL_DOWNLOADS_REPORT_ID_RELATION_ORGUNIT_RP_RESEARCHOUTPUTS,
+                                        TOTAL_DOWNLOADS_REPORT_ID, totalDownloadsPoints),
                         UsageReportMatcher.matchUsageReport(orgUnit.getID() + "_" +
-                                                                TOTAL_VISITS_TOTAL_DOWNLOADS_RELATION,
-                                                            TOTAL_VISITS_TOTAL_DOWNLOADS,
-                                                            totalDownloadsAndViewsPoints)
+                                        TOTAL_VISITS_TOTAL_DOWNLOADS_RELATION_ORGUNIT_RP_RESEARCHOUTPUTS,
+                                        TOTAL_VISITS_TOTAL_DOWNLOADS,
+                                        totalDownloadsAndViewsPoints)
                 )));
     }
 }

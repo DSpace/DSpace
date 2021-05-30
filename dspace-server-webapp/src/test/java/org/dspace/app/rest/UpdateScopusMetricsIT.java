@@ -122,7 +122,7 @@ public class UpdateScopusMetricsIT extends AbstractControllerIntegrationTest {
             assertEquals(UpdateScopusMetrics.SCOPUS_CITATION, metrics.getMetricType());
             assertEquals(44, metrics.getMetricCount(), 0);
 
-            String remark = "{\"identifier\":\"2-s2.0-67349162500\",\"link\":"
+            String remark = "{\"identifier\":\"2-s2.0-67349162500\",\"detailUrl\":"
                     + "\"https://www.scopus.com/inward/citedby.uri?"
                     + "partnerID\\u003dHzOxMe3b\\u0026scp\\u003d67349162500\\u0026origin\\u003dinward\""
                     + ",\"pmid\":\"19406218\",\"doi\":\"10.1016/j.gene.2009.04.019\"}";
@@ -273,7 +273,7 @@ public class UpdateScopusMetricsIT extends AbstractControllerIntegrationTest {
             assertEquals(UpdateScopusMetrics.SCOPUS_CITATION, metrics.getMetricType());
             assertEquals(44, metrics.getMetricCount(), 0);
 
-            String remark = "{\"identifier\":\"2-s2.0-67349162500\",\"link\":"
+            String remark = "{\"identifier\":\"2-s2.0-67349162500\",\"detailUrl\":"
                     + "\"https://www.scopus.com/inward/citedby.uri?"
                     + "partnerID\\u003dHzOxMe3b\\u0026scp\\u003d67349162500\\u0026origin\\u003dinward\""
                     + ",\"pmid\":\"19406218\",\"doi\":\"10.1016/j.gene.2009.04.019\"}";
@@ -361,7 +361,7 @@ public class UpdateScopusMetricsIT extends AbstractControllerIntegrationTest {
             assertEquals(UpdateScopusMetrics.SCOPUS_CITATION, metrics.getMetricType());
             assertEquals(44, metrics.getMetricCount(), 0);
 
-            String remark = "{\"identifier\":\"2-s2.0-67349162500\",\"link\":"
+            String remark = "{\"identifier\":\"2-s2.0-67349162500\",\"detailUrl\":"
                     + "\"https://www.scopus.com/inward/citedby.uri?"
                     + "partnerID\\u003dHzOxMe3b\\u0026scp\\u003d67349162500\\u0026origin\\u003dinward\""
                     + ",\"pmid\":\"19406218\",\"doi\":\"10.1016/j.gene.2009.04.019\"}";

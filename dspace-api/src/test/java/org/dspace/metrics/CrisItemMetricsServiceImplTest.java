@@ -99,7 +99,7 @@ public class CrisItemMetricsServiceImplTest {
 
         // should combine stored and embeddable
         when(crisItemMetricsService.getStoredMetrics(any(), any())).thenReturn(stored);
-        when(crisItemMetricsService.getEmbeddableMetrics(any(), any())).thenReturn(embeddable);
+        when(crisItemMetricsService.getEmbeddableMetrics(any(), any(), any())).thenReturn(embeddable);
         when(crisItemMetricsService.getMetrics(any(), any())).thenCallRealMethod();
 
         assertEquals(crisItemMetricsService.getMetrics(null, null).size(), 2);
@@ -121,15 +121,15 @@ public class CrisItemMetricsServiceImplTest {
 
         // should call provide on each provider and add every present metric
 
-        when(provider1.provide(context, item)).thenReturn(Optional.of(embeddable1));
-        when(provider2.provide(context, item)).thenReturn(Optional.empty());
+        when(provider1.provide(context, item, null)).thenReturn(Optional.of(embeddable1));
+        when(provider2.provide(context, item, null)).thenReturn(Optional.empty());
 
-        when(crisItemMetricsService.getEmbeddableMetrics(context, item.getID())).thenCallRealMethod();
+        when(crisItemMetricsService.getEmbeddableMetrics(context, item.getID(), null)).thenCallRealMethod();
 
-        List<EmbeddableCrisMetrics> result = crisItemMetricsService.getEmbeddableMetrics(context, item.getID());
+        List<EmbeddableCrisMetrics> result = crisItemMetricsService.getEmbeddableMetrics(context, item.getID(), null);
 
-        verify(provider1, times(1)).provide(context, item);
-        verify(provider2, times(1)).provide(context, item);
+        verify(provider1, times(1)).provide(context, item, null);
+        verify(provider2, times(1)).provide(context, item, null);
 
         assertEquals(result.size(), 1);
 

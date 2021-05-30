@@ -8,11 +8,9 @@
 
 package org.dspace.metrics.embeddable.impl;
 
-import java.sql.SQLException;
-import java.util.Objects;
+import java.util.List;
 
 import org.dspace.app.metrics.CrisMetrics;
-import org.dspace.app.metrics.service.CrisMetricsService;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
@@ -22,8 +20,6 @@ public class DefaultViewEmbeddableMetricProvider extends AbstractEmbeddableMetri
 
     @Autowired
     private ConfigurationService configurationService;
-    @Autowired
-    private CrisMetricsService crisMetricsService;
 
     private final String TEMPLATE =
             "<a "
@@ -34,19 +30,11 @@ public class DefaultViewEmbeddableMetricProvider extends AbstractEmbeddableMetri
                     + "</a>";
 
     @Override
-    public boolean hasMetric(Context context, Item item) {
-
-        try {
-            final CrisMetrics view = crisMetricsService.findLastMetricByResourceIdAndMetricsTypes(
-                context,
-                "view",
-                item.getID());
-            return Objects.isNull(view);
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
-            return false;
+    public boolean hasMetric(Context context, Item item, List<CrisMetrics> retrivedStoredMetrics) {
+        if (retrivedStoredMetrics == null) {
+            return true;
         }
-
+        return !retrivedStoredMetrics.stream().anyMatch(m -> fallbackOf(m.getMetricType()));
     }
 
     @Override

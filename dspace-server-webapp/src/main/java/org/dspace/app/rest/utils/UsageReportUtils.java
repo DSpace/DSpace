@@ -41,18 +41,40 @@ public class UsageReportUtils {
     private StatisticsReportsConfiguration configuration;
 
     public static final String TOTAL_VISITS_REPORT_ID = "TotalVisits";
-    public static final String TOTAL_VISITS_REPORT_ID_RELATION = "TotalVisitsRelation";
-    public static final String TOP_ITEMS_REPORT_RELATION = "TopItemsRelation";
-    public static final String TOTAL_DOWNLOADS_REPORT_ID_RELATION = "TotalDownloadsRelation";
-    public static final String TOTAL_VISITS_PER_MONTH_REPORT_ID_RELATION = "TotalVisitPerPeriodRelation";
+    public static final String TOTAL_VISITS_REPORT_ID_RELATION_PERSON_RESEARCHOUTPUTS
+        = "TotalVisitsPersonResearchoutputs";
+    public static final String TOTAL_VISITS_REPORT_ID_RELATION_PERSON_PROJECTS
+        = "TotalVisitsPersonProjects";
+    public static final String TOTAL_VISITS_REPORT_ID_RELATION_ORGUNIT_RP_RESEARCHOUTPUTS
+        = "TotalVisitsOrgUnitRppublications";
+    public static final String TOTAL_VISITS_REPORT_ID_RELATION_ORGUNIT_PROJECTS
+        = "TotalVisitsOrgUnitRpprojects";
+    public static final String TOP_ITEMS_REPORT_RELATION_ORGUNIT_RP_RESEARCHOUTPUTS = "TopItemsOrgUnitRppublications";
+    public static final String TOTAL_DOWNLOADS_REPORT_ID_RELATION_PERSON_RESEARCHOUTPUTS
+        = "TotalDownloadsPersonResearchoutputs";
+    public static final String TOTAL_DOWNLOADS_REPORT_ID_RELATION_ORGUNIT_RP_RESEARCHOUTPUTS
+        = "TotalDownloadsOrgUnitRppublications";
+    public static final String TOTAL_VISITS_PER_MONTH_REPORT_ID_RELATION_PERSON_RESEARCHOUTPUTS
+        = "TotalVisitPerPeriodPersonResearchoutputs";
+    public static final String TOTAL_VISITS_PER_MONTH_REPORT_ID_RELATION_ORGUNIT_RP_RESEARCHOUTPUTS
+        = "TotalVisitPerPeriodOrgUnitRppublications";
     public static final String TOTAL_VISITS_PER_MONTH_REPORT_ID = "TotalVisitsPerMonth";
     public static final String TOTAL_DOWNLOADS_REPORT_ID = "TotalDownloads";
     public static final String TOP_COUNTRIES_REPORT_ID = "TopCountries";
-    public static final String TOP_COUNTRIES_REPORT_ID_RELATION = "TopCountriesRelation";
+    public static final String TOP_COUNTRIES_REPORT_ID_RELATION_PERSON_RESEARCHOUTPUTS
+        = "TopCountriesPersonResearchoutputs";
+    public static final String TOP_COUNTRIES_REPORT_ID_RELATION_ORGUNIT_RP_RESEARCHOUTPUTS
+        = "TopCountriesOrgUnitRppublications";
     public static final String TOP_CITIES_REPORT_ID = "TopCities";
-    public static final String TOP_CITIES_REPORT_ID_RELATION = "TopCitiesRelation";
+    public static final String TOP_CITIES_REPORT_ID_RELATION_PERSON_RESEARCHOUTPUTS
+        = "TopCitiesPersonResearchoutputs";
+    public static final String TOP_CITIES_REPORT_ID_RELATION_ORGUNIT_RP_RESEARCHOUTPUTS
+        = "TopCitiesOrgUnitRppublications";
     public static final String TOTAL_VISITS_TOTAL_DOWNLOADS = "TotalVisitsAndDownloads";
-    public static final String TOTAL_VISITS_TOTAL_DOWNLOADS_RELATION = "TotalViewsDownloadsRelation";
+    public static final String TOTAL_VISITS_TOTAL_DOWNLOADS_RELATION_PERSON_RESEARCHOUTPUTS
+        = "TotalViewsDownloadsPersonResearchoutputs";
+    public static final String TOTAL_VISITS_TOTAL_DOWNLOADS_RELATION_ORGUNIT_RP_RESEARCHOUTPUTS
+        = "TotalViewsDownloadsOrgUnitRppublications";
 
     /**
      * Get list of usage reports that are applicable to the DSO (of given UUID)

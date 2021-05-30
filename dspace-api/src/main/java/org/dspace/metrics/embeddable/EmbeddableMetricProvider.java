@@ -8,8 +8,10 @@
 package org.dspace.metrics.embeddable;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 
+import org.dspace.app.metrics.CrisMetrics;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.metrics.embeddable.model.EmbeddableCrisMetrics;
@@ -20,9 +22,10 @@ public interface EmbeddableMetricProvider {
      * returns weter or not a given item has a metric of the kind handled by implementing class
      * @param context
      * @param item
+     * @param retrivedStoredMetrics the already retrieved stored metrics
      * @return
      */
-    boolean hasMetric(Context context, Item item);
+    boolean hasMetric(Context context, Item item,  List<CrisMetrics> retrivedStoredMetrics);
 
     /**
      * returns weter or not implementing class support metric of provided id
@@ -43,9 +46,10 @@ public interface EmbeddableMetricProvider {
      * returns an EmbeddableCrisMetrics instance given the item id
      * @param context
      * @param item
+     * @param retrivedStoredMetrics the already retrieved stored metrics
      * @return
      */
-    Optional<EmbeddableCrisMetrics> provide(Context context, Item item);
+    Optional<EmbeddableCrisMetrics> provide(Context context, Item item, List<CrisMetrics> retrivedStoredMetrics);
 
     /**
      * returns an EmbeddableCrisMetrics instance given the metric id

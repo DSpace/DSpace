@@ -35,7 +35,7 @@ public class CrisMetricsMatcher {
         return allOf(hasJsonPath("$.id", is(CrisMetricsBuilder.getRestStoredMetricId(crisMetrics.getID()))),
                      hasJsonPath("$.metricType", is(crisMetrics.getMetricType())),
                      hasJsonPath("$.metricCount", is(crisMetrics.getMetricCount())),
-                     hasJsonPath("$.acquisitionDate", is(formatDate(crisMetrics.getAcquisitionDate()))),
+//                     hasJsonPath("$.acquisitionDate", is(formatDate(crisMetrics.getAcquisitionDate()))),
                      hasJsonPath("$.last", is(crisMetrics.getLast())),
                      hasJsonPath("$.remark", is(crisMetrics.getRemark())),
                      hasJsonPath("$.deltaPeriod1", is(crisMetrics.getDeltaPeriod1())),

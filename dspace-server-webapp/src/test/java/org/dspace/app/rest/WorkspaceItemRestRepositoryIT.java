@@ -4759,7 +4759,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         Map<String, String> value = new HashMap<String, String>();
         value.put("value", "18926410");
         values.add(value);
-        addId.add(new AddOperation("/sections/traditionalpageone/dc.identifier.other", values));
+        addId.add(new AddOperation("/sections/traditionalpageone/dc.identifier.pmid", values));
 
         String patchBody = getPatchContent(addId);
 
@@ -4768,7 +4768,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                     .andExpect(status().isOk())
                     // testing lookup
-                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.other'][0].value",
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.pmid'][0].value",
                         is("18926410")))
                     .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
                         is("Transfer of peanut allergy from the donor to a lung transplant recipient.")))
@@ -4784,7 +4784,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                 .andExpect(status().isOk())
                 // testing lookup
-                .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.other'][0].value",
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.pmid'][0].value",
                     is("18926410")))
                 .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
                     is("Transfer of peanut allergy from the donor to a lung transplant recipient.")))
@@ -4802,7 +4802,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                     .andExpect(status().isOk())
                     // testing lookup
-                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.other'][0].value",
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.pmid'][0].value",
                         is("18926410")))
                     .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
                         is("This is a test title")))
@@ -4823,7 +4823,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                     .andExpect(status().isOk())
                     // testing lookup
-                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.other'][0].value",
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.pmid'][0].value",
                         is("18926410")))
                     .andExpect(jsonPath("$.sections.traditionalpageone['dc.title']").doesNotExist())
                     .andExpect(jsonPath("$.sections.traditionalpageone['dc.date.issued'][0].value",
@@ -4836,7 +4836,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // verify that if we add more values to the listened metadata the lookup is not triggered again
         // (i.e. the title stays empty)
         List<Operation> addId2 = new ArrayList<Operation>();
-        addId2.add(new AddOperation("/sections/traditionalpageone/dc.identifier.other/-", value));
+        addId2.add(new AddOperation("/sections/traditionalpageone/dc.identifier.pmid/-", value));
 
         patchBody = getPatchContent(addId2);
         getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem2.getID())
@@ -4844,10 +4844,10 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                     .andExpect(status().isOk())
                     // testing lookup
-                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.other'][0].value",
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.pmid'][0].value",
                         is("18926410")))
                     // second copy of the added identifier
-                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.other'][1].value",
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.pmid'][1].value",
                             is("18926410")))
                     .andExpect(jsonPath("$.sections.traditionalpageone['dc.title']").doesNotExist())
                     .andExpect(jsonPath("$.sections.traditionalpageone['dc.date.issued'][0].value",
@@ -4862,10 +4862,10 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem2.getID()))
                 .andExpect(status().isOk())
                 // testing lookup
-                .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.other'][0].value",
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.pmid'][0].value",
                     is("18926410")))
                 // second copy of the added identifier
-                .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.other'][1].value",
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.pmid'][1].value",
                         is("18926410")))
                 .andExpect(jsonPath("$.sections.traditionalpageone['dc.title']").doesNotExist())
                 .andExpect(jsonPath("$.sections.traditionalpageone['dc.date.issued'][0].value",

@@ -47,9 +47,11 @@ public interface CrisItemMetricsService {
      * Returns only embeddable metrics
      * @param context
      * @param itemUuid
+     * @param retrivedStoredMetrics the already retrieved stored metrics
      * @return
      */
-    List<EmbeddableCrisMetrics> getEmbeddableMetrics(Context context, UUID itemUuid);
+    List<EmbeddableCrisMetrics> getEmbeddableMetrics(Context context, UUID itemUuid,
+            List<CrisMetrics> retrivedStoredMetrics);
 
     /**
      * returns an {@link EmbeddableCrisMetrics} given a metric id.
