@@ -31,8 +31,6 @@
         -->
     </submission-map>
 
-
-
     <!-- The 'step-definitions' allows you to define steps which you may wish -->
     <!-- to "share" amongst multiple submission-item definitions. In order to -->
     <!-- share the same step definition, you can refer to it by its unique id -->
@@ -168,14 +166,12 @@
       <processing-class>org.dspace.app.rest.submit.step.DetectPotentialDuplicateStep</processing-class>
       <type>detect-duplicate</type>
     </step-definition>
-
-    <!-- This optional step may allow the user to select a Creative Commons license -->
+        <!-- This optional step may allow the user to select a Creative Commons license -->
     <step-definition id="cclicense" mandatory="false">
       <heading>submit.progressbar.CClicense</heading>
       <processing-class>org.dspace.app.rest.submit.step.CCLicenseStep</processing-class>
       <type>cclicense</type>
     </step-definition>
-
     <!-- This optional step may enrich the current submission using information extracted
              from uploaded files or metadata.  -->
     <!-- Please note that this step will be triggered only when a request is performed,
@@ -184,20 +180,12 @@
            see the 'submission.autosave' settings in the 'environment.common.ts'.
            See also 'config/spring/api/step-processing-listener.xml' for further server side configuration
            -->
-    <step-definition id="extractionstep">
+    <step-definition id="extractionstep" mandatory="true">
       <heading>submit.progressbar.ExtractMetadataStep</heading>
       <processing-class>org.dspace.app.rest.submit.step.ExtractMetadataStep</processing-class>
       <type>extract</type>
       <scope visibility="hidden" visibilityOutside="hidden">submission</scope>
     </step-definition>
-
-    <!-- This is the Sample/Fake Step which is used for testing only -->
-    <step-definition id="sample">
-      <heading>Sample</heading>
-      <processing-class>org.dspace.submit.step.SampleStep</processing-class>
-      <type>sample</type>
-    </step-definition>
-
   </step-definitions>
   <submission-definitions>
     <submission-process name="product">
@@ -316,6 +304,7 @@
     </submission-process>
     <submission-process name="patent">
       <step id="collection" />
+      <step id="extractionstep" />
       <step id="patent" />
       <step id="patent_indexing" />
       <step id="patent_references" />
@@ -324,6 +313,7 @@
       <step id="license" />
     </submission-process>
     <submission-process name="patent-edit">
+      <step id="extractionstep" />
       <step id="patent" />
       <step id="patent_indexing" />
       <step id="patent_references" />

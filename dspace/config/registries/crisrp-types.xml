@@ -19,6 +19,13 @@
     <dc-type>
         <schema>crisrp</schema>
         <element>qualification</element>
+        <qualifier>role</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisrp</schema>
+        <element>qualification</element>
         <qualifier>start</qualifier>
         <scope_note></scope_note>
     </dc-type>
