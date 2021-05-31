@@ -99,7 +99,7 @@
                         </list>
                     </list>
                 </entry>
-                <entry key="orgunits">
+                <!--<entry key="orgunits">
                     <list>
                         <list>
                             <bean class="org.dspace.layout.CrisLayoutBrowseComponent">
@@ -146,7 +146,7 @@
                             </bean>
                         </list>
                     </list>
-                </entry>
+                </entry>-->
             </map>
         </property>
     </bean>
