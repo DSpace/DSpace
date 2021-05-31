@@ -126,8 +126,7 @@ public class InitializeEntitiesIT extends AbstractControllerIntegrationTest {
                         RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(6)),
                         RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(7)),
                         RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(8)),
-                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(9)),
-                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(10)))
+                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(9)))
                 ));
 
         //Verify the left min cardinality of the first relationship type (isAuthorOfPublication) is 0
@@ -178,8 +177,7 @@ public class InitializeEntitiesIT extends AbstractControllerIntegrationTest {
                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(6)),
                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(7)),
                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(8)),
-                       RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(9)),
-                       RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(10)))
+                       RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(9)))
                    ));
 
         //Verify the left min cardinality of the first relationship type (isAuthorOfPublication) has been updated to 10
