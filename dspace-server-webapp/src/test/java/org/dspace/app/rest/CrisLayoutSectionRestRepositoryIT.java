@@ -40,7 +40,7 @@ public class CrisLayoutSectionRestRepositoryIT extends AbstractControllerIntegra
 
         getClient().perform(get("/api/layout/sections"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.sections", hasSize(5)))
+            .andExpect(jsonPath("$._embedded.sections", hasSize(3)))
 
             .andExpect(jsonPath("$._embedded.sections",
                 hasItem(withIdAndBrowseComponent("researchoutputs", 0, 0, "col-md-4", expectedBrowseNames))))
@@ -63,20 +63,7 @@ public class CrisLayoutSectionRestRepositoryIT extends AbstractControllerIntegra
             .andExpect(jsonPath("$._embedded.sections",
                 hasItem(withIdAndBrowseComponent("fundings_and_projects", 0, 0, "col-md-4", "pjtitle"))))
             .andExpect(jsonPath("$._embedded.sections",
-                hasItem(withIdAndSearchComponent("fundings_and_projects", 0, 1, "col-md-8", "project_funding"))))
-
-            .andExpect(jsonPath("$._embedded.sections",
-                hasItem(withIdAndBrowseComponent("orgunits", 0, 0, "col-md-4", "ouname"))))
-            .andExpect(jsonPath("$._embedded.sections",
-                hasItem(withIdAndSearchComponent("orgunits", 0, 1, "col-md-8", "orgunit"))))
-            .andExpect(jsonPath("$._embedded.sections",
-                hasItem(withIdAndFacetComponent("orgunits", 1, 0, "col-md-12", "orgunit"))))
-            .andExpect(jsonPath("$._embedded.sections",
-                hasItem(withIdAndBrowseComponent("infrastructure", 0, 0, "col-md-4", "eqtitle"))))
-            .andExpect(jsonPath("$._embedded.sections",
-                hasItem(withIdAndSearchComponent("infrastructure", 0, 1, "col-md-8", "infrastructure"))))
-            .andExpect(jsonPath("$._embedded.sections",
-                hasItem(withIdAndFacetComponent("infrastructure", 1, 0, "col-md-12", "infrastructure"))));
+                hasItem(withIdAndSearchComponent("fundings_and_projects", 0, 1, "col-md-8", "project_funding"))));
     }
 
     @Test
