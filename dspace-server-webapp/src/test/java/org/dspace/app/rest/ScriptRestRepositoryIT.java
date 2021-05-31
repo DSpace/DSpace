@@ -54,6 +54,7 @@ import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.Process;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.service.ProcessService;
+import org.dspace.services.ConfigurationService;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -73,6 +74,9 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     @Test
     public void findAllScriptsWithAdminTest() throws Exception {
@@ -500,13 +504,13 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
 
         Group specialGroup = GroupBuilder.createGroup(context)
-                                         .withName("Group A")
+                                         .withName("Special Group")
                                          .addMember(admin)
                                          .build();
 
         context.restoreAuthSystemState();
 
-        context.setSpecialGroup(specialGroup.getID());
+        configurationService.setProperty("authentication-password.login.specialgroup", specialGroup.getName());
 
         LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
 

@@ -105,7 +105,6 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
                             context, scriptToExecute.getName(), dSpaceCommandLineParameters);
         List<String> args = constructArgs(dSpaceCommandLineParameters);
         runDSpaceScript(files, context, scriptToExecute, restDSpaceRunnableHandler, args);
-        org.dspace.scripts.Process p = restDSpaceRunnableHandler.getProcess(context);
         return converter.toRest(restDSpaceRunnableHandler.getProcess(context), utils.obtainProjection());
     }
 
