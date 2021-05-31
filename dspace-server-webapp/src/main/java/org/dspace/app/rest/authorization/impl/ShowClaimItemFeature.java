@@ -8,14 +8,10 @@
 package org.dspace.app.rest.authorization.impl;
 
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
-import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.profile.ResearcherProfile;
+import org.apache.commons.lang3.ArrayUtils;
 import org.dspace.app.profile.service.ResearcherProfileService;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
@@ -32,24 +28,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Checks if a given Item can be claimed or not by a given user.
+ * Checks if the given user can request the claim of an item. Whether or not the
+ * user can then make the claim is determined by the feature
+ * {@link CanClaimItemFeature}.
  *
  * @author Corrado Lombardi (corrado.lombardi at 4science.it)
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  */
 @Component
-@AuthorizationFeatureDocumentation(name = ClaimItemFeature.NAME,
-    description = "Used to verify if for a given Profile (Person) Item, an user has claim rights")
-public class ClaimItemFeature implements AuthorizationFeature {
+@AuthorizationFeatureDocumentation(name = ShowClaimItemFeature.NAME,
+    description = "Used to verify if the given user can request the claim of an item")
+public class ShowClaimItemFeature implements AuthorizationFeature {
 
-    public static final String NAME = "canClaimItem";
-    private static final Logger LOG = LoggerFactory.getLogger(ClaimItemFeature.class);
+    public static final String NAME = "showClaimItem";
+    private static final Logger LOG = LoggerFactory.getLogger(ShowClaimItemFeature.class);
 
     private final ItemService itemService;
     private final ResearcherProfileService researcherProfileService;
     private final ConfigurationService configurationService;
 
     @Autowired
-    public ClaimItemFeature(ItemService itemService,
+    public ShowClaimItemFeature(ItemService itemService,
                             ResearcherProfileService researcherProfileService,
                             ConfigurationService configurationService) {
         this.itemService = itemService;
@@ -58,26 +57,22 @@ public class ClaimItemFeature implements AuthorizationFeature {
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
 
-        if (!(object instanceof ItemRest) ||
-                Objects.isNull(context.getCurrentUser()) ||
-                hasAlreadyAProfileWithClone(context)) {
+        if (!(object instanceof ItemRest) || Objects.isNull(context.getCurrentUser())) {
             return false;
         }
+
         String id = ((ItemRest) object).getId();
         Item item = itemService.find(context, UUID.fromString(id));
-        return claimable(context, item);
+
+        return claimableEntityType(item) && hasNotAlreadyAProfile(context);
     }
 
-    private boolean hasAlreadyAProfileWithClone(Context context) {
+    private boolean hasNotAlreadyAProfile(Context context) {
         try {
-
-            ResearcherProfile profile = researcherProfileService.findById(context, context.getCurrentUser().getID());
-            return Optional.ofNullable(profile)
-                .map(p -> Objects.nonNull(p.getItem()))
-                .orElse(false);
-
+            return researcherProfileService.findById(context, context.getCurrentUser().getID()) == null;
         } catch (SQLException | AuthorizeException e) {
             LOG.warn("Error while checking if eperson has a ResearcherProfileAssociated: {}",
                      e.getMessage(), e);
@@ -85,29 +80,10 @@ public class ClaimItemFeature implements AuthorizationFeature {
         }
     }
 
-    private boolean claimable(final Context context, Item item)  {
-        if (unClaimableEntityType(item) || alreadyInARelation(context, item)) {
-            return false;
-        }
-        return true;
-    }
-
-    private boolean alreadyInARelation(final Context context, final Item item) {
-
-        return hasOwner(item);
-    }
-
-    private boolean hasOwner(final Item item) {
-        return StringUtils.isNotBlank(itemService.getMetadata(item, "cris.owner"));
-    }
-
-    private boolean unClaimableEntityType(Item item) {
-        List<String> claimableEntityTypes = Arrays.asList(
-            configurationService.getArrayProperty("claimable.entityType")
-                                                         );
-        return itemService.getMetadataByMetadataString(item, "dspace.entity.type")
-                          .stream()
-                          .noneMatch(mv -> claimableEntityTypes.contains(mv.getValue()));
+    private boolean claimableEntityType(Item item) {
+        String[] claimableEntityTypes = configurationService.getArrayProperty("claimable.entityType");
+        String entityType = itemService.getEntityType(item);
+        return ArrayUtils.contains(claimableEntityTypes, entityType);
     }
 
     @Override
