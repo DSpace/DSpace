@@ -46,6 +46,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.FacetParams;
 import org.apache.solr.common.params.HighlightParams;
@@ -70,6 +71,7 @@ import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.configuration.DiscoveryMoreLikeThisConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
+import org.dspace.discovery.configuration.DiscoverySortFunctionConfiguration;
 import org.dspace.discovery.configuration.GraphDiscoverSearchFilterFacet;
 import org.dspace.discovery.indexobject.IndexableCollection;
 import org.dspace.discovery.indexobject.IndexableCommunity;
@@ -1311,6 +1313,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
     @Override
     public String toSortFieldIndex(String metadataField, String type) {
+        if (DiscoverySortFunctionConfiguration.SORT_FUNCTION.equals(type)) {
+            return metadataField;
+        }
         if (StringUtils.equalsIgnoreCase(DiscoverySortConfiguration.SCORE, metadataField)) {
             return DiscoverySortConfiguration.SCORE;
         } else if (StringUtils.equals(type, DiscoveryConfigurationParameters.TYPE_DATE)) {
@@ -1577,5 +1582,26 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             log.error(e.getMessage(), e);
         }
         return queryResponse;
+    }
+
+    @Override
+    public void updateRelationForItem(final String itemId, final String relationLabel,
+                                      final List<String> relatedItems) {
+
+        UpdateRequest req = new UpdateRequest();
+        SolrClient solrClient =  solrSearchCore.getSolr();
+
+        try {
+            SolrInputDocument solrInDoc = new SolrInputDocument();
+            solrInDoc.addField(SearchUtils.RESOURCE_UNIQUE_ID, "Item-" + itemId);
+            final String field = "relation." + relationLabel;
+            solrInDoc.addField(field,
+                               Collections.<String, Object>singletonMap("set", relatedItems));
+            req.add(solrInDoc);
+            solrClient.request(req);
+            solrClient.commit();
+        } catch (SolrServerException | SolrException | IOException e) {
+            log.error(e.getMessage(), e);
+        }
     }
 }

@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -83,7 +84,11 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
         Item otherItem;
         int place = 0;
         boolean isLeftwards;
-        if (StringUtils.equals(relationshipType.getLeftType().getLabel(), entityType) &&
+        final boolean sameLeftType = Objects.isNull(relationshipType.getLeftType()) ||
+                                         StringUtils.equals(relationshipType.getLeftType().getLabel(), entityType);
+        final boolean sameRightType = Objects.isNull(relationshipType.getRightType()) ||
+                                          StringUtils.equals(relationshipType.getRightType().getLabel(), entityType);
+        if (sameLeftType &&
                 item.getID().equals(relationship.getLeftItem().getID())) {
             hashMaps = virtualMetadataPopulator.getMap().get(relationshipType.getLeftwardType());
             otherItem = relationship.getRightItem();
@@ -91,7 +96,7 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
             place = relationship.getLeftPlace();
             isLeftwards = false; //if the current item is stored on the left,
             // the name variant is retrieved from the rightwards label
-        } else if (StringUtils.equals(relationshipType.getRightType().getLabel(), entityType) &&
+        } else if (sameRightType &&
                 item.getID().equals(relationship.getRightItem().getID())) {
             hashMaps = virtualMetadataPopulator.getMap().get(relationshipType.getRightwardType());
             otherItem = relationship.getLeftItem();

@@ -3,7 +3,6 @@
 
 <relationships>
     <type>
-        <leftType>Publication</leftType>
         <rightType>Person</rightType>
         <leftwardType>isResearchoutputsHiddenFor</leftwardType>
         <rightwardType>notDisplayingResearchoutputs</rightwardType>
@@ -15,19 +14,6 @@
         </rightCardinality>
     </type>
     <type>
-        <leftType>Patent</leftType>
-        <rightType>Person</rightType>
-        <leftwardType>isResearchoutputsHiddenFor</leftwardType>
-        <rightwardType>notDisplayingResearchoutputs</rightwardType>
-        <leftCardinality>
-            <min>0</min>
-        </leftCardinality>
-        <rightCardinality>
-            <min>0</min>
-        </rightCardinality>
-    </type>
-    <type>
-        <leftType>Project</leftType>
         <rightType>Person</rightType>
         <leftwardType>isProjectsHiddenFor</leftwardType>
         <rightwardType>notDisplayingProjects</rightwardType>
@@ -39,7 +25,6 @@
         </rightCardinality>
     </type>
     <type>
-        <leftType>Publication</leftType>
         <rightType>Person</rightType>
         <leftwardType>isResearchoutputsSelectedFor</leftwardType>
         <rightwardType>hasSelectedResearchoutputs</rightwardType>
@@ -51,19 +36,6 @@
         </rightCardinality>
     </type>
     <type>
-        <leftType>Patent</leftType>
-        <rightType>Person</rightType>
-        <leftwardType>isResearchoutputsSelectedFor</leftwardType>
-        <rightwardType>hasSelectedResearchoutputs</rightwardType>
-        <leftCardinality>
-            <min>0</min>
-        </leftCardinality>
-        <rightCardinality>
-            <min>0</min>
-        </rightCardinality>
-    </type>
-    <type>
-        <leftType>Project</leftType>
         <rightType>Person</rightType>
         <leftwardType>isProjectsSelectedFor</leftwardType>
         <rightwardType>hasSelectedProjects</rightwardType>
@@ -74,4 +46,203 @@
             <min>0</min>
         </rightCardinality>
     </type>
+    <type>
+        <rightType>OrgUnit</rightType>
+        <leftwardType>isRpprojectsHiddenFor</leftwardType>
+        <rightwardType>notDisplayingRpprojects</rightwardType>
+        <leftCardinality>
+            <min>0</min>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+        </rightCardinality>
+    </type>
+    <type>
+        <rightType>OrgUnit</rightType>
+        <leftwardType>isRpprojectsSelectedFor</leftwardType>
+        <rightwardType>hasSelectedRpprojects</rightwardType>
+        <leftCardinality>
+            <min>0</min>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+        </rightCardinality>
+    </type>
+    <type>
+        <rightType>OrgUnit</rightType>
+        <leftwardType>isPublicationsHiddenFor</leftwardType>
+        <rightwardType>notDisplayingPublications</rightwardType>
+        <leftCardinality>
+            <min>0</min>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+        </rightCardinality>
+    </type>
+    <type>
+        <rightType>OrgUnit</rightType>
+        <leftwardType>isPublicationsSelectedFor</leftwardType>
+        <rightwardType>hasSelectedPublications</rightwardType>
+        <leftCardinality>
+            <min>0</min>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+        </rightCardinality>
+    </type>
+    <type>
+        <rightType>OrgUnit</rightType>
+        <leftwardType>isRppublicationsHiddenFor</leftwardType>
+        <rightwardType>notDisplayingRppublications</rightwardType>
+        <leftCardinality>
+            <min>0</min>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+        </rightCardinality>
+    </type>
+    <type>
+        <rightType>OrgUnit</rightType>
+        <leftwardType>isRppublicationsSelectedFor</leftwardType>
+        <rightwardType>hasSelectedRppublications</rightwardType>
+        <leftCardinality>
+            <min>0</min>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+        </rightCardinality>
+    </type>
+    <type>
+        <rightType>OrgUnit</rightType>
+        <leftwardType>isPeopleHiddenFor</leftwardType>
+        <rightwardType>notDisplayingPeople</rightwardType>
+        <leftCardinality>
+            <min>0</min>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+        </rightCardinality>
+    </type>
+    <type>
+        <rightType>OrgUnit</rightType>
+        <leftwardType>isPeopleSelectedFor</leftwardType>
+        <rightwardType>hasSelectedPeople</rightwardType>
+        <leftCardinality>
+            <min>0</min>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+        </rightCardinality>
+    </type>
+    <type>
+        <rightType>OrgUnit</rightType>
+        <leftwardType>isProjectsHiddenFor</leftwardType>
+        <rightwardType>notDisplayingProjects</rightwardType>
+        <leftCardinality>
+            <min>0</min>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+        </rightCardinality>
+    </type>
+    <type>
+        <rightType>OrgUnit</rightType>
+        <leftwardType>isProjectsSelectedFor</leftwardType>
+        <rightwardType>hasSelectedProjects</rightwardType>
+        <leftCardinality>
+            <min>0</min>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+        </rightCardinality>
+    </type>
+    <type>
+        <rightType>OrgUnit</rightType>
+        <leftwardType>isOrganizationsHiddenFor</leftwardType>
+        <rightwardType>notDisplayingOrganizations</rightwardType>
+        <leftCardinality>
+            <min>0</min>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+        </rightCardinality>
+    </type>
+    <type>
+        <rightType>OrgUnit</rightType>
+        <leftwardType>isOrganizationsSelectedFor</leftwardType>
+        <rightwardType>hasSelectedOrganizations</rightwardType>
+        <leftCardinality>
+            <min>0</min>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+        </rightCardinality>
+    </type>
+    <type>
+        <rightType>Project</rightType>
+        <leftwardType>isProjectsHiddenFor</leftwardType>
+        <rightwardType>notDisplayingProjects</rightwardType>
+        <leftCardinality>
+            <min>0</min>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+        </rightCardinality>
+    </type>
+    <type>
+        <rightType>Project</rightType>
+        <leftwardType>isProjectsSelectedFor</leftwardType>
+        <rightwardType>hasSelectedProjects</rightwardType>
+        <leftCardinality>
+            <min>0</min>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+        </rightCardinality>
+    </type>
+    <type>
+        <rightType>Project</rightType>
+        <leftwardType>isGrantsHiddenFor</leftwardType>
+        <rightwardType>notDisplayingGrants</rightwardType>
+        <leftCardinality>
+            <min>0</min>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+        </rightCardinality>
+    </type>
+    <type>
+        <rightType>Project</rightType>
+        <leftwardType>isGrantsSelectedFor</leftwardType>
+        <rightwardType>hasSelectedGrants</rightwardType>
+        <leftCardinality>
+            <min>0</min>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+        </rightCardinality>
+    </type>
+    <type>
+        <rightType>Project</rightType>
+        <leftwardType>isResearchoutputsHiddenFor</leftwardType>
+        <rightwardType>notDisplayingResearchoutputs</rightwardType>
+        <leftCardinality>
+            <min>0</min>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+        </rightCardinality>
+    </type>
+    <type>
+        <rightType>Project</rightType>
+        <leftwardType>isResearchoutputsSelectedFor</leftwardType>
+        <rightwardType>hasSelectedResearchoutputs</rightwardType>
+        <leftCardinality>
+            <min>0</min>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+        </rightCardinality>
+    </type>
+
 </relationships>

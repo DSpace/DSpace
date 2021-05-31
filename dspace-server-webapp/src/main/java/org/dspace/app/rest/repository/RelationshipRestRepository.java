@@ -249,7 +249,12 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             if (jsonNode.hasNonNull("leftPlace")) {
                 relationship.setLeftPlace(relationshipRest.getLeftPlace());
             }
-
+            // places are updated only if relationship sorting has to be kept. This happens in case
+            // relationshipType is set to handle single-side places (only leftPlace or rightPlace
+            // value should be considered
+            if (updateRelationshipPlaces(relationship.getRelationshipType())) {
+                relationshipService.updatePlaceInRelationship(context, relationship);
+            }
             relationshipService.update(context, relationship);
             context.commit();
             context.reloadEntity(relationship);
@@ -366,5 +371,10 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
         }
 
         return converter.toRestPage(relationships, pageable, total, utils.obtainProjection());
+    }
+
+    private boolean updateRelationshipPlaces(final RelationshipType relationshipType) {
+        return relationshipService.placesOnly(relationshipType, true)
+                   || relationshipService.placesOnly(relationshipType, false);
     }
 }

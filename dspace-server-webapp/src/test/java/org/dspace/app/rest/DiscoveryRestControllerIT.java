@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -26,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.jayway.jsonpath.matchers.JsonPathMatchers;
@@ -51,18 +53,25 @@ import org.dspace.builder.ClaimedTaskBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.PoolTaskBuilder;
+import org.dspace.builder.RelationshipBuilder;
+import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.EntityType;
 import org.dspace.content.Item;
+import org.dspace.content.Relationship;
+import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.MetadataAuthorityService;
+import org.dspace.content.service.EntityTypeService;
 import org.dspace.core.CrisConstants;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.configuration.DiscoveryConfigurationService;
@@ -73,6 +82,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.util.UUIDUtils;
 import org.dspace.utils.DSpace;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
@@ -91,6 +101,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
     @Autowired
     private DiscoveryConfigurationService discoveryConfigurationService;
+    @Autowired
+    private EntityTypeService entityTypeService;
 
     @Test
     public void rootDiscoverTest() throws Exception {
@@ -6182,6 +6194,568 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                             "api/discover/search/objects?dsoType=Item&configuration=defaultConfiguration"
                                 + "&f.dateIssued=%5B2017%20TO%202020%5D,equals")))
                    .andExpect(jsonPath("$._embedded.values").value(Matchers.hasSize(1)));
+
+    }
+
+    @Test
+    public void relevanceByRelationPlacesTest() throws Exception {
+
+        configurationService.setProperty("relationship.places.onlyright",
+                                         "null::Person::isResearchoutputsSelectedFor::hasSelectedResearchoutputs");
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        final Collection publications = CollectionBuilder.createCollection(context, parentCommunity)
+                                                         .withEntityType("Publication")
+                                                         .build();
+        final Collection patents = CollectionBuilder.createCollection(context, parentCommunity)
+                                                    .withEntityType("Patent")
+                                                    .build();
+        final Collection people = CollectionBuilder.createCollection(context, parentCommunity)
+                                                   .withEntityType("Person")
+                                                   .build();
+
+        Item author1 = ItemBuilder.createItem(context, people)
+                                  .withTitle("Doe, John").build();
+        Item author2 = ItemBuilder.createItem(context, people)
+                                  .withTitle("Smith, John").build();
+
+        Item publication1 = ItemBuilder.createItem(context, publications).withTitle("Publication 1")
+                                       .withAuthor(author1.getName(), author1.getID().toString()).build();
+        Item publication2 = ItemBuilder.createItem(context, publications).withTitle("Publication 2")
+                                       .withAuthor(author1.getName(), author1.getID().toString())
+                                       .withAuthor(author2.getName(), author2.getID().toString())
+                                       .build();
+        Item publication3 = ItemBuilder.createItem(context, publications).withTitle("Publication 3")
+                                       .withAuthor(author2.getName(), author2.getID().toString())
+                                       .build();
+        Item patent1 = ItemBuilder.createItem(context, patents).withTitle("Patent 1")
+                                  .withAuthor(author1.getName(), author1.getID().toString())
+                                  .build();
+
+        final EntityType personEntity = Optional.ofNullable(entityTypeService.findByEntityType(context, "Person"))
+            .orElseGet(() -> EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build());
+        final RelationshipType selectedResearchOutput = RelationshipTypeBuilder
+                                                            .createRelationshipTypeBuilder(
+                                                                context,
+                                                                null,
+                                                                personEntity,
+                                                                "isResearchoutputsSelectedFor",
+                                                                "hasSelectedResearchoutputs",
+                                                                0, null,
+                                                                0, null).build();
+
+        final Relationship publication2ToAuthor1 =
+            RelationshipBuilder.createRelationshipBuilder(context, publication2, author1, selectedResearchOutput,
+                                                          -1, -1).build();
+
+        final Relationship publication1ToAuthor1 =
+            RelationshipBuilder.createRelationshipBuilder(context, publication1,
+                                                          author1, selectedResearchOutput, -1, -1)
+                               .build();
+        final Relationship publication3ToAuthor2 =
+            RelationshipBuilder.createRelationshipBuilder(context, publication3, author2, selectedResearchOutput,
+                                                          -1, -1)
+                               .build();
+
+        final Relationship publication2ToAuthor2 =
+            RelationshipBuilder.createRelationshipBuilder(context, publication2, author2, selectedResearchOutput,
+                                                          -1, -1)
+                               .build();
+
+        final Relationship patent1ToAuthor1 =
+            RelationshipBuilder.createRelationshipBuilder(context, patent1, author1, selectedResearchOutput,
+                                                          -1, -1)
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/discover/search/objects")
+                                          .param("configuration", "RELATION.Person.researchoutputs")
+                                          .param("scope", author1.getID().toString()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.configuration", is("RELATION.Person.researchoutputs")))
+                             .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.contains(
+                                 SearchResultMatcher.matchOnItemName("item", "items", "Publication 2"),
+                                 SearchResultMatcher.matchOnItemName("item", "items", "Publication 1"),
+                                 SearchResultMatcher.matchOnItemName("item", "items", "Patent 1"))))
+                             .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(3)));
+
+        getClient().perform(get("/api/discover/search/objects")
+                                .param("configuration", "RELATION.Person.researchoutputs")
+                                .param("scope", author2.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.configuration", is("RELATION.Person.researchoutputs")))
+                   .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.contains(
+                       SearchResultMatcher.matchOnItemName("item", "items", "Publication 3"),
+                       SearchResultMatcher.matchOnItemName("item", "items", "Publication 2"))))
+                   .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(2)));
+
+        configurationService.setProperty("relationship.places.onlyright", "");
+
+
+    }
+
+    @Test
+    public void hiddenItemsTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        final Collection publications = CollectionBuilder.createCollection(context, parentCommunity)
+                                                         .withEntityType("Publication")
+                                                         .build();
+        final Collection projects = CollectionBuilder.createCollection(context, parentCommunity)
+                                                    .withEntityType("Project")
+                                                    .build();
+        final Collection people = CollectionBuilder.createCollection(context, parentCommunity)
+                                                   .withEntityType("Person")
+                                                   .build();
+        EPerson owner = EPersonBuilder.createEPerson(context)
+                                      .withEmail("test@test.com")
+                                      .withPassword("password")
+                                      .withCanLogin(true)
+            .withNameInMetadata("John", "Doe").build();
+
+        Item author = ItemBuilder.createItem(context, people)
+                                  .withCrisOwner(owner.getFullName(), UUIDUtils.toString(owner.getID()))
+                                  .withTitle("Doe, John").build();
+
+        Item publication1 = ItemBuilder.createItem(context, publications).withTitle("Publication 1")
+                                       .withAuthor(author.getName(), author.getID().toString()).build();
+        Item publication2 = ItemBuilder.createItem(context, publications).withTitle("Publication 2")
+                                       .withAuthor(author.getName(), author.getID().toString())
+                                       .build();
+
+
+        Item project2 = ItemBuilder.createItem(context, projects).withTitle("Project 2")
+                                   .withProjectInvestigator(author.getName(), author.getID().toString())
+                                   .build();
+
+        final EntityType personEntity = Optional.ofNullable(entityTypeService.findByEntityType(context, "Person"))
+                                                .orElseGet(() -> EntityTypeBuilder
+                                                                     .createEntityTypeBuilder(
+                                                                         context, "Person").build());
+        final RelationshipType hiddenResearchOutput = RelationshipTypeBuilder
+                                                            .createRelationshipTypeBuilder(
+                                                                context,
+                                                                null,
+                                                                personEntity,
+                                                                "isResearchoutputsHiddenFor",
+                                                                "notDisplayingResearchoutputs",
+                                                                0, null,
+                                                                0, null).build();
+
+        final RelationshipType hiddenProject = RelationshipTypeBuilder
+                                                          .createRelationshipTypeBuilder(
+                                                              context,
+                                                              null,
+                                                              personEntity,
+                                                              "isProjectsHiddenFor",
+                                                              "notDisplayingProjects",
+                                                              0, null,
+                                                              0, null).build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, publication1, author, hiddenResearchOutput)
+                           .build();
+        RelationshipBuilder.createRelationshipBuilder(context, project2, author, hiddenProject)
+                           .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/discover/search/objects")
+                                .param("configuration", "RELATION.Person.researchoutputs")
+                                .param("scope", author.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.configuration", is("RELATION.Person.researchoutputs")))
+                   .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                       SearchResultMatcher.matchOnItemName("item", "items", "Publication 2"))))
+                   .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(1)));
+
+
+        final String ownerToken = getAuthToken(owner.getEmail(), "password");
+
+        getClient(ownerToken).perform(get("/api/discover/search/objects")
+                                .param("configuration", "RELATION.Person.researchoutputs")
+                                .param("scope", author.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.configuration", is("RELATION.Person.researchoutputs")))
+                   .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                       SearchResultMatcher.matchOnItemName("item", "items", "Publication 2"),
+                       SearchResultMatcher.matchOnItemName("item", "items", "Publication 1"))))
+                   .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(2)));
+
+
+        final String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/discover/search/objects")
+                                          .param("configuration", "RELATION.Person.researchoutputs")
+                                          .param("scope", author.getID().toString()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.configuration", is("RELATION.Person.researchoutputs")))
+                             .andExpect(
+                                 jsonPath("$._embedded.searchResult._embedded.objects",
+                                          Matchers.containsInAnyOrder(
+                                              SearchResultMatcher
+                                                  .matchOnItemName("item", "items", "Publication 2"),
+                                              SearchResultMatcher
+                                                  .matchOnItemName("item", "items", "Publication 1"))))
+                             .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(2)));
+
+
+    }
+
+    /**
+     * This test checks the scenario when an item is related to many owners and it is hidden by only one, many or all of
+     * them.
+     * @throws Exception
+     */
+    @Test
+    public void sameItemHiddenByDifferentOwners() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+
+
+        final Collection publications = CollectionBuilder.createCollection(context, parentCommunity)
+                                                         .withEntityType("Publication")
+                                                         .build();
+        final Collection projects = CollectionBuilder.createCollection(context, parentCommunity)
+                                                     .withEntityType("Project")
+                                                     .build();
+        final Collection people = CollectionBuilder.createCollection(context, parentCommunity)
+                                                   .withEntityType("Person")
+                                                   .build();
+
+
+        Item firstPerson = ItemBuilder.createItem(context, people)
+                                 .withTitle("Doe, John").build();
+        Item secondPerson = ItemBuilder.createItem(context, people)
+                                      .withTitle("Smith, Bryan").build();
+
+        Item project = ItemBuilder.createItem(context, projects).withTitle("Project 2")
+                                  .withProjectInvestigator(firstPerson.getName(), firstPerson.getID().toString())
+                                  .build();
+
+         Item publication1 = ItemBuilder.createItem(context, publications).withTitle("Publication 1")
+                                      .withAuthor(firstPerson.getName(), firstPerson.getID().toString())
+                                      .withAuthor(secondPerson.getName(), secondPerson.getID().toString())
+                                      .withRelationProject(project.getName(), project.getID().toString())
+                                      .build();
+
+        Item publication2 = ItemBuilder.createItem(context, publications).withTitle("Publication 2")
+                                             .withAuthor(firstPerson.getName(), firstPerson.getID().toString())
+                                             .withAuthor(secondPerson.getName(), secondPerson.getID().toString())
+                                             .withRelationProject(project.getName(), project.getID().toString())
+                                             .build();
+
+
+
+
+        final EntityType personEntity = Optional.ofNullable(entityTypeService.findByEntityType(context, "Person"))
+                                                .orElseGet(() -> EntityTypeBuilder
+                                                                     .createEntityTypeBuilder(
+                                                                         context, "Person").build());
+
+        final EntityType publicationEntity = Optional.ofNullable(
+            entityTypeService.findByEntityType(context, "Publication"))
+                                                 .orElseGet(() -> EntityTypeBuilder
+                                                                      .createEntityTypeBuilder(
+                                                                          context, "Publication").build());
+
+        final EntityType projectEntity = Optional.ofNullable(entityTypeService.findByEntityType(context, "Project"))
+                                                .orElseGet(() -> EntityTypeBuilder
+                                                                     .createEntityTypeBuilder(
+                                                                         context, "Project").build());
+        final RelationshipType researchOutputHiddenByPerson = RelationshipTypeBuilder
+                                                          .createRelationshipTypeBuilder(
+                                                              context,
+                                                              null,
+                                                              personEntity,
+                                                              "isResearchoutputsHiddenFor",
+                                                              "notDisplayingResearchoutputs",
+                                                              0, null,
+                                                              0, null).build();
+
+        final RelationshipType researchOutputHiddenByProject = RelationshipTypeBuilder
+                                                                .createRelationshipTypeBuilder(
+                                                                    context,
+                                                                    null,
+                                                                    projectEntity,
+                                                                    "isResearchoutputsHiddenFor",
+                                                                    "notDisplayingResearchoutputs",
+                                                                    0, null,
+                                                                    0, null).build();
+
+
+        // first scenario: publication 1 hidden by first person
+        final Relationship publicationOneHiddenByFirstPerson =
+            RelationshipBuilder.createRelationshipBuilder(
+                context, publication1, firstPerson, researchOutputHiddenByPerson)
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/discover/search/objects")
+                                .param("configuration", "RELATION.Person.researchoutputs")
+                                .param("scope", firstPerson.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.configuration", is("RELATION.Person.researchoutputs")))
+                   .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                       SearchResultMatcher.matchOnItemName("item", "items", "Publication 2"))))
+                   .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(1)));
+
+        getClient().perform(get("/api/discover/search/objects")
+                                .param("configuration", "RELATION.Person.researchoutputs")
+                                .param("scope", secondPerson.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.configuration", is("RELATION.Person.researchoutputs")))
+                   .andExpect(
+                       jsonPath("$._embedded.searchResult._embedded.objects",
+                                Matchers.containsInAnyOrder(
+                                    SearchResultMatcher
+                                        .matchOnItemName("item", "items", "Publication 2"),
+                                    SearchResultMatcher
+                                        .matchOnItemName("item", "items", "Publication 1"))))
+                   .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(2)));
+
+        getClient().perform(get("/api/discover/search/objects")
+                                .param("configuration", "RELATION.Project.researchoutputs")
+                                .param("scope", project.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.configuration", is("RELATION.Project.researchoutputs")))
+                   .andExpect(
+                       jsonPath("$._embedded.searchResult._embedded.objects",
+                                Matchers.containsInAnyOrder(
+                                    SearchResultMatcher
+                                        .matchOnItemName("item", "items", "Publication 2"),
+                                    SearchResultMatcher
+                                        .matchOnItemName("item", "items", "Publication 1"))))
+                   .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(2)));
+
+        // second scenario: publication 2 hidden by second person
+        final String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(delete("/api/core/relationships/" + publicationOneHiddenByFirstPerson.getID()));
+        context.turnOffAuthorisationSystem();
+        final Relationship publicationTwoHiddenBySecondPerson =
+            RelationshipBuilder.createRelationshipBuilder(
+                context, publication2, secondPerson, researchOutputHiddenByPerson)
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/discover/search/objects")
+                                .param("configuration", "RELATION.Person.researchoutputs")
+                                .param("scope", secondPerson.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.configuration", is("RELATION.Person.researchoutputs")))
+                   .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                       SearchResultMatcher.matchOnItemName("item", "items", "Publication 1"))))
+                   .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(1)));
+
+        getClient().perform(get("/api/discover/search/objects")
+                                .param("configuration", "RELATION.Person.researchoutputs")
+                                .param("scope", firstPerson.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.configuration", is("RELATION.Person.researchoutputs")))
+                   .andExpect(
+                       jsonPath("$._embedded.searchResult._embedded.objects",
+                                Matchers.containsInAnyOrder(
+                                    SearchResultMatcher
+                                        .matchOnItemName("item", "items", "Publication 2"),
+                                    SearchResultMatcher
+                                        .matchOnItemName("item", "items", "Publication 1"))))
+                   .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(2)));
+
+        getClient().perform(get("/api/discover/search/objects")
+                                .param("configuration", "RELATION.Project.researchoutputs")
+                                .param("scope", project.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.configuration", is("RELATION.Project.researchoutputs")))
+                   .andExpect(
+                       jsonPath("$._embedded.searchResult._embedded.objects",
+                                Matchers.containsInAnyOrder(
+                                    SearchResultMatcher
+                                        .matchOnItemName("item", "items", "Publication 2"),
+                                    SearchResultMatcher
+                                        .matchOnItemName("item", "items", "Publication 1"))))
+                   .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(2)));
+
+        // third scenario: publication 1 hidden by project owner
+        getClient(adminToken).perform(delete("/api/core/relationships/" + publicationTwoHiddenBySecondPerson.getID()));
+        context.turnOffAuthorisationSystem();
+        final Relationship publicationOneHiddenByProjectOwner =
+            RelationshipBuilder.createRelationshipBuilder(context, publication1, project, researchOutputHiddenByProject)
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/discover/search/objects")
+                                .param("configuration", "RELATION.Person.researchoutputs")
+                                .param("scope", firstPerson.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.configuration", is("RELATION.Person.researchoutputs")))
+                   .andExpect(
+                       jsonPath("$._embedded.searchResult._embedded.objects",
+                                Matchers.containsInAnyOrder(
+                                    SearchResultMatcher
+                                        .matchOnItemName("item", "items", "Publication 2"),
+                                    SearchResultMatcher
+                                        .matchOnItemName("item", "items", "Publication 1"))))
+                   .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(2)));
+
+        getClient().perform(get("/api/discover/search/objects")
+                                .param("configuration", "RELATION.Person.researchoutputs")
+                                .param("scope", secondPerson.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.configuration", is("RELATION.Person.researchoutputs")))
+                   .andExpect(
+                       jsonPath("$._embedded.searchResult._embedded.objects",
+                                Matchers.containsInAnyOrder(
+                                    SearchResultMatcher
+                                        .matchOnItemName("item", "items", "Publication 2"),
+                                    SearchResultMatcher
+                                        .matchOnItemName("item", "items", "Publication 1"))))
+                   .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(2)));
+
+        getClient().perform(get("/api/discover/search/objects")
+                                .param("configuration", "RELATION.Project.researchoutputs")
+                                .param("scope", project.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.configuration", is("RELATION.Project.researchoutputs")))
+                   .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                       SearchResultMatcher.matchOnItemName("item", "items", "Publication 2"))))
+                   .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(1)));
+
+        // fifth scenario: publication 1 hidden by both authors and project owner
+        getClient(adminToken).perform(delete("/api/core/relationships/" + publicationOneHiddenByProjectOwner.getID()));
+        context.turnOffAuthorisationSystem();
+
+        RelationshipBuilder.createRelationshipBuilder(context, publication1, firstPerson, researchOutputHiddenByPerson)
+                           .build();
+        RelationshipBuilder.createRelationshipBuilder(context, publication1, secondPerson, researchOutputHiddenByPerson)
+                           .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/discover/search/objects")
+                                .param("configuration", "RELATION.Person.researchoutputs")
+                                .param("scope", firstPerson.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.configuration", is("RELATION.Person.researchoutputs")))
+                   .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                       SearchResultMatcher.matchOnItemName("item", "items", "Publication 2"))))
+                   .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(1)));
+
+        getClient().perform(get("/api/discover/search/objects")
+                                .param("configuration", "RELATION.Person.researchoutputs")
+                                .param("scope", secondPerson.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.configuration", is("RELATION.Person.researchoutputs")))
+                   .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                       SearchResultMatcher.matchOnItemName("item", "items", "Publication 2"))))
+                   .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(1)));
+
+        getClient().perform(get("/api/discover/search/objects")
+                                .param("configuration", "RELATION.Project.researchoutputs")
+                                .param("scope", project.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.configuration", is("RELATION.Project.researchoutputs")))
+                   .andExpect(
+                       jsonPath("$._embedded.searchResult._embedded.objects",
+                                Matchers.containsInAnyOrder(
+                                    SearchResultMatcher
+                                        .matchOnItemName("item", "items", "Publication 2"),
+                                    SearchResultMatcher
+                                        .matchOnItemName("item", "items", "Publication 1"))))
+                   .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(2)));
+
+        // fifth scenario: publication 1 hidden by both authors and project owner
+        getClient(adminToken).perform(delete("/api/core/relationships/" + publicationOneHiddenByProjectOwner.getID()));
+        context.turnOffAuthorisationSystem();
+
+        RelationshipBuilder.createRelationshipBuilder(context, publication1, project, researchOutputHiddenByProject)
+                           .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/discover/search/objects")
+                                .param("configuration", "RELATION.Person.researchoutputs")
+                                .param("scope", firstPerson.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.configuration", is("RELATION.Person.researchoutputs")))
+                   .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                       SearchResultMatcher.matchOnItemName("item", "items", "Publication 2"))))
+                   .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(1)));
+
+        getClient().perform(get("/api/discover/search/objects")
+                                .param("configuration", "RELATION.Person.researchoutputs")
+                                .param("scope", secondPerson.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.configuration", is("RELATION.Person.researchoutputs")))
+                   .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                       SearchResultMatcher.matchOnItemName("item", "items", "Publication 2"))))
+                   .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(1)));
+
+        getClient().perform(get("/api/discover/search/objects")
+                                .param("configuration", "RELATION.Project.researchoutputs")
+                                .param("scope", project.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.configuration", is("RELATION.Project.researchoutputs")))
+                   .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                       SearchResultMatcher.matchOnItemName("item", "items", "Publication 2"))))
+                   .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(1)));
+
+
+        // admin user is able to see hidden items
+
+        getClient(adminToken).perform(get("/api/discover/search/objects")
+                                          .param("configuration", "RELATION.Person.researchoutputs")
+                                          .param("scope", firstPerson.getID().toString()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.configuration", is("RELATION.Person.researchoutputs")))
+                             .andExpect(
+                                 jsonPath("$._embedded.searchResult._embedded.objects",
+                                          Matchers.containsInAnyOrder(
+                                              SearchResultMatcher
+                                                  .matchOnItemName("item", "items", "Publication 2"),
+                                              SearchResultMatcher
+                                                  .matchOnItemName("item", "items", "Publication 1"))))
+                             .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(2)));
+
+        getClient(adminToken).perform(get("/api/discover/search/objects")
+                                          .param("configuration", "RELATION.Person.researchoutputs")
+                                          .param("scope", secondPerson.getID().toString()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.configuration", is("RELATION.Person.researchoutputs")))
+                             .andExpect(
+                                 jsonPath("$._embedded.searchResult._embedded.objects",
+                                          Matchers.containsInAnyOrder(
+                                              SearchResultMatcher
+                                                  .matchOnItemName("item", "items", "Publication 2"),
+                                              SearchResultMatcher
+                                                  .matchOnItemName("item", "items", "Publication 1"))))
+                             .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(2)));
+
+        getClient(adminToken).perform(get("/api/discover/search/objects")
+                                .param("configuration", "RELATION.Project.researchoutputs")
+                                .param("scope", project.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.configuration", is("RELATION.Project.researchoutputs")))
+                             .andExpect(
+                                 jsonPath("$._embedded.searchResult._embedded.objects",
+                                          Matchers.containsInAnyOrder(
+                                              SearchResultMatcher
+                                                  .matchOnItemName("item", "items", "Publication 2"),
+                                              SearchResultMatcher
+                                                  .matchOnItemName("item", "items", "Publication 1"))))
+                             .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(2)));
 
     }
 }
