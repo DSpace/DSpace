@@ -1334,9 +1334,7 @@
                 <property name="sortFields">
                     <list>
                         <ref bean="sortScore" />
-                        <ref bean="sortFamilyName"/>
-                        <ref bean="sortGivenName"/>
-                        <ref bean="sortBirthDate"/>
+                        <ref bean="sortTitle"/>
                         <ref bean="sortDateAccessioned"/>
                     </list>
                 </property>
