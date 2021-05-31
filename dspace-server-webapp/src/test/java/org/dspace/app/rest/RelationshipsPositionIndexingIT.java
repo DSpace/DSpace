@@ -449,6 +449,7 @@ public class RelationshipsPositionIndexingIT extends AbstractEntityIntegrationTe
     @Test
     public void sameItemRelatedToDifferentEntityTypesItems() throws Exception {
 
+        configurationService.setProperty("relationship.places.onlyleft", "");
         configurationService.setProperty("relationship.places.onlyright",
                                          "null::Person::isResearchoutputsSelectedFor::hasSelectedResearchoutputs");
         configurationService.addPropertyValue("relationship.places.onlyright",
@@ -694,6 +695,7 @@ public class RelationshipsPositionIndexingIT extends AbstractEntityIntegrationTe
     @Test
     public void onlyLeftPlacesUpdated() throws Exception {
 
+        configurationService.setProperty("relationship.places.onlyright", "");
         configurationService.setProperty("relationship.places.onlyleft",
                                          "null::Person::isResearchoutputsSelectedFor::hasSelectedResearchoutputs");
         configurationService.addPropertyValue(
