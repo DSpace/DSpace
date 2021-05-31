@@ -7,7 +7,7 @@
 	<bean id="org.dspace.submit.listener.MetadataListener" class="org.dspace.submit.listener.SimpleMetadataListener">
         <property name="externalDataProvidersMap">
 	        <map>
-                <entry key="dc.identifier.other">
+                <entry key="dc.identifier.pmid">
                     <list>
                         <ref bean="pubmedLiveImportDataProvider"/>
                     </list>

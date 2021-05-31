@@ -53,8 +53,8 @@ public class WorkspaceItemPatentStepIT extends AbstractControllerIntegrationTest
     @Override
     public void setUp() throws Exception {
         Assume.assumeTrue("EPO Credentials are set",
-                configurationService.hasProperty("submission.lookup.epo.consumerKey")
-                        && configurationService.hasProperty("submission.lookup.epo.consumerSecretKey"));
+                configurationService.hasProperty("epo.consumerKey")
+                        && configurationService.hasProperty("epo.consumerSecretKey"));
         super.setUp();
 
         // disable file upload mandatory
@@ -88,90 +88,6 @@ public class WorkspaceItemPatentStepIT extends AbstractControllerIntegrationTest
         value.put("value", "DE102012108018");
         values.add(value);
         addId.add(new AddOperation("/sections/patent/dc.identifier.patentno", values));
-
-        String patchBody = getPatchContent(addId);
-
-        getClient(authToken)
-                .perform(patch("/api/submission/workspaceitems/" + witem.getID()).content(patchBody)
-                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                .andExpect(status().isOk())
-                // testing lookup
-                .andExpect(jsonPath("$.sections.patent['dc.title'][0].value",
-                        is("Verfahren zur bedarfsgerechten Regelung einer Vorrichtung für eine Schichtlüftung "
-                                + "und Vorrichtung für eine Schichtlüftung")))
-                .andExpect(jsonPath("$.sections.patent['dc.date.issued'][0].value", is("2014-03-06")))
-                .andExpect(jsonPath("$.sections.patent['dc.contributor.author'][0].value", is("HESSELBACH JENS [DE]")))
-                .andExpect(jsonPath("$.sections.patent['dc.contributor.author'][1].value", is("SCHAEFER MIRKO [DE]")))
-                .andExpect(jsonPath("$.sections.patent['dc.contributor.author'][2].value", is("DETZER RUEDIGER [DE]")))
-                .andExpect(jsonPath("$.sections.patent_indexing['dc.description.abstract'][0].value",
-                        is("Um ein Verfahren (100) zur Regelung einer Vorrichtung (10) für eine "
-                                + "Schichtlüftung in einem zu belüftenden Raum (11), wobei sich eine "
-                                + "Schichtgrenze (12) zwischen einer ersten geodätisch unteren Luftschicht "
-                                + "(13) und einer zweiten geodätisch oberen Luftschicht (14) bildet "
-                                + "(V2)/bereitzustellen, welche den Energiebedarf einer Vorrichtung zur "
-                                + "Schichtlüftung durch eine flexible, vollautomatische, bedarfsgerechte "
-                                + "Regelung der Höhe der Schichtgrenze senkt, wird vorgeschlagen, dass der "
-                                + "Ist-Wert der Höhe der Schichtgrenze (12) an mindestens einem Ort (16) im "
-                                + "zu belüftenden Raum (11) ermittelt wird (V4), dass der Ist-Wert mit "
-                                + "einem Soll-Wert verglichen wird (V5), und dass einer Abweichung des "
-                                + "Ist-Werts vom Soll-Wert durch Regelung der Vorrichtung (10) für eine "
-                                + "Schichtlüftung entgegen gesteuert wird (V7).")));
-
-        // verify that the patch changes have been persisted
-        getClient(authToken)
-                .perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
-                // testing lookup
-                .andExpect(jsonPath("$.sections.patent['dc.title'][0].value",
-                        is("Verfahren zur bedarfsgerechten Regelung einer Vorrichtung für eine Schichtlüftung "
-                                + "und Vorrichtung für eine Schichtlüftung")))
-                .andExpect(jsonPath("$.sections.patent['dc.date.issued'][0].value", is("2014-03-06")))
-                .andExpect(jsonPath("$.sections.patent['dc.contributor.author'][0].value", is("HESSELBACH JENS [DE]")))
-                .andExpect(jsonPath("$.sections.patent['dc.contributor.author'][1].value", is("SCHAEFER MIRKO [DE]")))
-                .andExpect(jsonPath("$.sections.patent['dc.contributor.author'][2].value", is("DETZER RUEDIGER [DE]")))
-                .andExpect(jsonPath("$.sections.patent_indexing['dc.description.abstract'][0].value",
-                        is("Um ein Verfahren (100) zur Regelung einer Vorrichtung (10) für eine "
-                                + "Schichtlüftung in einem zu belüftenden Raum (11), wobei sich eine "
-                                + "Schichtgrenze (12) zwischen einer ersten geodätisch unteren Luftschicht "
-                                + "(13) und einer zweiten geodätisch oberen Luftschicht (14) bildet "
-                                + "(V2)/bereitzustellen, welche den Energiebedarf einer Vorrichtung zur "
-                                + "Schichtlüftung durch eine flexible, vollautomatische, bedarfsgerechte "
-                                + "Regelung der Höhe der Schichtgrenze senkt, wird vorgeschlagen, dass der "
-                                + "Ist-Wert der Höhe der Schichtgrenze (12) an mindestens einem Ort (16) im "
-                                + "zu belüftenden Raum (11) ermittelt wird (V4), dass der Ist-Wert mit "
-                                + "einem Soll-Wert verglichen wird (V5), und dass einer Abweichung des "
-                                + "Ist-Werts vom Soll-Wert durch Regelung der Vorrichtung (10) für eine "
-                                + "Schichtlüftung entgegen gesteuert wird (V7).")));
-
-    }
-
-    @Test
-    /**
-     * Test the metadata lookup
-     *
-     * @throws Exception
-     */
-    public void lookupWithpatentnunmberTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        // ** GIVEN **
-        // 1. A community-collection structure with one parent community with
-        // sub-community and two collections.
-        parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity).withName("Sub Community")
-                .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1, PATENT_COLLECTION_HANDLE_TEST)
-                .withName("Collection 1").build();
-        String authToken = getAuthToken(admin.getEmail(), password);
-
-        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1).build();
-
-        List<Operation> addId = new ArrayList<Operation>();
-        List<Map<String, String>> values = new ArrayList<Map<String, String>>();
-        Map<String, String> value = new HashMap<String, String>();
-        value.put("value", "DE102012108018");
-        values.add(value);
-        // dc.identifier.patentnumber is used instead of dc.identifier.patentno
-        addId.add(new AddOperation("/sections/patent/dc.identifier.patentnumber", values));
 
         String patchBody = getPatchContent(addId);
 

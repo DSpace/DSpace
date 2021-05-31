@@ -4,16 +4,16 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-parent</artifactId>
     <packaging>pom</packaging>
-    <version>7.0-beta5-SNAPSHOT</version>
+    <version>cris-2021.01.00-SNAPSHOT</version>
     <name>DSpace Parent Project</name>
     <description>
-   	DSpace open source software is a turnkey institutional repository application.
+   	DSpace-CRIS is an open source extension of DSpace (http://www.dspace.org) providing out of box support for the CRIS / RIMS and moder Institution Repository use cases with advanced features and optimized configurations
     </description>
-    <url>https://github.com/dspace/DSpace</url>
+    <url>https://github.com/4Science/DSpace</url>
 
     <organization>
-        <name>LYRASIS</name>
-        <url>http://www.dspace.org</url>
+        <name>4Science</name>
+        <url>https://www.4science.it</url>
     </organization>
 
     <properties>
@@ -30,12 +30,12 @@
         <axiom.version>1.2.22</axiom.version>
         <errorprone.version>2.3.4</errorprone.version>
         <!-- NOTE: when updating jackson.version, also sync jackson-databind dependency below -->
-        <jackson.version>2.10.2</jackson.version>
+        <jackson.version>2.12.3</jackson.version>
         <javax-annotation.version>1.3.2</javax-annotation.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <jaxb-runtime.version>2.3.1</jaxb-runtime.version>
         <!-- NOTE: Jetty needed for Solr, Handle Server & tests -->
-        <jetty.version>9.4.35.v20201120</jetty.version>
+        <jetty.version>9.4.38.v20210224</jetty.version>
         <log4j.version>2.13.3</log4j.version>
         <pdfbox-version>2.0.15</pdfbox-version>
         <poi-version>3.17</poi-version>
@@ -826,14 +826,14 @@
                    <dependency>
                        <groupId>org.dspace</groupId>
                        <artifactId>dspace-rest</artifactId>
-                       <version>7.0-beta5-SNAPSHOT</version>
+                       <version>cris-2021.01.00-SNAPSHOT</version>
                        <type>jar</type>
                        <classifier>classes</classifier>
                    </dependency>
                    <dependency>
                        <groupId>org.dspace</groupId>
                        <artifactId>dspace-rest</artifactId>
-                       <version>7.0-beta5-SNAPSHOT</version>
+                       <version>cris-2021.01.00-SNAPSHOT</version>
                        <type>war</type>
                    </dependency>
                </dependencies>
@@ -980,64 +980,64 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
-                <version>7.0-beta5-SNAPSHOT</version>
+                <version>cris-2021.01.00-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
                 <type>test-jar</type>
-                <version>7.0-beta5-SNAPSHOT</version>
+                <version>cris-2021.01.00-SNAPSHOT</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace.modules</groupId>
                 <artifactId>additions</artifactId>
-                <version>7.0-beta5-SNAPSHOT</version>
+                <version>cris-2021.01.00-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-sword</artifactId>
-                <version>7.0-beta5-SNAPSHOT</version>
+                <version>cris-2021.01.00-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-swordv2</artifactId>
-                <version>7.0-beta5-SNAPSHOT</version>
+                <version>cris-2021.01.00-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-oai</artifactId>
-                <version>7.0-beta5-SNAPSHOT</version>
+                <version>cris-2021.01.00-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-services</artifactId>
-                <version>7.0-beta5-SNAPSHOT</version>
+                <version>cris-2021.01.00-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
                 <type>test-jar</type>
-                <version>7.0-beta5-SNAPSHOT</version>
+                <version>cris-2021.01.00-SNAPSHOT</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-rdf</artifactId>
-                <version>7.0-beta5-SNAPSHOT</version>
+                <version>cris-2021.01.00-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>7.0-beta5-SNAPSHOT</version>
+                <version>cris-2021.01.00-SNAPSHOT</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>7.0-beta5-SNAPSHOT</version>
+                <version>cris-2021.01.00-SNAPSHOT</version>
                 <type>war</type>
             </dependency>
             <!-- DSpace API Localization Packages -->
@@ -1369,7 +1369,7 @@
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
-                <version>2.6</version>
+                <version>2.7</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -1722,8 +1722,8 @@
 
     <licenses>
         <license>
-            <name>DSpace BSD License</name>
-            <url>https://raw.github.com/DSpace/DSpace/main/LICENSE</url>
+            <name>DSpace-CRIS BSD License</name>
+            <url>https://github.com/4Science/DSpace/raw/dspace-cris-7/LICENSE</url>
             <distribution>repo</distribution>
             <comments>
                A BSD 3-Clause license for the DSpace codebase.
@@ -1733,7 +1733,7 @@
 
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/DSpace/DSpace/issues</url>
+        <url>https://github.com/4Science/DSpace/issues</url>
     </issueManagement>
 
     <mailingLists>
@@ -1816,24 +1816,30 @@
       Information about the SCM repository where source code exists.
     -->
     <scm>
-        <connection>scm:git:git@github.com:DSpace/DSpace.git</connection>
-        <developerConnection>scm:git:git@github.com:DSpace/DSpace.git</developerConnection>
-        <url>git@github.com:DSpace/DSpace.git</url>
-        <tag>HEAD</tag>
+        <connection>scm:git:git@github.com:4Science/DSpace.git</connection>
+        <developerConnection>scm:git:git@github.com:4Science/DSpace.git</developerConnection>
+        <url>git@github.com:4Science/DSpace.git</url>
+        <tag>dspace-cris-7</tag>
     </scm>
 
 
     <!-- Configure our release repositories to use Sonatype.
          See: http://central.sonatype.org/pages/apache-maven.html -->
     <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
         <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <id>4science-nexus</id>
+            <name>4Science Public Releases</name>
+            <url>https://nexus.4science.it/repository/maven-releases/</url>
         </repository>
+        <snapshotRepository>
+            <id>4science-snapshot</id>
+            <name>4Science Public Snapshot</name>
+            <url>https://nexus.4science.it/repository/maven-snapshots/</url>
+        </snapshotRepository>
+        <site>
+            <id>website</id>
+            <url>https://wiki.duraspace.org/display/DSPACECRIS/DSpace-CRIS+Home</url>
+        </site>
     </distributionManagement>
 
     <repositories>
@@ -1858,6 +1864,11 @@
         <repository>
             <id>handle.net</id>
             <url>https://handle.net/maven</url>
+        </repository>
+        <repository>
+            <id>4science-repo-nexus</id>
+            <name>4Science Maven Repository</name>
+            <url>https://nexus.4science.it/repository/maven-public/</url>
         </repository>
     </repositories>
 </project>

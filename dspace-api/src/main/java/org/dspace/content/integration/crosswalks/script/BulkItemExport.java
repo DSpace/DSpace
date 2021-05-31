@@ -272,7 +272,8 @@ public class BulkItemExport extends DSpaceRunnable<BulkItemExportScriptConfigura
 
             String name = searchFilter.getIndexFieldName();
 
-            DiscoverFilterQuery filterQuery = searchService.toFilterQuery(context, name, filterOperator, filterValue);
+            DiscoverFilterQuery filterQuery = searchService.toFilterQuery(context, name, filterOperator, filterValue,
+                    discoveryConfiguration);
             if (filterQuery != null) {
                 filterQueries.add(filterQuery.getFilterQuery());
             }

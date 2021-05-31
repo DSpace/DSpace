@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.matcher;
 
+import static com.google.common.net.UrlEscapers.urlPathSegmentEscaper;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
@@ -24,7 +25,9 @@ public class FacetValueMatcher {
             hasJsonPath("$.label", is(label)),
             hasJsonPath("$.type", is("discover")),
             hasJsonPath("$._links.search.href", containsString("api/discover/search/objects")),
-            hasJsonPath("$._links.search.href", containsString("f.author=" + label + ",equals"))
+            hasJsonPath("$._links.search.href", containsString(
+                    "f.author=" + urlPathSegmentEscaper().escape(label) + ",equals"
+            ))
         );
     }
 

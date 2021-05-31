@@ -116,7 +116,7 @@
     <bean id="pubmedLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="mockPubmedImportService"/>
         <property name="sourceIdentifier" value="pubmed"/>
-        <property name="recordIdMetadata" value="dc.identifier.other"/>
+        <property name="recordIdMetadata" value="dc.identifier.pmid"/>
     </bean>
 
     <bean id="mockPubmedImportService"

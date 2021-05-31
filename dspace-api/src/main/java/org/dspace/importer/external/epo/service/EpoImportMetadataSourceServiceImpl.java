@@ -13,11 +13,13 @@ import java.io.StringReader;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -48,12 +50,11 @@ import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.exception.MetadataSourceException;
+import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
 import org.dspace.importer.external.metadatamapping.contributor.EpoIdMetadataContributor.EpoDocumentId;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.components.QuerySource;
-import org.dspace.services.ConfigurationService;
 import org.jaxen.JaxenException;
-import org.springframework.beans.factory.annotation.Autowired;
 
 
 /**
@@ -67,7 +68,8 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
     private String consumerKey;
     private String consumerSecret;
-
+    private MetadataFieldConfig dateFiled;
+    private MetadataFieldConfig applicationNumber;
 
     private static final Logger log = Logger.getLogger(EpoImportMetadataSourceServiceImpl.class);
 
@@ -78,8 +80,8 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
     private static final String endPointPublisherDataRetriveService =
             "http://ops.epo.org/rest-services/published-data/publication/$(doctype)/$(id)/biblio";
 
-    @Autowired
-    private ConfigurationService configurationService;
+    public static final String APP_NO_DATE_SEPARATOR = "$$$";
+    private static final String APP_NO_DATE_SEPARATOR_REGEX = "\\$\\$\\$";
 
 /**
      * Initialize the class
@@ -116,6 +118,22 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
         this.consumerSecret = consumerSecret;
     }
 
+    public void setDateFiled(MetadataFieldConfig dateFiled) {
+        this.dateFiled = dateFiled;
+    }
+
+    public MetadataFieldConfig getDateFiled() {
+        return dateFiled;
+    }
+
+    public void setApplicationNumber(MetadataFieldConfig applicationNumber) {
+        this.applicationNumber = applicationNumber;
+    }
+
+    public MetadataFieldConfig getApplicationNumber() {
+        return applicationNumber;
+    }
+
     /***
      * Log to EPO, bearer is valid for 20 minutes
      * 
@@ -128,7 +146,6 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
     protected String login() throws IOException, HttpException {
         HttpPost method = null;
         String accessToken = null;
-        fillKey();
         try {
             HttpClient client = HttpClientBuilder.create().build();
             method = new HttpPost(endPointAuthService);
@@ -162,7 +179,6 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
     @Override
     public int getRecordsCount(String query) throws MetadataSourceException {
-        fillKey();
         if (StringUtils.isNotBlank(consumerKey) && StringUtils.isNotBlank(consumerSecret)) {
             try {
                 String bearer = login();
@@ -177,7 +193,6 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
     @Override
     public int getRecordsCount(Query query) throws MetadataSourceException {
-        fillKey();
         if (StringUtils.isNotBlank(consumerKey) && StringUtils.isNotBlank(consumerSecret)) {
             try {
                 String bearer = login();
@@ -192,7 +207,6 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
     @Override
     public Collection<ImportRecord> getRecords(String query, int start,
             int count) throws MetadataSourceException {
-        fillKey();
         if (StringUtils.isNotBlank(consumerKey) && StringUtils.isNotBlank(consumerSecret)) {
             try {
                 String bearer = login();
@@ -201,13 +215,12 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
                 e.printStackTrace();
             }
         }
-        return null;
+        return Collections.EMPTY_LIST;
     }
 
     @Override
     public Collection<ImportRecord> getRecords(Query query)
             throws MetadataSourceException {
-        fillKey();
         if (StringUtils.isNotBlank(consumerKey) && StringUtils.isNotBlank(consumerSecret)) {
             try {
                 String bearer = login();
@@ -216,12 +229,11 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
                 e.printStackTrace();
             }
         }
-        return null;
+        return Collections.EMPTY_LIST;
     }
 
     @Override
     public ImportRecord getRecord(String id) throws MetadataSourceException {
-        fillKey();
         if (StringUtils.isNotBlank(consumerKey) && StringUtils.isNotBlank(consumerSecret)) {
             try {
                 String bearer = login();
@@ -240,21 +252,18 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
     @Override
     public ImportRecord getRecord(Query query) throws MetadataSourceException {
-        fillKey();
         return null;
     }
 
     @Override
     public Collection<ImportRecord> findMatchingRecords(Item item)
             throws MetadataSourceException {
-        fillKey();
         return null;
     }
 
     @Override
     public Collection<ImportRecord> findMatchingRecords(Query query)
             throws MetadataSourceException {
-        fillKey();
         return null;
     }
 
@@ -290,8 +299,25 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
         public List<ImportRecord> call() throws Exception {
             int positionToSplit = id.indexOf(":");
-            String docType = id.substring(0, positionToSplit);
-            String idS = id.substring(positionToSplit + 1, id.length());
+            String docType = EpoDocumentId.EPODOC;
+            String idS = id;
+            if (positionToSplit != -1) {
+                docType = id.substring(0, positionToSplit);
+                idS = id.substring(positionToSplit + 1, id.length());
+            } else if (id.contains(APP_NO_DATE_SEPARATOR)) {
+                 // special case the id is the combination of the applicationnumber and date filed
+                String query = "applicationnumber=" + id.split(APP_NO_DATE_SEPARATOR_REGEX)[0];
+                SearchByQueryCallable search = new SearchByQueryCallable(query, bearer, 0, 10);
+                List<ImportRecord> records = search.call().stream()
+                        .filter(r -> r.getValue(dateFiled.getSchema(), dateFiled.getElement(),
+                                    dateFiled.getQualifier())
+                                .stream()
+                                .anyMatch(m -> StringUtils.equals(m.getValue(),
+                                        id.split(APP_NO_DATE_SEPARATOR_REGEX)[1])
+                        ))
+                        .limit(1).collect(Collectors.toList());
+                return records;
+            }
             List<ImportRecord> records = searchDocument(bearer, idS, docType);
             if (records.size() > 1) {
                 log.warn("More record are returned with epocID " + id);
@@ -363,7 +389,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             }
             InputStream is = httpResponse.getEntity().getContent();
             String response = IOUtils.toString(is, Charsets.UTF_8);
-            System.out.println(response);
+            log.debug(response);
             Map<String, String> epoNamespaces = new HashMap<>();
             epoNamespaces.put("xlink", "http://www.w3.org/1999/xlink");
             epoNamespaces.put("ops", "http://ops.epo.org");
@@ -400,7 +426,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             }
             InputStream is = httpResponse.getEntity().getContent();
             String response = IOUtils.toString(is, Charsets.UTF_8);
-            System.out.println(response);
+            log.debug(response);
             Map<String, String> epoNamespaces = new HashMap<>();
             epoNamespaces.put("xlink", "http://www.w3.org/1999/xlink");
             epoNamespaces.put("ops", "http://ops.epo.org");
@@ -444,7 +470,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             }
             InputStream is = httpResponse.getEntity().getContent();
             String response = IOUtils.toString(is, Charsets.UTF_8);
-            System.out.println(response);
+            log.debug(response);
             List<OMElement> omElements = splitToRecords(response);
             for (OMElement record : omElements) {
                 results.add(transformSourceRecords(record));
@@ -513,13 +539,9 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
         } else if (el instanceof OMText) {
             return ((OMText) el).getText();
         } else {
-            System.err.println("node of type: " + el.getClass());
+            log.error("node of type: " + el.getClass());
             return "";
         }
     }
 
-    private void fillKey() {
-        this.consumerKey = configurationService.getProperty("submission.lookup.epo.consumerKey");
-        this.consumerSecret = configurationService.getProperty("submission.lookup.epo.consumerSecretKey");
-    }
 }

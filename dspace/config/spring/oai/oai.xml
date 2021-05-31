@@ -18,12 +18,13 @@
 
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
-	<!-- Additional item.compile plugin to enrich field with information about Creative Commons License metadata -->
-    <!-- Temporarily commented out: DSC-70 should be solved -->
-    <!--    <bean id="CCElementAdditional"-->
-    <!--          class="org.dspace.xoai.app.CCElementAdditional"/>-->
     <bean id="xoaiCerifGenerator" class="org.dspace.xoai.app.XOAICerifItemCompilePlugin">
         <property name="generator" value="cerif-xml"/>
         <property name="fieldName" value="openaire"/>
     </bean>
+
+	<!-- Additional item.compile plugin to enrich field with information about 
+		Creative Commons License metadata -->
+	<bean class="org.dspace.xoai.app.CCElementItemCompilePlugin"/>
+
 </beans>

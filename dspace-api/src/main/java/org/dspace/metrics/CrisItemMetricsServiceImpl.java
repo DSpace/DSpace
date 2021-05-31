@@ -55,7 +55,7 @@ public class CrisItemMetricsServiceImpl implements CrisItemMetricsService {
     public List<CrisMetrics> getMetrics(Context context, UUID itemUuid) {
         // searches in solr
         List<CrisMetrics> metrics = getStoredMetrics(context, itemUuid);
-        metrics.addAll(getEmbeddableMetrics(context, itemUuid));
+        metrics.addAll(getEmbeddableMetrics(context, itemUuid, metrics));
         return metrics;
     }
 
@@ -65,12 +65,13 @@ public class CrisItemMetricsServiceImpl implements CrisItemMetricsService {
     }
 
     @Override
-    public List<EmbeddableCrisMetrics> getEmbeddableMetrics(Context context, UUID itemUuid) {
+    public List<EmbeddableCrisMetrics> getEmbeddableMetrics(Context context, UUID itemUuid,
+            List<CrisMetrics> retrivedStoredMetrics) {
         try {
             Item item = itemService.find(context, itemUuid);
             List<EmbeddableCrisMetrics> metrics = new ArrayList<>();
             this.providers.stream().forEach(provider -> {
-                final Optional<EmbeddableCrisMetrics> metric = provider.provide(context, item);
+                final Optional<EmbeddableCrisMetrics> metric = provider.provide(context, item, retrivedStoredMetrics);
                 metric.ifPresent(metrics::add);
             });
             return metrics;

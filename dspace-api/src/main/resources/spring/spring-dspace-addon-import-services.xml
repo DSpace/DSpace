@@ -162,6 +162,11 @@
     <bean id="EpoImportService"
           class="org.dspace.importer.external.epo.service.EpoImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="epoMetadataFieldMapping"/>
+        <property name="consumerKey" value="${epo.consumerKey}" />
+        <property name="consumerSecret" value="${epo.consumerSecretKey}" />
+        <!-- date filed mapped metadata, see epo-integration.xml -->
+        <property name="dateFiled" ref="epo.dc.date.filed" />
+        <property name="applicationNumber" ref="epo.dc.identifier.applicationnumber" />
     </bean>
     <bean id="epoMetadataFieldMapping"
           class="org.dspace.importer.external.epo.service.EpoFieldMapping">
@@ -171,8 +176,8 @@
     <bean id="ScopusImportService"
           class="org.dspace.importer.external.scopus.service.ScopusImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="scopusMetadataFieldMapping"/>
-        <property name="apiKey" value="${submission.lookup.scopus.apikey}"/>
-        <property name="instKey" value="${submission.lookup.scopus.instkey}"/>
+        <property name="apiKey" value="${scopus.apiKey}"/>
+        <property name="instKey" value="${scopus.instToken}"/>
     </bean>
 
     <bean id="OpenAIREService"

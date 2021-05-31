@@ -291,7 +291,7 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
             boxTypes.add(b.getType());
             crisMetricService.embeddableFallback(b.getType()).ifPresent(boxTypes::add);
         });
-        if (this.crisMetricService.getEmbeddableMetrics(context, itemUuid).stream()
+        if (this.crisMetricService.getEmbeddableMetrics(context, itemUuid, null).stream()
             .filter(m -> boxTypes.contains(m.getMetricType())).count() > 0) {
             return true;
         }

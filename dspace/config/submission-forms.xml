@@ -172,14 +172,25 @@
       <row>
         <field>
           <dc-schema>oairecerif</dc-schema>
-          <dc-element>person</dc-element>
-          <dc-qualifier>affiliation</dc-qualifier>
-          <label>Affiliation</label>
+          <dc-element>affiliation</dc-element>
+          <dc-qualifier>role</dc-qualifier>
+          <label>Role</label>
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
-          <required>You must enter at least the affiliation.</required>
+          <required />
+          <style>col-xs-12 col-md-6 col-lg-4</style>
           <hint />
-          <style>col-xs-12 col-lg-6 order-0</style>
+        </field>
+        <field>
+          <dc-schema>oairecerif</dc-schema>
+          <dc-element>person</dc-element>
+          <dc-qualifier>affiliation</dc-qualifier>
+          <label>Organisation name</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required>You must enter at least the organisation of your affiliation.</required>
+          <style>col-xs-12 col-md-6 col-lg-4</style>
+          <hint />
         </field>
         <field>
           <dc-schema>oairecerif</dc-schema>
@@ -189,8 +200,8 @@
           <input-type>date</input-type>
           <repeatable>false</repeatable>
           <required />
+          <style>col-xs-12 col-md-6 col-lg-3</style>
           <hint />
-          <style>col-xs-12 col-lg-6 order-2</style>
         </field>
         <field>
           <dc-schema>oairecerif</dc-schema>
@@ -200,19 +211,8 @@
           <input-type>date</input-type>
           <repeatable>false</repeatable>
           <required />
+          <style>col-xs-12 col-md-6 col-lg-3</style>
           <hint />
-          <style>col-xs-12 col-lg-6 order-3</style>
-        </field>
-        <field>
-          <dc-schema>oairecerif</dc-schema>
-          <dc-element>affiliation</dc-element>
-          <dc-qualifier>role</dc-qualifier>
-          <label>Role</label>
-          <input-type>onebox</input-type>
-          <repeatable>false</repeatable>
-          <required />
-          <hint />
-          <style>col-xs-12 col-lg-6 order-1</style>
         </field>
       </row>
     </form>
@@ -221,12 +221,23 @@
         <field>
           <dc-schema>crisrp</dc-schema>
           <dc-element>qualification</dc-element>
-          <label>Qualification</label>
+          <label>Organisation name</label>
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
-          <required>You must enter at least the qualification title.</required>
+          <required>You must enter the organisation</required>
+          <style>col-xs-12 col-md-6 col-lg-4</style>
           <hint />
-          <style>col-12</style>
+        </field>
+        <field>
+          <dc-schema>crisrp</dc-schema>
+          <dc-element>qualification</dc-element>
+          <dc-qualifier>role</dc-qualifier>
+          <label>Qualification Title</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required>You must enter the qualification title.</required>
+          <style>col-xs-12 col-md-6 col-lg-4</style>
+          <hint />
         </field>
         <field>
           <dc-schema>crisrp</dc-schema>
@@ -236,8 +247,8 @@
           <input-type>date</input-type>
           <repeatable>false</repeatable>
           <required />
+          <style>col-xs-12 col-md-3</style>
           <hint />
-          <style>col-12 col-lg-6</style>
         </field>
         <field>
           <dc-schema>crisrp</dc-schema>
@@ -247,8 +258,8 @@
           <input-type>date</input-type>
           <repeatable>false</repeatable>
           <required />
+          <style>col-xs-12 col-md-3</style>
           <hint />
-          <style>col-12 col-lg-6</style>
         </field>
       </row>
     </form>
@@ -257,12 +268,23 @@
         <field>
           <dc-schema>crisrp</dc-schema>
           <dc-element>education</dc-element>
-          <label>Education</label>
+          <dc-qualifier>role</dc-qualifier>
+          <label>Degree/Title</label>
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
-          <required>You must enter at least the education title.</required>
+          <required>You must enter the degree/title</required>
+          <style>col-xs-12 col-md-6 col-lg-4</style>
           <hint />
-          <style>col-xs-12 col-lg-6 order-0</style>
+        </field>
+        <field>
+          <dc-schema>crisrp</dc-schema>
+          <dc-element>education</dc-element>
+          <label>Organisation name</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required>You must enter the organisation</required>
+          <style>col-xs-12 col-md-6 col-lg-4</style>
+          <hint />
         </field>
         <field>
           <dc-schema>crisrp</dc-schema>
@@ -272,8 +294,8 @@
           <input-type>date</input-type>
           <repeatable>false</repeatable>
           <required />
+          <style>col-xs-12 col-md-6 col-lg-3</style>
           <hint />
-          <style>col-xs-12 col-lg-6 order-2</style>
         </field>
         <field>
           <dc-schema>crisrp</dc-schema>
@@ -283,19 +305,8 @@
           <input-type>date</input-type>
           <repeatable>false</repeatable>
           <required />
+          <style>col-xs-12 col-md-6 col-lg-3</style>
           <hint />
-          <style>col-xs-12 col-lg-6 order-3</style>
-        </field>
-        <field>
-          <dc-schema>crisrp</dc-schema>
-          <dc-element>education</dc-element>
-          <dc-qualifier>role</dc-qualifier>
-          <label>Role</label>
-          <input-type>onebox</input-type>
-          <repeatable>false</repeatable>
-          <required />
-          <hint />
-          <style>col-xs-12 col-lg-6 order-1</style>
         </field>
       </row>
     </form>
@@ -334,7 +345,7 @@
           <label>Author</label>
           <input-type>name</input-type>
           <repeatable>false</repeatable>
-          <required>You must enter at least the author.</required>
+          <required>You must enter at least the inventor.</required>
           <hint>Enter the names of the authors of this item in the form Lastname, Firstname [i.e. Smith, Josh or Smith, J].</hint>
         </field>
       </row>
@@ -570,7 +581,7 @@ it, please enter the types and the actual numbers or codes.</hint>
           <repeatable>false</repeatable>
           <required />
           <hint>The publication where this publication is included. E.g. a book chapter lists here the book, a contribution to a conference lists here the conference proceeding.</hint>
-          <type-bind>types:c_3248</type-bind>
+          <type-bind>types:c_3248,types:c_5794,types:c_6670</type-bind>
         </field>
       </row>
       <row>
@@ -583,7 +594,7 @@ it, please enter the types and the actual numbers or codes.</hint>
           <repeatable>false</repeatable>
           <required />
           <hint>The ISBN of the book/report if it was not found in the system</hint>
-          <type-bind>types:c_3248</type-bind>
+          <type-bind>types:c_3248,types:c_5794,types:c_6670</type-bind>
         </field>
       </row>
       <row>
@@ -596,7 +607,7 @@ it, please enter the types and the actual numbers or codes.</hint>
           <repeatable>false</repeatable>
           <required />
           <hint>The DOI of the book/report if it was not found in the system</hint>
-          <type-bind>types:c_3248</type-bind>
+          <type-bind>types:c_3248,types:c_5794,types:c_6670</type-bind>
         </field>
       </row>
       <row>
@@ -1054,6 +1065,39 @@ it, please enter the types and the actual numbers or codes.</hint>
       <row>
         <field>
           <dc-schema>dc</dc-schema>
+          <dc-element>identifier</dc-element>
+          <dc-qualifier>patentno</dc-qualifier>
+          <label>Patent Number</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint>The patent number</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>identifier</dc-element>
+          <dc-qualifier>applicationnumber</dc-qualifier>
+          <label>Application Number</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint>The application number</hint>
+        </field>
+        <field>
+          <dc-schema>dcterms</dc-schema>
+          <dc-element>dateSubmitted</dc-element>
+          <label>Registration Date</label>
+          <input-type>date</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint>Date on which the application was physically received at the Patent Authority. Also named Filling Date</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
           <dc-element>title</dc-element>
           <label>Title</label>
           <input-type>onebox</input-type>
@@ -1070,8 +1114,7 @@ it, please enter the types and the actual numbers or codes.</hint>
           <input-type>date</input-type>
           <repeatable>false</repeatable>
           <required />
-          <hint>The Approval date.
-You can leave out the day and/or month if they aren't applicable.</hint>
+          <hint>Date on which the application has been granted by the Patent Office.</hint>
         </field>
       </row>
       <row>
@@ -1079,12 +1122,11 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <dc-schema>dc</dc-schema>
           <dc-element>date</dc-element>
           <dc-qualifier>issued</dc-qualifier>
-          <label>Registration Date</label>
+          <label>Publication Date</label>
           <input-type>date</input-type>
           <repeatable>false</repeatable>
           <required />
-          <hint>The registration date of the patent.
-You can leave out the day and/or month if they aren't applicable.</hint>
+          <hint>Date of making available to the public by printing or similar process of a patent document on which grant has taken place on or before the said date</hint>
         </field>
       </row>
       <row>
@@ -1119,18 +1161,6 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <repeatable>true</repeatable>
           <required />
           <hint>The issuer of the patent: the patent office</hint>
-        </field>
-      </row>
-      <row>
-        <field>
-          <dc-schema>dc</dc-schema>
-          <dc-element>identifier</dc-element>
-          <dc-qualifier>patentno</dc-qualifier>
-          <label>Patent Number</label>
-          <input-type>onebox</input-type>
-          <repeatable>false</repeatable>
-          <required />
-          <hint>The patent number.</hint>
         </field>
       </row>
       <row>
@@ -1308,7 +1338,6 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <repeatable>false</repeatable>
           <required />
           <hint />
-          <style>col-12 col-lg-6</style>
         </field>
         <field>
           <dc-schema>oairecerif</dc-schema>
@@ -1319,7 +1348,6 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <repeatable>false</repeatable>
           <required />
           <hint />
-          <style>col-12 col-lg-6</style>
         </field>
       </row>
       <row>
@@ -1397,8 +1425,8 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
           <required />
-          <readonly>all</readonly>
           <hint>Settable by connecting the entity with ORCID</hint>
+          <readonly>all</readonly>
         </field>
       </row>
       <row>
@@ -2376,10 +2404,6 @@ You can leave out the day and/or month if they aren't applicable.</hint>
       <pair>
         <displayed-value>arXiv ID</displayed-value>
         <stored-value>arxiv</stored-value>
-      </pair>
-      <pair>
-        <displayed-value>ISSN</displayed-value>
-        <stored-value>issn</stored-value>
       </pair>
       <pair>
         <displayed-value>Other</displayed-value>

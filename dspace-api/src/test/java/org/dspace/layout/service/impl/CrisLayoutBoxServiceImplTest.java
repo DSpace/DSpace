@@ -345,7 +345,7 @@ public class CrisLayoutBoxServiceImplTest {
             when(metric.getMetricType()).thenReturn(mt);
             return metric;
         }).collect(Collectors.toList());
-        when(crisItemMetricsService.getEmbeddableMetrics(any(), any())).thenReturn(metrics);
+        when(crisItemMetricsService.getEmbeddableMetrics(any(), any(), any())).thenReturn(metrics);
         return metrics;
     }
 

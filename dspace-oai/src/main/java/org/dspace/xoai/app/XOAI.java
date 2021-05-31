@@ -57,6 +57,7 @@ import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.SolrUtils;
+import org.dspace.utils.DSpace;
 import org.dspace.xoai.exceptions.CompilingException;
 import org.dspace.xoai.services.api.CollectionsService;
 import org.dspace.xoai.services.api.cache.XOAICacheService;
@@ -96,7 +97,7 @@ public class XOAI {
     private final static ConfigurationService configurationService = DSpaceServicesFactory
             .getInstance().getConfigurationService();
 
-    private List<XOAIItemCompilePlugin> xOAIItemCompilePlugins;
+    private List<XOAIExtensionItemCompilePlugin> extensionPlugins;
 
     private List<String> getFileFormats(Item item) {
         List<String> formats = new ArrayList<>();
@@ -123,6 +124,8 @@ public class XOAI {
         // Load necessary DSpace services
         this.authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         this.itemService = ContentServiceFactory.getInstance().getItemService();
+        this.extensionPlugins = new DSpace().getServiceManager()
+                .getServicesByType(XOAIExtensionItemCompilePlugin.class);
     }
 
     public XOAI(Context ctx, boolean hasOption) {
@@ -132,6 +135,8 @@ public class XOAI {
         // Load necessary DSpace services
         this.authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         this.itemService = ContentServiceFactory.getInstance().getItemService();
+        this.extensionPlugins = new DSpace().getServiceManager()
+                .getServicesByType(XOAIExtensionItemCompilePlugin.class);
     }
 
     private void println(String line) {
@@ -461,8 +466,8 @@ public class XOAI {
         Metadata metadata = retrieveMetadata(context, item);
 
         // Do any additional metadata element, depends on the plugins
-        for (XOAIItemCompilePlugin xOAIItemCompilePlugin : getxOAIItemCompilePlugins()) {
-            metadata = xOAIItemCompilePlugin.additionalMetadata(context, metadata, item);
+        for (XOAIExtensionItemCompilePlugin plugin : extensionPlugins) {
+            metadata = plugin.additionalMetadata(context, metadata, item);
         }
 
         metadata.write(xmlContext);
@@ -707,20 +712,4 @@ public class XOAI {
         }
     }
 
-    /**
-     * Do any additional content on "item.compile" field, depends on the plugins
-     * 
-     * @return
-     */
-    public List<XOAIItemCompilePlugin> getxOAIItemCompilePlugins() {
-        if (xOAIItemCompilePlugins == null) {
-            xOAIItemCompilePlugins = DSpaceServicesFactory.getInstance().getServiceManager()
-                    .getServicesByType(XOAIItemCompilePlugin.class);
-        }
-        return xOAIItemCompilePlugins;
-    }
-
-    public void setxOAIItemCompilePlugins(List<XOAIItemCompilePlugin> xOAIItemCompilePlugins) {
-        this.xOAIItemCompilePlugins = xOAIItemCompilePlugins;
-    }
 }

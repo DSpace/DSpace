@@ -84,16 +84,16 @@ public class AbstractEmbeddableMetricProviderTest {
 
         // should return false if provider is not enabled
         provider.setEnabled(false);
-        assertFalse(provider.hasMetric(context, item));
+        assertFalse(provider.hasMetric(context, item, null));
         verify(filterService, times(0)).getResult(context, item);
 
         // should return getResult of filter if provider is enabled
         provider.setEnabled(true);
 
         when(filterService.getResult(eq(context), eq(item))).thenReturn(false);
-        assertFalse(provider.hasMetric(context, item));
+        assertFalse(provider.hasMetric(context, item, null));
         when(filterService.getResult(eq(context), eq(item))).thenReturn(true);
-        assertTrue(provider.hasMetric(context, item));
+        assertTrue(provider.hasMetric(context, item, null));
 
     }
 
@@ -102,13 +102,13 @@ public class AbstractEmbeddableMetricProviderTest {
 
         // should return empty if hasMetric is false
         provider.setEnabled(false);
-        assertTrue(provider.provide(context, item).isEmpty());
+        assertTrue(provider.provide(context, item, null).isEmpty());
 
         // should return EmbeddableCrisMetrics with getId, metricType and innerHtml called
         provider.setEnabled(true);
         when(filterService.getResult(eq(context), eq(item))).thenReturn(true);
 
-        Optional<EmbeddableCrisMetrics> metric = provider.provide(context, item);
+        Optional<EmbeddableCrisMetrics> metric = provider.provide(context, item, null);
         assertTrue(metric.isPresent());
         assertEquals(metric.get().getEmbeddableId(), provider.getId(context, item));
         assertEquals(metric.get().getRemark(), provider.innerHtml(context, item));

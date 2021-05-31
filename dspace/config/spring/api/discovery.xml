@@ -1839,7 +1839,6 @@
                         <ref bean="sortFamilyName"/>
                         <ref bean="sortGivenName"/>
                         <ref bean="sortBirthDate"/>
-                        <ref bean="sortDateAccessioned"/>
                     </list>
                 </property>
             </bean>
@@ -2287,7 +2286,6 @@
             <list>
                 <value>crispj.investigator</value>
                 <value>crispj.coinvestigators</value>
-                <value>oairecerif.fundingProgram</value>
             </list>
         </property>
         <property name="facetLimit" value="5"/>

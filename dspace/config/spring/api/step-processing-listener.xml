@@ -37,6 +37,21 @@
                         <ref bean="wosLiveImportDataProvider" />
                     </list>
                 </entry>
+                <entry key="dc.identifier.patentno">
+                    <list>
+                        <ref bean="epoLiveImportDataProvider" />
+                    </list>
+                </entry>
+                <entry key="dc.identifier.applicationnumber">
+                    <list>
+                        <ref bean="epoLiveImportDataProvider" />
+                    </list>
+                </entry>
+                <entry key="dcterms.dateSubmitted">
+                    <list>
+                        <ref bean="epoLiveImportDataProvider" />
+                    </list>
+                </entry>
 	        </map>           
         </property>
     </bean>

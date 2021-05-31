@@ -18,8 +18,9 @@
     <bean class="org.dspace.versioning.ItemCorrectionProvider">
         <property name="ignoredMetadataFields" >
             <set>
-		<value>dc.date.accessioned</value>
-		<value>dc.date.available</value>
+				<value>dc.date.accessioned</value>
+				<value>dc.date.available</value>
+				<value>dspace.entity.type</value>
             </set>
         </property>
         

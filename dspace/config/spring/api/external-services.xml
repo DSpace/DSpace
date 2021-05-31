@@ -204,6 +204,11 @@
         <property name="metadataSource" ref="OpenAIREService"/>
         <property name="sourceIdentifier" value="openaire"/>
         <property name="recordIdMetadata" value="dc.identifier.other"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+            </list>
+        </property>
     </bean>
     
     <bean id="orcidPublicationDataProvider" class="org.dspace.external.provider.impl.OrcidPublicationDataProvider">
