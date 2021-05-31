@@ -1280,6 +1280,9 @@
                     <ref bean="sortTitle" />
                     <ref bean="sortDateIssued" />
                     <ref bean="sortDateAccessioned"/>
+                    <ref bean="sortViews"/>
+                    <ref bean="sortDownloads"/>
+                    <ref bean="sortCitations"/>
                 </list>
             </property>
         </bean>
@@ -3001,6 +3004,19 @@
 
     <bean id="sortEntityType" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
         <property name="metadataField" value="dspace.entity.type"/>
+        <property name="defaultSortOrder" value="desc"/>
+    </bean>
+
+    <bean id="sortViews" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
+        <property name="metadataField" value="metric.view"/>
+        <property name="defaultSortOrder" value="desc"/>
+    </bean>
+    <bean id="sortDownloads" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
+        <property name="metadataField" value="metric.download"/>
+        <property name="defaultSortOrder" value="desc"/>
+    </bean>
+    <bean id="sortCitations" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
+        <property name="metadataField" value="metric.scopus.citation"/>
         <property name="defaultSortOrder" value="desc"/>
     </bean>
 
