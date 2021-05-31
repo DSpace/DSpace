@@ -112,7 +112,7 @@ public class InitializeEntitiesIT extends AbstractControllerIntegrationTest {
                 //We expect a 200 OK status
                 .andExpect(status().isOk())
                 //10 relationship types should be created
-                .andExpect(jsonPath("$.page.totalElements", is(11)))
+                .andExpect(jsonPath("$.page.totalElements", is(10)))
                 //There needs to be a self link to this endpoint
                 .andExpect(jsonPath("$._links.self.href", containsString("api/core/relationshiptypes")))
                 //We have 10 relationship types, they need to all be present in the embedded section
@@ -163,7 +163,7 @@ public class InitializeEntitiesIT extends AbstractControllerIntegrationTest {
                    //We expect a 200 OK status
                    .andExpect(status().isOk())
                    //10 relationship types should remain present (no duplicates created)
-                   .andExpect(jsonPath("$.page.totalElements", is(11)))
+                   .andExpect(jsonPath("$.page.totalElements", is(10)))
                    //There needs to be a self link to this endpoint
                    .andExpect(jsonPath("$._links.self.href", containsString("api/core/relationshiptypes")))
                    //We have 10 relationship types, they need to all be present in the embedded section
