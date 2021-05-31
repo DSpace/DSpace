@@ -263,3 +263,14 @@ submission.lookup.ads.apikey =
 # Note that when apikey is configured by default the service is enabled, see bte.xml for further configuration
 epo.consumerKey=
 epo.consumerSecretKey=
+
+##########################################
+# ORCID Integration                      #
+##########################################
+orcid.domain-url= https://sandbox.orcid.org
+orcid.api-url = https://api.sandbox.orcid.org/v3.0
+orcid.public-url = https://pub.sandbox.orcid.org/v3.0
+orcid.webhook-url = https://api.sandbox.orcid.org/
+orcid.application-client-id =
+orcid.application-client-secret =
+orcid.webhook.registration-token =
