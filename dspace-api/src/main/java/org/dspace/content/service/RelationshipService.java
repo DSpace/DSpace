@@ -387,5 +387,24 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
     void forceDelete(Context context, Relationship relationship, boolean copyToLeftItem, boolean copyToRightItem)
         throws SQLException, AuthorizeException;
 
+    /**
+     * This method establishes if for a given RelationshipType, among leftPlace and rightPlace value,
+     * only one of the two represents actually a position.
+     * In this case, value not used to represent a position is used to indicate the total number of relationship
+     * of the same type with one of the two related item in common.
+     *
+     * This decision is based on key configuration "relationship.place.onlyleft" or "relationship.place.onlyright"
+     * values.
+     *
+     * For example, if a relation between a Publication and a Person, with leftPlace set to 3 and rightPlace set to 1,
+     * means that the same Person has in total 3 relations of the same type with Publication and this relation is in
+     * the 2nd position out of 3 (valid place field value is 0-based).
+     *
+     * @param relationshipType type of relationship
+     * @param isLeft if true, it is checked if used places field is "leftPlace", "rightPlace" is used otherwise.
+     * @return
+     */
+    boolean placesOnly(final RelationshipType relationshipType, final boolean isLeft);
+
 
 }

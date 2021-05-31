@@ -41,6 +41,7 @@ import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
+import org.dspace.discovery.configuration.DiscoverySortFunctionConfiguration;
 import org.dspace.discovery.indexobject.factory.IndexFactory;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.InitializingBean;
@@ -120,9 +121,11 @@ public class DiscoverQueryBuilder implements InitializingBean {
 
         //Configure pagination and sorting
         configurePagination(page, queryArgs);
-        configureSorting(page, queryArgs, discoveryConfiguration.getSearchSortConfiguration());
+        configureSorting(page, queryArgs, discoveryConfiguration.getSearchSortConfiguration(), scope);
 
         addDiscoveryHitHighlightFields(discoveryConfiguration, queryArgs);
+
+        queryArgs.setScopeObject(scope);
         return queryArgs;
     }
 
@@ -195,7 +198,17 @@ public class DiscoverQueryBuilder implements InitializingBean {
         //Configure pagination
         configurePaginationForFacet(page, queryArgs);
 
+        addScopeForHiddenFilter(scope, discoveryConfiguration, queryArgs);
+
         return queryArgs;
+    }
+
+    private void addScopeForHiddenFilter(final IndexableObject scope,
+                                         final DiscoveryConfiguration discoveryConfiguration,
+                                         final DiscoverQuery queryArgs) {
+        if (scope != null) {
+            queryArgs.setScopeObject(scope);
+        }
     }
 
     private void configurePaginationForFacet(Pageable page, DiscoverQuery queryArgs) {
@@ -299,7 +312,8 @@ public class DiscoverQueryBuilder implements InitializingBean {
     }
 
     private void configureSorting(Pageable page, DiscoverQuery queryArgs,
-                                  DiscoverySortConfiguration searchSortConfiguration) throws DSpaceBadRequestException {
+                                  DiscoverySortConfiguration searchSortConfiguration,
+                                  final IndexableObject scope) throws DSpaceBadRequestException {
         String sortBy = null;
         String sortOrder = null;
 
@@ -331,8 +345,18 @@ public class DiscoverQueryBuilder implements InitializingBean {
             .getSortFieldConfiguration(sortBy);
 
         if (sortFieldConfiguration != null) {
-            String sortField = searchService
-                .toSortFieldIndex(sortFieldConfiguration.getMetadataField(), sortFieldConfiguration.getType());
+            String sortField;
+
+            if (DiscoverySortFunctionConfiguration.SORT_FUNCTION.equals(sortFieldConfiguration.getType())) {
+                sortField = MessageFormat.format(
+                    ((DiscoverySortFunctionConfiguration) sortFieldConfiguration).getFunction(scope.getID()),
+                    scope.getID());
+            } else {
+                sortField = searchService
+                                .toSortFieldIndex(
+                                    sortFieldConfiguration.getMetadataField(), sortFieldConfiguration.getType());
+            }
+
 
             if ("asc".equalsIgnoreCase(sortOrder)) {
                 queryArgs.setSortField(sortField, DiscoverQuery.SORT_ORDER.asc);

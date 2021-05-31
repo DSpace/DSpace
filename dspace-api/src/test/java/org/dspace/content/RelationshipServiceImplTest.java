@@ -19,6 +19,7 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.RelationshipDAO;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipPlacesIndexingService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.virtual.VirtualMetadataPopulator;
 import org.dspace.core.Constants;
@@ -70,6 +71,9 @@ public class RelationshipServiceImplTest {
 
     @Mock
     private ConfigurationService configurationService;
+
+    @Mock
+    private RelationshipPlacesIndexingService relationshipPlacesIndexingService;
 
     @Before
     public void init() {

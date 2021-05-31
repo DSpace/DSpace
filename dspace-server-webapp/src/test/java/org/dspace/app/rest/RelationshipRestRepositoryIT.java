@@ -2176,22 +2176,25 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         // We're creating a Relationship of type isOrgUnitOfPerson between an author and an orgunit
         Relationship relationship1 = RelationshipBuilder
-            .createRelationshipBuilder(context, author1, orgUnit1, isOrgUnitOfPersonRelationshipType).build();
+            .createRelationshipBuilder(context, author1, orgUnit1, isOrgUnitOfPersonRelationshipType, -1, -1).build();
 
         Relationship relationshipOrgunitExtra = RelationshipBuilder
-                .createRelationshipBuilder(context, author1, orgUnit2, isOrgUnitOfPersonRelationshipType).build();
+                .createRelationshipBuilder(context, author1, orgUnit2,
+                                           isOrgUnitOfPersonRelationshipType, -1, -1).build();
 
         // We're creating a Relationship of type isOrgUnitOfPerson between a different author and the same orgunit
         Relationship relationshipAuthorExtra = RelationshipBuilder
-            .createRelationshipBuilder(context, author2, orgUnit1, isOrgUnitOfPersonRelationshipType).build();
+            .createRelationshipBuilder(context, author2, orgUnit1, isOrgUnitOfPersonRelationshipType, -1, -1).build();
 
         // We're creating a Relationship of type isOrgUnitOfProject between a project and an orgunit
         Relationship relationship2 = RelationshipBuilder
-            .createRelationshipBuilder(context, project1, orgUnit1, isOrgUnitOfProjectRelationshipType).build();
+            .createRelationshipBuilder(context, project1, orgUnit1, isOrgUnitOfProjectRelationshipType,
+                                       -1, -1).build();
 
         // We're creating a Relationship of type isAuthorOfPublication between a publication and an author
         Relationship relationship3 = RelationshipBuilder
-            .createRelationshipBuilder(context, publication1, author1, isAuthorOfPublicationRelationshipType).build();
+            .createRelationshipBuilder(context, publication1, author1,
+                                       isAuthorOfPublicationRelationshipType, -1, -1).build();
 
         context.restoreAuthSystemState();
         // Perform a GET request to the searchByLabel endpoint, asking for Relationships of type isOrgUnitOfPerson

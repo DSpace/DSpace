@@ -32,8 +32,10 @@ public class RelationshipTypeDAOImpl extends AbstractHibernateDAO<RelationshipTy
         criteriaQuery.select(relationshipTypeRoot);
         criteriaQuery.where(
             criteriaBuilder.and(
-                criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.leftType), leftType),
-                criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.rightType), rightType),
+                leftType == null ? criteriaBuilder.isNull(relationshipTypeRoot.get(RelationshipType_.leftType)) :
+                    criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.leftType), leftType),
+                rightType == null ? criteriaBuilder.isNull(relationshipTypeRoot.get(RelationshipType_.rightType)) :
+                    criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.rightType), rightType),
                 criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.leftwardType), leftwardType),
                 criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.rightwardType), rightwardType)));
         return uniqueResult(context, criteriaQuery, false, RelationshipType.class, -1, -1);

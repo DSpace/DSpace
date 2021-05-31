@@ -37,8 +37,12 @@ public class RelationshipTypeConverter implements DSpaceConverter<RelationshipTy
         relationshipTypeRest.setLeftMaxCardinality(obj.getLeftMaxCardinality());
         relationshipTypeRest.setRightMinCardinality(obj.getRightMinCardinality());
         relationshipTypeRest.setRightMaxCardinality(obj.getRightMaxCardinality());
-        relationshipTypeRest.setLeftType(converter.toRest(obj.getLeftType(), projection));
-        relationshipTypeRest.setRightType(converter.toRest(obj.getRightType(), projection));
+        if (obj.getLeftType() != null) {
+            relationshipTypeRest.setLeftType(converter.toRest(obj.getLeftType(), projection));
+        }
+        if (obj.getRightType() != null) {
+            relationshipTypeRest.setRightType(converter.toRest(obj.getRightType(), projection));
+        }
 
         return relationshipTypeRest;
     }

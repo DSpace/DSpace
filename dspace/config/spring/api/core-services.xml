@@ -52,6 +52,7 @@
     <bean class="org.dspace.content.SupervisedItemServiceImpl"/>
     <bean class="org.dspace.content.WorkspaceItemServiceImpl"/>
     <bean class="org.dspace.content.RelationshipServiceImpl"/>
+    <bean class="org.dspace.content.RelationshipPlacesIndexingServiceImpl"/>
     <bean class="org.dspace.content.EntityTypeServiceImpl"/>
     <bean class="org.dspace.content.EntityServiceImpl"/>
     <bean class="org.dspace.content.RelationshipTypeServiceImpl"/>
