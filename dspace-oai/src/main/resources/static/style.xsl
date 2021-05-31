@@ -127,7 +127,7 @@
                         <p><small>DSpace OAI-PMH Data Provider</small></p>
                         <p>
                             <a href="https://dspace.org">
-                                <img src="static/img/dspace-logo.png" alt="DSpace" />
+                                <img src="static/img/dspace-cris-logo-200.png" alt="DSpace-CRIS" />
                             </a>
                         </p>
                     </div>
