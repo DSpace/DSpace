@@ -10,11 +10,18 @@ package org.dspace.app.rest.repository;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.Parameter;
+import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.patch.Patch;
@@ -24,11 +31,15 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.handle.service.HandleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -59,6 +70,12 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
 
     @Autowired
     private CommunityService communityService;
+
+    @Autowired
+    private BitstreamService bitstreamService;
+
+    @Autowired
+    private HandleService handleService;
 
     @Autowired
     public BitstreamRestRepository(BitstreamService dsoService) {
@@ -133,6 +150,97 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    /**
+     * Find the bitstream for the provided handle and sequence or filename.
+     * When a bitstream can be found with the sequence ID it will be returned if the user has "METADATA_READ" access.
+     *
+     * @param handle    The handle of the item
+     * @param sequence  The sequence ID of the bitstream
+     * @param filename  The filename of the bitstream
+     *
+     * @return a Page of BitstreamRest instance matching the user query
+     */
+    @SearchRestMethod(name = "byItemHandle")
+    public BitstreamRest findByItemHandle(@Parameter(value = "handle", required = true) String handle,
+                                          @Parameter(value = "sequence") Integer sequence,
+                                          @Parameter(value = "filename") String filename) throws AuthorizeException {
+        if (StringUtils.isBlank(filename) && sequence == null) {
+            throw new IllegalArgumentException("The request should include a sequence or a filename");
+        }
+
+        try {
+            Context context = obtainContext();
+            DSpaceObject dSpaceObject = handleService.resolveToObject(context, handle);
+
+            if (!(dSpaceObject instanceof Item)) {
+                throw new UnprocessableEntityException("The provided handle does not correspond to an existing item");
+            }
+            Item item = (Item) dSpaceObject;
+
+            List<Bitstream> matchedBitstreams = getMatchedBitstreams(item, sequence, filename);
+
+            if (matchedBitstreams.isEmpty()) {
+                return null;
+            }
+
+            for (Bitstream bitstream : matchedBitstreams) {
+                if (isAuthorizedBitstream(context, bitstream)) {
+                    return converter.toRest(bitstream, utils.obtainProjection());
+                }
+            }
+            throw new RESTAuthorizationException("Current user cannot access the bistream.");
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    private List<Bitstream> getMatchedBitstreams(Item item, Integer sequence, String filename) {
+        List<Bundle> bundles = item.getBundles();
+
+        List<Bitstream> bitstreams = new LinkedList<>();
+        bundles.forEach(bundle -> bitstreams.addAll(bundle.getBitstreams()));
+
+        List<Bitstream> matchingBitstreams = new LinkedList<>();
+        if (sequence != null) {
+            for (Bitstream bitstream : bitstreams) {
+                if (bitstream.getSequenceID() == sequence) {
+                    matchingBitstreams.add(bitstream);
+                }
+            }
+        }
+        if (StringUtils.isNotBlank(filename)) {
+            for (Bitstream bitstream : bitstreams) {
+                if (StringUtils.equals(bitstream.getName(), filename) && !matchingBitstreams.contains(bitstream)) {
+                    matchingBitstreams.add(bitstream);
+                }
+            }
+        }
+        return matchingBitstreams;
+    }
+
+    private boolean isAuthorizedBitstream(Context context, Bitstream bitstream) throws SQLException {
+        if (authorizeService.isAdmin(context, bitstream)) {
+            // Is Admin on bitstream
+            return true;
+        }
+        if (authorizeService.authorizeActionBoolean(context, bitstream, Constants.READ)) {
+            // Has READ rights on bitstream
+            return true;
+        }
+        DSpaceObject bitstreamParentObject = bitstreamService.getParentObject(context, (Bitstream) bitstream);
+        if (bitstreamParentObject instanceof Item && !((Bitstream) bitstream).getBundles().isEmpty()) {
+            // If parent is item and it is in a bundle
+            Bundle firstBundle = bitstream.getBundles().get(0);
+            if (authorizeService.authorizeActionBoolean(context, bitstreamParentObject, Constants.READ)
+                    && authorizeService.authorizeActionBoolean(context, firstBundle, Constants.READ)) {
+                // Has READ rights on bitstream's parent item AND first bundle bitstream is in
+                return true;
+            }
+        }
+        return false;
     }
 
     public InputStream retrieve(UUID uuid) {
