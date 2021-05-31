@@ -787,8 +787,8 @@ it, please enter the types and the actual numbers or codes.</hint>
         <field>
           <dc-schema>dc</dc-schema>
           <dc-element>relation</dc-element>
-          <dc-qualifier>dataset</dc-qualifier>
-          <label>Dataset</label>
+          <dc-qualifier>product</dc-qualifier>
+          <label>Dataset or product</label>
           <input-type>onebox</input-type>
           <repeatable>true</repeatable>
           <required />

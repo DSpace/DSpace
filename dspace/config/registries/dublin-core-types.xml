@@ -516,8 +516,8 @@
   <dc-type>
 	<schema>dc</schema>
     <element>relation</element>
-    <qualifier>dataset</qualifier>
-    <scope_note>References dataset for related item.</scope_note>
+    <qualifier>product</qualifier>
+    <scope_note>References product for related item.</scope_note>
   </dc-type>
 
   <dc-type>

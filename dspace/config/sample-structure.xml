@@ -84,8 +84,8 @@
             <provenance />
         </collection>
         <collection>
-            <name>Dataset</name>
-            <entity-type>Dataset</entity-type>
+            <name>Dataset or other products</name>
+            <entity-type>Product</entity-type>
             <description />
             <intro />
             <copyright />

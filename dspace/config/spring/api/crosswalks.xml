@@ -55,7 +55,7 @@
 				
 				<entry key="patent-cerif-xml" value-ref="referCrosswalkPatentCerifXml"></entry>
 				
-				<entry key="dataSet-cerif-xml" value-ref="referCrosswalkDatasetCerifXml"></entry>
+				<entry key="product-cerif-xml" value-ref="referCrosswalkDatasetCerifXml"></entry>
 				
 				<entry key="event-cerif-xml" value-ref="referCrosswalkEventCerifXml"></entry>
 				
