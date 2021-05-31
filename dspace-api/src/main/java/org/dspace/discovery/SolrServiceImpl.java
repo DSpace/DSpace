@@ -1539,6 +1539,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         StringBuilder uniqueID = new StringBuilder("Item-");
         uniqueID.append(metric.getResource().getID());
         String type = "metric." + metric.getMetricType();
+        String typeSort = type + "_sort";
         String typeId = "metric.id." + metric.getMetricType();
         String typeAcquisitionDate = "metric.acquisitionDate." + metric.getMetricType();
         String typeRemark = "metric.remark." + metric.getMetricType();
@@ -1557,6 +1558,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             Map<String, Object> deltaPeriod2Map = Collections.singletonMap("set", metric.getDeltaPeriod2());
             Map<String, Object> rankMap = Collections.singletonMap("set", metric.getRank());
             solrInDoc.addField(type, metricCountMap);
+            solrInDoc.addField(typeSort, metricCountMap);
             solrInDoc.addField(typeId, idMap);
             solrInDoc.addField(typeAcquisitionDate, acquisitionDateMap);
             solrInDoc.addField(typeRemark, remarkMap);

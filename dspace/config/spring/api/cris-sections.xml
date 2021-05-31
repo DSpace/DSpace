@@ -37,8 +37,8 @@
                             </bean>
                             <bean class="org.dspace.layout.CrisLayoutTopComponent">
                                 <property name="discoveryConfigurationName" value="researchoutputs" />
-                                <property name="sortField" value="dc.title" />
-                                <property name="order" value="asc" />
+                                <property name="sortField" value="metric.views" />
+                                <property name="order" value="desc" />
                                 <property name="style" value="col-md-6"/>
                             </bean>
                         </list>
@@ -99,7 +99,7 @@
                         </list>
                     </list>
                 </entry>
-                <entry key="orgunits">
+                <!--<entry key="orgunits">
                     <list>
                         <list>
                             <bean class="org.dspace.layout.CrisLayoutBrowseComponent">
@@ -146,7 +146,7 @@
                             </bean>
                         </list>
                     </list>
-                </entry>
+                </entry>-->
             </map>
         </property>
     </bean>
