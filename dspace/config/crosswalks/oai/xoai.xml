@@ -30,7 +30,6 @@
             <Format ref="marc"/>
             <Format ref="uketd_dc"/>
             <!--<Format ref="junii2" />-->
-            <Format ref="oai_cerif"/>
             <Description>
                 This is the default context of the DSpace OAI-PMH data provider.
             </Description>
@@ -96,6 +95,7 @@
             <!-- OpenAIRE filter -->
             <Filter ref="openAIRE4Filter"/>
             <!-- Metadata Formats -->
+            <Format ref="oaidc"/>
             <Format ref="oaiopenaire"/>
             <Description>
                 This contexts complies with OpenAIRE Guidelines for Literature Repositories v4.0.
@@ -118,9 +118,24 @@
             <Set ref="openaireEquipmentsCrisSet"/>
             <Set ref="openaireFundingCrisSet"/>
             <!-- Metadata Formats -->
+            <Format ref="oaidc"/>
             <Format ref="oai_cerif"/>
             <Description>
                 This contexts complies with OpenAIRE rules for CRIS system v 1.1.1
+            </Description>
+        </Context>
+
+        <Context baseurl="openairedata" name="OpenAIRE Data Repository Context">
+            <!-- OpenAIRE DataArchive filter -->
+            <Filter ref="openaireDataFilter"/>
+            <!-- Just an alias, in fact it returns all items within the driver context -->
+            <Set ref="openaireDataSet"/>
+            <!-- Metadata Formats -->
+            <Format ref="oaidc"/>
+            <!-- set the reference at the new format called datacite41_openaire -->
+            <Format ref="datacite41_openaire"/>
+            <Description>
+                This contexts complies with Data Archive OpenAIRE rules.
             </Description>
         </Context>
 
@@ -224,6 +239,13 @@
             <XSLT>metadataFormats/oai_cerif.xsl</XSLT>
             <Namespace>https://www.openaire.eu/cerif-profile/1.1/</Namespace>
             <SchemaLocation>https://www.openaire.eu/schema/cris/1.1/openaire-cerif-profile.xsd</SchemaLocation>
+        </Format>
+        <!-- set the format that use the new XSL file called datacite41-openaire -->
+        <Format id="datacite41_openaire">
+            <Prefix>oai_datacite</Prefix>
+            <XSLT>metadataFormats/datacite41-openaire.xsl</XSLT>
+            <Namespace>http://schema.datacite.org/oai/oai-1.1/</Namespace>
+            <SchemaLocation>http://schema.datacite.org/oai/oai-1.1/oai.xsd</SchemaLocation>
         </Format>
     </Formats>
 
@@ -375,8 +397,50 @@
                 		</And>
 					</LeftCondition>
                 	<RightCondition>
-                		<Custom ref="dspaceItemCondition" />
+                		<Custom ref="dataArchiveTypeCondition" />
                 	</RightCondition>
+                </And>
+            </Definition>
+        </Filter>
+
+        <!-- create a new filter for the openairedata Context -->
+        <Filter id="openaireDataFilter">
+            <Definition>
+                <And>
+                    <LeftCondition>
+                        <And>
+                            <LeftCondition>
+                                <And>
+                                    <LeftCondition>
+                                        <Custom ref="titleExistsCondition"/>
+                                    </LeftCondition>
+                                    <RightCondition>
+                                        <Custom ref="authorExistsCondition"/>
+                                    </RightCondition>
+                                </And>
+                            </LeftCondition>
+                            <RightCondition>
+                                <And>
+                                    <LeftCondition>
+                                        <Custom ref="identifierExistsCondition"/>
+                                    </LeftCondition>
+                                    <RightCondition>
+                                        <And>
+                                            <LeftCondition>
+                                                <Custom ref="dateExistsCondition"/> 
+                                            </LeftCondition>
+                                            <RightCondition>
+                                                <Custom ref="publisherExistsCondition"/>
+                                            </RightCondition>
+                                        </And>
+                                    </RightCondition>
+                                </And>
+                            </RightCondition>
+                        </And>
+                    </LeftCondition>
+                    <RightCondition>
+                        <Custom ref="dataArchiveTypeCondition" />
+                    </RightCondition>
                 </And>
             </Definition>
         </Filter>
@@ -765,6 +829,22 @@
                 <string name="value">info:eu-repo/grantAgreement/</string>
             </Configuration>
         </CustomCondition> -->
+
+        <!-- This condition determines if an OAI document is of one of the types
+             required by OpenAIRE for DataArchive System. -->
+        <CustomCondition id="dataArchiveTypeCondition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dspace.entity.type</string>
+                <string name="operator">contains</string>
+                <list name="values">
+                    <string>Publication</string>
+                    <string>Product</string>
+                    <string>Patent</string>
+                </list>
+            </Configuration>
+        </CustomCondition>
+
     </Filters>
 
     <Sets>
@@ -823,6 +903,12 @@
             <Spec>openaire_cris_funding</Spec>
             <Name>OpenAIRE_CRIS_funding</Name>
             <Filter ref="fundingSetFilter" />
+        </Set>
+        <!-- set the OpenAIRE Data Archive OAI Set. See: https://guidelines.openaire.eu/en/latest/data/use_of_oai_pmh.html -->
+        <Set id="openaireDataSet">
+            <Spec>openaire_data</Spec>
+            <Name>OpenAIRE</Name>
+            <!-- Just an alias or set a filter condition to expose only specific kind of items (dataset) -->
         </Set>
     </Sets>
 </Configuration>

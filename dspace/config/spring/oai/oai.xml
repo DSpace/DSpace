@@ -23,8 +23,28 @@
         <property name="fieldName" value="openaire"/>
     </bean>
 
-	<!-- Additional item.compile plugin to enrich field with information about 
+	<!-- Additional item.compile plugin to enrich field with information about
 		Creative Commons License metadata -->
 	<bean class="org.dspace.xoai.app.CCElementItemCompilePlugin"/>
 
+    <!-- Additional item.compile plugin to enrich the xoai document with information about
+        the fulltext access condition -->
+    <bean class="org.dspace.xoai.app.FulltextAccessElementItemCompilePlugin"/>
+
+    <bean class="org.dspace.xoai.app.LinkedEntityMetadataElementItemCompilePlugin">
+        <property name="mapping">
+			<map>
+		          <entry key="dc.contributor.author">
+		              <map>
+		                  <entry key="crisitem.author.orcid" value="person.identifier.orcid" />
+		              </map>
+		          </entry>
+		          <entry key="dc.contributor.editor">
+                      <map>
+                          <entry key="crisitem.editor.orcid" value="person.identifier.orcid" />
+                      </map>
+                  </entry>
+			</map>
+        </property>
+    </bean>
 </beans>

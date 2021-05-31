@@ -64,24 +64,28 @@ public class XOAICerifItemCompilePlugin implements XOAIExtensionItemCompilePlugi
             final String crosswalkType = entityType.substring(0, 1).toLowerCase()
                                              + entityType.substring(1) + "-" + generator;
             StreamDisseminationCrosswalk crosswalk = crosswalkMapper.getByType(crosswalkType);
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            crosswalk.disseminate(context, item, out);
-            List<Element> elementList = metadata.getElement();
-            elementList.add(ItemUtils.create("cerif"));
-            Element cerif = ItemUtils.getElement(elementList, "cerif");
-            assert cerif != null;
-            Element fieldname = ItemUtils.create(fieldName);
-            cerif.getElement().add(fieldname);
-            Element none = ItemUtils.create("none");
-            fieldname.getElement().add(none);
-            String xml_presentation = out.toString();
-            String toWrite = String.format("<![CDATA[%s]]>", xml_presentation);
-            none.getField().add(ItemUtils.createValue("value", toWrite ));
-            none.getField().add(ItemUtils.createValue("authority", ""));
-            none.getField().add(ItemUtils.createValue("confidence", "-1"));
-            return metadata;
+            if (crosswalk == null) {
+                log.warn("No Crosswalk found with name " + crosswalkType);
+            } else {
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                crosswalk.disseminate(context, item, out);
+                List<Element> elementList = metadata.getElement();
+                elementList.add(ItemUtils.create("cerif"));
+                Element cerif = ItemUtils.getElement(elementList, "cerif");
+                assert cerif != null;
+                Element fieldname = ItemUtils.create(fieldName);
+                cerif.getElement().add(fieldname);
+                Element none = ItemUtils.create("none");
+                fieldname.getElement().add(none);
+                String xml_presentation = out.toString();
+                String toWrite = String.format("<![CDATA[%s]]>", xml_presentation);
+                none.getField().add(ItemUtils.createValue("value", toWrite ));
+                none.getField().add(ItemUtils.createValue("authority", ""));
+                none.getField().add(ItemUtils.createValue("confidence", "-1"));
+                return metadata;
+            }
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
         }
         return metadata;
     }
