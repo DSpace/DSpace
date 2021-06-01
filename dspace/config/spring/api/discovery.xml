@@ -1292,7 +1292,7 @@
     <property name="defaultFilterQueries">
         <list>
             <!--Only find items, communities and collections-->
-            <value>search.resourcetype:Item AND (entityType_keyword:Publication OR entityType_keyword:Patent OR entityType_keyword:Dataset)</value>
+            <value>search.resourcetype:Item AND (entityType_keyword:Publication OR entityType_keyword:Patent OR entityType_keyword:Product)</value>
         </list>
     </property>
     <!--The configuration for the recent submissions-->
