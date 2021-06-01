@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.openAire.service.OpenAireProjectImportMetadataSourceServiceImpl;
@@ -93,16 +94,18 @@ public class OpenAIREProjectAuthority extends ItemAuthority {
     }
 
     private Choice convertToChoice(ImportRecord record) {
-        String value = getMetadataValueByElement(record, "title");
-        String code = getMetadataValueByElement(record, "identifier");
+        String value = getMetadataValue(record, "dc", "title", null);
+        String code = getMetadataValue(record, "oairecerif", "funding", "identifier");
         String authority = getAuthorityPrefix() + code;
-        String label = value + "(" + code + ")";
+        String label = StringUtils.isNotBlank(code) ? value + "(" + code + ")" : value;
         return new Choice(authority, value, label, getOpenAireExtra(code));
     }
 
-    private String getMetadataValueByElement(ImportRecord record, String element) {
+    private String getMetadataValue(ImportRecord record, String schema, String element, String qualifier) {
         return record.getValueList().stream()
-            .filter(metadatum -> metadatum.getElement().equals(element))
+            .filter(metadatum -> StringUtils.equals(metadatum.getSchema(), schema))
+            .filter(metadatum -> StringUtils.equals(metadatum.getElement(), element))
+            .filter(metadatum -> StringUtils.equals(metadatum.getQualifier(), qualifier))
             .map(metadatum -> metadatum.getValue())
             .findFirst()
             .orElse("");
