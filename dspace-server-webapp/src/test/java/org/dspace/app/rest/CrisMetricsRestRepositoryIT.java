@@ -160,7 +160,7 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
     }
 
     @Test
-    public void findOneUnauthorizedTest() throws Exception {
+    public void findOneAnonymousTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -181,7 +181,7 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/cris/metrics/" + CrisMetricsBuilder.getRestStoredMetricId(metric.getID())))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isOk());
     }
 
     @Test

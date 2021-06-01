@@ -74,11 +74,6 @@ public class CrisMetricsRestPermissionEvaluatorPlugin extends RestObjectPermissi
         try {
             ePerson = ePersonService.findByEmail(context, (String) authentication.getPrincipal());
 
-            // anonymous user
-            if (ePerson == null) {
-                return false;
-            }
-
             Item item = itemFromMetricId(context, targetId.toString());
 
             if (Objects.isNull(item)) {
