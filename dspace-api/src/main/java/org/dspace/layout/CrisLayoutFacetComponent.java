@@ -19,6 +19,8 @@ public class CrisLayoutFacetComponent implements CrisLayoutSectionComponent {
 
     private String style;
 
+    private Integer facetsPerRow = 4;
+
     /**
      * @return the discoveryConfigurationName
      */
@@ -45,4 +47,15 @@ public class CrisLayoutFacetComponent implements CrisLayoutSectionComponent {
         this.style = style;
     }
 
+    /**
+     * Number of facets to be displayed per single line, min 1, max 4
+     * @param facetsPerRow
+     */
+    public void setFacetsPerRow(Integer facetsPerRow) {
+        this.facetsPerRow = facetsPerRow;
+    }
+
+    public Integer getFacetsPerRow() {
+        return facetsPerRow;
+    }
 }

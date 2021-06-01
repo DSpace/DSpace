@@ -34,6 +34,7 @@ public class CrisLayoutTopComponentConverter implements CrisLayoutSectionCompone
         rest.setOrder(topComponent.getOrder());
         rest.setSortField(topComponent.getSortField());
         rest.setStyle(component.getStyle());
+        rest.setTitleKey(topComponent.getTitleKey());
         return rest;
     }
 

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:util="http://www.springframework.org/schema/util"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
-    default-lazy-init="true">
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+       default-lazy-init="true">
 
     <bean class="org.dspace.layout.service.impl.CrisLayoutSectionServiceImpl" >
         <property name="componentMap">
@@ -74,7 +74,7 @@
                         </list>
                     </list>
                 </entry>
-				<entry key="researcherprofiles">
+                <entry key="researcherprofiles">
                     <list>
                         <list>
                             <bean class="org.dspace.layout.CrisLayoutBrowseComponent">
@@ -95,6 +95,66 @@
                             <bean class="org.dspace.layout.CrisLayoutFacetComponent">
                                 <property name="discoveryConfigurationName" value="person" />
                                 <property name="style" value="col-md-12"/>
+                            </bean>
+                        </list>
+                    </list>
+                </entry>
+                <entry key="site">
+                    <list>
+                        <list>
+                            <bean class="org.dspace.layout.CrisLayoutSearchComponent">
+                                <property name="discoveryConfigurationName" value="site" />
+                                <property name="style" value="col-md-12"/>
+                                <property name="searchType" value="basic"/>
+                                <property name="displayTitle" value="false"/>
+                            </bean>
+                        </list>
+                        <list>
+                            <bean class="org.dspace.layout.CrisLayoutCountersComponent">
+                                <property name="style" value="col-md-12 py-4"/>
+                                <property name="counterSettingsList">
+                                    <list>
+                                        <bean class="org.dspace.layout.CrisLayoutCountersComponent.CounterSettings">
+                                            <property name="discoveryConfigurationName" value="researchoutputs"/>
+                                            <property name="label" value="publications"/>
+                                            <property name="icon" value="fas fa-book fa-3x"/>
+                                            <property name="link" value="/explore/researchoutputs"/>
+                                        </bean>
+                                        <bean class="org.dspace.layout.CrisLayoutCountersComponent.CounterSettings">
+                                            <property name="discoveryConfigurationName" value="project_funding"/>
+                                            <property name="label" value="project_funding"/>
+                                            <property name="icon" value="fas fa-project-diagram fa-3x"/>
+                                            <property name="link" value="/explore/fundings_and_projects"/>
+                                        </bean>
+                                        <bean class="org.dspace.layout.CrisLayoutCountersComponent.CounterSettings">
+                                            <property name="discoveryConfigurationName" value="person"/>
+                                            <property name="label" value="rprofiles"/>
+                                            <property name="icon" value="fas fa-graduation-cap fa-3x"/>
+                                            <property name="link" value="/explore/researcherprofiles"/>
+                                        </bean>
+                                    </list>
+                                </property>
+                            </bean>
+
+                        </list>
+                        <list>
+                            <bean class="org.dspace.layout.CrisLayoutTopComponent">
+                                <property name="discoveryConfigurationName" value="researchoutputs" />
+                                <property name="sortField" value="metric.view" />
+                                <property name="order" value="desc" />
+                                <property name="style" value="col-md-4"/>
+                            </bean>
+                            <bean class="org.dspace.layout.CrisLayoutTopComponent">
+                                <property name="discoveryConfigurationName" value="researchoutputs" />
+                                <property name="sortField" value="metric.download" />
+                                <property name="order" value="desc" />
+                                <property name="style" value="col-md-4"/>
+                            </bean>
+                            <bean class="org.dspace.layout.CrisLayoutTopComponent">
+                                <property name="discoveryConfigurationName" value="researchoutputs" />
+                                <property name="sortField" value="metric.scopus.citation" />
+                                <property name="order" value="desc" />
+                                <property name="style" value="col-md-4"/>
                             </bean>
                         </list>
                     </list>
