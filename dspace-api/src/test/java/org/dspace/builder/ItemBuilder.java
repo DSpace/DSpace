@@ -182,6 +182,14 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return withCrisOwner(ePerson.getFullName(), ePerson.getID().toString());
     }
 
+    public ItemBuilder withCrisPolicyEPerson(String value, String authority) {
+        return addMetadataValue(item, CRIS.getName(), "policy", "eperson", null, value, authority, CF_ACCEPTED);
+    }
+
+    public ItemBuilder withCrisPolicyGroup(String value, String authority) {
+        return addMetadataValue(item, CRIS.getName(), "policy", "group", null, value, authority, CF_ACCEPTED);
+    }
+
     public ItemBuilder withUriIdentifier(String uri) {
         return addMetadataValue(item, "dc", "identifier", "uri", uri);
     }

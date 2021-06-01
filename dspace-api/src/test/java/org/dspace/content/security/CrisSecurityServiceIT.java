@@ -143,45 +143,66 @@ public class CrisSecurityServiceIT extends AbstractIntegrationTestWithDatabase {
 
         context.turnOffAuthorisationSystem();
 
-        EPerson author = EPersonBuilder.createEPerson(context)
-            .withEmail("author@mail.it")
+        EPerson firstUser = EPersonBuilder.createEPerson(context)
+            .withEmail("user@mail.it")
             .build();
 
-        EPerson editor = EPersonBuilder.createEPerson(context)
-            .withEmail("editor@mail.it")
+        EPerson secondUser = EPersonBuilder.createEPerson(context)
+            .withEmail("user2@mail.it")
+            .build();
+
+        EPerson thirdUser = EPersonBuilder.createEPerson(context)
+            .withEmail("user3@mail.it")
+            .build();
+
+        EPerson fourthUser = EPersonBuilder.createEPerson(context)
+            .withEmail("user4@mail.it")
+            .build();
+
+        Item author = ItemBuilder.createItem(context, collection)
+            .withTitle("Author")
+            .withCrisOwner(thirdUser)
+            .build();
+
+        Item editor = ItemBuilder.createItem(context, collection)
+            .withTitle("Editor")
+            .withCrisOwner(fourthUser)
             .build();
 
         Group group = GroupBuilder.createGroup(context)
-            .addMember(editor)
+            .withName("Group")
+            .addMember(secondUser)
             .build();
 
         Item item = ItemBuilder.createItem(context, collection)
             .withTitle("Test item")
             .withCrisOwner("Owner", owner.getID().toString())
-            .withAuthor("Walter White", author.getID().toString())
-            .withEditor("Editor", group.getID().toString())
+            .withAuthor("Author", author.getID().toString())
+            .withEditor("Editor", editor.getID().toString())
+            .withEditor("Another editor", "5260f7f1-f583-4a7a-86e5-25db93a29240")
+            .withCrisPolicyEPerson("First User", firstUser.getID().toString())
+            .withCrisPolicyGroup("Second User", group.getID().toString())
             .build();
 
         context.restoreAuthSystemState();
 
         AccessItemMode accessMode = buildAccessItemMode(CrisSecurity.CUSTOM);
-        when(accessMode.getUsers()).thenReturn(List.of("dc.contributor.author"));
-        when(accessMode.getGroups()).thenReturn(List.of("dc.contributor.editor"));
+        when(accessMode.getUserMetadataFields()).thenReturn(List.of("cris.policy.eperson"));
+        when(accessMode.getGroupMetadataFields()).thenReturn(List.of("cris.policy.group"));
+        when(accessMode.getItemMetadataFields()).thenReturn(List.of("dc.contributor.author"));
 
-        boolean hasAccess = crisSecurityService.hasAccess(context, item, eperson, accessMode);
-        assertThat(hasAccess, is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, eperson, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, admin, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, owner, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, firstUser, accessMode), is(true));
+        assertThat(crisSecurityService.hasAccess(context, item, secondUser, accessMode), is(true));
+        assertThat(crisSecurityService.hasAccess(context, item, thirdUser, accessMode), is(true));
+        assertThat(crisSecurityService.hasAccess(context, item, fourthUser, accessMode), is(false));
 
-        boolean hasAdminAccess = crisSecurityService.hasAccess(context, item, admin, accessMode);
-        assertThat(hasAdminAccess, is(false));
+        when(accessMode.getItemMetadataFields()).thenReturn(List.of("dc.contributor.author", "dc.contributor.editor"));
+        assertThat(crisSecurityService.hasAccess(context, item, thirdUser, accessMode), is(true));
+        assertThat(crisSecurityService.hasAccess(context, item, fourthUser, accessMode), is(true));
 
-        boolean hasOwnerAccess = crisSecurityService.hasAccess(context, item, owner, accessMode);
-        assertThat(hasOwnerAccess, is(false));
-
-        boolean hasAuthorAccess = crisSecurityService.hasAccess(context, item, author, accessMode);
-        assertThat(hasAuthorAccess, is(true));
-
-        boolean hasEditorAccess = crisSecurityService.hasAccess(context, item, editor, accessMode);
-        assertThat(hasEditorAccess, is(true));
     }
 
     private AccessItemMode buildAccessItemMode(CrisSecurity security) {

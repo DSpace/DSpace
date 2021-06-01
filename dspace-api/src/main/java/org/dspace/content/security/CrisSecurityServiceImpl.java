@@ -8,6 +8,7 @@
 package org.dspace.content.security;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -22,6 +23,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -71,13 +73,18 @@ public class CrisSecurityServiceImpl implements CrisSecurityService {
 
         if (security == CrisSecurity.CUSTOM) {
 
-            boolean hasAccessByGroup = hasAccessByGroup(context, item, user, accessMode.getGroups());
+            boolean hasAccessByGroup = hasAccessByGroup(context, item, user, accessMode.getGroupMetadataFields());
             if (hasAccessByGroup) {
                 return true;
             }
 
-            boolean hasAccessByUser = hasAccessByUser(context, item, user, accessMode.getUsers());
+            boolean hasAccessByUser = hasAccessByUser(context, item, user, accessMode.getUserMetadataFields());
             if (hasAccessByUser) {
+                return true;
+            }
+
+            boolean hasAccessByItem = hasAccessByItem(context, item, user, accessMode.getItemMetadataFields());
+            if (hasAccessByItem) {
                 return true;
             }
 
@@ -86,10 +93,10 @@ public class CrisSecurityServiceImpl implements CrisSecurityService {
         return false;
     }
 
-    private boolean hasAccessByGroup(Context context, Item item, EPerson user, List<String> groups)
+    private boolean hasAccessByGroup(Context context, Item item, EPerson user, List<String> groupMetadataFields)
         throws SQLException {
 
-        if (user == null || CollectionUtils.isEmpty(groups)) {
+        if (user == null || CollectionUtils.isEmpty(groupMetadataFields)) {
             return false;
         }
 
@@ -99,8 +106,8 @@ public class CrisSecurityServiceImpl implements CrisSecurityService {
         }
 
         for (Group group : userGroups) {
-            for (String metadataGroup : groups) {
-                if (check(context, item, metadataGroup, group.getID())) {
+            for (String groupMetadataField : groupMetadataFields) {
+                if (anyMetadataHasAuthorityEqualsTo(item, groupMetadataField, group.getID())) {
                     return true;
                 }
             }
@@ -109,14 +116,15 @@ public class CrisSecurityServiceImpl implements CrisSecurityService {
         return false;
     }
 
-    private boolean hasAccessByUser(Context context, Item item, EPerson user, List<String> users) throws SQLException {
+    private boolean hasAccessByUser(Context context, Item item, EPerson user, List<String> userMetadataFields)
+        throws SQLException {
 
-        if (user == null || CollectionUtils.isEmpty(users)) {
+        if (user == null || CollectionUtils.isEmpty(userMetadataFields)) {
             return false;
         }
 
-        for (String metadataUser : users) {
-            if (check(context, item, metadataUser, user.getID())) {
+        for (String userMetadataField : userMetadataFields) {
+            if (anyMetadataHasAuthorityEqualsTo(item, userMetadataField, user.getID())) {
                 return true;
             }
         }
@@ -124,7 +132,42 @@ public class CrisSecurityServiceImpl implements CrisSecurityService {
         return false;
     }
 
-    private boolean check(Context context, Item item, String metadata, UUID uuid) throws SQLException {
+    private boolean hasAccessByItem(Context context, Item item, EPerson user, List<String> itemMetadataFields)
+        throws SQLException {
+
+        if (user == null || CollectionUtils.isEmpty(itemMetadataFields)) {
+            return false;
+        }
+
+        return findRelatedItems(context, item, itemMetadataFields).stream()
+            .anyMatch(relatedItem -> isOwner(user, relatedItem));
+    }
+
+    private List<Item> findRelatedItems(Context context, Item item, List<String> itemMetadataFields)
+        throws SQLException {
+
+        List<Item> relatedItems = new ArrayList<>();
+
+        if (CollectionUtils.isEmpty(itemMetadataFields)) {
+            return relatedItems;
+        }
+
+        for (String itemMetadataField : itemMetadataFields) {
+            List<MetadataValue> metadataValues = itemService.getMetadataByMetadataString(item, itemMetadataField);
+            for (MetadataValue metadataValue : metadataValues) {
+                UUID relatedItemId = UUIDUtils.fromString(metadataValue.getAuthority());
+                Item relatedItem = itemService.find(context, relatedItemId);
+                if (relatedItem != null) {
+                    relatedItems.add(relatedItem);
+                }
+            }
+        }
+
+        return relatedItems;
+
+    }
+
+    private boolean anyMetadataHasAuthorityEqualsTo(Item item, String metadata, UUID uuid) {
         return itemService.getMetadataByMetadataString(item, metadata).stream()
             .anyMatch(value -> uuid.toString().equals(value.getAuthority()));
     }

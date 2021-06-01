@@ -25,16 +25,23 @@ public interface AccessItemMode {
     public CrisSecurity getSecurity();
 
     /**
-     * Returns the configured groups for the CUSTOM security.
+     * Returns the configured group metadata fields for the CUSTOM security.
      *
-     * @return the groups list
+     * @return the metadata fields list
      */
-    public List<String> getGroups();
+    public List<String> getGroupMetadataFields();
 
     /**
-     * Returns the configured users for the CUSTOM security.
+     * Returns the configured user metadata fields for the CUSTOM security.
      *
-     * @return the users list
+     * @return the metadata fields list
      */
-    public List<String> getUsers();
+    public List<String> getUserMetadataFields();
+
+    /**
+     * Returns the configured item metadata fields for the CUSTOM security.
+     *
+     * @return the metadata fields list
+     */
+    public List<String> getItemMetadataFields();
 }

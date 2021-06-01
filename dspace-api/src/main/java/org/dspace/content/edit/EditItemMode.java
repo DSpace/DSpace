@@ -44,6 +44,10 @@ public class EditItemMode implements AccessItemMode {
      * Contains the list of users metadata for CUSTOM security
      */
     private List<String> users;
+    /**
+     * Contains the list of items metadata for CUSTOM security
+     */
+    private List<String> items;
 
     public EditItemMode() {}
 
@@ -107,17 +111,23 @@ public class EditItemMode implements AccessItemMode {
     public void setLabel(String label) {
         this.label = label;
     }
-    public List<String> getGroups() {
+    public List<String> getGroupMetadataFields() {
         return groups;
     }
     public void setGroups(List<String> groups) {
         this.groups = groups;
     }
-    public List<String> getUsers() {
+    public List<String> getUserMetadataFields() {
         return users;
     }
     public void setUsers(List<String> users) {
         this.users = users;
+    }
+    public List<String> getItemMetadataFields() {
+        return items;
+    }
+    public void setItems(List<String> items) {
+        this.items = items;
     }
 
     @Override

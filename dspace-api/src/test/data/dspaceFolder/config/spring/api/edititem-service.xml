@@ -61,6 +61,16 @@
                             <property name="users" ref="usersMetadata" />
                             <property name="groups" ref="groupsMetadata" />
                         </bean>
+                        <bean class="org.dspace.content.edit.EditItemMode">
+                            <property name="name" value="AUTHOR-CUSTOM" />
+                            <property name="security">
+                              <value type="org.dspace.content.security.CrisSecurity">
+                                CUSTOM
+                              </value>
+                            </property>
+                            <property name="submissionDefinition" value="modeA" />
+                            <property name="items" ref="itemsMetadata" />
+                        </bean>
                     </list>
                 </entry>
             </map>
@@ -73,6 +83,10 @@
 
 	<util:list id="groupsMetadata" value-type="java.lang.String">
        <value>cris.policy.group</value>
+    </util:list>
+
+	<util:list id="itemsMetadata" value-type="java.lang.String">
+       <value>dc.contributor.author</value>
     </util:list>
 
 </beans>

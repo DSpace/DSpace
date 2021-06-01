@@ -68,6 +68,20 @@
                             </property>
                             <property name="submissionDefinition" value="funding-edit" />
                         </bean>
+                        <bean class="org.dspace.content.edit.EditItemMode">
+                            <property name="name" value="INVESTIGATOR" />
+                            <property name="security">
+                              <value type="org.dspace.content.security.CrisSecurity">
+                                CUSTOM
+                              </value>
+                            </property>
+                            <property name="submissionDefinition" value="funding-edit" />
+                            <property name="items">
+                            	<list>
+                            		<value>crisfund.investigators</value>
+                            	</list>
+                            </property>
+                        </bean>
                     </list>
                 </entry>
                 <entry key="orgunit">
@@ -80,6 +94,20 @@
                                 </value>
                             </property>
                             <property name="submissionDefinition" value="orgunit-edit" />
+                        </bean>
+                        <bean class="org.dspace.content.edit.EditItemMode">
+                            <property name="name" value="DIRECTOR" />
+                            <property name="security">
+                              <value type="org.dspace.content.security.CrisSecurity">
+                                CUSTOM
+                              </value>
+                            </property>
+                            <property name="submissionDefinition" value="orgunit-edit" />
+                            <property name="items">
+                            	<list>
+                            		<value>crisou.director</value>
+                            	</list>
+                            </property>
                         </bean>
                     </list>
                 </entry>
@@ -106,6 +134,20 @@
                                 </value>
                             </property>
                             <property name="submissionDefinition" value="project-edit" />
+                        </bean>
+                        <bean class="org.dspace.content.edit.EditItemMode">
+                            <property name="name" value="INVESTIGATOR" />
+                            <property name="security">
+                              <value type="org.dspace.content.security.CrisSecurity">
+                                CUSTOM
+                              </value>
+                            </property>
+                            <property name="submissionDefinition" value="project-edit" />
+                            <property name="items">
+                            	<list>
+                            		<value>crispj.investigator</value>
+                            	</list>
+                            </property>
                         </bean>
                     </list>
                 </entry>

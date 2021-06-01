@@ -10,22 +10,29 @@ package org.dspace.layout.service.impl;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.authority.ChoiceAuthority;
+import org.dspace.content.authority.EPersonAuthority;
+import org.dspace.content.authority.GroupAuthority;
+import org.dspace.content.authority.ItemAuthority;
+import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.security.service.CrisSecurityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.core.exception.SQLRuntimeException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.layout.LayoutSecurity;
 import org.dspace.layout.service.LayoutSecurityService;
+import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -37,16 +44,19 @@ public class LayoutSecurityServiceImpl implements LayoutSecurityService {
     private final ItemService itemService;
     private final GroupService groupService;
     private final CrisSecurityService crisSecurityService;
+    private final ChoiceAuthorityService choiceAuthorityService;
 
     @Autowired
     public LayoutSecurityServiceImpl(AuthorizeService authorizeService,
                                      ItemService itemService,
                                      final GroupService groupService,
-                                     CrisSecurityService crisSecurityService) {
+                                     CrisSecurityService crisSecurityService,
+                                     ChoiceAuthorityService choiceAuthorityService) {
         this.authorizeService = authorizeService;
         this.itemService = itemService;
         this.groupService = groupService;
         this.crisSecurityService = crisSecurityService;
+        this.choiceAuthorityService = choiceAuthorityService;
     }
 
 
@@ -76,7 +86,7 @@ public class LayoutSecurityServiceImpl implements LayoutSecurityService {
                                      .map(mf -> getMetadata(item, mf))
                                      .filter(Objects::nonNull)
                                      .filter(metadataValues -> !metadataValues.isEmpty())
-                                     .anyMatch(values -> checkUser(context, user, values));
+                                     .anyMatch(values -> checkUser(context, user, item, values));
 
 
     }
@@ -87,14 +97,44 @@ public class LayoutSecurityServiceImpl implements LayoutSecurityService {
                                 true);
     }
 
-    private boolean checkUser(final Context context, EPerson user, List<MetadataValue> values) {
-        Predicate<MetadataValue> currentUserPredicate = v -> Objects.nonNull(user) &&
-            Optional.ofNullable(v.getAuthority()).map(a -> a.equals(user.getID().toString())).orElse(false);
+    private boolean checkUser(final Context context, EPerson user, Item item, List<MetadataValue> values) {
 
-        Predicate<MetadataValue> checkGroupsPredicate = v -> checkGroup(v, groups(context, user));
+        for (MetadataValue metadataValue : values) {
 
-        return values.stream()
-            .anyMatch(currentUserPredicate.or(checkGroupsPredicate));
+            ChoiceAuthority choiceAuthority = getChoiceAuthority(item, metadataValue);
+            if (choiceAuthority == null) {
+                continue;
+            }
+
+            if (choiceAuthority instanceof EPersonAuthority && isAuthorityEqualsTo(metadataValue, user)) {
+                return true;
+            }
+
+            if (choiceAuthority instanceof GroupAuthority && checkGroup(metadataValue, groups(context, user))) {
+                return true;
+            }
+
+            if (choiceAuthority instanceof ItemAuthority && isOwnerOfRelatedItem(context, metadataValue, user)) {
+                return true;
+            }
+
+        }
+
+        return false;
+    }
+
+
+    private ChoiceAuthority getChoiceAuthority(Item item, MetadataValue metadataValue) {
+        String schema = metadataValue.getMetadataField().getMetadataSchema().getName();
+        String element = metadataValue.getMetadataField().getElement();
+        String qualifier = metadataValue.getMetadataField().getQualifier();
+        Collection collection = item.getOwningCollection();
+        String authorityName = choiceAuthorityService.getChoiceAuthorityName(schema, element, qualifier, collection);
+        return authorityName != null ? choiceAuthorityService.getChoiceAuthorityByAuthorityName(authorityName) : null;
+    }
+
+    private boolean isAuthorityEqualsTo(MetadataValue metadataValue, EPerson user) {
+        return StringUtils.equals(metadataValue.getAuthority(), user.getID().toString());
     }
 
     private boolean checkGroup(MetadataValue value, Set<Group> groups) {
@@ -109,6 +149,16 @@ public class LayoutSecurityServiceImpl implements LayoutSecurityService {
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    private boolean isOwnerOfRelatedItem(Context context, MetadataValue metadataValue, EPerson user) {
+        try {
+            Item relatedItem = itemService.find(context, UUIDUtils.fromString(metadataValue.getAuthority()));
+            return relatedItem != null ? crisSecurityService.isOwner(user, relatedItem) : false;
+        } catch (SQLException e) {
+            throw new SQLRuntimeException(e);
+        }
+
     }
 
 }
