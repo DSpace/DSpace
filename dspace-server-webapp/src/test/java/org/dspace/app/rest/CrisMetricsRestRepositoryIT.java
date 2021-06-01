@@ -12,18 +12,25 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.metrics.CrisMetrics;
 import org.dspace.app.metrics.service.CrisMetricsService;
 import org.dspace.app.rest.matcher.CrisMetricsMatcher;
+import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
 import org.dspace.authorize.service.AuthorizeService;
@@ -590,4 +597,85 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
                                     Matchers.containsString("api/core/items/" + itemA.getID() + "/metrics")))
                 .andExpect(jsonPath("$.page.totalElements", is(6)));
     }
+
+    @Test
+    public void checkMetricsAfterReindexingOfAnItemTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 1").build();
+
+        Item itemA = ItemBuilder.createItem(context, col1)
+                                .withTitle("Title item A")
+                                .build();
+
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.set(Calendar.YEAR, 2019);
+        calendar.set(Calendar.MONTH, 9);
+        calendar.set(Calendar.DATE, 31);
+
+        Date date = calendar.getTime();
+
+        CrisMetrics metric = CrisMetricsBuilder.createCrisMetrics(context, itemA)
+                                               .withAcquisitionDate(date)
+                                               .withMetricType(UpdateScopusMetrics.SCOPUS_CITATION)
+                                               .withMetricCount(4)
+                                               .isLast(true).build();
+
+        CrisMetrics metric2 = CrisMetricsBuilder.createCrisMetrics(context, itemA)
+                                                .withAcquisitionDate(date)
+                                                .withMetricType("view")
+                                                .withMetricCount(4501)
+                                                .isLast(true).build();
+
+        context.restoreAuthSystemState();
+
+        String[] args = new String[]{"update-metrics-in-solr"};
+
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+
+        assertEquals(0, handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin));
+
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String tokenEperson = getAuthToken(admin.getEmail(), password);
+
+        getClient(tokenEperson).perform(get("/api/core/items/" + itemA.getID() + "/metrics"))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$._embedded.metrics", Matchers.containsInAnyOrder(
+                                          CrisMetricsMatcher.matchCrisMetrics(metric),
+                                          CrisMetricsMatcher.matchCrisMetrics(metric2),
+                                          CrisMetricsMatcher.matchCrisDynamicMetrics(itemA.getID(), "google-scholar"),
+                                          CrisMetricsMatcher.matchCrisDynamicMetrics(itemA.getID(), "embedded-download")
+                                          )))
+                               .andExpect(jsonPath("$.page.totalElements", is(4)));
+
+        List<Operation> ops = new ArrayList<>();
+        List<Map<String, String>> values = new ArrayList<>();
+        Map<String, String> value = new HashMap<>();
+        value.put("value", "New Title");
+        values.add(value);
+        ops.add(new ReplaceOperation("/metadata/dc.title", values));
+
+        getClient(tokenAdmin).perform(patch("/api/core/items/" + itemA.getID())
+                             .content(getPatchContent(ops))
+                             .contentType(contentType))
+                             .andExpect(status().isOk());
+
+        getClient(tokenEperson).perform(get("/api/core/items/" + itemA.getID() + "/metrics"))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$._embedded.metrics", Matchers.containsInAnyOrder(
+                                          CrisMetricsMatcher.matchCrisMetrics(metric),
+                                          CrisMetricsMatcher.matchCrisMetrics(metric2),
+                                          CrisMetricsMatcher.matchCrisDynamicMetrics(itemA.getID(), "google-scholar"),
+                                          CrisMetricsMatcher.matchCrisDynamicMetrics(itemA.getID(), "embedded-download")
+                                          )))
+                               .andExpect(jsonPath("$.page.totalElements", is(4)));
+    }
+
 }
