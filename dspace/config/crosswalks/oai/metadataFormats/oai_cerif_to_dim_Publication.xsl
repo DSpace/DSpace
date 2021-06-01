@@ -179,7 +179,7 @@
 				<xsl:value-of select="cerif:PresentedAt/cerif:Event/cerif:Name" />
 			</dim:field>
 			
-			<dim:field mdschema="dc" element="relation" qualifier="dataset" >
+			<dim:field mdschema="dc" element="relation" qualifier="product" >
 				<xsl:value-of select="cerif:References/cerif:Product/cerif:Name" />
 			</dim:field>
 			

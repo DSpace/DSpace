@@ -584,7 +584,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withRelationProject("Test Project", project.getID().toString())
             .withRelationFunding("Another Test Funding", funding.getID().toString())
             .withRelationConference("The best Conference")
-            .withRelationDataset("DataSet")
+            .withRelationProduct("DataSet")
             .build();
 
         context.restoreAuthSystemState();
@@ -658,7 +658,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withRelationProject("Test Project", project.getID().toString())
             .withRelationFunding("Another Test Funding", funding.getID().toString())
             .withRelationConference("The best Conference")
-            .withRelationDataset("DataSet")
+            .withRelationProduct("DataSet")
             .build();
 
         context.restoreAuthSystemState();
@@ -1594,7 +1594,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .build();
 
         Item dataSet = ItemBuilder.createItem(context, collection)
-            .withEntityType("Dataset")
+            .withEntityType("Product")
             .withTitle("Test DataSet")
             .withLanguage("EN")
             .withDescriptionVersion("V-01")
@@ -1611,13 +1611,13 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withRelationEquipment("Test Equipment")
             .build();
 
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("dataSet-cerif-xml");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("product-cerif-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         referCrossWalk.disseminate(context, dataSet, out);
 
-        try (FileInputStream fis = getFileInputStream("dataSet.xml")) {
+        try (FileInputStream fis = getFileInputStream("product.xml")) {
             String expectedContent = IOUtils.toString(fis, Charset.defaultCharset());
             compareEachLine(out.toString(), expectedContent);
         }
@@ -1628,7 +1628,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
     public void testManyDataSetsCerifXmlDisseminate() throws Exception {
 
         Item firstDataSet = ItemBuilder.createItem(context, collection)
-            .withEntityType("Dataset")
+            .withEntityType("Product")
             .withTitle("First DataSet")
             .withAuthor("Walter White")
             .withAuthorAffiliation(PLACEHOLDER_PARENT_METADATA_VALUE)
@@ -1640,7 +1640,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .build();
 
         Item secondDataSet = ItemBuilder.createItem(context, collection)
-            .withEntityType("Dataset")
+            .withEntityType("Product")
             .withTitle("Second DataSet")
             .withPublisher("Publisher")
             .withSubject("DataSet")
@@ -1648,13 +1648,13 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withRelationProject("Second Project")
             .build();
 
-        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("dataSet-cerif-xml");
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("product-cerif-xml");
         assertThat(referCrossWalk, notNullValue());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         referCrossWalk.disseminate(context, Arrays.asList(firstDataSet, secondDataSet).iterator(), out);
 
-        try (FileInputStream fis = getFileInputStream("dataSets.xml")) {
+        try (FileInputStream fis = getFileInputStream("products.xml")) {
             String expectedContent = IOUtils.toString(fis, Charset.defaultCharset());
             compareEachLine(out.toString(), expectedContent);
         }

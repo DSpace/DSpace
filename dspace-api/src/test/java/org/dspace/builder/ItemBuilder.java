@@ -514,8 +514,8 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "dc", "relation", "conference", conference);
     }
 
-    public ItemBuilder withRelationDataset(String dataset) {
-        return addMetadataValue(item, "dc", "relation", "dataset", dataset);
+    public ItemBuilder withRelationProduct(String dataset) {
+        return addMetadataValue(item, "dc", "relation", "product", dataset);
     }
 
     public ItemBuilder withRelationEquipment(String equipment) {

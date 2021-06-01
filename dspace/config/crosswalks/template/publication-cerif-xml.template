@@ -107,7 +107,7 @@
    	@relation.dc-relation-funding.end@
 	<PresentedAt> <Event> <Name>@dc.relation.conference@</Name> </Event> </PresentedAt>
     <Coverage> <Event> <Name>@dc.coverage.publication@</Name> </Event> </Coverage>
-	<References> <Product> <Name>@dc.relation.dataset@</Name> </Product> </References>
+	<References> <Product> <Name>@dc.relation.product@</Name> </Product> </References>
 	<Access xmlns="http://purl.org/coar/access_right" 
         endDate="@oairecerif.access.embargoEnd@"
     >

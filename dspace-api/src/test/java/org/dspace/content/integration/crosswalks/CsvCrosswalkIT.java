@@ -554,7 +554,7 @@ public class CsvCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withEditor("Editor")
             .withEditorAffiliation("Editor Affiliation")
             .withRelationConference("The best Conference")
-            .withRelationDataset("DataSet")
+            .withRelationProduct("DataSet")
             .build();
     }
 
