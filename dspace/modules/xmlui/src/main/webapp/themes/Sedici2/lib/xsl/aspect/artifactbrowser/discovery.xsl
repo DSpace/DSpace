@@ -451,7 +451,7 @@
 				<xsl:call-template name="renderDiscoveryField">
                     <xsl:with-param name="value">
 						<xsl:choose>
-							<xsl:when test="(dri:list[@n=(concat($handle, ':dc.date.created')) and descendant::text()]) and (dri:list[@n=(concat($handle, ':dc.date.created')) and descendant::text()]/dri:item=$objeto_fisico)">
+							<xsl:when test="(dri:list[@n=(concat($handle, ':dc.date.created')) and descendant::text()]) and (dri:list[@n=(concat($handle, ':dc.type')) and descendant::text()]/dri:item[text()=$objeto_fisico or text()=$conjunto_de_datos])">
 									<xsl:value-of select="substring(dri:list[@n=(concat($handle, ':dc.date.created'))]/dri:item,1,4)"/>
 							</xsl:when>
 							<xsl:when test="dri:list[@n=(concat($handle, ':sedici.date.exposure')) and descendant::text()]">
