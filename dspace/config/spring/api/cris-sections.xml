@@ -37,7 +37,7 @@
                             </bean>
                             <bean class="org.dspace.layout.CrisLayoutTopComponent">
                                 <property name="discoveryConfigurationName" value="researchoutputs" />
-                                <property name="sortField" value="metric.views" />
+                                <property name="sortField" value="metric.view" />
                                 <property name="order" value="desc" />
                                 <property name="style" value="col-md-6"/>
                             </bean>
