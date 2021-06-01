@@ -65,7 +65,7 @@
          	<Title>@dc.title@</Title>
          	<StartDate>@oairecerif.project.startDate@</StartDate>
          	<EndDate>@oairecerif.project.endDate@</EndDate>
-         	@relation.grants.start@
+         	@relation.fundings.start@
          	<Funded>
 				<By>
 					@relation.oairecerif-funder.start@
@@ -87,7 +87,7 @@
 					</Funding>
 				</As>
 			</Funded>
-         	@relation.grants.end@
+         	@relation.fundings.end@
       	</Project>
 	</OriginatesFrom>
    	@relation.dc-relation-project.end@

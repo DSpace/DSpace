@@ -48,7 +48,7 @@
 			<Person displayName="@crispj.coinvestigators@" />
 		</Member>
 	</Team>
-	@relation.grants.start@
+	@relation.fundings.start@
 	<Funded>
 		<By>
 			@relation.oairecerif-funder.start@
@@ -70,7 +70,7 @@
 			</Funding>
 		</As>
 	</Funded>
-	@relation.grants.end@
+	@relation.fundings.end@
 	<Keyword>@dc.subject@</Keyword>
 	<Abstract>@dc.description.abstract@</Abstract>
     <Status>@oairecerif.project.status@</Status>
