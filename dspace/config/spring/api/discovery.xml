@@ -81,6 +81,7 @@
                 <entry key="journal" value-ref="journal"/>
                 <entry key="project_funding" value-ref="project_funding"/>
                 <entry key="project" value-ref="project"/>
+                <entry key="homePageTopItems" value-ref="homePageTopItemsConfiguration"/>
                 <!-- search for an entity that can be a Person or an OrgUnit -->
                 <entry key="personOrOrgunit" value-ref="personOrOrgunit"/>
                 <!-- OpenAIRE4 guidelines - search for an OrgUnit that have a specific dc.type=FundingOrganization -->
@@ -2052,6 +2053,39 @@
              Possible values: Tag.NameComparatorAsc | Tag.NameComparatorDesc | Tag.ScoreComparatorAsc | Tag.ScoreComparatorDesc
              Default: Tag.NameComparatorAsc  -->
         <!-- <property name="ordering" value="Tag.NameComparatorAsc"/>-->
+    </bean>
+
+    <bean id="homePageTopItemsConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration" >
+        <property name="indexAlways" value="true"/>
+        <!--Which sidebar facets are to be displayed (same as defaultConfiguration above)-->
+        <property name="sidebarFacets">
+            <list>
+            </list>
+        </property>
+         <!--The search filters which can be used on the discovery search page (same as defaultConfiguration above)-->
+        <property name="searchFilters">
+            <list>
+            </list>
+        </property>
+        <!--The sort filters for the discovery search (same as defaultConfiguration above)-->
+        <property name="searchSortConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="sortFields">
+                    <list>
+                        <ref bean="sortDateAccessioned" />
+                        <ref bean="sortViews" />
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <!--Any default filter queries, these filter queries will be used for all
+            queries done by discovery for this configuration-->
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find items -->
+                <value>search.resourcetype:Item</value>
+            </list>
+        </property>
     </bean>
 
     <!--Search filter configuration beans-->
