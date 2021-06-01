@@ -98,7 +98,7 @@
                 <entry key="RELATION.OrgUnit.organizations" value-ref="relationOrgunitOrgunitsConfiguration"/>
                 <!-- Project Related items -->
                 <entry key="RELATION.Project.projects" value-ref="relationProjectProjectsConfiguration"/>
-                <entry key="RELATION.Project.grants" value-ref="relationProjectFundingsConfiguration"/>
+                <entry key="RELATION.Project.fundings" value-ref="relationProjectFundingsConfiguration"/>
                 <entry key="RELATION.Project.researchoutputs" value-ref="relationProjectPublicationConfiguration"/>
                 <!-- Edit Configurations -->
                 <entry key="editCommunity" value-ref="editCommunityConfiguration"/>
