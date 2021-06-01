@@ -23,6 +23,8 @@ public class CrisLayoutTopComponent implements CrisLayoutSectionComponent {
 
     private String style;
 
+    private String titleKey;
+
     /**
      * @return the discoveryConfigurationName
      */
@@ -77,4 +79,20 @@ public class CrisLayoutTopComponent implements CrisLayoutSectionComponent {
         this.style = style;
     }
 
+    /**
+     *
+     * @return titleKey param value
+     */
+    public String getTitleKey() {
+        return titleKey;
+    }
+
+    /**
+     * a key containing title of this section, in case is missing
+     * sortField value is used
+     * @param titleKey
+     */
+    public void setTitleKey(String titleKey) {
+        this.titleKey = titleKey;
+    }
 }
