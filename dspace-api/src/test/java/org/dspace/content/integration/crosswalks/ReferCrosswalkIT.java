@@ -1654,7 +1654,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         referCrossWalk.disseminate(context, Arrays.asList(firstDataSet, secondDataSet).iterator(), out);
 
-        try (FileInputStream fis = getFileInputStream("product.xml")) {
+        try (FileInputStream fis = getFileInputStream("products.xml")) {
             String expectedContent = IOUtils.toString(fis, Charset.defaultCharset());
             compareEachLine(out.toString(), expectedContent);
         }
