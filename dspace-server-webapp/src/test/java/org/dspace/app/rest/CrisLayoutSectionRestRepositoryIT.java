@@ -51,7 +51,7 @@ public class CrisLayoutSectionRestRepositoryIT extends AbstractControllerIntegra
                     "researchoutputs", "dc.date.accessioned", "desc"))))
             .andExpect(jsonPath("$._embedded.sections",
                 hasItem(withIdAndTopComponent("researchoutputs", 1, 1, "col-md-6",
-                                    "researchoutputs", "metric.views", "desc"))))
+                                    "researchoutputs", "metric.view", "desc"))))
             .andExpect(jsonPath("$._embedded.sections",
                 hasItem(withIdAndFacetComponent("researchoutputs", 2, 0, "col-md-12", "researchoutputs"))))
 
