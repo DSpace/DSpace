@@ -6325,23 +6325,22 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         Integer workspaceItemId = null;
         try {
+            ObjectMapper mapper = new ObjectMapper();
+            // You have to be an admin to create an Item from an ExternalDataObject
+            String token = getAuthToken(admin.getEmail(), password);
+            MvcResult mvcResult = getClient(token)
+                    .perform(post("/api/submission/workspaceitems?owningCollection=" + col1.getID().toString())
+                            .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                            .content("https://localhost:8080/server/api/integration/"
+                                    + "externalsources/openaireProject/entryValues/777541"))
+                    .andExpect(status().isCreated()).andReturn();
 
-        ObjectMapper mapper = new ObjectMapper();
-        // You have to be an admin to create an Item from an ExternalDataObject
-        String token = getAuthToken(admin.getEmail(), password);
-        MvcResult mvcResult = getClient(token).perform(post("/api/submission/workspaceitems?owningCollection="
-                                                            + col1.getID().toString())
-                                                           .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
-                                                           .content("https://localhost:8080/server/api/integration/" +
-                                                                    "externalsources/openaire/entryValues/777541"))
-                                              .andExpect(status().isCreated()).andReturn();
+            String content = mvcResult.getResponse().getContentAsString();
+            Map<String,Object> map = mapper.readValue(content, Map.class);
+            workspaceItemId = (Integer) map.get("id");
+            String itemUuidString = String.valueOf(((Map) ((Map) map.get("_embedded")).get("item")).get("uuid"));
 
-        String content = mvcResult.getResponse().getContentAsString();
-        Map<String,Object> map = mapper.readValue(content, Map.class);
-        workspaceItemId = (Integer) map.get("id");
-        String itemUuidString = String.valueOf(((Map) ((Map) map.get("_embedded")).get("item")).get("uuid"));
-
-        getClient(token).perform(get("/api/submission/workspaceitems/" + workspaceItemId))
+            getClient(token).perform(get("/api/submission/workspaceitems/" + workspaceItemId))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", Matchers.allOf(
                                 hasJsonPath("$.id", is(workspaceItemId)),
@@ -6352,7 +6351,14 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                 hasJsonPath("$.type", is("item")),
                                 hasJsonPath("$.metadata", Matchers.allOf(
                                    MetadataMatcher.matchMetadata("dc.title", "OpenAIRE Advancing Open Scholarship"),
-                                   MetadataMatcher.matchMetadata("dc.identifier.other", "777541")
+                                   MetadataMatcher.matchMetadata("oairecerif.acronym", "OpenAIRE-Advance"),
+                                   MetadataMatcher.matchMetadata("oairecerif.funding.startDate", "2018-01-01"),
+                                   MetadataMatcher.matchMetadata("oairecerif.funding.endDate", "2021-02-28"),
+                                   MetadataMatcher.matchMetadata("oairecerif.funding.oamandate", "true"),
+                                   MetadataMatcher.matchMetadata("oairecerif.fundingParent", "H2020-EINFRA-2017"),
+                                   MetadataMatcher.matchMetadataStringStartsWith("dc.description",
+                                           "OpenAIRE-Advance continues the mission of OpenAIRE to support"),
+                                   MetadataMatcher.matchMetadata("oairecerif.funding.identifier", "777541")
                                 )))))
                         ));
         } finally {

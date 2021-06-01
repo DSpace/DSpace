@@ -333,10 +333,14 @@ public class CrisMetricsRestRepositoryIT extends AbstractControllerIntegrationTe
         getClient().perform(get("/api/core/items/" + itemA.getID() + "/metrics"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.metrics").value(Matchers.hasSize(0)))
+                .andExpect(jsonPath("$._embedded.metrics").value(Matchers.hasSize(2)))
+                .andExpect(jsonPath("$._embedded.metrics").value(Matchers.containsInAnyOrder(
+                        CrisMetricsMatcher.matchCrisDynamicMetrics(itemA.getID(), "embedded-view"),
+                        CrisMetricsMatcher.matchCrisDynamicMetrics(itemA.getID(), "embedded-download")
+                        )))
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.containsString("api/core/items/" + itemA.getID() + "/metrics")))
-                .andExpect(jsonPath("$.page.totalElements", is(0)));
+                .andExpect(jsonPath("$.page.totalElements", is(2)));
     }
 
     @Test

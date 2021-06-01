@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.not;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.hamcrest.core.StringEndsWith;
+import org.hamcrest.core.StringStartsWith;
 
 /**
  * Utility class to provide convenient matchers for metadata.
@@ -54,6 +55,16 @@ public class MetadataMatcher {
      */
     public static Matcher<? super Object> matchMetadataStringEndsWith(String key, String subString) {
         return hasJsonPath("$.['" + key + "'][*].value", hasItem(StringEndsWith.endsWith(subString)));
+    }
+
+    /**
+     * Gets a matcher to ensure that at least one value for a given metadata key startsWith the given prefix.
+     * @param key the metadata key.
+     * @param prefixString the prefix which the value must starts with
+     * @return the matcher
+     */
+    public static Matcher<? super Object> matchMetadataStringStartsWith(String key, String prefixString) {
+        return hasJsonPath("$.['" + key + "'][*].value", hasItem(StringStartsWith.startsWith(prefixString)));
     }
 
     /**
