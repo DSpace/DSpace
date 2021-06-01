@@ -24,7 +24,7 @@ public class SimpleJsonPathMetadataContributor implements MetadataContributor<St
 
     private String query;
 
-    private JsonPathMetadataProcessor metadataProcessor;
+    protected JsonPathMetadataProcessor metadataProcessor;
 
     /**
      * Initialize SimpleJsonPathMetadataContributor with a query, prefixToNamespaceMapping and MetadataFieldConfig

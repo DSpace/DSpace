@@ -81,6 +81,22 @@
           class="org.dspace.importer.external.arxiv.metadatamapping.ArXivFieldMapping">
     </bean>
 
+    <bean id="vufindImportService"
+          class="org.dspace.importer.external.vufind.VuFindImportMetadataSourceServiceImpl" scope="singleton">
+          <!-- vufind search endpoint full address -->
+          <constructor-arg type="java.lang.String" value="${vufind.api-search}"/>
+          <!-- vufind get by id endpoint full address https://.../api/v1/record -->
+          <constructor-arg type="java.lang.String" value="${vufind.api-record}"/>
+          <!-- vufind  comma separated response fields list, empty or null force default values-->
+          <!-- Set to empty to use the default set of fields  -->
+          <constructor-arg type="java.lang.String" value=""/>
+          <property name="metadataFieldMapping" ref="vufindMetadataFieldMapping"/>
+    </bean>
+    <bean id="vufindMetadataFieldMapping"
+          class="org.dspace.importer.external.vufind.metadatamapping.VuFindFieldMapping">
+    </bean>
+
+
 
     <bean id="pubmedImportService"
           class="org.dspace.importer.external.pubmed.service.PubmedImportMetadataSourceServiceImpl">
