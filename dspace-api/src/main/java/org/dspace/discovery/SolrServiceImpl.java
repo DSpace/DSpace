@@ -1538,34 +1538,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         SolrClient solrClient =  solrSearchCore.getSolr();
         StringBuilder uniqueID = new StringBuilder("Item-");
         uniqueID.append(metric.getResource().getID());
-        String type = "metric." + metric.getMetricType();
-        String typeSort = type + "_sort";
-        String typeId = "metric.id." + metric.getMetricType();
-        String typeAcquisitionDate = "metric.acquisitionDate." + metric.getMetricType();
-        String typeRemark = "metric.remark." + metric.getMetricType();
-        String typeDeltaPeriod1 = "metric.deltaPeriod1." + metric.getMetricType();
-        String typeDeltaPeriod2 = "metric.deltaPeriod2." + metric.getMetricType();
-        String typeRank = "metric.rank." + metric.getMetricType();
 
         try {
             SolrInputDocument solrInDoc = new SolrInputDocument();
             solrInDoc.addField(SearchUtils.RESOURCE_UNIQUE_ID, uniqueID);
-            Map<String, Object> metricCountMap = Collections.singletonMap("set", metric.getMetricCount());
-            Map<String, Object> acquisitionDateMap = Collections.singletonMap("set", metric.getAcquisitionDate());
-            Map<String, Object> idMap = Collections.singletonMap("set", metric.getId());
-            Map<String, Object> remarkMap = Collections.singletonMap("set", metric.getRemark());
-            Map<String, Object> deltaPeriod1Map = Collections.singletonMap("set", metric.getDeltaPeriod1());
-            Map<String, Object> deltaPeriod2Map = Collections.singletonMap("set", metric.getDeltaPeriod2());
-            Map<String, Object> rankMap = Collections.singletonMap("set", metric.getRank());
-            solrInDoc.addField(type, metricCountMap);
-            solrInDoc.addField(typeSort, metricCountMap);
-            solrInDoc.addField(typeId, idMap);
-            solrInDoc.addField(typeAcquisitionDate, acquisitionDateMap);
-            solrInDoc.addField(typeRemark, remarkMap);
-            solrInDoc.addField(typeDeltaPeriod1, deltaPeriod1Map);
-            solrInDoc.addField(typeDeltaPeriod2, deltaPeriod2Map);
-            solrInDoc.addField(typeRank, rankMap);
-            req.add(solrInDoc);
+            req.add(SearchUtils.addMetricFieldsInSolrDoc(metric, solrInDoc));
             solrClient.request(req);
             solrClient.commit();
         } catch (SolrServerException | IOException e) {
