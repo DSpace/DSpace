@@ -232,6 +232,16 @@
         </property>
     </bean>
 
+    <bean id="authorityFundingDataProvider" class="org.dspace.external.provider.impl.AuthorityImportDataProvider">
+        <property name="supportedAuthority" value="FundingAuthority"/>
+        <property name="authorityMetadata" value="dc.relation.funding"/>
+        <property name="sourceIdentifier" value="fundingAuthority"/>
+		<property name="supportedEntityTypes">
+            <list>
+                <value></value>
+            </list>
+        </property>
+    </bean>
 
 </beans>
 

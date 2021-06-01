@@ -80,6 +80,21 @@
 						</property>
 					</bean>
 				</entry>
+				<entry key="dc.relation.funding">
+					<bean class="org.dspace.authority.filler.MetadataConfiguration">
+						<property name="updateEnabled" value="false" />
+						<property name="mapping">
+							<map>
+								<entry key="dc.relation.grantno">
+									<bean class="org.dspace.authority.filler.MetadataConfiguration.MappingDetails">
+										<property name="visibility" value="1" />
+										<property name="targetMetadata" value="oairecerif.funding.identifier" />
+									</bean>
+								</entry>
+							</map>
+						</property>
+					</bean>
+				</entry>
 			</map>
 		</property>
 	</bean>
