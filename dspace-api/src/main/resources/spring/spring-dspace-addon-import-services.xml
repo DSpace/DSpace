@@ -197,7 +197,7 @@
     </bean>
 
     <bean id="OpenAIREService"
-          class="org.dspace.importer.external.openAire.service.OpenAIREImportMetadataSourceServiceImpl" scope="singleton">
+          class="org.dspace.importer.external.openAire.service.OpenAireProjectImportMetadataSourceServiceImpl" scope="singleton">
           <property name="metadataFieldMapping" ref="openaireMetadataFieldMapping"/>
     </bean>
     <bean id="openaireMetadataFieldMapping"

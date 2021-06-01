@@ -48,10 +48,10 @@ import org.springframework.beans.factory.annotation.Autowired;
  * 
  * @author Mykhaylo Boychuk (4science.it)
  */
-public class OpenAIREImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<OMElement>
+public class OpenAireProjectImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<OMElement>
     implements QuerySource {
 
-    private static final Logger log = Logger.getLogger(OpenAIREImportMetadataSourceServiceImpl.class);
+    private static final Logger log = Logger.getLogger(OpenAireProjectImportMetadataSourceServiceImpl.class);
     private static final String ENDPOINT_SEARCH_OPENAIRE = "http://api.openaire.eu/search/projects";
 
     private int timeout = 1000;

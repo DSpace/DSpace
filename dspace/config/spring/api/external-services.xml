@@ -202,11 +202,11 @@
 
     <bean id="openaireLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="OpenAIREService"/>
-        <property name="sourceIdentifier" value="openaire"/>
+        <property name="sourceIdentifier" value="openaireProject"/>
         <property name="recordIdMetadata" value="dc.identifier.other"/>
         <property name="supportedEntityTypes">
             <list>
-                <value>Publication</value>
+                <value>Funding</value>
             </list>
         </property>
     </bean>

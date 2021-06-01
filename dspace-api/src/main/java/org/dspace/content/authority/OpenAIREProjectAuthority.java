@@ -18,7 +18,7 @@ import java.util.Map;
 import org.apache.commons.collections.CollectionUtils;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.exception.MetadataSourceException;
-import org.dspace.importer.external.openAire.service.OpenAIREImportMetadataSourceServiceImpl;
+import org.dspace.importer.external.openAire.service.OpenAireProjectImportMetadataSourceServiceImpl;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -41,8 +41,8 @@ public class OpenAIREProjectAuthority extends ItemAuthority {
     private List<OpenAIREExtraMetadataGenerator> extraMetadataGenerators = serviceManager
         .getServicesByType(OpenAIREExtraMetadataGenerator.class);
 
-    private OpenAIREImportMetadataSourceServiceImpl openAIREProjectService = serviceManager
-        .getServiceByName("OpenAIREService", OpenAIREImportMetadataSourceServiceImpl.class);
+    private OpenAireProjectImportMetadataSourceServiceImpl openAIREProjectService = serviceManager
+        .getServiceByName("OpenAIREService", OpenAireProjectImportMetadataSourceServiceImpl.class);
 
 
     @Override
