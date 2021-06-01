@@ -248,11 +248,11 @@
 	</bean>
 
 	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkDatasetCerifXml">
-		<property name="templateFileName" value="crosswalks/template/dataSet-cerif-xml.template"/>
+		<property name="templateFileName" value="crosswalks/template/product-cerif-xml.template"/>
 		<property name="mimeType" value="application/xml; charset=UTF-8"/>
-		<property name="fileName" value="dataSet.xml"/>
-		<property name="entityType" value="Dataset"/>
-		<property name="multipleItemsTemplateFileName" value="crosswalks/template/dataSets-xml.template"/>
+		<property name="fileName" value="product.xml"/>
+		<property name="entityType" value="Product"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/products-xml.template"/>
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
 		<property name="converter" ref="xmlValueConverter" />
 	</bean>

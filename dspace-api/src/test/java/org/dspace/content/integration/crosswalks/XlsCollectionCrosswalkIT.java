@@ -102,7 +102,7 @@ public class XlsCollectionCrosswalkIT extends AbstractIntegrationTestWithDatabas
             .withRelationGrantno(CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE)
             .withRelationFunding("Test Funding")
             .withRelationConference("The best Conference")
-            .withRelationDataset("DataSet")
+            .withRelationProduct("DataSet")
             .withDescription("Description")
             .withDescriptionAbstract("Description Abstract")
             .withIsPartOf("Journal")
@@ -128,7 +128,7 @@ public class XlsCollectionCrosswalkIT extends AbstractIntegrationTestWithDatabas
             .withRelationGrantno("01")
             .withRelationConference("Conference1")
             .withRelationConference("Conference2")
-            .withRelationDataset("DataSet")
+            .withRelationProduct("DataSet")
             .withDescription("Publication Description")
             .withCitationIdentifier("CIT-01")
             .build();
@@ -153,7 +153,7 @@ public class XlsCollectionCrosswalkIT extends AbstractIntegrationTestWithDatabas
             "dc.relation.isbn", "dc.relation.doi", "dc.relation.ispartof", "dc.relation.ispartofseries",
             "dc.relation.issn", "dc.coverage.publication", "dc.coverage.isbn", "dc.coverage.doi",
             "dc.description.sponsorship", "dc.description.volume", "dc.description.issue", "dc.description.startpage",
-            "dc.description.endpage", "dc.relation.conference", "dc.relation.dataset",
+            "dc.description.endpage", "dc.relation.conference", "dc.relation.product",
             "dc.identifier.citation", "dc.description" };
         String[] mainSheetFirstRow = { firstItemId, "doi:111.111/publication", "99999999",
             "111-222-333", "", "", "", "2049-3630", "", "", "", "http://localhost:4000/handle/123456789/001",

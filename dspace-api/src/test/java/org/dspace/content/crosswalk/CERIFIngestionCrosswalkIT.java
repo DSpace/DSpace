@@ -226,7 +226,7 @@ public class CERIFIngestionCrosswalkIT extends AbstractIntegrationTestWithDataba
             "will be generated::repository-id::mock-id", 0, 500)));
 
         assertThat(values, hasItems(with("dc.relation.conference", "The best Conference")));
-        assertThat(values, hasItems(with("dc.relation.dataset", "DataSet")));
+        assertThat(values, hasItems(with("dc.relation.product", "DataSet")));
     }
 
     @Test
