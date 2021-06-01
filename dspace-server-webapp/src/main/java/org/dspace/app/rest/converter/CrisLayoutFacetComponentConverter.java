@@ -32,6 +32,7 @@ public class CrisLayoutFacetComponentConverter implements CrisLayoutSectionCompo
         CrisLayoutFacetComponentRest rest = new CrisLayoutFacetComponentRest();
         rest.setDiscoveryConfigurationName(topComponent.getDiscoveryConfigurationName());
         rest.setStyle(component.getStyle());
+        rest.setFacetsPerRow(topComponent.getFacetsPerRow());
         return rest;
     }
 

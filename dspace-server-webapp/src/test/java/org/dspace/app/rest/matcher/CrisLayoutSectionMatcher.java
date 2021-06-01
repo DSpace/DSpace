@@ -12,6 +12,9 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hamcrest.Matcher;
 
 /**
@@ -183,5 +186,100 @@ public final class CrisLayoutSectionMatcher {
             hasJsonPath("$.componentRows[" + row + "][" + pos + "].componentType", is("facet")),
             hasJsonPath("$.componentRows[" + row + "][" + pos + "].style", is(style)),
             hasJsonPath("$.componentRows[" + row + "][" + pos + "].discoveryConfigurationName", is(discoveryConfig)));
+    }
+
+    /**
+     * Matcher to verify that the section with the given id has a textRow component
+     * at the position pos of the row row with the given attributes.
+     *
+     * @param id              the section id to match
+     * @param row             the row index of the top component to match
+     * @param pos             the index of the top component in the given row
+     * @param style           the component style
+     * @param discoveryConfig the discovery configuration name of the top component
+     * @return the Matcher instance
+     */
+    public static Matcher<? super Object> withIdAndTextRowComponent(String id, int row, int pos, String style,
+                                                                   String contentType) {
+
+        return allOf(
+            hasJsonPath("$.id", is(id)),
+            withTextRowComponent(row, pos, style, contentType));
+    }
+
+    /**
+     * Matcher to verify that the section has a textRow component
+     * at the position pos of the row row with the given attributes.
+     *
+     * @param row             the row index of the top component to match
+     * @param pos             the index of the top component in the given row
+     * @param style           the component style
+     * @param contentType     the content type of the text row component
+     * @return the Matcher instance
+     */
+    public static Matcher<? super Object> withTextRowComponent(int row, int pos, String style,
+                                                                    String contentType) {
+
+        return allOf(
+            hasJsonPath("$.componentRows[" + row + "][" + pos + "].componentType", is("text-row")),
+            hasJsonPath("$.componentRows[" + row + "][" + pos + "].style", is(style)),
+            hasJsonPath("$.componentRows[" + row + "][" + pos + "].contentType", is(contentType)));
+    }
+
+    /**
+     * Matcher to verify that the section with the given id has a counters component
+     * at the position pos of the row row with the given discovery configurations.
+     *
+     * @param id                        section id
+     * @param row                       row
+     * @param pos                       position
+     * @param style                     style to check
+     * @param discoveryConfigurations   discovery configuration to check
+     * @return
+     */
+    public static Matcher<? super Object> withIdAndCountersComponent(String id, int row, int pos, String style,
+                                                     List<String> discoveryConfigurations) {
+        return allOf(
+            hasJsonPath("$.id", is(id)),
+            withCountersComponent(row, pos, style, discoveryConfigurations));
+    }
+
+    /**
+     * Matcher to verify that the section with the given id has a counters component
+     * at the position pos of the row row with the given discovery configurations.
+     *
+     * @param id section id
+     * @param row row
+     * @param pos position
+     * @param style style to check
+     * @param discoveryConfigurations discovery configuration to check
+     * @return
+     */
+    public static Matcher<? super Object> withCountersComponent(int row, int pos, String style,
+                                                                     List<String> discoveryConfigurations) {
+        List<Matcher<? super Object>> matchers = new ArrayList<>();
+        matchers.add(hasJsonPath("$.componentRows[" + row + "][" + pos + "].componentType", is("counters")));
+        matchers.add(hasJsonPath("$.componentRows[" + row + "][" + pos + "].style", is(style)));
+        for (int i = 0; i < discoveryConfigurations.size(); i++) {
+            matchers.add(withCounterComponent(row, pos, i, discoveryConfigurations.get(i)));
+        }
+        return allOf(matchers);
+    }
+
+    /**
+     * Matcher to verify that the counter on pos pos of row row
+     * at the position counterPos within counters list
+     * has the given discovery configuration.
+     *
+     * @param row   row
+     * @param pos   pos
+     * @param counterPos position of the counter inside counter list
+     * @param discoveryConfiguration discovery configuration to check
+     * @return
+     */
+    public static Matcher<? super Object> withCounterComponent(int row, int pos, int counterPos,
+                                                               String discoveryConfiguration) {
+        return hasJsonPath("$.componentRows[" + row + "][" + pos + "].counterSettingsList[" + counterPos + "]" +
+            ".discoveryConfigurationName", is(discoveryConfiguration));
     }
 }

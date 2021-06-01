@@ -210,7 +210,7 @@ public class EpoIdMetadataContributor implements MetadataContributor<OMElement> 
         public EpoDocumentId(OMElement documentId, Map<String, String> namespaces) throws JaxenException {
             this.namespaces = namespaces;
             OMElement preferredId = null;
-            AXIOMXPath xpath = new AXIOMXPath("//ns:document-id[@document-id-type=\"epodoc\"]");
+            AXIOMXPath xpath = new AXIOMXPath("./ns:document-id[@document-id-type=\"epodoc\"]");
             if (namespaces != null) {
                 for (Entry<String, String> entry : namespaces.entrySet()) {
                     xpath.addNamespace(entry.getKey(), entry.getValue());
@@ -220,7 +220,7 @@ public class EpoIdMetadataContributor implements MetadataContributor<OMElement> 
             if (nodes != null && nodes.size() > 0) {
                 preferredId = (OMElement) nodes.get(0);
             } else {
-                xpath = new AXIOMXPath("//ns:document-id");
+                xpath = new AXIOMXPath("./ns:document-id");
                 if (namespaces != null) {
                     for (Entry<String, String> entry : namespaces.entrySet()) {
                         xpath.addNamespace(entry.getKey(), entry.getValue());
@@ -230,6 +230,9 @@ public class EpoIdMetadataContributor implements MetadataContributor<OMElement> 
                 if (nodes != null && nodes.size() > 0) {
                     preferredId = (OMElement) nodes.get(0);
                 }
+            }
+            if (preferredId == null) {
+                preferredId = documentId;
             }
             this.documentIdType = buildDocumentIdType(preferredId);
             this.country = buildCountry(preferredId);

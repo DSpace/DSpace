@@ -103,9 +103,9 @@ public class SimpleMetadataListener implements MetadataListener {
                 if (dateFiled != null && dateFiled.size() == 1 && applicNo != null && applicNo.size() == 1) {
                     return applicNo.get(0).getValue() + EpoImportMetadataSourceServiceImpl.APP_NO_DATE_SEPARATOR
                             + dateFiled.get(0).getValue();
+                } else {
+                    return null;
                 }
-            } else {
-                return null;
             }
         }
         // only suggest an identifier if there is exactly one value for the metadata. If

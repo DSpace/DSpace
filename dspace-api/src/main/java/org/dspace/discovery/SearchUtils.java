@@ -10,10 +10,14 @@ package org.dspace.discovery;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.apache.solr.common.SolrInputDocument;
+import org.dspace.app.metrics.CrisMetrics;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -170,4 +174,33 @@ public class SearchUtils {
         DiscoveryConfiguration configurationExtra = getDiscoveryConfigurationByName(confName);
         result.add(configurationExtra);
     }
+
+    public static SolrInputDocument addMetricFieldsInSolrDoc(CrisMetrics metric, SolrInputDocument solrInDoc) {
+        String type = "metric." + metric.getMetricType();
+        String typeSort = type + "_sort";
+        String typeId = "metric.id." + metric.getMetricType();
+        String typeAcquisitionDate = "metric.acquisitionDate." + metric.getMetricType();
+        String typeRemark = "metric.remark." + metric.getMetricType();
+        String typeDeltaPeriod1 = "metric.deltaPeriod1." + metric.getMetricType();
+        String typeDeltaPeriod2 = "metric.deltaPeriod2." + metric.getMetricType();
+        String typeRank = "metric.rank." + metric.getMetricType();
+
+        Map<String, Object> metricCountMap = Collections.singletonMap("set", metric.getMetricCount());
+        Map<String, Object> acquisitionDateMap = Collections.singletonMap("set", metric.getAcquisitionDate());
+        Map<String, Object> idMap = Collections.singletonMap("set", metric.getId());
+        Map<String, Object> remarkMap = Collections.singletonMap("set", metric.getRemark());
+        Map<String, Object> deltaPeriod1Map = Collections.singletonMap("set", metric.getDeltaPeriod1());
+        Map<String, Object> deltaPeriod2Map = Collections.singletonMap("set", metric.getDeltaPeriod2());
+        Map<String, Object> rankMap = Collections.singletonMap("set", metric.getRank());
+        solrInDoc.addField(type, metricCountMap);
+        solrInDoc.addField(typeSort, metricCountMap);
+        solrInDoc.addField(typeId, idMap);
+        solrInDoc.addField(typeAcquisitionDate, acquisitionDateMap);
+        solrInDoc.addField(typeRemark, remarkMap);
+        solrInDoc.addField(typeDeltaPeriod1, deltaPeriod1Map);
+        solrInDoc.addField(typeDeltaPeriod2, deltaPeriod2Map);
+        solrInDoc.addField(typeRank, rankMap);
+        return solrInDoc;
+    }
+
 }

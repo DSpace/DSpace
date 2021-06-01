@@ -37,7 +37,6 @@ import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.exception.MetadataSourceException;
-import org.dspace.importer.external.scopus.service.ScopusImportMetadataSourceServiceImpl;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.components.QuerySource;
 import org.dspace.services.ConfigurationService;
@@ -52,7 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class OpenAIREImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<OMElement>
     implements QuerySource {
 
-    private static final Logger log = Logger.getLogger(ScopusImportMetadataSourceServiceImpl.class);
+    private static final Logger log = Logger.getLogger(OpenAIREImportMetadataSourceServiceImpl.class);
     private static final String ENDPOINT_SEARCH_OPENAIRE = "http://api.openaire.eu/search/projects";
 
     private int timeout = 1000;

@@ -264,6 +264,11 @@ submission.lookup.ads.apikey =
 epo.consumerKey=
 epo.consumerSecretKey=
 
+# VuFind endpoints (i.e. https://vufind.org/demo/api/v1/...)
+# please note that VuFind API are IP protected so you need to configure it to grant access from the DSpace Server IP
+vufind.api-search =
+vufind.api-record =
+
 ##########################################
 # ORCID Integration                      #
 ##########################################
