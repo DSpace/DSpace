@@ -139,22 +139,16 @@
                         </list>
                         <list>
                             <bean class="org.dspace.layout.CrisLayoutTopComponent">
-                                <property name="discoveryConfigurationName" value="researchoutputs" />
+                                <property name="discoveryConfigurationName" value="homePageTopItems" />
+                                <property name="sortField" value="dc.date.accessioned" />
+                                <property name="order" value="desc" />
+                                <property name="style" value="col-md-6"/>
+                            </bean>
+                            <bean class="org.dspace.layout.CrisLayoutTopComponent">
+                                <property name="discoveryConfigurationName" value="homePageTopItems" />
                                 <property name="sortField" value="metric.view" />
                                 <property name="order" value="desc" />
-                                <property name="style" value="col-md-4"/>
-                            </bean>
-                            <bean class="org.dspace.layout.CrisLayoutTopComponent">
-                                <property name="discoveryConfigurationName" value="researchoutputs" />
-                                <property name="sortField" value="metric.download" />
-                                <property name="order" value="desc" />
-                                <property name="style" value="col-md-4"/>
-                            </bean>
-                            <bean class="org.dspace.layout.CrisLayoutTopComponent">
-                                <property name="discoveryConfigurationName" value="researchoutputs" />
-                                <property name="sortField" value="metric.scopus.citation" />
-                                <property name="order" value="desc" />
-                                <property name="style" value="col-md-4"/>
+                                <property name="style" value="col-md-6"/>
                             </bean>
                         </list>
                     </list>

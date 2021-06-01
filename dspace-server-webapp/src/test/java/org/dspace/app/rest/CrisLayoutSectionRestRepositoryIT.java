@@ -77,13 +77,10 @@ public class CrisLayoutSectionRestRepositoryIT extends AbstractControllerIntegra
                                                                                                  "person")))))
 
             .andExpect(jsonPath("$._embedded.sections",
-              hasItem(withIdAndTopComponent("site", 2, 0, "col-md-4", "researchoutputs", "metric.view",
+              hasItem(withIdAndTopComponent("site", 2, 0, "col-md-6", "homePageTopItems", "dc.date.accessioned",
                                             "desc"))))
             .andExpect(jsonPath("$._embedded.sections",
-              hasItem(withIdAndTopComponent("site", 2, 1, "col-md-4", "researchoutputs", "metric.download",
-                                            "desc"))))
-            .andExpect(jsonPath("$._embedded.sections",
-              hasItem(withIdAndTopComponent("site", 2, 2, "col-md-4", "researchoutputs", "metric.scopus.citation",
+              hasItem(withIdAndTopComponent("site", 2, 1, "col-md-6", "homePageTopItems", "metric.view",
                                             "desc"))))
             ;
     }
