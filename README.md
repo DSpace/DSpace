@@ -1,10 +1,10 @@
 
-# DSpace
+# DSpace-CRIS
 
 [![Build Status](https://github.com/4Science/DSpace/workflows/Build/badge.svg)](https://github.com/4Science/DSpace/actions?query=workflow%3ABuild)
 
-[DSpace Documentation](https://wiki.lyrasis.org/display/DSPACECRIS/Technical+and+User+documentation) |
-[DSpace Wiki](https://wiki.duraspace.org/display/DSPACECRIS/DSpace-CRIS+Home) |
+[DSpace-CRIS Documentation](https://wiki.lyrasis.org/display/DSPACECRIS/Technical+and+User+documentation) |
+[DSpace-CRIS Wiki](https://wiki.duraspace.org/display/DSPACECRIS/DSpace-CRIS+Home) |
 [Support](https://wiki.lyrasis.org/display/DSPACE/Support)
 
 DSpace-CRIS is an open source extension of DSpace (http://www.dspace.org) providing out of box support for the CRIS / RIMS and moder Institution Repository use cases with advanced features and optimized configurations
@@ -17,37 +17,27 @@ For more information, visit https://wiki.duraspace.org/display/DSPACECRIS/DSpace
 
 ## Downloads
 
-The latest release of DSpace can be downloaded from the [DSpace website](http://www.dspace.org/latest-release/) or from [GitHub](https://github.com/DSpace/DSpace/releases).
+The latest release of DSpace-CRIS can be downloaded from the [DSpace-CRIS Wiki](https://wiki.duraspace.org/display/DSPACECRIS/DSpace-CRIS+Home) or from [GitHub](https://github.com/4Science/DSpace/releases).
 
-Past releases are all available via GitHub at https://github.com/DSpace/DSpace/releases
+Past releases and future releases are documented in the [RoadMap page](https://wiki.lyrasis.org/display/DSPACECRIS/Product+RoadMap)
 
 ## Documentation / Installation
 
-Documentation for each release may be viewed online or downloaded via our [Documentation Wiki](https://wiki.lyrasis.org/display/DSDOC/).
+Documentation is available on our [Documentation Wiki](https://wiki.lyrasis.org/display/DSPACECRIS/Technical+and+User+documentation) please check also the documentation from the parent DSpace project as basic features and principle are common and only described in the [DSpace documentation](https://wiki.lyrasis.org/display/DSDOC/).
 
 The latest DSpace Installation instructions are available at:
 https://wiki.lyrasis.org/display/DSDOC7x/Installing+DSpace
 
-Please be aware that, as a Java web application, DSpace-CRIS requires a database (PostgreSQL or Oracle)
-and a servlet container (usually Tomcat) in order to function.
+some extra step to initialize te DSpace-CRIS with proper default can be found in our documentation (see above)
+
+Please be aware that, as a Java web application, DSpace-CRIS requires a database (PostgreSQL or Oracle), a servlet container (usually Tomcat) and a SOLR instance in order to function.
+
 More information about these and all other prerequisites can be found in the Installation instructions above.
 
-## Contributing
-
-DSpace is a community built and supported project. We do not have a centralized development or support team,
-but have a dedicated group of volunteers who help us improve the software, documentation, resources, etc.
-
-We welcome contributions of any type. Here's a few basic guides that provide suggestions for contributing to DSpace:
-* [How to Contribute to DSpace](https://wiki.lyrasis.org/display/DSPACE/How+to+Contribute+to+DSpace): How to contribute in general (via code, documentation, bug reports, expertise, etc)
-* [Code Contribution Guidelines](https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines): How to give back code or contribute features, bug fixes, etc.
-* [DSpace Community Advisory Team (DCAT)](https://wiki.lyrasis.org/display/cmtygp/DSpace+Community+Advisory+Team): If you are not a developer, we also have an interest group specifically for repository managers. The DCAT group meets virtually, once a month, and sends open invitations to join their meetings via the [DCAT mailing list](https://groups.google.com/d/forum/DSpaceCommunityAdvisoryTeam).
-
-We also encourage GitHub Pull Requests (PRs) at any time. Please see our [Development with Git](https://wiki.lyrasis.org/display/DSPACE/Development+with+Git) guide for more info.
-
-In addition, a listing of all known contributors to DSpace software can be
-found online at: https://wiki.lyrasis.org/display/DSPACE/DSpaceContributors
-
 ## Getting Help
+DSpace-CRIS has a [dedicated slack channel](https://dspace-org.slack.com/messages/dspace-cris/) in the DSpace.org workspace.
+
+Support can be received also via the DSpace support channels
 
 DSpace provides public mailing lists where you can post questions or raise topics for discussion.
 We welcome everyone to participate in these lists:
@@ -66,7 +56,7 @@ install, upgrade, customize or host DSpace, then we recommend getting in touch w
 
 ## Issue Tracker
 
-DSpace uses GitHub to track issues:
+DSpace-CRIS uses GitHub to track public reported issues:
 * Backend (REST API) issues: https://github.com/4Science/DSpace/issues
 * Frontend (User Interface) issues: https://github.com/4Science/dspace-angular/issues
 
