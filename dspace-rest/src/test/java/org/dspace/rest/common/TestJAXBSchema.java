@@ -63,7 +63,7 @@ public class TestJAXBSchema {
 
         // System.err.println(writer.toString());
 
-        assertEquals("JAXB schema", expected, writer.toString());
+        assertEquals("JAXB schema", expected.replaceAll("\\r\\n|\\r|\\n", System.getProperty("line.separator")).trim(), writer.toString().replaceAll("\\r\\n|\\r|\\n", System.getProperty("line.separator")).trim());
     }
 
 }
