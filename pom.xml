@@ -914,9 +914,9 @@
                         <extensions>true</extensions>
                         <configuration>
                             <!-- In your settings.xml, your username/password
-                                 MUST be specified for server 'ossrh' -->
-                            <serverId>ossrh</serverId>
-                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                                 MUST be specified for server '4science-nexus' -->
+                            <serverId>4science-nexus</serverId>
+                            <nexusUrl>https://nexus.4science.it/</nexusUrl>
                             <!-- Require manual verification / release to Maven Central -->
                             <autoReleaseAfterClose>false</autoReleaseAfterClose>
                         </configuration>
