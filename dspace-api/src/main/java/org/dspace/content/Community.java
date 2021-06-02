@@ -804,7 +804,8 @@ public class Community extends DSpaceObject
                 ourContext,"community",
                 "SELECT community.* FROM community, community2community WHERE " +
                 "community2community.parent_comm_id=community.community_id " +
-                "AND community2community.child_comm_id= ? ",
+                "AND community2community.child_comm_id= ? " +
+                "ORDER BY community2community.id ASC",
                 getID());
         
         // Make Community object
