@@ -6354,7 +6354,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                    MetadataMatcher.matchMetadata("oairecerif.acronym", "OpenAIRE-Advance"),
                                    MetadataMatcher.matchMetadata("oairecerif.funding.startDate", "2018-01-01"),
                                    MetadataMatcher.matchMetadata("oairecerif.funding.endDate", "2021-02-28"),
-                                   MetadataMatcher.matchMetadata("oairecerif.funding.oamandate", "true"),
+                                   MetadataMatcher.matchMetadata("oairecerif.oamandate", "true"),
                                    MetadataMatcher.matchMetadata("oairecerif.fundingParent", "H2020-EINFRA-2017"),
                                    MetadataMatcher.matchMetadataStringStartsWith("dc.description",
                                            "OpenAIRE-Advance continues the mission of OpenAIRE to support"),

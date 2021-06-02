@@ -44,11 +44,10 @@ public class ExternalSourcesByEntityTypesIT extends AbstractControllerIntegratio
                                 ExternalSourceMatcher.matchExternalSource("mock3", "mock3", false),
                                 ExternalSourceMatcher.matchExternalSource("pubmed", "pubmed", false),
                                 ExternalSourceMatcher.matchExternalSource("suggestion", "suggestion", false),
-                                ExternalSourceMatcher.matchExternalSource("openaire", "openaire", false),
                                 ExternalSourceMatcher.matchExternalSource("crossref", "crossref", false),
                                 ExternalSourceMatcher.matchExternalSource("orcidWorks", "orcidWorks", false)
                                 )))
-                            .andExpect(jsonPath("$.page.totalElements", Matchers.is(8)));
+                            .andExpect(jsonPath("$.page.totalElements", Matchers.is(7)));
         // mock and ORCID are configured without any entity type
         getClient()
                 .perform(get("/api/integration/externalsources/search/findByEntityType").param("entityType", "Funding"))
@@ -57,7 +56,7 @@ public class ExternalSourcesByEntityTypesIT extends AbstractControllerIntegratio
                 ExternalSourceMatcher.matchExternalSource("mock", "mock", false),
                 ExternalSourceMatcher.matchExternalSource("pubmed", "pubmed", false),
                 ExternalSourceMatcher.matchExternalSource("suggestion", "suggestion", false),
-                ExternalSourceMatcher.matchExternalSource("openaire", "openaire", false)
+                ExternalSourceMatcher.matchExternalSource("openaireProject", "openaireProject", false)
             )))
             .andExpect(jsonPath("$.page.totalElements", Matchers.is(4)));
     }
@@ -72,7 +71,7 @@ public class ExternalSourcesByEntityTypesIT extends AbstractControllerIntegratio
                                 ExternalSourceMatcher.matchExternalSource("mock3", "mock3", false),
                                 ExternalSourceMatcher.matchExternalSource("pubmed", "pubmed", false)
                             )))
-                            .andExpect(jsonPath("$.page.totalElements", Matchers.is(8)));
+                            .andExpect(jsonPath("$.page.totalElements", Matchers.is(7)));
     }
     @Test
     public void findAllByAuthorizedExternalSource() throws Exception {
@@ -80,6 +79,7 @@ public class ExternalSourcesByEntityTypesIT extends AbstractControllerIntegratio
         EntityType publicationType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         EntityType orgUnitType = EntityTypeBuilder.createEntityTypeBuilder(context, "OrgUnit").build();
         EntityType projectType = EntityTypeBuilder.createEntityTypeBuilder(context, "Project").build();
+        EntityType fundingType = EntityTypeBuilder.createEntityTypeBuilder(context, "Funding").build();
         // ** GIVEN **
         // 1. A community-collection structure with one parent community with
         // sub-community and one collection.
@@ -90,6 +90,8 @@ public class ExternalSourcesByEntityTypesIT extends AbstractControllerIntegratio
                 .withEntityType("Publication").withSubmitterGroup(eperson).withName("Collection 2").build();
         Collection col3 = CollectionBuilder.createCollection(context, parentCommunity).withEntityType("Project")
                 .withSubmitterGroup(eperson).withName("Collection 3").build();
+        Collection col4 = CollectionBuilder.createCollection(context, parentCommunity).withEntityType("Funding")
+                .withSubmitterGroup(eperson).withName("Collection 4").build();
 
         context.restoreAuthSystemState();
 
@@ -99,8 +101,9 @@ public class ExternalSourcesByEntityTypesIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$._embedded.entitytypes",
                         containsInAnyOrder(
                                 EntityTypeMatcher.matchEntityTypeEntry(publicationType),
+                                EntityTypeMatcher.matchEntityTypeEntry(fundingType),
                                 EntityTypeMatcher.matchEntityTypeEntry(projectType))))
-                .andExpect(jsonPath("$.page.totalElements", Matchers.is(2)));
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
 
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(get("/api/core/entitytypes/search/findAllByAuthorizedExternalSource"))
@@ -108,21 +111,20 @@ public class ExternalSourcesByEntityTypesIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$._embedded.entitytypes",
                         containsInAnyOrder(
                                 EntityTypeMatcher.matchEntityTypeEntry(orgUnitType),
+                                EntityTypeMatcher.matchEntityTypeEntry(fundingType),
                                 EntityTypeMatcher.matchEntityTypeEntry(projectType),
                                 EntityTypeMatcher.matchEntityTypeEntry(publicationType))))
-                .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(4)));
         getClient(adminToken)
                 .perform(get("/api/core/entitytypes/search/findAllByAuthorizedExternalSource").param("size", "1")
                         .param("page", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.entitytypes", Matchers.hasSize(1)))
-                .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
-        // temporary alter the mock, orcid, suggestion and openaire data providers to restrict them to Publication
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(4)));
+        // temporary alter the mock, orcid, suggestion data providers to restrict them to Publication
         try {
             ((AbstractExternalDataProvider) externalDataService.getExternalDataProvider("mock"))
                     .setSupportedEntityTypes(Arrays.asList("Publication"));
-            ((AbstractExternalDataProvider) externalDataService.getExternalDataProvider("openaire"))
-                .setSupportedEntityTypes(Arrays.asList("Publication"));
             ((AbstractExternalDataProvider) externalDataService.getExternalDataProvider("suggestion"))
                     .setSupportedEntityTypes(Arrays.asList("Publication"));
             ((AbstractExternalDataProvider) externalDataService.getExternalDataProvider("pubmed"))
@@ -131,23 +133,25 @@ public class ExternalSourcesByEntityTypesIT extends AbstractControllerIntegratio
             getClient(token).perform(get("/api/core/entitytypes/search/findAllByAuthorizedExternalSource"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$._embedded.entitytypes",
-                            containsInAnyOrder(EntityTypeMatcher.matchEntityTypeEntry(publicationType))))
-                    .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+                            containsInAnyOrder(
+                                    EntityTypeMatcher.matchEntityTypeEntry(publicationType),
+                                    EntityTypeMatcher.matchEntityTypeEntry(fundingType))))
+                    .andExpect(jsonPath("$.page.totalElements", Matchers.is(2)));
 
             getClient(adminToken).perform(get("/api/core/entitytypes/search/findAllByAuthorizedExternalSource"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$._embedded.entitytypes",
-                            containsInAnyOrder(EntityTypeMatcher.matchEntityTypeEntry(orgUnitType),
+                            containsInAnyOrder(
+                                    EntityTypeMatcher.matchEntityTypeEntry(orgUnitType),
+                                    EntityTypeMatcher.matchEntityTypeEntry(fundingType),
                                     EntityTypeMatcher.matchEntityTypeEntry(publicationType))))
-                    .andExpect(jsonPath("$.page.totalElements", Matchers.is(2)));
+                    .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
 
         } finally {
             ((AbstractExternalDataProvider) externalDataService.getExternalDataProvider("mock"))
                     .setSupportedEntityTypes(null);
             ((AbstractExternalDataProvider) externalDataService.getExternalDataProvider("suggestion"))
                     .setSupportedEntityTypes(null);
-            ((AbstractExternalDataProvider) externalDataService.getExternalDataProvider("openaire"))
-                .setSupportedEntityTypes(null);
             ((AbstractExternalDataProvider) externalDataService.getExternalDataProvider("pubmed"))
                 .setSupportedEntityTypes(null);
         }

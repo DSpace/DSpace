@@ -136,6 +136,11 @@
         <property name="metadataSource" ref="OpenAIREService"/>
         <property name="sourceIdentifier" value="openaireProject"/>
         <property name="recordIdMetadata" value="oairecerif.funding.identifier"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Funding</value>
+            </list>
+        </property>
     </bean>
 
     <bean id="crossRefLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
