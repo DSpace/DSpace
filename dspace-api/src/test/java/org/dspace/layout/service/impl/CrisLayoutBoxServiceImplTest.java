@@ -31,7 +31,6 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
 import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.CrisLayoutField;
 import org.dspace.layout.CrisLayoutMetric2Box;
@@ -268,8 +267,6 @@ public class CrisLayoutBoxServiceImplTest {
     @Test
     public void hasMetricsBoxContent() {
 
-        when(context.getCurrentUser()).thenReturn((EPerson)mock(EPerson.class));
-
         // should return false when the box has no metrics associated
         CrisLayoutBox boxWithoutMetrics = crisLayoutMetricBox();
         assertFalse(crisLayoutBoxService.hasMetricsBoxContent(context, boxWithoutMetrics, null));
@@ -294,18 +291,6 @@ public class CrisLayoutBoxServiceImplTest {
         mockStoredCrisMetrics("metric2");
         mockEmbeddableCrisMetrics();
         assertFalse(crisLayoutBoxService.hasMetricsBoxContent(context, boxMetric1, null));
-
-    }
-
-    @Test
-    public void hasMetricsBoxContentNotAuthenticated() {
-
-        when(context.getCurrentUser()).thenReturn(null);
-
-        // should return false if the context has not an authenticated user
-        CrisLayoutBox boxWithoutMetrics = crisLayoutMetricBox();
-        assertFalse(crisLayoutBoxService.hasMetricsBoxContent(context, boxWithoutMetrics, null));
-
 
     }
 
