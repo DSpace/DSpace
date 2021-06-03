@@ -25,6 +25,7 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.security.BitstreamMetadataReadPermissionEvaluatorPlugin;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
@@ -37,7 +38,6 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,6 +76,9 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
 
     @Autowired
     private HandleService handleService;
+
+    @Autowired
+    private BitstreamMetadataReadPermissionEvaluatorPlugin bitstreamMetadataReadPermissionEvaluatorPlugin;
 
     @Autowired
     public BitstreamRestRepository(BitstreamService dsoService) {
@@ -165,7 +168,7 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
     @SearchRestMethod(name = "byItemHandle")
     public BitstreamRest findByItemHandle(@Parameter(value = "handle", required = true) String handle,
                                           @Parameter(value = "sequence") Integer sequence,
-                                          @Parameter(value = "filename") String filename) throws AuthorizeException {
+                                          @Parameter(value = "filename") String filename) {
         if (StringUtils.isBlank(filename) && sequence == null) {
             throw new IllegalArgumentException("The request should include a sequence or a filename");
         }
@@ -186,11 +189,12 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
             }
 
             for (Bitstream bitstream : matchedBitstreams) {
-                if (isAuthorizedBitstream(context, bitstream)) {
+                if (bitstreamMetadataReadPermissionEvaluatorPlugin
+                    .metadataReadPermissionOnBitstream(context, bitstream)) {
                     return converter.toRest(bitstream, utils.obtainProjection());
                 }
             }
-            throw new RESTAuthorizationException("Current user cannot access the bistream.");
+            throw new RESTAuthorizationException("Current user cannot access the bitstream.");
 
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -221,28 +225,6 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
         return matchingBitstreams;
     }
 
-    private boolean isAuthorizedBitstream(Context context, Bitstream bitstream) throws SQLException {
-        if (authorizeService.isAdmin(context, bitstream)) {
-            // Is Admin on bitstream
-            return true;
-        }
-        if (authorizeService.authorizeActionBoolean(context, bitstream, Constants.READ)) {
-            // Has READ rights on bitstream
-            return true;
-        }
-        DSpaceObject bitstreamParentObject = bitstreamService.getParentObject(context, (Bitstream) bitstream);
-        if (bitstreamParentObject instanceof Item && !((Bitstream) bitstream).getBundles().isEmpty()) {
-            // If parent is item and it is in a bundle
-            Bundle firstBundle = bitstream.getBundles().get(0);
-            if (authorizeService.authorizeActionBoolean(context, bitstreamParentObject, Constants.READ)
-                    && authorizeService.authorizeActionBoolean(context, firstBundle, Constants.READ)) {
-                // Has READ rights on bitstream's parent item AND first bundle bitstream is in
-                return true;
-            }
-        }
-        return false;
-    }
-
     public InputStream retrieve(UUID uuid) {
         Context context = obtainContext();
         Bitstream bit = null;
@@ -265,7 +247,7 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
     }
 
     /**
-     * Method that will move the bitsream corresponding to the uuid to the target bundle
+     * Method that will move the bitstream corresponding to the uuid to the target bundle
      *
      * @param context      The context
      * @param bitstream    The bitstream to be moved

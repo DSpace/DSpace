@@ -2061,20 +2061,19 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                       .withAuthor("Smith, Donald")
                                       .build();
 
-        Bundle license = BundleBuilder.createBundle(context, publicItem1)
-                                      .withName("LICENSE")
-                                      .build();
-
-        String bitstreamContent = "This is an archived bitstream";
+        String bitstreamContent = "Embargoed bitstream";
         Bitstream bitstream1 = null;
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
-            bitstream1 = BitstreamBuilder.
-                                                 createBitstream(context, license, is)
-                                         .withName("BitstreamName")
-                                         .withMimeType("text/plain")
-                                         .build();
+            bitstream1 = BitstreamBuilder
+                .createBitstream(context, publicItem1, is)
+                .withName("Test Embargoed Bitstream")
+                .withDescription("This bitstream is embargoed")
+                .withMimeType("text/plain")
+                .withEmbargoPeriod("3 months")
+                .build();
         }
 
+        // Embargo on bitstream, but item is public, so has read_metadata access on bitstream
         getClient().perform(get("/api/core/bitstreams/search/byItemHandle")
                                               .param("handle", publicItem1.getHandle())
                                               .param("sequence", String.valueOf(bitstream1.getSequenceID()))
