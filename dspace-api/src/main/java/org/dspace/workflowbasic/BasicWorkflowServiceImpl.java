@@ -958,38 +958,40 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
     public void notifyOfCuration(Context c, BasicWorkflowItem wi, List<EPerson> ePeople,
            String taskName, String action, String message) throws SQLException, IOException
     {
-        try
+
+        // Get the item title
+        String title = getItemTitle(wi);
+
+        // Get the submitter's name
+        String submitter = getSubmitterName(wi);
+
+        // Get the collection
+        Collection coll = wi.getCollection();
+
+        for (EPerson epa : ePeople)
         {
-            // Get the item title
-            String title = getItemTitle(wi);
+            Locale supportedLocale = I18nUtil.getEPersonLocale(epa);
+            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale,
+                                                                              "flowtask_notify"));
+            email.addArgument(title);
+            email.addArgument(coll.getName());
+            email.addArgument(submitter);
+            email.addArgument(taskName);
+            email.addArgument(message);
+            email.addArgument(action);
+            email.addRecipient(epa.getEmail());
 
-            // Get the submitter's name
-            String submitter = getSubmitterName(wi);
-
-            // Get the collection
-            Collection coll = wi.getCollection();
-
-            for (EPerson epa : ePeople)
-            {
-                Locale supportedLocale = I18nUtil.getEPersonLocale(epa);
-                Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale,
-                                                                                  "flowtask_notify"));
-                email.addArgument(title);
-                email.addArgument(coll.getName());
-                email.addArgument(submitter);
-                email.addArgument(taskName);
-                email.addArgument(message);
-                email.addArgument(action);
-                email.addRecipient(epa.getEmail());
+            try {
                 email.send();
             }
-        }
-        catch (MessagingException e)
-        {
-            log.warn(LogManager.getHeader(c, "notifyOfCuration",
-                    "cannot email users of workflow_item_id " + wi.getID()
+            catch (MessagingException e) {
+                    log.warn(LogManager.getHeader(c, "notifyOfCuration",
+                    "cannot email user=" + epa.getID()
+                            + " of workflow_item_id " + wi.getID()
                             + ":  " + e.getMessage()));
+            }
         }
+
     }
 
     protected void notifyGroupOfTask(Context c, BasicWorkflowItem wi,
@@ -1007,60 +1009,64 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
         }
         else
         {
-            try
+
+            // Get the item title
+            String title = getItemTitle(wi);
+
+            // Get the submitter's name
+            String submitter = getSubmitterName(wi);
+
+            // Get the collection
+            Collection coll = wi.getCollection();
+
+            String message = "";
+
+            for (EPerson anEpa : epa)
             {
-                // Get the item title
-                String title = getItemTitle(wi);
+                Locale supportedLocale = I18nUtil.getEPersonLocale(anEpa);
+                Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_task"));
+                email.addArgument(title);
+                email.addArgument(coll.getName());
+                email.addArgument(submitter);
 
-                // Get the submitter's name
-                String submitter = getSubmitterName(wi);
-
-                // Get the collection
-                Collection coll = wi.getCollection();
-
-                String message = "";
-
-                for (EPerson anEpa : epa)
+                ResourceBundle messages = ResourceBundle.getBundle("Messages", supportedLocale);
+                switch (wi.getState())
                 {
-                    Locale supportedLocale = I18nUtil.getEPersonLocale(anEpa);
-                    Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_task"));
-                    email.addArgument(title);
-                    email.addArgument(coll.getName());
-                    email.addArgument(submitter);
+                    case WFSTATE_STEP1POOL:
+                        message = messages.getString("org.dspace.workflow.WorkflowManager.step1");
 
-                    ResourceBundle messages = ResourceBundle.getBundle("Messages", supportedLocale);
-                    switch (wi.getState())
-                    {
-                        case WFSTATE_STEP1POOL:
-                            message = messages.getString("org.dspace.workflow.WorkflowManager.step1");
+                        break;
 
-                            break;
+                    case WFSTATE_STEP2POOL:
+                        message = messages.getString("org.dspace.workflow.WorkflowManager.step2");
 
-                        case WFSTATE_STEP2POOL:
-                            message = messages.getString("org.dspace.workflow.WorkflowManager.step2");
+                        break;
 
-                            break;
+                    case WFSTATE_STEP3POOL:
+                        message = messages.getString("org.dspace.workflow.WorkflowManager.step3");
 
-                        case WFSTATE_STEP3POOL:
-                            message = messages.getString("org.dspace.workflow.WorkflowManager.step3");
+                        break;
+                }
+                email.addArgument(message);
+                email.addArgument(getMyDSpaceLink());
+                email.addRecipient(anEpa.getEmail());
 
-                            break;
-                    }
-                    email.addArgument(message);
-                    email.addArgument(getMyDSpaceLink());
-                    email.addRecipient(anEpa.getEmail());
+                try
+                {
                     email.send();
                 }
+                catch (MessagingException e)
+                {
+                    String gid = (mygroup != null) ?
+                            String.valueOf(mygroup.getID()) : "none";
+                    log.warn(LogManager.getHeader(c, "notifyGroupofTask",
+                            "cannot email user=" + anEpa.getID()
+                                    + " in group_id=" + gid
+                                    + " workflow_item_id=" + wi.getID()
+                                    + ":  " + e.getMessage()));
+                }
             }
-            catch (MessagingException e)
-            {
-                String gid = (mygroup != null) ?
-                             String.valueOf(mygroup.getID()) : "none";
-                log.warn(LogManager.getHeader(c, "notifyGroupofTask",
-                        "cannot email user group_id=" + gid
-                                + " workflow_item_id=" + wi.getID()
-                                + ":  " + e.getMessage()));
-            }
+
         }
     }
 
