@@ -23,6 +23,11 @@
  * is configured with lists of {@code Group}s and {@code EPerson}s who will be
  * notified, when the item has entered the step, that there is a review task
  * awaiting them.
+ *
+ * <p>When a WorkflowItem enters a Step, it can be acted on first by one or more
+ * configured {@link org.dspace.curate.CurationTask Curation Task}s.  See
+ * {@link org.dspace.curate.service.XmlWorkflowCuratorService the workflow
+ * curation service}.
  */
 
 package org.dspace.xmlworkflow;

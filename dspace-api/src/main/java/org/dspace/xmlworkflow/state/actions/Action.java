@@ -87,10 +87,18 @@ public abstract class Action {
         return false;
     }
 
+    /**
+     * Get the configuration of this Action.
+     * @return details of this instance of an Action.
+     */
     public WorkflowActionConfig getParent() {
         return parent;
     }
 
+    /**
+     * Configure this Action.
+     * @param parent details of this instance of an Action.
+     */
     public void setParent(WorkflowActionConfig parent) {
         this.parent = parent;
     }
@@ -126,7 +134,7 @@ public abstract class Action {
      * @throws SQLException passed through.
      * @throws AuthorizeException passed through.
      * @throws IOException passed through.
-     * @throws WorkflowConfigurationException if the workflow is mis-configured. 
+     * @throws WorkflowConfigurationException if the workflow is mis-configured.
      */
     public abstract boolean isAuthorized(Context context, HttpServletRequest request, XmlWorkflowItem wfi)
         throws SQLException, AuthorizeException, IOException, WorkflowConfigurationException;

@@ -1,4 +1,11 @@
 /**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+/**
  * A workflow contains a sequence of steps.
  * A {@link org.dspace.workflow.WorkflowItem WorkflowItem} advances through the
  * sequence until it is either rejected or accepted.
