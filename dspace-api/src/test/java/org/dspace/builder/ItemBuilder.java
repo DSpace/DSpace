@@ -703,6 +703,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "crisevent", "partnerpj", null, partner);
     }
 
+    public ItemBuilder withDateAccepted(String dateAccepted) {
+        return addMetadataValue(item, "dcterms", "dateAccepted", null, dateAccepted);
+    }
+
     public ItemBuilder withHandle(String handle) {
         this.handle = handle;
         return this;

@@ -9,8 +9,6 @@
 	   </Inventors>
 	   <Holders>
 	   </Holders>
-	   <Predecessor>
-	   </Predecessor>
 	</Patent>
 	<Patent xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
 	   <Type xmlns="https://www.openaire.eu/cerif-profile/vocab/COAR_Patent_Types">http://purl.org/coar/resource_type/c_15cd</Type>
@@ -31,8 +29,6 @@
 	   </Inventors>
 	   <Holders>
 	   </Holders>
-	   <Predecessor>
-	      <Patent> <Title>Another patent</Title> </Patent>
-	   </Predecessor>
+	   <Predecessor> <Patent> <Title>Another patent</Title> </Patent> </Predecessor>
 	</Patent>
 </Patents>

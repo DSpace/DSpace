@@ -1585,6 +1585,86 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    public void testPatentJsonDisseminate() throws Exception {
+
+        Item patent = ItemBuilder.createItem(context, collection)
+            .withEntityType("Patent")
+            .withTitle("Test patent")
+            .withDateAccepted("2020-01-01")
+            .withIssueDate("2021-01-01")
+            .withLanguage("en")
+            .withType("patent")
+            .withPublisher("First publisher")
+            .withPublisher("Second publisher")
+            .withPatentNo("12345-666")
+            .withAuthor("Walter White", "b6ff8101-05ec-49c5-bd12-cba7894012b7")
+            .withAuthorAffiliation("4Science")
+            .withAuthor("Jesse Pinkman")
+            .withAuthorAffiliation(PLACEHOLDER_PARENT_METADATA_VALUE)
+            .withAuthor("John Smith", "will be referenced::ORCID::0000-0000-0012-3456")
+            .withAuthorAffiliation("4Science")
+            .withRightsHolder("Test Organization")
+            .withDescriptionAbstract("This is a patent")
+            .withRelationPatent("Another patent")
+            .withSubject("patent")
+            .withSubject("test")
+            .withRelationFunding("Test funding")
+            .withRelationProject("First project")
+            .withRelationProject("Second project")
+            .build();
+
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("patent-json");
+        assertThat(referCrossWalk, notNullValue());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        referCrossWalk.disseminate(context, patent, out);
+
+        try (FileInputStream fis = getFileInputStream("patent.json")) {
+            String expectedContent = IOUtils.toString(fis, Charset.defaultCharset());
+            compareEachLine(out.toString(), expectedContent);
+        }
+
+    }
+
+    @Test
+    public void testManyPatentsJsonDisseminate() throws Exception {
+
+        Item firstPatent = ItemBuilder.createItem(context, collection)
+            .withEntityType("Patent")
+            .withTitle("Test patent")
+            .withIssueDate("2021-01-01")
+            .withPublisher("Publisher")
+            .withPatentNo("12345-666")
+            .withSubject("subject")
+            .withRelationProject("Project")
+            .build();
+
+        Item secondPatent = ItemBuilder.createItem(context, collection)
+            .withEntityType("Patent")
+            .withTitle("Second patent")
+            .withIssueDate("2011-01-01")
+            .withPublisher("First publisher")
+            .withPublisher("Second publisher")
+            .withPatentNo("12345-777")
+            .withAuthor("Walter White")
+            .withAuthorAffiliation("4Science")
+            .withRelationPatent("Another patent")
+            .build();
+
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("patent-json");
+        assertThat(referCrossWalk, notNullValue());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        referCrossWalk.disseminate(context, Arrays.asList(firstPatent, secondPatent).iterator(), out);
+
+        try (FileInputStream fis = getFileInputStream("patents.json")) {
+            String expectedContent = IOUtils.toString(fis, Charset.defaultCharset());
+            compareEachLine(out.toString(), expectedContent);
+        }
+
+    }
+
+    @Test
     public void testDataSetCerifXmlDisseminate() throws Exception {
 
         Item project = ItemBuilder.createItem(context, collection)
@@ -1762,7 +1842,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             resultLines.length, equalTo(expectedResultLines.length));
 
         for (int i = 0; i < resultLines.length; i++) {
-            assertThat(resultLines[i], equalTo(expectedResultLines[i]));
+            assertThat(removeTabs(resultLines[i]), equalTo(removeTabs(expectedResultLines[i])));
         }
     }
 
@@ -1771,6 +1851,10 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         String result = String.join("\n", resultLines);
         String expectedResult = String.join("\n", expectedResultLines);
         return message + "\nExpected:\n" + expectedResult + "\nActual:\n" + result;
+    }
+
+    private String removeTabs(String string) {
+        return string != null ? string.replace("\t", "").trim() : null;
     }
 
     private FileInputStream getFileInputStream(String name) throws FileNotFoundException {

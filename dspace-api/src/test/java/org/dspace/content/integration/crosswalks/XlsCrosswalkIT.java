@@ -599,6 +599,94 @@ public class XlsCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             "EUR", "", "", "", "2010-01-01", "false", "www.mandate.com"));
     }
 
+    @Test
+    public void testDisseminatePatents() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item firstItem = ItemBuilder.createItem(context, collection)
+            .withEntityType("Patent")
+            .withTitle("First patent")
+            .withDateAccepted("2020-01-01")
+            .withIssueDate("2021-01-01")
+            .withLanguage("en")
+            .withType("patent")
+            .withPublisher("First publisher")
+            .withPublisher("Second publisher")
+            .withPatentNo("12345-666")
+            .withAuthor("Walter White", "b6ff8101-05ec-49c5-bd12-cba7894012b7")
+            .withAuthorAffiliation("4Science")
+            .withAuthor("Jesse Pinkman")
+            .withAuthorAffiliation(PLACEHOLDER_PARENT_METADATA_VALUE)
+            .withAuthor("John Smith", "will be referenced::ORCID::0000-0000-0012-3456")
+            .withAuthorAffiliation("4Science")
+            .withRightsHolder("Test Organization")
+            .withDescriptionAbstract("This is a patent")
+            .withRelationPatent("Another patent")
+            .withSubject("patent")
+            .withSubject("test")
+            .withRelationFunding("Test funding")
+            .withRelationProject("First project")
+            .withRelationProject("Second project")
+            .build();
+
+        Item secondItem = ItemBuilder.createItem(context, collection)
+            .withEntityType("Patent")
+            .withTitle("Second patent")
+            .withType("patent")
+            .withPatentNo("12345-777")
+            .withAuthor("Bruce Wayne")
+            .withRelationPatent("Another patent")
+            .withSubject("second")
+            .withRelationFunding("Funding")
+            .build();
+
+        Item thirdItem = ItemBuilder.createItem(context, collection)
+            .withEntityType("Patent")
+            .withTitle("Third patent")
+            .withDateAccepted("2019-01-01")
+            .withLanguage("ita")
+            .withPublisher("Publisher")
+            .withPatentNo("12345-888")
+            .withRightsHolder("Organization")
+            .withDescriptionAbstract("Patent description")
+            .withRelationPatent("Another patent")
+            .withRelationFunding("First funding")
+            .withRelationFunding("Second funding")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        xlsCrosswalk = (XlsCrosswalk) crosswalkMapper.getByType("patent-xls");
+        assertThat(xlsCrosswalk, notNullValue());
+        xlsCrosswalk.setDCInputsReader(dcInputsReader);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        xlsCrosswalk.disseminate(context, Arrays.asList(firstItem, secondItem, thirdItem).iterator(), baos);
+
+        Workbook workbook = WorkbookFactory.create(new ByteArrayInputStream(baos.toByteArray()));
+        assertThat(workbook.getNumberOfSheets(), equalTo(1));
+
+        Sheet sheet = workbook.getSheetAt(0);
+        assertThat(sheet.getPhysicalNumberOfRows(), equalTo(4));
+
+        assertThat(getRowValues(sheet.getRow(0)), contains("Title", "Approval date", "Registration date",
+            "Patent number", "Type", "Language", "Inventor(s)", "Holder(s)", "Issuer(s)", "Keyword(s)", "Funding(s)",
+            "Project(s)", "Predecessor(s)", "Reference(s)", "Abstract"));
+
+        assertThat(getRowValues(sheet.getRow(1)), contains("First patent", "2020-01-01", "2021-01-01", "12345-666",
+            "patent", "en", "Walter White/4Science||Jesse Pinkman||John Smith/4Science", "Test Organization",
+            "First publisher||Second publisher", "patent||test", "Test funding", "First project||Second project",
+            "Another patent", "", "This is a patent"));
+
+        assertThat(getRowValues(sheet.getRow(2)), contains("Second patent", "", "", "12345-777", "patent", "",
+            "Bruce Wayne", "", "", "second", "Funding", "", "Another patent", "", ""));
+
+        assertThat(getRowValues(sheet.getRow(3)), contains("Third patent", "2019-01-01", "", "12345-888", "", "ita", "",
+            "Organization", "Publisher", "", "First funding||Second funding", "", "Another patent", "",
+            "Patent description"));
+    }
+
     private Item createFullPersonItem() {
         Item item = createItem(context, collection)
             .withTitle("John Smith")

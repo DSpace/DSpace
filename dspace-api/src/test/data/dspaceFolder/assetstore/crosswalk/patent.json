@@ -1,0 +1,45 @@
+{
+	"title": "Test patent",
+	"approval-date": "2020-01-01",
+	"registration-date": "2021-01-01",
+	"patent-number": "12345-666",
+	"type": "patent",
+	"language": "en",
+	"inventors": [
+		{
+			"name": "Walter White",
+			"affiliation": "4Science"
+		},
+		{
+			"name": "Jesse Pinkman"
+		},
+		{
+			"name": "John Smith",
+			"affiliation": "4Science"
+		}
+	],
+	"holders": [
+		"Test Organization"
+	],
+	"issuers": [
+		"First publisher",
+		"Second publisher"
+	],
+	"keywords": [
+		"patent",
+		"test"
+	],
+	"fundings": [
+		"Test funding"
+	],
+	"projects": [
+		"First project",
+		"Second project"
+	],
+	"predecessors": [
+		"Another patent"
+	],
+	"references": [
+	],
+	"abstract": "This is a patent"
+}

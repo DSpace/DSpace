@@ -1,0 +1,56 @@
+{
+	"patents": [
+		{
+			"title": "Test patent",
+			"registration-date": "2021-01-01",
+			"patent-number": "12345-666",
+			"inventors": [
+			],
+			"holders": [
+			],
+			"issuers": [
+				"Publisher"
+			],
+			"keywords": [
+				"subject"
+			],
+			"fundings": [
+			],
+			"projects": [
+				"Project"
+			],
+			"predecessors": [
+			],
+			"references": [
+			]
+		},
+		{
+			"title": "Second patent",
+			"registration-date": "2011-01-01",
+			"patent-number": "12345-777",
+			"inventors": [
+				{
+					"name": "Walter White",
+					"affiliation": "4Science"
+				}
+			],
+			"holders": [
+			],
+			"issuers": [
+				"First publisher",
+				"Second publisher"
+			],
+			"keywords": [
+			],
+			"fundings": [
+			],
+			"projects": [
+			],
+			"predecessors": [
+				"Another patent"
+			],
+			"references": [
+			]
+		}
+	]
+}

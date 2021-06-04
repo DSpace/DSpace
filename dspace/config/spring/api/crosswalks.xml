@@ -54,6 +54,10 @@
 				<entry key="funding-xls" value-ref="xlsCrosswalkFunding"></entry>
 				
 				<entry key="patent-cerif-xml" value-ref="referCrosswalkPatentCerifXml"></entry>
+				<entry key="patent-json" value-ref="referCrosswalkPatentJson"></entry>
+				<entry key="patent-pdf" value-ref="pdfCrosswalkPatent"></entry>
+				<entry key="patent-csv" value-ref="csvCrosswalkPatent"></entry>
+				<entry key="patent-xls" value-ref="xlsCrosswalkPatent"></entry>
 				
 				<entry key="product-cerif-xml" value-ref="referCrosswalkDatasetCerifXml"></entry>
 				
@@ -247,6 +251,17 @@
 		<property name="converter" ref="xmlValueConverter" />
 	</bean>
 
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkPatentJson">
+		<property name="templateFileName" value="crosswalks/template/patent-json.template"/>
+		<property name="mimeType" value="application/json; charset=UTF-8"/>
+		<property name="fileName" value="patent.json"/>
+		<property name="entityType" value="Patent"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/patents-json.template"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+		<property name="converter" ref="jsonValueConverter" />
+		<property name="linesPostProcessor" ref="jsonPostProcessor" />
+	</bean>
+
 	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkDatasetCerifXml">
 		<property name="templateFileName" value="crosswalks/template/product-cerif-xml.template"/>
 		<property name="mimeType" value="application/xml; charset=UTF-8"/>
@@ -321,6 +336,14 @@
 		<property name="mimeType" value="application/pdf"/>
 		<property name="entityType" value="Funding"/>
 		<property name="referCrosswalk" ref="referCrosswalkFundingCerifXml"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.DocumentCrosswalk" id="pdfCrosswalkPatent">
+		<property name="templateFileName" value="crosswalks/template/patent-template.xsl"/>
+		<property name="fileName" value="patent.pdf"/>
+		<property name="mimeType" value="application/pdf"/>
+		<property name="entityType" value="Patent"/>
+		<property name="referCrosswalk" ref="referCrosswalkPatentCerifXml"/>
 	</bean>
 
 	<bean class="org.dspace.content.integration.crosswalks.CsvCrosswalk" id="csvCrosswalkPerson">
@@ -410,6 +433,21 @@
 		<property name="fileName" value="fundings.xls"/>
 		<property name="sheetName" value="Fundings"/>
 		<property name="entityType" value="Funding"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.CsvCrosswalk" id="csvCrosswalkPatent">
+		<property name="templateFileName" value="crosswalks/template/patent-table.template"/>
+		<property name="fileName" value="patents.csv"/>
+		<property name="entityType" value="Patent"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.XlsCrosswalk" id="xlsCrosswalkPatent">
+		<property name="templateFileName" value="crosswalks/template/patent-table.template"/>
+		<property name="fileName" value="patents.xls"/>
+		<property name="sheetName" value="Patents"/>
+		<property name="entityType" value="Patent"/>
 		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
 	</bean>
 

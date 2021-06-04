@@ -477,6 +477,77 @@ public class CsvCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         }
     }
 
+    @Test
+    public void testDisseminatePatents() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item firstItem = ItemBuilder.createItem(context, collection)
+            .withEntityType("Patent")
+            .withTitle("First patent")
+            .withDateAccepted("2020-01-01")
+            .withIssueDate("2021-01-01")
+            .withLanguage("en")
+            .withType("patent")
+            .withPublisher("First publisher")
+            .withPublisher("Second publisher")
+            .withPatentNo("12345-666")
+            .withAuthor("Walter White", "b6ff8101-05ec-49c5-bd12-cba7894012b7")
+            .withAuthorAffiliation("4Science")
+            .withAuthor("Jesse Pinkman")
+            .withAuthorAffiliation(PLACEHOLDER_PARENT_METADATA_VALUE)
+            .withAuthor("John Smith", "will be referenced::ORCID::0000-0000-0012-3456")
+            .withAuthorAffiliation("4Science")
+            .withRightsHolder("Test Organization")
+            .withDescriptionAbstract("This is a patent")
+            .withRelationPatent("Another patent")
+            .withSubject("patent")
+            .withSubject("test")
+            .withRelationFunding("Test funding")
+            .withRelationProject("First project")
+            .withRelationProject("Second project")
+            .build();
+
+        Item secondItem = ItemBuilder.createItem(context, collection)
+            .withEntityType("Patent")
+            .withTitle("second patent")
+            .withType("patent")
+            .withPatentNo("12345-777")
+            .withAuthor("Bruce Wayne")
+            .withRelationPatent("Another patent")
+            .withSubject("second")
+            .withRelationFunding("Funding")
+            .build();
+
+        Item thirdItem = ItemBuilder.createItem(context, collection)
+            .withEntityType("Patent")
+            .withTitle("Third patent")
+            .withDateAccepted("2019-01-01")
+            .withLanguage("ita")
+            .withPublisher("Publisher")
+            .withPatentNo("12345-888")
+            .withRightsHolder("Organization")
+            .withDescriptionAbstract("Patent description")
+            .withRelationPatent("Another patent")
+            .withRelationFunding("First funding")
+            .withRelationFunding("Second funding")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        csvCrosswalk = (CsvCrosswalk) crosswalkMapper.getByType("patent-csv");
+        assertThat(csvCrosswalk, notNullValue());
+        csvCrosswalk.setDCInputsReader(dcInputsReader);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        csvCrosswalk.disseminate(context, Arrays.asList(firstItem, secondItem, thirdItem).iterator(), out);
+
+        try (FileInputStream fis = getFileInputStream("patents.csv")) {
+            String expectedCsv = IOUtils.toString(fis, Charset.defaultCharset());
+            assertThat(out.toString(), equalTo(expectedCsv));
+        }
+    }
+
     private Item createFullPersonItem() {
         Item item = createItem(context, collection)
             .withTitle("John Smith")

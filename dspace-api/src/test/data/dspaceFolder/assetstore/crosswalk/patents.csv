@@ -1,0 +1,4 @@
+Title,Approval date,Registration date,Patent number,Type,Language,Inventor(s),Holder(s),Issuer(s),Keyword(s),Funding(s),Project(s),Predecessor(s),Reference(s),Abstract
+"First patent","2020-01-01","2021-01-01","12345-666","patent","en","Walter White/4Science||Jesse Pinkman||John Smith/4Science","Test Organization","First publisher||Second publisher","patent||test","Test funding","First project||Second project","Another patent","","This is a patent"
+"second patent","","","12345-777","patent","","Bruce Wayne","","","second","Funding","","Another patent","",""
+"Third patent","2019-01-01","","12345-888","","ita","","Organization","Publisher","","First funding||Second funding","","Another patent","","Patent description"

@@ -23,7 +23,5 @@
    </Holders>
    <Abstract>@dc.description.abstract@</Abstract>
    <Keyword>@dc.subject@</Keyword>
-   <Predecessor>
-      <Patent> <Title>@dc.relation.patent@</Title> </Patent>
-   </Predecessor>
+   <Predecessor> <Patent> <Title>@dc.relation.patent@</Title> </Patent> </Predecessor>
 </Patent>

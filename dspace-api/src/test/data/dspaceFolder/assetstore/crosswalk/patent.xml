@@ -35,7 +35,5 @@
       <Holder> <OrgUnit> <Name>Test Organization</Name> </OrgUnit> </Holder>
    </Holders>
    <Abstract>This is a patent</Abstract>
-   <Predecessor>
-      <Patent> <Title>Another patent</Title> </Patent>
-   </Predecessor>
+   <Predecessor> <Patent> <Title>Another patent</Title> </Patent> </Predecessor>
 </Patent>

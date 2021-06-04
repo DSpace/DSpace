@@ -1,0 +1,38 @@
+{
+	"title": "@dc.title@",
+	"approval-date": "@dcterms.dateAccepted@",
+	"registration-date": "@dc.date.issued@",
+	"patent-number": "@dc.identifier.patentno@",
+	"type": "@dc.type@",
+	"language": "@dc.language.iso@",
+	"inventors": [
+		@group.dc-contributor-author.start@
+		{
+			"name": "@dc.contributor.author@",
+			"affiliation": "@oairecerif.author.affiliation@"
+		},
+		@group.dc-contributor-author.end@
+	],
+	"holders": [
+		"@dcterms.rightsHolder@",
+	],
+	"issuers": [
+		"@dc.publisher@",
+	],
+	"keywords": [
+		"@dc.subject@",
+	],
+	"fundings": [
+		"@dc.relation.funding@",
+	],
+	"projects": [
+		"@dc.relation.project@",
+	],
+	"predecessors": [
+		"@dc.relation.patent@",
+	],
+	"references": [
+		"@dc.relation.reference@",
+	],
+	"abstract": "@dc.description.abstract@"
+}
