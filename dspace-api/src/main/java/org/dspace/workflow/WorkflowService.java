@@ -50,9 +50,9 @@ public interface WorkflowService<T extends WorkflowItem> {
         throws SQLException, AuthorizeException, IOException, WorkflowException;
 
     /**
-     * startWithoutNotify() starts the workflow normally, but disables
-     * notifications (useful for large imports,) for the first workflow step -
-     * subsequent notifications happen normally
+     * Start the workflow normally, but disable notifications for the first
+     * workflow step.  Subsequent notifications happen normally.  Useful for
+     * large imports.
      *
      * @param c   The relevant DSpace Context.
      * @param wsi workspace item

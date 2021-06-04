@@ -26,6 +26,14 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  */
 public interface ClaimedTaskDAO extends GenericDAO<ClaimedTask> {
 
+    /**
+     * Find all claimed tasks for a given workflow item.
+     *
+     * @param context current DSpace session.
+     * @param workflowItem the interesting workflow item.
+     * @return all claimed tasks for that item.
+     * @throws SQLException passed through.
+     */
     public List<ClaimedTask> findByWorkflowItem(Context context, XmlWorkflowItem workflowItem) throws SQLException;
 
     /**

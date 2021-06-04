@@ -1786,6 +1786,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
 
         //** GIVEN **
+
         // A submitter;
         EPerson submitter = EPersonBuilder.createEPerson(context)
                 .withEmail("submitter@example.com")

@@ -147,7 +147,7 @@ public class Step implements BeanNameAware {
 
     /**
      * Getter for the number of required reviews.
-     * @return the number of users required to review this step. 
+     * @return the number of users required to review this step.
      */
     public int getRequiredUsers() {
         return requiredUsers;
