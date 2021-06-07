@@ -138,7 +138,7 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
-    public void testPdfCrosswalkPersonDisseminateWithImage() throws Exception {
+    public void testPdfCrosswalkPersonDisseminateWithJpegImage() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -179,7 +179,48 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
-    public void testRtfCrosswalkPersonDisseminateWithImage() throws Exception {
+    public void testPdfCrosswalkPersonDisseminateWithPngImage() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item personItem = buildPersonItem();
+
+        ItemBuilder.createItem(context, collection)
+            .withTitle("First Publication")
+            .withIssueDate("2020-01-01")
+            .withAuthor("John Smith", personItem.getID().toString())
+            .withAuthor("Walter White")
+            .build();
+
+        ItemBuilder.createItem(context, collection)
+            .withTitle("Second Publication")
+            .withIssueDate("2020-04-01")
+            .withAuthor("John Smith", personItem.getID().toString())
+            .build();
+
+        Bundle bundle = BundleBuilder.createBundle(context, personItem)
+            .withName("ORIGINAL")
+            .build();
+
+        BitstreamBuilder.createBitstream(context, bundle, getFileInputStream("picture.png"))
+            .withType("personal picture")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        StreamDisseminationCrosswalk streamCrosswalkDefault = (StreamDisseminationCrosswalk) CoreServiceFactory
+            .getInstance().getPluginService().getNamedPlugin(StreamDisseminationCrosswalk.class, "person-pdf");
+
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            streamCrosswalkDefault.disseminate(context, personItem, out);
+            assertThat(out.toString(), not(isEmptyString()));
+            assertThatPdfHasContent(out, content -> assertThatPersonDocumentHasContent(content));
+        }
+
+    }
+
+    @Test
+    public void testRtfCrosswalkPersonDisseminateWithJpegImage() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -215,6 +256,49 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             streamCrosswalkDefault.disseminate(context, personItem, out);
             assertThat(out.toString(), not(isEmptyString()));
             assertThatRtfHasContent(out, content -> assertThatPersonDocumentHasContent(content));
+            assertThatRtfHasJpegImage(out);
+        }
+
+    }
+
+    @Test
+    public void testRtfCrosswalkPersonDisseminateWithPngImage() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item personItem = buildPersonItem();
+
+        ItemBuilder.createItem(context, collection)
+            .withTitle("First Publication")
+            .withIssueDate("2020-01-01")
+            .withAuthor("John Smith", personItem.getID().toString())
+            .withAuthor("Walter White")
+            .build();
+
+        ItemBuilder.createItem(context, collection)
+            .withTitle("Second Publication")
+            .withIssueDate("2020-04-01")
+            .withAuthor("John Smith", personItem.getID().toString())
+            .build();
+
+        Bundle bundle = BundleBuilder.createBundle(context, personItem)
+            .withName("ORIGINAL")
+            .build();
+
+        BitstreamBuilder.createBitstream(context, bundle, getFileInputStream("picture.png"))
+            .withType("personal picture")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        StreamDisseminationCrosswalk streamCrosswalkDefault = (StreamDisseminationCrosswalk) CoreServiceFactory
+            .getInstance().getPluginService().getNamedPlugin(StreamDisseminationCrosswalk.class, "person-rtf");
+
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            streamCrosswalkDefault.disseminate(context, personItem, out);
+            assertThat(out.toString(), not(isEmptyString()));
+            assertThatRtfHasContent(out, content -> assertThatPersonDocumentHasContent(content));
+            assertThatRtfHasJpegImage(out);
         }
 
     }
@@ -612,6 +696,10 @@ public class DocumentCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         rtfParser.read(new ByteArrayInputStream(out.toByteArray()), document, 0);
         String content = document.getText(0, document.getLength());
         assertConsumer.accept(content);
+    }
+
+    private void assertThatRtfHasJpegImage(ByteArrayOutputStream out) {
+        assertThat(out.toString(), containsString("\\jpegblip"));
     }
 
     private void assertThatPdfHasContent(ByteArrayOutputStream out, Consumer<String> assertConsumer)
