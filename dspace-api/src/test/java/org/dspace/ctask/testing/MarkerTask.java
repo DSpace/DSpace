@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.curate;
+package org.dspace.ctask.testing;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -15,6 +15,8 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.core.Context;
+import org.dspace.curate.AbstractCurationTask;
+import org.dspace.curate.Curator;
 
 /**
  * Curation task to mark an Item so that we can see that it has been curated.
@@ -55,6 +57,10 @@ public class MarkerTask
             } finally {
                 context.restoreAuthSystemState();
             }
+
+            String result = String.format("Item %s marked.", item.getID().toString());
+            setResult(result);
+            report(result);
 
             return Curator.CURATE_SUCCESS;
         } else {
