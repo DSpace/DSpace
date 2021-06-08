@@ -9,7 +9,6 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -31,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.regex.Pattern;
 
 import org.dspace.app.rest.matcher.ClaimedTaskMatcher;
 import org.dspace.app.rest.matcher.EPersonMatcher;
@@ -52,9 +50,7 @@ import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
-import org.dspace.curate.MarkerTask;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -1773,67 +1769,6 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .param("submit_approve", "true")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED))
             .andExpect(status().isNotFound());
-    }
-
-    /**
-     * Test of curation tasks attached to a workflow step.
-     * See {@link MarkerTask}.
-     * @throws java.lang.Exception passed through.
-     */
-    @Test
-    public void curationTest()
-            throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        //** GIVEN **
-
-        // A submitter;
-        EPerson submitter = EPersonBuilder.createEPerson(context)
-                .withEmail("submitter@example.com")
-                .withPassword(password)
-                .build();
-
-        // A containment hierarchy;
-        Community community = CommunityBuilder.createCommunity(context)
-                .withName("Community")
-                .build();
-        final String CURATION_COLLECTION_HANDLE = "123456789/curation-test-1";
-        Collection collection = CollectionBuilder
-                .createCollection(context, community, CURATION_COLLECTION_HANDLE)
-                .withName("Collection")
-                .build();
-
-        // A workflow configuration for the test Collection;
-        // See test/dspaceFolder/config/spring/api/workflow.xml
-
-        // A curation task attached to the workflow;
-        // See test/dspaceFolder/config/workflow-curation.xml
-        // This should include MarkerTask.
-
-        // A workflow item;
-        context.setCurrentUser(submitter);
-        XmlWorkflowItem wfi = WorkflowItemBuilder.createWorkflowItem(context, collection)
-                .withTitle("Test of workflow curation")
-                .withIssueDate("2021-05-14")
-                .withSubject("Testing")
-                .build();
-
-        context.restoreAuthSystemState();
-
-        //** THEN **
-
-        // Search the Item's provenance for MarkerTask's name.
-        List<MetadataValue> provenance = itemService.getMetadata(wfi.getItem(),
-                MarkerTask.SCHEMA, MarkerTask.ELEMENT, MarkerTask.QUALIFIER, MarkerTask.LANGUAGE);
-        Pattern markerPattern = Pattern.compile(MarkerTask.class.getCanonicalName());
-        boolean found = false;
-        for (MetadataValue record : provenance) {
-            if (markerPattern.matcher(record.getValue()).lookingAt()) {
-                found = true;
-                break;
-            }
-        }
-        assertThat("Item should have been curated", found);
     }
 
     @Test
