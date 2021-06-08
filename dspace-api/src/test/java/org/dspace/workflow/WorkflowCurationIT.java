@@ -46,9 +46,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class WorkflowCurationIT
         extends AbstractIntegrationTestWithDatabase {
     @Inject
-    private ConfigurationService configurationService;
-
-    @Inject
     private ItemService itemService;
 
     /**
