@@ -24,7 +24,6 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.ctask.testing.MarkerTask;
 import org.dspace.eperson.EPerson;
-import org.dspace.services.ConfigurationService;
 import org.dspace.util.DSpaceConfigurationInitializer;
 import org.dspace.util.DSpaceKernelInitializer;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
