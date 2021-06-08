@@ -50,7 +50,6 @@ import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
-import org.dspace.content.service.ItemService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -78,9 +77,6 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private XmlWorkflowFactory xmlWorkflowFactory;
-
-    @Autowired
-    private ItemService itemService;
 
     @Test
     /**
