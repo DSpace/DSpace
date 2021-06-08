@@ -187,7 +187,7 @@ public class XmlWorkflowCuratorServiceImpl
             String taskSetName = curationTaskConfig.containsKey(coll.getHandle()) ?
                     coll.getHandle() : CurationTaskConfig.DEFAULT_TASKSET_NAME;
             TaskSet ts = curationTaskConfig.findTaskSet(taskSetName);
-            return ts.steps.get(0);
+            return ts.steps.isEmpty() ? null : ts.steps.get(0);
         }
         ClaimedTask claimedTask
                 = claimedTaskService.findByWorkflowIdAndEPerson(c, wfi, c.getCurrentUser());
