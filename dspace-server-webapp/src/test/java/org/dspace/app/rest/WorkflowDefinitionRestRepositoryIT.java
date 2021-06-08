@@ -338,12 +338,15 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
             .build();
         context.restoreAuthSystemState();
 
+        // XXX xmlWorkflowFactory.getWorkflowByName(String) might be safer than
+        // assuming that the first non-default workflow is the one designed for this test.
         Workflow defaultWorkflow = xmlWorkflowFactory.getDefaultWorkflow();
         List<Workflow> allConfiguredWorkflows = xmlWorkflowFactory.getAllConfiguredWorkflows();
         String firstNonDefaultWorkflowName = "";
         for (Workflow workflow : allConfiguredWorkflows) {
             if (!workflow.getID().equalsIgnoreCase(defaultWorkflow.getID())) {
                 firstNonDefaultWorkflowName = workflow.getID();
+                break;
             }
         }
 
