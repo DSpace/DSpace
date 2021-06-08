@@ -12,11 +12,14 @@
         <!-- A taskset that does no curation. -->
         <taskset name='none'/>
 
-        <!-- A taskset that runs a curation task which does nothing.
-             See config/modules/curate.cfg for 'noop' task. -->
+        <!--
+            A taskset that runs a curation task which only marks the object as
+            having been curated.
+            See config/modules/curate.cfg for 'marker' task.
+        -->
         <taskset name='test1'>
-            <flowstep name='nullStep'>
-                <task name='noop'/>
+            <flowstep name='markingStep'>
+                <task name='marker'/>
             </flowstep>
         </taskset>
     </tasksets>

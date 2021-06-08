@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
@@ -39,8 +40,6 @@ import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -55,7 +54,7 @@ import org.springframework.stereotype.Service;
 public class XmlWorkflowCuratorServiceImpl
         implements XmlWorkflowCuratorService {
     private static final Logger LOG
-            = LoggerFactory.getLogger(XmlWorkflowCuratorServiceImpl.class);
+            = org.apache.logging.log4j.LogManager.getLogger();
 
     @Autowired(required = true)
     protected XmlWorkflowFactory workflowFactory;
@@ -84,6 +83,9 @@ public class XmlWorkflowCuratorServiceImpl
     @Autowired(required = true)
     protected XmlWorkflowItemService workflowItemService;
 
+    /** A sink for curation task reports. */
+    private final StringBuilder reporter = new StringBuilder();
+
     @Override
     public boolean needsCuration(Context c, XmlWorkflowItem wfi)
             throws SQLException, IOException {
@@ -94,6 +96,7 @@ public class XmlWorkflowCuratorServiceImpl
     public boolean doCuration(Context c, XmlWorkflowItem wfi)
             throws AuthorizeException, IOException, SQLException {
         Curator curator = new Curator();
+        curator.setReporter(reporter);
         return curate(curator, c, wfi);
     }
 
@@ -157,6 +160,14 @@ public class XmlWorkflowCuratorServiceImpl
                 }
                 curator.clear();
             }
+
+            // Record any reporting done by the tasks.
+            if (reporter.length() > 0) {
+                LOG.info("Curation tasks over item {} for step {} report:%n{}",
+                    () -> wfi.getItem().getID(),
+                    () -> step.step,
+                    () -> reporter.toString());
+            }
         }
         return true;
     }
@@ -171,6 +182,13 @@ public class XmlWorkflowCuratorServiceImpl
      */
     protected FlowStep getFlowStep(Context c, XmlWorkflowItem wfi)
             throws SQLException, IOException {
+        if (claimedTaskService.find(c, wfi).isEmpty()) { // No claimed tasks:  assume first step
+            Collection coll = wfi.getCollection();
+            String taskSetName = curationTaskConfig.containsKey(coll.getHandle()) ?
+                    coll.getHandle() : CurationTaskConfig.DEFAULT_TASKSET_NAME;
+            TaskSet ts = curationTaskConfig.findTaskSet(taskSetName);
+            return ts.steps.get(0);
+        }
         ClaimedTask claimedTask
                 = claimedTaskService.findByWorkflowIdAndEPerson(c, wfi, c.getCurrentUser());
         if (claimedTask != null) {
