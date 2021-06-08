@@ -66,7 +66,7 @@ public class XmlWorkflowCuratorServiceImplTest
     // Configure the workflow task mapping.
     private static final String TASK_CONFIG_TEMPLATE
             = ("<?xml version='1.0' encoding='UTF-8'?>"
-            + "<workflow-curation>"
+            + "<workflow-curation xmlns='https://dspace.org/workflow-curation'>"
             + "  <taskset-map>"
             + "    <mapping collection-handle='default' taskset='default'/>"
             + "  </taskset-map>"
